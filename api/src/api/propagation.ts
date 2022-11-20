@@ -30,6 +30,7 @@ import {
 } from '../propagation/TextMapPropagator';
 import {
   getBaggage,
+  getActiveBaggage,
   setBaggage,
   deleteBaggage,
 } from '../baggage/context-helpers';
@@ -111,6 +112,8 @@ export class PropagationAPI {
   public createBaggage = createBaggage;
 
   public getBaggage = getBaggage;
+
+  public getActiveBaggage = getActiveBaggage;
 
   public setBaggage = setBaggage;
 

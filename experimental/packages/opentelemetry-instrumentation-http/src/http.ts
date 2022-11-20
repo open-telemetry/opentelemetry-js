@@ -26,9 +26,8 @@ import {
   SpanStatusCode,
   trace,
   Histogram,
-  MeterProvider,
   MetricAttributes,
-  ValueType,
+  ValueType
 } from '@opentelemetry/api';
 import { hrTime, hrTimeDuration, hrTimeToMilliseconds, suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
@@ -74,15 +73,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       config
     );
     this._headerCapture = this._createHeaderCapture();
-    this._updateMetricInstruments();
   }
 
-  override setMeterProvider(meterProvider: MeterProvider) {
-    super.setMeterProvider(meterProvider);
-    this._updateMetricInstruments();
-  }
-
-  private _updateMetricInstruments() {
+  protected override _updateMetricInstruments() {
     this._httpServerDurationHistogram = this.meter.createHistogram('http.server.duration', {
       description: 'measures the duration of the inbound HTTP requests',
       unit: 'ms',

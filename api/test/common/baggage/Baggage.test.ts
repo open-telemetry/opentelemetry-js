@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import {
+  context,
   ROOT_CONTEXT,
   propagation,
   baggageEntryMetadataFromString,
@@ -130,6 +131,20 @@ describe('Baggage', () => {
       const ctx = propagation.setBaggage(ROOT_CONTEXT, bag);
 
       assert.strictEqual(bag, propagation.getBaggage(ctx));
+    });
+
+    it('should get the current baggage', () => {
+      const entries = {
+        'banana': {value: 'boats'}
+      };
+      const bag = propagation.createBaggage(entries);
+      const ctx = propagation.setBaggage(ROOT_CONTEXT, bag);
+
+      context.setGlobalContextManager({ active: () => ctx, disable: () => {} } as any);
+
+      assert.strictEqual(bag, propagation.getActiveBaggage());
+
+      context.disable();
     });
   });
 
