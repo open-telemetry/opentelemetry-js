@@ -44,7 +44,7 @@ export function epochMillisToHrTime(epochMillis: number): api.HrTime {
   return [seconds, nanos];
 }
 
-export function getTimeOrigin(): number {
+function getTimeOrigin(): number {
   let timeOrigin = performance.timeOrigin;
   if (typeof timeOrigin !== 'number') {
     const perf: TimeOriginLegacy = (performance as unknown) as TimeOriginLegacy;
