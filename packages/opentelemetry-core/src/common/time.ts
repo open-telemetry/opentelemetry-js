@@ -33,7 +33,7 @@ const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
  * This is represented in HrTime format as [1609504210, 150000000].
  * @param epochMillis
  */
-function numberToHrtime(epochMillis: number): api.HrTime {
+export function epochMillisToHrTime(epochMillis: number): api.HrTime {
   const epochSeconds = epochMillis / 1000;
   // Decimals only.
   const seconds = Math.trunc(epochSeconds);
@@ -44,7 +44,7 @@ function numberToHrtime(epochMillis: number): api.HrTime {
   return [seconds, nanos];
 }
 
-function getTimeOrigin(): number {
+export function getTimeOrigin(): number {
   let timeOrigin = performance.timeOrigin;
   if (typeof timeOrigin !== 'number') {
     const perf: TimeOriginLegacy = (performance as unknown) as TimeOriginLegacy;
@@ -58,21 +58,12 @@ function getTimeOrigin(): number {
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
-  const timeOrigin = numberToHrtime(getTimeOrigin());
-  const now = numberToHrtime(
+  const timeOrigin = epochMillisToHrTime(getTimeOrigin());
+  const now = epochMillisToHrTime(
     typeof performanceNow === 'number' ? performanceNow : performance.now()
   );
 
-  let seconds = timeOrigin[0] + now[0];
-  let nanos = timeOrigin[1] + now[1];
-
-  // Nanoseconds
-  if (nanos > SECOND_TO_NANOSECONDS) {
-    nanos -= SECOND_TO_NANOSECONDS;
-    seconds += 1;
-  }
-
-  return [seconds, nanos];
+  return addHrTimes(timeOrigin, now);
 }
 
 /**
@@ -90,10 +81,10 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
       return hrTime(time);
     } else {
       // epoch milliseconds or performance.timeOrigin
-      return numberToHrtime(time);
+      return epochMillisToHrTime(time);
     }
   } else if (time instanceof Date) {
-    return numberToHrtime(time.getTime());
+    return epochMillisToHrTime(time.getTime());
   } else {
     throw TypeError('Invalid input type');
   }
@@ -180,4 +171,15 @@ export function isTimeInput(value: unknown): value is api.HrTime | number | Date
     typeof value === 'number' ||
     value instanceof Date
   );
+}
+
+export function addHrTimes(time1: api.HrTime, time2: api.HrTime): api.HrTime {
+  const out: api.HrTime = [time1[0] + time2[0], time1[1] + time2[1]];
+
+  if(out[1] > SECOND_TO_NANOSECONDS) {
+    out[0] = out[0] + Math.floor(out[1] / SECOND_TO_NANOSECONDS);
+    out[1] = out[1] % SECOND_TO_NANOSECONDS;
+  }
+
+  return out;
 }
