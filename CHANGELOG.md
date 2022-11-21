@@ -21,7 +21,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.name`
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
-* fix(sdk-trace): make spans resilient to clock drift [#3384](https://github.com/open-telemetry/opentelemetry-js/pull/3384) @dyladan
+* fix(sdk-trace): make spans resilient to clock drift [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
 
 ### :books: (Refine Doc)
 
