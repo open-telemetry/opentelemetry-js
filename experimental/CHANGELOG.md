@@ -19,6 +19,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* chore(otlp-proto-exporter-base): upgrade protobufjs to 7.1.2 and relax versioning [#3433](https://github.com/open-telemetry/opentelemetry-js/pull/3433) @seemk
+
 ## 0.34.0
 
 * `@opentelemetry/sdk-metrics` moved to [packages/sdk-metrics](../packages/sdk-metrics)
