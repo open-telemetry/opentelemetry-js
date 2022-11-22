@@ -15,7 +15,7 @@
  */
 
 import { GrpcJsInstrumentation } from './';
-import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
+import type {GrpcClientFunc, metadataCaptureType, SendUnaryDataCallback} from './types';
 import {
   Span,
   SpanStatusCode,
@@ -69,7 +69,7 @@ export function getMethodsToWrap(
  * span on callback or receiving an emitted event.
  */
 export function makeGrpcClientRemoteCall(
-  metadataCapture: any,
+  metadataCapture: metadataCaptureType,
   original: GrpcClientFunc,
   args: unknown[],
   metadata: grpcJs.Metadata,

@@ -16,7 +16,7 @@
 
 import type * as grpcTypes from 'grpc';
 import type * as events from 'events';
-import { SendUnaryDataCallback, GrpcClientFunc } from './types';
+import {SendUnaryDataCallback, GrpcClientFunc, metadataCaptureType} from './types';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   context,
@@ -36,7 +36,7 @@ import { AttributeNames } from '../enums/AttributeNames';
  * This method handles the client remote call
  */
 export const makeGrpcClientRemoteCall = function (
-  metadataCapture: any,
+  metadataCapture: metadataCaptureType,
   grpcClient: typeof grpcTypes,
   original: GrpcClientFunc,
   args: any[],
@@ -106,11 +106,7 @@ export const makeGrpcClientRemoteCall = function (
     ((call as unknown) as events.EventEmitter).on(
       'metadata',
       responseMetadata => {
-        const metadataMap = responseMetadata.getMap();
-
-        metadataCapture.client.captureResponseMetadata(span, (metadataKey: string) => {
-          return metadataMap[metadataKey];
-        });
+        metadataCapture.client.captureResponseMetadata(span, responseMetadata);
       });
 
     // if server stream or bidi
