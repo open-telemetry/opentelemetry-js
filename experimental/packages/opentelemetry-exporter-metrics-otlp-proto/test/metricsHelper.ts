@@ -20,11 +20,10 @@ import {
   Histogram,
   ValueType,
   ObservableGauge,
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import {
-  AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader,
@@ -34,10 +33,6 @@ import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry
 import { Stream } from 'stream';
 
 export class TestMetricReader extends MetricReader {
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
-  }
-
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
   }
@@ -47,11 +42,11 @@ export class TestMetricReader extends MetricReader {
   }
 }
 
-const testResource = Resource.default().merge(new Resource({
+const testResource = new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
-}));
+});
 
 let meterProvider = new MeterProvider({ resource: testResource });
 

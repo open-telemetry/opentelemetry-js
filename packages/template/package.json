@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.6.0",
+  "version": "1.8.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -68,6 +68,7 @@
     "LICENSE",
     "README.md"
   ],
+  "sideEffects": false,
   "Add these to files if browser is supported": [
     "build/esm/**/*.js",
     "build/esm/**/*.js.map",

@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides automatic instrumentation for [`http`](https://nodejs.org/api/http.html) and [`https`](https://nodejs.org/api/https.html).
 
 For automatic instrumentation see the
@@ -22,8 +24,11 @@ To load a specific instrumentation (HTTP in this case), specify it in the Node T
 
 ```js
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const {
+  ConsoleSpanExporter,
+  NodeTracerProvider,
+  SimpleSpanProcessor,
+} = require('@opentelemetry/sdk-trace-node');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
 const provider = new NodeTracerProvider();

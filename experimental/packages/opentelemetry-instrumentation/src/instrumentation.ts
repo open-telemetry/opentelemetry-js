@@ -17,11 +17,13 @@
 import {
   diag,
   DiagLogger,
+  metrics,
+  Meter,
+  MeterProvider,
   trace,
   Tracer,
   TracerProvider,
 } from '@opentelemetry/api';
-import { Meter, MeterProvider, metrics } from '@opentelemetry/api-metrics';
 import * as shimmer from 'shimmer';
 import { InstrumentationModuleDefinition } from './platform/node';
 import * as types from './types';
@@ -54,6 +56,7 @@ implements types.Instrumentation {
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
 
     this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
+    this._updateMetricInstruments();
   }
 
   /* Api to wrap instrumented method */
@@ -79,6 +82,15 @@ implements types.Instrumentation {
       this.instrumentationName,
       this.instrumentationVersion
     );
+
+    this._updateMetricInstruments();
+  }
+
+  /**
+   * Sets the new metric instruments with the current Meter.
+   */
+  protected _updateMetricInstruments(): void {
+    return;
   }
 
   /* Returns InstrumentationConfig */

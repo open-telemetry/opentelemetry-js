@@ -67,17 +67,19 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
-    if (isTracingSuppressed(context)) {
-      api.diag.debug('Instrumentation suppressed, returning Noop Span');
-      return api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
-    }
-
     // remove span from context in case a root span is requested via options
     if (options.root) {
       context = api.trace.deleteSpan(context);
     }
+    const parentSpan = api.trace.getSpan(context);
 
-    const parentSpanContext = api.trace.getSpanContext(context);
+    if (isTracingSuppressed(context)) {
+      api.diag.debug('Instrumentation suppressed, returning Noop Span');
+      const nonRecordingSpan = api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
+      return nonRecordingSpan;
+    }
+
+    const parentSpanContext = parentSpan?.spanContext();
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
@@ -117,7 +119,8 @@ export class Tracer implements api.Tracer {
     const spanContext = { traceId, spanId, traceFlags, traceState };
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       api.diag.debug('Recording is off, propagating context in a non-recording span');
-      return api.trace.wrapSpanContext(spanContext);
+      const nonRecordingSpan = api.trace.wrapSpanContext(spanContext);
+      return nonRecordingSpan;
     }
 
     const span = new Span(
@@ -128,7 +131,7 @@ export class Tracer implements api.Tracer {
       spanKind,
       parentSpanId,
       links,
-      options.startTime
+      options.startTime,
     );
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.

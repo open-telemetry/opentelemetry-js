@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides exporter for web and node to be used with OTLP (`http/json`) compatible receivers.
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.48 <=0.50`.
 
@@ -23,8 +25,10 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Web expects the endpoint to end in `/v1/traces`.
 
 ```js
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import {
+  BatchSpanProcessor,
+  WebTracerProvider,
+} from '@opentelemetry/sdk-trace-web';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const collectorOptions = {
