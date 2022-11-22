@@ -104,8 +104,8 @@ export class Span implements APISpan, ReadableSpan {
     this.links = links;
 
     const now = Date.now();
-    this._performanceStartTime = otperformance.now()
-    this._performanceOffset = now - this._performanceStartTime
+    this._performanceStartTime = otperformance.now();
+    this._performanceOffset = now - this._performanceStartTime;
     this._startTimeProvided = startTime != null;
 
 
@@ -232,15 +232,15 @@ export class Span implements APISpan, ReadableSpan {
       // apply correction and convert to hrtime
       return hrTime(inp + this._performanceOffset);
     }
-    
+
     if (typeof inp === 'number') {
       return epochMillisToHrTime(inp);
     }
-    
+
     if (inp instanceof Date) {
       return epochMillisToHrTime(inp.valueOf());
     }
-    
+
     if (isTimeInputHrTime(inp)) {
       return inp;
     }
