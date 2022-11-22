@@ -131,11 +131,7 @@ export function makeGrpcClientRemoteCall(
     const call = original.apply(self, args);
 
     call.on('metadata', responseMetadata => {
-      const metadataMap = responseMetadata.getMap();
-
-      metadataCapture.client.captureResponseMetadata(span, (metadataKey: string) => {
-        return metadataMap[metadataKey];
-      });
+      metadataCapture.client.captureResponseMetadata(span, responseMetadata);
     });
 
     // if server stream or bidi

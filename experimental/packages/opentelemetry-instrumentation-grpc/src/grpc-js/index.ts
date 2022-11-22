@@ -307,11 +307,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
             [SemanticAttributes.RPC_SERVICE]: service,
           });
 
-        instrumentation._metadataCapture.client.captureRequestMetadata(span, (metadataKey: string) => {
-          const metadataMap = metadata.getMap();
-
-          return metadataMap[metadataKey];
-        });
+        instrumentation._metadataCapture.client.captureRequestMetadata(span, metadata);
 
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(instrumentation._metadataCapture, original, args, metadata, this)(span)

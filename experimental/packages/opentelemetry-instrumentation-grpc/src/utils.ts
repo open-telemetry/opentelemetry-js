@@ -112,26 +112,25 @@ export const _extractMethodAndService = (name: string): { service: string, metho
 };
 
 
-export function metadataCapture(type: 'request' | 'response', metadata: string[]) {
-  const normalizedMetadataAttributes = new Map(metadata.map(value => [value.toLowerCase(), value.toLowerCase().replace(/-/g, '_')]));
+export function metadataCapture(type: 'request' | 'response', metadataToAdd: string[]) {
+  const normalizedMetadataAttributes = new Map(metadataToAdd.map(value => [value.toLowerCase(), value.toLowerCase().replace(/-/g, '_')]));
 
-  return (span: Span, getMetadata: (key: string) => undefined | string | string[] | Buffer) => {
+  return (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => {
     for (const [capturedMetadata, normalizedMetadata] of normalizedMetadataAttributes) {
-      const value = getMetadata(capturedMetadata);
+      const metadataValues =
+        metadata
+          .get(capturedMetadata)
+          .flatMap(value =>
+            typeof value === 'string' ? value.toString() : []
+          );
 
-      if (value === undefined || value instanceof Buffer) {
+      if (metadataValues === undefined || metadataValues === []) {
         continue;
       }
 
       const key = `rpc.${type}.metadata.${normalizedMetadata}`;
 
-      if (typeof value === 'string') {
-        span.setAttribute(key, [value]);
-      } else if (Array.isArray(value)) {
-        span.setAttribute(key, value);
-      } else {
-        span.setAttribute(key, [value]);
-      }
+      span.setAttribute(key, metadataValues);
     }
   };
 }
