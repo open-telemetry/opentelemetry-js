@@ -23,6 +23,8 @@ import {
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
   timeInputToHrTime,
+  epochMillisToHrTime,
+  hrTimeToMilliseconds,
 } from '@opentelemetry/core';
 import {
   defaultTextMapGetter,
@@ -259,8 +261,10 @@ describe('OpenTracing Shim', () => {
 
         const otSpan = (span as SpanShim).getSpan() as Span;
 
+        const adjustment = otSpan["_performanceOffset"];
+
         assert.strictEqual(otSpan.links.length, 1);
-        assert.deepStrictEqual(otSpan.startTime, timeInputToHrTime(now));
+        assert.deepStrictEqual(hrTimeToMilliseconds(otSpan.startTime), Math.round(now + adjustment + performance.timeOrigin));
         assert.deepStrictEqual(otSpan.attributes, opentracingOptions.tags);
       });
     });
@@ -453,7 +457,8 @@ describe('OpenTracing Shim', () => {
     it('sets explicit end timestamp', () => {
       const now = performance.now();
       span.finish(now);
-      assert.deepStrictEqual(otSpan.endTime, timeInputToHrTime(now));
+      const adjustment = otSpan["_performanceOffset"];
+      assert.deepStrictEqual(hrTimeToMilliseconds(otSpan.endTime), Math.round(now + adjustment + performance.timeOrigin));
     });
 
     it('can set and retrieve baggage', () => {
