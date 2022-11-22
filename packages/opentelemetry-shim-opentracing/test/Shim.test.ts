@@ -22,8 +22,6 @@ import {
   CompositePropagator,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
-  timeInputToHrTime,
-  epochMillisToHrTime,
   hrTimeToMilliseconds,
 } from '@opentelemetry/core';
 import {
