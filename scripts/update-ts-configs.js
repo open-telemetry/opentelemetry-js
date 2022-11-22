@@ -32,7 +32,7 @@ const {
   getDefaultTsConfig,
   getEsmTsConfig,
   getEsnextTsConfig,
-} = require('./update-ts-config-constants');
+} = require('./update-ts-configs-constants');
 
 const packageJsonDependencyFields = ['dependencies', 'peerDependencies', 'devDependencies'];
 const tsConfigMergeKeys = [
