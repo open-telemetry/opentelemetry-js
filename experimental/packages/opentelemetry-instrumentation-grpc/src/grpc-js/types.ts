@@ -17,6 +17,9 @@
 import type * as grpcJs from '@grpc/grpc-js';
 import type { EventEmitter } from 'events';
 import type { CALL_SPAN_ENDED } from './serverUtils';
+import { Span } from '@opentelemetry/api';
+import type * as grpcJsTypes from '@grpc/grpc-js';
+import type * as grpcTypes from 'grpc';
 
 /**
  * Server Unary callback type
@@ -59,3 +62,10 @@ export type MakeClientConstructorFunction = typeof grpcJs.makeGenericClientConst
 
 export type { HandleCall } from '@grpc/grpc-js/build/src/server-call';
 export type { PackageDefinition } from '@grpc/grpc-js/build/src/make-client';
+
+export type metadataCaptureType = {
+  client: {
+    captureRequestMetadata: (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => void,
+    captureResponseMetadata: (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => void
+  }
+};

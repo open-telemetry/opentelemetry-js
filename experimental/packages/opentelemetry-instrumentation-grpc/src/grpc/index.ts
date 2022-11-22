@@ -26,6 +26,7 @@ import {
   ServerCallWithMeta,
   SendUnaryDataCallback,
   GrpcClientFunc,
+  metadataCaptureType,
 } from './types';
 import { GrpcInstrumentationConfig } from '../types';
 import {
@@ -54,7 +55,7 @@ let grpcClient: typeof grpcTypes;
 export class GrpcNativeInstrumentation extends InstrumentationBase<
   typeof grpcTypes
   > {
-  private _metadataCapture;
+  private _metadataCapture: metadataCaptureType;
 
   constructor(
     name: string,
@@ -333,7 +334,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     };
   }
 
-  private _createMetadataCapture() {
+  private _createMetadataCapture(): metadataCaptureType {
     const config = this.getConfig();
 
     return {

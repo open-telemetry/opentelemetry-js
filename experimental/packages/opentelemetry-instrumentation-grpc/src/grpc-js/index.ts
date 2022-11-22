@@ -29,6 +29,7 @@ import {
   MakeClientConstructorFunction,
   PackageDefinition,
   GrpcClientFunc,
+  metadataCaptureType,
 } from './types';
 import {
   context,
@@ -54,7 +55,7 @@ import { AttributeValues } from '../enums/AttributeValues';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
-  private _metadataCapture;
+  private _metadataCapture: metadataCaptureType;
 
   constructor(
     name: string,
@@ -346,7 +347,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     });
   }
 
-  private _createMetadataCapture() {
+  private _createMetadataCapture(): metadataCaptureType {
     const config = this.getConfig();
 
     return {
