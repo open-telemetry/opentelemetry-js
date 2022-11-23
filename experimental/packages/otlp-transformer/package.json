@@ -13,14 +13,14 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.all.json",
-    "clean": "tsc --build --clean tsconfig.all.json",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:browser": "nyc karma start --single-run",
-    "watch": "tsc --build -w tsconfig.all.json",
+    "watch": "tsc --build -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
   },
