@@ -16,7 +16,7 @@
 
 import type * as grpcTypes from 'grpc';
 import type * as events from 'events';
-import {SendUnaryDataCallback, GrpcClientFunc, metadataCaptureType} from './types';
+import { SendUnaryDataCallback, GrpcClientFunc } from './types';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   context,
@@ -31,6 +31,7 @@ import {
   findIndex,
 } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
+import { metadataCaptureType } from '../types';
 
 /**
  * This method handles the client remote call

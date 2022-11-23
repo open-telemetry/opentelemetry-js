@@ -15,7 +15,7 @@
  */
 
 import { GrpcJsInstrumentation } from './';
-import type {GrpcClientFunc, metadataCaptureType, SendUnaryDataCallback} from './types';
+import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
 import {
   Span,
   SpanStatusCode,
@@ -33,6 +33,7 @@ import { CALL_SPAN_ENDED } from './serverUtils';
 import { EventEmitter } from 'events';
 import { AttributeNames } from '../enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { metadataCaptureType } from '../types';
 
 /**
  * Parse a package method list and return a list of methods to patch
