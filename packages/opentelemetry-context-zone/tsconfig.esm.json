@@ -1,16 +1,19 @@
 {
   "extends": "../../tsconfig.base.esm.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "build/esm",
+    "rootDir": "src",
     "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
   },
+  "files": [
+    "node_modules/zone.js/dist/zone.js.d.ts"
+  ],
   "include": [
     "src/**/*.ts"
   ],
   "references": [
     {
-      "path": "../opentelemetry-context-zone-peer-dep/tsconfig.esm.json"
+      "path": "../opentelemetry-context-zone-peer-dep"
     }
   ]
 }

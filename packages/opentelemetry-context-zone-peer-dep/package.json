@@ -9,15 +9,15 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.all.json",
-    "clean": "tsc --build --clean tsconfig.all.json",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "version": "node ../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "nyc karma start --single-run",
-    "watch": "tsc --build --watch tsconfig.all.json",
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js"

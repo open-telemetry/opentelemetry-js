@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.base.esnext.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "build/esnext",
+    "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
@@ -10,7 +10,10 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-core/tsconfig.esnext.json"
+      "path": "../../api"
+    },
+    {
+      "path": "../opentelemetry-core"
     }
   ]
 }
