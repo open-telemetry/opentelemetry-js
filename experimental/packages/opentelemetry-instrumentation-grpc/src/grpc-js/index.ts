@@ -20,7 +20,7 @@ import {
   isWrapped,
 } from '@opentelemetry/instrumentation';
 import { InstrumentationBase } from '@opentelemetry/instrumentation';
-import { GrpcInstrumentationConfig } from '../types';
+import { GrpcInstrumentationConfig, metadataCaptureType } from '../types';
 import {
   ServerCallWithMeta,
   SendUnaryDataCallback,
@@ -29,7 +29,6 @@ import {
   MakeClientConstructorFunction,
   PackageDefinition,
   GrpcClientFunc,
-  metadataCaptureType,
 } from './types';
 import {
   context,

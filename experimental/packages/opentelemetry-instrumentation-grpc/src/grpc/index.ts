@@ -26,9 +26,8 @@ import {
   ServerCallWithMeta,
   SendUnaryDataCallback,
   GrpcClientFunc,
-  metadataCaptureType,
 } from './types';
-import { GrpcInstrumentationConfig } from '../types';
+import { GrpcInstrumentationConfig, metadataCaptureType } from '../types';
 import {
   context,
   propagation,

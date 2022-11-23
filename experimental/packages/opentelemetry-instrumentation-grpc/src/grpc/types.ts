@@ -16,8 +16,6 @@
 
 import type * as grpcTypes from 'grpc';
 import * as events from 'events';
-import { Span } from '@opentelemetry/api';
-import type * as grpcJsTypes from '@grpc/grpc-js';
 
 export type SendUnaryDataCallback = (
   error: grpcTypes.ServiceError | null,
@@ -52,11 +50,4 @@ export type GrpcClientFunc = typeof Function & {
 
 export type GrpcInternalClientTypes = {
   makeClientConstructor: typeof grpcTypes.makeGenericClientConstructor;
-};
-
-export type metadataCaptureType = {
-  client: {
-    captureRequestMetadata: (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => void,
-    captureResponseMetadata: (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => void
-  }
 };
