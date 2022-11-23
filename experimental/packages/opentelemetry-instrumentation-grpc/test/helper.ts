@@ -15,16 +15,16 @@
  */
 
 import {
+  Attributes,
   context,
-  SpanKind,
-  propagation, trace,
+  propagation, SpanKind, trace,
 } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/api';
 import {
-  InMemorySpanExporter,
+  InMemorySpanExporter, ReadableSpan,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -70,6 +70,7 @@ type ServerDuplexStream =
 type Metadata = grpcNapi.Metadata | grpcJs.Metadata;
 
 type TestGrpcClient = (typeof grpcJs | typeof grpcNapi)['Client'] & {
+  unaryMethodWithMetadata: any;
   unaryMethod: any;
   UnaryMethod: any;
   camelCaseMethod: any;
@@ -116,6 +117,26 @@ export const runTests = (
   const MAX_ERROR_STATUS = grpc.status.UNAUTHENTICATED;
 
   const grpcClient = {
+    unaryMethodWithMetadata: (
+      client: TestGrpcClient,
+      request: TestRequestResponse,
+      metadata: Metadata
+    ): Promise<TestRequestResponse> => {
+      return new Promise((resolve, reject) => {
+        return client.unaryMethodWithMetadata(
+          request,
+          metadata,
+          (err: ServiceError, response: TestRequestResponse) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(response);
+            }
+          }
+        );
+      });
+    },
+
     unaryMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse,
@@ -285,13 +306,30 @@ export const runTests = (
       // in those cases, erro.code = request.num
 
       // This method returns the request
+      unaryMethodWithMetadata(call: ServerUnaryCall, callback: RequestCallback) {
+        const serverMetadata: any = new grpc.Metadata();
+        serverMetadata.add('server_metadata_key', 'server_metadata_value');
+
+        call.sendMetadata(serverMetadata);
+
+        call.request.num <= MAX_ERROR_STATUS
+          ? callback(
+            getError(
+              'Unary Method with Metadata Error',
+              call.request.num
+            ) as grpcJs.ServiceError
+          )
+          : callback(null, { num: call.request.num });
+      },
+
+      // This method returns the request
       unaryMethod(call: ServerUnaryCall, callback: RequestCallback) {
         call.request.num <= MAX_ERROR_STATUS
           ? callback(
-              getError(
-                'Unary Method Error',
-                call.request.num
-              ) as grpcJs.ServiceError
+            getError(
+              'Unary Method Error',
+              call.request.num
+            ) as grpcJs.ServiceError
           )
           : callback(null, { num: call.request.num });
       },
@@ -456,11 +494,61 @@ export const runTests = (
       },
     ];
 
-    const runTest = (
+    const validateSpans = (
+      serverSpan: ReadableSpan,
+      clientSpan: ReadableSpan,
+      methodName: string,
+      attributesValidation?: {
+          serverAttributes?: Attributes,
+          clientAttributes?: Attributes
+        }) => {
+      const validations = {
+        name: `grpc.pkg_test.GrpcTester/${methodName}`,
+        status: grpc.status.OK,
+      };
+
+      assertSpan(
+        moduleName,
+        serverSpan,
+        SpanKind.SERVER,
+        validations
+      );
+      assertSpan(
+        moduleName,
+        clientSpan,
+        SpanKind.CLIENT,
+        validations
+      );
+
+      assertPropagation(serverSpan, clientSpan);
+
+      if (attributesValidation?.clientAttributes) {
+        for (const key in attributesValidation.clientAttributes) {
+          const expected = attributesValidation.clientAttributes[key] as string;
+          const actual = clientSpan.attributes[key] as string;
+
+          assert.equal(actual, expected);
+        }
+      }
+
+      if (attributesValidation?.serverAttributes) {
+        for (const key in attributesValidation.serverAttributes) {
+          const expected = attributesValidation.serverAttributes[key];
+          const actual = serverSpan.attributes[key];
+
+          assert.equal(actual, expected);
+        }
+      }
+    };
+
+    const ClientServerValidationTest = (
       method: typeof methodList[0],
       provider: NodeTracerProvider,
-      checkSpans = true
-    ) => {
+      checkSpans = true,
+      attributesValidation?: {
+          serverAttributes?: Attributes,
+          clientAttributes?: Attributes
+        }) => {
       it(`should ${
         checkSpans ? 'do' : 'not'
       }: create a rootSpan for client and a childSpan for server - ${
@@ -472,44 +560,40 @@ export const runTests = (
           .then((result: TestRequestResponse | TestRequestResponse[]) => {
             assert.ok(
               checkEqual(result)(method.result),
-              'gRPC call returns correct values'
-            );
+              'gRPC call returns correct values');
+
             const spans = memoryExporter.getFinishedSpans();
             if (checkSpans) {
-              const incomingSpan = spans[0];
-              const outgoingSpan = spans[1];
-              const validations = {
-                name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
-                status: grpc.status.OK,
-              };
-
+              const spans = memoryExporter.getFinishedSpans();
               assert.strictEqual(spans.length, 2);
-              assertSpan(
-                moduleName,
-                incomingSpan,
-                SpanKind.SERVER,
-                validations
-              );
-              assertSpan(
-                moduleName,
-                outgoingSpan,
-                SpanKind.CLIENT,
-                validations
-              );
-              assertPropagation(incomingSpan, outgoingSpan);
+
+              const serverSpan = spans[0];
+              const clientSpan = spans[1];
+
+              validateSpans(serverSpan, clientSpan, method.methodName, attributesValidation);
             } else {
               assert.strictEqual(spans.length, 0);
             }
           });
       });
+    };
 
+    const ErrorValidationTest = (
+      method: typeof methodList[0],
+      provider: NodeTracerProvider,
+      checkSpans = true,
+      attributesValidation?: {
+          serverAttributes?: Attributes,
+          clientAttributes?: Attributes
+        }
+    ) => {
       it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = OK`, () => {
         const expectEmpty = memoryExporter.getFinishedSpans();
         assert.strictEqual(expectEmpty.length, 0);
 
         const span = provider
           .getTracer('default')
-          .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
+          .startSpan('TestSpan', {kind: SpanKind.PRODUCER});
         return context.with(trace.setSpan(context.active(), span), async () => {
           const rootSpan = trace.getSpan(context.active());
           if (!rootSpan) {
@@ -527,23 +611,9 @@ export const runTests = (
                 assert.strictEqual(spans.length, 2);
                 const serverSpan = spans[0];
                 const clientSpan = spans[1];
-                const validations = {
-                  name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
-                  status: grpc.status.OK,
-                };
-                assertSpan(
-                  moduleName,
-                  serverSpan,
-                  SpanKind.SERVER,
-                  validations
-                );
-                assertSpan(
-                  moduleName,
-                  clientSpan,
-                  SpanKind.CLIENT,
-                  validations
-                );
-                assertPropagation(serverSpan, clientSpan);
+
+                validateSpans(serverSpan, clientSpan, method.methodName, attributesValidation);
+
                 assert.strictEqual(
                   rootSpan.spanContext().traceId,
                   serverSpan.spanContext().traceId
@@ -559,6 +629,27 @@ export const runTests = (
             });
         });
       });
+    };
+
+    const runTestWithAttributeValidation = (
+      method: typeof methodList[0],
+      provider: NodeTracerProvider,
+      checkSpans = true,
+      attributesValidation: {
+          serverAttributes?: Attributes,
+          clientAttributes?: Attributes
+        }) => {
+      ClientServerValidationTest(method, provider, checkSpans, attributesValidation);
+      ErrorValidationTest(method, provider, checkSpans, attributesValidation);
+    };
+
+    const runTest = (
+      method: typeof methodList[0],
+      provider: NodeTracerProvider,
+      checkSpans = true
+    ) => {
+      ClientServerValidationTest(method, provider, checkSpans);
+      ErrorValidationTest(method, provider, checkSpans);
     };
 
     const insertError = (
@@ -834,6 +925,67 @@ export const runTests = (
 
       methodList.map(method => {
         runClientMethodTest(method);
+      });
+    });
+
+    describe('Test capturing metadata', () => {
+      const provider = new NodeTracerProvider();
+      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+
+      const clientMetadata: Metadata = new grpc.Metadata();
+      clientMetadata.add('client_metadata_key', 'client_metadata_value');
+
+      const customMetadataMethod: TestGrpcCall = {
+        description: 'unary call with metadata',
+        methodName: 'unaryMethodWithMetadata',
+        method: grpcClient.unaryMethodWithMetadata,
+        request: requestList[0],
+        result: requestList[0],
+        metadata: clientMetadata
+      };
+
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      before(async () => {
+        plugin.disable();
+        plugin.setConfig({
+          metadataToSpanAttributes: {
+            client: {
+              requestMetadata: ['client_metadata_key'],
+              responseMetadata: ['server_metadata_key']
+            }
+          }
+        });
+
+        plugin.setTracerProvider(provider);
+        plugin.enable();
+
+        const packageDefinition = await protoLoader.load(PROTO_PATH, options);
+        const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
+
+        server = await startServer(grpc, proto);
+        client = createClient(grpc, proto);
+      });
+
+      after(done => {
+        client.close();
+        server.tryShutdown(() => {
+          plugin.disable();
+          done();
+        });
+      });
+
+      describe('Capture request/response metadata in client span', () => {
+        const attributeValidation = {
+          clientAttributes: {
+            'rpc.request.metadata.client_metadata_key': 'client_metadata_value',
+            'rpc.response.metadata.server_metadata_key': 'server_metadata_value'
+          }
+        };
+
+        runTestWithAttributeValidation(customMetadataMethod, provider, true, attributeValidation);
       });
     });
   });

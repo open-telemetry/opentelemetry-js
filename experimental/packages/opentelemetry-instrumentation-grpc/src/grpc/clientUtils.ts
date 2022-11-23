@@ -31,11 +31,13 @@ import {
   findIndex,
 } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
+import { metadataCaptureType } from '../types';
 
 /**
  * This method handles the client remote call
  */
 export const makeGrpcClientRemoteCall = function (
+  metadataCapture: metadataCaptureType,
   grpcClient: typeof grpcTypes,
   original: GrpcClientFunc,
   args: any[],
@@ -101,6 +103,12 @@ export const makeGrpcClientRemoteCall = function (
 
     setSpanContext(metadata);
     const call = original.apply(self, args);
+
+    ((call as unknown) as events.EventEmitter).on(
+      'metadata',
+      responseMetadata => {
+        metadataCapture.client.captureResponseMetadata(span, responseMetadata);
+      });
 
     // if server stream or bidi
     if (original.responseStream) {

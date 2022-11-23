@@ -27,7 +27,7 @@ import {
   SendUnaryDataCallback,
   GrpcClientFunc,
 } from './types';
-import { GrpcInstrumentationConfig } from '../types';
+import { GrpcInstrumentationConfig, metadataCaptureType } from '../types';
 import {
   context,
   propagation,
@@ -41,7 +41,7 @@ import {
   serverStreamAndBidiHandler,
 } from './serverUtils';
 import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
-import { _extractMethodAndService, _methodIsIgnored } from '../utils';
+import {_extractMethodAndService, _methodIsIgnored, metadataCapture} from '../utils';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {AttributeValues} from '../enums/AttributeValues';
 
@@ -54,12 +54,15 @@ let grpcClient: typeof grpcTypes;
 export class GrpcNativeInstrumentation extends InstrumentationBase<
   typeof grpcTypes
   > {
+  private _metadataCapture: metadataCaptureType;
+
   constructor(
     name: string,
     version: string,
     config?: GrpcInstrumentationConfig
   ) {
     super(name, version, config);
+    this._metadataCapture = this._createMetadataCapture();
   }
 
   init() {
@@ -103,6 +106,11 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
 
   override getConfig(): GrpcInstrumentationConfig {
     return super.getConfig();
+  }
+
+  override setConfig(config?: GrpcInstrumentationConfig): void {
+    super.setConfig(config);
+    this._metadataCapture = this._createMetadataCapture();
   }
 
   private _getInternalPatchs() {
@@ -306,8 +314,12 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
             [SemanticAttributes.RPC_METHOD]: method,
             [SemanticAttributes.RPC_SERVICE]: service,
           });
+
+        instrumentation._metadataCapture.client.captureRequestMetadata(span, metadata);
+
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
+            instrumentation._metadataCapture,
             grpcClient,
             original,
             args,
@@ -318,6 +330,17 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
       }
       Object.assign(clientMethodTrace, original);
       return clientMethodTrace;
+    };
+  }
+
+  private _createMetadataCapture(): metadataCaptureType {
+    const config = this.getConfig();
+
+    return {
+      client: {
+        captureRequestMetadata: metadataCapture('request', config.metadataToSpanAttributes?.client?.requestMetadata ?? []),
+        captureResponseMetadata: metadataCapture('response', config.metadataToSpanAttributes?.client?.responseMetadata ?? [])
+      }
     };
   }
 }
