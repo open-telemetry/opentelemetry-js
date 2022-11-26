@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-export * from './common/types';
-export * from './metrics/types';
-export * from './resource/types';
-export * from './trace/types';
-export * from './logs/types';
+import type { ReadableLogRecord } from "@opentelemetry/sdk-logs";
 
-export { createExportTraceServiceRequest } from './trace';
-export { createExportMetricsServiceRequest } from './metrics';
-export { createExportLogsServiceRequest } from './logs';
+import type { IExportLogServiceRequest } from "./types";
+import { toResourceLogs } from "./internal";
 
+export function createExportLogsServiceRequest(logRecords: ReadableLogRecord[]): IExportLogServiceRequest {
+  return {
+    resourceLogs: toResourceLogs(logRecords),
+  };
+}
