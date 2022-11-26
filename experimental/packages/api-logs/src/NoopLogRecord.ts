@@ -14,4 +14,18 @@
  * limitations under the License.
  */
 
-export * from "./node";
+import type { Attributes, AttributeValue } from "@opentelemetry/api";
+
+import type { LogRecord } from "./types/LogRecord";
+
+export class NoopLogRecord implements LogRecord {
+  setAttribute(_key: string, _value?: AttributeValue): LogRecord {
+    return this;
+  }
+
+  setAttributes(_attributes: Attributes): LogRecord {
+    return this;
+  }
+
+  emit(): void {}
+}

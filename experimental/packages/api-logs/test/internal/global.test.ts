@@ -14,33 +14,31 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { _global, GLOBAL_LOGS_API_KEY } from '../../src/internal/global-utils';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import * as assert from "assert";
 
-const api1 = require('../../src') as typeof import('../../src');
+import { _global, GLOBAL_LOGS_API_KEY } from "../../src/internal/global-utils";
+import { NoopLoggerProvider } from "../../src/NoopLoggerProvider";
+
+const api1 = require("../../src") as typeof import("../../src");
 
 // clear cache and load a second instance of the api
 for (const key of Object.keys(require.cache)) {
   delete require.cache[key];
 }
-const api2 = require('../../src') as typeof import('../../src');
+const api2 = require("../../src") as typeof import("../../src");
 
-describe('Global Utils', () => {
+describe("Global Utils", () => {
   // prove they are separate instances
   assert.notStrictEqual(api1, api2);
   // that return separate noop instances to start
-  assert.notStrictEqual(
-    api1.logs.getLoggerProvider(),
-    api2.logs.getLoggerProvider()
-  );
+  assert.notStrictEqual(api1.logs.getLoggerProvider(), api2.logs.getLoggerProvider());
 
   beforeEach(() => {
     api1.logs.disable();
     api2.logs.disable();
   });
 
-  it('should change the global logger provider', () => {
+  it("should change the global logger provider", () => {
     const original = api1.logs.getLoggerProvider();
     const newLoggerProvider = new NoopLoggerProvider();
     api1.logs.setGlobalLoggerProvider(newLoggerProvider);
@@ -48,15 +46,12 @@ describe('Global Utils', () => {
     assert.strictEqual(api1.logs.getLoggerProvider(), newLoggerProvider);
   });
 
-  it('should load an instance from one which was set in the other', () => {
+  it("should load an instance from one which was set in the other", () => {
     api1.logs.setGlobalLoggerProvider(new NoopLoggerProvider());
-    assert.strictEqual(
-      api1.logs.getLoggerProvider(),
-      api2.logs.getLoggerProvider()
-    );
+    assert.strictEqual(api1.logs.getLoggerProvider(), api2.logs.getLoggerProvider());
   });
 
-  it('should disable both if one is disabled', () => {
+  it("should disable both if one is disabled", () => {
     const original = api1.logs.getLoggerProvider();
 
     api1.logs.setGlobalLoggerProvider(new NoopLoggerProvider());
@@ -66,7 +61,7 @@ describe('Global Utils', () => {
     assert.strictEqual(original, api1.logs.getLoggerProvider());
   });
 
-  it('should return the module NoOp implementation if the version is a mismatch', () => {
+  it("should return the module NoOp implementation if the version is a mismatch", () => {
     const original = api1.logs.getLoggerProvider();
     api1.logs.setGlobalLoggerProvider(new NoopLoggerProvider());
     const afterSet = _global[GLOBAL_LOGS_API_KEY]!(-1);

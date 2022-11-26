@@ -16,19 +16,29 @@
 
 import * as assert from "assert";
 
-import { NoopLogger } from "../../src/NoopLogger";
 import { NoopLoggerProvider } from "../../src/NoopLoggerProvider";
+import { NoopLogRecord } from "../../src/NoopLogRecord";
 
-describe("NoopLoggerProvider", () => {
-  it("should not crash", () => {
-    const loggerProvider = new NoopLoggerProvider();
+describe("NoopLogRecord", () => {
+  const logger = new NoopLoggerProvider().getLogger("test-noop");
+  const logRecord = logger.getLogRecord({});
 
-    assert.ok(loggerProvider.getLogger("logger-name") instanceof NoopLogger);
-    assert.ok(loggerProvider.getLogger("logger-name", "v1") instanceof NoopLogger);
-    assert.ok(
-      loggerProvider.getLogger("logger-name", "v1", {
-        schemaUrl: "https://opentelemetry.io/schemas/1.7.0",
-      }) instanceof NoopLogger
-    );
+  it("constructor should not crash", () => {
+    assert(logRecord instanceof NoopLogRecord);
+  });
+
+  it("calling setAttribute should not crash", () => {
+    logRecord.setAttribute("attribute.name", "test attribute name");
+  });
+
+  it("calling setAttributes should not crash", () => {
+    logRecord.setAttributes({
+      "attribute.name": "test attribute name",
+      "attribute.age": 18,
+    });
+  });
+
+  it("calling emit should not crash", () => {
+    logRecord.emit();
   });
 });

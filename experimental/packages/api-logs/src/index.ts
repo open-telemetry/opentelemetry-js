@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/LogEvent';
-export * from './types/LoggerOptions';
+export * from "./types/Logger";
+export * from "./types/LoggerProvider";
+export * from "./types/LogRecord";
+export * from "./types/LoggerOptions";
 
-import { LogsAPI } from './api/logs';
+import { LogsAPI } from "./api/logs";
 export const logs = LogsAPI.getInstance();

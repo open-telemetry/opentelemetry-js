@@ -14,21 +14,56 @@
  * limitations under the License.
  */
 
-import { LogRecord } from './LogRecord';
-import { LogEvent } from './LogEvent';
+import type { Attributes, SpanContext, TimeInput } from "@opentelemetry/api";
+
+import type { LogEvent, LogRecord, SeverityNumber } from "./LogRecord";
+
+export interface LogRecordOptions {
+  /**
+   * The time when the log record occurred as UNIX Epoch time in nanoseconds.
+   */
+  timestamp?: TimeInput;
+
+  /**
+   * Numerical value of the severity.
+   */
+  severityNumber?: SeverityNumber;
+
+  /**
+   * The severity text.
+   */
+  severityText?: string;
+
+  /**
+   * A value containing the body of the log record.
+   */
+  body?: string;
+
+  /**
+   * Attributes that define the log record.
+   */
+  attributes?: Attributes;
+
+  /**
+   * The trace context.
+   */
+  context?: SpanContext;
+}
 
 export interface Logger {
   /**
-   * Emit a log record. This method should only be used by log appenders.
+   * Get a log record. This method should only be used by log appenders.
    *
-   * @param logRecord
+   * @param options
    */
-  emitLogRecord(logRecord: LogRecord): void;
+  getLogRecord(options?: LogRecordOptions): LogRecord;
 
   /**
-   * Emit an event. This method should only be used by instrumentations emitting events.
+   * Get an event. This method should only be used by instrumentations emitting events.
    *
-   * @param event
+   * @param eventName the event name, which acts as a classifier for events. Within a particular event domain,
+   * event name defines a particular class or type of event.
+   * @param options
    */
-  emitEvent(event: LogEvent): void;
+  getLogEvent(eventName: string, options?: LogRecordOptions): LogEvent;
 }

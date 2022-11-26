@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
+import type { LoggerProvider } from "../types/LoggerProvider";
+import type { Logger } from "../types/Logger";
+import type { LoggerOptions } from "../types/LoggerOptions";
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_LOGS_API_KEY,
   _global,
-  makeGetter
-} from '../internal/global-utils';
-import { LoggerProvider } from '../types/LoggerProvider';
-import { NOOP_LOGGER_PROVIDER } from '../NoopLoggerProvider';
-import { Logger } from '../types/Logger';
-import { LoggerOptions } from '../types/LoggerOptions';
+  makeGetter,
+} from "../internal/global-utils";
+import { NOOP_LOGGER_PROVIDER } from "../NoopLoggerProvider";
 
 export class LogsAPI {
   private static _instance?: LogsAPI;
@@ -58,10 +58,7 @@ export class LogsAPI {
    * @returns LoggerProvider
    */
   public getLoggerProvider(): LoggerProvider {
-    return (
-      _global[GLOBAL_LOGS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_LOGGER_PROVIDER
-    );
+    return _global[GLOBAL_LOGS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ?? NOOP_LOGGER_PROVIDER;
   }
 
   /**

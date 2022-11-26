@@ -14,32 +14,33 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { Logger, logs } from '../../src';
-import { NoopLogger } from '../../src/NoopLogger';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import * as assert from "assert";
 
-describe('API', () => {
+import { Logger, logs } from "../../src";
+import { NoopLogger } from "../../src/NoopLogger";
+import { NoopLoggerProvider } from "../../src/NoopLoggerProvider";
+
+describe("API", () => {
   const dummyLogger = new NoopLogger();
 
-  it('should expose a logger provider via getLoggerProvider', () => {
+  it("should expose a logger provider via getLoggerProvider", () => {
     const provider = logs.getLoggerProvider();
     assert.ok(provider);
-    assert.strictEqual(typeof provider, 'object');
+    assert.strictEqual(typeof provider, "object");
   });
 
-  describe('GlobalLoggerProvider', () => {
+  describe("GlobalLoggerProvider", () => {
     beforeEach(() => {
       logs.disable();
     });
 
-    it('should use the global logger provider', () => {
+    it("should use the global logger provider", () => {
       logs.setGlobalLoggerProvider(new TestLoggerProvider());
-      const logger = logs.getLoggerProvider().getLogger('name');
+      const logger = logs.getLoggerProvider().getLogger("name");
       assert.deepStrictEqual(logger, dummyLogger);
     });
 
-    it('should not allow overriding global provider if already set', () => {
+    it("should not allow overriding global provider if already set", () => {
       const provider1 = new TestLoggerProvider();
       const provider2 = new TestLoggerProvider();
       logs.setGlobalLoggerProvider(provider1);
@@ -49,14 +50,14 @@ describe('API', () => {
     });
   });
 
-  describe('getLogger', () => {
+  describe("getLogger", () => {
     beforeEach(() => {
       logs.disable();
     });
 
-    it('should return a logger instance from global provider', () => {
+    it("should return a logger instance from global provider", () => {
       logs.setGlobalLoggerProvider(new TestLoggerProvider());
-      const logger = logs.getLogger('myLogger');
+      const logger = logs.getLogger("myLogger");
       assert.deepStrictEqual(logger, dummyLogger);
     });
   });

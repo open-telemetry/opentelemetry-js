@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { NoopLogger } from '../../src/NoopLogger';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import * as assert from "assert";
 
-describe('NoopLogger', () => {
-  it('constructor should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
+import { NoopLogger } from "../../src/NoopLogger";
+import { NoopLoggerProvider } from "../../src/NoopLoggerProvider";
+
+describe("NoopLogger", () => {
+  it("constructor should not crash", () => {
+    const logger = new NoopLoggerProvider().getLogger("test-noop");
     assert(logger instanceof NoopLogger);
   });
 
-  it('calling emitEvent should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
+  it("calling getLogEvent should not crash", () => {
+    const logger = new NoopLoggerProvider().getLogger("test-noop");
+    logger.getLogEvent("event-name", { severityNumber: 1, body: "log body" });
   });
 
-  it('calling emitLogRecord should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitLogRecord({ severityNumber: 1, body: 'log body' });
+  it("calling getLogRecord should not crash", () => {
+    const logger = new NoopLoggerProvider().getLogger("test-noop");
+    logger.getLogRecord({ severityNumber: 1, body: "log body" });
   });
 });

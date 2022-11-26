@@ -36,13 +36,15 @@ api.logs.setGlobalLoggerProvider(loggerProvider);
 /* returns loggerProvider (no-op if a working provider has not been initialized) */
 api.logs.getLoggerProvider();
 /* returns a logger from the registered global logger provider (no-op if a working provider has not been initialized) */
-const logger = api.logs.getLogger(name, version);
+const logger = api.logs.getLogger(name, version, {
+  eventDomain: "event-domain",
+});
 
 // logging an event in an instrumentation library
-logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
+logger.getLogEvent("event-name", { body: "this is a body" }).emit();
 
 // logging an event in a log appender
-logger.emitLogRecord({ severityNumber: 1, body: 'log data' });
+logger.getLogRecord({ body: "this is a body", severityNumber: SeverityNumber.INFO, severityText: "INFO" }).emit();
 ```
 
 ## Useful links
