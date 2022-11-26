@@ -1,0 +1,13 @@
+{
+  "name": "logs-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.3.0",
+    "@opentelemetry/api-logs": "0.34.0",
+    "@opentelemetry/sdk-logs": "0.34.0"
+  }
+}

@@ -9,6 +9,9 @@
       "path": "experimental/packages/api-logs/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/exporter-logs-otlp-http/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/exporter-trace-otlp-http/tsconfig.esm.json"
     },
     {
@@ -31,6 +34,9 @@
     },
     {
       "path": "experimental/packages/otlp-transformer/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/sdk-logs/tsconfig.esm.json"
     },
     {
       "path": "packages/opentelemetry-context-zone/tsconfig.esm.json"
