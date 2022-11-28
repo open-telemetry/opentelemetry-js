@@ -15,9 +15,9 @@
  */
 
 interface AttributeValuesType {
-  RPC_SYSTEM: string
+  RPC_SYSTEM: string;
 }
 
 export const AttributeValues: Readonly<AttributeValuesType> = {
-  RPC_SYSTEM: 'grpc'
+  RPC_SYSTEM: 'grpc',
 };

@@ -39,13 +39,14 @@ const hostname = 'localhost';
 const pathname = '/test';
 const tracerProvider = new NodeTracerProvider();
 const meterProvider = new MeterProvider();
-const metricsMemoryExporter = new InMemoryMetricExporter(AggregationTemporality.DELTA);
+const metricsMemoryExporter = new InMemoryMetricExporter(
+  AggregationTemporality.DELTA
+);
 const metricReader = new TestMetricReader(metricsMemoryExporter);
 
 meterProvider.addMetricReader(metricReader);
 instrumentation.setTracerProvider(tracerProvider);
 instrumentation.setMeterProvider(meterProvider);
-
 
 describe('metrics', () => {
   beforeEach(() => {
@@ -68,7 +69,9 @@ describe('metrics', () => {
   it('should add server/client duration metrics', async () => {
     const requestCount = 3;
     for (let i = 0; i < requestCount; i++) {
-      await httpRequest.get(`${protocol}://${hostname}:${serverPort}${pathname}`);
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}`
+      );
     }
     await metricReader.collectAndExport();
     const resourceMetrics = metricsMemoryExporter.getMetrics();
@@ -77,28 +80,73 @@ describe('metrics', () => {
     const metrics = scopeMetrics[0].metrics;
     assert.strictEqual(metrics.length, 2, 'metrics count');
     assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
-    assert.strictEqual(metrics[0].descriptor.description, 'measures the duration of the inbound HTTP requests');
+    assert.strictEqual(
+      metrics[0].descriptor.description,
+      'measures the duration of the inbound HTTP requests'
+    );
     assert.strictEqual(metrics[0].descriptor.name, 'http.server.duration');
     assert.strictEqual(metrics[0].descriptor.unit, 'ms');
     assert.strictEqual(metrics[0].dataPoints.length, 1);
-    assert.strictEqual((metrics[0].dataPoints[0].value as any).count, requestCount);
-    assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_SCHEME], 'http');
-    assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD], 'GET');
-    assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR], '1.1');
-    assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_NAME], 'localhost');
-    assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE], 200);
-    assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_PORT], 22346);
+    assert.strictEqual(
+      (metrics[0].dataPoints[0].value as any).count,
+      requestCount
+    );
+    assert.strictEqual(
+      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_SCHEME],
+      'http'
+    );
+    assert.strictEqual(
+      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD],
+      'GET'
+    );
+    assert.strictEqual(
+      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR],
+      '1.1'
+    );
+    assert.strictEqual(
+      metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_NAME],
+      'localhost'
+    );
+    assert.strictEqual(
+      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE],
+      200
+    );
+    assert.strictEqual(
+      metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_PORT],
+      22346
+    );
 
     assert.strictEqual(metrics[1].dataPointType, DataPointType.HISTOGRAM);
-    assert.strictEqual(metrics[1].descriptor.description, 'measures the duration of the outbound HTTP requests');
+    assert.strictEqual(
+      metrics[1].descriptor.description,
+      'measures the duration of the outbound HTTP requests'
+    );
     assert.strictEqual(metrics[1].descriptor.name, 'http.client.duration');
     assert.strictEqual(metrics[1].descriptor.unit, 'ms');
     assert.strictEqual(metrics[1].dataPoints.length, 1);
-    assert.strictEqual((metrics[1].dataPoints[0].value as any).count, requestCount);
-    assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD], 'GET');
-    assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_NAME], 'localhost');
-    assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_PORT], 22346);
-    assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE], 200);
-    assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR], '1.1');
+    assert.strictEqual(
+      (metrics[1].dataPoints[0].value as any).count,
+      requestCount
+    );
+    assert.strictEqual(
+      metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD],
+      'GET'
+    );
+    assert.strictEqual(
+      metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_NAME],
+      'localhost'
+    );
+    assert.strictEqual(
+      metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_PORT],
+      22346
+    );
+    assert.strictEqual(
+      metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE],
+      200
+    );
+    assert.strictEqual(
+      metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR],
+      '1.1'
+    );
   });
 });

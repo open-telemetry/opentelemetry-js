@@ -30,13 +30,18 @@ import { MeterProviderSharedState } from './MeterProviderSharedState';
  * state for each MetricReader.
  */
 export class MetricCollector implements MetricProducer {
-  constructor(private _sharedState: MeterProviderSharedState, private _metricReader: MetricReader) {
-  }
+  constructor(
+    private _sharedState: MeterProviderSharedState,
+    private _metricReader: MetricReader
+  ) {}
 
   async collect(options?: MetricCollectOptions): Promise<CollectionResult> {
     const collectionTime = hrTime();
-    const meterCollectionPromises = Array.from(this._sharedState.meterSharedStates.values())
-      .map(meterSharedState => meterSharedState.collect(this, collectionTime, options));
+    const meterCollectionPromises = Array.from(
+      this._sharedState.meterSharedStates.values()
+    ).map(meterSharedState =>
+      meterSharedState.collect(this, collectionTime, options)
+    );
     const result = await Promise.all(meterCollectionPromises);
 
     return {

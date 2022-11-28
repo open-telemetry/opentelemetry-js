@@ -35,21 +35,24 @@ describe('NoopAttributesProcessor', () => {
 describe('FilteringAttributesProcessor', () => {
   it('should not add keys when attributes do not exist', () => {
     const processor = new FilteringAttributesProcessor(['foo', 'bar']);
-    assert.deepStrictEqual(
-      processor.process({}, context.active()), {});
+    assert.deepStrictEqual(processor.process({}, context.active()), {});
   });
 
   it('should only keep allowed attributes', () => {
     const processor = new FilteringAttributesProcessor(['foo', 'bar']);
     assert.deepStrictEqual(
-      processor.process({
-        foo: 'fooValue',
-        bar: 'barValue',
-        baz: 'bazValue'
-      }, context.active()),
+      processor.process(
+        {
+          foo: 'fooValue',
+          bar: 'barValue',
+          baz: 'bazValue',
+        },
+        context.active()
+      ),
       {
         foo: 'fooValue',
-        bar: 'barValue'
-      });
+        bar: 'barValue',
+      }
+    );
   });
 });

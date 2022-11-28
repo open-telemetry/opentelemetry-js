@@ -18,16 +18,28 @@ import { TraceState, hexToBase64 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { createExportTraceServiceRequest, ESpanKind, EStatusCode } from '../src';
+import {
+  createExportTraceServiceRequest,
+  ESpanKind,
+  EStatusCode,
+} from '../src';
 
-function createExpectedSpanJson(useHex: boolean){
-  const traceId = useHex? '00000000000000000000000000000001' : hexToBase64('00000000000000000000000000000001');
-  const spanId = useHex? '0000000000000002' : hexToBase64('0000000000000002');
-  const parentSpanId = useHex? '0000000000000001' : hexToBase64('0000000000000001');
-  const linkSpanId = useHex? '0000000000000003' : hexToBase64('0000000000000003');
-  const linkTraceId = useHex? '00000000000000000000000000000002' : hexToBase64('00000000000000000000000000000002');
+function createExpectedSpanJson(useHex: boolean) {
+  const traceId = useHex
+    ? '00000000000000000000000000000001'
+    : hexToBase64('00000000000000000000000000000001');
+  const spanId = useHex ? '0000000000000002' : hexToBase64('0000000000000002');
+  const parentSpanId = useHex
+    ? '0000000000000001'
+    : hexToBase64('0000000000000001');
+  const linkSpanId = useHex
+    ? '0000000000000003'
+    : hexToBase64('0000000000000003');
+  const linkTraceId = useHex
+    ? '00000000000000000000000000000002'
+    : hexToBase64('00000000000000000000000000000002');
 
-  return  {
+  return {
     resourceSpans: [
       {
         resource: {
@@ -59,11 +71,11 @@ function createExpectedSpanJson(useHex: boolean){
                       {
                         key: 'link-attribute',
                         value: {
-                          stringValue: 'string value'
-                        }
-                      }
-                    ]
-                  }
+                          stringValue: 'string value',
+                        },
+                      },
+                    ],
+                  },
                 ],
                 // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
                 startTimeUnixNano: 1640715557342725388,
@@ -76,13 +88,13 @@ function createExpectedSpanJson(useHex: boolean){
                       {
                         key: 'event-attribute',
                         value: {
-                          stringValue: 'some string value'
-                        }
-                      }
+                          stringValue: 'some string value',
+                        },
+                      },
                     ],
                     name: 'some event',
-                    timeUnixNano: 1640715558542725400
-                  }
+                    timeUnixNano: 1640715558542725400,
+                  },
                 ],
                 attributes: [
                   {
@@ -134,9 +146,9 @@ describe('Trace', () => {
             name: 'some event',
             time: [1640715558, 542725388],
             attributes: {
-              'event-attribute': 'some string value'
-            }
-          }
+              'event-attribute': 'some string value',
+            },
+          },
         ],
         instrumentationLibrary: {
           name: 'myLib',
@@ -151,12 +163,12 @@ describe('Trace', () => {
               traceId: '00000000000000000000000000000002',
               traceFlags: 1,
               isRemote: false,
-              traceState: new TraceState('')
+              traceState: new TraceState(''),
             },
             attributes: {
-              'link-attribute': 'string value'
-            }
-          }
+              'link-attribute': 'string value',
+            },
+          },
         ],
         name: 'span-name',
         resource,
@@ -168,7 +180,9 @@ describe('Trace', () => {
     });
 
     it('returns null on an empty list', () => {
-      assert.deepStrictEqual(createExportTraceServiceRequest([], true), { resourceSpans: [] });
+      assert.deepStrictEqual(createExportTraceServiceRequest([], true), {
+        resourceSpans: [],
+      });
     });
 
     it('serializes a span with useHex = true', () => {
@@ -187,14 +201,20 @@ describe('Trace', () => {
       (span as any).parentSpanId = undefined;
       const exportRequest = createExportTraceServiceRequest([span], true);
       assert.ok(exportRequest);
-      assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId, undefined);
+      assert.strictEqual(
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId,
+        undefined
+      );
     });
 
     it('serializes a span without a parent with useHex = false', () => {
       (span as any).parentSpanId = undefined;
       const exportRequest = createExportTraceServiceRequest([span], false);
       assert.ok(exportRequest);
-      assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId, undefined);
+      assert.strictEqual(
+        exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].parentSpanId,
+        undefined
+      );
     });
 
     describe('status code', () => {
@@ -203,7 +223,8 @@ describe('Trace', () => {
         span.status.message = 'error message';
         const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
-        const spanStatus = exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status;
+        const spanStatus =
+          exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status;
         assert.strictEqual(spanStatus?.code, EStatusCode.STATUS_CODE_ERROR);
         assert.strictEqual(spanStatus?.message, 'error message');
       });
@@ -212,7 +233,10 @@ describe('Trace', () => {
         span.status.code = SpanStatusCode.UNSET;
         const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status.code, EStatusCode.STATUS_CODE_UNSET);
+        assert.strictEqual(
+          exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].status.code,
+          EStatusCode.STATUS_CODE_UNSET
+        );
       });
     });
 
@@ -221,31 +245,46 @@ describe('Trace', () => {
         (span as any).kind = SpanKind.CONSUMER;
         const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_CONSUMER);
+        assert.strictEqual(
+          exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
+          ESpanKind.SPAN_KIND_CONSUMER
+        );
       });
       it('internal', () => {
         (span as any).kind = SpanKind.INTERNAL;
         const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_INTERNAL);
+        assert.strictEqual(
+          exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
+          ESpanKind.SPAN_KIND_INTERNAL
+        );
       });
       it('producer', () => {
         (span as any).kind = SpanKind.PRODUCER;
         const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_PRODUCER);
+        assert.strictEqual(
+          exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
+          ESpanKind.SPAN_KIND_PRODUCER
+        );
       });
       it('server', () => {
         (span as any).kind = SpanKind.SERVER;
         const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_SERVER);
+        assert.strictEqual(
+          exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
+          ESpanKind.SPAN_KIND_SERVER
+        );
       });
       it('unspecified', () => {
         (span as any).kind = undefined;
         const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_UNSPECIFIED);
+        assert.strictEqual(
+          exportRequest.resourceSpans?.[0].scopeSpans[0].spans?.[0].kind,
+          ESpanKind.SPAN_KIND_UNSPECIFIED
+        );
       });
     });
   });

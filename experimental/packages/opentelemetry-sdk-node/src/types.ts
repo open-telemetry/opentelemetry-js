@@ -32,7 +32,7 @@ export interface NodeSDKConfiguration {
   defaultAttributes: SpanAttributes;
   textMapPropagator: TextMapPropagator;
   metricReader: MetricReader;
-  views: View[]
+  views: View[];
   instrumentations: InstrumentationOption[];
   resource: Resource;
   resourceDetectors: Detector[];

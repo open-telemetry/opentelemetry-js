@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 export type UserAgentData = {
-  brands: {brand:string,version:string}[],
-  platform: string,
-  mobile: boolean
+  brands: { brand: string; version: string }[];
+  platform: string;
+  mobile: boolean;
 };
 
 export const BROWSER_ATTRIBUTES = {
@@ -24,5 +24,5 @@ export const BROWSER_ATTRIBUTES = {
   BRANDS: 'browser.brands',
   MOBILE: 'browser.mobile',
   LANGUAGE: 'browser.language',
-  USER_AGENT: 'browser.user_agent'
+  USER_AGENT: 'browser.user_agent',
 };

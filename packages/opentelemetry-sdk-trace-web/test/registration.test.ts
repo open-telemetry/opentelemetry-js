@@ -46,7 +46,7 @@ describe('API registration', () => {
   it('should register configured implementations', () => {
     const tracerProvider = new WebTracerProvider();
 
-    const contextManager = { disable() { }, enable() { } } as any;
+    const contextManager = { disable() {}, enable() {} } as any;
     const propagator = {} as any;
 
     tracerProvider.register({
@@ -68,7 +68,11 @@ describe('API registration', () => {
       contextManager: null,
     });
 
-    assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
+    assert.strictEqual(
+      context['_getContextManager'](),
+      ctxManager,
+      'context manager should not change'
+    );
 
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
@@ -84,7 +88,11 @@ describe('API registration', () => {
       propagator: null,
     });
 
-    assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
+    assert.strictEqual(
+      propagation['_getGlobalPropagator'](),
+      propagator,
+      'propagator should not change'
+    );
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;

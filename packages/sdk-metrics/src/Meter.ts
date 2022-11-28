@@ -26,7 +26,10 @@ import {
   BatchObservableCallback,
   Observable,
 } from '@opentelemetry/api';
-import { createInstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
+import {
+  createInstrumentDescriptor,
+  InstrumentType,
+} from './InstrumentDescriptor';
 import {
   CounterInstrument,
   HistogramInstrument,
@@ -47,7 +50,11 @@ export class Meter implements IMeter {
    * Create a {@link Histogram} instrument.
    */
   createHistogram(name: string, options?: MetricOptions): Histogram {
-    const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.HISTOGRAM,
+      options
+    );
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new HistogramInstrument(storage, descriptor);
   }
@@ -56,7 +63,11 @@ export class Meter implements IMeter {
    * Create a {@link Counter} instrument.
    */
   createCounter(name: string, options?: MetricOptions): Counter {
-    const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.COUNTER,
+      options
+    );
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new CounterInstrument(storage, descriptor);
   }
@@ -65,7 +76,11 @@ export class Meter implements IMeter {
    * Create a {@link UpDownCounter} instrument.
    */
   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter {
-    const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.UP_DOWN_COUNTER,
+      options
+    );
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new UpDownCounterInstrument(storage, descriptor);
   }
@@ -75,11 +90,20 @@ export class Meter implements IMeter {
    */
   createObservableGauge(
     name: string,
-    options?: MetricOptions,
+    options?: MetricOptions
   ): ObservableGauge {
-    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_GAUGE, options);
-    const storages = this._meterSharedState.registerAsyncMetricStorage(descriptor);
-    return new ObservableGaugeInstrument(descriptor, storages, this._meterSharedState.observableRegistry);
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.OBSERVABLE_GAUGE,
+      options
+    );
+    const storages =
+      this._meterSharedState.registerAsyncMetricStorage(descriptor);
+    return new ObservableGaugeInstrument(
+      descriptor,
+      storages,
+      this._meterSharedState.observableRegistry
+    );
   }
 
   /**
@@ -87,11 +111,20 @@ export class Meter implements IMeter {
    */
   createObservableCounter(
     name: string,
-    options?: MetricOptions,
+    options?: MetricOptions
   ): ObservableCounter {
-    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_COUNTER, options);
-    const storages = this._meterSharedState.registerAsyncMetricStorage(descriptor);
-    return new ObservableCounterInstrument(descriptor, storages, this._meterSharedState.observableRegistry);
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.OBSERVABLE_COUNTER,
+      options
+    );
+    const storages =
+      this._meterSharedState.registerAsyncMetricStorage(descriptor);
+    return new ObservableCounterInstrument(
+      descriptor,
+      storages,
+      this._meterSharedState.observableRegistry
+    );
   }
 
   /**
@@ -99,24 +132,45 @@ export class Meter implements IMeter {
    */
   createObservableUpDownCounter(
     name: string,
-    options?: MetricOptions,
+    options?: MetricOptions
   ): ObservableUpDownCounter {
-    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, options);
-    const storages = this._meterSharedState.registerAsyncMetricStorage(descriptor);
-    return new ObservableUpDownCounterInstrument(descriptor, storages, this._meterSharedState.observableRegistry);
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+      options
+    );
+    const storages =
+      this._meterSharedState.registerAsyncMetricStorage(descriptor);
+    return new ObservableUpDownCounterInstrument(
+      descriptor,
+      storages,
+      this._meterSharedState.observableRegistry
+    );
   }
 
   /**
    * @see {@link Meter.addBatchObservableCallback}
    */
-  addBatchObservableCallback(callback: BatchObservableCallback, observables: Observable[]) {
-    this._meterSharedState.observableRegistry.addBatchCallback(callback, observables);
+  addBatchObservableCallback(
+    callback: BatchObservableCallback,
+    observables: Observable[]
+  ) {
+    this._meterSharedState.observableRegistry.addBatchCallback(
+      callback,
+      observables
+    );
   }
 
   /**
    * @see {@link Meter.removeBatchObservableCallback}
    */
-  removeBatchObservableCallback(callback: BatchObservableCallback, observables: Observable[]) {
-    this._meterSharedState.observableRegistry.removeBatchCallback(callback, observables);
+  removeBatchObservableCallback(
+    callback: BatchObservableCallback,
+    observables: Observable[]
+  ) {
+    this._meterSharedState.observableRegistry.removeBatchCallback(
+      callback,
+      observables
+    );
   }
 }

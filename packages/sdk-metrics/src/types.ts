@@ -15,7 +15,7 @@
  */
 
 export type CommonReaderOptions = {
-  timeoutMillis?: number
+  timeoutMillis?: number;
 };
 
 export type CollectionOptions = CommonReaderOptions;

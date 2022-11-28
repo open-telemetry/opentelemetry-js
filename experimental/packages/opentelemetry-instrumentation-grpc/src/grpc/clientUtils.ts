@@ -104,11 +104,12 @@ export const makeGrpcClientRemoteCall = function (
     setSpanContext(metadata);
     const call = original.apply(self, args);
 
-    ((call as unknown) as events.EventEmitter).on(
+    (call as unknown as events.EventEmitter).on(
       'metadata',
       responseMetadata => {
         metadataCapture.client.captureResponseMetadata(span, responseMetadata);
-      });
+      }
+    );
 
     // if server stream or bidi
     if (original.responseStream) {
@@ -122,7 +123,7 @@ export const makeGrpcClientRemoteCall = function (
         }
       };
       context.bind(context.active(), call);
-      ((call as unknown) as events.EventEmitter).on(
+      (call as unknown as events.EventEmitter).on(
         'error',
         (err: grpcTypes.ServiceError) => {
           span.setStatus({
@@ -137,7 +138,7 @@ export const makeGrpcClientRemoteCall = function (
         }
       );
 
-      ((call as unknown) as events.EventEmitter).on(
+      (call as unknown as events.EventEmitter).on(
         'status',
         (status: SpanStatus) => {
           span.setStatus({ code: SpanStatusCode.UNSET });

@@ -29,17 +29,29 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
     this._numMeasurementsSeen = 0;
   }
 
-  private getRandomInt(min: number, max: number) { //[min, max)
+  private getRandomInt(min: number, max: number) {
+    //[min, max)
     return Math.floor(Math.random() * (max - min) + min);
   }
 
-  private _findBucketIndex(_value: number, _timestamp: HrTime, _attributes: MetricAttributes, _ctx: Context) {
-    if (this._numMeasurementsSeen < this._size ) return this._numMeasurementsSeen++;
+  private _findBucketIndex(
+    _value: number,
+    _timestamp: HrTime,
+    _attributes: MetricAttributes,
+    _ctx: Context
+  ) {
+    if (this._numMeasurementsSeen < this._size)
+      return this._numMeasurementsSeen++;
     const index = this.getRandomInt(0, ++this._numMeasurementsSeen);
-    return index < this._size ? index: -1;
+    return index < this._size ? index : -1;
   }
 
-  offer(value: number, timestamp: HrTime, attributes: MetricAttributes, ctx: Context): void {
+  offer(
+    value: number,
+    timestamp: HrTime,
+    attributes: MetricAttributes,
+    ctx: Context
+  ): void {
     const index = this._findBucketIndex(value, timestamp, attributes, ctx);
     if (index !== -1) {
       this._reservoirStorage[index].offer(value, timestamp, attributes, ctx);

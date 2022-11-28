@@ -23,9 +23,13 @@ describe('NoopLoggerProvider', () => {
     const loggerProvider = new NoopLoggerProvider();
 
     assert.ok(loggerProvider.getLogger('logger-name') instanceof NoopLogger);
-    assert.ok(loggerProvider.getLogger('logger-name', 'v1') instanceof NoopLogger);
-    assert.ok(loggerProvider.getLogger('logger-name', 'v1', {
-      schemaUrl: 'https://opentelemetry.io/schemas/1.7.0'
-    }) instanceof NoopLogger);
+    assert.ok(
+      loggerProvider.getLogger('logger-name', 'v1') instanceof NoopLogger
+    );
+    assert.ok(
+      loggerProvider.getLogger('logger-name', 'v1', {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
+      }) instanceof NoopLogger
+    );
   });
 });

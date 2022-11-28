@@ -23,10 +23,13 @@ export interface Exporter<T> {
 }
 
 /**
-* @internal
-* Shared functionality used by Exporters while exporting data, including suppresion of Traces.
-*/
-export function _export<T>(exporter: Exporter<T>, arg: T): Promise<ExportResult> {
+ * @internal
+ * Shared functionality used by Exporters while exporting data, including suppresion of Traces.
+ */
+export function _export<T>(
+  exporter: Exporter<T>,
+  arg: T
+): Promise<ExportResult> {
   return new Promise(resolve => {
     // prevent downstream exporter calls from generating spans
     context.with(suppressTracing(context.active()), () => {

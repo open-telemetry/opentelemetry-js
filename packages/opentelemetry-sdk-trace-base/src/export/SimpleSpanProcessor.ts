@@ -20,7 +20,7 @@ import {
   ExportResultCode,
   globalErrorHandler,
   BindOnceFuture,
-  ExportResult
+  ExportResult,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -46,7 +46,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(_span: Span, _parentContext: Context): void { }
+  onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {
@@ -57,18 +57,21 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    internal._export(this._exporter, [span]).then((result: ExportResult) => {
-      if (result.code !== ExportResultCode.SUCCESS) {
-        globalErrorHandler(
-          result.error ??
-          new Error(
-            `SimpleSpanProcessor: span export failed (status ${result})`
-          )
-        );
-      }
-    }).catch(error => {
-      globalErrorHandler(error);
-    });
+    internal
+      ._export(this._exporter, [span])
+      .then((result: ExportResult) => {
+        if (result.code !== ExportResultCode.SUCCESS) {
+          globalErrorHandler(
+            result.error ??
+              new Error(
+                `SimpleSpanProcessor: span export failed (status ${result})`
+              )
+          );
+        }
+      })
+      .catch(error => {
+        globalErrorHandler(error);
+      });
   }
 
   shutdown(): Promise<void> {

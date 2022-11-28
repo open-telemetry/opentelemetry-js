@@ -77,8 +77,7 @@ export abstract class OTLPExporterNodeBase<
         resolve,
         reject
       );
-    })
-      .then(onSuccess, onError);
+    }).then(onSuccess, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {

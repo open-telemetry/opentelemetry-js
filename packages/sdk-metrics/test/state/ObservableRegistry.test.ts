@@ -28,8 +28,16 @@ describe('ObservableRegistry', () => {
 
   beforeEach(() => {
     observableRegistry = new ObservableRegistry();
-    instrument1 = new ObservableInstrument(defaultInstrumentDescriptor, [], observableRegistry);
-    instrument2 = new ObservableInstrument(defaultInstrumentDescriptor, [], observableRegistry);
+    instrument1 = new ObservableInstrument(
+      defaultInstrumentDescriptor,
+      [],
+      observableRegistry
+    );
+    instrument2 = new ObservableInstrument(
+      defaultInstrumentDescriptor,
+      [],
+      observableRegistry
+    );
   });
 
   describe('addCallback', () => {
@@ -38,11 +46,23 @@ describe('ObservableRegistry', () => {
       observableRegistry.addCallback(callback2, instrument1);
 
       assert.strictEqual(observableRegistry['_callbacks'].length, 2);
-      assert.strictEqual(observableRegistry['_callbacks'][0].callback, callback1);
-      assert.strictEqual(observableRegistry['_callbacks'][0].instrument, instrument1);
+      assert.strictEqual(
+        observableRegistry['_callbacks'][0].callback,
+        callback1
+      );
+      assert.strictEqual(
+        observableRegistry['_callbacks'][0].instrument,
+        instrument1
+      );
 
-      assert.strictEqual(observableRegistry['_callbacks'][1].callback, callback2);
-      assert.strictEqual(observableRegistry['_callbacks'][1].instrument, instrument1);
+      assert.strictEqual(
+        observableRegistry['_callbacks'][1].callback,
+        callback2
+      );
+      assert.strictEqual(
+        observableRegistry['_callbacks'][1].instrument,
+        instrument1
+      );
     });
 
     it('should not add duplicated callbacks', () => {
@@ -50,8 +70,14 @@ describe('ObservableRegistry', () => {
       observableRegistry.addCallback(callback1, instrument1);
 
       assert.strictEqual(observableRegistry['_callbacks'].length, 1);
-      assert.strictEqual(observableRegistry['_callbacks'][0].callback, callback1);
-      assert.strictEqual(observableRegistry['_callbacks'][0].instrument, instrument1);
+      assert.strictEqual(
+        observableRegistry['_callbacks'][0].callback,
+        callback1
+      );
+      assert.strictEqual(
+        observableRegistry['_callbacks'][0].instrument,
+        instrument1
+      );
     });
   });
 
@@ -76,8 +102,14 @@ describe('ObservableRegistry', () => {
       observableRegistry.addBatchCallback(callback2, [instrument1]);
 
       // duplicated pairs.
-      observableRegistry.addBatchCallback(callback1, [instrument1, instrument2]);
-      observableRegistry.addBatchCallback(callback1, [instrument1, instrument2]);
+      observableRegistry.addBatchCallback(callback1, [
+        instrument1,
+        instrument2,
+      ]);
+      observableRegistry.addBatchCallback(callback1, [
+        instrument1,
+        instrument2,
+      ]);
 
       assert.strictEqual(observableRegistry['_batchCallbacks'].length, 3);
     });
@@ -85,7 +117,12 @@ describe('ObservableRegistry', () => {
     it('should ignore callback without associated instruments', () => {
       observableRegistry.addBatchCallback(callback1, []);
       // eslint-disable-next-line no-sparse-arrays
-      observableRegistry.addBatchCallback(callback1, [1, /* hole */, undefined, 2] as unknown as ObservableInstrument[]);
+      observableRegistry.addBatchCallback(callback1, [
+        1 /* hole */,
+        ,
+        undefined,
+        2,
+      ] as unknown as ObservableInstrument[]);
 
       assert.strictEqual(observableRegistry['_batchCallbacks'].length, 0);
     });
@@ -95,15 +132,24 @@ describe('ObservableRegistry', () => {
     it('should remove callback with associated instruments', () => {
       observableRegistry.addBatchCallback(callback1, [instrument1]);
       observableRegistry.addBatchCallback(callback2, [instrument1]);
-      observableRegistry.addBatchCallback(callback1, [instrument1, instrument2]);
+      observableRegistry.addBatchCallback(callback1, [
+        instrument1,
+        instrument2,
+      ]);
       assert.strictEqual(observableRegistry['_batchCallbacks'].length, 3);
 
       observableRegistry.removeBatchCallback(callback1, [instrument1]);
       assert.strictEqual(observableRegistry['_batchCallbacks'].length, 2);
 
       // remove twice
-      observableRegistry.removeBatchCallback(callback1, [instrument1, instrument2]);
-      observableRegistry.removeBatchCallback(callback1, [instrument1, instrument2]);
+      observableRegistry.removeBatchCallback(callback1, [
+        instrument1,
+        instrument2,
+      ]);
+      observableRegistry.removeBatchCallback(callback1, [
+        instrument1,
+        instrument2,
+      ]);
       assert.strictEqual(observableRegistry['_batchCallbacks'].length, 1);
     });
   });

@@ -15,7 +15,12 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { SpanAttributes, SpanAttributeValue, SpanStatusCode, TextMapPropagator } from '@opentelemetry/api';
+import {
+  SpanAttributes,
+  SpanAttributeValue,
+  SpanStatusCode,
+  TextMapPropagator,
+} from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
@@ -179,7 +184,10 @@ export class TracerShim extends opentracing.Tracer {
     }
   }
 
-  override _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
+  override _extract(
+    format: string,
+    carrier: unknown
+  ): opentracing.SpanContext | null {
     if (format === opentracing.FORMAT_BINARY) {
       api.diag.warn('OpentracingShim.extract() does not support FORMAT_BINARY');
       // @todo: Implement binary format
@@ -199,7 +207,10 @@ export class TracerShim extends opentracing.Tracer {
       if (!spanContext) {
         return null;
       }
-      return new SpanContextShim(spanContext, baggage || api.propagation.createBaggage());
+      return new SpanContextShim(
+        spanContext,
+        baggage || api.propagation.createBaggage()
+      );
     }
     return null;
   }
@@ -296,7 +307,11 @@ export class SpanShim extends opentracing.Span {
     return this;
   }
 
-  private _logInternal(eventName: string, attributes: SpanAttributes | undefined, timestamp?: number): void {
+  private _logInternal(
+    eventName: string,
+    attributes: SpanAttributes | undefined,
+    timestamp?: number
+  ): void {
     if (attributes && eventName === 'error') {
       const entries = Object.entries(attributes);
       const errorEntry = entries.find(([key]) => key === 'error.object');

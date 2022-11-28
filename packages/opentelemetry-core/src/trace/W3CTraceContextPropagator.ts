@@ -20,7 +20,8 @@ import {
   SpanContext,
   TextMapGetter,
   TextMapPropagator,
-  TextMapSetter, trace,
+  TextMapSetter,
+  trace,
   TraceFlags,
 } from '@opentelemetry/api';
 import { isTracingSuppressed } from './suppress-tracing';

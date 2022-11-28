@@ -19,7 +19,7 @@ import * as core from '@opentelemetry/core';
 import {
   CompressionAlgorithm,
   OTLPExporterError,
-  OTLPExporterNodeConfigBase
+  OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -27,13 +27,11 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { PassThrough, Stream } from 'stream';
 import * as zlib from 'zlib';
-import {
-  OTLPTraceExporter
-} from '../../src/platform/node';
+import { OTLPTraceExporter } from '../../src/platform/node';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureSpanIsCorrect,
-  mockedReadableSpan
+  mockedReadableSpan,
 } from '../traceHelper';
 import { nextTick } from 'process';
 import { MockedResponse } from './nodeHelpers';
@@ -60,14 +58,13 @@ describe('OTLPTraceExporter - node with json over http', () => {
       const metadata = 'foo';
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const warnStub = sinon.stub();
-      const nop = () => {
-      };
+      const nop = () => {};
       const diagLogger: DiagLogger = {
         debug: nop,
         error: nop,
         info: nop,
         verbose: nop,
-        warn: warnStub
+        warn: warnStub,
       };
       diag.setLogger(diagLogger);
 
@@ -148,7 +145,8 @@ describe('OTLPTraceExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
     });
     it('should not add root path when signal url defined in env contains path and ends in /', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces/';
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+        'http://foo.bar/v1/traces/';
       const collectorExporter = new OTLPTraceExporter();
       assert.strictEqual(
         collectorExporter.url,
@@ -205,7 +203,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
 
     it('should open the connection', done => {
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
         const mockRes = new MockedResponse(200);
@@ -223,7 +221,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
 
     it('should set custom headers', done => {
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
         const mockRes = new MockedResponse(200);
@@ -239,7 +237,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
 
     it('should not have Content-Encoding header', done => {
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
         const mockRes = new MockedResponse(200);
@@ -255,7 +253,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
 
     it('should have keep alive and keepAliveMsecs option set', done => {
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
         const mockRes = new MockedResponse(200);
@@ -274,7 +272,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
     it('different http export requests should use the same agent', done => {
       const clock = sinon.useFakeTimers();
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       const mockRes = new MockedResponse(200);
       const args = stubRequest.args[0];
@@ -286,7 +284,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
       nextTick(() => {
         const clock = sinon.useFakeTimers();
-        collectorExporter.export(spans, () => { });
+        collectorExporter.export(spans, () => {});
 
         const mockRes2 = new MockedResponse(200);
         const args2 = stubRequest.args[1];
@@ -325,7 +323,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       const mockRes = new MockedResponse(200);
       const args = stubRequest.args[0];
@@ -423,7 +421,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
-      collectorExporter.export(spans,() => { });
+      collectorExporter.export(spans, () => {});
 
       const mockRes = new MockedResponse(200);
       const args = stubRequest.args[0];
@@ -481,7 +479,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
-        fakeRequest.emit('error', { code: 'ECONNRESET'});
+        fakeRequest.emit('error', { code: 'ECONNRESET' });
 
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;

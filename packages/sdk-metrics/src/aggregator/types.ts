@@ -115,8 +115,10 @@ export interface Aggregator<T> {
    * @param endTime the end time of the metric data.
    * @return the {@link MetricData} that this {@link Aggregator} will produce.
    */
-  toMetricData(descriptor: InstrumentDescriptor,
+  toMetricData(
+    descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<T>[],
-    endTime: HrTime): Maybe<MetricData>;
+    endTime: HrTime
+  ): Maybe<MetricData>;
 }

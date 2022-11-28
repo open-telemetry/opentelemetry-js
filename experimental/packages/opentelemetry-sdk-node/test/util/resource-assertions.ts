@@ -306,12 +306,14 @@ export const assertEmptyResource = (resource: Resource) => {
 };
 
 const assertHasOneLabel = (prefix: string, resource: Resource): void => {
-  const hasOne = Object.entries(SemanticResourceAttributes).find(([key, value]) => {
-    return (
-      key.startsWith(prefix) &&
-      Object.prototype.hasOwnProperty.call(resource.attributes, value)
-    );
-  });
+  const hasOne = Object.entries(SemanticResourceAttributes).find(
+    ([key, value]) => {
+      return (
+        key.startsWith(prefix) &&
+        Object.prototype.hasOwnProperty.call(resource.attributes, value)
+      );
+    }
+  );
 
   assert.ok(
     hasOne,

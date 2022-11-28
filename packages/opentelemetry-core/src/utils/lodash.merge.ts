@@ -42,7 +42,7 @@ const nativeObjectToString = objectProto.toString;
  * @returns {Function} Returns the new function.
  */
 function overArg(func: Function, transform: any): any {
-  return function(arg: any) {
+  return function (arg: any) {
     return func(transform(arg));
   };
 }
@@ -84,8 +84,11 @@ export function isPlainObject(value: any) {
     return true;
   }
   const Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
-  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
-    funcToString.call(Ctor) === objectCtorString;
+  return (
+    typeof Ctor == 'function' &&
+    Ctor instanceof Ctor &&
+    funcToString.call(Ctor) === objectCtorString
+  );
 }
 
 /**
@@ -127,7 +130,7 @@ function baseGetTag(value: any) {
   if (value == null) {
     return value === undefined ? undefinedTag : nullTag;
   }
-  return (symToStringTag && symToStringTag in Object(value))
+  return symToStringTag && symToStringTag in Object(value)
     ? getRawTag(value)
     : objectToString(value);
 }

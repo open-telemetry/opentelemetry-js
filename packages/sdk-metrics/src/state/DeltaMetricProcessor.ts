@@ -34,7 +34,12 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
 
   constructor(private _aggregator: Aggregator<T>) {}
 
-  record(value: number, attributes: MetricAttributes, _context: Context, collectionTime: HrTime) {
+  record(
+    value: number,
+    attributes: MetricAttributes,
+    _context: Context,
+    collectionTime: HrTime
+  ) {
     const accumulation = this._activeCollectionStorage.getOrDefault(
       attributes,
       () => this._aggregator.createAccumulation(collectionTime)
@@ -42,22 +47,31 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
     accumulation?.record(value);
   }
 
-  batchCumulate(measurements: AttributeHashMap<number>, collectionTime: HrTime) {
-    Array.from(measurements.entries()).forEach(([attributes, value, hashCode]) => {
-      const accumulation = this._aggregator.createAccumulation(collectionTime);
-      accumulation?.record(value);
-      let delta = accumulation;
-      if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
-        // has() returned true, previous is present.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const previous = this._cumulativeMemoStorage.get(attributes, hashCode)!;
-        delta = this._aggregator.diff(previous, accumulation);
-      }
+  batchCumulate(
+    measurements: AttributeHashMap<number>,
+    collectionTime: HrTime
+  ) {
+    Array.from(measurements.entries()).forEach(
+      ([attributes, value, hashCode]) => {
+        const accumulation =
+          this._aggregator.createAccumulation(collectionTime);
+        accumulation?.record(value);
+        let delta = accumulation;
+        if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
+          // has() returned true, previous is present.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const previous = this._cumulativeMemoStorage.get(
+            attributes,
+            hashCode
+          )!;
+          delta = this._aggregator.diff(previous, accumulation);
+        }
 
-      // Save the current record and the delta record.
-      this._cumulativeMemoStorage.set(attributes, accumulation, hashCode);
-      this._activeCollectionStorage.set(attributes, delta, hashCode);
-    });
+        // Save the current record and the delta record.
+        this._cumulativeMemoStorage.set(attributes, accumulation, hashCode);
+        this._activeCollectionStorage.set(attributes, delta, hashCode);
+      }
+    );
   }
 
   /**
