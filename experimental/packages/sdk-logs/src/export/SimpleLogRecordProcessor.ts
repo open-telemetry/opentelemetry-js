@@ -36,7 +36,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
   }
 
   public forceFlush(): Promise<void> {
-    // do nothing as all spans are being exported without waiting
+    // do nothing as all logs are being exported without waiting
     return Promise.resolve();
   }
 

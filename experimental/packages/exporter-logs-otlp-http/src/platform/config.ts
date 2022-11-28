@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
+import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { getEnv } from "@opentelemetry/core";
-import {
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
-  OTLPExporterConfigBase,
-} from "@opentelemetry/otlp-exporter-base";
+import { appendResourcePathToUrl, appendRootPathToUrlIfNeeded } from "@opentelemetry/otlp-exporter-base";
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = "v1/logs";
 export const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;

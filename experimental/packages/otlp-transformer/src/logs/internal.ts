@@ -19,9 +19,9 @@ import type { ReadableLogRecord } from "@opentelemetry/sdk-logs";
 import { hrTimeToNanoseconds } from "@opentelemetry/core";
 
 import type { IResource } from "../resource/types";
+import type { IScopeLogs, ILogRecord, IResourceLogs } from "./types";
 import { toAnyValue, toAttributes } from "../common/internal";
 
-import type { IScopeLogs, ILogRecord, IResourceLogs } from "./types";
 
 type ResourceMapValue = Map<string, ReadableLogRecord[]>;
 

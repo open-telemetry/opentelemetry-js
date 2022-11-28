@@ -16,7 +16,8 @@
 
 import * as assert from "assert";
 
-import { Logger, logs } from "../../src";
+import type { Logger } from "../../src";
+import { logs } from "../../src";
 import { NoopLogger } from "../../src/NoopLogger";
 import { NoopLoggerProvider } from "../../src/NoopLoggerProvider";
 

@@ -69,9 +69,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   }
 
   /**
-   * Notifies all registered LogRecordProcessor to flush any buffered data.
-   *
-   * Returns a promise which is resolved when all flushes are complete.
+   * Notifies all registered {@link LogRecordProcessor} to flush any buffered data.
+   * @returns Returns a promise which is resolved when all flushes are complete.
    */
   public forceFlush(): Promise<void> {
     if (this._shutdownOnceFeature.isCalled) {

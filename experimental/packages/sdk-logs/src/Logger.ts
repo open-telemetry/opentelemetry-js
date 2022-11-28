@@ -32,6 +32,7 @@ export class Logger implements logsAPI.Logger {
     this._loggerSharedState = config.loggerSharedState;
     this._instrumentationScope = config.instrumentationScope;
   }
+
   /**
    * Get a new {@link LogRecord} instance
    *

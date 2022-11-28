@@ -21,7 +21,7 @@ import type { LogRecordOptions } from "@opentelemetry/api-logs";
 import type { LoggerSharedState } from "./LoggerSharedState";
 
 export interface LoggerProviderConfig {
-  /** Resource associated with trace telemetry  */
+  /** Resource associated with log telemetry  */
   resource?: Resource;
 
   /** Log Record Limits*/
