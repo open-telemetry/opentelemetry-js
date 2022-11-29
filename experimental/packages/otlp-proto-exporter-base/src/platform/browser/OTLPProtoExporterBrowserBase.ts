@@ -19,14 +19,16 @@ import { ServiceClientType } from '../types';
 import {
   OTLPExporterBrowserBase as OTLPExporterBaseMain,
   OTLPExporterError,
-  OTLPExporterConfigBase
+  OTLPExporterConfigBase,
+  sendWithXhr
 } from '@opentelemetry/otlp-exporter-base';
-import { send } from './util';
+import * as root from '../../generated/root';
 
-type SendFn = <ExportItem, ServiceRequest>(collector: OTLPProtoExporterBrowserBase<ExportItem, ServiceRequest>,
-  objects: ExportItem[],
-  onSuccess: () => void,
-  onError: (error: OTLPExporterError) => void) => void;
+interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
+  create(properties?: T): R;
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: (protobuf.Reader | Uint8Array), length?: number): R;
+}
 
 /**
  * Collector Exporter abstract base class
@@ -35,28 +37,19 @@ export abstract class OTLPProtoExporterBrowserBase<
 ExportItem,
 ServiceRequest
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {
-  private _send!: SendFn;
 
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
   }
 
-  private _sendPromise(
-    objects: ExportItem[],
-    onSuccess: () => void,
-    onError: (error: OTLPExporterError) => void
-  ): void {
-    const promise = new Promise<void>((resolve, reject) => {
-      this._send(this, objects, resolve, reject);
-    })
-      .then(onSuccess, onError);
-
-    this._sendingPromises.push(promise);
-    const popPromise = () => {
-      const index = this._sendingPromises.indexOf(promise);
-      this._sendingPromises.splice(index, 1);
-    };
-    promise.then(popPromise, popPromise);
+ private getExportRequestProto<ServiceRequest>(
+  clientType: ServiceClientType,
+  ): ExportRequestType<ServiceRequest> {
+    if (clientType === ServiceClientType.SPANS) {
+      return root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
+    } else {
+      return root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest as unknown as ExportRequestType<ServiceRequest>;
+    }
   }
 
   override send(
@@ -68,13 +61,28 @@ ServiceRequest
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
-    if (!this._send) {
-      this._send = send;
-      this._sendPromise(objects, onSuccess, onError);
+
+    const serviceRequest = this.convert(objects);
+    const exportRequestType = this.getExportRequestProto<ServiceRequest>(this.getServiceClientType());
+    const message = exportRequestType.create(serviceRequest);
+
+    if (message) {
+      const body = exportRequestType.encode(message).finish();
+      if (body) {
+        sendWithXhr(
+          new Blob([body], { type: 'application/x-protobuf'}),
+          this.url,
+          {...this._headers, 'Content-Type': 'application/x-protobuf'},
+          this.timeoutMillis,
+          onSuccess,
+          onError
+        );
+      }
     } else {
-      this._sendPromise(objects, onSuccess, onError);
+      onError(new OTLPExporterError('No proto'));
     }
   }
+
 abstract getServiceClientType(): ServiceClientType;
 
 }
