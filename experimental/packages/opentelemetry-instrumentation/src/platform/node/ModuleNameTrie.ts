@@ -57,19 +57,28 @@ export class ModuleNameTrie {
    *
    * @param {string} moduleName Module name
    * @param {boolean} maintainInsertionOrder Whether to return the results in insertion order
+   * @param {boolean} fullOnly Whether to return only full matches
    * @returns {Hooked[]} Matching hooks
    */
-  search(moduleName: string, { maintainInsertionOrder }: { maintainInsertionOrder?: boolean } = {}): Hooked[] {
+  search(moduleName: string, { maintainInsertionOrder, fullOnly }: { maintainInsertionOrder?: boolean, fullOnly?: boolean } = {}): Hooked[] {
     let trieNode = this._trie;
     const results: ModuleNameTrieNode['hooks'] = [];
+    let foundFull = true;
 
     for (const moduleNamePart of moduleName.split(ModuleNameSeparator)) {
       const nextNode = trieNode.children.get(moduleNamePart);
       if (!nextNode) {
+        foundFull = false;
         break;
       }
-      results.push(...nextNode.hooks);
+      if (!fullOnly) {
+        results.push(...nextNode.hooks);
+      }
       trieNode = nextNode;
+    }
+
+    if (fullOnly && foundFull) {
+      results.push(...trieNode.hooks);
     }
 
     if (results.length === 0) {
