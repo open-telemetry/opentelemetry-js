@@ -321,22 +321,15 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
 
         function endSpanOnSuccess(span: api.Span, response: Response) {
           plugin._applyAttributesAfterFetch(span, options, response);
-          const spanResponse = {
-            status: response.status,
-            statusText: response.statusText,
-            headers: response.headers,
-            url
-          };
           if (response.status >= 200 && response.status < 400) {
-            if (response.url != null && response.url !== '') {
-              spanResponse.url = url;
-            }
+            plugin._endSpan(span, spanData, response);
+          } else {
+            plugin._endSpan(span, spanData, {
+              status: response.status,
+              statusText: response.statusText,
+              url,
+            });
           }
-          plugin._endSpan(span, spanData, {
-            status: response.status,
-            statusText: response.statusText,
-            url,
-          });
         }
 
         function onSuccess(

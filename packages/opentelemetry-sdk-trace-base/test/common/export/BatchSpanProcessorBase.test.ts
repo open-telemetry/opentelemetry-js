@@ -16,14 +16,13 @@
 
 import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
-  AlwaysOnSampler,
   ExportResultCode,
   loggingErrorHandler,
-  setGlobalErrorHandler,
+  setGlobalErrorHandler
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
+import { AlwaysOnSampler, BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
@@ -433,6 +432,23 @@ describe('BatchSpanProcessorBase', () => {
           processor.onEnd(span);
         }
         assert.equal(processor['_finishedSpans'].length, 6);
+      });
+    });
+  });
+
+  describe('maxExportBatchSize', () => {
+    let processor: BatchSpanProcessor;
+
+    describe('when "maxExportBatchSize" is greater than "maxQueueSize"', () => {
+      beforeEach(() => {
+        processor = new BatchSpanProcessor(
+          exporter,{
+            maxExportBatchSize: 7,
+            maxQueueSize: 6,
+          });
+      });
+      it('should match maxQueueSize', () => {
+        assert.equal(processor['_maxExportBatchSize'], processor['_maxQueueSize']);
       });
     });
   });

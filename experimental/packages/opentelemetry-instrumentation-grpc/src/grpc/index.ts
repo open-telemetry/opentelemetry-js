@@ -27,7 +27,7 @@ import {
   SendUnaryDataCallback,
   GrpcClientFunc,
 } from './types';
-import { GrpcInstrumentationConfig } from '../types';
+import { GrpcInstrumentationConfig, metadataCaptureType } from '../types';
 import {
   context,
   propagation,
@@ -41,8 +41,9 @@ import {
   serverStreamAndBidiHandler,
 } from './serverUtils';
 import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
-import { _methodIsIgnored } from '../utils';
-import { AttributeNames } from '../enums/AttributeNames';
+import {_extractMethodAndService, _methodIsIgnored, metadataCapture} from '../utils';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {AttributeValues} from '../enums/AttributeValues';
 
 /**
  * Holding reference to grpc module here to access constant of grpc modules
@@ -52,13 +53,16 @@ let grpcClient: typeof grpcTypes;
 
 export class GrpcNativeInstrumentation extends InstrumentationBase<
   typeof grpcTypes
-> {
+  > {
+  private _metadataCapture: metadataCaptureType;
+
   constructor(
     name: string,
     version: string,
     config?: GrpcInstrumentationConfig
   ) {
     super(name, version, config);
+    this._metadataCapture = this._createMetadataCapture();
   }
 
   init() {
@@ -102,6 +106,11 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
 
   override getConfig(): GrpcInstrumentationConfig {
     return super.getConfig();
+  }
+
+  override setConfig(config?: GrpcInstrumentationConfig): void {
+    super.setConfig(config);
+    this._metadataCapture = this._createMetadataCapture();
   }
 
   private _getInternalPatchs() {
@@ -195,10 +204,14 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                   keys: metadata => Object.keys(metadata.getMap()),
                 }),
                 () => {
+                  const { service, method } = _extractMethodAndService(name);
+
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
+                      [SemanticAttributes.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
+                      [SemanticAttributes.RPC_METHOD]: method,
+                      [SemanticAttributes.RPC_SERVICE]: service,
                     });
 
                   context.with(trace.setSpan(context.active(), span), () => {
@@ -291,11 +304,21 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         )}`;
         const args = Array.prototype.slice.call(arguments);
         const metadata = getMetadata(grpcClient, original, args);
+        const { service, method } = _extractMethodAndService(original.path);
         const span = instrumentation.tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
-        });
+        })
+          .setAttributes({
+            [SemanticAttributes.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
+            [SemanticAttributes.RPC_METHOD]: method,
+            [SemanticAttributes.RPC_SERVICE]: service,
+          });
+
+        instrumentation._metadataCapture.client.captureRequestMetadata(span, metadata);
+
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
+            grpcClient,
             original,
             args,
             metadata,
@@ -305,6 +328,17 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
       }
       Object.assign(clientMethodTrace, original);
       return clientMethodTrace;
+    };
+  }
+
+  private _createMetadataCapture(): metadataCaptureType {
+    const config = this.getConfig();
+
+    return {
+      client: {
+        captureRequestMetadata: metadataCapture('request', config.metadataToSpanAttributes?.client?.requestMetadata ?? []),
+        captureResponseMetadata: metadataCapture('response', config.metadataToSpanAttributes?.client?.responseMetadata ?? [])
+      }
     };
   }
 }

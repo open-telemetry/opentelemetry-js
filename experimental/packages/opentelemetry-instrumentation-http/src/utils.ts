@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import {
+  MetricAttributes,
   SpanAttributes,
   SpanStatusCode,
   Span,
@@ -295,6 +296,26 @@ export const isValidOptionsType = (options: unknown): boolean => {
   return type === 'string' || (type === 'object' && !Array.isArray(options));
 };
 
+export const extractHostnameAndPort = (
+  requestOptions: Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>
+): { hostname: string, port: number | string } => {
+  if (requestOptions.hostname && requestOptions.port) {
+    return { hostname: requestOptions.hostname, port: requestOptions.port };
+  }
+  const matches = requestOptions.host?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
+  const hostname = requestOptions.hostname || (matches === null ? 'localhost' : matches[1]);
+  let port = requestOptions.port;
+  if (!port) {
+    if (matches && matches[2]) {
+      // remove the leading ":". The extracted port would be something like ":8080"
+      port = matches[2].substring(1);
+    } else {
+      port = requestOptions.protocol === 'https:' ? '443' : '80';
+    }
+  }
+  return { hostname, port };
+};
+
 /**
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
@@ -302,13 +323,10 @@ export const isValidOptionsType = (options: unknown): boolean => {
  */
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
-  options: { component: string; hostname: string; hookAttributes?: SpanAttributes }
+  options: { component: string; hostname: string; port: string | number, hookAttributes?: SpanAttributes }
 ): SpanAttributes => {
-  const host = requestOptions.host;
-  const hostname =
-    requestOptions.hostname ||
-    host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
-    'localhost';
+  const hostname = options.hostname;
+  const port = options.port;
   const requestMethod = requestOptions.method;
   const method = requestMethod ? requestMethod.toUpperCase() : 'GET';
   const headers = requestOptions.headers || {};
@@ -322,12 +340,27 @@ export const getOutgoingRequestAttributes = (
     [SemanticAttributes.HTTP_METHOD]: method,
     [SemanticAttributes.HTTP_TARGET]: requestOptions.path || '/',
     [SemanticAttributes.NET_PEER_NAME]: hostname,
+    [SemanticAttributes.HTTP_HOST]: requestOptions.headers?.host ?? `${hostname}:${port}`,
   };
 
   if (userAgent !== undefined) {
     attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
   return Object.assign(attributes, options.hookAttributes);
+};
+
+/**
+ * Returns outgoing request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributes = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_PEER_NAME] = spanAttributes[SemanticAttributes.NET_PEER_NAME];
+  //TODO: http.url attribute, it should susbtitute any parameters to avoid high cardinality.
+  return metricAttributes;
 };
 
 /**
@@ -354,14 +387,12 @@ export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
  */
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
-  options: { hostname: string }
 ): SpanAttributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
   const attributes: SpanAttributes = {
     [SemanticAttributes.NET_PEER_IP]: remoteAddress,
     [SemanticAttributes.NET_PEER_PORT]: remotePort,
-    [SemanticAttributes.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
   setResponseContentLengthAttribute(response, attributes);
 
@@ -374,6 +405,20 @@ export const getOutgoingRequestAttributesOnResponse = (
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes);
+};
+
+/**
+ * Returns outgoing request Metric attributes scoped to the response data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributesOnResponse = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.NET_PEER_PORT] = spanAttributes[SemanticAttributes.NET_PEER_PORT];
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  return metricAttributes;
 };
 
 /**
@@ -406,6 +451,7 @@ export const getIncomingRequestAttributes = (
     [SemanticAttributes.HTTP_HOST]: host,
     [SemanticAttributes.NET_HOST_NAME]: hostname,
     [SemanticAttributes.HTTP_METHOD]: method,
+    [SemanticAttributes.HTTP_SCHEME]: options.component,
   };
 
   if (typeof ips === 'string') {
@@ -427,6 +473,23 @@ export const getIncomingRequestAttributes = (
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes, options.hookAttributes);
+};
+
+/**
+ * Returns incoming request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ * @param {{ component: string }} options used to pass data needed to create attributes
+ */
+export const getIncomingRequestMetricAttributes = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_SCHEME] = spanAttributes[SemanticAttributes.HTTP_SCHEME];
+  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_HOST_NAME] = spanAttributes[SemanticAttributes.NET_HOST_NAME];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
+  return metricAttributes;
 };
 
 /**
@@ -457,6 +520,19 @@ export const getIncomingRequestAttributesOnResponse = (
     attributes[SemanticAttributes.HTTP_ROUTE] = rpcMetadata.route;
   }
   return attributes;
+};
+
+/**
+ * Returns incoming request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getIncomingRequestMetricAttributesOnResponse = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.NET_HOST_PORT] = spanAttributes[SemanticAttributes.NET_HOST_PORT];
+  return metricAttributes;
 };
 
 export function headerCapture(type: 'request' | 'response', headers: string[]) {

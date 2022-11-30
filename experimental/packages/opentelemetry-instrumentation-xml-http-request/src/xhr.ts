@@ -339,7 +339,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       kind: api.SpanKind.CLIENT,
       attributes: {
         [SemanticAttributes.HTTP_METHOD]: method,
-        [SemanticAttributes.HTTP_URL]: url,
+        [SemanticAttributes.HTTP_URL]: parseUrl(url).toString(),
       },
     });
 

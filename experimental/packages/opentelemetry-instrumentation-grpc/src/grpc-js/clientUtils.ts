@@ -17,7 +17,6 @@
 import { GrpcJsInstrumentation } from './';
 import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
 import {
-  SpanKind,
   Span,
   SpanStatusCode,
   SpanStatus,
@@ -34,6 +33,7 @@ import { CALL_SPAN_ENDED } from './serverUtils';
 import { EventEmitter } from 'events';
 import { AttributeNames } from '../enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { metadataCaptureType } from '../types';
 import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 /**
@@ -71,6 +71,7 @@ export function getMethodsToWrap(
  * span on callback or receiving an emitted event.
  */
 export function makeGrpcClientRemoteCall(
+  metadataCapture: metadataCaptureType,
   original: GrpcClientFunc,
   args: unknown[],
   metadata: grpcJs.Metadata,
@@ -128,13 +129,12 @@ export function makeGrpcClientRemoteCall(
       }
     }
 
-    span.setAttributes({
-      [AttributeNames.GRPC_METHOD]: original.path,
-      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
-    });
-
     setSpanContext(metadata);
     const call = original.apply(self, args);
+
+    call.on('metadata', responseMetadata => {
+      metadataCapture.client.captureResponseMetadata(span, responseMetadata);
+    });
 
     // if server stream or bidi
     if (original.responseStream) {

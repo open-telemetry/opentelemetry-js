@@ -23,6 +23,7 @@ import {
   Span,
   SpanStatusCode,
   SpanKind,
+  SpanStatus,
   propagation,
 } from '@opentelemetry/api';
 import {
@@ -31,12 +32,14 @@ import {
   findIndex,
 } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
+import { metadataCaptureType } from '../types';
 import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 /**
  * This method handles the client remote call
  */
 export const makeGrpcClientRemoteCall = function (
+  metadataCapture: metadataCaptureType,
   original: GrpcClientFunc,
   args: any[],
   metadata: grpcTypes.Metadata,
@@ -98,13 +101,15 @@ export const makeGrpcClientRemoteCall = function (
     }
 
     span.addEvent('sent');
-    span.setAttributes({
-      [AttributeNames.GRPC_METHOD]: original.path,
-      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
-    });
 
     setSpanContext(metadata);
     const call = original.apply(self, args);
+
+    ((call as unknown) as events.EventEmitter).on(
+      'metadata',
+      responseMetadata => {
+        metadataCapture.client.captureResponseMetadata(span, responseMetadata);
+      });
 
     // if server stream or bidi
     if (original.responseStream) {

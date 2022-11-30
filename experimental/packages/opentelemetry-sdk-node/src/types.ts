@@ -15,14 +15,15 @@
  */
 
 import type { ContextManager, SpanAttributes } from '@opentelemetry/api';
-import { Sampler, TextMapPropagator } from '@opentelemetry/api';
+import { TextMapPropagator } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
-import { Resource } from '@opentelemetry/resources';
-import { MetricReader } from '@opentelemetry/sdk-metrics-base';
+import { Detector, Resource } from '@opentelemetry/resources';
+import { MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
+  Sampler,
   SpanExporter,
   SpanLimits,
-  SpanProcessor
+  SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 
 export interface NodeSDKConfiguration {
@@ -31,8 +32,10 @@ export interface NodeSDKConfiguration {
   defaultAttributes: SpanAttributes;
   textMapPropagator: TextMapPropagator;
   metricReader: MetricReader;
+  views: View[]
   instrumentations: InstrumentationOption[];
   resource: Resource;
+  resourceDetectors: Detector[];
   sampler: Sampler;
   serviceName?: string;
   spanProcessor: SpanProcessor;

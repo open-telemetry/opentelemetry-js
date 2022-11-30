@@ -117,6 +117,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[def-context]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/context.md
+[def-context]: https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/context.md
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-trace-node
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk-trace-node.svg

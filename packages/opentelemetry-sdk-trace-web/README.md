@@ -31,8 +31,11 @@ npm install --save @opentelemetry/sdk-trace-web
 ## Usage
 
 ```js
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import {
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+  WebTracerProvider,
+} from '@opentelemetry/sdk-trace-web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';

@@ -177,6 +177,17 @@ implements ContextManager {
   ) {
     const contextManager = this;
     return function (this: never, event: string, listener: Func<void>) {
+      /**
+       * This check is required to prevent double-wrapping the listener.
+       * The implementation for ee.once wraps the listener and calls ee.on.
+       * Without this check, we would wrap that wrapped listener.
+       * This causes an issue because ee.removeListener depends on the onceWrapper
+       * to properly remove the listener. If we wrap their wrapper, we break
+       * that detection.
+       */
+      if (contextManager._wrapped) {
+        return original.call(this, event, listener);
+      }
       let map = contextManager._getPatchMap(ee);
       if (map === undefined) {
         map = contextManager._createPatchMap(ee);
@@ -189,7 +200,16 @@ implements ContextManager {
       const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
-      return original.call(this, event, patchedListener);
+
+      /**
+       * See comment at the start of this function for the explanation of this property.
+       */
+      contextManager._wrapped = true;
+      try {
+        return original.call(this, event, patchedListener);
+      } finally {
+        contextManager._wrapped = false;
+      }
     };
   }
 
@@ -204,4 +224,5 @@ implements ContextManager {
   }
 
   private readonly _kOtListeners = Symbol('OtListeners');
+  private _wrapped = false;
 }

@@ -837,6 +837,17 @@ describe('fetch', () => {
         `event ${PTN.REQUEST_START} is not defined`
       );
     });
+
+    it('should have an absolute http.url attribute', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const attributes = span.attributes;
+
+      assert.strictEqual(
+        attributes[SemanticAttributes.HTTP_URL],
+        location.origin + '/get',
+        `attributes ${SemanticAttributes.HTTP_URL} is wrong`
+      );
+    });
   });
 
   describe('when PerformanceObserver is undefined', () => {

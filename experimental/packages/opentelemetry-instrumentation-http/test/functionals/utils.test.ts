@@ -28,11 +28,12 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { IgnoreMatcher } from '../../src/types';
+import {IgnoreMatcher, ParsedRequestOptions} from '../../src/types';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import {extractHostnameAndPort} from '../../src/utils';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -534,6 +535,60 @@ describe('Utility', () => {
 
       assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
       assert.deepStrictEqual(span.attributes['http.request.header.accept'], undefined);
+    });
+  });
+
+  describe('extractHostnameAndPort', () => {
+    it('should return the hostname and port defined in the parsedOptions', () => {
+      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      const parsedOption: tmpParsedOption = {
+        hostname: 'www.google.com',
+        port: '80',
+        host: 'www.google.com',
+        protocol: 'http:'
+      };
+      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      assert.strictEqual(hostname, parsedOption.hostname);
+      assert.strictEqual(port, parsedOption.port);
+    });
+
+    it('should return the hostname and port based on host field defined in the parsedOptions when hostname and port are missing', () => {
+      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      const parsedOption: tmpParsedOption = {
+        hostname: null,
+        port: null,
+        host: 'www.google.com:8181',
+        protocol: 'http:'
+      };
+      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '8181');
+    });
+
+    it('should infer the port number based on protocol https when can not extract it from host field', () => {
+      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      const parsedOption: tmpParsedOption = {
+        hostname: null,
+        port: null,
+        host: 'www.google.com',
+        protocol: 'https:'
+      };
+      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '443');
+    });
+
+    it('should infer the port number based on protocol http when can not extract it from host field', () => {
+      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      const parsedOption: tmpParsedOption = {
+        hostname: null,
+        port: null,
+        host: 'www.google.com',
+        protocol: 'http:'
+      };
+      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      assert.strictEqual(hostname, 'www.google.com');
+      assert.strictEqual(port, '80');
     });
   });
 });

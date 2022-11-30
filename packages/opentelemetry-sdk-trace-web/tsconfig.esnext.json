@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.base.esnext.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "build/esnext",
+    "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
@@ -10,22 +10,25 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-context-zone/tsconfig.esnext.json"
+      "path": "../../api"
     },
     {
-      "path": "../opentelemetry-core/tsconfig.esnext.json"
+      "path": "../opentelemetry-context-zone"
     },
     {
-      "path": "../opentelemetry-propagator-b3/tsconfig.esnext.json"
+      "path": "../opentelemetry-core"
     },
     {
-      "path": "../opentelemetry-resources/tsconfig.esnext.json"
+      "path": "../opentelemetry-propagator-b3"
     },
     {
-      "path": "../opentelemetry-sdk-trace-base/tsconfig.esnext.json"
+      "path": "../opentelemetry-resources"
     },
     {
-      "path": "../opentelemetry-semantic-conventions/tsconfig.esnext.json"
+      "path": "../opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }

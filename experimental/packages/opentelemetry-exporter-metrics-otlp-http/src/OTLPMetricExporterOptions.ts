@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
+import { AggregationTemporality } from '@opentelemetry/sdk-metrics';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
   temporalityPreference?: AggregationTemporality
 }
-export const defaultExporterTemporality = AggregationTemporality.CUMULATIVE;
-export const defaultOptions = {temporalityPreference: defaultExporterTemporality};

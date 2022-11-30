@@ -33,7 +33,7 @@ import {
   mockHistogram,
   mockObservableGauge, setUp, shutdown,
 } from './metricsHelper';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { IExportMetricsServiceRequest, IResourceMetrics } from '@opentelemetry/otlp-transformer';
 
 const metricsServiceProtoPath =
@@ -214,13 +214,18 @@ const testOTLPMetricExporter = (params: TestParams) =>
 
           assert.ok(exportedData, 'exportedData does not exist');
 
+          // The order of the metrics is not guaranteed.
+          const counterIndex = exportedData[0].scopeMetrics[0].metrics.findIndex(it => it.name === 'int-counter');
+          const observableIndex = exportedData[0].scopeMetrics[0].metrics.findIndex(it => it.name === 'double-observable-gauge');
+          const histogramIndex = exportedData[0].scopeMetrics[0].metrics.findIndex(it => it.name === 'int-histogram');
+
           const resource = exportedData[0].resource;
           const counter =
-            exportedData[0].scopeMetrics[0].metrics[0];
+            exportedData[0].scopeMetrics[0].metrics[counterIndex];
           const observableGauge =
-            exportedData[0].scopeMetrics[0].metrics[1];
+            exportedData[0].scopeMetrics[0].metrics[observableIndex];
           const histogram =
-            exportedData[0].scopeMetrics[0].metrics[2];
+            exportedData[0].scopeMetrics[0].metrics[histogramIndex];
           ensureExportedCounterIsCorrect(
             counter,
             counter.sum?.dataPoints[0].timeUnixNano,

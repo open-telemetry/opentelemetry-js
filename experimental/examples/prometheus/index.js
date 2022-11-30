@@ -1,7 +1,7 @@
 'use strict';
 
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
@@ -31,8 +31,17 @@ const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
 
 const attributes = { pid: process.pid, environment: 'staging' };
 
+let counter = 0;
+const observableCounter = meter.createObservableCounter('observable_requests', {
+  description: 'Example of an ObservableCounter',
+});
+observableCounter.addCallback(observableResult => {
+  observableResult.observe(counter, attributes);
+});
+
 // Record metrics
 setInterval(() => {
+  counter++;
   requestCounter.add(1, attributes);
   upDownCounter.add(Math.random() > 0.5 ? 1 : -1, attributes);
 }, 1000);

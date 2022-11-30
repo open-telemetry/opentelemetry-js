@@ -29,9 +29,8 @@ import {
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
-  AlwaysOnSampler,
-  AlwaysOffSampler,
   TraceState,
+  W3CTraceContextPropagator,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -43,12 +42,39 @@ import {
   InMemorySpanExporter,
   SpanExporter,
   BatchSpanProcessor,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
 } from '../../src';
 
-describe('BasicTracerProvider', () => {
-  let removeEvent: (() => void) | undefined;
+class DummyPropagator implements TextMapPropagator {
+  inject(
+    context: Context,
+    carrier: any,
+    setter: TextMapSetter<any>
+  ): void {
+    throw new Error('Method not implemented.');
+  }
+  extract(
+    context: Context,
+    carrier: any,
+    getter: TextMapGetter<any>
+  ): Context {
+    throw new Error('Method not implemented.');
+  }
+  fields(): string[] {
+    throw new Error('Method not implemented.');
+  }
+}
 
+class DummyExporter extends InMemorySpanExporter {}
+
+describe('BasicTracerProvider', () => {
   let envSource: Record<string, any>;
+  let setGlobalPropagatorStub: sinon.SinonSpy<
+    [TextMapPropagator],
+    boolean
+  >;
+
   if (typeof process === 'undefined') {
     envSource = (globalThis as unknown) as Record<string, any>;
   } else {
@@ -56,15 +82,15 @@ describe('BasicTracerProvider', () => {
   }
 
   beforeEach(() => {
+    // to avoid actually registering the TraceProvider and leaking env to other tests
+    sinon.stub(trace, 'setGlobalTracerProvider');
+    setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+
     context.disable();
   });
 
   afterEach(() => {
     sinon.restore();
-    if (removeEvent) {
-      removeEvent();
-      removeEvent = undefined;
-    }
   });
 
   describe('constructor', () => {
@@ -182,6 +208,108 @@ describe('BasicTracerProvider', () => {
         });
       });
 
+      describe('when attribute value length limit is defined via env', () => {
+        it('should have general attribute value length limits value as defined with env', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '115';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 115);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+        it('should have span attribute value length limit value same as general limit value', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, 125);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+        it('should have span and general attribute value length limits as defined in env', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
+          envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = '109';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, 109);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+        it('should have span attribute value length limit as deafult of Infinity', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
+          envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+      });
+
+      describe('when attribute value length limit is not defined via env', () => {
+        it('should use default value of Infinity', () => {
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, Infinity);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
+        });
+      });
+
+      describe('when attribute count limit is defined via env', () => {
+        it('should general attribute count limit as defined with env', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '25';
+          const tracer = new BasicTracerProvider({}).getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 25);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+        });
+        it('should have span attribute count limit value same as general limit value', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 20);
+          assert.strictEqual(spanLimits.attributeCountLimit, 20);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+        });
+        it('should have span and general attribute count limits as defined in env', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
+          envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '35';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 20);
+          assert.strictEqual(spanLimits.attributeCountLimit, 35);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
+        });
+        it('should have span attribute count limit as default of 128', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
+          envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '128';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 20);
+          assert.strictEqual(spanLimits.attributeCountLimit, 128);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
+        });
+      });
+
+      describe('when attribute count limit is not defined via env', () => {
+        it('should use default value of 128', () => {
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 128);
+          assert.strictEqual(spanLimits.attributeCountLimit, 128);
+        });
+      });
+
       describe('when "eventCountLimit" is defined', () => {
         it('should have tracer with defined value', () => {
           const tracer = new BasicTracerProvider({
@@ -240,40 +368,104 @@ describe('BasicTracerProvider', () => {
     });
   });
 
-  describe('.register()', () => {
-    describe('propagator', () => {
-      class DummyPropagator implements TextMapPropagator {
-        inject(
-          context: Context,
-          carrier: any,
-          setter: TextMapSetter<any>
-        ): void {
-          throw new Error('Method not implemented.');
+  describe('Custom TracerProvider through inheritance', () => {
+    beforeEach(() => {
+      envSource.OTEL_TRACES_EXPORTER = 'custom-exporter';
+      envSource.OTEL_PROPAGATORS = 'custom-propagator';
+    });
+
+    afterEach(() => {
+      delete envSource.OTEL_TRACES_EXPORTER;
+      delete envSource.OTEL_PROPAGATORS;
+      sinon.restore();
+    });
+
+    it('can be extended by overriding registered components', () => {
+      class CustomTracerProvider extends BasicTracerProvider {
+        protected static override readonly _registeredPropagators = new Map<
+          string,
+          () => TextMapPropagator
+            >([
+              ...BasicTracerProvider._registeredPropagators,
+              ['custom-propagator', () => new DummyPropagator()],
+            ]);
+
+        protected static override readonly _registeredExporters = new Map<
+          string,
+          () => SpanExporter
+            >([
+              ...BasicTracerProvider._registeredExporters,
+              ['custom-exporter', () => new DummyExporter()],
+            ]);
+      }
+
+      const provider = new CustomTracerProvider({});
+      assert(provider['_getPropagator']('tracecontext') instanceof W3CTraceContextPropagator);
+      /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
+
+      provider.register();
+      const processor = provider.getActiveSpanProcessor();
+      assert(processor instanceof BatchSpanProcessor);
+      // @ts-expect-error access configured to verify its the correct one
+      const exporter = processor._exporter;
+      assert(exporter instanceof DummyExporter);
+
+      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+    });
+
+    it('the old way of extending still works', () => {
+      // this is an anti-pattern, but we test that for backwards compatibility
+      class CustomTracerProvider extends BasicTracerProvider {
+        protected static override readonly _registeredPropagators = new Map<
+          string,
+          () => TextMapPropagator
+            >([
+              ['custom-propagator', () => new DummyPropagator()],
+            ]);
+
+        protected static override readonly _registeredExporters = new Map<
+          string,
+          () => SpanExporter
+            >([
+              ['custom-exporter', () => new DummyExporter()],
+            ]);
+
+        protected override  _getPropagator(name: string): TextMapPropagator | undefined {
+          return (
+            super._getPropagator(name) ||
+            CustomTracerProvider._registeredPropagators.get(name)?.()
+          );
         }
-        extract(
-          context: Context,
-          carrier: any,
-          getter: TextMapGetter<any>
-        ): Context {
-          throw new Error('Method not implemented.');
-        }
-        fields(): string[] {
-          throw new Error('Method not implemented.');
+
+        protected override _getSpanExporter(name: string): SpanExporter | undefined {
+          return (
+            super._getSpanExporter(name) ||
+            CustomTracerProvider._registeredExporters.get(name)?.()
+          );
         }
       }
 
-      let setGlobalPropagatorStub: sinon.SinonSpy<
-        [TextMapPropagator],
-        boolean
-      >;
+      const provider = new CustomTracerProvider({});
+      provider.register();
+      const processor = provider.getActiveSpanProcessor();
+      assert(processor instanceof BatchSpanProcessor);
+      // @ts-expect-error access configured to verify its the correct one
+      const exporter = processor._exporter;
+      assert(exporter instanceof DummyExporter);
+
+      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+    });
+  });
+
+  describe('.register()', () => {
+    describe('propagator', () => {
       let originalPropagators: string | number | undefined | string[];
       beforeEach(() => {
-        setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
         originalPropagators = envSource.OTEL_PROPAGATORS;
       });
 
       afterEach(() => {
-        setGlobalPropagatorStub.restore();
+        sinon.restore();
 
         // otherwise we may assign 'undefined' (a string)
         if (originalPropagators !== undefined) {
@@ -288,10 +480,10 @@ describe('BasicTracerProvider', () => {
         provider.register({
           propagator: new DummyPropagator(),
         });
-        assert.ok(
-          setGlobalPropagatorStub.calledOnceWithExactly(
-            sinon.match.instanceOf(DummyPropagator)
-          )
+
+        sinon.assert.calledOnceWithExactly(
+          setGlobalPropagatorStub,
+          sinon.match.instanceOf(DummyPropagator)
         );
       });
 
@@ -299,10 +491,9 @@ describe('BasicTracerProvider', () => {
         const provider = new BasicTracerProvider();
         provider.register();
 
-        assert.ok(
-          setGlobalPropagatorStub.calledOnceWithExactly(
-            sinon.match.instanceOf(CompositePropagator)
-          )
+        sinon.assert.calledOnceWithExactly(
+          setGlobalPropagatorStub,
+          sinon.match.instanceOf(CompositePropagator)
         );
         assert.deepStrictEqual(setGlobalPropagatorStub.args[0][0].fields(), [
           'traceparent',
@@ -318,13 +509,10 @@ describe('BasicTracerProvider', () => {
         const provider = new BasicTracerProvider({});
         provider.register();
 
-        assert.ok(
-          warnStub.calledOnceWithExactly(
-            'Propagator "missing-propagator" requested through environment variable is unavailable.'
-          )
+        sinon.assert.calledOnceWithExactly(
+          warnStub,
+          'Propagator "missing-propagator" requested through environment variable is unavailable.'
         );
-
-        warnStub.restore();
       });
     });
 

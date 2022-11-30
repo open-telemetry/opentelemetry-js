@@ -59,6 +59,11 @@ function get(input: any, options?: any): GetResult {
     req.on('error', err => {
       reject(err);
     });
+    req.on('timeout', () => {
+      const err = new Error('timeout');
+      req.emit('error', err);
+      reject(err);
+    });
     return req;
   });
 }

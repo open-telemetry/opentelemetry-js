@@ -15,12 +15,17 @@
  */
 
 
-import { diag, DiagLogger } from '@opentelemetry/api';
+import {
+  diag,
+  DiagLogger
+} from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import {
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
   OTLPMetricExporterOptions
 } from '../../src';
 
@@ -28,19 +33,31 @@ import {
   OTLPMetricExporter
 } from '../../src/platform/node';
 import {
+  collect,
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
-  ensureObservableGaugeIsCorrect,
   ensureHistogramIsCorrect,
+  ensureObservableGaugeIsCorrect,
+  HISTOGRAM_AGGREGATION_VIEW,
   mockCounter,
-  mockObservableGauge,
   mockHistogram,
-  collect, shutdown, setUp,
+  mockObservableGauge,
+  setUp,
+  shutdown,
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
-import { Stream, PassThrough } from 'stream';
-import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  AggregationTemporality,
+  ResourceMetrics
+} from '@opentelemetry/sdk-metrics';
+import {
+  PassThrough,
+  Stream
+} from 'stream';
+import {
+  OTLPExporterError,
+  OTLPExporterNodeConfigBase
+} from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
@@ -54,7 +71,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
   let metrics: ResourceMetrics;
 
   beforeEach(async () => {
-    setUp();
+    setUp([HISTOGRAM_AGGREGATION_VIEW]);
   });
 
   afterEach(async () => {
@@ -187,6 +204,34 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
+    it('should use delta temporality defined via env', () => {
+      for (const envValue of ['delta', 'DELTA', 'DeLTa', 'delta     ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
+      }
+    });
+    it('should use cumulative temporality defined via env', () => {
+      for (const envValue of ['cumulative', 'CUMULATIVE', 'CuMULaTIvE', 'cumulative    ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
+      }
+    });
+    it('should configure cumulative temporality with invalid value in env', () => {
+      for (const envValue of ['invalid', ' ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
+      }
+    });
+    it('should respect explicit config over environment variable', () => {
+      envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'cumulative';
+      const exporter = new OTLPMetricExporter({
+        temporalityPreference: AggregationTemporality.DELTA
+      });
+      assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
+    });
   });
 
   describe('export', () => {
@@ -285,29 +330,34 @@ describe('OTLPMetricExporter - node with json over http', () => {
         const responseBody = buff.toString();
 
         const json = JSON.parse(responseBody) as IExportMetricsServiceRequest;
-        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+        // The order of the metrics is not guaranteed.
+        const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
+        const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge2');
+        const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(
           metric1,
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].startTime)
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime)
         );
         assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
         ensureObservableGaugeIsCorrect(
           metric2,
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].startTime),
           6,
           'double-observable-gauge2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureHistogramIsCorrect(
           metric3,
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].startTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].startTime),
           [0, 100],
           [0, 2, 0]
         );

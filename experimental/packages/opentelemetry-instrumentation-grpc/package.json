@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-grpc",
-  "version": "0.29.2",
+  "version": "0.34.0",
   "description": "OpenTelemetry grpc automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -45,34 +45,35 @@
     "access": "public"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.5.9",
-    "@grpc/proto-loader": "0.6.9",
-    "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/context-async-hooks": "1.3.1",
-    "@opentelemetry/core": "1.3.1",
-    "@opentelemetry/sdk-trace-base": "1.3.1",
-    "@opentelemetry/sdk-trace-node": "1.3.1",
-    "@types/mocha": "8.2.3",
-    "@types/node": "14.17.33",
+    "@grpc/grpc-js": "^1.7.1",
+    "@grpc/proto-loader": "^0.7.3",
+    "@opentelemetry/api": "^1.3.0",
+    "@opentelemetry/context-async-hooks": "1.8.0",
+    "@opentelemetry/core": "1.8.0",
+    "@opentelemetry/sdk-trace-base": "1.8.0",
+    "@opentelemetry/sdk-trace-node": "1.8.0",
+    "@types/mocha": "10.0.0",
+    "@types/node": "18.6.5",
     "@types/semver": "7.3.9",
-    "@types/sinon": "10.0.6",
+    "@types/sinon": "10.0.13",
     "codecov": "3.8.3",
     "grpc": "1.24.11",
-    "mocha": "7.2.0",
+    "mocha": "10.0.0",
     "node-pre-gyp": "0.17.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "semver": "7.3.5",
-    "sinon": "12.0.1",
-    "ts-mocha": "9.0.2",
+    "sinon": "14.0.0",
+    "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.0"
+    "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
-    "@opentelemetry/api-metrics": "0.29.2",
-    "@opentelemetry/instrumentation": "0.29.2",
-    "@opentelemetry/semantic-conventions": "1.3.1"
-  }
+    "@opentelemetry/instrumentation": "0.34.0",
+    "@opentelemetry/semantic-conventions": "1.8.0"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
+  "sideEffects": false
 }

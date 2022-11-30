@@ -22,16 +22,16 @@ import {
   ObservableCounter,
   ObservableGauge,
   ObservableUpDownCounter,
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { InstrumentationScope, VERSION } from '@opentelemetry/core';
 import {
-  AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
-  MetricReader
-} from '@opentelemetry/sdk-metrics-base';
+  MetricReader,
+  View
+} from '@opentelemetry/sdk-metrics';
 import {
   IExportMetricsServiceRequest,
   IKeyValue,
@@ -55,11 +55,12 @@ class TestMetricReader extends MetricReader {
   protected onShutdown(): Promise<void> {
     return Promise.resolve(undefined);
   }
-
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
-  }
 }
+
+export const HISTOGRAM_AGGREGATION_VIEW = new View({
+  aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+  instrumentName: 'int-histogram',
+});
 
 const defaultResource = Resource.default().merge(new Resource({
   service: 'ui',
@@ -78,8 +79,8 @@ export async function collect() {
   return (await reader.collect())!;
 }
 
-export function setUp() {
-  meterProvider = new MeterProvider({ resource: defaultResource });
+export function setUp(views?: View[]) {
+  meterProvider = new MeterProvider({ resource: defaultResource, views });
   reader = new TestMetricReader();
   meterProvider.addMetricReader(
     reader
@@ -124,7 +125,6 @@ export function mockDoubleCounter(): Counter {
 }
 
 
-
 export function mockObservableCounter(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-observable-counter'
@@ -158,18 +158,7 @@ export function mockObservableUpDownCounter(
 }
 
 export function mockHistogram(): Histogram {
-  const name = 'int-histogram';
-
-  meterProvider.addView({
-    aggregation: new ExplicitBucketHistogramAggregation([0, 100])
-  },
-  {
-    instrument: {
-      name: name
-    }
-  });
-
-  return meter.createHistogram(name, {
+  return meter.createHistogram('int-histogram', {
     description: 'sample histogram description',
     valueType: ValueType.INT,
   });

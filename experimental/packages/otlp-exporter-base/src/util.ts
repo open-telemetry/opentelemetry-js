@@ -53,14 +53,19 @@ export function appendResourcePathToUrl(url: string, path: string): string {
 /**
  * Adds root path to signal specific endpoint when endpoint contains no path part and no root path
  * @param url
- * @param path
  * @returns url
  */
-export function appendRootPathToUrlIfNeeded(url: string, path: string): string {
-  if (!url.includes(path) && !url.endsWith('/')) {
-    url = url + '/';
+export function appendRootPathToUrlIfNeeded(url: string): string {
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.pathname === '') {
+      parsedUrl.pathname = parsedUrl.pathname + '/';
+    }
+    return parsedUrl.toString();
+  } catch {
+    diag.warn(`Could not parse export URL: '${url}'`);
+    return url;
   }
-  return url;
 }
 
 /**
@@ -83,7 +88,7 @@ export function configureExporterTimeout(timeoutMillis: number | undefined): num
 function getExporterTimeoutFromEnv(): number {
   const definedTimeout =
     Number(getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ??
-    getEnv().OTEL_EXPORTER_OTLP_TIMEOUT);
+      getEnv().OTEL_EXPORTER_OTLP_TIMEOUT);
 
   if (definedTimeout <= 0) {
     // OTLP exporter configured timeout - using default value of 10000ms

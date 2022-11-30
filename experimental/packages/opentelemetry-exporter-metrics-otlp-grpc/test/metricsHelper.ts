@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-import { Counter, Histogram, ObservableGauge, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
+import { Counter, Histogram, ObservableGauge, ObservableResult, ValueType } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
 import {
-  AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader,
-} from '@opentelemetry/sdk-metrics-base';
+  View,
+} from '@opentelemetry/sdk-metrics';
 import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
 
 class TestMetricReader extends MetricReader {
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
-  }
-
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
   }
@@ -41,11 +37,11 @@ class TestMetricReader extends MetricReader {
   }
 }
 
-const testResource = Resource.default().merge(new Resource({
+const testResource = new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
-}));
+});
 
 let meterProvider = new MeterProvider({ resource: testResource });
 
@@ -59,7 +55,15 @@ export async function collect() {
 }
 
 export function setUp() {
-  meterProvider = new MeterProvider({ resource: testResource });
+  meterProvider = new MeterProvider({
+    resource: testResource,
+    views: [
+      new View({
+        aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+        instrumentName: 'int-histogram',
+      })
+    ]
+  });
   reader = new TestMetricReader();
   meterProvider.addMetricReader(
     reader
@@ -96,10 +100,7 @@ export function mockObservableGauge(
 }
 
 export function mockHistogram(): Histogram {
-  const name = 'int-histogram';
-  meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) });
-
-  return meter.createHistogram(name, {
+  return meter.createHistogram('int-histogram', {
     description: 'sample histogram description',
     valueType: ValueType.INT,
   });

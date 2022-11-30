@@ -3,7 +3,9 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for node to be used with [opentelemetry-collector][opentelemetry-collector-url].
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
+This module provides exporter for node to be used with OTLP (`grpc`) compatible receivers.
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.16 <=0.50`.
 
 ## Installation

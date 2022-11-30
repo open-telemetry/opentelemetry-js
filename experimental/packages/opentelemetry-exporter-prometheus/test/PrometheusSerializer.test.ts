@@ -15,36 +15,55 @@
  */
 
 import * as assert from 'assert';
-import { MetricAttributes, UpDownCounter } from '@opentelemetry/api-metrics';
 import {
+  MetricAttributes,
+  UpDownCounter
+} from '@opentelemetry/api';
+import {
+  Aggregation,
   AggregationTemporality,
-  MeterProvider,
-  MetricReader,
   DataPoint,
   DataPointType,
   ExplicitBucketHistogramAggregation,
-  SumAggregation,
   Histogram,
-} from '@opentelemetry/sdk-metrics-base';
+  LastValueAggregation,
+  MeterProvider,
+  MetricReader,
+  SumAggregation,
+  View,
+} from '@opentelemetry/sdk-metrics';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
-import { mockedHrTimeMs, mockHrTime } from './util';
+import {
+  mockedHrTimeMs,
+  mockHrTime,
+  sdkLanguage,
+  sdkName,
+  sdkVersion,
+  serviceName
+} from './util';
+import { Resource } from '@opentelemetry/resources';
 
 const attributes = {
   foo1: 'bar1',
   foo2: 'bar2',
 };
 
+const serializedDefaultResource =
+  '# HELP target_info Target metadata\n' +
+  '# TYPE target_info gauge\n' +
+  `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1\n`;
+
 class TestMetricReader extends MetricReader {
   constructor() {
-    super();
-  }
-
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
+    super({
+      aggregationTemporalitySelector: _instrumentType => AggregationTemporality.CUMULATIVE,
+      aggregationSelector: _instrumentType => Aggregation.Default()
+    });
   }
 
   async onForceFlush() {}
+
   async onShutdown() {}
 }
 
@@ -67,11 +86,12 @@ describe('PrometheusSerializer', () => {
     describe('Singular', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider();
+        const meterProvider = new MeterProvider(
+          {
+            views: [new View({ aggregation: new SumAggregation(), instrumentName: '*' })]
+          }
+        );
         meterProvider.addMetricReader(reader);
-        meterProvider.addView({
-          aggregation: new SumAggregation(),
-        });
         const meter = meterProvider.getMeter('test');
 
         const counter = meter.createCounter('test_total');
@@ -82,7 +102,7 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const metric = resourceMetrics.scopeMetrics[0].metrics[0];
-        assert.strictEqual(metric.dataPointType, DataPointType.SINGULAR);
+        assert.strictEqual(metric.dataPointType, DataPointType.SUM);
         const pointData = metric.dataPoints as DataPoint<number>[];
         assert.strictEqual(pointData.length, 1);
 
@@ -112,9 +132,13 @@ describe('PrometheusSerializer', () => {
     describe('Histogram', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider();
+        const meterProvider = new MeterProvider({
+          views: [new View({
+            aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]),
+            instrumentName: '*'
+          })]
+        });
         meterProvider.addMetricReader(reader);
-        meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]) });
         const meter = meterProvider.getMeter('test');
 
         const histogram = meter.createHistogram('test');
@@ -164,12 +188,13 @@ describe('PrometheusSerializer', () => {
   });
 
   describe('serialize an instrumentation metrics', () => {
-    describe('Singular', () => {
+    describe('monotonic Sum', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider();
+        const meterProvider = new MeterProvider({
+          views: [new View({ aggregation: new SumAggregation(), instrumentName: '*' })]
+        });
         meterProvider.addMetricReader(reader);
-        meterProvider.addView({ aggregation: new SumAggregation() });
         const meter = meterProvider.getMeter('test');
 
         const counter = meter.createCounter('test_total', {
@@ -188,7 +213,7 @@ describe('PrometheusSerializer', () => {
         return result;
       }
 
-      it('should serialize metric record with sum aggregator', async () => {
+      it('should serialize metric record', async () => {
         const serializer = new PrometheusSerializer();
         const result = await testSerializer(serializer);
         assert.strictEqual(
@@ -200,7 +225,7 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('serialize metric record with sum aggregator without timestamp', async () => {
+      it('should serialize metric record without timestamp', async () => {
         const serializer = new PrometheusSerializer(undefined, false);
         const result = await testSerializer(serializer);
         assert.strictEqual(
@@ -213,12 +238,118 @@ describe('PrometheusSerializer', () => {
       });
     });
 
+    describe('non-monotonic Sum', () => {
+      async function testSerializer(serializer: PrometheusSerializer) {
+        const reader = new TestMetricReader();
+        const meterProvider = new MeterProvider({
+          views: [
+            new View({ aggregation: new SumAggregation(), instrumentName: '*' })
+          ]
+        });
+        meterProvider.addMetricReader(reader);
+        const meter = meterProvider.getMeter('test');
+
+        const counter = meter.createUpDownCounter('test_total', {
+          description: 'foobar',
+        });
+        counter.add(1, { val: '1' });
+        counter.add(1, { val: '2' });
+
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+        const scopeMetrics = resourceMetrics.scopeMetrics[0];
+
+        return serializer['_serializeScopeMetrics'](scopeMetrics);
+      }
+
+      it('should serialize metric record', async () => {
+        const serializer = new PrometheusSerializer();
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+          '# TYPE test_total gauge\n' +
+          `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+          `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
+
+      it('serialize metric record without timestamp', async () => {
+        const serializer = new PrometheusSerializer(undefined, false);
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+          '# TYPE test_total gauge\n' +
+          'test_total{val="1"} 1\n' +
+          'test_total{val="2"} 1\n'
+        );
+      });
+    });
+
+    describe('Gauge', () => {
+      async function testSerializer(serializer: PrometheusSerializer) {
+        const reader = new TestMetricReader();
+        const meterProvider = new MeterProvider({
+          views: [
+            new View({ aggregation: new LastValueAggregation(), instrumentName: '*' })
+          ]
+        });
+        meterProvider.addMetricReader(reader);
+        const meter = meterProvider.getMeter('test');
+
+        const counter = meter.createUpDownCounter('test_total', {
+          description: 'foobar',
+        });
+        counter.add(1, { val: '1' });
+        counter.add(1, { val: '2' });
+
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+        const scopeMetrics = resourceMetrics.scopeMetrics[0];
+
+        return serializer['_serializeScopeMetrics'](scopeMetrics);
+      }
+
+      it('should serialize metric record', async () => {
+        const serializer = new PrometheusSerializer();
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+          '# TYPE test_total gauge\n' +
+          `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+          `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
+
+      it('serialize metric record without timestamp', async () => {
+        const serializer = new PrometheusSerializer(undefined, false);
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+          '# TYPE test_total gauge\n' +
+          'test_total{val="1"} 1\n' +
+          'test_total{val="2"} 1\n'
+        );
+      });
+    });
+
     describe('with ExplicitBucketHistogramAggregation', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider();
+        const meterProvider = new MeterProvider({
+          views: [new View({
+            aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]),
+            instrumentName: '*'
+          })]
+        });
         meterProvider.addMetricReader(reader);
-        meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]) });
         const meter = meterProvider.getMeter('test');
 
         const histogram = meter.createHistogram('test', {
@@ -240,13 +371,13 @@ describe('PrometheusSerializer', () => {
         return result;
       }
 
-      it('serialize metric record with ExplicitHistogramAggregation aggregator, cumulative', async () => {
+      it('serialize cumulative metric record', async () => {
         const serializer = new PrometheusSerializer();
         const result = await testSerializer(serializer);
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
-            '# TYPE test histogram\n' +
+          '# TYPE test histogram\n' +
             `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
             `test_sum{val="1"} 175 ${mockedHrTimeMs}\n` +
             `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
@@ -261,18 +392,68 @@ describe('PrometheusSerializer', () => {
             `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
+
+      it('serialize cumulative metric record on instrument that allows negative values', async () => {
+        const serializer = new PrometheusSerializer();
+        const reader = new TestMetricReader();
+        const meterProvider = new MeterProvider({
+          views: [
+            new View({
+              aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]),
+              instrumentName: '*'
+            })
+          ]
+        });
+        meterProvider.addMetricReader(reader);
+        const meter = meterProvider.getMeter('test');
+
+        const upDownCounter = meter.createUpDownCounter('test', {
+          description: 'foobar',
+        });
+        upDownCounter.add(5, { val: '1' });
+        upDownCounter.add(50, { val: '1' });
+        upDownCounter.add(120, { val: '1' });
+
+        upDownCounter.add(5, { val: '2' });
+
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+        const scopeMetrics = resourceMetrics.scopeMetrics[0];
+
+        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        assert.strictEqual(
+          result,
+          '# HELP test foobar\n' +
+          '# TYPE test histogram\n' +
+          `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
+          `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
     });
   });
 
   describe('validate against metric conventions', () => {
-    async function getCounterResult(name: string, serializer: PrometheusSerializer) {
+
+    async function getCounterResult(name: string, serializer: PrometheusSerializer, options: Partial<{ unit: string, exportAll: boolean }> = {}) {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider();
+      const meterProvider = new MeterProvider({
+        views: [new View({ aggregation: new SumAggregation(), instrumentName: '*' })]
+      });
       meterProvider.addMetricReader(reader);
-      meterProvider.addView({ aggregation: new SumAggregation() });
       const meter = meterProvider.getMeter('test');
 
-      const counter = meter.createCounter(name);
+      const { unit, exportAll = false } = options;
+      const counter = meter.createCounter(name, { unit: unit });
       counter.add(1);
 
       const { resourceMetrics, errors } = await reader.collect();
@@ -280,13 +461,46 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
       const metric = resourceMetrics.scopeMetrics[0].metrics[0];
-      assert.strictEqual(metric.dataPointType, DataPointType.SINGULAR);
+      assert.strictEqual(metric.dataPointType, DataPointType.SUM);
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
 
-      const result = serializer['_serializeSingularDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
-      return result;
+      if (exportAll) {
+        const result = serializer.serialize(resourceMetrics);
+        return result;
+      } else {
+        const result = serializer['_serializeSingularDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
+        return result;
+      }
     }
+
+    it('should export unit block when unit of metric is given', async () => {
+      const serializer = new PrometheusSerializer();
+
+      const unitOfMetric = 'seconds';
+      const result = await getCounterResult('test', serializer, { unit: unitOfMetric, exportAll: true });
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+        '# HELP test_total description missing\n' +
+        `# UNIT test_total ${unitOfMetric}\n` +
+        '# TYPE test_total counter\n' +
+        `test_total 1 ${mockedHrTimeMs}\n`
+      );
+    });
+
+    it('should not export unit block when unit of metric is missing', async () => {
+      const serializer = new PrometheusSerializer();
+
+      const result = await getCounterResult('test', serializer, { exportAll: true });
+      assert.strictEqual(
+        result,
+        serializedDefaultResource +
+        '# HELP test_total description missing\n' +
+        '# TYPE test_total counter\n' +
+        `test_total 1 ${mockedHrTimeMs}\n`
+      );
+    });
 
     it('should rename metric of type counter when name misses _total suffix', async () => {
       const serializer = new PrometheusSerializer();
@@ -306,9 +520,10 @@ describe('PrometheusSerializer', () => {
   describe('serialize non-normalized values', () => {
     async function testSerializer(serializer: PrometheusSerializer, name: string, fn: (counter: UpDownCounter) => void) {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider();
+      const meterProvider = new MeterProvider({
+        views: [new View({ aggregation: new SumAggregation(), instrumentName: '*' })]
+      });
       meterProvider.addMetricReader(reader);
-      meterProvider.addView({ aggregation: new SumAggregation() });
       const meter = meterProvider.getMeter('test');
 
       const counter = meter.createUpDownCounter(name);
@@ -319,7 +534,7 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
       const metric = resourceMetrics.scopeMetrics[0].metrics[0];
-      assert.strictEqual(metric.dataPointType, DataPointType.SINGULAR);
+      assert.strictEqual(metric.dataPointType, DataPointType.SUM);
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
 
@@ -337,12 +552,16 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
     });
 
-    it('should serialize non-string attribute values', async () => {
+    it('should serialize non-string attribute values in JSON representations', async () => {
       const serializer = new PrometheusSerializer();
 
       const result = await testSerializer(serializer, 'test_total', counter => {
         counter.add(1, ({
+          true: true,
+          false: false,
+          array: [1, undefined, null, 2],
           object: {},
+          Infinity: Infinity,
           NaN: NaN,
           null: null,
           undefined: undefined,
@@ -351,7 +570,7 @@ describe('PrometheusSerializer', () => {
 
       assert.strictEqual(
         result,
-        `test_total{object="[object Object]",NaN="NaN",null="null",undefined="undefined"} 1 ${mockedHrTimeMs}\n`
+        `test_total{true="true",false="false",array="[1,null,null,2]",object="{}",Infinity="null",NaN="null",null="null",undefined=""} 1 ${mockedHrTimeMs}\n`
       );
     });
 
@@ -406,7 +625,7 @@ describe('PrometheusSerializer', () => {
       const serializer = new PrometheusSerializer();
 
       const result = await testSerializer(serializer, 'test_total', counter => {
-        // if you try to use a attribute name like account-id prometheus will complain
+        // if you try to use an attribute name like account-id prometheus will complain
         // with an error like:
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
         counter.add(1, ({
@@ -417,6 +636,26 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(
         result,
         `test_total{account_id="123456"} 1 ${mockedHrTimeMs}\n`
+      );
+    });
+  });
+
+  describe('_serializeResource', () => {
+    it('should serialize resource', () => {
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        env: 'prod',
+        hostname: 'myhost',
+        datacenter: 'sdc',
+        region: 'europe',
+        owner: 'frontend'
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend"} 1\n'
       );
     });
   });

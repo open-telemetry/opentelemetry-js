@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ValueType } from '@opentelemetry/api-metrics';
+import { ValueType } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   DataPoint,
   DataPointType,
   Histogram,
-  ScopeMetrics,
-  InstrumentType,
   MetricData,
-  ResourceMetrics
-} from '@opentelemetry/sdk-metrics-base';
+  ResourceMetrics,
+  ScopeMetrics
+} from '@opentelemetry/sdk-metrics';
 import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
@@ -69,24 +68,18 @@ export function toMetric(metricData: MetricData): IMetric {
 
   const aggregationTemporality = toAggregationTemporality(metricData.aggregationTemporality);
 
-  if (metricData.dataPointType === DataPointType.SINGULAR) {
-    const dataPoints = toSingularDataPoints(metricData);
-    const isMonotonic = metricData.descriptor.type === InstrumentType.COUNTER ||
-      metricData.descriptor.type === InstrumentType.OBSERVABLE_COUNTER;
-    if (isSum(metricData)) {
-      out.sum = {
-        aggregationTemporality,
-        isMonotonic,
-        dataPoints
-      };
-
-    } else {
-      // Instrument is a gauge.
-      out.gauge = {
-        dataPoints
-      };
-    }
-  } else if (isHistogram(metricData)) {
+  if (metricData.dataPointType === DataPointType.SUM) {
+    out.sum = {
+      aggregationTemporality,
+      isMonotonic: metricData.isMonotonic,
+      dataPoints: toSingularDataPoints(metricData)
+    };
+  } else if (metricData.dataPointType === DataPointType.GAUGE) {
+    // Instrument is a gauge.
+    out.gauge = {
+      dataPoints: toSingularDataPoints(metricData)
+    };
+  } else if (metricData.dataPointType === DataPointType.HISTOGRAM) {
     out.histogram = {
       aggregationTemporality,
       dataPoints: toHistogramDataPoints(metricData)
@@ -135,25 +128,14 @@ function toHistogramDataPoints(
       explicitBounds: histogram.buckets.boundaries,
       count: histogram.count,
       sum: histogram.sum,
-      min: histogram.hasMinMax ? histogram.min : undefined,
-      max: histogram.hasMinMax ? histogram.max : undefined,
+      min: histogram.min,
+      max: histogram.max,
       startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
       timeUnixNano: hrTimeToNanoseconds(
         dataPoint.endTime
       ),
     };
   });
-}
-
-function isSum(metric: MetricData) {
-  return (metric.descriptor.type === InstrumentType.COUNTER ||
-    metric.descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
-    metric.descriptor.type === InstrumentType.OBSERVABLE_COUNTER ||
-    metric.descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER);
-}
-
-function isHistogram(metric: MetricData) {
-  return metric.dataPointType === DataPointType.HISTOGRAM;
 }
 
 function toAggregationTemporality(

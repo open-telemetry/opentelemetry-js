@@ -16,6 +16,7 @@
 
 import { DiagLogLevel } from '@opentelemetry/api';
 import { TracesSamplerValues } from './sampling';
+import { _globalThis } from '../platform/browser/globalThis';
 
 const DEFAULT_LIST_SEPARATOR = ',';
 
@@ -101,7 +102,11 @@ export type ENVIRONMENT = {
   OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY?: string,
   OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE?: string,
   OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE?: string,
-  OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE?: string
+  OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE?: string,
+  OTEL_EXPORTER_OTLP_PROTOCOL?: string,
+  OTEL_EXPORTER_OTLP_TRACES_PROTOCOL?: string,
+  OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?: string,
+  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE?: string
 } & ENVIRONMENT_NUMBERS &
   ENVIRONMENT_LISTS;
 
@@ -153,7 +158,7 @@ export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   OTEL_SPAN_EVENT_COUNT_LIMIT: 128,
   OTEL_SPAN_LINK_COUNT_LIMIT: 128,
-  OTEL_TRACES_EXPORTER: 'none',
+  OTEL_TRACES_EXPORTER: 'otlp',
   OTEL_TRACES_SAMPLER: TracesSamplerValues.ParentBasedAlwaysOn,
   OTEL_TRACES_SAMPLER_ARG: '',
   OTEL_EXPORTER_OTLP_INSECURE: '',
@@ -170,7 +175,11 @@ export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY: '',
   OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE: '',
   OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE: '',
-  OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE: ''
+  OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE: '',
+  OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf',
+  OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: 'http/protobuf',
+  OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: 'http/protobuf',
+  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: 'cumulative'
 };
 
 /**
@@ -282,4 +291,14 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
   }
 
   return environment;
+}
+
+/**
+ * Get environment in node or browser without
+ * populating default values.
+ */
+export function getEnvWithoutDefaults(): ENVIRONMENT {
+  return typeof process !== 'undefined' ?
+    parseEnvironment(process.env as RAW_ENVIRONMENT) :
+    parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
 }
