@@ -21,6 +21,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.name`
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
+* fix(sdk-trace-base): eager exporting for batch span processor [#3458](https://github.com/open-telemetry/opentelemetry-js/pull/3458) @seemk
 
 ### :books: (Refine Doc)
 
