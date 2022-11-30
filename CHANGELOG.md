@@ -52,6 +52,9 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
   [#3359](https://github.com/open-telemetry/opentelemetry-js/pull/3359) @dyladan
 * fix(resources): strict OTEL_RESOURCE_ATTRIBUTES baggage octet decoding
   [#3341](https://github.com/open-telemetry/opentelemetry-js/pull/3341) @legendecas
+* fix(version): updated webpack version for selenium test issue
+  [#3397](https://github.com/open-telemetry/opentelemetry-js/issues/3397) @SaumyaBhushan
+
 
 ### :books: (Refine Doc)
 
