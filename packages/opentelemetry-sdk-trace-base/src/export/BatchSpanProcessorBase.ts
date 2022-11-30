@@ -70,11 +70,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     }
 
     this._timer = setInterval(async () => {
-      try {
-        await this._flushOneBatch();
-      } catch (e) {
-        globalErrorHandler(e);
-      }
+      await this._tryExportOneBatch();
     }, this._scheduledDelayMillis);
     unrefTimer(this._timer);
   }
@@ -119,7 +115,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       return;
     }
     this._finishedSpans.push(span);
-    this._maybeSend();
+    this._exportCompleteBatches();
   }
 
   /**
@@ -134,13 +130,13 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       this._finishedSpans.length / this._maxExportBatchSize
     );
     for (let i = 0, j = count; i < j; i++) {
-      promises.push(this._flushOneBatch());
+      promises.push(this._exportOneBatch());
     }
 
     await Promise.all(promises);
   }
 
-  private async _flushOneBatch(): Promise<void> {
+  private async _exportOneBatch(): Promise<void> {
     if (this._finishedSpans.length === 0) {
       return;
     }
@@ -173,18 +169,22 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     });
   }
 
-  private _maybeSend() {
+  private async _tryExportOneBatch(): Promise<void> {
+    try {
+      await this._exportOneBatch();
+    } catch (e) {
+      globalErrorHandler(e);
+    }
+  }
+
+  private _exportCompleteBatches() {
     if (this._finishedSpans.length < this._maxExportBatchSize) {
       return;
     }
 
     setImmediate(async () => {
-      try {
-        await this._flushOneBatch();
-      } catch (e) {
-        globalErrorHandler(e);
-      }
-      this._maybeSend();
+      await this._tryExportOneBatch();
+      this._exportCompleteBatches();
     });
   }
 

@@ -391,6 +391,24 @@ describe('BatchSpanProcessorBase', () => {
           done();
         });
       });
+
+      it('should periodically export spans', () => {
+        const clock = sinon.useFakeTimers();
+        const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+        const batchSize = Math.round(defaultBufferConfig.maxExportBatchSize / 2);
+
+        for (let cycle = 0; cycle < 2; cycle++) {
+          for (let i = 0; i < batchSize; i++) {
+            const span = createSampledSpan(`${name}_${cycle}_${i}`);
+            processor.onStart(span, ROOT_CONTEXT);
+            processor.onEnd(span);
+          }
+          clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
+          assert.strictEqual(exporter.getFinishedSpans().length, batchSize);
+          assert(exporter.getFinishedSpans().every(s => s.name.startsWith(`${name}_${cycle}`)));
+          exporter.reset();
+        }
+      });
     });
 
     describe('flushing spans with exporter triggering instrumentation', () => {
