@@ -164,8 +164,8 @@ export abstract class InstrumentationBase<T = any>
       const onRequire: RequireInTheMiddle.OnRequireFn = (exports, name, baseDir) => {
         return this._onRequire<typeof exports>(
           (module as unknown) as InstrumentationModuleDefinition<
-              typeof exports
-            >,
+            typeof exports
+          >,
           exports,
           name,
           baseDir
