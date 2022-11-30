@@ -32,6 +32,7 @@ import {
 import {
   addHrTimes,
   epochMillisToHrTime,
+  getTimeOrigin,
   hrTime,
   hrTimeDuration,
   InstrumentationLibrary,
@@ -105,7 +106,7 @@ export class Span implements APISpan, ReadableSpan {
 
     const now = Date.now();
     this._performanceStartTime = otperformance.now();
-    this._performanceOffset = now - this._performanceStartTime;
+    this._performanceOffset = now - (this._performanceStartTime + getTimeOrigin());
     this._startTimeProvided = startTime != null;
 
 
