@@ -9,12 +9,18 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(instrumentation-http): monitor error events with events.errorMonitor [#3402](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @legendecas
+* feat(instrumentation-grpc): added grpc metadata client side attributes in instrumentation [#3386](https://github.com/open-telemetry/opentelemetry-js/pull/3386)
+* feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every meter provider update.
 
 ### :bug: (Bug Fix)
+
+* fix(instrumentation-xhr): http.url attribute should be absolute [#3200](https://github.com/open-telemetry/opentelemetry-js/pull/3200) @t2t2
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* chore(otlp-proto-exporter-base): upgrade protobufjs to 7.1.2 and relax versioning [#3433](https://github.com/open-telemetry/opentelemetry-js/pull/3433) @seemk
 
 ## 0.34.0
 

@@ -56,6 +56,7 @@ implements types.Instrumentation {
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
 
     this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
+    this._updateMetricInstruments();
   }
 
   /* Api to wrap instrumented method */
@@ -81,6 +82,15 @@ implements types.Instrumentation {
       this.instrumentationName,
       this.instrumentationVersion
     );
+
+    this._updateMetricInstruments();
+  }
+
+  /**
+   * Sets the new metric instruments with the current Meter.
+   */
+  protected _updateMetricInstruments(): void {
+    return;
   }
 
   /* Returns InstrumentationConfig */
