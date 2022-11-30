@@ -69,7 +69,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       this._maxExportBatchSize = this._maxQueueSize;
     }
 
-    this._timer = setTimeout(async () => {
+    this._timer = setInterval(async () => {
       try {
         await this._flushOneBatch();
       } catch (e) {
@@ -190,7 +190,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
 
   private _clearTimer() {
     if (this._timer !== undefined) {
-      clearTimeout(this._timer);
+      clearInterval(this._timer);
       this._timer = undefined;
     }
   }
