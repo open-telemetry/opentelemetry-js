@@ -42,8 +42,8 @@ ServiceRequest
     super(config);
   }
 
- private getExportRequestProto<ServiceRequest>(
-  clientType: ServiceClientType,
+  private getExportRequestProto(
+    clientType: ServiceClientType,
   ): ExportRequestType<ServiceRequest> {
     if (clientType === ServiceClientType.SPANS) {
       return root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
