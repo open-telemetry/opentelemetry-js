@@ -34,6 +34,7 @@ import { EventEmitter } from 'events';
 import { AttributeNames } from '../enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { metadataCaptureType } from '../types';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -93,7 +94,7 @@ export function makeGrpcClientRemoteCall(
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
           span.setAttribute(
             SemanticAttributes.RPC_GRPC_STATUS_CODE,
-            err.code.toString()
+            err.code
           );
         }
         span.setAttributes({
@@ -104,7 +105,7 @@ export function makeGrpcClientRemoteCall(
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
           SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          SpanStatusCode.UNSET.toString()
+          GRPC_STATUS_CODE_OK
         );
       }
 
@@ -160,6 +161,7 @@ export function makeGrpcClientRemoteCall(
         span.setAttributes({
           [AttributeNames.GRPC_ERROR_NAME]: err.name,
           [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+          [SemanticAttributes.RPC_GRPC_STATUS_CODE]: err.code,
         });
 
         endSpan();
@@ -172,6 +174,7 @@ export function makeGrpcClientRemoteCall(
         call[CALL_SPAN_ENDED] = true;
 
         span.setStatus(_grpcStatusCodeToSpanStatus(status.code));
+        span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, status.code);
 
         endSpan();
       });
