@@ -80,7 +80,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
           this._wrap(
             moduleExports.Server.prototype,
             'register',
-            this._patchServer(moduleExports) as any
+            this._patchServer() as any
           );
           // Wrap the externally exported client constructor
           if (isWrapped(moduleExports.makeGenericClientConstructor)) {
@@ -149,7 +149,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     ];
   }
 
-  private _patchServer(grpcModule: typeof grpcTypes) {
+  private _patchServer() {
     const instrumentation = this;
     return (originalRegister: typeof grpcTypes.Server.prototype.register) => {
       instrumentation._diag.debug('patched gRPC server');
@@ -219,7 +219,6 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                       case 'unary':
                       case 'client_stream':
                         return clientStreamAndUnaryHandler(
-                          grpcModule,
                           span,
                           call,
                           callback,
@@ -320,7 +319,6 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
             instrumentation._metadataCapture,
-            grpcClient,
             original,
             args,
             metadata,
