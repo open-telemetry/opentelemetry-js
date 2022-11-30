@@ -68,6 +68,15 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       diag.warn('BatchSpanProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, setting maxExportBatchSize to match maxQueueSize');
       this._maxExportBatchSize = this._maxQueueSize;
     }
+
+    this._timer = setTimeout(async () => {
+      try {
+        await this._flushOneBatch();
+      } catch (e) {
+        globalErrorHandler(e);
+      }
+    }, this._scheduledDelayMillis);
+    unrefTimer(this._timer);
   }
 
   forceFlush(): Promise<void> {
@@ -96,17 +105,11 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     return this._shutdownOnce.call();
   }
 
-  private _shutdown() {
-    return Promise.resolve()
-      .then(() => {
-        return this.onShutdown();
-      })
-      .then(() => {
-        return this._flushAll();
-      })
-      .then(() => {
-        return this._exporter.shutdown();
-      });
+  private async _shutdown() {
+    this.onShutdown();
+    this._clearTimer();
+    await this._flushAll();
+    await this._exporter.shutdown();
   }
 
   /** Add a span in the buffer. */
@@ -116,7 +119,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       return;
     }
     this._finishedSpans.push(span);
-    this._maybeStartTimer();
+    this._maybeSend();
   }
 
   /**
@@ -124,29 +127,24 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
    * This function is used only on forceFlush or shutdown,
    * for all other cases _flush should be used
    * */
-  private _flushAll(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const promises = [];
-      // calculate number of batches
-      const count = Math.ceil(
-        this._finishedSpans.length / this._maxExportBatchSize
-      );
-      for (let i = 0, j = count; i < j; i++) {
-        promises.push(this._flushOneBatch());
-      }
-      Promise.all(promises)
-        .then(() => {
-          resolve();
-        })
-        .catch(reject);
-    });
+  private async _flushAll(): Promise<void> {
+    const promises = [];
+    // calculate number of batches
+    const count = Math.ceil(
+      this._finishedSpans.length / this._maxExportBatchSize
+    );
+    for (let i = 0, j = count; i < j; i++) {
+      promises.push(this._flushOneBatch());
+    }
+
+    await Promise.all(promises);
   }
 
-  private _flushOneBatch(): Promise<void> {
-    this._clearTimer();
+  private async _flushOneBatch(): Promise<void> {
     if (this._finishedSpans.length === 0) {
-      return Promise.resolve();
+      return;
     }
+
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         // don't wait anymore for export, this way the next batch can start
@@ -175,21 +173,19 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     });
   }
 
-  private _maybeStartTimer() {
-    if (this._timer !== undefined) return;
-    this._timer = setTimeout(() => {
-      this._flushOneBatch()
-        .then(() => {
-          if (this._finishedSpans.length > 0) {
-            this._clearTimer();
-            this._maybeStartTimer();
-          }
-        })
-        .catch(e => {
-          globalErrorHandler(e);
-        });
-    }, this._scheduledDelayMillis);
-    unrefTimer(this._timer);
+  private _maybeSend() {
+    if (this._finishedSpans.length < this._maxExportBatchSize) {
+      return;
+    }
+
+    setImmediate(async () => {
+      try {
+        await this._flushOneBatch();
+      } catch (e) {
+        globalErrorHandler(e);
+      }
+      this._maybeSend();
+    });
   }
 
   private _clearTimer() {

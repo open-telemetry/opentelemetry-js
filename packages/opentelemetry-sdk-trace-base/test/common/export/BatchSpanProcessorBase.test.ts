@@ -168,7 +168,7 @@ describe('BatchSpanProcessorBase', () => {
       assert.strictEqual(spy.args.length, 0);
     });
 
-    it('should export the sampled spans with buffer size reached', done => {
+    it('should export the sampled spans with buffer size or timeout reached', done => {
       const clock = sinon.useFakeTimers();
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
@@ -179,18 +179,25 @@ describe('BatchSpanProcessorBase', () => {
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
-      const span = createSampledSpan(`${name}_6`);
-      processor.onStart(span, ROOT_CONTEXT);
-      processor.onEnd(span);
 
-      setTimeout(async () => {
+      setTimeout(() => {
         assert.strictEqual(exporter.getFinishedSpans().length, 5);
-        await processor.shutdown();
-        assert.strictEqual(exporter.getFinishedSpans().length, 0);
-        done();
-      }, defaultBufferConfig.scheduledDelayMillis + 1000);
-      clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
-      clock.restore();
+
+        const span = createSampledSpan(`${name}_6`);
+        processor.onStart(span, ROOT_CONTEXT);
+        processor.onEnd(span);
+
+        setTimeout(async () => {
+          assert.strictEqual(exporter.getFinishedSpans().length, 6);
+          await processor.shutdown();
+          assert.strictEqual(exporter.getFinishedSpans().length, 0);
+          done();
+        }, defaultBufferConfig.scheduledDelayMillis + 1000);
+        clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
+        clock.restore();
+      }, 0);
+
+      clock.tick(10);
     });
 
     it('should force flush when timeout exceeded', done => {
