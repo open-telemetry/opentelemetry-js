@@ -63,7 +63,7 @@ ServiceRequest
     }
 
     const serviceRequest = this.convert(objects);
-    const exportRequestType = this.getExportRequestProto<ServiceRequest>(this.getServiceClientType());
+    const exportRequestType = this.getExportRequestProto(this.getServiceClientType());
     const message = exportRequestType.create(serviceRequest);
 
     if (message) {
