@@ -318,7 +318,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
 
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
-            grpcClient,
+            instrumentation._metadataCapture,
             original,
             args,
             metadata,
