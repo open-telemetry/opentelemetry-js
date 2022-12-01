@@ -92,5 +92,5 @@ export const detectResourcesSync = (
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
     Resource.empty()
-  );;
+  );
 };
