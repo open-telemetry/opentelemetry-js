@@ -54,8 +54,14 @@ describe('InMemorySpanExporter', () => {
     assert.strictEqual(span1.name, 'grand-child');
     assert.strictEqual(span2.name, 'child');
     assert.strictEqual(span3.name, 'root');
-    assert.strictEqual(span1.spanContext().traceId, span2.spanContext().traceId);
-    assert.strictEqual(span2.spanContext().traceId, span3.spanContext().traceId);
+    assert.strictEqual(
+      span1.spanContext().traceId,
+      span2.spanContext().traceId
+    );
+    assert.strictEqual(
+      span2.spanContext().traceId,
+      span3.spanContext().traceId
+    );
     assert.strictEqual(span1.parentSpanId, span2.spanContext().spanId);
     assert.strictEqual(span2.parentSpanId, span3.spanContext().spanId);
   });

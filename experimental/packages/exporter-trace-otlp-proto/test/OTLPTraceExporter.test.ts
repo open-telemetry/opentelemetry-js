@@ -29,8 +29,15 @@ import {
   mockedReadableSpan,
   MockedResponse,
 } from './traceHelper';
-import { CompressionAlgorithm, OTLPExporterNodeConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
-import { getExportRequestProto, ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
+import {
+  CompressionAlgorithm,
+  OTLPExporterNodeConfigBase,
+  OTLPExporterError,
+} from '@opentelemetry/otlp-exporter-base';
+import {
+  getExportRequestProto,
+  ServiceClientType,
+} from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
@@ -113,7 +120,8 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
     });
     it('should not add root path when signal url defined in env contains path and ends in /', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces/';
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
+        'http://foo.bar/v1/traces/';
       const collectorExporter = new OTLPTraceExporter();
       assert.strictEqual(
         collectorExporter.url,
@@ -158,7 +166,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     });
 
     it('should open the connection', done => {
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -174,7 +182,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     });
 
     it('should set custom headers', done => {
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
@@ -188,7 +196,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     });
 
     it('should have keep alive and keepAliveMsecs option set', done => {
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
@@ -208,7 +216,9 @@ describe('OTLPTraceExporter - node with proto over http', () => {
 
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
-        const ExportTraceServiceRequestProto = getExportRequestProto(ServiceClientType.SPANS);
+        const ExportTraceServiceRequestProto = getExportRequestProto(
+          ServiceClientType.SPANS
+        );
         const data = ExportTraceServiceRequestProto.decode(buff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
@@ -225,7 +235,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       });
 
       const clock = sinon.useFakeTimers();
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
       clock.tick(200);
       clock.restore();
     });
@@ -294,7 +304,9 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
-        const ExportTraceServiceRequestProto = getExportRequestProto(ServiceClientType.SPANS);
+        const ExportTraceServiceRequestProto = getExportRequestProto(
+          ServiceClientType.SPANS
+        );
         const data = ExportTraceServiceRequestProto.decode(unzippedBuff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
@@ -312,13 +324,12 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       });
 
       const clock = sinon.useFakeTimers();
-      collectorExporter.export(spans, () => { });
+      collectorExporter.export(spans, () => {});
       clock.tick(200);
       clock.restore();
     });
   });
 });
-
 
 describe('export - real http request destroyed before response received', () => {
   let collectorExporter: OTLPTraceExporter;

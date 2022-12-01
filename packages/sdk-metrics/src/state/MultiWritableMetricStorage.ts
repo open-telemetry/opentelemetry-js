@@ -23,7 +23,12 @@ import { WritableMetricStorage } from './WritableMetricStorage';
 export class MultiMetricStorage implements WritableMetricStorage {
   constructor(private readonly _backingStorages: WritableMetricStorage[]) {}
 
-  record(value: number, attributes: MetricAttributes, context: Context, recordTime: HrTime) {
+  record(
+    value: number,
+    attributes: MetricAttributes,
+    context: Context,
+    recordTime: HrTime
+  ) {
     this._backingStorages.forEach(it => {
       it.record(value, attributes, context, recordTime);
     });

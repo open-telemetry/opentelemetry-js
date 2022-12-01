@@ -27,12 +27,15 @@ import { describeBrowser } from '../../util';
 describeBrowser('envDetector() on web browser', () => {
   describe('with valid env', () => {
     before(() => {
-      (globalThis as typeof globalThis & RAW_ENVIRONMENT).OTEL_RESOURCE_ATTRIBUTES =
+      (
+        globalThis as typeof globalThis & RAW_ENVIRONMENT
+      ).OTEL_RESOURCE_ATTRIBUTES =
         'webengine.name="chromium",webengine.version="99",webengine.description="Chromium",custom.key="custom%20value"';
     });
 
     after(() => {
-      delete (globalThis as typeof globalThis & RAW_ENVIRONMENT).OTEL_RESOURCE_ATTRIBUTES;
+      delete (globalThis as typeof globalThis & RAW_ENVIRONMENT)
+        .OTEL_RESOURCE_ATTRIBUTES;
     });
 
     it('should return resource information from environment variable', async () => {
@@ -46,20 +49,20 @@ describeBrowser('envDetector() on web browser', () => {
     });
   });
 
-
   describe('with invalid env', () => {
-    const values = [
-      'webengine.description="with spaces"',
-    ];
+    const values = ['webengine.description="with spaces"'];
 
     for (const value of values) {
       describe(`value: '${value}'`, () => {
         before(() => {
-          (globalThis as typeof globalThis & RAW_ENVIRONMENT).OTEL_RESOURCE_ATTRIBUTES = value;
+          (
+            globalThis as typeof globalThis & RAW_ENVIRONMENT
+          ).OTEL_RESOURCE_ATTRIBUTES = value;
         });
 
         after(() => {
-          delete (globalThis as typeof globalThis & RAW_ENVIRONMENT).OTEL_RESOURCE_ATTRIBUTES;
+          delete (globalThis as typeof globalThis & RAW_ENVIRONMENT)
+            .OTEL_RESOURCE_ATTRIBUTES;
         });
 
         it('should return empty resource', async () => {

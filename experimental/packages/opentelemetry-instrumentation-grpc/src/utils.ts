@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {SpanStatusCode, SpanStatus, Span} from '@opentelemetry/api';
+import { SpanStatusCode, SpanStatus, Span } from '@opentelemetry/api';
 import type * as grpcTypes from 'grpc';
 import type * as grpcJsTypes from '@grpc/grpc-js';
 import { IgnoreMatcher } from './types';
@@ -100,29 +100,38 @@ export const _methodIsIgnored = (
  * Return method and service values getting from grpc name/path
  * @param name the grpc name/path
  */
-export const _extractMethodAndService = (name: string): { service: string, method: string } => {
+export const _extractMethodAndService = (
+  name: string
+): { service: string; method: string } => {
   const serviceMethod = name.replace(/^\//, '').split('/');
   const service = serviceMethod.shift() || '';
   const method = serviceMethod.join('/');
 
-  return ({
+  return {
     service,
-    method
-  });
+    method,
+  };
 };
 
-
-export function metadataCapture(type: 'request' | 'response', metadataToAdd: string[]) {
-  const normalizedMetadataAttributes = new Map(metadataToAdd.map(value => [value.toLowerCase(), value.toLowerCase().replace(/-/g, '_')]));
+export function metadataCapture(
+  type: 'request' | 'response',
+  metadataToAdd: string[]
+) {
+  const normalizedMetadataAttributes = new Map(
+    metadataToAdd.map(value => [
+      value.toLowerCase(),
+      value.toLowerCase().replace(/-/g, '_'),
+    ])
+  );
 
   return (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => {
-    for (const [capturedMetadata, normalizedMetadata] of normalizedMetadataAttributes) {
-      const metadataValues =
-        metadata
-          .get(capturedMetadata)
-          .flatMap(value =>
-            typeof value === 'string' ? value.toString() : []
-          );
+    for (const [
+      capturedMetadata,
+      normalizedMetadata,
+    ] of normalizedMetadataAttributes) {
+      const metadataValues = metadata
+        .get(capturedMetadata)
+        .flatMap(value => (typeof value === 'string' ? value.toString() : []));
 
       if (metadataValues === undefined || metadataValues === []) {
         continue;
@@ -134,4 +143,3 @@ export function metadataCapture(type: 'request' | 'response', metadataToAdd: str
     }
   };
 }
-

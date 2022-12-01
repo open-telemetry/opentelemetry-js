@@ -20,7 +20,13 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { Stream } from 'stream';
-import { IEvent, IExportTraceServiceRequest, IKeyValue, ILink, ISpan } from '@opentelemetry/otlp-transformer';
+import {
+  IEvent,
+  IExportTraceServiceRequest,
+  IKeyValue,
+  ILink,
+  ISpan,
+} from '@opentelemetry/otlp-transformer';
 
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
 const spanIdHex = '5e107261f64fa53e';
@@ -83,9 +89,7 @@ export const mockedReadableSpan: ReadableSpan = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
-export function ensureProtoEventsAreCorrect(
-  events: IEvent[]
-) {
+export function ensureProtoEventsAreCorrect(events: IEvent[]) {
   assert.deepStrictEqual(
     events,
     [
@@ -134,9 +138,7 @@ export function ensureProtoEventsAreCorrect(
   );
 }
 
-export function ensureProtoAttributesAreCorrect(
-  attributes: IKeyValue[]
-) {
+export function ensureProtoAttributesAreCorrect(attributes: IKeyValue[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -151,9 +153,7 @@ export function ensureProtoAttributesAreCorrect(
   );
 }
 
-export function ensureProtoLinksAreCorrect(
-  attributes: ILink[]
-) {
+export function ensureProtoLinksAreCorrect(attributes: ILink[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -175,9 +175,7 @@ export function ensureProtoLinksAreCorrect(
   );
 }
 
-export function ensureProtoSpanIsCorrect(
-  span: ISpan
-) {
+export function ensureProtoSpanIsCorrect(span: ISpan) {
   if (span.attributes) {
     ensureProtoAttributesAreCorrect(span.attributes);
   }
@@ -238,11 +236,7 @@ export function ensureExportTraceServiceRequestIsSet(
   assert.ok(resource, 'resource is missing');
 
   const scopeSpans = resourceSpans?.[0].scopeSpans;
-  assert.strictEqual(
-    scopeSpans?.length,
-    1,
-    'scopeSpans is missing'
-  );
+  assert.strictEqual(scopeSpans?.length, 1, 'scopeSpans is missing');
 
   const scope = scopeSpans?.[0].scope;
   assert.ok(scope, 'scope is missing');

@@ -113,7 +113,7 @@ export enum DataPointType {
    * A sum metric data point has a single numeric value and a
    * monotonicity-indicator.
    */
-  SUM
+  SUM,
 }
 
 /**

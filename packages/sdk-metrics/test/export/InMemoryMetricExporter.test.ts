@@ -24,7 +24,10 @@ import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportin
 import { MeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
 
-async function waitForNumberOfExports(exporter: InMemoryMetricExporter , numberOfExports: number): Promise<ResourceMetrics[]> {
+async function waitForNumberOfExports(
+  exporter: InMemoryMetricExporter,
+  numberOfExports: number
+): Promise<ResourceMetrics[]> {
   if (numberOfExports <= 0) {
     throw new Error('numberOfExports must be greater than or equal to 0');
   }
@@ -52,7 +55,7 @@ describe('InMemoryMetricExporter', () => {
     meterReader = new PeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
-      exportTimeoutMillis: 100
+      exportTimeoutMillis: 100,
     });
     meterProvider.addMetricReader(meterReader);
   });
@@ -69,17 +72,16 @@ describe('InMemoryMetricExporter', () => {
       });
       const resourceMetrics: ResourceMetrics = {
         resource: resource,
-        scopeMetrics:
-          [
-            {
-              scope: {
-                name: 'mylib',
-                version: '0.1.0',
-                schemaUrl: 'http://url.to.schema'
-              },
-              metrics: [],
-            }
-          ]
+        scopeMetrics: [
+          {
+            scope: {
+              name: 'mylib',
+              version: '0.1.0',
+              schemaUrl: 'http://url.to.schema',
+            },
+            metrics: [],
+          },
+        ],
       };
       exporter.export(resourceMetrics, result => {
         assert.ok(result.code === ExportResultCode.FAILED);
@@ -117,7 +119,9 @@ describe('InMemoryMetricExporter', () => {
     counter.add(10, counterAttribute);
     counter.add(10, counterAttribute);
 
-    const histogram = meter.createHistogram('histogram', { description: 'a histogram' });
+    const histogram = meter.createHistogram('histogram', {
+      description: 'a histogram',
+    });
     histogram.record(10);
     histogram.record(100);
     histogram.record(1000);

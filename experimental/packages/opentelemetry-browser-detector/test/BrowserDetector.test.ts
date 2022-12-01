@@ -16,11 +16,7 @@
 import * as sinon from 'sinon';
 import { Resource } from '@opentelemetry/resources';
 import { browserDetector } from '../src/BrowserDetector';
-import {
-  describeBrowser,
-  assertResource,
-  assertEmptyResource
-} from './util';
+import { describeBrowser, assertResource, assertEmptyResource } from './util';
 
 describeBrowser('browserDetector()', () => {
   afterEach(() => {
@@ -33,32 +29,28 @@ describeBrowser('browserDetector()', () => {
       language: 'en-US',
       userAgentData: {
         platform: 'platform',
-        brands:[
+        brands: [
           {
             brand: 'Chromium',
-            version: '106'
+            version: '106',
           },
           {
             brand: 'Google Chrome',
-            version: '106'
+            version: '106',
           },
           {
             brand: 'Not;A=Brand',
-            version: '99'
-          }
+            version: '99',
+          },
         ],
-        mobile: false
-      }
+        mobile: false,
+      },
     });
 
     const resource: Resource = await browserDetector.detect();
     assertResource(resource, {
       platform: 'platform',
-      brands: [
-        'Chromium 106',
-        'Google Chrome 106',
-        'Not;A=Brand 99'
-      ],
+      brands: ['Chromium 106', 'Google Chrome 106', 'Not;A=Brand 99'],
       mobile: false,
       language: 'en-US',
     });
@@ -74,7 +66,7 @@ describeBrowser('browserDetector()', () => {
     const resource: Resource = await browserDetector.detect();
     assertResource(resource, {
       language: 'en-US',
-      user_agent: 'dddd'
+      user_agent: 'dddd',
     });
   });
 

@@ -53,12 +53,15 @@ describe('DropAggregator', () => {
 
       const endTime: HrTime = [1, 1];
 
-      assert.strictEqual(aggregator.toMetricData(
-        defaultInstrumentDescriptor,
-        AggregationTemporality.CUMULATIVE,
-        [[{}, undefined]],
-        endTime,
-      ), undefined);
+      assert.strictEqual(
+        aggregator.toMetricData(
+          defaultInstrumentDescriptor,
+          AggregationTemporality.CUMULATIVE,
+          [[{}, undefined]],
+          endTime
+        ),
+        undefined
+      );
     });
   });
 });

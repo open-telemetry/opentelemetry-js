@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { Accumulation, AccumulationRecord, Aggregator, AggregatorKind, LastValue } from './types';
+import {
+  Accumulation,
+  AccumulationRecord,
+  Aggregator,
+  AggregatorKind,
+  LastValue,
+} from './types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
 import { DataPointType, GaugeMetricData } from '../export/MetricData';
@@ -23,7 +29,11 @@ import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
 export class LastValueAccumulation implements Accumulation {
-  constructor(public startTime: HrTime, private _current: number = 0, public sampleTime: HrTime = [0, 0]) {}
+  constructor(
+    public startTime: HrTime,
+    private _current: number = 0,
+    public sampleTime: HrTime = [0, 0]
+  ) {}
 
   record(value: number): void {
     this._current = value;
@@ -52,10 +62,21 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
    *
    * Return the newly captured (delta) accumulation for LastValueAggregator.
    */
-  merge(previous: LastValueAccumulation, delta: LastValueAccumulation): LastValueAccumulation {
+  merge(
+    previous: LastValueAccumulation,
+    delta: LastValueAccumulation
+  ): LastValueAccumulation {
     // nanoseconds may lose precisions.
-    const latestAccumulation = hrTimeToMicroseconds(delta.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? delta : previous;
-    return new LastValueAccumulation(previous.startTime, latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
+    const latestAccumulation =
+      hrTimeToMicroseconds(delta.sampleTime) >=
+      hrTimeToMicroseconds(previous.sampleTime)
+        ? delta
+        : previous;
+    return new LastValueAccumulation(
+      previous.startTime,
+      latestAccumulation.toPointValue(),
+      latestAccumulation.sampleTime
+    );
   }
 
   /**
@@ -64,17 +85,29 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
    * A delta aggregation is not meaningful to LastValueAggregator, just return
    * the newly captured (delta) accumulation for LastValueAggregator.
    */
-  diff(previous: LastValueAccumulation, current: LastValueAccumulation): LastValueAccumulation {
+  diff(
+    previous: LastValueAccumulation,
+    current: LastValueAccumulation
+  ): LastValueAccumulation {
     // nanoseconds may lose precisions.
-    const latestAccumulation = hrTimeToMicroseconds(current.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? current : previous;
-    return new LastValueAccumulation(current.startTime, latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
+    const latestAccumulation =
+      hrTimeToMicroseconds(current.sampleTime) >=
+      hrTimeToMicroseconds(previous.sampleTime)
+        ? current
+        : previous;
+    return new LastValueAccumulation(
+      current.startTime,
+      latestAccumulation.toPointValue(),
+      latestAccumulation.sampleTime
+    );
   }
 
   toMetricData(
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
-    endTime: HrTime): Maybe<GaugeMetricData> {
+    endTime: HrTime
+  ): Maybe<GaugeMetricData> {
     return {
       descriptor,
       aggregationTemporality,
@@ -86,7 +119,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
           endTime,
           value: accumulation.toPointValue(),
         };
-      })
+      }),
     };
   }
 }

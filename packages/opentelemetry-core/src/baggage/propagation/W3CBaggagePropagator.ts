@@ -28,13 +28,9 @@ import {
   BAGGAGE_HEADER,
   BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_MAX_NAME_VALUE_PAIRS,
-  BAGGAGE_MAX_PER_NAME_VALUE_PAIRS
+  BAGGAGE_MAX_PER_NAME_VALUE_PAIRS,
 } from '../constants';
-import {
-  getKeyPairs,
-  parsePairKeyValue,
-  serializeKeyPairs
-} from '../utils';
+import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils';
 
 /**
  * Propagates {@link Baggage} through Context format propagation.
@@ -59,7 +55,9 @@ export class W3CBaggagePropagator implements TextMapPropagator {
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     const headerValue = getter.get(carrier, BAGGAGE_HEADER);
-    const baggageString = Array.isArray(headerValue) ? headerValue.join(BAGGAGE_ITEMS_SEPARATOR) : headerValue;
+    const baggageString = Array.isArray(headerValue)
+      ? headerValue.join(BAGGAGE_ITEMS_SEPARATOR)
+      : headerValue;
     if (!baggageString) return context;
     const baggage: Record<string, BaggageEntry> = {};
     if (baggageString.length === 0) {

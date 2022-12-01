@@ -16,11 +16,21 @@
 
 import { diag } from '@opentelemetry/api';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { ConsoleSpanExporter, SpanExporter, BatchSpanProcessor, SimpleSpanProcessor, SDKRegistrationConfig, SpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import {
+  ConsoleSpanExporter,
+  SpanExporter,
+  BatchSpanProcessor,
+  SimpleSpanProcessor,
+  SDKRegistrationConfig,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
+import {
+  NodeTracerConfig,
+  NodeTracerProvider,
+} from '@opentelemetry/sdk-trace-node';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
-import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
+import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
@@ -34,45 +44,58 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
 
     switch (protocol) {
       case 'grpc':
-        return new OTLPGrpcTraceExporter;
+        return new OTLPGrpcTraceExporter();
       case 'http/json':
-        return new OTLPHttpTraceExporter;
+        return new OTLPHttpTraceExporter();
       case 'http/protobuf':
-        return new OTLPProtoTraceExporter;
+        return new OTLPProtoTraceExporter();
       default:
-        diag.warn(`Unsupported OTLP traces protocol: ${protocol}. Using http/protobuf.`);
-        return new OTLPProtoTraceExporter;
+        diag.warn(
+          `Unsupported OTLP traces protocol: ${protocol}. Using http/protobuf.`
+        );
+        return new OTLPProtoTraceExporter();
     }
   }
 
   static getOtlpProtocol(): string {
     const parsedEnvValues = getEnvWithoutDefaults();
 
-    return parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-          parsedEnvValues.OTEL_EXPORTER_OTLP_PROTOCOL ??
-          getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-          getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
+    return (
+      parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
+      parsedEnvValues.OTEL_EXPORTER_OTLP_PROTOCOL ??
+      getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
+      getEnv().OTEL_EXPORTER_OTLP_PROTOCOL
+    );
   }
 
   protected static override _registeredExporters = new Map<
     string,
     () => SpanExporter
-      >([
-        ['otlp', () => this.configureOtlp()],
-        ['zipkin', () => new ZipkinExporter],
-        ['jaeger', () => new JaegerExporter],
-        ['console', () => new ConsoleSpanExporter]
-      ]);
+  >([
+    ['otlp', () => this.configureOtlp()],
+    ['zipkin', () => new ZipkinExporter()],
+    ['jaeger', () => new JaegerExporter()],
+    ['console', () => new ConsoleSpanExporter()],
+  ]);
 
   public constructor(config: NodeTracerConfig = {}) {
     super(config);
-    let traceExportersList = this.filterBlanksAndNulls(Array.from(new Set(getEnv().OTEL_TRACES_EXPORTER.split(','))));
+    let traceExportersList = this.filterBlanksAndNulls(
+      Array.from(new Set(getEnv().OTEL_TRACES_EXPORTER.split(',')))
+    );
 
     if (traceExportersList.length === 0 || traceExportersList[0] === 'none') {
-      diag.warn('OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.');
+      diag.warn(
+        'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.'
+      );
     } else {
-      if (traceExportersList.length > 1 && traceExportersList.includes('none')) {
-        diag.warn('OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.');
+      if (
+        traceExportersList.length > 1 &&
+        traceExportersList.includes('none')
+      ) {
+        diag.warn(
+          'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
+        );
         traceExportersList = ['otlp'];
       }
 
@@ -81,17 +104,23 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
         if (exporter) {
           this._configuredExporters.push(exporter);
         } else {
-          diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value: ${exporterName}.`);
+          diag.warn(
+            `Unrecognized OTEL_TRACES_EXPORTER value: ${exporterName}.`
+          );
         }
       });
 
       if (this._configuredExporters.length > 0) {
-        this._spanProcessors = this.configureSpanProcessors(this._configuredExporters);
+        this._spanProcessors = this.configureSpanProcessors(
+          this._configuredExporters
+        );
         this._spanProcessors.forEach(processor => {
           this.addSpanProcessor(processor);
         });
       } else {
-        diag.warn('Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.');
+        diag.warn(
+          'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
+        );
       }
     }
   }
@@ -107,7 +136,9 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     }
   }
 
-  private configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
+  private configureSpanProcessors(
+    exporters: SpanExporter[]
+  ): (BatchSpanProcessor | SimpleSpanProcessor)[] {
     return exporters.map(exporter => {
       if (exporter instanceof ConsoleSpanExporter) {
         return new SimpleSpanProcessor(exporter);
@@ -118,7 +149,6 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
   }
 
   private filterBlanksAndNulls(list: string[]): string[] {
-    return list.map(item => item.trim())
-      .filter(s => s !== 'null' && s !== '');
+    return list.map(item => item.trim()).filter(s => s !== 'null' && s !== '');
   }
 }

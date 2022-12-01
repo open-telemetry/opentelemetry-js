@@ -113,13 +113,13 @@ export interface LoggerOptions {
 
 export interface DiagLoggerApi {
   /**
-  * Set the global DiagLogger and DiagLogLevel.
-  * If a global diag logger is already set, this will override it.
-  *
-  * @param logger - The {@link DiagLogger} instance to set as the default logger.
-  * @param options - A {@link LoggerOptions} object. If not provided, default values will be set.
-  * @returns `true` if the logger was successfully registered, else `false`
-  */
+   * Set the global DiagLogger and DiagLogLevel.
+   * If a global diag logger is already set, this will override it.
+   *
+   * @param logger - The {@link DiagLogger} instance to set as the default logger.
+   * @param options - A {@link LoggerOptions} object. If not provided, default values will be set.
+   * @returns `true` if the logger was successfully registered, else `false`
+   */
   setLogger(logger: DiagLogger, options?: LoggerOptions): boolean;
 
   /**

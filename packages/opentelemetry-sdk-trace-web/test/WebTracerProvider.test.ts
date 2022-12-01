@@ -96,12 +96,10 @@ describe('WebTracerProvider', () => {
             trace.getSpan(context.active()) === rootSpan,
             'Current span is rootSpan'
           );
-          const concurrentSpan1 = webTracerWithZone.startSpan(
-            'concurrentSpan1'
-          );
-          const concurrentSpan2 = webTracerWithZone.startSpan(
-            'concurrentSpan2'
-          );
+          const concurrentSpan1 =
+            webTracerWithZone.startSpan('concurrentSpan1');
+          const concurrentSpan2 =
+            webTracerWithZone.startSpan('concurrentSpan2');
 
           context.with(trace.setSpan(context.active(), concurrentSpan1), () => {
             setTimeout(() => {
@@ -132,7 +130,9 @@ describe('WebTracerProvider', () => {
         assert.ok(span);
         assert.ok(span.resource instanceof Resource);
         assert.equal(
-          span.resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
+          span.resource.attributes[
+            SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE
+          ],
           'webjs'
         );
       });

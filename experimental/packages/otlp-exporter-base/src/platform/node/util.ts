@@ -75,9 +75,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
     res.on('aborted', () => {
       if (reqIsDestroyed) {
-        const err = new OTLPExporterError(
-          'Request Timeout'
-        );
+        const err = new OTLPExporterError('Request Timeout');
         onError(err);
       }
     });
@@ -102,9 +100,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   req.on('error', (error: Error | any) => {
     if (reqIsDestroyed) {
-      const err = new OTLPExporterError(
-        'Request Timeout', error.code
-      );
+      const err = new OTLPExporterError('Request Timeout', error.code);
       onError(err);
     } else {
       clearTimeout(exporterTimer);
@@ -116,8 +112,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     case CompressionAlgorithm.GZIP: {
       req.setHeader('Content-Encoding', 'gzip');
       const dataStream = readableFromBuffer(data);
-      dataStream.on('error', onError)
-        .pipe(zlib.createGzip()).on('error', onError)
+      dataStream
+        .on('error', onError)
+        .pipe(zlib.createGzip())
+        .on('error', onError)
         .pipe(req);
 
       break;
@@ -158,11 +156,17 @@ export function createHttpAgent(
   }
 }
 
-export function configureCompression(compression: CompressionAlgorithm | undefined): CompressionAlgorithm {
+export function configureCompression(
+  compression: CompressionAlgorithm | undefined
+): CompressionAlgorithm {
   if (compression) {
     return compression;
   } else {
-    const definedCompression = getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION || getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
-    return definedCompression === CompressionAlgorithm.GZIP ? CompressionAlgorithm.GZIP : CompressionAlgorithm.NONE;
+    const definedCompression =
+      getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
+      getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+    return definedCompression === CompressionAlgorithm.GZIP
+      ? CompressionAlgorithm.GZIP
+      : CompressionAlgorithm.NONE;
   }
 }

@@ -21,7 +21,6 @@ export interface Clock {
   now(): number;
 }
 
-
 /**
  * A utility for returning wall times anchored to a given point in time. Wall time measurements will
  * not be taken from the system, but instead are computed by adding a monotonic clock time

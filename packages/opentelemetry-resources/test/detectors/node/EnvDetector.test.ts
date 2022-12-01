@@ -38,15 +38,13 @@ describeNode('envDetector() on Node.js', () => {
         podName: 'pod-xyz-123',
         clusterName: 'c1',
         namespaceName: 'default',
-        deploymentName: 'deployment name'
+        deploymentName: 'deployment name',
       });
     });
   });
 
   describe('with invalid env', () => {
-    const values = [
-      'k8s.deployment.name="with spaces"',
-    ];
+    const values = ['k8s.deployment.name="with spaces"'];
 
     for (const value of values) {
       describe(`value: '${value}'`, () => {

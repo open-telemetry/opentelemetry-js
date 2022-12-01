@@ -17,14 +17,17 @@
 import {
   Attributes,
   context,
-  propagation, SpanKind, trace,
+  propagation,
+  SpanKind,
+  trace,
 } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/api';
 import {
-  InMemorySpanExporter, ReadableSpan,
+  InMemorySpanExporter,
+  ReadableSpan,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -89,22 +92,25 @@ interface TestGrpcCall {
 }
 
 // Compare two arrays using an equal function f
-const arrayIsEqual = (f: any) => ([x, ...xs]: any) => ([y, ...ys]: any): any =>
-  x === undefined && y === undefined
-    ? true
-    : Boolean(f(x)(y)) && arrayIsEqual(f)(xs)(ys);
+const arrayIsEqual =
+  (f: any) =>
+  ([x, ...xs]: any) =>
+  ([y, ...ys]: any): any =>
+    x === undefined && y === undefined
+      ? true
+      : Boolean(f(x)(y)) && arrayIsEqual(f)(xs)(ys);
 
 // Return true if two requests has the same num value
 const requestEqual = (x: TestRequestResponse) => (y: TestRequestResponse) =>
   x.num !== undefined && x.num === y.num;
 
 // Check if its equal requests or array of requests
-const checkEqual = (x: TestRequestResponse | TestRequestResponse[]) => (
-  y: TestRequestResponse | TestRequestResponse[]
-) =>
-  x instanceof Array && y instanceof Array
-    ? arrayIsEqual(requestEqual)(x as any)(y as any)
-    : !(x instanceof Array) && !(y instanceof Array)
+const checkEqual =
+  (x: TestRequestResponse | TestRequestResponse[]) =>
+  (y: TestRequestResponse | TestRequestResponse[]) =>
+    x instanceof Array && y instanceof Array
+      ? arrayIsEqual(requestEqual)(x as any)(y as any)
+      : !(x instanceof Array) && !(y instanceof Array)
       ? requestEqual(x)(y)
       : false;
 
@@ -306,7 +312,10 @@ export const runTests = (
       // in those cases, erro.code = request.num
 
       // This method returns the request
-      unaryMethodWithMetadata(call: ServerUnaryCall, callback: RequestCallback) {
+      unaryMethodWithMetadata(
+        call: ServerUnaryCall,
+        callback: RequestCallback
+      ) {
         const serverMetadata: any = new grpc.Metadata();
         serverMetadata.add('server_metadata_key', 'server_metadata_value');
 
@@ -314,11 +323,11 @@ export const runTests = (
 
         call.request.num <= MAX_ERROR_STATUS
           ? callback(
-            getError(
-              'Unary Method with Metadata Error',
-              call.request.num
-            ) as grpcJs.ServiceError
-          )
+              getError(
+                'Unary Method with Metadata Error',
+                call.request.num
+              ) as grpcJs.ServiceError
+            )
           : callback(null, { num: call.request.num });
       },
 
@@ -326,11 +335,11 @@ export const runTests = (
       unaryMethod(call: ServerUnaryCall, callback: RequestCallback) {
         call.request.num <= MAX_ERROR_STATUS
           ? callback(
-            getError(
-              'Unary Method Error',
-              call.request.num
-            ) as grpcJs.ServiceError
-          )
+              getError(
+                'Unary Method Error',
+                call.request.num
+              ) as grpcJs.ServiceError
+            )
           : callback(null, { num: call.request.num });
       },
 
@@ -342,7 +351,7 @@ export const runTests = (
                 'Unary Method Error',
                 call.request.num
               ) as grpcJs.ServiceError
-          )
+            )
           : callback(null, { num: call.request.num });
       },
 
@@ -499,26 +508,17 @@ export const runTests = (
       clientSpan: ReadableSpan,
       methodName: string,
       attributesValidation?: {
-          serverAttributes?: Attributes,
-          clientAttributes?: Attributes
-        }) => {
+        serverAttributes?: Attributes;
+        clientAttributes?: Attributes;
+      }
+    ) => {
       const validations = {
         name: `grpc.pkg_test.GrpcTester/${methodName}`,
         status: grpc.status.OK,
       };
 
-      assertSpan(
-        moduleName,
-        serverSpan,
-        SpanKind.SERVER,
-        validations
-      );
-      assertSpan(
-        moduleName,
-        clientSpan,
-        SpanKind.CLIENT,
-        validations
-      );
+      assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
+      assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
 
       assertPropagation(serverSpan, clientSpan);
 
@@ -546,9 +546,10 @@ export const runTests = (
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
-          serverAttributes?: Attributes,
-          clientAttributes?: Attributes
-        }) => {
+        serverAttributes?: Attributes;
+        clientAttributes?: Attributes;
+      }
+    ) => {
       it(`should ${
         checkSpans ? 'do' : 'not'
       }: create a rootSpan for client and a childSpan for server - ${
@@ -560,7 +561,8 @@ export const runTests = (
           .then((result: TestRequestResponse | TestRequestResponse[]) => {
             assert.ok(
               checkEqual(result)(method.result),
-              'gRPC call returns correct values');
+              'gRPC call returns correct values'
+            );
 
             const spans = memoryExporter.getFinishedSpans();
             if (checkSpans) {
@@ -570,7 +572,12 @@ export const runTests = (
               const serverSpan = spans[0];
               const clientSpan = spans[1];
 
-              validateSpans(serverSpan, clientSpan, method.methodName, attributesValidation);
+              validateSpans(
+                serverSpan,
+                clientSpan,
+                method.methodName,
+                attributesValidation
+              );
             } else {
               assert.strictEqual(spans.length, 0);
             }
@@ -583,9 +590,9 @@ export const runTests = (
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
-          serverAttributes?: Attributes,
-          clientAttributes?: Attributes
-        }
+        serverAttributes?: Attributes;
+        clientAttributes?: Attributes;
+      }
     ) => {
       it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = OK`, () => {
         const expectEmpty = memoryExporter.getFinishedSpans();
@@ -593,7 +600,7 @@ export const runTests = (
 
         const span = provider
           .getTracer('default')
-          .startSpan('TestSpan', {kind: SpanKind.PRODUCER});
+          .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
         return context.with(trace.setSpan(context.active(), span), async () => {
           const rootSpan = trace.getSpan(context.active());
           if (!rootSpan) {
@@ -612,7 +619,12 @@ export const runTests = (
                 const serverSpan = spans[0];
                 const clientSpan = spans[1];
 
-                validateSpans(serverSpan, clientSpan, method.methodName, attributesValidation);
+                validateSpans(
+                  serverSpan,
+                  clientSpan,
+                  method.methodName,
+                  attributesValidation
+                );
 
                 assert.strictEqual(
                   rootSpan.spanContext().traceId,
@@ -636,10 +648,16 @@ export const runTests = (
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation: {
-          serverAttributes?: Attributes,
-          clientAttributes?: Attributes
-        }) => {
-      ClientServerValidationTest(method, provider, checkSpans, attributesValidation);
+        serverAttributes?: Attributes;
+        clientAttributes?: Attributes;
+      }
+    ) => {
+      ClientServerValidationTest(
+        method,
+        provider,
+        checkSpans,
+        attributesValidation
+      );
       ErrorValidationTest(method, provider, checkSpans, attributesValidation);
     };
 
@@ -652,10 +670,10 @@ export const runTests = (
       ErrorValidationTest(method, provider, checkSpans);
     };
 
-    const insertError = (
-      request: TestRequestResponse | TestRequestResponse[]
-    ) => (code: number) =>
-      request instanceof Array ? [{ num: code }, ...request] : { num: code };
+    const insertError =
+      (request: TestRequestResponse | TestRequestResponse[]) =>
+      (code: number) =>
+        request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
       method: typeof methodList[0],
@@ -737,9 +755,7 @@ export const runTests = (
       });
     };
 
-    const runClientMethodTest = (
-      method: typeof methodList[0]
-    ) => {
+    const runClientMethodTest = (method: typeof methodList[0]) => {
       it(`should assign original properties for grpc remote method ${method.methodName}`, async () => {
         const patchedClientMethod = (client as any)[method.methodName];
         const properties = Object.keys(patchedClientMethod);
@@ -941,7 +957,7 @@ export const runTests = (
         method: grpcClient.unaryMethodWithMetadata,
         request: requestList[0],
         result: requestList[0],
-        metadata: clientMetadata
+        metadata: clientMetadata,
       };
 
       beforeEach(() => {
@@ -954,9 +970,9 @@ export const runTests = (
           metadataToSpanAttributes: {
             client: {
               requestMetadata: ['client_metadata_key'],
-              responseMetadata: ['server_metadata_key']
-            }
-          }
+              responseMetadata: ['server_metadata_key'],
+            },
+          },
         });
 
         plugin.setTracerProvider(provider);
@@ -981,11 +997,17 @@ export const runTests = (
         const attributeValidation = {
           clientAttributes: {
             'rpc.request.metadata.client_metadata_key': 'client_metadata_value',
-            'rpc.response.metadata.server_metadata_key': 'server_metadata_value'
-          }
+            'rpc.response.metadata.server_metadata_key':
+              'server_metadata_value',
+          },
         };
 
-        runTestWithAttributeValidation(customMetadataMethod, provider, true, attributeValidation);
+        runTestWithAttributeValidation(
+          customMetadataMethod,
+          provider,
+          true,
+          attributeValidation
+        );
       });
     });
   });

@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 
+import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import {
-  OTLPMetricExporterOptions
-} from '@opentelemetry/exporter-metrics-otlp-http';
-import { ServiceClientType, OTLPProtoExporterNodeBase } from '@opentelemetry/otlp-proto-exporter-base';
+  ServiceClientType,
+  OTLPProtoExporterNodeBase,
+} from '@opentelemetry/otlp-proto-exporter-base';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
 import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded
+  appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/otlp-exporter-base';
-import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  createExportMetricsServiceRequest,
+  IExportMetricsServiceRequest,
+} from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
-class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetrics, IExportMetricsServiceRequest> {
-
+class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
+  ResourceMetrics,
+  IExportMetricsServiceRequest
+> {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(config);
     this.headers = Object.assign(
@@ -51,10 +57,15 @@ class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetr
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
-        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-          ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
-          : DEFAULT_COLLECTOR_URL;
+      ? appendRootPathToUrlIfNeeded(
+          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+        )
+      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+      ? appendResourcePathToUrl(
+          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
+          DEFAULT_COLLECTOR_RESOURCE_PATH
+        )
+      : DEFAULT_COLLECTOR_URL;
   }
 
   getServiceClientType() {

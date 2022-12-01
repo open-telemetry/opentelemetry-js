@@ -15,7 +15,11 @@
  */
 
 import * as grpc from '@grpc/grpc-js';
-import { CompressionAlgorithm, OTLPExporterConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
+import {
+  CompressionAlgorithm,
+  OTLPExporterConfigBase,
+  OTLPExporterError,
+} from '@opentelemetry/otlp-exporter-base';
 
 /**
  * Queue item to be used to save temporary spans/metrics in case the GRPC service
@@ -42,8 +46,7 @@ export interface ServiceClient extends grpc.Client {
 /**
  * OTLP Exporter Config for Node
  */
-export interface OTLPGRPCExporterConfigNode
-  extends OTLPExporterConfigBase {
+export interface OTLPGRPCExporterConfigNode extends OTLPExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
   compression?: CompressionAlgorithm;

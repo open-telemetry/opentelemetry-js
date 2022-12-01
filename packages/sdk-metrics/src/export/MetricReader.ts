@@ -23,14 +23,14 @@ import { InstrumentType } from '../InstrumentDescriptor';
 import {
   CollectionOptions,
   ForceFlushOptions,
-  ShutdownOptions
+  ShutdownOptions,
 } from '../types';
 import { Aggregation } from '../view/Aggregation';
 import {
   AggregationSelector,
   AggregationTemporalitySelector,
   DEFAULT_AGGREGATION_SELECTOR,
-  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
 
 export interface MetricReaderOptions {
@@ -61,9 +61,10 @@ export abstract class MetricReader {
   private readonly _aggregationSelector: AggregationSelector;
 
   constructor(options?: MetricReaderOptions) {
-    this._aggregationSelector = options?.aggregationSelector ??
-      DEFAULT_AGGREGATION_SELECTOR;
-    this._aggregationTemporalitySelector = options?.aggregationTemporalitySelector ??
+    this._aggregationSelector =
+      options?.aggregationSelector ?? DEFAULT_AGGREGATION_SELECTOR;
+    this._aggregationTemporalitySelector =
+      options?.aggregationTemporalitySelector ??
       DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
   }
 
@@ -74,7 +75,9 @@ export abstract class MetricReader {
    */
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._metricProducer) {
-      throw new Error('MetricReader can not be bound to a MeterProvider again.');
+      throw new Error(
+        'MetricReader can not be bound to a MeterProvider again.'
+      );
     }
     this._metricProducer = metricProducer;
     this.onInitialized();
@@ -92,7 +95,9 @@ export abstract class MetricReader {
    * Select the {@link AggregationTemporality} for the given
    * {@link InstrumentType} for this reader.
    */
-  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
+  selectAggregationTemporality(
+    instrumentType: InstrumentType
+  ): AggregationTemporality {
     return this._aggregationTemporalitySelector(instrumentType);
   }
 

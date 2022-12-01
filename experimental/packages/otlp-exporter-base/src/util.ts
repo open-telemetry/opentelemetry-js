@@ -73,7 +73,9 @@ export function appendRootPathToUrlIfNeeded(url: string): string {
  * @param timeoutMillis
  * @returns timeout value in milliseconds
  */
-export function configureExporterTimeout(timeoutMillis: number | undefined): number {
+export function configureExporterTimeout(
+  timeoutMillis: number | undefined
+): number {
   if (typeof timeoutMillis === 'number') {
     if (timeoutMillis <= 0) {
       // OTLP exporter configured timeout - using default value of 10000ms
@@ -86,9 +88,10 @@ export function configureExporterTimeout(timeoutMillis: number | undefined): num
 }
 
 function getExporterTimeoutFromEnv(): number {
-  const definedTimeout =
-    Number(getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ??
-      getEnv().OTEL_EXPORTER_OTLP_TIMEOUT);
+  const definedTimeout = Number(
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ??
+      getEnv().OTEL_EXPORTER_OTLP_TIMEOUT
+  );
 
   if (definedTimeout <= 0) {
     // OTLP exporter configured timeout - using default value of 10000ms
@@ -99,7 +102,10 @@ function getExporterTimeoutFromEnv(): number {
 }
 
 // OTLP exporter configured timeout - using default value of 10000ms
-export function invalidTimeout(timeout: number, defaultTimeout: number): number {
+export function invalidTimeout(
+  timeout: number,
+  defaultTimeout: number
+): number {
   diag.warn('Timeout must be greater than 0', timeout);
 
   return defaultTimeout;

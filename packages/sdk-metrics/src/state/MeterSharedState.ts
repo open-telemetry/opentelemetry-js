@@ -18,7 +18,10 @@ import { HrTime } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { MetricCollectOptions } from '../export/MetricProducer';
 import { ScopeMetrics } from '../export/MetricData';
-import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
+import {
+  createInstrumentDescriptorWithView,
+  InstrumentDescriptor,
+} from '../InstrumentDescriptor';
 import { Meter } from '../Meter';
 import { isNotNullish, Maybe } from '../utils';
 import { AsyncMetricStorage } from './AsyncMetricStorage';
@@ -40,21 +43,27 @@ export class MeterSharedState {
   observableRegistry = new ObservableRegistry();
   meter: Meter;
 
-  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationScope: InstrumentationScope) {
+  constructor(
+    private _meterProviderSharedState: MeterProviderSharedState,
+    private _instrumentationScope: InstrumentationScope
+  ) {
     this.meter = new Meter(this);
   }
 
   registerMetricStorage(descriptor: InstrumentDescriptor) {
     const storages = this._registerMetricStorage(descriptor, SyncMetricStorage);
 
-    if (storages.length === 1)  {
+    if (storages.length === 1) {
       return storages[0];
     }
     return new MultiMetricStorage(storages);
   }
 
   registerAsyncMetricStorage(descriptor: InstrumentDescriptor) {
-    const storages = this._registerMetricStorage(descriptor, AsyncMetricStorage);
+    const storages = this._registerMetricStorage(
+      descriptor,
+      AsyncMetricStorage
+    );
 
     return storages;
   }
@@ -65,18 +74,28 @@ export class MeterSharedState {
    * @param options options for collection.
    * @returns the list of metric data collected.
    */
-  async collect(collector: MetricCollectorHandle, collectionTime: HrTime, options?: MetricCollectOptions): Promise<ScopeMetricsResult> {
+  async collect(
+    collector: MetricCollectorHandle,
+    collectionTime: HrTime,
+    options?: MetricCollectOptions
+  ): Promise<ScopeMetricsResult> {
     /**
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
      */
-    const errors = await this.observableRegistry.observe(collectionTime, options?.timeoutMillis);
-    const metricDataList = Array.from(this.metricStorageRegistry.getStorages(collector))
+    const errors = await this.observableRegistry.observe(
+      collectionTime,
+      options?.timeoutMillis
+    );
+    const metricDataList = Array.from(
+      this.metricStorageRegistry.getStorages(collector)
+    )
       .map(metricStorage => {
         return metricStorage.collect(
           collector,
           this._meterProviderSharedState.metricCollectors,
-          collectionTime);
+          collectionTime
+        );
       })
       .filter(isNotNullish);
 
@@ -89,34 +108,63 @@ export class MeterSharedState {
     };
   }
 
-  private _registerMetricStorage<MetricStorageType extends MetricStorageConstructor, R extends InstanceType<MetricStorageType>>(descriptor: InstrumentDescriptor, MetricStorageType: MetricStorageType): R[] {
-    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationScope);
-    let storages = views
-      .map(view => {
-        const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
-        const compatibleStorage = this.metricStorageRegistry.findOrUpdateCompatibleStorage<R>(viewDescriptor);
-        if (compatibleStorage != null) {
-          return compatibleStorage;
-        }
-        const aggregator = view.aggregation.createAggregator(viewDescriptor);
-        const viewStorage = new MetricStorageType(viewDescriptor, aggregator, view.attributesProcessor) as R;
-        this.metricStorageRegistry.register(viewStorage);
-        return viewStorage;
-      });
+  private _registerMetricStorage<
+    MetricStorageType extends MetricStorageConstructor,
+    R extends InstanceType<MetricStorageType>
+  >(
+    descriptor: InstrumentDescriptor,
+    MetricStorageType: MetricStorageType
+  ): R[] {
+    const views = this._meterProviderSharedState.viewRegistry.findViews(
+      descriptor,
+      this._instrumentationScope
+    );
+    let storages = views.map(view => {
+      const viewDescriptor = createInstrumentDescriptorWithView(
+        view,
+        descriptor
+      );
+      const compatibleStorage =
+        this.metricStorageRegistry.findOrUpdateCompatibleStorage<R>(
+          viewDescriptor
+        );
+      if (compatibleStorage != null) {
+        return compatibleStorage;
+      }
+      const aggregator = view.aggregation.createAggregator(viewDescriptor);
+      const viewStorage = new MetricStorageType(
+        viewDescriptor,
+        aggregator,
+        view.attributesProcessor
+      ) as R;
+      this.metricStorageRegistry.register(viewStorage);
+      return viewStorage;
+    });
 
     // Fallback to the per-collector aggregations if no view is configured for the instrument.
     if (storages.length === 0) {
-      const perCollectorAggregations = this._meterProviderSharedState.selectAggregations(descriptor.type);
-      const collectorStorages = perCollectorAggregations.map(([collector, aggregation]) => {
-        const compatibleStorage = this.metricStorageRegistry.findOrUpdateCompatibleCollectorStorage<R>(collector, descriptor);
-        if (compatibleStorage != null) {
-          return compatibleStorage;
+      const perCollectorAggregations =
+        this._meterProviderSharedState.selectAggregations(descriptor.type);
+      const collectorStorages = perCollectorAggregations.map(
+        ([collector, aggregation]) => {
+          const compatibleStorage =
+            this.metricStorageRegistry.findOrUpdateCompatibleCollectorStorage<R>(
+              collector,
+              descriptor
+            );
+          if (compatibleStorage != null) {
+            return compatibleStorage;
+          }
+          const aggregator = aggregation.createAggregator(descriptor);
+          const storage = new MetricStorageType(
+            descriptor,
+            aggregator,
+            AttributesProcessor.Noop()
+          ) as R;
+          this.metricStorageRegistry.registerForCollector(collector, storage);
+          return storage;
         }
-        const aggregator = aggregation.createAggregator(descriptor);
-        const storage = new MetricStorageType(descriptor, aggregator, AttributesProcessor.Noop()) as R;
-        this.metricStorageRegistry.registerForCollector(collector, storage);
-        return storage;
-      });
+      );
       storages = storages.concat(collectorStorages);
     }
 
@@ -130,7 +178,9 @@ interface ScopeMetricsResult {
 }
 
 interface MetricStorageConstructor {
-  new (instrumentDescriptor: InstrumentDescriptor,
+  new (
+    instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<Maybe<Accumulation>>,
-    attributesProcessor: AttributesProcessor): MetricStorage;
+    attributesProcessor: AttributesProcessor
+  ): MetricStorage;
 }

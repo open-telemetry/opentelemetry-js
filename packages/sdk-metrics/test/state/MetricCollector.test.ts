@@ -29,7 +29,10 @@ import {
   ObservableCallbackDelegate,
   BatchObservableCallbackDelegate,
 } from '../util';
-import { TestDeltaMetricReader, TestMetricReader } from '../export/TestMetricReader';
+import {
+  TestDeltaMetricReader,
+  TestMetricReader,
+} from '../export/TestMetricReader';
 
 describe('MetricCollector', () => {
   afterEach(() => {
@@ -38,10 +41,14 @@ describe('MetricCollector', () => {
 
   describe('constructor', () => {
     it('should construct MetricCollector without exceptions', () => {
-      const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
-      const readers = [ new TestMetricReader(), new TestDeltaMetricReader() ];
+      const meterProviderSharedState = new MeterProviderSharedState(
+        defaultResource
+      );
+      const readers = [new TestMetricReader(), new TestDeltaMetricReader()];
       for (const reader of readers) {
-        assert.doesNotThrow(() => new MetricCollector(meterProviderSharedState, reader));
+        assert.doesNotThrow(
+          () => new MetricCollector(meterProviderSharedState, reader)
+        );
       }
     });
   });
@@ -54,9 +61,13 @@ describe('MetricCollector', () => {
       meterProvider.addMetricReader(reader);
       const metricCollector = reader.getMetricCollector();
 
-      const meter = meterProvider.getMeter(defaultInstrumentationScope.name, defaultInstrumentationScope.version, {
-        schemaUrl: defaultInstrumentationScope.schemaUrl,
-      });
+      const meter = meterProvider.getMeter(
+        defaultInstrumentationScope.name,
+        defaultInstrumentationScope.version,
+        {
+          schemaUrl: defaultInstrumentationScope.schemaUrl,
+        }
+      );
 
       return { metricCollector, meter };
     }
@@ -83,7 +94,7 @@ describe('MetricCollector', () => {
       /** checking batch[0] */
       const metricData1 = metrics[0];
       assertMetricData(metricData1, DataPointType.SUM, {
-        name: 'counter1'
+        name: 'counter1',
       });
       assert.strictEqual(metricData1.dataPoints.length, 2);
       assertDataPoint(metricData1.dataPoints[0], {}, 1);
@@ -92,7 +103,7 @@ describe('MetricCollector', () => {
       /** checking batch[1] */
       const metricData2 = metrics[1];
       assertMetricData(metricData2, DataPointType.SUM, {
-        name: 'counter2'
+        name: 'counter2',
       });
       assert.strictEqual(metricData2.dataPoints.length, 1);
       assertDataPoint(metricData2.dataPoints[0], {}, 3);
@@ -116,7 +127,10 @@ describe('MetricCollector', () => {
       const delegate2 = new BatchObservableCallbackDelegate();
       const observableCounter2 = meter.createObservableCounter('observable2');
       const observableCounter3 = meter.createObservableCounter('observable3');
-      meter.addBatchObservableCallback(delegate2.getCallback(), [ observableCounter2, observableCounter3 ]);
+      meter.addBatchObservableCallback(delegate2.getCallback(), [
+        observableCounter2,
+        observableCounter3,
+      ]);
       delegate2.setDelegate(observableResult => {
         observableResult.observe(observableCounter2, 3, {});
         observableResult.observe(observableCounter2, 4, { foo: 'bar' });
@@ -132,7 +146,7 @@ describe('MetricCollector', () => {
       /** checking batch[0] */
       const metricData1 = metrics[0];
       assertMetricData(metricData1, DataPointType.SUM, {
-        name: 'observable1'
+        name: 'observable1',
       });
       assert.strictEqual(metricData1.dataPoints.length, 2);
       assertDataPoint(metricData1.dataPoints[0], {}, 1);
@@ -141,7 +155,7 @@ describe('MetricCollector', () => {
       /** checking batch[1] */
       const metricData2 = metrics[1];
       assertMetricData(metricData2, DataPointType.SUM, {
-        name: 'observable2'
+        name: 'observable2',
       });
       assert.strictEqual(metricData2.dataPoints.length, 2);
       assertDataPoint(metricData2.dataPoints[0], {}, 3);
@@ -150,7 +164,7 @@ describe('MetricCollector', () => {
       /** checking batch[2] */
       const metricData3 = metrics[2];
       assertMetricData(metricData3, DataPointType.SUM, {
-        name: 'observable3'
+        name: 'observable3',
       });
       assert.strictEqual(metricData3.dataPoints.length, 0);
     });
@@ -195,13 +209,13 @@ describe('MetricCollector', () => {
 
         /** observer1 */
         assertMetricData(metrics[0], DataPointType.SUM, {
-          name: 'observer1'
+          name: 'observer1',
         });
         assert.strictEqual(metrics[0].dataPoints.length, 0);
 
         /** observer2 */
         assertMetricData(metrics[1], DataPointType.SUM, {
-          name: 'observer2'
+          name: 'observer2',
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
       }
@@ -225,14 +239,14 @@ describe('MetricCollector', () => {
 
         /** observer1 */
         assertMetricData(metrics[0], DataPointType.SUM, {
-          name: 'observer1'
+          name: 'observer1',
         });
         assert.strictEqual(metrics[0].dataPoints.length, 1);
         assertDataPoint(metrics[0].dataPoints[0], {}, 100);
 
         /** observer2 */
         assertMetricData(metrics[1], DataPointType.SUM, {
-          name: 'observer2'
+          name: 'observer2',
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
       }
@@ -262,13 +276,13 @@ describe('MetricCollector', () => {
 
       /** counter1 data points are collected */
       assertMetricData(metrics[0], DataPointType.SUM, {
-        name: 'counter1'
+        name: 'counter1',
       });
       assert.strictEqual(metrics[0].dataPoints.length, 1);
 
       /** observer1 data points are not collected */
       assertMetricData(metrics[1], DataPointType.SUM, {
-        name: 'observer1'
+        name: 'observer1',
       });
       assert.strictEqual(metrics[1].dataPoints.length, 0);
     });
@@ -283,7 +297,9 @@ describe('MetricCollector', () => {
       /** observer1 is an abnormal observer */
       const observableCounter1 = meter.createObservableCounter('observer1');
       const delegate1 = new BatchObservableCallbackDelegate();
-      meter.addBatchObservableCallback(delegate1.getCallback(), [ observableCounter1 ]);
+      meter.addBatchObservableCallback(delegate1.getCallback(), [
+        observableCounter1,
+      ]);
       delegate1.setDelegate(_observableResult => {
         return new Promise(() => {
           /** promise never settles */
@@ -293,7 +309,9 @@ describe('MetricCollector', () => {
       /** observer2 is a normal observer */
       const observableCounter2 = meter.createObservableCounter('observer2');
       const delegate2 = new BatchObservableCallbackDelegate();
-      meter.addBatchObservableCallback(delegate2.getCallback(), [ observableCounter2 ]);
+      meter.addBatchObservableCallback(delegate2.getCallback(), [
+        observableCounter2,
+      ]);
       delegate2.setDelegate(observableResult => {
         observableResult.observe(observableCounter2, 1, {});
       });
@@ -313,13 +331,13 @@ describe('MetricCollector', () => {
 
         /** observer1 */
         assertMetricData(metrics[0], DataPointType.SUM, {
-          name: 'observer1'
+          name: 'observer1',
         });
         assert.strictEqual(metrics[0].dataPoints.length, 0);
 
         /** observer2 */
         assertMetricData(metrics[1], DataPointType.SUM, {
-          name: 'observer2'
+          name: 'observer2',
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
       }
@@ -343,14 +361,14 @@ describe('MetricCollector', () => {
 
         /** observer1 */
         assertMetricData(metrics[0], DataPointType.SUM, {
-          name: 'observer1'
+          name: 'observer1',
         });
         assert.strictEqual(metrics[0].dataPoints.length, 1);
         assertDataPoint(metrics[0].dataPoints[0], {}, 100);
 
         /** observer2 */
         assertMetricData(metrics[1], DataPointType.SUM, {
-          name: 'observer2'
+          name: 'observer2',
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
       }
@@ -367,7 +385,9 @@ describe('MetricCollector', () => {
       /** observer1 is an abnormal observer */
       const observableCounter1 = meter.createObservableCounter('observer1');
       const delegate1 = new BatchObservableCallbackDelegate();
-      meter.addBatchObservableCallback(delegate1.getCallback(), [ observableCounter1 ]);
+      meter.addBatchObservableCallback(delegate1.getCallback(), [
+        observableCounter1,
+      ]);
       delegate1.setDelegate(_observableResult => {
         throw new Error('foobar');
       });
@@ -382,13 +402,13 @@ describe('MetricCollector', () => {
 
       /** counter1 data points are collected */
       assertMetricData(metrics[0], DataPointType.SUM, {
-        name: 'counter1'
+        name: 'counter1',
       });
       assert.strictEqual(metrics[0].dataPoints.length, 1);
 
       /** observer1 data points are not collected */
       assertMetricData(metrics[1], DataPointType.SUM, {
-        name: 'observer1'
+        name: 'observer1',
       });
       assert.strictEqual(metrics[1].dataPoints.length, 0);
     });
