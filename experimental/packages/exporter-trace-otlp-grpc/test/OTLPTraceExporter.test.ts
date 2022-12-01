@@ -37,11 +37,16 @@ import {
 import * as core from '@opentelemetry/core';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import { GrpcCompressionAlgorithm } from '@opentelemetry/otlp-grpc-exporter-base';
-import { IExportTraceServiceRequest, IResourceSpans } from '@opentelemetry/otlp-transformer';
+import {
+  IExportTraceServiceRequest,
+  IResourceSpans,
+} from '@opentelemetry/otlp-transformer';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
-const includeDirs = [path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos')];
+const includeDirs = [
+  path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
+];
 
 const address = 'localhost:1501';
 
@@ -59,9 +64,7 @@ const testCollectorExporter = (params: TestParams) =>
   } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
     let collectorExporter: OTLPTraceExporter;
     let server: grpc.Server;
-    let exportedData:
-      | IResourceSpans
-      | undefined;
+    let exportedData: IResourceSpans | undefined;
     let reqMetadata: grpc.Metadata | undefined;
 
     before(done => {
@@ -76,9 +79,8 @@ const testCollectorExporter = (params: TestParams) =>
           includeDirs,
         })
         .then((packageDefinition: protoLoader.PackageDefinition) => {
-          const packageObject: any = grpc.loadPackageDefinition(
-            packageDefinition
-          );
+          const packageObject: any =
+            grpc.loadPackageDefinition(packageDefinition);
           server.addService(
             packageObject.opentelemetry.proto.collector.trace.v1.TraceService
               .service,
@@ -96,14 +98,14 @@ const testCollectorExporter = (params: TestParams) =>
           );
           const credentials = params.useTLS
             ? grpc.ServerCredentials.createSsl(
-              fs.readFileSync('./test/certs/ca.crt'),
-              [
-                {
-                  cert_chain: fs.readFileSync('./test/certs/server.crt'),
-                  private_key: fs.readFileSync('./test/certs/server.key'),
-                },
-              ]
-            )
+                fs.readFileSync('./test/certs/ca.crt'),
+                [
+                  {
+                    cert_chain: fs.readFileSync('./test/certs/server.crt'),
+                    private_key: fs.readFileSync('./test/certs/server.key'),
+                  },
+                ]
+              )
             : grpc.ServerCredentials.createInsecure();
           server.bindAsync(address, credentials, () => {
             server.start();
@@ -119,10 +121,10 @@ const testCollectorExporter = (params: TestParams) =>
     beforeEach(done => {
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
-          fs.readFileSync('./test/certs/ca.crt'),
-          fs.readFileSync('./test/certs/client.key'),
-          fs.readFileSync('./test/certs/client.crt')
-        )
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
+          )
         : grpc.credentials.createInsecure();
       collectorExporter = new OTLPTraceExporter({
         url: 'https://' + address,
@@ -181,17 +183,11 @@ const testCollectorExporter = (params: TestParams) =>
           const spans = exportedData.scopeSpans[0].spans;
           const resource = exportedData.resource;
 
-          assert.ok(
-            typeof spans !== 'undefined',
-            'spans do not exist'
-          );
+          assert.ok(typeof spans !== 'undefined', 'spans do not exist');
 
           ensureExportedSpanIsCorrect(spans[0]);
 
-          assert.ok(
-            typeof resource !== 'undefined',
-            "resource doesn't exist"
-          );
+          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
 
           ensureResourceIsCorrect(resource);
 
@@ -203,10 +199,10 @@ const testCollectorExporter = (params: TestParams) =>
       it('should log deadline exceeded error', done => {
         const credentials = params.useTLS
           ? grpc.credentials.createSsl(
-            fs.readFileSync('./test/certs/ca.crt'),
-            fs.readFileSync('./test/certs/client.key'),
-            fs.readFileSync('./test/certs/client.crt')
-          )
+              fs.readFileSync('./test/certs/ca.crt'),
+              fs.readFileSync('./test/certs/client.key'),
+              fs.readFileSync('./test/certs/client.crt')
+            )
           : grpc.credentials.createInsecure();
 
         const collectorExporterWithTimeout = new OTLPTraceExporter({
@@ -223,7 +219,10 @@ const testCollectorExporter = (params: TestParams) =>
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          assert.strictEqual(responseSpy.args[0][0].error.details, 'Deadline exceeded');
+          assert.strictEqual(
+            responseSpy.args[0][0].error.details,
+            'Deadline exceeded'
+          );
           done();
         }, 300);
       });
@@ -232,10 +231,10 @@ const testCollectorExporter = (params: TestParams) =>
       beforeEach(() => {
         const credentials = params.useTLS
           ? grpc.credentials.createSsl(
-            fs.readFileSync('./test/certs/ca.crt'),
-            fs.readFileSync('./test/certs/client.key'),
-            fs.readFileSync('./test/certs/client.crt')
-          )
+              fs.readFileSync('./test/certs/ca.crt'),
+              fs.readFileSync('./test/certs/client.key'),
+              fs.readFileSync('./test/certs/client.crt')
+            )
           : grpc.credentials.createInsecure();
         collectorExporter = new OTLPTraceExporter({
           url: 'https://' + address,
@@ -259,16 +258,10 @@ const testCollectorExporter = (params: TestParams) =>
           const spans = exportedData.scopeSpans[0].spans;
           const resource = exportedData.resource;
 
-          assert.ok(
-            typeof spans !== 'undefined',
-            'spans do not exist'
-          );
+          assert.ok(typeof spans !== 'undefined', 'spans do not exist');
           ensureExportedSpanIsCorrect(spans[0]);
 
-          assert.ok(
-            typeof resource !== 'undefined',
-            "resource doesn't exist"
-          );
+          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           ensureResourceIsCorrect(resource);
 
           ensureMetadataIsCorrect(reqMetadata, params.metadata);
@@ -282,10 +275,10 @@ const testCollectorExporter = (params: TestParams) =>
       it('should return gzip compression algorithm on exporter', () => {
         const credentials = params.useTLS
           ? grpc.credentials.createSsl(
-            fs.readFileSync('./test/certs/ca.crt'),
-            fs.readFileSync('./test/certs/client.key'),
-            fs.readFileSync('./test/certs/client.crt')
-          )
+              fs.readFileSync('./test/certs/ca.crt'),
+              fs.readFileSync('./test/certs/client.key'),
+              fs.readFileSync('./test/certs/client.crt')
+            )
           : grpc.credentials.createInsecure();
 
         envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
@@ -294,7 +287,10 @@ const testCollectorExporter = (params: TestParams) =>
           credentials,
           metadata: params.metadata,
         });
-        assert.strictEqual(collectorExporter.compression, GrpcCompressionAlgorithm.GZIP);
+        assert.strictEqual(
+          collectorExporter.compression,
+          GrpcCompressionAlgorithm.GZIP
+        );
         delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
       });
     });
@@ -323,20 +319,14 @@ describe('when configuring via environment', () => {
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      'foo.bar'
-    );
+    assert.strictEqual(collectorExporter.url, 'foo.bar');
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should override global exporter url with signal url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces';
     const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      'foo.traces'
-    );
+    assert.strictEqual(collectorExporter.url, 'foo.traces');
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
   });

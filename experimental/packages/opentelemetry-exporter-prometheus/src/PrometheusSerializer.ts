@@ -114,9 +114,7 @@ function valueString(value: number) {
   }
 }
 
-function toPrometheusType(
-  metricData: MetricData,
-): PrometheusDataTypeLiteral {
+function toPrometheusType(metricData: MetricData): PrometheusDataTypeLiteral {
   switch (metricData.dataPointType) {
     case DataPointType.SUM:
       if (metricData.isMonotonic) {
@@ -212,45 +210,58 @@ export class PrometheusSerializer {
     }
     const dataPointType = metricData.dataPointType;
 
-    name = enforcePrometheusNamingConvention(
-      name,
-      metricData.descriptor.type
-    );
+    name = enforcePrometheusNamingConvention(name, metricData.descriptor.type);
 
     const help = `# HELP ${name} ${escapeString(
       metricData.descriptor.description || 'description missing'
     )}`;
-    const unit = metricData.descriptor.unit ? `\n# UNIT ${name} ${escapeString(
-      metricData.descriptor.unit,
-    )}` : '';
-    const type = `# TYPE ${name} ${toPrometheusType(
-      metricData
-    )}`;
+    const unit = metricData.descriptor.unit
+      ? `\n# UNIT ${name} ${escapeString(metricData.descriptor.unit)}`
+      : '';
+    const type = `# TYPE ${name} ${toPrometheusType(metricData)}`;
 
     let results = '';
     switch (dataPointType) {
       case DataPointType.SUM:
       case DataPointType.GAUGE: {
         results = metricData.dataPoints
-          .map(it => this._serializeSingularDataPoint(name, metricData.descriptor.type, it))
+          .map(it =>
+            this._serializeSingularDataPoint(
+              name,
+              metricData.descriptor.type,
+              it
+            )
+          )
           .join('');
         break;
       }
       case DataPointType.HISTOGRAM: {
         results = metricData.dataPoints
-          .map(it => this._serializeHistogramDataPoint(name, metricData.descriptor.type, it))
+          .map(it =>
+            this._serializeHistogramDataPoint(
+              name,
+              metricData.descriptor.type,
+              it
+            )
+          )
           .join('');
         break;
       }
       default: {
-        diag.error(`Unrecognizable DataPointType: ${dataPointType} for metric "${name}"`);
+        diag.error(
+          `Unrecognizable DataPointType: ${dataPointType} for metric "${name}"`
+        );
       }
     }
 
     return `${help}${unit}\n${type}\n${results}`.trim();
   }
 
-  private _serializeSingularDataPoint(name: string, type: InstrumentType, dataPoint: DataPoint<number>): string {
+  private _serializeSingularDataPoint(
+    name: string,
+    type: InstrumentType,
+    dataPoint: DataPoint<number>
+  ): string {
     let results = '';
 
     name = enforcePrometheusNamingConvention(name, type);
@@ -266,7 +277,11 @@ export class PrometheusSerializer {
     return results;
   }
 
-  private _serializeHistogramDataPoint(name: string, type: InstrumentType, dataPoint: DataPoint<Histogram>): string {
+  private _serializeHistogramDataPoint(
+    name: string,
+    type: InstrumentType,
+    dataPoint: DataPoint<Histogram>
+  ): string {
     let results = '';
 
     name = enforcePrometheusNamingConvention(name, type);

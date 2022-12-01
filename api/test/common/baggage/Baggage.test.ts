@@ -135,12 +135,15 @@ describe('Baggage', () => {
 
     it('should get the current baggage', () => {
       const entries = {
-        'banana': {value: 'boats'}
+        banana: { value: 'boats' },
       };
       const bag = propagation.createBaggage(entries);
       const ctx = propagation.setBaggage(ROOT_CONTEXT, bag);
 
-      context.setGlobalContextManager({ active: () => ctx, disable: () => {} } as any);
+      context.setGlobalContextManager({
+        active: () => ctx,
+        disable: () => {},
+      } as any);
 
       assert.strictEqual(bag, propagation.getActiveBaggage());
 

@@ -311,17 +311,22 @@ export const assertResource = (
   }
   if (validations.runtimeDescription) {
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION],
+      resource.attributes[
+        SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION
+      ],
       validations.runtimeDescription
     );
   }
 };
 
-export const assertWebEngineResource = (resource: Resource, validations: {
-  name?: string;
-  version?: string;
-  description?: string;
-}) => {
+export const assertWebEngineResource = (
+  resource: Resource,
+  validations: {
+    name?: string;
+    version?: string;
+    description?: string;
+  }
+) => {
   if (validations.name) {
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.WEBENGINE_NAME],
@@ -352,12 +357,14 @@ export const assertEmptyResource = (resource: Resource) => {
 };
 
 const assertHasOneLabel = (prefix: string, resource: Resource): void => {
-  const hasOne = Object.entries(SemanticResourceAttributes).find(([key, value]) => {
-    return (
-      key.startsWith(prefix) &&
-      Object.prototype.hasOwnProperty.call(resource.attributes, value)
-    );
-  });
+  const hasOne = Object.entries(SemanticResourceAttributes).find(
+    ([key, value]) => {
+      return (
+        key.startsWith(prefix) &&
+        Object.prototype.hasOwnProperty.call(resource.attributes, value)
+      );
+    }
+  );
 
   assert.ok(
     hasOne,

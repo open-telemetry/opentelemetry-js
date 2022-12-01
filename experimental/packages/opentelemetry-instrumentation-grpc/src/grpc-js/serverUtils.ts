@@ -124,10 +124,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
           code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
-        span.setAttribute(
-          SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          err.code
-        );
+        span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
       }
       span.setAttributes({
         [AttributeNames.GRPC_ERROR_NAME]: err.name,

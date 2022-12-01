@@ -24,7 +24,10 @@ import {
 import { ServiceClient } from './types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { configureCompression, GrpcCompressionAlgorithm } from './util';
-import { OTLPExporterBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
+import {
+  OTLPExporterBase,
+  OTLPExporterError,
+} from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Exporter abstract base class
@@ -48,7 +51,9 @@ export abstract class OTLPGRPCExporterNodeBase<
     if (config.headers) {
       diag.warn('Headers cannot be set when using grpc');
     }
-    const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS);
+    const headers = baggageUtils.parseKeyPairsIntoRecord(
+      getEnv().OTEL_EXPORTER_OTLP_HEADERS
+    );
     this.metadata = config.metadata || new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
@@ -63,8 +68,7 @@ export abstract class OTLPGRPCExporterNodeBase<
   ): void {
     const promise = new Promise<void>((resolve, reject) => {
       this._send(this, objects, resolve, reject);
-    })
-      .then(onSuccess, onError);
+    }).then(onSuccess, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {

@@ -31,7 +31,10 @@ interface ObjectInto {
  */
 export function merge(...args: any[]): any {
   let result: any = args.shift();
-  const objects: WeakMap<any, ObjectInto[]> | undefined = new WeakMap<any, ObjectInto[]>();
+  const objects: WeakMap<any, ObjectInto[]> | undefined = new WeakMap<
+    any,
+    ObjectInto[]
+  >();
   while (args.length > 0) {
     result = mergeTwoObjects(result, args.shift(), 0, objects);
   }
@@ -58,7 +61,7 @@ function mergeTwoObjects(
   one: any,
   two: any,
   level = 0,
-  objects: WeakMap<any, ObjectInto[]>,
+  objects: WeakMap<any, ObjectInto[]>
 ): any {
   let result: any;
   if (level > MAX_LEVEL) {
@@ -109,7 +112,6 @@ function mergeTwoObjects(
           ) {
             delete result[key];
           } else {
-
             if (isObject(obj1) && isObject(obj2)) {
               const arr1 = objects.get(obj1) || [];
               const arr2 = objects.get(obj2) || [];
@@ -145,7 +147,7 @@ function mergeTwoObjects(
 function wasObjectReferenced(
   obj: any,
   key: string,
-  objects: WeakMap<any, ObjectInto[]>,
+  objects: WeakMap<any, ObjectInto[]>
 ): boolean {
   const arr = objects.get(obj[key]) || [];
   for (let i = 0, j = arr.length; i < j; i++) {
@@ -166,17 +168,24 @@ function isFunction(value: any): boolean {
 }
 
 function isObject(value: any): boolean {
-  return !isPrimitive(value) && !isArray(value) && !isFunction(value) && typeof value === 'object';
+  return (
+    !isPrimitive(value) &&
+    !isArray(value) &&
+    !isFunction(value) &&
+    typeof value === 'object'
+  );
 }
 
 function isPrimitive(value: any): boolean {
-  return typeof value === 'string' ||
+  return (
+    typeof value === 'string' ||
     typeof value === 'number' ||
     typeof value === 'boolean' ||
     typeof value === 'undefined' ||
     value instanceof Date ||
     value instanceof RegExp ||
-    value === null;
+    value === null
+  );
 }
 
 function shouldMerge(one: any, two: any): boolean {
@@ -186,4 +195,3 @@ function shouldMerge(one: any, two: any): boolean {
 
   return true;
 }
-

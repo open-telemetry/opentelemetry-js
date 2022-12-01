@@ -21,12 +21,18 @@ import { AggregationTemporality } from './AggregationTemporality';
 /**
  * Aggregation selector based on metric instrument types.
  */
-export type AggregationSelector = (instrumentType: InstrumentType) => Aggregation;
+export type AggregationSelector = (
+  instrumentType: InstrumentType
+) => Aggregation;
 
 /**
-  * Aggregation temporality selector based on metric instrument types.
-  */
-export type AggregationTemporalitySelector = (instrumentType: InstrumentType) => AggregationTemporality;
+ * Aggregation temporality selector based on metric instrument types.
+ */
+export type AggregationTemporalitySelector = (
+  instrumentType: InstrumentType
+) => AggregationTemporality;
 
-export const DEFAULT_AGGREGATION_SELECTOR: AggregationSelector = _instrumentType => Aggregation.Default();
-export const DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR: AggregationTemporalitySelector = _instrumentType => AggregationTemporality.CUMULATIVE;
+export const DEFAULT_AGGREGATION_SELECTOR: AggregationSelector =
+  _instrumentType => Aggregation.Default();
+export const DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR: AggregationTemporalitySelector =
+  _instrumentType => AggregationTemporality.CUMULATIVE;

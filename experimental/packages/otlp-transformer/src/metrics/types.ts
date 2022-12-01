@@ -18,19 +18,17 @@ import { IResource } from '../resource/types';
 
 /** Properties of an ExportMetricsServiceRequest. */
 export interface IExportMetricsServiceRequest {
-
   /** ExportMetricsServiceRequest resourceMetrics */
-  resourceMetrics: IResourceMetrics[]
+  resourceMetrics: IResourceMetrics[];
 }
 
 /** Properties of a ResourceMetrics. */
 export interface IResourceMetrics {
-
   /** ResourceMetrics resource */
   resource?: IResource;
 
   /** ResourceMetrics scopeMetrics */
-  scopeMetrics: IScopeMetrics[]
+  scopeMetrics: IScopeMetrics[];
 
   /** ResourceMetrics schemaUrl */
   schemaUrl?: string;
@@ -38,7 +36,6 @@ export interface IResourceMetrics {
 
 /** Properties of an IScopeMetrics. */
 export interface IScopeMetrics {
-
   /** ScopeMetrics scope */
   scope?: IInstrumentationScope;
 
@@ -51,7 +48,6 @@ export interface IScopeMetrics {
 
 /** Properties of a Metric. */
 export interface IMetric {
-
   /** Metric name */
   name: string;
 
@@ -80,29 +76,28 @@ export interface IMetric {
 /** Properties of a Gauge. */
 export interface IGauge {
   /** Gauge dataPoints */
-  dataPoints: INumberDataPoint[]
+  dataPoints: INumberDataPoint[];
 }
 
 /** Properties of a Sum. */
 export interface ISum {
-
   /** Sum dataPoints */
   dataPoints: INumberDataPoint[];
 
   /** Sum aggregationTemporality */
-  aggregationTemporality: EAggregationTemporality
+  aggregationTemporality: EAggregationTemporality;
 
   /** Sum isMonotonic */
-  isMonotonic?: (boolean | null);
+  isMonotonic?: boolean | null;
 }
 
 /** Properties of a Histogram. */
 export interface IHistogram {
   /** Histogram dataPoints */
-  dataPoints: IHistogramDataPoint[]
+  dataPoints: IHistogramDataPoint[];
 
   /** Histogram aggregationTemporality */
-  aggregationTemporality?: EAggregationTemporality
+  aggregationTemporality?: EAggregationTemporality;
 }
 
 /** Properties of an ExponentialHistogram. */
@@ -122,9 +117,8 @@ export interface ISummary {
 
 /** Properties of a NumberDataPoint. */
 export interface INumberDataPoint {
-
   /** NumberDataPoint attributes */
-  attributes: IKeyValue[]
+  attributes: IKeyValue[];
 
   /** NumberDataPoint startTimeUnixNano */
   startTimeUnixNano?: number;
@@ -133,7 +127,7 @@ export interface INumberDataPoint {
   timeUnixNano?: number;
 
   /** NumberDataPoint asDouble */
-  asDouble?: (number | null);
+  asDouble?: number | null;
 
   /** NumberDataPoint asInt */
   asInt?: number;
@@ -144,7 +138,6 @@ export interface INumberDataPoint {
   /** NumberDataPoint flags */
   flags?: number;
 }
-
 
 /** Properties of a HistogramDataPoint. */
 export interface IHistogramDataPoint {
@@ -164,10 +157,10 @@ export interface IHistogramDataPoint {
   sum?: number;
 
   /** HistogramDataPoint bucketCounts */
-  bucketCounts?: number[]
+  bucketCounts?: number[];
 
   /** HistogramDataPoint explicitBounds */
-  explicitBounds?: number[]
+  explicitBounds?: number[];
 
   /** HistogramDataPoint exemplars */
   exemplars?: IExemplar[];
@@ -184,7 +177,6 @@ export interface IHistogramDataPoint {
 
 /** Properties of an ExponentialHistogramDataPoint. */
 export interface IExponentialHistogramDataPoint {
-
   /** ExponentialHistogramDataPoint attributes */
   attributes?: IKeyValue[];
 
@@ -216,9 +208,8 @@ export interface IExponentialHistogramDataPoint {
   flags?: number;
 
   /** ExponentialHistogramDataPoint exemplars */
-  exemplars?: IExemplar[]
+  exemplars?: IExemplar[];
 }
-
 
 /** Properties of a SummaryDataPoint. */
 export interface ISummaryDataPoint {
@@ -353,5 +344,5 @@ export const enum EAggregationTemporality {
   CUMULATIVE is valid, it is not recommended. This may cause problems for
   systems that do not use start_time to determine when the aggregation
   value was reset (e.g. Prometheus). */
-  AGGREGATION_TEMPORALITY_CUMULATIVE = 2
+  AGGREGATION_TEMPORALITY_CUMULATIVE = 2,
 }

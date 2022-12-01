@@ -29,15 +29,21 @@ export interface GrpcInstrumentationConfig extends InstrumentationConfig {
   /** Map the following gRPC metadata to span attributes. */
   metadataToSpanAttributes?: {
     client?: {
-      responseMetadata?: string[],
+      responseMetadata?: string[];
       requestMetadata?: string[];
-    }
-  }
+    };
+  };
 }
 
 export type metadataCaptureType = {
   client: {
-    captureRequestMetadata: (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => void,
-    captureResponseMetadata: (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => void
-  }
+    captureRequestMetadata: (
+      span: Span,
+      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
+    ) => void;
+    captureResponseMetadata: (
+      span: Span,
+      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
+    ) => void;
+  };
 };

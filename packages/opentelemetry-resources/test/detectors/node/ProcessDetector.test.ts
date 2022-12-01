@@ -32,9 +32,7 @@ describeNode('processDetector() on Node.js', () => {
     sinon
       .stub(process, 'argv')
       .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
-    sinon
-      .stub(process, 'versions')
-      .value({'node': '1.4.1'});
+    sinon.stub(process, 'versions').value({ node: '1.4.1' });
 
     const resource: Resource = await processDetector.detect();
     assertResource(resource, {

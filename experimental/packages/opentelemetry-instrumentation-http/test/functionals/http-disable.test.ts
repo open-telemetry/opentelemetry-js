@@ -26,8 +26,11 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import { trace, TracerProvider, INVALID_SPAN_CONTEXT } from '@opentelemetry/api';
-
+import {
+  trace,
+  TracerProvider,
+  INVALID_SPAN_CONTEXT,
+} from '@opentelemetry/api';
 
 describe('HttpInstrumentation', () => {
   let server: http.Server;
@@ -40,9 +43,11 @@ describe('HttpInstrumentation', () => {
     before(() => {
       provider = {
         getTracer: () => {
-          startSpanStub = sinon.stub().returns(trace.wrapSpanContext(INVALID_SPAN_CONTEXT));
+          startSpanStub = sinon
+            .stub()
+            .returns(trace.wrapSpanContext(INVALID_SPAN_CONTEXT));
           return { startSpan: startSpanStub } as any;
-        }
+        },
       };
       nock.cleanAll();
       nock.enableNetConnect();

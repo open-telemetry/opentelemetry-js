@@ -59,7 +59,10 @@ describe('PatternPredicate', () => {
 
   describe('escapePattern', () => {
     it('should escape regexp elements', () => {
-      assert.strictEqual(PatternPredicate.escapePattern('^$\\.+?()[]{}|'), '^\\^\\$\\\\\\.\\+\\?\\(\\)\\[\\]\\{\\}\\|$');
+      assert.strictEqual(
+        PatternPredicate.escapePattern('^$\\.+?()[]{}|'),
+        '^\\^\\$\\\\\\.\\+\\?\\(\\)\\[\\]\\{\\}\\|$'
+      );
       assert.strictEqual(PatternPredicate.escapePattern('*'), '^.*$');
       assert.strictEqual(PatternPredicate.escapePattern('foobar'), '^foobar$');
       assert.strictEqual(PatternPredicate.escapePattern('foo*'), '^foo.*$');

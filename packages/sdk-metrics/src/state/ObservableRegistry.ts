@@ -14,10 +14,24 @@
  * limitations under the License.
  */
 
-import { diag, HrTime, BatchObservableCallback, Observable, ObservableCallback } from '@opentelemetry/api';
+import {
+  diag,
+  HrTime,
+  BatchObservableCallback,
+  Observable,
+  ObservableCallback,
+} from '@opentelemetry/api';
 import { isObservableInstrument, ObservableInstrument } from '../Instruments';
-import { BatchObservableResultImpl, ObservableResultImpl } from '../ObservableResult';
-import { callWithTimeout, PromiseAllSettled, isPromiseAllSettledRejectionResult, setEquals } from '../utils';
+import {
+  BatchObservableResultImpl,
+  ObservableResultImpl,
+} from '../ObservableResult';
+import {
+  callWithTimeout,
+  PromiseAllSettled,
+  isPromiseAllSettledRejectionResult,
+  setEquals,
+} from '../utils';
 
 /**
  * Records for single instrument observable callback.
@@ -53,7 +67,10 @@ export class ObservableRegistry {
     this._callbacks.push({ callback, instrument });
   }
 
-  removeCallback(callback: ObservableCallback, instrument: ObservableInstrument) {
+  removeCallback(
+    callback: ObservableCallback,
+    instrument: ObservableInstrument
+  ) {
     const idx = this._findCallback(callback, instrument);
     if (idx < 0) {
       return;
@@ -61,11 +78,19 @@ export class ObservableRegistry {
     this._callbacks.splice(idx, 1);
   }
 
-  addBatchCallback(callback: BatchObservableCallback, instruments: Observable[]) {
+  addBatchCallback(
+    callback: BatchObservableCallback,
+    instruments: Observable[]
+  ) {
     // Create a set of unique instruments.
-    const observableInstruments = new Set(instruments.filter(isObservableInstrument));
+    const observableInstruments = new Set(
+      instruments.filter(isObservableInstrument)
+    );
     if (observableInstruments.size === 0) {
-      diag.error('BatchObservableCallback is not associated with valid instruments', instruments);
+      diag.error(
+        'BatchObservableCallback is not associated with valid instruments',
+        instruments
+      );
       return;
     }
     const idx = this._findBatchCallback(callback, observableInstruments);
@@ -75,9 +100,14 @@ export class ObservableRegistry {
     this._batchCallbacks.push({ callback, instruments: observableInstruments });
   }
 
-  removeBatchCallback(callback: BatchObservableCallback, instruments: Observable[]) {
+  removeBatchCallback(
+    callback: BatchObservableCallback,
+    instruments: Observable[]
+  ) {
     // Create a set of unique instruments.
-    const observableInstruments = new Set(instruments.filter(isObservableInstrument));
+    const observableInstruments = new Set(
+      instruments.filter(isObservableInstrument)
+    );
     const idx = this._findBatchCallback(callback, observableInstruments);
     if (idx < 0) {
       return;
@@ -88,62 +118,89 @@ export class ObservableRegistry {
   /**
    * @returns a promise of rejected reasons for invoking callbacks.
    */
-  async observe(collectionTime: HrTime, timeoutMillis?: number): Promise<unknown[]> {
-    const callbackFutures = this._observeCallbacks(collectionTime, timeoutMillis);
-    const batchCallbackFutures = this._observeBatchCallbacks(collectionTime, timeoutMillis);
+  async observe(
+    collectionTime: HrTime,
+    timeoutMillis?: number
+  ): Promise<unknown[]> {
+    const callbackFutures = this._observeCallbacks(
+      collectionTime,
+      timeoutMillis
+    );
+    const batchCallbackFutures = this._observeBatchCallbacks(
+      collectionTime,
+      timeoutMillis
+    );
 
-    const results = await PromiseAllSettled([...callbackFutures, ...batchCallbackFutures]);
+    const results = await PromiseAllSettled([
+      ...callbackFutures,
+      ...batchCallbackFutures,
+    ]);
 
-    const rejections = results.filter(isPromiseAllSettledRejectionResult)
+    const rejections = results
+      .filter(isPromiseAllSettledRejectionResult)
       .map(it => it.reason);
     return rejections;
   }
 
   private _observeCallbacks(observationTime: HrTime, timeoutMillis?: number) {
-    return this._callbacks
-      .map(async ({ callback, instrument }) => {
-        const observableResult = new ObservableResultImpl(instrument._descriptor);
-        let callPromise: Promise<void> = Promise.resolve(callback(observableResult));
-        if (timeoutMillis != null) {
-          callPromise = callWithTimeout(callPromise, timeoutMillis);
+    return this._callbacks.map(async ({ callback, instrument }) => {
+      const observableResult = new ObservableResultImpl(instrument._descriptor);
+      let callPromise: Promise<void> = Promise.resolve(
+        callback(observableResult)
+      );
+      if (timeoutMillis != null) {
+        callPromise = callWithTimeout(callPromise, timeoutMillis);
+      }
+      await callPromise;
+      instrument._metricStorages.forEach(metricStorage => {
+        metricStorage.record(observableResult._buffer, observationTime);
+      });
+    });
+  }
+
+  private _observeBatchCallbacks(
+    observationTime: HrTime,
+    timeoutMillis?: number
+  ) {
+    return this._batchCallbacks.map(async ({ callback, instruments }) => {
+      const observableResult = new BatchObservableResultImpl();
+      let callPromise: Promise<void> = Promise.resolve(
+        callback(observableResult)
+      );
+      if (timeoutMillis != null) {
+        callPromise = callWithTimeout(callPromise, timeoutMillis);
+      }
+      await callPromise;
+      instruments.forEach(instrument => {
+        const buffer = observableResult._buffer.get(instrument);
+        if (buffer == null) {
+          return;
         }
-        await callPromise;
         instrument._metricStorages.forEach(metricStorage => {
-          metricStorage.record(observableResult._buffer, observationTime);
+          metricStorage.record(buffer, observationTime);
         });
       });
+    });
   }
 
-  private _observeBatchCallbacks(observationTime: HrTime, timeoutMillis?: number) {
-    return this._batchCallbacks
-      .map(async ({ callback, instruments }) => {
-        const observableResult = new BatchObservableResultImpl();
-        let callPromise: Promise<void> = Promise.resolve(callback(observableResult));
-        if (timeoutMillis != null) {
-          callPromise = callWithTimeout(callPromise, timeoutMillis);
-        }
-        await callPromise;
-        instruments.forEach(instrument => {
-          const buffer = observableResult._buffer.get(instrument);
-          if (buffer == null) {
-            return;
-          }
-          instrument._metricStorages.forEach(metricStorage => {
-            metricStorage.record(buffer, observationTime);
-          });
-        });
-      });
-  }
-
-  private _findCallback(callback: ObservableCallback, instrument: ObservableInstrument) {
+  private _findCallback(
+    callback: ObservableCallback,
+    instrument: ObservableInstrument
+  ) {
     return this._callbacks.findIndex(record => {
       return record.callback === callback && record.instrument === instrument;
     });
   }
 
-  private _findBatchCallback(callback: BatchObservableCallback, instruments: Set<ObservableInstrument>) {
+  private _findBatchCallback(
+    callback: BatchObservableCallback,
+    instruments: Set<ObservableInstrument>
+  ) {
     return this._batchCallbacks.findIndex(record => {
-      return record.callback === callback && setEquals(record.instruments, instruments);
+      return (
+        record.callback === callback &&
+        setEquals(record.instruments, instruments)
+      );
     });
   }
 }

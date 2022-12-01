@@ -31,9 +31,7 @@ export class GrpcInstrumentation {
     '@opentelemetry/instrumentation-grpc';
   public readonly instrumentationVersion: string = VERSION;
 
-  constructor(
-    config?: GrpcInstrumentationConfig
-  ) {
+  constructor(config?: GrpcInstrumentationConfig) {
     this._grpcJsInstrumentation = new GrpcJsInstrumentation(
       this.instrumentationName,
       this.instrumentationVersion,

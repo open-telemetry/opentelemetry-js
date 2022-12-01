@@ -17,7 +17,11 @@
 import { Meter, MeterOptions } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
-import { getGlobal, registerGlobal, unregisterGlobal } from '../internal/global-utils';
+import {
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
 import { DiagAPI } from './diag';
 
 const API_NAME = 'metrics';
@@ -58,7 +62,11 @@ export class MetricsAPI {
   /**
    * Returns a meter from the global meter provider.
    */
-  public getMeter(name: string, version?: string, options?: MeterOptions): Meter {
+  public getMeter(
+    name: string,
+    version?: string,
+    options?: MeterOptions
+  ): Meter {
     return this.getMeterProvider().getMeter(name, version, options);
   }
 

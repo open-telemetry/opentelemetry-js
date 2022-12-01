@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-export {
-  Sum,
-  LastValue,
-  Histogram,
-} from './aggregator/types';
+export { Sum, LastValue, Histogram } from './aggregator/types';
 
 export {
   AggregationSelector,
   AggregationTemporalitySelector,
 } from './export/AggregationSelector';
 
-export {
-  AggregationTemporality,
-} from './export/AggregationTemporality';
+export { AggregationTemporality } from './export/AggregationTemporality';
 
 export {
   DataPoint,
@@ -41,37 +35,22 @@ export {
   CollectionResult,
 } from './export/MetricData';
 
-export {
-  PushMetricExporter,
-} from './export/MetricExporter';
+export { PushMetricExporter } from './export/MetricExporter';
 
-export {
-  MetricReader,
-  MetricReaderOptions
-} from './export/MetricReader';
+export { MetricReader, MetricReaderOptions } from './export/MetricReader';
 
 export {
   PeriodicExportingMetricReader,
   PeriodicExportingMetricReaderOptions,
 } from './export/PeriodicExportingMetricReader';
 
-export {
-  InMemoryMetricExporter,
-} from './export/InMemoryMetricExporter';
+export { InMemoryMetricExporter } from './export/InMemoryMetricExporter';
 
-export {
-  ConsoleMetricExporter,
-} from './export/ConsoleMetricExporter';
+export { ConsoleMetricExporter } from './export/ConsoleMetricExporter';
 
-export {
-  InstrumentDescriptor,
-  InstrumentType,
-} from './InstrumentDescriptor';
+export { InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
 
-export {
-  MeterProvider,
-  MeterProviderOptions,
-} from './MeterProvider';
+export { MeterProvider, MeterProviderOptions } from './MeterProvider';
 
 export {
   DefaultAggregation,
@@ -80,14 +59,9 @@ export {
   HistogramAggregation,
   LastValueAggregation,
   SumAggregation,
-  Aggregation
+  Aggregation,
 } from './view/Aggregation';
 
-export {
-  View,
-  ViewOptions,
-} from './view/View';
+export { View, ViewOptions } from './view/View';
 
-export {
-  TimeoutError
-} from './utils';
+export { TimeoutError } from './utils';

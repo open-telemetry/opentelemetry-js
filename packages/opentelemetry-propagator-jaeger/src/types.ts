@@ -15,6 +15,6 @@
  */
 
 export interface JaegerPropagatorConfig {
-  customTraceHeader?: string,
-  customBaggageHeaderPrefix?: string,
+  customTraceHeader?: string;
+  customBaggageHeaderPrefix?: string;
 }

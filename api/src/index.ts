@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-export {
-  BaggageEntry,
-  BaggageEntryMetadata,
-  Baggage,
-} from './baggage/types';
+export { BaggageEntry, BaggageEntryMetadata, Baggage } from './baggage/types';
 export { baggageEntryMetadataFromString } from './baggage/utils';
 export { Exception } from './common/Exception';
 export { HrTime, TimeInput } from './common/Time';
 export { Attributes, AttributeValue } from './common/Attributes';
 
 // Context APIs
-export {
-  createContextKey,
-  ROOT_CONTEXT,
-} from './context/context';
-export {
-  Context,
-  ContextManager,
-} from './context/types';
+export { createContextKey, ROOT_CONTEXT } from './context/context';
+export { Context, ContextManager } from './context/types';
 export type { ContextAPI } from './api/context';
 
 // Diag APIs
@@ -46,16 +36,9 @@ export {
 export type { DiagAPI } from './api/diag';
 
 // Metrics APIs
-export {
-  createNoopMeter,
-} from './metrics/NoopMeter';
-export {
-  MeterOptions,
-  Meter,
-} from './metrics/Meter';
-export {
-  MeterProvider,
-} from './metrics/MeterProvider';
+export { createNoopMeter } from './metrics/NoopMeter';
+export { MeterOptions, Meter } from './metrics/Meter';
+export { MeterProvider } from './metrics/MeterProvider';
 export {
   ValueType,
   Counter,
@@ -87,10 +70,7 @@ export {
 export type { PropagationAPI } from './api/propagation';
 
 // Trace APIs
-export {
-  SpanAttributes,
-  SpanAttributeValue,
-} from './trace/attributes';
+export { SpanAttributes, SpanAttributeValue } from './trace/attributes';
 export { Link } from './trace/link';
 export { ProxyTracer, TracerDelegator } from './trace/ProxyTracer';
 export { ProxyTracerProvider } from './trace/ProxyTracerProvider';
@@ -128,13 +108,7 @@ import { propagation } from './propagation-api';
 import { trace } from './trace-api';
 
 // Named export.
-export {
-  context,
-  diag,
-  metrics,
-  propagation,
-  trace,
-};
+export { context, diag, metrics, propagation, trace };
 // Default export.
 export default {
   context,
