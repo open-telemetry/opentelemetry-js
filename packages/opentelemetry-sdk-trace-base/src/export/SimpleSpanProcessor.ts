@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, TraceFlags } from '@opentelemetry/api';
+import { Context, diag, TraceFlags } from '@opentelemetry/api';
 import {
   internal,
   ExportResultCode,
@@ -57,7 +57,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    internal._export(this._exporter, [span]).then((result: ExportResult) => {
+    const doExport = () => internal._export(this._exporter, [span]).then((result: ExportResult) => {
       if (result.code !== ExportResultCode.SUCCESS) {
         globalErrorHandler(
           result.error ??
@@ -69,6 +69,14 @@ export class SimpleSpanProcessor implements SpanProcessor {
     }).catch(error => {
       globalErrorHandler(error);
     });
+
+    // Avoid scheduling a promise to make the behavior more predictable and easier to test
+    if (span.resource.asyncAttributesHaveResolved()) {
+      void doExport();
+    } else {
+      span.resource.waitForAsyncAttributes()
+        .then(doExport, err => diag.debug('Error while resolving async portion of resource: ', err));
+    }
   }
 
   shutdown(): Promise<void> {

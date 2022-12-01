@@ -156,9 +156,11 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       context.with(suppressTracing(context.active()), () => {
         // Reset the finished spans buffer here because the next invocations of the _flush method
         // could pass the same finished spans to the exporter if the buffer is cleared
-        // outside of the execution of this callback.
-        this._exporter.export(
-          this._finishedSpans.splice(0, this._maxExportBatchSize),
+        // outside the execution of this callback.
+        const spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
+
+        const doExport = () => this._exporter.export(
+          spans,
           result => {
             clearTimeout(timer);
             if (result.code === ExportResultCode.SUCCESS) {
@@ -171,6 +173,16 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
             }
           }
         );
+        const pendingResources = spans.map(span => span.resource)
+          .filter(resource => !resource.asyncAttributesHaveResolved());
+
+        // Avoid scheduling a promise to make the behavior more predictable and easier to test
+        if (pendingResources.length === 0) {
+          doExport();
+        } else {
+          Promise.all(pendingResources.map(resource => resource.waitForAsyncAttributes()))
+            .then(doExport, err => diag.debug('Error while resolving async portion of resource: ', err));
+        }
       });
     });
   }

@@ -21,7 +21,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import {
   Detector,
-  detectResources,
+  detectResourcesSync,
   envDetector,
   processDetector,
   Resource,
@@ -166,12 +166,12 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources(): Promise<void> {
+  public detectResources(): void {
     const internalConfig: ResourceDetectionConfig = {
       detectors: this._resourceDetectors,
     };
 
-    this.addResource(await detectResources(internalConfig));
+    this.addResource(detectResourcesSync(internalConfig));
   }
 
   /** Manually add a resource */
@@ -182,9 +182,9 @@ export class NodeSDK {
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public async start(): Promise<void> {
+  public start(): void {
     if (this._autoDetectResources) {
-      await this.detectResources();
+      this.detectResources();
     }
 
     this._resource = this._serviceName === undefined
