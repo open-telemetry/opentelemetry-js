@@ -62,7 +62,10 @@ export const assertSpan = (
     span.status.code,
     grpcStatusCodeToOpenTelemetryStatusCode(validations.status)
   );
-  assert.strictEqual(span.attributes[SemanticAttributes.RPC_GRPC_STATUS_CODE], validations.status);
+  assert.strictEqual(
+    span.attributes[SemanticAttributes.RPC_GRPC_STATUS_CODE],
+    validations.status
+  );
 };
 
 // Check if sourceSpan was propagated to targetSpan
