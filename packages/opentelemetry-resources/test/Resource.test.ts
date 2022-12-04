@@ -20,7 +20,7 @@ import { SDK_INFO } from '@opentelemetry/core';
 import { Resource } from '../src';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { describeBrowser, describeNode } from './util';
-import {diag} from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -113,19 +113,25 @@ describe('Resource', () => {
     });
 
     it('should return true for asyncAttributesHaveResolved() if no promise provided', () => {
-      assert.ok(new Resource({'foo': 'bar'}).asyncAttributesHaveResolved());
+      assert.ok(new Resource({ foo: 'bar' }).asyncAttributesHaveResolved());
       assert.ok(Resource.empty().asyncAttributesHaveResolved());
       assert.ok(Resource.default().asyncAttributesHaveResolved());
     });
 
     it('should return true for asyncAttributesHaveResolved() once promise finishes', async () => {
       const clock = sinon.useFakeTimers();
-      const resourceResolve = new Resource({}, new Promise(resolve => {
-        setTimeout(resolve, 100);
-      }));
-      const resourceReject = new Resource({}, new Promise((_, reject) => {
-        setTimeout(reject, 200);
-      }));
+      const resourceResolve = new Resource(
+        {},
+        new Promise(resolve => {
+          setTimeout(resolve, 100);
+        })
+      );
+      const resourceReject = new Resource(
+        {},
+        new Promise((_, reject) => {
+          setTimeout(reject, 200);
+        })
+      );
 
       for (const resource of [resourceResolve, resourceReject]) {
         assert.ok(!resource.asyncAttributesHaveResolved());
@@ -137,49 +143,47 @@ describe('Resource', () => {
 
     it('should merge async attributes into sync attributes once resolved', async () => {
       const resource = new Resource(
-        {'sync': 'fromsync', 'shared': 'fromsync'},
-        Promise.resolve({'async': 'fromasync', 'shared': 'fromasync'}),
+        { sync: 'fromsync', shared: 'fromsync' },
+        Promise.resolve({ async: 'fromasync', shared: 'fromasync' })
       );
 
       await resource.waitForAsyncAttributes();
-      assert.deepStrictEqual(
-        resource.attributes,
-        {
-          'sync': 'fromsync',
-          // async takes precedence
-          'shared': 'fromasync',
-          'async': 'fromasync',
-        },
-      );
+      assert.deepStrictEqual(resource.attributes, {
+        sync: 'fromsync',
+        // async takes precedence
+        shared: 'fromasync',
+        async: 'fromasync',
+      });
     });
 
     it('should merge async attributes when both resources have promises', async () => {
       const resource1 = new Resource(
-        {}, Promise.resolve({'promise1': 'promise1val', 'shared': 'promise1val'}),
+        {},
+        Promise.resolve({ promise1: 'promise1val', shared: 'promise1val' })
       );
       const resource2 = new Resource(
-        {}, Promise.resolve({'promise2': 'promise2val', 'shared': 'promise2val'}),
+        {},
+        Promise.resolve({ promise2: 'promise2val', shared: 'promise2val' })
       );
       // this one rejects
-      const resource3 = new Resource(
-        {}, Promise.reject(new Error('reject')),
-      );
+      const resource3 = new Resource({}, Promise.reject(new Error('reject')));
       const resource4 = new Resource(
-        {}, Promise.resolve({'promise4': 'promise4val', 'shared': 'promise4val'}),
+        {},
+        Promise.resolve({ promise4: 'promise4val', shared: 'promise4val' })
       );
 
-      const merged = resource1.merge(resource2).merge(resource3).merge(resource4);
+      const merged = resource1
+        .merge(resource2)
+        .merge(resource3)
+        .merge(resource4);
       await merged.waitForAsyncAttributes();
-      assert.deepStrictEqual(
-        merged.attributes,
-        {
-          'promise1': 'promise1val',
-          'promise2': 'promise2val',
-          'promise4': 'promise4val',
-          // same behavior as for synchronous attributes
-          'shared': 'promise4val',
-        }
-      );
+      assert.deepStrictEqual(merged.attributes, {
+        promise1: 'promise1val',
+        promise2: 'promise2val',
+        promise4: 'promise4val',
+        // same behavior as for synchronous attributes
+        shared: 'promise4val',
+      });
     });
 
     it('should log when promise rejects', async () => {
@@ -187,9 +191,12 @@ describe('Resource', () => {
       // should be possible to catch failure with waitForAsyncAttributes()
       try {
         await assert.rejects(
-          new Resource({}, Promise.reject(new Error('rejected'))).waitForAsyncAttributes(),
+          new Resource(
+            {},
+            Promise.reject(new Error('rejected'))
+          ).waitForAsyncAttributes()
         );
-      } catch(err) {}
+      } catch (err) {}
       // will log after yielding to event loop
       await new Promise(resolve => setTimeout(resolve));
       assert.ok(debugStub.calledOnce);

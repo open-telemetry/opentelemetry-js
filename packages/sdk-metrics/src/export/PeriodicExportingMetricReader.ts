@@ -23,10 +23,7 @@ import {
 } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
 import { PushMetricExporter } from './MetricExporter';
-import {
-  callWithTimeout,
-  TimeoutError
-} from '../utils';
+import { callWithTimeout, TimeoutError } from '../utils';
 import { diag } from '@opentelemetry/api';
 
 export type PeriodicExportingMetricReaderOptions = {
@@ -116,8 +113,11 @@ export class PeriodicExportingMetricReader extends MetricReader {
     if (resourceMetrics.resource.asyncAttributesHaveResolved()) {
       await doExport();
     } else {
-      resourceMetrics.resource.waitForAsyncAttributes()
-        .then(await doExport, err => diag.debug('Error while resolving async portion of resource: ', err));
+      resourceMetrics.resource
+        .waitForAsyncAttributes()
+        .then(await doExport, err =>
+          diag.debug('Error while resolving async portion of resource: ', err)
+        );
     }
   }
 

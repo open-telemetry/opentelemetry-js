@@ -80,11 +80,14 @@ export const detectResourcesSync = (
         resource = resourceOrPromise;
       }
 
-      resource.waitForAsyncAttributes().then(() => {
-        diag.debug(`${d.constructor.name} found resource.`, resource);
-      }).catch(e => {
-        diag.debug(`${d.constructor.name} failed: ${e.message}`);
-      });
+      resource
+        .waitForAsyncAttributes()
+        .then(() => {
+          diag.debug(`${d.constructor.name} found resource.`, resource);
+        })
+        .catch(e => {
+          diag.debug(`${d.constructor.name} failed: ${e.message}`);
+        });
 
       return resource;
     } catch (e) {
@@ -92,7 +95,6 @@ export const detectResourcesSync = (
       return Resource.empty();
     }
   });
-
 
   const mergedResources = resources.reduce(
     (acc, resource) => acc.merge(resource),

@@ -28,9 +28,7 @@ describe('detectResourcesSync', () => {
   it('handles resource detectors which return Promise<Resource>', async () => {
     const detector: Detector = {
       async detect() {
-        return new Resource(
-          { 'sync': 'fromsync', 'async': 'fromasync' },
-        );
+        return new Resource({ sync: 'fromsync', async: 'fromasync' });
       },
     };
     const resource = detectResourcesSync({
@@ -38,15 +36,18 @@ describe('detectResourcesSync', () => {
     });
 
     await resource.waitForAsyncAttributes();
-    assert.deepStrictEqual(resource.attributes, {'sync': 'fromsync', 'async': 'fromasync'});
+    assert.deepStrictEqual(resource.attributes, {
+      sync: 'fromsync',
+      async: 'fromasync',
+    });
   });
 
   it('handles resource detectors which return Resource with a promise inside', async () => {
     const detector: Detector = {
       detect() {
         return new Resource(
-          { 'sync': 'fromsync' },
-          Promise.resolve({ 'async': 'fromasync'})
+          { sync: 'fromsync' },
+          Promise.resolve({ async: 'fromasync' })
         );
       },
     };
@@ -55,9 +56,12 @@ describe('detectResourcesSync', () => {
     });
 
     // before waiting, it should already have the sync resources
-    assert.deepStrictEqual(resource.attributes, {'sync': 'fromsync'});
+    assert.deepStrictEqual(resource.attributes, { sync: 'fromsync' });
     await resource.waitForAsyncAttributes();
-    assert.deepStrictEqual(resource.attributes, {'sync': 'fromsync', 'async': 'fromasync'});
+    assert.deepStrictEqual(resource.attributes, {
+      sync: 'fromsync',
+      async: 'fromasync',
+    });
   });
 
   describeNode('logging', () => {
@@ -68,24 +72,22 @@ describe('detectResourcesSync', () => {
       class DetectorRejects implements Detector {
         detect() {
           return new Resource(
-            { 'sync': 'fromsync' },
-            Promise.reject(new Error('reject')),
+            { sync: 'fromsync' },
+            Promise.reject(new Error('reject'))
           );
         }
       }
       class DetectorOk implements Detector {
         detect() {
           return new Resource(
-            { 'sync': 'fromsync' },
-            Promise.resolve({'async': 'fromasync'}),
+            { sync: 'fromsync' },
+            Promise.resolve({ async: 'fromasync' })
           );
         }
       }
       class DetectorAsync implements Detector {
         async detect() {
-          return new Resource(
-            { 'sync': 'fromsync', 'async': 'fromasync' },
-          );
+          return new Resource({ sync: 'fromsync', async: 'fromasync' });
         }
       }
 

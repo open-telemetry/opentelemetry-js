@@ -57,25 +57,32 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    const doExport = () => internal._export(this._exporter, [span]).then((result: ExportResult) => {
-      if (result.code !== ExportResultCode.SUCCESS) {
-        globalErrorHandler(
-          result.error ??
-          new Error(
-            `SimpleSpanProcessor: span export failed (status ${result})`
-          )
-        );
-      }
-    }).catch(error => {
-      globalErrorHandler(error);
-    });
+    const doExport = () =>
+      internal
+        ._export(this._exporter, [span])
+        .then((result: ExportResult) => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              result.error ??
+                new Error(
+                  `SimpleSpanProcessor: span export failed (status ${result})`
+                )
+            );
+          }
+        })
+        .catch(error => {
+          globalErrorHandler(error);
+        });
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (span.resource.asyncAttributesHaveResolved()) {
       void doExport();
     } else {
-      span.resource.waitForAsyncAttributes()
-        .then(doExport, err => diag.debug('Error while resolving async portion of resource: ', err));
+      span.resource
+        .waitForAsyncAttributes()
+        .then(doExport, err =>
+          diag.debug('Error while resolving async portion of resource: ', err)
+        );
     }
   }
 

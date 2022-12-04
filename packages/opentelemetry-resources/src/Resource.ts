@@ -59,7 +59,7 @@ export class Resource {
      * TODO: Consider to add check/validation on attributes.
      */
     attributes: ResourceAttributes,
-    asyncAttributesPromise?: Promise<ResourceAttributes>,
+    asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
     this._attributes = attributes;
     this._asyncAttributesHaveResolved = asyncAttributesPromise === undefined;
@@ -126,15 +126,13 @@ export class Resource {
       mergedAsyncAttributesPromise = Promise.all([
         this._asyncAttributesPromise.catch(() => ({})),
         other._asyncAttributesPromise.catch(() => ({})),
-      ]).then(
-        ([thisAttributes, otherAttributes]) => {
-          return Object.assign({}, thisAttributes, otherAttributes);
-        }
-      );
+      ]).then(([thisAttributes, otherAttributes]) => {
+        return Object.assign({}, thisAttributes, otherAttributes);
+      });
     } else {
-      mergedAsyncAttributesPromise = this._asyncAttributesPromise ?? other._asyncAttributesPromise;
+      mergedAsyncAttributesPromise =
+        this._asyncAttributesPromise ?? other._asyncAttributesPromise;
     }
-
 
     return new Resource(mergedAttributes, mergedAsyncAttributesPromise);
   }

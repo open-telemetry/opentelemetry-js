@@ -163,9 +163,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         // outside the execution of this callback.
         const spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
 
-        const doExport = () => this._exporter.export(
-          spans,
-          result => {
+        const doExport = () =>
+          this._exporter.export(spans, result => {
             clearTimeout(timer);
             if (result.code === ExportResultCode.SUCCESS) {
               resolve();
@@ -175,17 +174,20 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
                   new Error('BatchSpanProcessor: span export failed')
               );
             }
-          }
-        );
-        const pendingResources = spans.map(span => span.resource)
+          });
+        const pendingResources = spans
+          .map(span => span.resource)
           .filter(resource => !resource.asyncAttributesHaveResolved());
 
         // Avoid scheduling a promise to make the behavior more predictable and easier to test
         if (pendingResources.length === 0) {
           doExport();
         } else {
-          Promise.all(pendingResources.map(resource => resource.waitForAsyncAttributes()))
-            .then(doExport, err => diag.debug('Error while resolving async portion of resource: ', err));
+          Promise.all(
+            pendingResources.map(resource => resource.waitForAsyncAttributes())
+          ).then(doExport, err =>
+            diag.debug('Error while resolving async portion of resource: ', err)
+          );
         }
       });
     });

@@ -607,7 +607,8 @@ describe('setup exporter from env', () => {
   it('use default exporter TracerProviderWithEnvExporters when user does not provide span processor or trace exporter to sdk config', async () => {
     const sdk = new NodeSDK();
     sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
     assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
     assert(listOfProcessors.length === 1);
@@ -619,7 +620,8 @@ describe('setup exporter from env', () => {
       traceExporter,
     });
     sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
     assert(
       sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
@@ -635,7 +637,8 @@ describe('setup exporter from env', () => {
       spanProcessor,
     });
     sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
     assert(
       sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
@@ -651,7 +654,8 @@ describe('setup exporter from env', () => {
       traceExporter,
     });
     sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
     assert(
       sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
