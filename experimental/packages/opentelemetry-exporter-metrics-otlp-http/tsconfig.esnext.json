@@ -1,11 +1,31 @@
 {
   "extends": "../../../tsconfig.base.esnext.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "build/esnext",
+    "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../../api"
+    },
+    {
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/opentelemetry-resources"
+    },
+    {
+      "path": "../../../packages/sdk-metrics"
+    },
+    {
+      "path": "../otlp-exporter-base"
+    },
+    {
+      "path": "../otlp-transformer"
+    }
   ]
 }

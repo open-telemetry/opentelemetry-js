@@ -20,7 +20,8 @@ import { SpanExporter } from '../../../src';
 import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
 import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExporter';
 
-const describeDocument = typeof document === 'object' ? describe : describe.skip;
+const describeDocument =
+  typeof document === 'object' ? describe : describe.skip;
 
 describeDocument('BatchSpanProcessor - web main context', () => {
   let visibilityState: VisibilityState = 'visible';
@@ -63,7 +64,9 @@ describeDocument('BatchSpanProcessor - web main context', () => {
 
       describe('AND disableAutoFlushOnDocumentHide configuration option', () => {
         it('set to false should force flush spans', () => {
-          processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: false });
+          processor = new BatchSpanProcessor(exporter, {
+            disableAutoFlushOnDocumentHide: false,
+          });
           forceFlushSpy = sinon.stub(processor, 'forceFlush');
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();
@@ -71,7 +74,9 @@ describeDocument('BatchSpanProcessor - web main context', () => {
         });
 
         it('set to true should NOT force flush spans', () => {
-          processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: true });
+          processor = new BatchSpanProcessor(exporter, {
+            disableAutoFlushOnDocumentHide: true,
+          });
           forceFlushSpy = sinon.stub(processor, 'forceFlush');
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();

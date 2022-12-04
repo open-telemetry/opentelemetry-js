@@ -20,7 +20,11 @@ import { LoggerOptions } from './types/LoggerOptions';
 import { NoopLogger } from './NoopLogger';
 
 export class NoopLoggerProvider implements LoggerProvider {
-  getLogger(_name: string, _version?: string | undefined, _options?: LoggerOptions | undefined): Logger {
+  getLogger(
+    _name: string,
+    _version?: string | undefined,
+    _options?: LoggerOptions | undefined
+  ): Logger {
     return new NoopLogger();
   }
 }

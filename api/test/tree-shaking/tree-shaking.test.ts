@@ -38,7 +38,7 @@ describe('tree-shaking', () => {
     },
     {
       name: 'TraceAPI',
-      export: 'trace'
+      export: 'trace',
     },
   ];
   const APIMatcher = /(?:class|function) (\w+API)/g;
@@ -74,12 +74,13 @@ describe('tree-shaking', () => {
         optimization: {
           // disable minimization so that we can inspect the output easily.
           minimize: false,
-        }
+          // disable module concatenation so that variable names will not be mangled.
+          concatenateModules: false,
+        },
       });
 
       const fs = new Union();
-      fs.use(mfs as any)
-        .use(realFs);
+      fs.use(mfs as any).use(realFs);
 
       //direct webpack to use unionfs for file input
       compiler.inputFileSystem = fs;

@@ -20,7 +20,7 @@ import {
   ExportResultCode,
   globalErrorHandler,
   BindOnceFuture,
-  ExportResult
+  ExportResult,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -46,7 +46,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(_span: Span, _parentContext: Context): void { }
+  onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {

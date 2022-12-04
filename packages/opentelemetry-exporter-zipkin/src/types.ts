@@ -188,4 +188,7 @@ export type SendFunction = (
 
 export type GetHeaders = () => Record<string, string> | undefined;
 
-export type SendFn = (zipkinSpans: Span[], done: (result: ExportResult) => void) => void;
+export type SendFn = (
+  zipkinSpans: Span[],
+  done: (result: ExportResult) => void
+) => void;

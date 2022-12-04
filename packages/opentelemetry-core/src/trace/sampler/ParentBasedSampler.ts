@@ -22,7 +22,8 @@ import {
   SamplingResult,
   SpanAttributes,
   SpanKind,
-  TraceFlags, trace,
+  TraceFlags,
+  trace,
 } from '@opentelemetry/api';
 import { globalErrorHandler } from '../../common/global-error-handler';
 import { AlwaysOffSampler } from './AlwaysOffSampler';

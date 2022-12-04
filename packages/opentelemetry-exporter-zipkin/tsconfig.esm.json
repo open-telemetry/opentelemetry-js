@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.base.esm.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "build/esm",
+    "rootDir": "src",
     "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
   },
   "include": [
@@ -10,16 +10,19 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-core/tsconfig.esm.json"
+      "path": "../../api"
     },
     {
-      "path": "../opentelemetry-resources/tsconfig.esm.json"
+      "path": "../opentelemetry-core"
     },
     {
-      "path": "../opentelemetry-sdk-trace-base/tsconfig.esm.json"
+      "path": "../opentelemetry-resources"
     },
     {
-      "path": "../opentelemetry-semantic-conventions/tsconfig.esm.json"
+      "path": "../opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }

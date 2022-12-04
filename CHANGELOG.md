@@ -2,7 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
+For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
+
 ## Unreleased
+
+### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+* feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): use default Resource to comply with semantic conventions [#3411](https://github.com/open-telemetry/opentelemetry-js/pull/3411) @pichlermarc
+  * Metrics exported by the SDK now contain the following resource attributes by default:
+    * `service.name`
+    * `telemetry.sdk.name`
+    * `telemetry.sdk.language`
+    * `telemetry.sdk.version`
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+* chore: automatically generate tsconfigs [#3432](https://github.com/open-telemetry/opentelemetry-js/pull/3432) @legendecas
+* chore: enforce format with prettier [#3444](https://github.com/open-telemetry/opentelemetry-js/pull/3444) @legendecas
+
+## 1.8.0
+
+* `@opentelemetry/sdk-metrics` has been promoted to stable
+* `@opentelemetry/api-metrics` has been merged into `@opentelemetry/api` and deprecated
 
 ### :boom: Breaking Change
 
@@ -26,6 +56,9 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
+* doc: Added Metrics documentation [#3360](https://github.com/open-telemetry/opentelemetry-js/pull/3360) @weyert
+* docs(api): fix counter negative value wording [#3396](https://github.com/open-telemetry/opentelemetry-js/pull/3396) @legendecas
+
 ### :house: (Internal)
 
 * ci: run browser tests without circle [#3328](https://github.com/open-telemetry/opentelemetry-js/pull/3328) @dyladan
@@ -34,6 +67,11 @@ All notable changes to this project will be documented in this file.
 
 Metrics API is now stable and generally available.
 There are no changes between 1.0.0 and the previous 0.33.0 version.
+
+### :boom: Breaking Change
+
+* Add semver check to metrics API [#3357](https://github.com/open-telemetry/opentelemetry-js/pull/3357) @dyladan
+  * Previously API versions were only considered compatible if the API was exactly the same
 
 ## 1.7.0
 

@@ -22,9 +22,8 @@ import { OTLPExporterConfigBase } from '../../src/types';
 import { ComplexTestObject, mockedComplexTestObject } from '../testHelper';
 import * as otlpTypes from '../../src/types';
 
-
 interface ExportRequest {
-  resourceSpans: object[]
+  resourceSpans: object[];
 }
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
@@ -32,7 +31,7 @@ class OTLPTraceExporter extends OTLPExporterBase<
   CollectorExporterConfig,
   ComplexTestObject,
   ExportRequest
-  > {
+> {
   onInit() {}
   onShutdown() {}
   send(
@@ -51,9 +50,7 @@ class OTLPTraceExporter extends OTLPExporterBase<
     return config.url || '';
   }
 
-  convert(
-    spans: ComplexTestObject[]
-  ): ExportRequest {
+  convert(spans: ComplexTestObject[]): ExportRequest {
     return { resourceSpans: [] };
   }
 }
@@ -120,7 +117,7 @@ describe('OTLPTraceExporter - common', () => {
     describe('when exporter is shutdown', () => {
       it(
         'should not export anything but return callback with code' +
-        ' "FailedNotRetryable"',
+          ' "FailedNotRetryable"',
         async () => {
           const spans: ComplexTestObject[] = [];
           spans.push(Object.assign({}, mockedComplexTestObject));
@@ -200,10 +197,7 @@ describe('OTLPTraceExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(
-        OTLPTraceExporter.prototype,
-        'onShutdown'
-      );
+      onShutdownSpy = sinon.stub(OTLPTraceExporter.prototype, 'onShutdown');
       collectorExporterConfig = {
         hostname: 'foo',
         url: 'http://foo.bar.com',

@@ -17,7 +17,7 @@
 /** Properties of an InstrumentationScope. */
 export interface IInstrumentationScope {
   /** InstrumentationScope name */
-  name: string
+  name: string;
 
   /** InstrumentationScope version */
   version?: string;
@@ -35,16 +35,16 @@ export interface IKeyValue {
 /** Properties of an AnyValue. */
 export interface IAnyValue {
   /** AnyValue stringValue */
-  stringValue?: (string | null);
+  stringValue?: string | null;
 
   /** AnyValue boolValue */
-  boolValue?: (boolean | null);
+  boolValue?: boolean | null;
 
   /** AnyValue intValue */
-  intValue?: (number | null);
+  intValue?: number | null;
 
   /** AnyValue doubleValue */
-  doubleValue?: (number | null);
+  doubleValue?: number | null;
 
   /** AnyValue arrayValue */
   arrayValue?: IArrayValue;

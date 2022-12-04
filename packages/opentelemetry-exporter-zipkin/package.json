@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-zipkin",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "OpenTelemetry Zipkin Exporter allows the user to send collected traces to Zipkin.",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -15,8 +15,8 @@
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.all.json",
-    "clean": "tsc --build --clean tsconfig.all.json",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
@@ -25,7 +25,7 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.all.json",
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js"
@@ -91,10 +91,10 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.7.0",
-    "@opentelemetry/resources": "1.7.0",
-    "@opentelemetry/sdk-trace-base": "1.7.0",
-    "@opentelemetry/semantic-conventions": "1.7.0"
+    "@opentelemetry/core": "1.8.0",
+    "@opentelemetry/resources": "1.8.0",
+    "@opentelemetry/sdk-trace-base": "1.8.0",
+    "@opentelemetry/semantic-conventions": "1.8.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-zipkin",
   "sideEffects": false

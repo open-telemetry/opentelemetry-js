@@ -84,7 +84,7 @@ body:
             "start": "node -r tracing.js app.js"
           },
           "dependencies": {
-            "@opentelemetry/api": "^1.2.0",
+            "@opentelemetry/api": "^1.3.0",
             "@opentelemetry/sdk-trace-base": "~1.3.1",
             ...
           }

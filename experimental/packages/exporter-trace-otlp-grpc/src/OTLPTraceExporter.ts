@@ -22,21 +22,25 @@ import {
   OTLPGRPCExporterNodeBase,
   ServiceClientType,
   validateAndNormalizeUrl,
-  DEFAULT_COLLECTOR_URL
+  DEFAULT_COLLECTOR_URL,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import { createExportTraceServiceRequest, IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  createExportTraceServiceRequest,
+  IExportTraceServiceRequest,
+} from '@opentelemetry/otlp-transformer';
 
 /**
  * OTLP Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPGRPCExporterNodeBase<ReadableSpan,
-    IExportTraceServiceRequest>
-  implements SpanExporter {
-
+  extends OTLPGRPCExporterNodeBase<ReadableSpan, IExportTraceServiceRequest>
+  implements SpanExporter
+{
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(config);
-    const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS);
+    const headers = baggageUtils.parseKeyPairsIntoRecord(
+      getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
+    );
     this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
@@ -64,8 +68,10 @@ export class OTLPTraceExporter
       return config.url;
     }
 
-    return getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
+    return (
+      getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
       getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
-      DEFAULT_COLLECTOR_URL;
+      DEFAULT_COLLECTOR_URL
+    );
   }
 }
