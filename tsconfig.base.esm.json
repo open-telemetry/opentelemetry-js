@@ -3,6 +3,5 @@
   "compilerOptions": {
     "module": "ES6",
     "moduleResolution": "node",
-    "target": "ES6"
   }
 }

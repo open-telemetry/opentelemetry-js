@@ -42,7 +42,7 @@ ServiceRequest
     super(config);
   }
 
-  private getExportRequestProto(
+  private _getExportRequestProto(
     clientType: ServiceClientType,
   ): ExportRequestType<ServiceRequest> {
     if (clientType === ServiceClientType.SPANS) {
@@ -63,7 +63,7 @@ ServiceRequest
     }
 
     const serviceRequest = this.convert(objects);
-    const exportRequestType = this.getExportRequestProto(this.getServiceClientType());
+    const exportRequestType = this._getExportRequestProto(this.getServiceClientType());
     const message = exportRequestType.create(serviceRequest);
 
     if (message) {
