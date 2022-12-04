@@ -17,7 +17,10 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { AggregationTemporality } from '../../src';
-import { LastValueAccumulation, LastValueAggregator } from '../../src/aggregator';
+import {
+  LastValueAccumulation,
+  LastValueAggregator,
+} from '../../src/aggregator';
 import { MetricData, DataPointType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentDescriptor, sleep } from '../util';
 
@@ -58,10 +61,20 @@ describe('LastValueAggregator', () => {
 
       assert.deepStrictEqual(
         aggregator.merge(accumulation1, accumulation2),
-        new LastValueAccumulation(accumulation1.startTime, 4, accumulation1.sampleTime));
+        new LastValueAccumulation(
+          accumulation1.startTime,
+          4,
+          accumulation1.sampleTime
+        )
+      );
       assert.deepStrictEqual(
         aggregator.merge(accumulation2, accumulation1),
-        new LastValueAccumulation(accumulation2.startTime, 4, accumulation1.sampleTime));
+        new LastValueAccumulation(
+          accumulation2.startTime,
+          4,
+          accumulation1.sampleTime
+        )
+      );
     });
   });
 
@@ -92,10 +105,20 @@ describe('LastValueAggregator', () => {
 
       assert.deepStrictEqual(
         aggregator.diff(accumulation1, accumulation2),
-        new LastValueAccumulation(accumulation2.startTime, 4, accumulation1.sampleTime));
+        new LastValueAccumulation(
+          accumulation2.startTime,
+          4,
+          accumulation1.sampleTime
+        )
+      );
       assert.deepStrictEqual(
         aggregator.diff(accumulation2, accumulation1),
-        new LastValueAccumulation(accumulation1.startTime, 4, accumulation1.sampleTime));
+        new LastValueAccumulation(
+          accumulation1.startTime,
+          4,
+          accumulation1.sampleTime
+        )
+      );
     });
   });
 
@@ -124,12 +147,15 @@ describe('LastValueAggregator', () => {
           },
         ],
       };
-      assert.deepStrictEqual(aggregator.toMetricData(
-        defaultInstrumentDescriptor,
-        AggregationTemporality.CUMULATIVE,
-        [[{}, accumulation]],
-        endTime,
-      ), expected);
+      assert.deepStrictEqual(
+        aggregator.toMetricData(
+          defaultInstrumentDescriptor,
+          AggregationTemporality.CUMULATIVE,
+          [[{}, accumulation]],
+          endTime
+        ),
+        expected
+      );
     });
   });
 });

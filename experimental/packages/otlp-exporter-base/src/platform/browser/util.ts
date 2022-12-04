@@ -35,9 +35,7 @@ export function sendWithBeacon(
     diag.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
-    const error = new OTLPExporterError(
-      `sendBeacon - cannot send ${body}`
-    );
+    const error = new OTLPExporterError(`sendBeacon - cannot send ${body}`);
     onError(error);
   }
 }
@@ -70,7 +68,7 @@ export function sendWithXhr(
   xhr.open('POST', url);
 
   const defaultHeaders = {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   };
 
@@ -90,9 +88,7 @@ export function sendWithXhr(
         diag.debug('xhr success', body);
         onSuccess();
       } else if (reqIsDestroyed) {
-        const error = new OTLPExporterError(
-          'Request Timeout', xhr.status
-        );
+        const error = new OTLPExporterError('Request Timeout', xhr.status);
         onError(error);
       } else {
         const error = new OTLPExporterError(

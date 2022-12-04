@@ -34,8 +34,10 @@ import { B3InjectEncoding, B3PropagatorConfig } from './types';
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3Propagator implements TextMapPropagator {
-  private readonly _b3MultiPropagator: B3MultiPropagator = new B3MultiPropagator();
-  private readonly _b3SinglePropagator: B3SinglePropagator = new B3SinglePropagator();
+  private readonly _b3MultiPropagator: B3MultiPropagator =
+    new B3MultiPropagator();
+  private readonly _b3SinglePropagator: B3SinglePropagator =
+    new B3SinglePropagator();
   private readonly _inject: (
     context: Context,
     carrier: unknown,

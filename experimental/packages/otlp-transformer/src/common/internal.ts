@@ -16,16 +16,11 @@
 import type { SpanAttributes } from '@opentelemetry/api';
 import { IAnyValue, IKeyValue } from './types';
 
-export function toAttributes(
-  attributes: SpanAttributes
-): IKeyValue[] {
+export function toAttributes(attributes: SpanAttributes): IKeyValue[] {
   return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
 }
 
-export function toKeyValue(
-  key: string,
-  value: unknown
-): IKeyValue {
+export function toKeyValue(key: string, value: unknown): IKeyValue {
   return {
     key: key,
     value: toAnyValue(value),
@@ -41,8 +36,16 @@ export function toAnyValue(value: unknown): IAnyValue {
   }
   if (t === 'boolean') return { boolValue: value as boolean };
   if (value instanceof Uint8Array) return { bytesValue: value };
-  if (Array.isArray(value)) return { arrayValue: { values: value.map(toAnyValue) } };
-  if (t === 'object' && value != null) return { kvlistValue: { values: Object.entries(value as object).map(([k, v]) => toKeyValue(k, v)) } };
+  if (Array.isArray(value))
+    return { arrayValue: { values: value.map(toAnyValue) } };
+  if (t === 'object' && value != null)
+    return {
+      kvlistValue: {
+        values: Object.entries(value as object).map(([k, v]) =>
+          toKeyValue(k, v)
+        ),
+      },
+    };
 
   return {};
 }

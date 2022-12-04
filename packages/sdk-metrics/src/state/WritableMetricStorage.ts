@@ -25,7 +25,12 @@ import { AttributeHashMap } from './HashMap';
  */
 export interface WritableMetricStorage {
   /** Records a measurement. */
-  record(value: number, attributes: MetricAttributes, context: Context, recordTime: HrTime): void;
+  record(
+    value: number,
+    attributes: MetricAttributes,
+    context: Context,
+    recordTime: HrTime
+  ): void;
 }
 
 /**

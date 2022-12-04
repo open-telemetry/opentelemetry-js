@@ -62,7 +62,7 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
     const keyIterator = this._keyMap.entries();
     let next = keyIterator.next();
     while (next.done !== true) {
-      yield [ next.value[1], next.value[0]];
+      yield [next.value[1], next.value[0]];
       next = keyIterator.next();
     }
   }
@@ -73,7 +73,7 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
     while (next.done !== true) {
       // next.value[0] here can not be undefined
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      yield [ this._keyMap.get(next.value[0])!, next.value[1], next.value[0]];
+      yield [this._keyMap.get(next.value[0])!, next.value[1], next.value[0]];
       next = valueIterator.next();
     }
   }
@@ -83,7 +83,11 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
   }
 }
 
-export class AttributeHashMap<ValueType> extends HashMap<MetricAttributes, ValueType, string> {
+export class AttributeHashMap<ValueType> extends HashMap<
+  MetricAttributes,
+  ValueType,
+  string
+> {
   constructor() {
     super(hashAttributes);
   }

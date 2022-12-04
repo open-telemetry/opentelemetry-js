@@ -22,7 +22,7 @@ export const ModuleNameSeparator = '/';
  * Node in a `ModuleNameTrie`
  */
 class ModuleNameTrieNode {
-  hooks: Array<{ hook: Hooked, insertedId: number }> = [];
+  hooks: Array<{ hook: Hooked; insertedId: number }> = [];
   children: Map<string, ModuleNameTrieNode> = new Map();
 }
 
@@ -59,7 +59,10 @@ export class ModuleNameTrie {
    * @param {boolean} maintainInsertionOrder Whether to return the results in insertion order
    * @returns {Hooked[]} Matching hooks
    */
-  search(moduleName: string, { maintainInsertionOrder }: { maintainInsertionOrder?: boolean } = {}): Hooked[] {
+  search(
+    moduleName: string,
+    { maintainInsertionOrder }: { maintainInsertionOrder?: boolean } = {}
+  ): Hooked[] {
     let trieNode = this._trie;
     const results: ModuleNameTrieNode['hooks'] = [];
 

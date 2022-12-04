@@ -20,7 +20,7 @@
  * Note: only the own enumerable keys are counted as valid attribute keys.
  */
 export interface Attributes {
-    [attributeKey: string]: AttributeValue | undefined;
+  [attributeKey: string]: AttributeValue | undefined;
 }
 
 /**
@@ -29,9 +29,9 @@ export interface Attributes {
  * null or undefined attribute values are invalid and will result in undefined behavior.
  */
 export type AttributeValue =
-    | string
-    | number
-    | boolean
-    | Array<null | undefined | string>
-    | Array<null | undefined | number>
-    | Array<null | undefined | boolean>;
+  | string
+  | number
+  | boolean
+  | Array<null | undefined | string>
+  | Array<null | undefined | number>
+  | Array<null | undefined | boolean>;

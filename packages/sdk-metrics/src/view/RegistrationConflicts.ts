@@ -17,7 +17,10 @@
 import { InstrumentSelectorCriteria } from './InstrumentSelector';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
-export function getIncompatibilityDetails(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+export function getIncompatibilityDetails(
+  existing: InstrumentDescriptor,
+  otherDescriptor: InstrumentDescriptor
+) {
   let incompatibility = '';
   if (existing.unit !== otherDescriptor.unit) {
     incompatibility += `\t- Unit '${existing.unit}' does not match '${otherDescriptor.unit}'\n`;
@@ -35,18 +38,27 @@ export function getIncompatibilityDetails(existing: InstrumentDescriptor, otherD
   return incompatibility;
 }
 
-export function getValueTypeConflictResolutionRecipe(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+export function getValueTypeConflictResolutionRecipe(
+  existing: InstrumentDescriptor,
+  otherDescriptor: InstrumentDescriptor
+) {
   return `\t- use valueType '${existing.valueType}' on instrument creation or use an instrument name other than '${otherDescriptor.name}'`;
 }
 
-export function getUnitConflictResolutionRecipe(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+export function getUnitConflictResolutionRecipe(
+  existing: InstrumentDescriptor,
+  otherDescriptor: InstrumentDescriptor
+) {
   return `\t- use unit '${existing.unit}' on instrument creation or use an instrument name other than '${otherDescriptor.name}'`;
 }
 
-export function getTypeConflictResolutionRecipe(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+export function getTypeConflictResolutionRecipe(
+  existing: InstrumentDescriptor,
+  otherDescriptor: InstrumentDescriptor
+) {
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
-    type: otherDescriptor.type
+    type: otherDescriptor.type,
   };
 
   const selectorString = JSON.stringify(selector);
@@ -54,10 +66,13 @@ export function getTypeConflictResolutionRecipe(existing: InstrumentDescriptor, 
   return `\t- create a new view with a name other than '${existing.name}' and InstrumentSelector '${selectorString}'`;
 }
 
-export function getDescriptionResolutionRecipe(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor): string {
+export function getDescriptionResolutionRecipe(
+  existing: InstrumentDescriptor,
+  otherDescriptor: InstrumentDescriptor
+): string {
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
-    type: otherDescriptor.type
+    type: otherDescriptor.type,
   };
 
   const selectorString = JSON.stringify(selector);
@@ -67,7 +82,10 @@ export function getDescriptionResolutionRecipe(existing: InstrumentDescriptor, o
     \t- OR - create a new view with the name ${otherDescriptor.name} and description '${existing.description}' and InstrumentSelector ${selectorString}`;
 }
 
-export function getConflictResolutionRecipe(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor): string {
+export function getConflictResolutionRecipe(
+  existing: InstrumentDescriptor,
+  otherDescriptor: InstrumentDescriptor
+): string {
   // Conflicts that cannot be solved via views.
   if (existing.valueType !== otherDescriptor.valueType) {
     return getValueTypeConflictResolutionRecipe(existing, otherDescriptor);

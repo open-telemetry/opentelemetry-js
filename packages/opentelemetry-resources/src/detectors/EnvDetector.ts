@@ -137,7 +137,7 @@ class EnvDetector implements Detector {
   private _isBaggageOctetString(str: string): boolean {
     for (let i = 0; i < str.length; i++) {
       const ch = str.charCodeAt(i);
-      if (ch < 0x21 || ch === 0x2C || ch === 0x3B || ch === 0x5C || ch > 0x7E) {
+      if (ch < 0x21 || ch === 0x2c || ch === 0x3b || ch === 0x5c || ch > 0x7e) {
         return false;
       }
     }

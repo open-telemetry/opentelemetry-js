@@ -32,14 +32,17 @@ import { AsyncWritableMetricStorage } from './WritableMetricStorage';
  *
  * Stores and aggregates {@link MetricData} for asynchronous instruments.
  */
-export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStorage implements AsyncWritableMetricStorage {
+export class AsyncMetricStorage<T extends Maybe<Accumulation>>
+  extends MetricStorage
+  implements AsyncWritableMetricStorage
+{
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
   constructor(
     _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    private _attributesProcessor: AttributesProcessor,
+    private _attributesProcessor: AttributesProcessor
   ) {
     super(_instrumentDescriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
@@ -64,7 +67,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricSto
   collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    collectionTime: HrTime,
+    collectionTime: HrTime
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 

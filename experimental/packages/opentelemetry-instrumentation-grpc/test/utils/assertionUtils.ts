@@ -23,6 +23,7 @@ import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: grpc.status | grpcJs.status
@@ -60,6 +61,10 @@ export const assertSpan = (
   assert.strictEqual(
     span.status.code,
     grpcStatusCodeToOpenTelemetryStatusCode(validations.status)
+  );
+  assert.strictEqual(
+    span.attributes[SemanticAttributes.RPC_GRPC_STATUS_CODE],
+    validations.status
   );
 };
 
