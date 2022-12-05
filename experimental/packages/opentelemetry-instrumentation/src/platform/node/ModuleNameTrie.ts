@@ -26,6 +26,17 @@ class ModuleNameTrieNode {
   children: Map<string, ModuleNameTrieNode> = new Map();
 }
 
+type ModuleNameTrieSearchOptions = {
+  /**
+   * Whether to return the results in insertion order
+   */
+  maintainInsertionOrder?: boolean;
+  /**
+   * Whether to return only full matches
+   */
+  fullOnly?: boolean;
+};
+
 /**
  * Trie containing nodes that represent a part of a module name (i.e. the parts separated by forward slash)
  */
@@ -57,22 +68,31 @@ export class ModuleNameTrie {
    *
    * @param {string} moduleName Module name
    * @param {boolean} maintainInsertionOrder Whether to return the results in insertion order
+   * @param {boolean} fullOnly Whether to return only full matches
    * @returns {Hooked[]} Matching hooks
    */
   search(
     moduleName: string,
-    { maintainInsertionOrder }: { maintainInsertionOrder?: boolean } = {}
+    { maintainInsertionOrder, fullOnly }: ModuleNameTrieSearchOptions = {}
   ): Hooked[] {
     let trieNode = this._trie;
     const results: ModuleNameTrieNode['hooks'] = [];
+    let foundFull = true;
 
     for (const moduleNamePart of moduleName.split(ModuleNameSeparator)) {
       const nextNode = trieNode.children.get(moduleNamePart);
       if (!nextNode) {
+        foundFull = false;
         break;
       }
-      results.push(...nextNode.hooks);
+      if (!fullOnly) {
+        results.push(...nextNode.hooks);
+      }
       trieNode = nextNode;
+    }
+
+    if (fullOnly && foundFull) {
+      results.push(...trieNode.hooks);
     }
 
     if (results.length === 0) {

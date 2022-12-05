@@ -61,5 +61,27 @@ describe('ModuleNameTrie', () => {
         ]);
       });
     });
+
+    describe('fullOnly = false', () => {
+      it('should return a list of matches for prefixes', () => {
+        assert.deepEqual(trie.search('a/b'), [
+          inserts[0],
+          inserts[2],
+          inserts[1],
+        ]);
+      });
+    });
+
+    describe('fullOnly = true', () => {
+      it('should return a list of matches for full values only', () => {
+        assert.deepEqual(trie.search('a', { fullOnly: true }), [
+          inserts[0],
+          inserts[2],
+        ]);
+        assert.deepEqual(trie.search('a/b', { fullOnly: true }), [inserts[1]]);
+        assert.deepEqual(trie.search('e', { fullOnly: true }), []);
+        assert.deepEqual(trie.search('a/b/e', { fullOnly: true }), []);
+      });
+    });
   });
 });
