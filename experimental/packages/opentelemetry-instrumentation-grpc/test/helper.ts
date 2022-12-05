@@ -515,6 +515,8 @@ export const runTests = (
       const validations = {
         name: `grpc.pkg_test.GrpcTester/${methodName}`,
         status: grpc.status.OK,
+        netPeerName: 'localhost',
+        netPeerPort: grpcPort,
       };
 
       assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
@@ -699,6 +701,8 @@ export const runTests = (
             const validations = {
               name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
               status: errorCode,
+              netPeerName: 'localhost',
+              netPeerPort: grpcPort,
             };
             const serverRoot = spans[0];
             const clientRoot = spans[1];
@@ -738,6 +742,8 @@ export const runTests = (
               const validations = {
                 name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
                 status: errorCode,
+                netPeerName: 'localhost',
+                netPeerPort: grpcPort,
               };
               assertSpan(moduleName, serverSpan, SpanKind.SERVER, validations);
               assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);

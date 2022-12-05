@@ -38,7 +38,12 @@ export const assertSpan = (
   component: string,
   span: ReadableSpan,
   kind: SpanKind,
-  validations: { name: string; status: grpc.status | grpcJs.status }
+  validations: {
+    name: string;
+    status: grpc.status | grpcJs.status;
+    netPeerName?: string;
+    netPeerPort?: number;
+  }
 ) => {
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
@@ -54,6 +59,21 @@ export const assertSpan = (
 
   if (span.kind === SpanKind.SERVER) {
     assert.ok(span.spanContext());
+  }
+
+  if (
+    span.kind === SpanKind.CLIENT &&
+    validations.netPeerName !== undefined &&
+    validations.netPeerPort !== undefined
+  ) {
+    assert.strictEqual(
+      span.attributes[SemanticAttributes.NET_PEER_NAME],
+      validations.netPeerName
+    );
+    assert.strictEqual(
+      span.attributes[SemanticAttributes.NET_PEER_PORT],
+      validations.netPeerPort
+    );
   }
 
   // validations
