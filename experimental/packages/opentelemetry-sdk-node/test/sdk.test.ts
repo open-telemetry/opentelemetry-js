@@ -393,6 +393,7 @@ describe('Node SDK', () => {
         });
         await sdk.detectResources();
         const resource = sdk['_resource'];
+        await resource.waitForAsyncAttributes();
 
         assert.strictEqual(resource.attributes['customAttr'], 'someValue');
 
@@ -535,6 +536,7 @@ describe('Node SDK', () => {
 
       sdk.start();
       const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes();
 
       assertServiceResource(resource, {
         name: 'env-set-name',
@@ -564,6 +566,7 @@ describe('Node SDK', () => {
 
       sdk.start();
       const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes();
 
       assertServiceResource(resource, {
         name: 'resource-env-set-name',
