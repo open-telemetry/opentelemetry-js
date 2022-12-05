@@ -20,34 +20,35 @@ import {
   OTLPExporterBrowserBase as OTLPExporterBaseMain,
   OTLPExporterError,
   OTLPExporterConfigBase,
-  sendWithXhr
+  sendWithXhr,
 } from '@opentelemetry/otlp-exporter-base';
 import * as root from '../../generated/root';
 
 interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
   create(properties?: T): R;
   encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
-  decode(reader: (protobuf.Reader | Uint8Array), length?: number): R;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
 }
 
 /**
  * Collector Exporter abstract base class
  */
 export abstract class OTLPProtoExporterBrowserBase<
-ExportItem,
-ServiceRequest
+  ExportItem,
+  ServiceRequest
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {
-
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
   }
 
   private _getExportRequestProto(
-    clientType: ServiceClientType,
+    clientType: ServiceClientType
   ): ExportRequestType<ServiceRequest> {
     if (clientType === ServiceClientType.SPANS) {
+      // eslint-disable-next-line
       return root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
     } else {
+      // eslint-disable-next-line
       return root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest as unknown as ExportRequestType<ServiceRequest>;
     }
   }
@@ -63,16 +64,18 @@ ServiceRequest
     }
 
     const serviceRequest = this.convert(objects);
-    const exportRequestType = this._getExportRequestProto(this.getServiceClientType());
+    const exportRequestType = this._getExportRequestProto(
+      this.getServiceClientType()
+    );
     const message = exportRequestType.create(serviceRequest);
 
     if (message) {
       const body = exportRequestType.encode(message).finish();
       if (body) {
         sendWithXhr(
-          new Blob([body], { type: 'application/x-protobuf'}),
+          new Blob([body], { type: 'application/x-protobuf' }),
           this.url,
-          {...this._headers, 'Content-Type': 'application/x-protobuf'},
+          { ...this._headers, 'Content-Type': 'application/x-protobuf' },
           this.timeoutMillis,
           onSuccess,
           onError
@@ -83,6 +86,5 @@ ServiceRequest
     }
   }
 
-abstract getServiceClientType(): ServiceClientType;
-
+  abstract getServiceClientType(): ServiceClientType;
 }

@@ -57,5 +57,4 @@ describe('OTLPTraceExporter - web', () => {
       collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
     });
   });
-
 });
