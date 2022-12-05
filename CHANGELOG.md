@@ -55,7 +55,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * fix(version): updated webpack version for selenium test issue
   [#3397](https://github.com/open-telemetry/opentelemetry-js/issues/3397) @SaumyaBhushan
 
-
 ### :books: (Refine Doc)
 
 * doc: Added Metrics documentation [#3360](https://github.com/open-telemetry/opentelemetry-js/pull/3360) @weyert
