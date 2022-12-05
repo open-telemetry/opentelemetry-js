@@ -28,7 +28,7 @@ import {
   ensureProtoSpanIsCorrect,
   mockedReadableSpan,
   MockedResponse,
-} from './traceHelper';
+} from '../traceHelper';
 import {
   CompressionAlgorithm,
   OTLPExporterNodeConfigBase,
