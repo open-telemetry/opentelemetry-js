@@ -106,9 +106,7 @@ describe('RequireInTheMiddleSingleton', () => {
       describe('AND module name matches', () => {
         it('should call `onRequire`', () => {
           const exports = require('fs/promises');
-          assert.deepStrictEqual(exports.__ritmOnRequires, [
-            'fs-promises',
-          ]);
+          assert.deepStrictEqual(exports.__ritmOnRequires, ['fs-promises']);
           sinon.assert.calledOnceWithExactly(
             onRequireFsPromisesStub,
             exports,
