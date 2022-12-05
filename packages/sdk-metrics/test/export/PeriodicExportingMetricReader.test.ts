@@ -16,31 +16,21 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import {
-  Aggregation,
-  InstrumentType,
-  PushMetricExporter
-} from '../../src';
+import { Aggregation, InstrumentType, PushMetricExporter } from '../../src';
 import { ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
-import {
-  ExportResult,
-  ExportResultCode
-} from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';
-import {
-  emptyResourceMetrics,
-  TestMetricProducer
-} from './TestMetricProducer';
+import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,
-  assertAggregationTemporalitySelector
+  assertAggregationTemporalitySelector,
 } from './utils';
 import {
   DEFAULT_AGGREGATION_SELECTOR,
-  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from '../../src/export/AggregationSelector';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
@@ -53,7 +43,10 @@ class TestMetricExporter implements PushMetricExporter {
   private _batches: ResourceMetrics[] = [];
   private _shutdown: boolean = false;
 
-  export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
+  export(
+    metrics: ResourceMetrics,
+    resultCallback: (result: ExportResult) => void
+  ): void {
     this._batches.push(metrics);
 
     if (this.throwException) {
@@ -61,7 +54,10 @@ class TestMetricExporter implements PushMetricExporter {
     }
     setTimeout(() => {
       if (this.failureResult) {
-        resultCallback({ code: ExportResultCode.FAILED, error: new Error('some error') });
+        resultCallback({
+          code: ExportResultCode.FAILED,
+          error: new Error('some error'),
+        });
       } else {
         resultCallback({ code: ExportResultCode.SUCCESS });
       }
@@ -83,7 +79,9 @@ class TestMetricExporter implements PushMetricExporter {
     await new Promise(resolve => setTimeout(resolve, this.forceFlushTime));
   }
 
-  async waitForNumberOfExports(numberOfExports: number): Promise<ResourceMetrics[]> {
+  async waitForNumberOfExports(
+    numberOfExports: number
+  ): Promise<ResourceMetrics[]> {
     if (numberOfExports <= 0) {
       throw new Error('numberOfExports must be greater than or equal to 0');
     }
@@ -96,7 +94,9 @@ class TestMetricExporter implements PushMetricExporter {
 }
 
 class TestDeltaMetricExporter extends TestMetricExporter {
-  selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
+  selectAggregationTemporality(
+    _instrumentType: InstrumentType
+  ): AggregationTemporality {
     return AggregationTemporality.DELTA;
   }
 }
@@ -115,38 +115,53 @@ describe('PeriodicExportingMetricReader', () => {
   describe('constructor', () => {
     it('should construct PeriodicExportingMetricReader without exceptions', () => {
       const exporter = new TestDeltaMetricExporter();
-      assert.doesNotThrow(() => new PeriodicExportingMetricReader({
-        exporter,
-        exportIntervalMillis: 4000,
-        exportTimeoutMillis: 3000
-      }));
+      assert.doesNotThrow(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter,
+            exportIntervalMillis: 4000,
+            exportTimeoutMillis: 3000,
+          })
+      );
     });
 
     it('should throw when interval less or equal to 0', () => {
       const exporter = new TestDeltaMetricExporter();
-      assert.throws(() => new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 0,
-        exportTimeoutMillis: 0
-      }), /exportIntervalMillis must be greater than 0/);
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            exportIntervalMillis: 0,
+            exportTimeoutMillis: 0,
+          }),
+        /exportIntervalMillis must be greater than 0/
+      );
     });
 
     it('should throw when timeout less or equal to 0', () => {
       const exporter = new TestDeltaMetricExporter();
-      assert.throws(() => new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 1,
-        exportTimeoutMillis: 0
-      }), /exportTimeoutMillis must be greater than 0/);
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            exportIntervalMillis: 1,
+            exportTimeoutMillis: 0,
+          }),
+        /exportTimeoutMillis must be greater than 0/
+      );
     });
 
     it('should throw when timeout less or equal to interval', () => {
       const exporter = new TestDeltaMetricExporter();
-      assert.throws(() => new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: 100,
-        exportTimeoutMillis: 200
-      }), /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/);
+      assert.throws(
+        () =>
+          new PeriodicExportingMetricReader({
+            exporter: exporter,
+            exportIntervalMillis: 100,
+            exportTimeoutMillis: 200,
+          }),
+        /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/
+      );
     });
 
     it('should not start exporting', async () => {
@@ -157,7 +172,7 @@ describe('PeriodicExportingMetricReader', () => {
       new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 1,
-        exportTimeoutMillis: 1
+        exportTimeoutMillis: 1,
       });
       await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -171,13 +186,16 @@ describe('PeriodicExportingMetricReader', () => {
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
-        exportTimeoutMillis: 20
+        exportTimeoutMillis: 20,
       });
 
       reader.setMetricProducer(new TestMetricProducer());
       const result = await exporter.waitForNumberOfExports(2);
 
-      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
+      assert.deepStrictEqual(result, [
+        emptyResourceMetrics,
+        emptyResourceMetrics,
+      ]);
       await reader.shutdown();
     });
   });
@@ -189,13 +207,16 @@ describe('PeriodicExportingMetricReader', () => {
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
-        exportTimeoutMillis: 20
+        exportTimeoutMillis: 20,
       });
 
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
+      assert.deepStrictEqual(result, [
+        emptyResourceMetrics,
+        emptyResourceMetrics,
+      ]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -207,13 +228,16 @@ describe('PeriodicExportingMetricReader', () => {
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
-        exportTimeoutMillis: 20
+        exportTimeoutMillis: 20,
       });
 
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
+      assert.deepStrictEqual(result, [
+        emptyResourceMetrics,
+        emptyResourceMetrics,
+      ]);
 
       exporter.failureResult = false;
       await reader.shutdown();
@@ -226,13 +250,16 @@ describe('PeriodicExportingMetricReader', () => {
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
-        exportTimeoutMillis: 20
+        exportTimeoutMillis: 20,
       });
 
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
+      assert.deepStrictEqual(result, [
+        emptyResourceMetrics,
+        emptyResourceMetrics,
+      ]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -251,7 +278,7 @@ describe('PeriodicExportingMetricReader', () => {
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
-        exportTimeoutMillis: 80
+        exportTimeoutMillis: 80,
       });
 
       reader.setMetricProducer(new TestMetricProducer());
@@ -271,8 +298,10 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(() => reader.forceFlush({ timeoutMillis: 20 }),
-        TimeoutError);
+      await assertRejects(
+        () => reader.forceFlush({ timeoutMillis: 20 }),
+        TimeoutError
+      );
       await reader.shutdown();
     });
 
@@ -316,7 +345,10 @@ describe('PeriodicExportingMetricReader', () => {
         exportIntervalMillis: MAX_32_BIT_INT,
       });
 
-      assertAggregationTemporalitySelector(reader, DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+      assertAggregationTemporalitySelector(
+        reader,
+        DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
+      );
       reader.shutdown();
     });
 
@@ -328,7 +360,10 @@ describe('PeriodicExportingMetricReader', () => {
         exportIntervalMillis: MAX_32_BIT_INT,
       });
 
-      assertAggregationTemporalitySelector(reader, exporter.selectAggregationTemporality);
+      assertAggregationTemporalitySelector(
+        reader,
+        exporter.selectAggregationTemporality
+      );
       reader.shutdown();
     });
   });
@@ -373,7 +408,7 @@ describe('PeriodicExportingMetricReader', () => {
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
-        exportTimeoutMillis: 80
+        exportTimeoutMillis: 80,
       });
 
       reader.setMetricProducer(new TestMetricProducer());
@@ -392,8 +427,10 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assertRejects(() => reader.shutdown({ timeoutMillis: 20 }),
-        TimeoutError);
+      await assertRejects(
+        () => reader.shutdown({ timeoutMillis: 20 }),
+        TimeoutError
+      );
     });
 
     it('called twice should call export shutdown only once', async () => {
@@ -403,7 +440,7 @@ describe('PeriodicExportingMetricReader', () => {
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
-        exportTimeoutMillis: 80
+        exportTimeoutMillis: 80,
       });
 
       reader.setMetricProducer(new TestMetricProducer());

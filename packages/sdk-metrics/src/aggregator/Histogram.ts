@@ -18,17 +18,11 @@ import {
   Accumulation,
   AccumulationRecord,
   Aggregator,
-  AggregatorKind
+  AggregatorKind,
 } from './types';
-import {
-  DataPointType,
-  HistogramMetricData
-} from '../export/MetricData';
+import { DataPointType, HistogramMetricData } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
-import {
-  InstrumentDescriptor,
-  InstrumentType
-} from '../InstrumentDescriptor';
+import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
@@ -61,7 +55,7 @@ function createNewEmptyCheckpoint(boundaries: number[]): InternalHistogram {
     count: 0,
     hasMinMax: false,
     min: Infinity,
-    max: -Infinity
+    max: -Infinity,
   };
 }
 
@@ -113,10 +107,17 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    * @param _boundaries upper bounds of recorded values.
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
-  constructor(private readonly _boundaries: number[], private readonly _recordMinMax: boolean) {}
+  constructor(
+    private readonly _boundaries: number[],
+    private readonly _recordMinMax: boolean
+  ) {}
 
   createAccumulation(startTime: HrTime) {
-    return new HistogramAccumulation(startTime, this._boundaries, this._recordMinMax);
+    return new HistogramAccumulation(
+      startTime,
+      this._boundaries,
+      this._recordMinMax
+    );
   }
 
   /**
@@ -124,7 +125,10 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    * instance produces all Accumulations with constant boundaries we don't need to worry about
    * merging accumulations with different boundaries.
    */
-  merge(previous: HistogramAccumulation, delta: HistogramAccumulation): HistogramAccumulation {
+  merge(
+    previous: HistogramAccumulation,
+    delta: HistogramAccumulation
+  ): HistogramAccumulation {
     const previousValue = previous.toPointValue();
     const deltaValue = delta.toPointValue();
 
@@ -152,23 +156,33 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       }
     }
 
-    return new HistogramAccumulation(previous.startTime, previousValue.buckets.boundaries, this._recordMinMax, {
-      buckets: {
-        boundaries: previousValue.buckets.boundaries,
-        counts: mergedCounts,
-      },
-      count: previousValue.count + deltaValue.count,
-      sum: previousValue.sum + deltaValue.sum,
-      hasMinMax: this._recordMinMax && (previousValue.hasMinMax || deltaValue.hasMinMax),
-      min: min,
-      max: max
-    });
+    return new HistogramAccumulation(
+      previous.startTime,
+      previousValue.buckets.boundaries,
+      this._recordMinMax,
+      {
+        buckets: {
+          boundaries: previousValue.buckets.boundaries,
+          counts: mergedCounts,
+        },
+        count: previousValue.count + deltaValue.count,
+        sum: previousValue.sum + deltaValue.sum,
+        hasMinMax:
+          this._recordMinMax &&
+          (previousValue.hasMinMax || deltaValue.hasMinMax),
+        min: min,
+        max: max,
+      }
+    );
   }
 
   /**
    * Returns a new DELTA aggregation by comparing two cumulative measurements.
    */
-  diff(previous: HistogramAccumulation, current: HistogramAccumulation): HistogramAccumulation {
+  diff(
+    previous: HistogramAccumulation,
+    current: HistogramAccumulation
+  ): HistogramAccumulation {
     const previousValue = previous.toPointValue();
     const currentValue = current.toPointValue();
 
@@ -180,24 +194,30 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       diffedCounts[idx] = currentCounts[idx] - previousCounts[idx];
     }
 
-    return new HistogramAccumulation(current.startTime, previousValue.buckets.boundaries, this._recordMinMax, {
-      buckets: {
-        boundaries: previousValue.buckets.boundaries,
-        counts: diffedCounts,
-      },
-      count: currentValue.count - previousValue.count,
-      sum: currentValue.sum - previousValue.sum,
-      hasMinMax: false,
-      min: Infinity,
-      max: -Infinity
-    });
+    return new HistogramAccumulation(
+      current.startTime,
+      previousValue.buckets.boundaries,
+      this._recordMinMax,
+      {
+        buckets: {
+          boundaries: previousValue.buckets.boundaries,
+          counts: diffedCounts,
+        },
+        count: currentValue.count - previousValue.count,
+        sum: currentValue.sum - previousValue.sum,
+        hasMinMax: false,
+        min: Infinity,
+        max: -Infinity,
+      }
+    );
   }
 
   toMetricData(
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
-    endTime: HrTime): Maybe<HistogramMetricData> {
+    endTime: HrTime
+  ): Maybe<HistogramMetricData> {
     return {
       descriptor,
       aggregationTemporality,
@@ -207,9 +227,9 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
 
         // determine if instrument allows negative values.
         const allowsNegativeValues =
-          (descriptor.type === InstrumentType.UP_DOWN_COUNTER) ||
-          (descriptor.type === InstrumentType.OBSERVABLE_GAUGE) ||
-          (descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER);
+          descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
+          descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
+          descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
 
         return {
           attributes,
@@ -220,10 +240,10 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
             max: pointValue.hasMinMax ? pointValue.max : undefined,
             sum: !allowsNegativeValues ? pointValue.sum : undefined,
             buckets: pointValue.buckets,
-            count: pointValue.count
+            count: pointValue.count,
           },
         };
-      })
+      }),
     };
   }
 }

@@ -20,7 +20,8 @@ import {
   INVALID_SPANID,
   INVALID_TRACEID,
   ROOT_CONTEXT,
-  SpanContext, trace,
+  SpanContext,
+  trace,
   TraceFlags,
 } from '@opentelemetry/api';
 import * as assert from 'assert';

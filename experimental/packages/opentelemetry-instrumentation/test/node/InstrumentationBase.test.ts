@@ -16,8 +16,13 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { InstrumentationBase, InstrumentationModuleDefinition, InstrumentationNodeModuleDefinition, InstrumentationNodeModuleFile } from '../../src';
 import * as path from 'path';
+import {
+  InstrumentationBase,
+  InstrumentationModuleDefinition,
+  InstrumentationNodeModuleDefinition,
+  InstrumentationNodeModuleFile
+} from '../../src';
 
 const MODULE_NAME = 'test-module';
 const MODULE_FILE_NAME = 'test-module-file';
@@ -146,8 +151,15 @@ describe('InstrumentationBase', () => {
           );
 
           assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
-          sinon.assert.calledOnceWithExactly(modulePatchSpy, moduleExports, undefined);
+          assert.strictEqual(
+            instrumentationModule.moduleExports,
+            moduleExports
+          );
+          sinon.assert.calledOnceWithExactly(
+            modulePatchSpy,
+            moduleExports,
+            undefined
+          );
         });
       });
     });
@@ -167,11 +179,13 @@ describe('InstrumentationBase', () => {
             supportedVersions,
             name: MODULE_NAME,
             patch: modulePatchSpy as unknown,
-            files: [{
-              name: MODULE_FILE_NAME,
-              supportedVersions,
-              patch: filePatchSpy as unknown
-            }]
+            files: [
+              {
+                name: MODULE_FILE_NAME,
+                supportedVersions,
+                patch: filePatchSpy as unknown,
+              },
+            ],
           } as InstrumentationModuleDefinition<unknown>;
 
           // @ts-expect-error access internal property for testing
@@ -197,11 +211,13 @@ describe('InstrumentationBase', () => {
             supportedVersions,
             name: MODULE_NAME,
             patch: modulePatchSpy as unknown,
-            files: [{
-              name: MODULE_FILE_NAME,
-              supportedVersions,
-              patch: filePatchSpy as unknown
-            }]
+            files: [
+              {
+                name: MODULE_FILE_NAME,
+                supportedVersions,
+                patch: filePatchSpy as unknown,
+              },
+            ],
           } as InstrumentationModuleDefinition<unknown>;
 
           // @ts-expect-error access internal property for testing
@@ -213,9 +229,16 @@ describe('InstrumentationBase', () => {
           );
 
           assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(instrumentationModule.files[0].moduleExports, moduleExports);
+          assert.strictEqual(
+            instrumentationModule.files[0].moduleExports,
+            moduleExports
+          );
           sinon.assert.notCalled(modulePatchSpy);
-          sinon.assert.calledOnceWithExactly(filePatchSpy, moduleExports, undefined);
+          sinon.assert.calledOnceWithExactly(
+            filePatchSpy,
+            moduleExports,
+            undefined
+          );
         });
       });
 
@@ -227,15 +250,18 @@ describe('InstrumentationBase', () => {
             supportedVersions,
             name: MODULE_NAME,
             patch: modulePatchSpy as unknown,
-            files: [{
-              name: MODULE_FILE_NAME,
-              supportedVersions,
-              patch: filePatchSpy as unknown
-            }, {
-              name: MODULE_FILE_NAME,
-              supportedVersions,
-              patch: filePatchSpy as unknown
-            }]
+            files: [
+              {
+                name: MODULE_FILE_NAME,
+                supportedVersions,
+                patch: filePatchSpy as unknown,
+              },
+              {
+                name: MODULE_FILE_NAME,
+                supportedVersions,
+                patch: filePatchSpy as unknown,
+              },
+            ],
           } as InstrumentationModuleDefinition<unknown>;
 
           // @ts-expect-error access internal property for testing
@@ -247,8 +273,14 @@ describe('InstrumentationBase', () => {
           );
 
           assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-          assert.strictEqual(instrumentationModule.files[0].moduleExports, moduleExports);
-          assert.strictEqual(instrumentationModule.files[1].moduleExports, moduleExports);
+          assert.strictEqual(
+            instrumentationModule.files[0].moduleExports,
+            moduleExports
+          );
+          assert.strictEqual(
+            instrumentationModule.files[1].moduleExports,
+            moduleExports
+          );
           sinon.assert.notCalled(modulePatchSpy);
           sinon.assert.calledTwice(filePatchSpy);
         });

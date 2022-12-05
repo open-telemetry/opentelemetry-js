@@ -313,7 +313,6 @@ describe('Zipkin Exporter - node', () => {
       });
     });
 
-
     it('should call globalErrorHandler on error', () => {
       const expectedError = new Error('Whoops');
       const scope = nock('http://localhost:9411')
@@ -498,10 +497,7 @@ describe('Zipkin Exporter - node', () => {
     exporter.export([span1, span2], (result: ExportResult) => {
       requestBody;
       scope.done();
-      assert.equal(
-        requestBody[0].localEndpoint.serviceName,
-        span_service_name
-      );
+      assert.equal(requestBody[0].localEndpoint.serviceName, span_service_name);
       assert.equal(
         requestBody[1].localEndpoint.serviceName,
         span_service_name_prime

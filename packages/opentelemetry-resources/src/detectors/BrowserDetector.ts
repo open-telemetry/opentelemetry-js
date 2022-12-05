@@ -31,7 +31,7 @@ class BrowserDetector implements Detector {
     const browserResource: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
       [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent
+      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent,
     };
     return this._getResourceAttributes(browserResource, config);
   }
@@ -60,6 +60,5 @@ class BrowserDetector implements Detector {
     }
   }
 }
-
 
 export const browserDetector = new BrowserDetector();

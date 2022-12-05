@@ -70,7 +70,9 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 /**
  * This class represents a fetch plugin for auto instrumentation
  */
-export class FetchInstrumentation extends InstrumentationBase<Promise<Response>> {
+export class FetchInstrumentation extends InstrumentationBase<
+  Promise<Response>
+> {
   readonly component: string = 'fetch';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -78,11 +80,7 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
   private _tasksCount = 0;
 
   constructor(config?: FetchInstrumentationConfig) {
-    super(
-      '@opentelemetry/instrumentation-fetch',
-      VERSION,
-      config
-    );
+    super('@opentelemetry/instrumentation-fetch', VERSION, config);
   }
 
   init(): void {}
@@ -301,7 +299,9 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
         ...args: Parameters<typeof fetch>
       ): Promise<Response> {
         const self = this;
-        const url = web.parseUrl(args[0] instanceof Request ? args[0].url : args[0]).href;
+        const url = web.parseUrl(
+          args[0] instanceof Request ? args[0].url : args[0]
+        ).href;
 
         const options = args[0] instanceof Request ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
@@ -388,7 +388,10 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
               // TypeScript complains about arrow function captured a this typed as globalThis
               // ts(7041)
               return original
-                .apply(self, options instanceof Request ? [options] : [url, options])
+                .apply(
+                  self,
+                  options instanceof Request ? [options] : [url, options]
+                )
                 .then(
                   onSuccess.bind(self, createdSpan, resolve),
                   onError.bind(self, createdSpan, reject)
@@ -405,8 +408,8 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
     request: Request | RequestInit,
     result: Response | FetchError
   ) {
-    const applyCustomAttributesOnSpan = this._getConfig()
-      .applyCustomAttributesOnSpan;
+    const applyCustomAttributesOnSpan =
+      this._getConfig().applyCustomAttributesOnSpan;
     if (applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, request, result),
@@ -437,10 +440,7 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
     const observer = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
       perfObsEntries.forEach(entry => {
-        if (
-          entry.initiatorType === 'fetch' &&
-          entry.name === spanUrl
-        ) {
+        if (entry.initiatorType === 'fetch' && entry.name === spanUrl) {
           entries.push(entry);
         }
       });

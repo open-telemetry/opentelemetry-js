@@ -41,7 +41,10 @@ export class ObservableResultImpl implements ObservableResult {
    * Observe a measurement of the value associated with the given attributes.
    */
   observe(value: number, attributes: MetricAttributes = {}): void {
-    if (this._descriptor.valueType === ValueType.INT && !Number.isInteger(value)) {
+    if (
+      this._descriptor.valueType === ValueType.INT &&
+      !Number.isInteger(value)
+    ) {
       diag.warn(
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
       );
@@ -63,7 +66,11 @@ export class BatchObservableResultImpl implements BatchObservableResult {
   /**
    * Observe a measurement of the value associated with the given attributes.
    */
-  observe(metric: Observable, value: number, attributes: MetricAttributes = {}): void {
+  observe(
+    metric: Observable,
+    value: number,
+    attributes: MetricAttributes = {}
+  ): void {
     if (!isObservableInstrument(metric)) {
       return;
     }
@@ -72,7 +79,10 @@ export class BatchObservableResultImpl implements BatchObservableResult {
       map = new AttributeHashMap();
       this._buffer.set(metric, map);
     }
-    if (metric._descriptor.valueType === ValueType.INT && !Number.isInteger(value)) {
+    if (
+      metric._descriptor.valueType === ValueType.INT &&
+      !Number.isInteger(value)
+    ) {
       diag.warn(
         `INT value type cannot accept a floating-point value for ${metric._descriptor.name}, ignoring the fractional digits.`
       );

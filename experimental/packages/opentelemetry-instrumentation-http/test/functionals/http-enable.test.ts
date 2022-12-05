@@ -41,7 +41,12 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import { ContextManager } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import type { ClientRequest, IncomingMessage, ServerResponse, RequestOptions } from 'http';
+import type {
+  ClientRequest,
+  IncomingMessage,
+  ServerResponse,
+  RequestOptions,
+} from 'http';
 import { isWrapped } from '@opentelemetry/instrumentation';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 
@@ -100,13 +105,13 @@ export const responseHookFunction = (
 export const startIncomingSpanHookFunction = (
   request: IncomingMessage
 ): SpanAttributes => {
-  return {guid: request.headers?.guid};
+  return { guid: request.headers?.guid };
 };
 
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): SpanAttributes => {
-  return {guid: request.headers?.guid};
+  return { guid: request.headers?.guid };
 };
 
 describe('HttpInstrumentation', () => {
@@ -176,8 +181,8 @@ describe('HttpInstrumentation', () => {
           `${protocol}://${hostname}:${serverPort}${pathname}`,
           {
             headers: {
-              'user-agent': 'tester'
-            }
+              'user-agent': 'tester',
+            },
           }
         );
         const spans = memoryExporter.getFinishedSpans();
@@ -219,7 +224,9 @@ describe('HttpInstrumentation', () => {
             (url: string) => url.endsWith('/ignored/function'),
           ],
           ignoreIncomingRequestHook: request => {
-            return request.headers['user-agent']?.match('ignored-string') != null;
+            return (
+              request.headers['user-agent']?.match('ignored-string') != null
+            );
           },
           ignoreOutgoingUrls: [
             `${protocol}://${hostname}:${serverPort}/ignored/string`,
@@ -228,7 +235,10 @@ describe('HttpInstrumentation', () => {
           ],
           ignoreOutgoingRequestHook: request => {
             if (request.headers?.['user-agent'] != null) {
-              return `${request.headers['user-agent']}`.match('ignored-string') != null;
+              return (
+                `${request.headers['user-agent']}`.match('ignored-string') !=
+                null
+              );
             }
             return false;
           },
@@ -312,17 +322,7 @@ describe('HttpInstrumentation', () => {
       });
 
       const httpErrorCodes = [
-        400,
-        401,
-        403,
-        404,
-        429,
-        501,
-        503,
-        504,
-        500,
-        505,
-        597,
+        400, 401, 403, 404, 429, 501, 503, 504, 500, 505, 597,
       ];
 
       for (let i = 0; i < httpErrorCodes.length; i++) {
@@ -410,36 +410,39 @@ describe('HttpInstrumentation', () => {
           );
           const name = 'TestRootSpan';
           const span = provider.getTracer('default').startSpan(name);
-          return context.with(trace.setSpan(context.active(), span), async () => {
-            const result = await httpRequest.get(
-              `${protocol}://${hostname}${testPath}`
-            );
-            span.end();
-            const spans = memoryExporter.getFinishedSpans();
-            const [reqSpan, localSpan] = spans;
-            const validations = {
-              hostname,
-              httpStatusCode: result.statusCode!,
-              httpMethod: 'GET',
-              pathname: testPath,
-              resHeaders: result.resHeaders,
-              reqHeaders: result.reqHeaders,
-              component: 'http',
-            };
+          return context.with(
+            trace.setSpan(context.active(), span),
+            async () => {
+              const result = await httpRequest.get(
+                `${protocol}://${hostname}${testPath}`
+              );
+              span.end();
+              const spans = memoryExporter.getFinishedSpans();
+              const [reqSpan, localSpan] = spans;
+              const validations = {
+                hostname,
+                httpStatusCode: result.statusCode!,
+                httpMethod: 'GET',
+                pathname: testPath,
+                resHeaders: result.resHeaders,
+                reqHeaders: result.reqHeaders,
+                component: 'http',
+              };
 
-            assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
-            assert.strictEqual(spans.length, 2);
-            assert.strictEqual(reqSpan.name, 'HTTP GET');
-            assert.strictEqual(
-              localSpan.spanContext().traceId,
-              reqSpan.spanContext().traceId
-            );
-            assertSpan(reqSpan, SpanKind.CLIENT, validations);
-            assert.notStrictEqual(
-              localSpan.spanContext().spanId,
-              reqSpan.spanContext().spanId
-            );
-          });
+              assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
+              assert.strictEqual(spans.length, 2);
+              assert.strictEqual(reqSpan.name, 'HTTP GET');
+              assert.strictEqual(
+                localSpan.spanContext().traceId,
+                reqSpan.spanContext().traceId
+              );
+              assertSpan(reqSpan, SpanKind.CLIENT, validations);
+              assert.notStrictEqual(
+                localSpan.spanContext().spanId,
+                reqSpan.spanContext().spanId
+              );
+            }
+          );
         });
       }
 
@@ -482,36 +485,27 @@ describe('HttpInstrumentation', () => {
         const testValue = 'ignored-string';
 
         await Promise.all([
-          httpRequest.get(
-            `${protocol}://${hostname}:${serverPort}`,
-            {
-              headers: {
-                'user-agent': testValue
-              }
-            }
-          ),
-          httpRequest.get(
-            `${protocol}://${hostname}:${serverPort}`,
-            {
-              headers: {
-                'uSeR-aGeNt': testValue
-              }
-            }
-          ),
+          httpRequest.get(`${protocol}://${hostname}:${serverPort}`, {
+            headers: {
+              'user-agent': testValue,
+            },
+          }),
+          httpRequest.get(`${protocol}://${hostname}:${serverPort}`, {
+            headers: {
+              'uSeR-aGeNt': testValue,
+            },
+          }),
         ]);
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
       });
 
       it('should trace not ignored requests with headers (client and server side)', async () => {
-        await httpRequest.get(
-          `${protocol}://${hostname}:${serverPort}`,
-          {
-            headers: {
-              'user-agent': 'test-bot',
-            }
-          }
-        );
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}`, {
+          headers: {
+            'user-agent': 'test-bot',
+          },
+        });
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 2);
       });
@@ -554,29 +548,32 @@ describe('HttpInstrumentation', () => {
       }
 
       it('should have 1 ended span when request throw on bad "options" object', () => {
-        assert.throws(() => http.request({ headers: { cookie: undefined} }), (err: unknown) => {
-          const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 1);
+        assert.throws(
+          () => http.request({ headers: { cookie: undefined } }),
+          (err: unknown) => {
+            const spans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(spans.length, 1);
 
-          assert.ok(err instanceof Error);
+            assert.ok(err instanceof Error);
 
-          const validations = {
-            httpStatusCode: undefined,
-            httpMethod: 'GET',
-            resHeaders: {},
-            hostname: 'localhost',
-            pathname: '/',
-            forceStatus: {
-              code: SpanStatusCode.ERROR,
-              message: err.message,
-            },
-            component: 'http',
-            noNetPeer: true,
-            error: err,
-          };
-          assertSpan(spans[0], SpanKind.CLIENT, validations);
-          return true;
-        });
+            const validations = {
+              httpStatusCode: undefined,
+              httpMethod: 'GET',
+              resHeaders: {},
+              hostname: 'localhost',
+              pathname: '/',
+              forceStatus: {
+                code: SpanStatusCode.ERROR,
+                message: err.message,
+              },
+              component: 'http',
+              noNetPeer: true,
+              error: err,
+            };
+            assertSpan(spans[0], SpanKind.CLIENT, validations);
+            return true;
+          }
+        );
       });
 
       it('should have 1 ended span when response.end throw an exception', async () => {
@@ -733,7 +730,9 @@ describe('HttpInstrumentation', () => {
 
         const req = http.request(`${protocol}://${hostname}:${serverPort}/`);
         req.on('close', () => {
-          const spans = memoryExporter.getFinishedSpans().filter(it => it.kind === SpanKind.CLIENT);
+          const spans = memoryExporter
+            .getFinishedSpans()
+            .filter(it => it.kind === SpanKind.CLIENT);
           assert.strictEqual(spans.length, 1);
           const [span] = spans;
           assert.ok(Object.keys(span.attributes).length > 6);
@@ -767,7 +766,7 @@ describe('HttpInstrumentation', () => {
       it('custom attributes should show up on client and server spans', async () => {
         await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${pathname}`,
-          {headers: {guid: 'user_guid'}}
+          { headers: { guid: 'user_guid' } }
         );
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
@@ -780,10 +779,7 @@ describe('HttpInstrumentation', () => {
           incomingSpan.attributes['custom response hook attribute'],
           'response'
         );
-        assert.strictEqual(
-          incomingSpan.attributes['guid'],
-          'user_guid'
-        );
+        assert.strictEqual(incomingSpan.attributes['guid'], 'user_guid');
         assert.strictEqual(
           incomingSpan.attributes['span kind'],
           SpanKind.CLIENT
@@ -797,10 +793,7 @@ describe('HttpInstrumentation', () => {
           outgoingSpan.attributes['custom response hook attribute'],
           'response'
         );
-        assert.strictEqual(
-          outgoingSpan.attributes['guid'],
-          'user_guid'
-        );
+        assert.strictEqual(outgoingSpan.attributes['guid'], 'user_guid');
         assert.strictEqual(
           outgoingSpan.attributes['span kind'],
           SpanKind.CLIENT
@@ -981,9 +974,15 @@ describe('HttpInstrumentation', () => {
     before(() => {
       instrumentation.setConfig({
         headersToSpanAttributes: {
-          client: { requestHeaders: ['X-Client-Header1'], responseHeaders: ['X-Server-Header1'] },
-          server: { requestHeaders: ['X-Client-Header2'], responseHeaders: ['X-Server-Header2'] },
-        }
+          client: {
+            requestHeaders: ['X-Client-Header1'],
+            responseHeaders: ['X-Server-Header1'],
+          },
+          server: {
+            requestHeaders: ['X-Client-Header2'],
+            responseHeaders: ['X-Server-Header2'],
+          },
+        },
       });
       instrumentation.enable();
       server = http.createServer((request, response) => {
@@ -1007,7 +1006,7 @@ describe('HttpInstrumentation', () => {
           headers: {
             'X-client-header1': 'client123',
             'X-CLIENT-HEADER2': '123client',
-          }
+          },
         }
       );
       const spans = memoryExporter.getFinishedSpans();

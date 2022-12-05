@@ -15,7 +15,8 @@
  */
 import {
   Context,
-  TextMapPropagator, trace,
+  TextMapPropagator,
+  trace,
   TraceFlags,
 } from '@opentelemetry/api';
 import type * as http from 'http';

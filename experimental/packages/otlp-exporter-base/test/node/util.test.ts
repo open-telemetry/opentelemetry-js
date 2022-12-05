@@ -17,8 +17,8 @@
 import * as assert from 'assert';
 import { configureExporterTimeout, invalidTimeout } from '../../src/util';
 import { sendWithHttp } from '../../src/platform/node/util';
-import { CompressionAlgorithm} from '../../src/platform/node/types';
-import { configureCompression} from '../../src/platform/node/util';
+import { CompressionAlgorithm } from '../../src/platform/node/types';
+import { configureCompression } from '../../src/platform/node/util';
 import { diag } from '@opentelemetry/api';
 import * as sinon from 'sinon';
 
@@ -50,7 +50,7 @@ class HttpRequest extends PassThrough {
 
 // Barebones exporter for use by sendWithHttp
 type ExporterConfig = OTLPExporterNodeConfigBase;
-class Exporter extends OTLPExporterNodeBase<object,object> {
+class Exporter extends OTLPExporterNodeBase<object, object> {
   getDefaultUrl(config: ExporterConfig): string {
     return config.url || '';
   }
@@ -147,20 +147,32 @@ describe('configureCompression', () => {
   const envSource = process.env;
   it('should return none for compression', () => {
     const compression = CompressionAlgorithm.NONE;
-    assert.strictEqual(configureCompression(compression), CompressionAlgorithm.NONE);
+    assert.strictEqual(
+      configureCompression(compression),
+      CompressionAlgorithm.NONE
+    );
   });
   it('should return gzip compression defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
-    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.GZIP);
+    assert.strictEqual(
+      configureCompression(undefined),
+      CompressionAlgorithm.GZIP
+    );
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
   });
   it('should return none for compression defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'none';
-    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.NONE);
+    assert.strictEqual(
+      configureCompression(undefined),
+      CompressionAlgorithm.NONE
+    );
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
   });
   it('should return none for compression when no compression is set', () => {
-    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.NONE);
+    assert.strictEqual(
+      configureCompression(undefined),
+      CompressionAlgorithm.NONE
+    );
   });
 });
 
@@ -171,12 +183,11 @@ describe('sendWithHttp', () => {
   let setHeaderSpy: sinon.SinonSpy;
 
   const spanData: object = {
-    'foo': 'bar',
-    'bar': 'baz',
+    foo: 'bar',
+    bar: 'baz',
   };
 
   beforeEach(() => {
-
     // Create stub of http.request (used by sendWithHttp)
     httpRequestStub = sinon.stub(http, 'request');
 
@@ -195,7 +206,7 @@ describe('sendWithHttp', () => {
     httpRequestStub.returns(mockRequest).callsArgWith(1, response);
   });
 
-  afterEach(function() {
+  afterEach(function () {
     httpRequestStub.restore();
     setHeaderSpy.restore();
   });
@@ -209,17 +220,23 @@ describe('sendWithHttp', () => {
 
     // Show that data is written to the request stream
     let requestData = '';
-    mockRequest.on('data', chunk => requestData += chunk);
+    mockRequest.on('data', chunk => (requestData += chunk));
     mockRequest.on('end', () => {
       assert.strictEqual(requestData, data);
     });
 
-    sendWithHttp(exporter, data, 'application/json', () => {
-      // Show that we aren't setting the gzip encoding header
-      assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').notCalled);
-    }, (err: OTLPExporterError) => {
-      assert.fail(err);
-    });
+    sendWithHttp(
+      exporter,
+      data,
+      'application/json',
+      () => {
+        // Show that we aren't setting the gzip encoding header
+        assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').notCalled);
+      },
+      (err: OTLPExporterError) => {
+        assert.fail(err);
+      }
+    );
   });
 
   it('should send with gzip compression if configured to do so', () => {
@@ -238,12 +255,18 @@ describe('sendWithHttp', () => {
       assert(Buffer.concat(buffers).equals(compressedData));
     });
 
-    sendWithHttp(exporter, data, 'application/json', () => {
-      // Show that we are setting the gzip encoding header
-      assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
-    }, (err: OTLPExporterError) => {
-      assert.fail(err);
-    });
+    sendWithHttp(
+      exporter,
+      data,
+      'application/json',
+      () => {
+        // Show that we are setting the gzip encoding header
+        assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
+      },
+      (err: OTLPExporterError) => {
+        assert.fail(err);
+      }
+    );
   });
 
   it('should work with gzip compression enabled even after multiple requests', () => {
@@ -274,12 +297,18 @@ describe('sendWithHttp', () => {
         assert(Buffer.concat(buffers).equals(compressedData));
       });
 
-      sendWithHttp(exporter, data, 'application/json', () => {
-        // Show that we are setting the gzip encoding header
-        assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
-      }, (err: OTLPExporterError) => {
-        assert.fail(err);
-      });
+      sendWithHttp(
+        exporter,
+        data,
+        'application/json',
+        () => {
+          // Show that we are setting the gzip encoding header
+          assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
+        },
+        (err: OTLPExporterError) => {
+          assert.fail(err);
+        }
+      );
     }
   });
 });

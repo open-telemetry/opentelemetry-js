@@ -92,10 +92,7 @@ export function makeGrpcClientRemoteCall(
       if (err) {
         if (err.code) {
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
-          span.setAttribute(
-            SemanticAttributes.RPC_GRPC_STATUS_CODE,
-            err.code
-          );
+          span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
         }
         span.setAttributes({
           [AttributeNames.GRPC_ERROR_NAME]: err.name,

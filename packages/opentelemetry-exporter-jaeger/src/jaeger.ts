@@ -15,7 +15,12 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { BindOnceFuture, ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import {
+  BindOnceFuture,
+  ExportResult,
+  ExportResultCode,
+  getEnv,
+} from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
@@ -85,7 +90,10 @@ export class JaegerExporter implements SpanExporter {
   private _shutdown(): Promise<void> {
     return Promise.race([
       new Promise<void>((_resolve, reject) => {
-        setTimeout(() => reject(new Error('Flush timeout')), this._onShutdownFlushTimeout);
+        setTimeout(
+          () => reject(new Error('Flush timeout')),
+          this._onShutdownFlushTimeout
+        );
       }),
       this._flush(),
     ]).finally(() => {
@@ -126,19 +134,25 @@ export class JaegerExporter implements SpanExporter {
     });
   }
 
-  private _getSender(span: jaegerTypes.ThriftSpan): typeof jaegerTypes.UDPSender {
+  private _getSender(
+    span: jaegerTypes.ThriftSpan
+  ): typeof jaegerTypes.UDPSender {
     if (this._sender) {
       return this._sender;
     }
 
-    const sender = this._localConfig.endpoint ? new jaegerTypes.HTTPSender(this._localConfig) : new jaegerTypes.UDPSender(this._localConfig);
+    const sender = this._localConfig.endpoint
+      ? new jaegerTypes.HTTPSender(this._localConfig)
+      : new jaegerTypes.UDPSender(this._localConfig);
 
     if (sender._client instanceof Socket) {
       // unref socket to prevent it from keeping the process running
       sender._client.unref();
     }
 
-    const serviceNameTag = span.tags.find(t => t.key === SemanticResourceAttributes.SERVICE_NAME);
+    const serviceNameTag = span.tags.find(
+      t => t.key === SemanticResourceAttributes.SERVICE_NAME
+    );
     const serviceName = serviceNameTag?.vStr || 'unknown_service';
 
     sender.setProcess({

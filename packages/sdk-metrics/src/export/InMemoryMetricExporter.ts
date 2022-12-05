@@ -38,9 +38,12 @@ export class InMemoryMetricExporter implements PushMetricExporter {
   /**
    * @inheritedDoc
    */
-  export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
+  export(
+    metrics: ResourceMetrics,
+    resultCallback: (result: ExportResult) => void
+  ): void {
     // Avoid storing metrics when exporter is shutdown
-    if (this. _shutdown) {
+    if (this._shutdown) {
       setTimeout(() => resultCallback({ code: ExportResultCode.FAILED }), 0);
       return;
     }
@@ -65,7 +68,9 @@ export class InMemoryMetricExporter implements PushMetricExporter {
     this._metrics = [];
   }
 
-  selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
+  selectAggregationTemporality(
+    _instrumentType: InstrumentType
+  ): AggregationTemporality {
     return this._aggregationTemporality;
   }
 
