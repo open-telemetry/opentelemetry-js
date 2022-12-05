@@ -32,13 +32,26 @@ import {
 import { hrTime } from '@opentelemetry/core';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { ObservableRegistry } from './state/ObservableRegistry';
-import { AsyncWritableMetricStorage, WritableMetricStorage } from './state/WritableMetricStorage';
+import {
+  AsyncWritableMetricStorage,
+  WritableMetricStorage,
+} from './state/WritableMetricStorage';
 
 export class SyncInstrument {
-  constructor(private _writableMetricStorage: WritableMetricStorage, protected _descriptor: InstrumentDescriptor) {}
+  constructor(
+    private _writableMetricStorage: WritableMetricStorage,
+    protected _descriptor: InstrumentDescriptor
+  ) {}
 
-  protected _record(value: number, attributes: MetricAttributes = {}, context: Context = contextApi.active()) {
-    if (this._descriptor.valueType === ValueType.INT && !Number.isInteger(value)) {
+  protected _record(
+    value: number,
+    attributes: MetricAttributes = {},
+    context: Context = contextApi.active()
+  ) {
+    if (
+      this._descriptor.valueType === ValueType.INT &&
+      !Number.isInteger(value)
+    ) {
       diag.warn(
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
       );
@@ -51,7 +64,10 @@ export class SyncInstrument {
 /**
  * The class implements {@link UpDownCounter} interface.
  */
-export class UpDownCounterInstrument extends SyncInstrument implements UpDownCounter {
+export class UpDownCounterInstrument
+  extends SyncInstrument
+  implements UpDownCounter
+{
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
@@ -69,7 +85,9 @@ export class CounterInstrument extends SyncInstrument implements Counter {
    */
   add(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     if (value < 0) {
-      diag.warn(`negative value provided to counter ${this._descriptor.name}: ${value}`);
+      diag.warn(
+        `negative value provided to counter ${this._descriptor.name}: ${value}`
+      );
       return;
     }
 
@@ -86,7 +104,9 @@ export class HistogramInstrument extends SyncInstrument implements Histogram {
    */
   record(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     if (value < 0) {
-      diag.warn(`negative value provided to histogram ${this._descriptor.name}: ${value}`);
+      diag.warn(
+        `negative value provided to histogram ${this._descriptor.name}: ${value}`
+      );
       return;
     }
     this._record(value, attributes, ctx);
@@ -99,7 +119,11 @@ export class ObservableInstrument implements Observable {
   /** @internal */
   _descriptor: InstrumentDescriptor;
 
-  constructor(descriptor: InstrumentDescriptor, metricStorages: AsyncWritableMetricStorage[], private _observableRegistry: ObservableRegistry) {
+  constructor(
+    descriptor: InstrumentDescriptor,
+    metricStorages: AsyncWritableMetricStorage[],
+    private _observableRegistry: ObservableRegistry
+  ) {
     this._descriptor = descriptor;
     this._metricStorages = metricStorages;
   }
@@ -119,10 +143,18 @@ export class ObservableInstrument implements Observable {
   }
 }
 
-export class ObservableCounterInstrument extends ObservableInstrument implements ObservableCounter {}
-export class ObservableGaugeInstrument extends ObservableInstrument implements ObservableGauge {}
-export class ObservableUpDownCounterInstrument extends ObservableInstrument implements ObservableUpDownCounter {}
+export class ObservableCounterInstrument
+  extends ObservableInstrument
+  implements ObservableCounter {}
+export class ObservableGaugeInstrument
+  extends ObservableInstrument
+  implements ObservableGauge {}
+export class ObservableUpDownCounterInstrument
+  extends ObservableInstrument
+  implements ObservableUpDownCounter {}
 
-export function isObservableInstrument(it: unknown): it is ObservableInstrument {
+export function isObservableInstrument(
+  it: unknown
+): it is ObservableInstrument {
   return it instanceof ObservableInstrument;
 }

@@ -18,12 +18,7 @@ import type * as grpcTypes from 'grpc';
 import type * as events from 'events';
 import { SendUnaryDataCallback, GrpcClientFunc } from './types';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import {
-  context,
-  Span,
-  SpanStatusCode,
-  propagation,
-} from '@opentelemetry/api';
+import { context, Span, SpanStatusCode, propagation } from '@opentelemetry/api';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
@@ -56,10 +51,7 @@ export const makeGrpcClientRemoteCall = function (
       if (err) {
         if (err.code) {
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
-          span.setAttribute(
-            SemanticAttributes.RPC_GRPC_STATUS_CODE,
-            err.code
-          );
+          span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
         }
         span.setAttributes({
           [AttributeNames.GRPC_ERROR_NAME]: err.name,
@@ -103,11 +95,12 @@ export const makeGrpcClientRemoteCall = function (
     setSpanContext(metadata);
     const call = original.apply(self, args);
 
-    ((call as unknown) as events.EventEmitter).on(
+    (call as unknown as events.EventEmitter).on(
       'metadata',
       responseMetadata => {
         metadataCapture.client.captureResponseMetadata(span, responseMetadata);
-      });
+      }
+    );
 
     // if server stream or bidi
     if (original.responseStream) {
@@ -121,7 +114,7 @@ export const makeGrpcClientRemoteCall = function (
         }
       };
       context.bind(context.active(), call);
-      ((call as unknown) as events.EventEmitter).on(
+      (call as unknown as events.EventEmitter).on(
         'error',
         (err: grpcTypes.ServiceError) => {
           span.setStatus({
@@ -132,14 +125,17 @@ export const makeGrpcClientRemoteCall = function (
             [AttributeNames.GRPC_ERROR_NAME]: err.name,
             [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
           });
-          if(err.code != null) {
-            span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
+          if (err.code != null) {
+            span.setAttribute(
+              SemanticAttributes.RPC_GRPC_STATUS_CODE,
+              err.code
+            );
           }
           endSpan();
         }
       );
 
-      ((call as unknown) as events.EventEmitter).on(
+      (call as unknown as events.EventEmitter).on(
         'status',
         (status: grpcTypes.StatusObject) => {
           span.setStatus({ code: SpanStatusCode.UNSET });

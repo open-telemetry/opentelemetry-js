@@ -17,9 +17,7 @@
 import { LoggerProvider } from '../types/LoggerProvider';
 import { _globalThis } from '../platform';
 
-export const GLOBAL_LOGS_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.logs'
-);
+export const GLOBAL_LOGS_API_KEY = Symbol.for('io.opentelemetry.js.api.logs');
 
 type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{

@@ -62,21 +62,27 @@ export enum ValueType {
  *   <li> count the number of 5xx errors. </li>
  * <ol>
  */
-export interface Counter<AttributesTypes extends MetricAttributes = MetricAttributes> {
+export interface Counter<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> {
   /**
    * Increment value of counter by the input. Inputs must not be negative.
    */
   add(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
 
-export interface UpDownCounter<AttributesTypes extends MetricAttributes = MetricAttributes> {
+export interface UpDownCounter<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> {
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
   add(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
 
-export interface Histogram<AttributesTypes extends MetricAttributes = MetricAttributes> {
+export interface Histogram<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
@@ -96,16 +102,24 @@ export type MetricAttributeValue = AttributeValue;
 /**
  * The observable callback for Observable instruments.
  */
-export type ObservableCallback<AttributesTypes extends MetricAttributes = MetricAttributes> =
-  (observableResult: ObservableResult<AttributesTypes>) => void | Promise<void>;
+export type ObservableCallback<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> = (
+  observableResult: ObservableResult<AttributesTypes>
+) => void | Promise<void>;
 
 /**
  * The observable callback for a batch of Observable instruments.
  */
-export type BatchObservableCallback<AttributesTypes extends MetricAttributes = MetricAttributes> =
-  (observableResult: BatchObservableResult<AttributesTypes>) => void | Promise<void>;
+export type BatchObservableCallback<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> = (
+  observableResult: BatchObservableResult<AttributesTypes>
+) => void | Promise<void>;
 
-export interface Observable<AttributesTypes extends MetricAttributes = MetricAttributes> {
+export interface Observable<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> {
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    *
@@ -119,6 +133,12 @@ export interface Observable<AttributesTypes extends MetricAttributes = MetricAtt
   removeCallback(callback: ObservableCallback<AttributesTypes>): void;
 }
 
-export type ObservableCounter<AttributesTypes extends MetricAttributes=MetricAttributes> = Observable<AttributesTypes>;
-export type ObservableUpDownCounter<AttributesTypes extends MetricAttributes=MetricAttributes> = Observable<AttributesTypes>;
-export type ObservableGauge<AttributesTypes extends MetricAttributes=MetricAttributes> = Observable<AttributesTypes>;
+export type ObservableCounter<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> = Observable<AttributesTypes>;
+export type ObservableUpDownCounter<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> = Observable<AttributesTypes>;
+export type ObservableGauge<
+  AttributesTypes extends MetricAttributes = MetricAttributes
+> = Observable<AttributesTypes>;

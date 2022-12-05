@@ -27,6 +27,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :house: (Internal)
 
 * chore: automatically generate tsconfigs [#3432](https://github.com/open-telemetry/opentelemetry-js/pull/3432) @legendecas
+* chore: enforce format with prettier [#3444](https://github.com/open-telemetry/opentelemetry-js/pull/3444) @legendecas
 
 ## 1.8.0
 

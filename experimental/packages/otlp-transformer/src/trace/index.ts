@@ -17,11 +17,18 @@ import type { Resource } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { toAttributes } from '../common/internal';
 import { sdkSpanToOtlpSpan } from './internal';
-import { IExportTraceServiceRequest, IResourceSpans, IScopeSpans } from './types';
+import {
+  IExportTraceServiceRequest,
+  IResourceSpans,
+  IScopeSpans,
+} from './types';
 
-export function createExportTraceServiceRequest(spans: ReadableSpan[], useHex?: boolean): IExportTraceServiceRequest {
+export function createExportTraceServiceRequest(
+  spans: ReadableSpan[],
+  useHex?: boolean
+): IExportTraceServiceRequest {
   return {
-    resourceSpans: spanRecordsToResourceSpans(spans, useHex)
+    resourceSpans: spanRecordsToResourceSpans(spans, useHex),
   };
 }
 
@@ -36,7 +43,9 @@ function createResourceMap(readableSpans: ReadableSpan[]) {
     }
 
     // TODO this is duplicated in basic tracer. Consolidate on a common helper in core
-    const instrumentationLibraryKey = `${record.instrumentationLibrary.name}@${record.instrumentationLibrary.version || ''}:${record.instrumentationLibrary.schemaUrl || ''}`;
+    const instrumentationLibraryKey = `${record.instrumentationLibrary.name}@${
+      record.instrumentationLibrary.version || ''
+    }:${record.instrumentationLibrary.schemaUrl || ''}`;
     let records = ilmMap.get(instrumentationLibraryKey);
 
     if (!records) {
@@ -50,7 +59,10 @@ function createResourceMap(readableSpans: ReadableSpan[]) {
   return resourceMap;
 }
 
-function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: boolean): IResourceSpans[] {
+function spanRecordsToResourceSpans(
+  readableSpans: ReadableSpan[],
+  useHex?: boolean
+): IResourceSpans[] {
   const resourceMap = createResourceMap(readableSpans);
   const out: IResourceSpans[] = [];
 
@@ -64,13 +76,16 @@ function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: bool
     while (!ilmEntry.done) {
       const scopeSpans = ilmEntry.value;
       if (scopeSpans.length > 0) {
-        const { name, version, schemaUrl } = scopeSpans[0].instrumentationLibrary;
-        const spans = scopeSpans.map(readableSpan => sdkSpanToOtlpSpan(readableSpan, useHex));
+        const { name, version, schemaUrl } =
+          scopeSpans[0].instrumentationLibrary;
+        const spans = scopeSpans.map(readableSpan =>
+          sdkSpanToOtlpSpan(readableSpan, useHex)
+        );
 
         scopeResourceSpans.push({
           scope: { name, version },
           spans: spans,
-          schemaUrl: schemaUrl
+          schemaUrl: schemaUrl,
         });
       }
       ilmEntry = ilmIterator.next();
@@ -82,7 +97,7 @@ function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: bool
         droppedAttributesCount: 0,
       },
       scopeSpans: scopeResourceSpans,
-      schemaUrl: undefined
+      schemaUrl: undefined,
     };
 
     out.push(transformedSpans);

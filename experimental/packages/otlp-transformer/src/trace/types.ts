@@ -19,14 +19,12 @@ import { IResource } from '../resource/types';
 
 /** Properties of an ExportTraceServiceRequest. */
 export interface IExportTraceServiceRequest {
-
   /** ExportTraceServiceRequest resourceSpans */
   resourceSpans?: IResourceSpans[];
 }
 
 /** Properties of a ResourceSpans. */
 export interface IResourceSpans {
-
   /** ResourceSpans resource */
   resource?: IResource;
 
@@ -39,15 +37,14 @@ export interface IResourceSpans {
 
 /** Properties of an ScopeSpans. */
 export interface IScopeSpans {
-
   /** IScopeSpans scope */
   scope?: IInstrumentationScope;
 
   /** IScopeSpans spans */
-  spans?: ISpan[]
+  spans?: ISpan[];
 
   /** IScopeSpans schemaUrl */
-  schemaUrl?: (string | null);
+  schemaUrl?: string | null;
 }
 
 /** Properties of a Span. */
@@ -59,7 +56,7 @@ export interface ISpan {
   spanId: string;
 
   /** Span traceState */
-  traceState?: (string | null);
+  traceState?: string | null;
 
   /** Span parentSpanId */
   parentSpanId?: string;
@@ -80,19 +77,19 @@ export interface ISpan {
   attributes: IKeyValue[];
 
   /** Span droppedAttributesCount */
-  droppedAttributesCount: number
+  droppedAttributesCount: number;
 
   /** Span events */
   events: IEvent[];
 
   /** Span droppedEventsCount */
-  droppedEventsCount: number
+  droppedEventsCount: number;
 
   /** Span links */
   links: ILink[];
 
   /** Span droppedLinksCount */
-  droppedLinksCount: number
+  droppedLinksCount: number;
 
   /** Span status */
   status: IStatus;
@@ -107,30 +104,30 @@ export enum ESpanKind {
   SPAN_KIND_UNSPECIFIED = 0,
 
   /** Indicates that the span represents an internal operation within an application,
-    * as opposed to an operation happening at the boundaries. Default value.
-    */
+   * as opposed to an operation happening at the boundaries. Default value.
+   */
   SPAN_KIND_INTERNAL = 1,
 
   /** Indicates that the span covers server-side handling of an RPC or other
-    * remote network request.
-    */
+   * remote network request.
+   */
   SPAN_KIND_SERVER = 2,
 
   /** Indicates that the span describes a request to some remote service.
-    */
+   */
   SPAN_KIND_CLIENT = 3,
 
   /** Indicates that the span describes a producer sending a message to a broker.
-    * Unlike CLIENT and SERVER, there is often no direct critical path latency relationship
-    * between producer and consumer spans. A PRODUCER span ends when the message was accepted
-    * by the broker while the logical processing of the message might span a much longer time.
-    */
+   * Unlike CLIENT and SERVER, there is often no direct critical path latency relationship
+   * between producer and consumer spans. A PRODUCER span ends when the message was accepted
+   * by the broker while the logical processing of the message might span a much longer time.
+   */
   SPAN_KIND_PRODUCER = 4,
 
   /** Indicates that the span describes consumer receiving a message from a broker.
-    * Like the PRODUCER kind, there is often no direct critical path latency relationship
-    * between producer and consumer spans.
-    */
+   * Like the PRODUCER kind, there is often no direct critical path latency relationship
+   * between producer and consumer spans.
+   */
   SPAN_KIND_CONSUMER = 5,
 }
 

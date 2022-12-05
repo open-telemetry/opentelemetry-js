@@ -18,7 +18,7 @@ import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_LOGS_API_KEY,
   _global,
-  makeGetter
+  makeGetter,
 } from '../internal/global-utils';
 import { LoggerProvider } from '../types/LoggerProvider';
 import { NOOP_LOGGER_PROVIDER } from '../NoopLoggerProvider';
@@ -69,7 +69,11 @@ export class LogsAPI {
    *
    * @returns Logger
    */
-  public getLogger(name: string, version?: string, options?: LoggerOptions): Logger {
+  public getLogger(
+    name: string,
+    version?: string,
+    options?: LoggerOptions
+  ): Logger {
     return this.getLoggerProvider().getLogger(name, version, options);
   }
 

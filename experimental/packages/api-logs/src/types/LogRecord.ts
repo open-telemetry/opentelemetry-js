@@ -17,43 +17,43 @@
 import { Attributes } from '@opentelemetry/api';
 
 export interface LogRecord {
-   /**
-    * The time when the log record occurred as UNIX Epoch time in nanoseconds.
-    */
-   timestamp?: number;
+  /**
+   * The time when the log record occurred as UNIX Epoch time in nanoseconds.
+   */
+  timestamp?: number;
 
-   /**
-    * Numerical value of the severity.
-    */
-   severityNumber?: number;
+  /**
+   * Numerical value of the severity.
+   */
+  severityNumber?: number;
 
-   /**
-    * The severity text.
-    */
-   severityText?: string;
+  /**
+   * The severity text.
+   */
+  severityText?: string;
 
-   /**
-    * A value containing the body of the log record.
-    */
-   body?: string;
+  /**
+   * A value containing the body of the log record.
+   */
+  body?: string;
 
-   /**
-    * Attributes that define the log record.
-    */
-   attributes?: Attributes;
+  /**
+   * Attributes that define the log record.
+   */
+  attributes?: Attributes;
 
-   /**
-    * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
-    */
-   traceFlags?: number;
+  /**
+   * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
+   */
+  traceFlags?: number;
 
-   /**
-    * A unique identifier for a trace.
-    */
-   traceId?: string;
+  /**
+   * A unique identifier for a trace.
+   */
+  traceId?: string;
 
-   /**
-    * A unique identifier for a span within a trace.
-    */
-   spanId?: string;
+  /**
+   * A unique identifier for a span within a trace.
+   */
+  spanId?: string;
 }

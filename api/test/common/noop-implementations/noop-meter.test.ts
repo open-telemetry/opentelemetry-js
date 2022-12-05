@@ -61,10 +61,7 @@ describe('NoopMeter', () => {
     // ensure the correct noop const is returned
     assert.strictEqual(histogram, NOOP_HISTOGRAM_METRIC);
 
-    const histogramWithOptions = meter.createHistogram(
-      'some-name',
-      options
-    );
+    const histogramWithOptions = meter.createHistogram('some-name', options);
     assert.strictEqual(histogramWithOptions, NOOP_HISTOGRAM_METRIC);
   });
 
@@ -95,7 +92,10 @@ describe('NoopMeter', () => {
       'some-name',
       options
     );
-    assert.strictEqual(observableCounterWithOptions, NOOP_OBSERVABLE_COUNTER_METRIC);
+    assert.strictEqual(
+      observableCounterWithOptions,
+      NOOP_OBSERVABLE_COUNTER_METRIC
+    );
   });
 
   it('observable gauge should not crash', () => {
@@ -110,22 +110,30 @@ describe('NoopMeter', () => {
       'some-name',
       options
     );
-    assert.strictEqual(observableGaugeWithOptions, NOOP_OBSERVABLE_GAUGE_METRIC);
+    assert.strictEqual(
+      observableGaugeWithOptions,
+      NOOP_OBSERVABLE_GAUGE_METRIC
+    );
   });
 
   it('observable up down counter should not crash', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
-    const observableUpDownCounter = meter.createObservableUpDownCounter('some-name');
+    const observableUpDownCounter =
+      meter.createObservableUpDownCounter('some-name');
     observableUpDownCounter.addCallback(() => {});
 
     // ensure the correct noop const is returned
-    assert.strictEqual(observableUpDownCounter, NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC);
-
-    const observableUpDownCounterWithOptions = meter.createObservableUpDownCounter(
-      'some-name',
-      options
+    assert.strictEqual(
+      observableUpDownCounter,
+      NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC
     );
-    assert.strictEqual(observableUpDownCounterWithOptions, NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC);
+
+    const observableUpDownCounterWithOptions =
+      meter.createObservableUpDownCounter('some-name', options);
+    assert.strictEqual(
+      observableUpDownCounterWithOptions,
+      NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC
+    );
   });
 
   it('batch callback should not crash', () => {

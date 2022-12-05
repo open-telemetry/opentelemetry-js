@@ -108,7 +108,9 @@ export function addSpanNetworkEvents(
  * sort resources by startTime
  * @param filteredResources
  */
-export function sortResources(filteredResources: PerformanceResourceTiming[]): PerformanceResourceTiming[] {
+export function sortResources(
+  filteredResources: PerformanceResourceTiming[]
+): PerformanceResourceTiming[] {
   return filteredResources.slice().sort((a, b) => {
     const valueA = a[PTN.FETCH_START];
     const valueB = b[PTN.FETCH_START];

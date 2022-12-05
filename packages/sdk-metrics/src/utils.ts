@@ -40,8 +40,12 @@ export function hashAttributes(attributes: MetricAttributes): string {
  * Converting the instrumentation scope object to a unique identifier string.
  * @param instrumentationScope
  */
-export function instrumentationScopeId(instrumentationScope: InstrumentationScope): string {
-  return `${instrumentationScope.name}:${instrumentationScope.version ?? ''}:${instrumentationScope.schemaUrl ?? ''}`;
+export function instrumentationScopeId(
+  instrumentationScope: InstrumentationScope
+): string {
+  return `${instrumentationScope.name}:${instrumentationScope.version ?? ''}:${
+    instrumentationScope.schemaUrl ?? ''
+  }`;
 }
 
 /**
@@ -66,26 +70,31 @@ export class TimeoutError extends Error {
  * @param promise promise to use with timeout.
  * @param timeout the timeout in milliseconds until the returned promise is rejected.
  */
-export function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promise<T> {
+export function callWithTimeout<T>(
+  promise: Promise<T>,
+  timeout: number
+): Promise<T> {
   let timeoutHandle: ReturnType<typeof setTimeout>;
 
-  const timeoutPromise = new Promise<never>(function timeoutFunction(_resolve, reject) {
-    timeoutHandle = setTimeout(
-      function timeoutHandler() {
-        reject(new TimeoutError('Operation timed out.'));
-      },
-      timeout
-    );
+  const timeoutPromise = new Promise<never>(function timeoutFunction(
+    _resolve,
+    reject
+  ) {
+    timeoutHandle = setTimeout(function timeoutHandler() {
+      reject(new TimeoutError('Operation timed out.'));
+    }, timeout);
   });
 
-  return Promise.race([promise, timeoutPromise]).then(result => {
-    clearTimeout(timeoutHandle);
-    return result;
-  },
-  reason => {
-    clearTimeout(timeoutHandle);
-    throw reason;
-  });
+  return Promise.race([promise, timeoutPromise]).then(
+    result => {
+      clearTimeout(timeoutHandle);
+      return result;
+    },
+    reason => {
+      clearTimeout(timeoutHandle);
+      throw reason;
+    }
+  );
 }
 
 export interface PromiseAllSettledFulfillResult<T> {
@@ -98,29 +107,37 @@ export interface PromiseAllSettledRejectionResult {
   reason: unknown;
 }
 
-export type PromiseAllSettledResult<T> = PromiseAllSettledFulfillResult<T> | PromiseAllSettledRejectionResult;
+export type PromiseAllSettledResult<T> =
+  | PromiseAllSettledFulfillResult<T>
+  | PromiseAllSettledRejectionResult;
 
 /**
  * Node.js v12.9 lower and browser compatible `Promise.allSettled`.
  */
-export async function PromiseAllSettled<T>(promises: Promise<T>[]): Promise<PromiseAllSettledResult<T>[]> {
-  return Promise.all(promises.map<Promise<PromiseAllSettledResult<T>>>(async p => {
-    try {
-      const ret = await p;
-      return {
-        status: 'fulfilled',
-        value: ret,
-      };
-    } catch (e) {
-      return {
-        status: 'rejected',
-        reason: e,
-      };
-    }
-  }));
+export async function PromiseAllSettled<T>(
+  promises: Promise<T>[]
+): Promise<PromiseAllSettledResult<T>[]> {
+  return Promise.all(
+    promises.map<Promise<PromiseAllSettledResult<T>>>(async p => {
+      try {
+        const ret = await p;
+        return {
+          status: 'fulfilled',
+          value: ret,
+        };
+      } catch (e) {
+        return {
+          status: 'rejected',
+          reason: e,
+        };
+      }
+    })
+  );
 }
 
-export function isPromiseAllSettledRejectionResult(it: PromiseAllSettledResult<unknown>): it is PromiseAllSettledRejectionResult {
+export function isPromiseAllSettledRejectionResult(
+  it: PromiseAllSettledResult<unknown>
+): it is PromiseAllSettledRejectionResult {
   return it.status === 'rejected';
 }
 

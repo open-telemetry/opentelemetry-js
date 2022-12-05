@@ -26,7 +26,7 @@ describe('ModuleNameTrie', () => {
       { moduleName: 'a/b', onRequire: () => {} },
       { moduleName: 'a', onRequire: () => {} },
       { moduleName: 'a/c', onRequire: () => {} },
-      { moduleName: 'd', onRequire: () => {} }
+      { moduleName: 'd', onRequire: () => {} },
     ] as Hooked[];
     inserts.forEach(trie.insert.bind(trie));
 
@@ -39,10 +39,7 @@ describe('ModuleNameTrie', () => {
     });
 
     it('should return a list of exact matches (more than one result)', () => {
-      assert.deepEqual(trie.search('a'), [
-        inserts[0],
-        inserts[2]
-      ]);
+      assert.deepEqual(trie.search('a'), [inserts[0], inserts[2]]);
     });
 
     describe('maintainInsertionOrder = false', () => {
@@ -50,7 +47,7 @@ describe('ModuleNameTrie', () => {
         assert.deepEqual(trie.search('a/b'), [
           inserts[0],
           inserts[2],
-          inserts[1]
+          inserts[1],
         ]);
       });
     });
@@ -60,7 +57,7 @@ describe('ModuleNameTrie', () => {
         assert.deepEqual(trie.search('a/b', { maintainInsertionOrder: true }), [
           inserts[0],
           inserts[1],
-          inserts[2]
+          inserts[2],
         ]);
       });
     });

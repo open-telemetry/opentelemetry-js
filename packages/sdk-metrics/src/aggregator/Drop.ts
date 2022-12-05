@@ -19,11 +19,7 @@ import { AggregationTemporality } from '../export/AggregationTemporality';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
-import {
-  AggregatorKind,
-  Aggregator,
-  AccumulationRecord,
-} from './types';
+import { AggregatorKind, Aggregator, AccumulationRecord } from './types';
 
 /** Basic aggregator for None which keeps no recorded value. */
 export class DropAggregator implements Aggregator<undefined> {
@@ -45,7 +41,8 @@ export class DropAggregator implements Aggregator<undefined> {
     _descriptor: InstrumentDescriptor,
     _aggregationTemporality: AggregationTemporality,
     _accumulationByAttributes: AccumulationRecord<undefined>[],
-    _endTime: HrTime): Maybe<MetricData> {
+    _endTime: HrTime
+  ): Maybe<MetricData> {
     return undefined;
   }
 }

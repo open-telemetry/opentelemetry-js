@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  SpanContext,
-  TraceFlags,
-} from '@opentelemetry/api';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -64,7 +61,7 @@ describe('ConsoleSpanExporter', () => {
           traceFlags: TraceFlags.SAMPLED,
         };
         const span = tracer.startSpan('foo', {
-          links: [ { context, attributes: { anAttr: 'aValue' } } ]
+          links: [{ context, attributes: { anAttr: 'aValue' } }],
         });
         span.addEvent('foobar');
         span.end();

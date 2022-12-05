@@ -22,7 +22,7 @@ export const ModuleNameSeparator = '/';
  * Node in a `ModuleNameTrie`
  */
 class ModuleNameTrieNode {
-  hooks: Array<{ hook: Hooked, insertedId: number }> = [];
+  hooks: Array<{ hook: Hooked; insertedId: number }> = [];
   children: Map<string, ModuleNameTrieNode> = new Map();
 }
 
@@ -60,7 +60,10 @@ export class ModuleNameTrie {
    * @param {boolean} fullOnly Whether to return only full matches
    * @returns {Hooked[]} Matching hooks
    */
-  search(moduleName: string, { maintainInsertionOrder, fullOnly }: { maintainInsertionOrder?: boolean, fullOnly?: boolean } = {}): Hooked[] {
+  search(
+    moduleName: string,
+    { maintainInsertionOrder, fullOnly }: { maintainInsertionOrder?: boolean, fullOnly?: boolean } = {}
+  ): Hooked[] {
     let trieNode = this._trie;
     const results: ModuleNameTrieNode['hooks'] = [];
     let foundFull = true;

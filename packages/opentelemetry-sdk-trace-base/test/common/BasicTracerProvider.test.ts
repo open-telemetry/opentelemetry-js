@@ -28,10 +28,7 @@ import {
   diag,
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
-import {
-  TraceState,
-  W3CTraceContextPropagator,
-} from '@opentelemetry/core';
+import { TraceState, W3CTraceContextPropagator } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -47,18 +44,10 @@ import {
 } from '../../src';
 
 class DummyPropagator implements TextMapPropagator {
-  inject(
-    context: Context,
-    carrier: any,
-    setter: TextMapSetter<any>
-  ): void {
+  inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
     throw new Error('Method not implemented.');
   }
-  extract(
-    context: Context,
-    carrier: any,
-    getter: TextMapGetter<any>
-  ): Context {
+  extract(context: Context, carrier: any, getter: TextMapGetter<any>): Context {
     throw new Error('Method not implemented.');
   }
   fields(): string[] {
@@ -70,13 +59,10 @@ class DummyExporter extends InMemorySpanExporter {}
 
 describe('BasicTracerProvider', () => {
   let envSource: Record<string, any>;
-  let setGlobalPropagatorStub: sinon.SinonSpy<
-    [TextMapPropagator],
-    boolean
-  >;
+  let setGlobalPropagatorStub: sinon.SinonSpy<[TextMapPropagator], boolean>;
 
   if (typeof process === 'undefined') {
-    envSource = (globalThis as unknown) as Record<string, any>;
+    envSource = globalThis as unknown as Record<string, any>;
   } else {
     envSource = process.env as Record<string, any>;
   }
@@ -385,22 +371,25 @@ describe('BasicTracerProvider', () => {
         protected static override readonly _registeredPropagators = new Map<
           string,
           () => TextMapPropagator
-            >([
-              ...BasicTracerProvider._registeredPropagators,
-              ['custom-propagator', () => new DummyPropagator()],
-            ]);
+        >([
+          ...BasicTracerProvider._registeredPropagators,
+          ['custom-propagator', () => new DummyPropagator()],
+        ]);
 
         protected static override readonly _registeredExporters = new Map<
           string,
           () => SpanExporter
-            >([
-              ...BasicTracerProvider._registeredExporters,
-              ['custom-exporter', () => new DummyExporter()],
-            ]);
+        >([
+          ...BasicTracerProvider._registeredExporters,
+          ['custom-exporter', () => new DummyExporter()],
+        ]);
       }
 
       const provider = new CustomTracerProvider({});
-      assert(provider['_getPropagator']('tracecontext') instanceof W3CTraceContextPropagator);
+      assert(
+        provider['_getPropagator']('tracecontext') instanceof
+          W3CTraceContextPropagator
+      );
       /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
 
       provider.register();
@@ -410,7 +399,10 @@ describe('BasicTracerProvider', () => {
       const exporter = processor._exporter;
       assert(exporter instanceof DummyExporter);
 
-      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+      sinon.assert.calledOnceWithExactly(
+        setGlobalPropagatorStub,
+        sinon.match.instanceOf(DummyPropagator)
+      );
     });
 
     it('the old way of extending still works', () => {
@@ -419,25 +411,25 @@ describe('BasicTracerProvider', () => {
         protected static override readonly _registeredPropagators = new Map<
           string,
           () => TextMapPropagator
-            >([
-              ['custom-propagator', () => new DummyPropagator()],
-            ]);
+        >([['custom-propagator', () => new DummyPropagator()]]);
 
         protected static override readonly _registeredExporters = new Map<
           string,
           () => SpanExporter
-            >([
-              ['custom-exporter', () => new DummyExporter()],
-            ]);
+        >([['custom-exporter', () => new DummyExporter()]]);
 
-        protected override  _getPropagator(name: string): TextMapPropagator | undefined {
+        protected override _getPropagator(
+          name: string
+        ): TextMapPropagator | undefined {
           return (
             super._getPropagator(name) ||
             CustomTracerProvider._registeredPropagators.get(name)?.()
           );
         }
 
-        protected override _getSpanExporter(name: string): SpanExporter | undefined {
+        protected override _getSpanExporter(
+          name: string
+        ): SpanExporter | undefined {
           return (
             super._getSpanExporter(name) ||
             CustomTracerProvider._registeredExporters.get(name)?.()
@@ -453,7 +445,10 @@ describe('BasicTracerProvider', () => {
       const exporter = processor._exporter;
       assert(exporter instanceof DummyExporter);
 
-      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+      sinon.assert.calledOnceWithExactly(
+        setGlobalPropagatorStub,
+        sinon.match.instanceOf(DummyPropagator)
+      );
     });
   });
 
@@ -518,7 +513,9 @@ describe('BasicTracerProvider', () => {
 
     describe('exporter', () => {
       class CustomTracerProvider extends BasicTracerProvider {
-        protected override _getSpanExporter(name: string): SpanExporter | undefined {
+        protected override _getSpanExporter(
+          name: string
+        ): SpanExporter | undefined {
           return name === 'memory'
             ? new InMemorySpanExporter()
             : BasicTracerProvider._registeredExporters.get(name)?.();
@@ -537,7 +534,7 @@ describe('BasicTracerProvider', () => {
         provider.register();
         assert.ok(
           errorStub.getCall(0).args[0] ===
-          'Exporter "missing-exporter" requested through environment variable is unavailable.'
+            'Exporter "missing-exporter" requested through environment variable is unavailable.'
         );
         errorStub.restore();
       });
@@ -649,7 +646,10 @@ describe('BasicTracerProvider', () => {
         trace.setSpan(ROOT_CONTEXT, span)
       );
       const context = rootSpan.spanContext();
-      assert.notStrictEqual(context.traceId, overrideParent.spanContext().traceId);
+      assert.notStrictEqual(
+        context.traceId,
+        overrideParent.spanContext().traceId
+      );
       span.end();
       rootSpan.end();
     });
@@ -663,7 +663,7 @@ describe('BasicTracerProvider', () => {
         {},
         trace.setSpanContext(
           ROOT_CONTEXT,
-          ('invalid-parent' as unknown) as SpanContext
+          'invalid-parent' as unknown as SpanContext
         )
       );
       assert.ok(span instanceof Span);

@@ -45,10 +45,12 @@ export class MeterProvider implements IMeterProvider {
   private _shutdown = false;
 
   constructor(options?: MeterProviderOptions) {
-    const resource = Resource.default().merge(options?.resource ?? Resource.empty());
+    const resource = Resource.default().merge(
+      options?.resource ?? Resource.empty()
+    );
     this._sharedState = new MeterProviderSharedState(resource);
-    if(options?.views != null && options.views.length > 0){
-      for(const view of options.views){
+    if (options?.views != null && options.views.length > 0) {
+      for (const view of options.views) {
         this._sharedState.viewRegistry.addView(view);
       }
     }
@@ -64,9 +66,11 @@ export class MeterProvider implements IMeterProvider {
       return createNoopMeter();
     }
 
-    return this._sharedState
-      .getMeterSharedState({ name, version, schemaUrl: options.schemaUrl })
-      .meter;
+    return this._sharedState.getMeterSharedState({
+      name,
+      version,
+      schemaUrl: options.schemaUrl,
+    }).meter;
   }
 
   /**
@@ -95,9 +99,11 @@ export class MeterProvider implements IMeterProvider {
 
     this._shutdown = true;
 
-    await Promise.all(this._sharedState.metricCollectors.map(collector => {
-      return collector.shutdown(options);
-    }));
+    await Promise.all(
+      this._sharedState.metricCollectors.map(collector => {
+        return collector.shutdown(options);
+      })
+    );
   }
 
   /**
@@ -112,8 +118,10 @@ export class MeterProvider implements IMeterProvider {
       return;
     }
 
-    await Promise.all(this._sharedState.metricCollectors.map(collector => {
-      return collector.forceFlush(options);
-    }));
+    await Promise.all(
+      this._sharedState.metricCollectors.map(collector => {
+        return collector.forceFlush(options);
+      })
+    );
   }
 }

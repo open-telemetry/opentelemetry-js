@@ -76,6 +76,8 @@ export function enableInstrumentations(
  * Disable instrumentations
  * @param instrumentations
  */
-export function disableInstrumentations(instrumentations: Instrumentation[]): void {
+export function disableInstrumentations(
+  instrumentations: Instrumentation[]
+): void {
   instrumentations.forEach(instrumentation => instrumentation.disable());
 }
