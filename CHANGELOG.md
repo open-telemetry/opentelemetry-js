@@ -13,6 +13,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
 * feat(resource): create sync resource with some attributes that resolve asynchronously [#3460](https://github.com/open-telemetry/opentelemetry-js/pull/3460)
+* feat(instrumentation-grpc): set net.peer.name and net.peer.port on client spans [#3430](https://github.com/open-telemetry/opentelemetry-js/pull/3430)
 
 ### :bug: (Bug Fix)
 
