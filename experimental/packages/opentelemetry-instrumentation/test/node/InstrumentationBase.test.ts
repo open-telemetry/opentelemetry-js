@@ -21,7 +21,7 @@ import {
   InstrumentationBase,
   InstrumentationModuleDefinition,
   InstrumentationNodeModuleDefinition,
-  InstrumentationNodeModuleFile
+  InstrumentationNodeModuleFile,
 } from '../../src';
 
 const MODULE_NAME = 'test-module';
@@ -295,7 +295,9 @@ describe('InstrumentationBase', () => {
       const moduleName = 'net';
       class TestInstrumentation extends InstrumentationBase<Exports> {
         constructor() {
-          super('@opentelemetry/instrumentation-net-test', '0.0.0', { enabled: false });
+          super('@opentelemetry/instrumentation-net-test', '0.0.0', {
+            enabled: false,
+          });
         }
         init(): InstrumentationNodeModuleDefinition<Exports>[] {
           return [
@@ -310,7 +312,7 @@ describe('InstrumentationBase', () => {
                 exports.__patched = false;
                 return exports;
               }
-            )
+            ),
           ];
         }
       }
@@ -335,7 +337,9 @@ describe('InstrumentationBase', () => {
       const fileName = path.join(__dirname, 'fixtures', `${moduleName}.js`);
       class TestInstrumentation extends InstrumentationBase<Exports> {
         constructor() {
-          super('@opentelemetry/instrumentation-absolute-path-test', '0.0.0', { enabled: false });
+          super('@opentelemetry/instrumentation-absolute-path-test', '0.0.0', {
+            enabled: false,
+          });
         }
         init(): InstrumentationNodeModuleDefinition<Exports>[] {
           return [
@@ -356,9 +360,9 @@ describe('InstrumentationBase', () => {
                     if (exports) exports.__patched = false;
                     return exports;
                   }
-                )
-              ],
-            )
+                ),
+              ]
+            ),
           ];
         }
       }

@@ -167,11 +167,13 @@ export abstract class InstrumentationBase<T = any>
 
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
-      const onRequire: RequireInTheMiddle.OnRequireFn = (exports, name, baseDir) => {
+      const onRequire: RequireInTheMiddle.OnRequireFn = (
+        exports,
+        name,
+        baseDir
+      ) => {
         return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition<
-            typeof exports
-          >,
+          module as unknown as InstrumentationModuleDefinition<typeof exports>,
           exports,
           name,
           baseDir
