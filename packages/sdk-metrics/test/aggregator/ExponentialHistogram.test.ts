@@ -319,6 +319,132 @@ describe('ExponentialHistogramAccumulation', () => {
       }
     });
   });
+  describe('diff', () => {
+    it('handles simple case', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        const v1 = 2 << i;
+
+        acc0.record(v1);
+        acc1.record(v1);
+        acc1.record(v1);
+      }
+
+      assert.strictEqual(acc0.scale(), 0);
+      assert.strictEqual(acc1.scale(), 0);
+
+      assert.strictEqual(acc0.positive().offset(), 0);
+      assert.strictEqual(acc1.positive().offset(), 0);
+
+      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive()), [2, 2, 2, 2]);
+
+      acc1.diff(acc0);
+
+      assertHistogramsEqual(acc0, acc1);
+    });
+
+    it('trims trailing 0 buckets after diff', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        const v1 = 2 << i;
+
+        if( i % 2 == 0) {
+          acc0.record(v1);
+        }
+
+        if( i % 2 == 1 ) {
+          acc1.record(v1);
+        }
+
+        acc2.record(v1);
+      }
+
+      assert.strictEqual(acc0.scale(), 0);
+      assert.strictEqual(acc1.scale(), 0);
+      assert.strictEqual(acc2.scale(), 0);
+
+      assert.strictEqual(acc0.positive().offset(), 0);
+      assert.strictEqual(acc1.positive().offset(), 1);
+      assert.strictEqual(acc2.positive().offset(), 0);
+
+      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 1, 1, 1]);
+
+      acc2.diff(acc1);
+
+      assertHistogramsEqual(acc0, acc2);
+    });
+
+    it('trims leading 0 buckets after diff', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        const v1 = 2 << i;
+
+        if( i % 2 == 1 ) {
+          acc0.record(v1);
+        }
+
+        if( i % 2 == 0) {
+          acc1.record(v1);
+        }
+
+        acc2.record(v1);
+      }
+
+      assert.strictEqual(acc0.scale(), 0);
+      assert.strictEqual(acc1.scale(), 0);
+      assert.strictEqual(acc2.scale(), 0);
+
+      assert.strictEqual(acc0.positive().offset(), 1);
+      assert.strictEqual(acc1.positive().offset(), 0);
+      assert.strictEqual(acc2.positive().offset(), 0);
+
+      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 1, 1, 1]);
+
+      acc2.diff(acc1);
+      assertHistogramsEqual(acc0, acc2);
+    });
+
+    it('handles all zero bucket case', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        const v1 = 2 << i;
+
+        acc1.record(v1);
+        acc2.record(v1);
+      }
+
+      assert.strictEqual(acc0.scale(), 0);
+      assert.strictEqual(acc1.scale(), 0);
+      assert.strictEqual(acc2.scale(), 0);
+
+      assert.strictEqual(acc0.positive().offset(), 0);
+      assert.strictEqual(acc1.positive().offset(), 0);
+      assert.strictEqual(acc2.positive().offset(), 0);
+
+      assert.deepStrictEqual(getCounts(acc0.positive()), []);
+      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 1, 1, 1]);
+
+      acc2.diff(acc1);
+      assertHistogramsEqual(acc0, acc2);
+    });
+  });
 });
 
 function getCounts(buckets: Buckets): Array<number> {

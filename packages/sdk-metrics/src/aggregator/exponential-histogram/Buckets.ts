@@ -60,7 +60,6 @@ export class Buckets {
     }
 
     position -= bias;
-
     return this.backing.countAt(position);
   }
 
@@ -74,9 +73,48 @@ export class Buckets {
   }
 
   /**
+   * decrementBucket decrements the backing array index by `decrement`
+   * if decrement is greater than the current value, it's set to 0.
+   * @param bucketIndex
+   * @param increment
+   */
+   decrementBucket(bucketIndex: number, decrement: number) {
+    this.backing.decrement(bucketIndex, decrement);
+  }
+
+  /**
    * clear zeros the backing array.
    */
   clear() {}
+
+  /**
+   * trim removes leading and / or trailing zero buckets (which can occur
+   * after diffing two histos) and rotates the backing array so that the
+   * smallest non-zero index is in the 0th position of the backing array
+   */
+  trim() {
+    for(let i = 0; i < this.length(); i++) {
+        if(this.at(i) !== 0) {
+          this.indexStart += i
+          break;
+        }
+        else if(i == this.length() - 1) {
+          //the entire array is zeroed out
+          this.indexStart = this.indexEnd = this.indexBase = 0;
+          return;
+        }
+    }
+
+    for(let i = this.length() - 1; i >= 0; i--) {
+      console.log(i)
+      if(this.at(i) !== 0 ) {
+        this.indexEnd -= this.length() - i - 1;
+        break;
+      }
+    }
+
+    this._rotate();
+  }
 
   /**
    *
@@ -113,13 +151,16 @@ export class Buckets {
 
     if (bias === 0) {
       return;
+    } else if( bias > 0) {
+      this.backing.reverse(0, this.backing.size());
+      this.backing.reverse(0, bias);
+      this.backing.reverse(bias, this.backing.size());
+    } else {
+      // negative bias, this can happen when diffing two histograms
+      this.backing.reverse(0, this.backing.size());
+      this.backing.reverse(0, this.backing.size() + bias);
     }
-
-    // rotate array so that indexbase == indexStart
     this.indexBase = this.indexStart;
-    this.backing.reverse(0, this.backing.size());
-    this.backing.reverse(0, bias);
-    this.backing.reverse(bias, this.backing.size());
   }
 
   private _relocateBucket(dest: number, src: number) {
@@ -142,7 +183,6 @@ class BucketsBacking {
   }
 
   growTo(newSize: number, oldPositiveLimit: number, newPositiveLimit: number) {
-    // todo: revisit implementation
     const tmp = new Array<number>(newSize).fill(0);
     tmp.splice(
       newPositiveLimit,
@@ -154,7 +194,7 @@ class BucketsBacking {
   }
 
   reverse(from: number, limit: number) {
-    const num = (from + limit) / 2 - from;
+    const num = Math.floor((from + limit) / 2) - from;
     for (let i = 0; i < num; i++) {
       const tmp = this._counts[from + i];
       this._counts[from + i] = this._counts[limit - i - 1];
@@ -170,6 +210,15 @@ class BucketsBacking {
 
   increment(bucketIndex: number, increment: number) {
     this._counts[bucketIndex] += increment;
+  }
+
+  decrement(bucketIndex: number, decrement: number) {
+    if (this._counts[bucketIndex] >= decrement) {
+      this._counts[bucketIndex] -= decrement;
+    } else {
+      // should not happen, todo: log
+      this._counts[bucketIndex] = 0;
+    }
   }
 
   countAt(pos: number): number {
