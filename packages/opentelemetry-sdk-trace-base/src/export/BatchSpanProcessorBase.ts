@@ -41,6 +41,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
 
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
+  private _nextExport: number = 0;
   private _shutdownOnce: BindOnceFuture<void>;
 
   constructor(private readonly _exporter: SpanExporter, config?: T) {
@@ -69,10 +70,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       this._maxExportBatchSize = this._maxQueueSize;
     }
 
-    this._timer = setInterval(async () => {
-      await this._tryExportOneBatch();
-    }, this._scheduledDelayMillis);
-    unrefTimer(this._timer);
+    this._resetTimer(this._scheduledDelayMillis);
   }
 
   forceFlush(): Promise<void> {
@@ -115,7 +113,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       return;
     }
     this._finishedSpans.push(span);
-    this._exportCompleteBatches();
+    this._exportCompleteBatch();
   }
 
   /**
@@ -177,20 +175,41 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     }
   }
 
-  private _exportCompleteBatches() {
+  private async _export() {
+    await this._tryExportOneBatch();
+
+    if (this._finishedSpans.length >= this._maxExportBatchSize) {
+      this._resetTimer(0);
+    } else {
+      this._resetTimer(this._scheduledDelayMillis);
+    }
+  }
+
+  private _exportCompleteBatch() {
     if (this._finishedSpans.length < this._maxExportBatchSize) {
       return;
     }
 
-    setImmediate(async () => {
-      await this._tryExportOneBatch();
-      this._exportCompleteBatches();
-    });
+    if (this._nextExport === 0) {
+      return;
+    }
+
+    this._resetTimer(0);
+  }
+
+  private _resetTimer(timeout: number) {
+    this._nextExport = timeout;
+    this._clearTimer();
+
+    this._timer = setTimeout(async () => {
+      await this._export();
+    }, timeout);
+    unrefTimer(this._timer);
   }
 
   private _clearTimer() {
     if (this._timer !== undefined) {
-      clearInterval(this._timer);
+      clearTimeout(this._timer);
       this._timer = undefined;
     }
   }
