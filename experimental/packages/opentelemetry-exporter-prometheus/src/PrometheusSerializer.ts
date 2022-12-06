@@ -56,6 +56,7 @@ function escapeAttributeValue(str: MetricAttributeValue = '') {
 }
 
 const invalidCharacterRegex = /[^a-z0-9_]/gi;
+const multipleUnderscoreRegex = /_{2,}/g;
 
 /**
  * Ensures metric names are valid Prometheus metric names by removing
@@ -76,7 +77,10 @@ const invalidCharacterRegex = /[^a-z0-9_]/gi;
  * @param name name to be sanitized
  */
 function sanitizePrometheusMetricName(name: string): string {
-  return name.replace(invalidCharacterRegex, '_'); // replace all invalid characters with '_'
+  // replace all invalid characters with '_'
+  return name
+    .replace(invalidCharacterRegex, '_')
+    .replace(multipleUnderscoreRegex, '_');
 }
 
 /**
