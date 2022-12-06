@@ -45,6 +45,7 @@ import {
   _extractMethodAndService,
   _methodIsIgnored,
   metadataCapture,
+  URI_REGEX,
 } from '../utils';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { AttributeValues } from '../enums/AttributeValues';
@@ -321,6 +322,18 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
             [SemanticAttributes.RPC_METHOD]: method,
             [SemanticAttributes.RPC_SERVICE]: service,
           });
+        // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
+        const parsedUri = URI_REGEX.exec(this.getChannel().getTarget());
+        if (parsedUri != null && parsedUri.groups != null) {
+          span.setAttribute(
+            SemanticAttributes.NET_PEER_NAME,
+            parsedUri.groups['name']
+          );
+          span.setAttribute(
+            SemanticAttributes.NET_PEER_PORT,
+            parseInt(parsedUri.groups['port'])
+          );
+        }
 
         instrumentation._metadataCapture.client.captureRequestMetadata(
           span,

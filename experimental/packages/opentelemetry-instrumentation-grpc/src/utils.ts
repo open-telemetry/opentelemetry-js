@@ -19,6 +19,10 @@ import type * as grpcTypes from 'grpc';
 import type * as grpcJsTypes from '@grpc/grpc-js';
 import { IgnoreMatcher } from './types';
 
+// e.g., "dns:otel-productcatalogservice:8080" or "otel-productcatalogservice:8080" or "127.0.0.1:8080"
+export const URI_REGEX =
+  /(?:([A-Za-z0-9+.-]+):(?:\/\/)?)?(?<name>[A-Za-z0-9+.-]+):(?<port>[0-9+.-]+)$/;
+
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
   args,

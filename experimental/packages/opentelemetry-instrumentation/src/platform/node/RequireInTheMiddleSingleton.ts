@@ -69,6 +69,10 @@ export class RequireInTheMiddleSingleton {
 
         const matches = this._moduleNameTrie.search(normalizedModuleName, {
           maintainInsertionOrder: true,
+          // For core modules (e.g. `fs`), do not match on sub-paths (e.g. `fs/promises').
+          // This matches the behavior of `require-in-the-middle`.
+          // `basedir` is always `undefined` for core modules.
+          fullOnly: basedir === undefined,
         });
 
         for (const { onRequire } of matches) {

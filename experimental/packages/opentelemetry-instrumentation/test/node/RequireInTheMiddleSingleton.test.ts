@@ -106,22 +106,14 @@ describe('RequireInTheMiddleSingleton', () => {
       describe('AND module name matches', () => {
         it('should call `onRequire`', () => {
           const exports = require('fs/promises');
-          assert.deepStrictEqual(exports.__ritmOnRequires, [
-            'fs',
-            'fs-promises',
-          ]);
+          assert.deepStrictEqual(exports.__ritmOnRequires, ['fs-promises']);
           sinon.assert.calledOnceWithExactly(
             onRequireFsPromisesStub,
             exports,
             'fs/promises',
             undefined
           );
-          sinon.assert.calledOnceWithMatch(
-            onRequireFsStub,
-            { __ritmOnRequires: ['fs', 'fs-promises'] },
-            'fs/promises',
-            undefined
-          );
+          sinon.assert.notCalled(onRequireFsStub);
         });
       });
     });
