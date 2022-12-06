@@ -20,7 +20,12 @@ import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';
 import { WritableMetricStorage } from '../../src/state/WritableMetricStorage';
-import { assertMeasurementEqual, commonAttributes, commonValues, Measurement } from '../util';
+import {
+  assertMeasurementEqual,
+  commonAttributes,
+  commonValues,
+  Measurement,
+} from '../util';
 
 describe('MultiMetricStorage', () => {
   describe('record', () => {
@@ -37,14 +42,21 @@ describe('MultiMetricStorage', () => {
     it('record with multiple backing storages', () => {
       class TestWritableMetricStorage implements WritableMetricStorage {
         records: Measurement[] = [];
-        record(value: number, attributes: MetricAttributes, context: api.Context): void {
+        record(
+          value: number,
+          attributes: MetricAttributes,
+          context: api.Context
+        ): void {
           this.records.push({ value, attributes, context });
         }
       }
 
       const backingStorage1 = new TestWritableMetricStorage();
       const backingStorage2 = new TestWritableMetricStorage();
-      const metricStorage = new MultiMetricStorage([backingStorage1, backingStorage2]);
+      const metricStorage = new MultiMetricStorage([
+        backingStorage1,
+        backingStorage2,
+      ]);
 
       const expectedMeasurements: Measurement[] = [];
       for (const value of commonValues) {
@@ -55,8 +67,14 @@ describe('MultiMetricStorage', () => {
         }
       }
 
-      assert.strictEqual(backingStorage1.records.length, expectedMeasurements.length);
-      assert.strictEqual(backingStorage2.records.length, expectedMeasurements.length);
+      assert.strictEqual(
+        backingStorage1.records.length,
+        expectedMeasurements.length
+      );
+      assert.strictEqual(
+        backingStorage2.records.length,
+        expectedMeasurements.length
+      );
       for (const [idx, expected] of expectedMeasurements.entries()) {
         assertMeasurementEqual(backingStorage1.records[idx], expected);
         assertMeasurementEqual(backingStorage2.records[idx], expected);

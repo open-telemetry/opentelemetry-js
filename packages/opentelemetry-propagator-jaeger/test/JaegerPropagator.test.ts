@@ -16,7 +16,8 @@
 
 import {
   defaultTextMapGetter,
-  defaultTextMapSetter, propagation,
+  defaultTextMapSetter,
+  propagation,
   ROOT_CONTEXT,
   SpanContext,
   TextMapGetter,
@@ -261,7 +262,11 @@ describe('JaegerPropagator', () => {
       carrier[`${customBaggageHeaderPrefix}-test`] = 'value';
       carrier[`${customBaggageHeaderPrefix}-myuser`] = '%25id%25';
       const extractedBaggage = propagation.getBaggage(
-        customJaegerPropagatorWithConfig.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+        customJaegerPropagatorWithConfig.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
       );
 
       const firstEntry = extractedBaggage?.getEntry('test');
@@ -277,7 +282,10 @@ describe('JaegerPropagator', () => {
       carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-myuser`] = '%25id%25';
       const extractedBaggage = propagation.getBaggage(
         jaegerPropagator.extract(
-          propagation.setBaggage(ROOT_CONTEXT, propagation.createBaggage({ one: { value: 'two' } })),
+          propagation.setBaggage(
+            ROOT_CONTEXT,
+            propagation.createBaggage({ one: { value: 'two' } })
+          ),
           carrier,
           defaultTextMapGetter
         )
@@ -316,18 +324,18 @@ describe('JaegerPropagator', () => {
     });
 
     it('should 0-pad span and trace id from header', () => {
-      carrier[UBER_TRACE_ID_HEADER] = '4cda95b652f4a1592b449d5929fda1b:e0c63257de34c92:0:01';
+      carrier[UBER_TRACE_ID_HEADER] =
+        '4cda95b652f4a1592b449d5929fda1b:e0c63257de34c92:0:01';
       const extractedSpanContext = trace.getSpanContext(
-        jaegerPropagator.extract(
-          ROOT_CONTEXT,
-          carrier,
-          defaultTextMapGetter
-        )
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
       assert.ok(extractedSpanContext);
       assert.equal(extractedSpanContext.spanId, '0e0c63257de34c92');
-      assert.equal(extractedSpanContext.traceId, '04cda95b652f4a1592b449d5929fda1b');
+      assert.equal(
+        extractedSpanContext.traceId,
+        '04cda95b652f4a1592b449d5929fda1b'
+      );
     });
   });
 
@@ -339,7 +347,9 @@ describe('JaegerPropagator', () => {
       assert.deepStrictEqual(customJaegerPropagator.fields(), [customHeader]);
     });
     it('returns the customized header if customized with config', () => {
-      assert.deepStrictEqual(customJaegerPropagatorWithConfig.fields(), [customHeader]);
+      assert.deepStrictEqual(customJaegerPropagatorWithConfig.fields(), [
+        customHeader,
+      ]);
     });
   });
 

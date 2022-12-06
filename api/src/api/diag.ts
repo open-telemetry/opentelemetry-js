@@ -68,7 +68,7 @@ export class DiagAPI implements DiagLogger, DiagLoggerApi {
 
     const setLogger: DiagLoggerApi['setLogger'] = (
       logger,
-      optionsOrLogLevel = { logLevel: DiagLogLevel.INFO },
+      optionsOrLogLevel = { logLevel: DiagLogLevel.INFO }
     ) => {
       if (logger === self) {
         // There isn't much we can do here.
@@ -88,7 +88,10 @@ export class DiagAPI implements DiagLogger, DiagLoggerApi {
       }
 
       const oldLogger = getGlobal('diag');
-      const newLogger = createLogLevelDiagLogger(optionsOrLogLevel.logLevel ?? DiagLogLevel.INFO, logger);
+      const newLogger = createLogLevelDiagLogger(
+        optionsOrLogLevel.logLevel ?? DiagLogLevel.INFO,
+        logger
+      );
       // There already is an logger registered. We'll let it know before overwriting it.
       if (oldLogger && !optionsOrLogLevel.suppressOverrideMessage) {
         const stack = new Error().stack ?? '<failed to generate stacktrace>';

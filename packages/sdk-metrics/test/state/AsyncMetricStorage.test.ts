@@ -23,7 +23,12 @@ import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
-import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor, ObservableCallbackDelegate } from '../util';
+import {
+  assertMetricData,
+  assertDataPoint,
+  defaultInstrumentDescriptor,
+  ObservableCallbackDelegate,
+} from '../util';
 import { ObservableInstrument } from '../../src/Instruments';
 import { HrTime } from '@opentelemetry/api';
 
@@ -45,7 +50,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -66,13 +71,32 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, collectionTime, collectionTime);
-          assertDataPoint(metric.dataPoints[1], { key: '2' }, 2, collectionTime, collectionTime);
-          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3, collectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            1,
+            collectionTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[1],
+            { key: '2' },
+            2,
+            collectionTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[2],
+            { key: '3' },
+            3,
+            collectionTime,
+            collectionTime
+          );
         }
 
         delegate.setDelegate(observableResult => {});
@@ -83,7 +107,8 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 0);
@@ -100,14 +125,33 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
           // All values were diffed. StartTime is being reset for gaps.
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 3, collectionTime, collectionTime);
-          assertDataPoint(metric.dataPoints[1], { key: '2' }, 3, collectionTime, collectionTime);
-          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3, collectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            3,
+            collectionTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[1],
+            { key: '2' },
+            3,
+            collectionTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[2],
+            { key: '3' },
+            3,
+            collectionTime,
+            collectionTime
+          );
         }
       });
 
@@ -117,7 +161,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -138,11 +182,18 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, collectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            100,
+            collectionTime,
+            collectionTime
+          );
           lastCollectionTime = collectionTime;
         }
 
@@ -157,11 +208,18 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, lastCollectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            1,
+            lastCollectionTime,
+            collectionTime
+          );
           lastCollectionTime = collectionTime;
         }
 
@@ -176,11 +234,18 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 49, lastCollectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            49,
+            lastCollectionTime,
+            collectionTime
+          );
         }
       });
 
@@ -190,7 +255,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(false),
-          new NoopAttributesProcessor(),
+          new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -211,11 +276,18 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, collectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            100,
+            collectionTime,
+            collectionTime
+          );
           lastCollectionTime = collectionTime;
         }
 
@@ -230,13 +302,19 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, -99, lastCollectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            -99,
+            lastCollectionTime,
+            collectionTime
+          );
           lastCollectionTime = collectionTime;
-
         }
 
         // Observe a new data point
@@ -250,11 +328,18 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 49, lastCollectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            49,
+            lastCollectionTime,
+            collectionTime
+          );
         }
       });
     });
@@ -267,7 +352,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -289,14 +374,33 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           startTime = collectionTime;
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, startTime, collectionTime);
-          assertDataPoint(metric.dataPoints[1], { key: '2' }, 2, startTime, collectionTime);
-          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            1,
+            startTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[1],
+            { key: '2' },
+            2,
+            startTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[2],
+            { key: '3' },
+            3,
+            startTime,
+            collectionTime
+          );
         }
 
         delegate.setDelegate(observableResult => {});
@@ -307,13 +411,32 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, startTime, collectionTime);
-          assertDataPoint(metric.dataPoints[1], { key: '2' }, 2, startTime, collectionTime);
-          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            1,
+            startTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[1],
+            { key: '2' },
+            2,
+            startTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[2],
+            { key: '3' },
+            3,
+            startTime,
+            collectionTime
+          );
         }
 
         delegate.setDelegate(observableResult => {
@@ -327,13 +450,32 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 4, startTime, collectionTime);
-          assertDataPoint(metric.dataPoints[1], { key: '2' }, 5, startTime, collectionTime);
-          assertDataPoint(metric.dataPoints[2], { key: '3' }, 6, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            4,
+            startTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[1],
+            { key: '2' },
+            5,
+            startTime,
+            collectionTime
+          );
+          assertDataPoint(
+            metric.dataPoints[2],
+            { key: '3' },
+            6,
+            startTime,
+            collectionTime
+          );
         }
       });
 
@@ -343,7 +485,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -364,12 +506,19 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           startTime = collectionTime;
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            100,
+            startTime,
+            collectionTime
+          );
         }
 
         // Observe a drop on the metric
@@ -383,12 +532,19 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           // The startTime should be reset.
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, collectionTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            1,
+            collectionTime,
+            collectionTime
+          );
           startTime = collectionTime;
         }
 
@@ -403,11 +559,18 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 50, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            50,
+            startTime,
+            collectionTime
+          );
         }
       });
 
@@ -417,7 +580,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(false),
-          new NoopAttributesProcessor(),
+          new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -438,12 +601,19 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           startTime = collectionTime;
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            100,
+            startTime,
+            collectionTime
+          );
         }
 
         // Observe a drop on the metric
@@ -457,12 +627,19 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           // No reset on the value or the startTime
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            1,
+            startTime,
+            collectionTime
+          );
         }
 
         // Observe a new data point
@@ -476,11 +653,18 @@ describe('AsyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            collectionTime);
+            collectionTime
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], { key: '1' }, 50, startTime, collectionTime);
+          assertDataPoint(
+            metric.dataPoints[0],
+            { key: '1' },
+            50,
+            startTime,
+            collectionTime
+          );
         }
       });
     });

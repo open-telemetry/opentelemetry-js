@@ -18,11 +18,17 @@ import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
   ExportResultCode,
   loggingErrorHandler,
-  setGlobalErrorHandler
+  setGlobalErrorHandler,
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { AlwaysOnSampler, BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
+import {
+  AlwaysOnSampler,
+  BasicTracerProvider,
+  BufferConfig,
+  InMemorySpanExporter,
+  Span,
+} from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
@@ -96,7 +102,7 @@ describe('BatchSpanProcessorBase', () => {
 
       let env: Record<string, any>;
       if (typeof process === 'undefined') {
-        env = (globalThis as unknown) as Record<string, any>;
+        env = globalThis as unknown as Record<string, any>;
       } else {
         env = process.env as Record<string, any>;
       }
@@ -402,7 +408,8 @@ describe('BatchSpanProcessorBase', () => {
         processor.onEnd(span);
 
         processor.forceFlush().then(() => {
-          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+          const exporterCreatedSpans =
+            testTracingExporter.getExporterCreatedSpans();
           assert.equal(exporterCreatedSpans.length, 0);
 
           done();
@@ -438,14 +445,16 @@ describe('BatchSpanProcessorBase', () => {
 
     describe('when "maxExportBatchSize" is greater than "maxQueueSize"', () => {
       beforeEach(() => {
-        processor = new BatchSpanProcessor(
-          exporter,{
-            maxExportBatchSize: 7,
-            maxQueueSize: 6,
-          });
+        processor = new BatchSpanProcessor(exporter, {
+          maxExportBatchSize: 7,
+          maxQueueSize: 6,
+        });
       });
       it('should match maxQueueSize', () => {
-        assert.equal(processor['_maxExportBatchSize'], processor['_maxQueueSize']);
+        assert.equal(
+          processor['_maxExportBatchSize'],
+          processor['_maxQueueSize']
+        );
       });
     });
   });

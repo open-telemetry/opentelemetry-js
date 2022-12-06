@@ -14,25 +14,4 @@
  * limitations under the License.
  */
 
-import { InstrumentationAbstract } from '../../instrumentation';
-import * as types from '../../types';
-
-/**
- * Base abstract class for instrumenting web plugins
- */
-export abstract class InstrumentationBase
-  extends InstrumentationAbstract
-  implements types.Instrumentation
-{
-  constructor(
-    instrumentationName: string,
-    instrumentationVersion: string,
-    config: types.InstrumentationConfig = {}
-  ) {
-    super(instrumentationName, instrumentationVersion, config);
-
-    if (this._config.enabled) {
-      this.enable();
-    }
-  }
-}
+module.exports = {};

@@ -16,7 +16,7 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 
-export interface SimpleTestObject{
+export interface SimpleTestObject {
   readonly propString: string;
   readonly propNumber: number;
   readonly propArray: number[];
@@ -38,31 +38,31 @@ export const mockedComplexTestObject: ComplexTestObject = {
     {
       propArray: [1, 2, 3],
       propNumber: 42,
-      propString: 'this is a string.'
+      propString: 'this is a string.',
     },
     {
       propArray: [3, 2, 1],
       propNumber: 3,
-      propString: 'this is a second string.'
-    }
+      propString: 'this is a second string.',
+    },
   ],
   propBoolean: true,
   propFunction: () => {
     return {
       propArray: [30, 20, 10],
       propNumber: 24,
-      propString: 'created by function'
+      propString: 'created by function',
     };
   },
   propObject: {
     propArray: [4, 3, 77],
     propNumber: 44,
-    propString: 'this is a string that is part of propObject.'
+    propString: 'this is a string that is part of propObject.',
   },
   propNumber: 12,
   propOptional: undefined,
   propString: 'this is just a string in a complex test object.',
-  propTime: [12, 455]
+  propTime: [12, 455],
 };
 
 export function ensureHeadersContain(

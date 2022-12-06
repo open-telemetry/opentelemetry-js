@@ -18,7 +18,6 @@ import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
 import { ExemplarFilter } from './ExemplarFilter';
 
 export class NeverSampleExemplarFilter implements ExemplarFilter {
-
   shouldSample(
     _value: number,
     _timestamp: HrTime,

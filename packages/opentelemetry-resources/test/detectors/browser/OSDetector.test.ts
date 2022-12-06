@@ -15,9 +15,7 @@
  */
 import * as sinon from 'sinon';
 import { osDetector, Resource } from '../../../src';
-import {
-  assertEmptyResource,
-} from '../../util/resource-assertions';
+import { assertEmptyResource } from '../../util/resource-assertions';
 import { describeBrowser } from '../../util';
 
 describeBrowser('osDetector() on web browser', () => {

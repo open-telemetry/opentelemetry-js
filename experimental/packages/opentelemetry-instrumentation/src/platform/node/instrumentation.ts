@@ -18,19 +18,25 @@ import * as types from '../../types';
 import * as path from 'path';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
-import { RequireInTheMiddleSingleton, Hooked } from './RequireInTheMiddleSingleton';
+import {
+  RequireInTheMiddleSingleton,
+  Hooked,
+} from './RequireInTheMiddleSingleton';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
+import * as RequireInTheMiddle from 'require-in-the-middle';
 
 /**
  * Base abstract class for instrumenting node plugins
  */
 export abstract class InstrumentationBase<T = any>
   extends InstrumentationAbstract
-  implements types.Instrumentation {
+  implements types.Instrumentation
+{
   private _modules: InstrumentationModuleDefinition<T>[];
-  private _hooks: Hooked[] = [];
-  private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
+  private _hooks: (Hooked | RequireInTheMiddle.Hooked)[] = [];
+  private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
+    RequireInTheMiddleSingleton.getInstance();
   private _enabled = false;
 
   constructor(
@@ -51,8 +57,8 @@ export abstract class InstrumentationBase<T = any>
     if (this._modules.length === 0) {
       diag.debug(
         'No modules instrumentation has been defined for ' +
-        `'${this.instrumentationName}@${this.instrumentationVersion}'` +
-        ', nothing will be patched'
+          `'${this.instrumentationName}@${this.instrumentationVersion}'` +
+          ', nothing will be patched'
       );
     }
 
@@ -68,7 +74,9 @@ export abstract class InstrumentationBase<T = any>
         const resolvedModule = require.resolve(name);
         if (require.cache[resolvedModule]) {
           // Module is already cached, which means the instrumentation hook might not work
-          this._diag.warn(`Module ${name} has been loaded before ${this.instrumentationName} so it might not work, please initialize it before requiring ${name}`);
+          this._diag.warn(
+            `Module ${name} has been loaded before ${this.instrumentationName} so it might not work, please initialize it before requiring ${name}`
+          );
         }
       } catch {
         // Module isn't available, we can simply skip
@@ -124,17 +132,16 @@ export abstract class InstrumentationBase<T = any>
     const files = module.files ?? [];
     const supportedFileInstrumentations = files
       .filter(f => f.name === name)
-      .filter(f => isSupported(f.supportedVersions, version, module.includePrerelease));
-    return supportedFileInstrumentations.reduce<T>(
-      (patchedExports, file) => {
-        file.moduleExports = patchedExports;
-        if (this._enabled) {
-          return file.patch(patchedExports, module.moduleVersion);
-        }
-        return patchedExports;
-      },
-      exports,
-    );
+      .filter(f =>
+        isSupported(f.supportedVersions, version, module.includePrerelease)
+      );
+    return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
+      file.moduleExports = patchedExports;
+      if (this._enabled) {
+        return file.patch(patchedExports, module.moduleVersion);
+      }
+      return patchedExports;
+    }, exports);
   }
 
   public enable(): void {
@@ -160,21 +167,26 @@ export abstract class InstrumentationBase<T = any>
 
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
-      this._hooks.push(
-        this._requireInTheMiddleSingleton.register(
-          module.name,
-          (exports, name, baseDir) => {
-            return this._onRequire<typeof exports>(
-              (module as unknown) as InstrumentationModuleDefinition<
-                typeof exports
-              >,
-              exports,
-              name,
-              baseDir
-            );
-          }
-        )
-      );
+      const onRequire: RequireInTheMiddle.OnRequireFn = (
+        exports,
+        name,
+        baseDir
+      ) => {
+        return this._onRequire<typeof exports>(
+          module as unknown as InstrumentationModuleDefinition<typeof exports>,
+          exports,
+          name,
+          baseDir
+        );
+      };
+
+      // `RequireInTheMiddleSingleton` does not support absolute paths.
+      // For an absolute paths, we must create a separate instance of `RequireInTheMiddle`.
+      const hook = path.isAbsolute(module.name)
+        ? RequireInTheMiddle([module.name], { internals: true }, onRequire)
+        : this._requireInTheMiddleSingleton.register(module.name, onRequire);
+
+      this._hooks.push(hook);
     }
   }
 
@@ -201,7 +213,11 @@ export abstract class InstrumentationBase<T = any>
   }
 }
 
-function isSupported(supportedVersions: string[], version?: string, includePrerelease?: boolean): boolean {
+function isSupported(
+  supportedVersions: string[],
+  version?: string,
+  includePrerelease?: boolean
+): boolean {
   if (typeof version === 'undefined') {
     // If we don't have the version, accept the wildcard case only
     return supportedVersions.includes('*');

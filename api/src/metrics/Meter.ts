@@ -84,7 +84,12 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter<AttributesTypes extends MetricAttributes = MetricAttributes>(name: string, options?: MetricOptions): UpDownCounter<AttributesTypes>;
+  createUpDownCounter<
+    AttributesTypes extends MetricAttributes = MetricAttributes
+  >(
+    name: string,
+    options?: MetricOptions
+  ): UpDownCounter<AttributesTypes>;
 
   /**
    * Creates a new `ObservableGauge` metric.
@@ -94,7 +99,9 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObservableGauge<AttributesTypes extends MetricAttributes = MetricAttributes>(
+  createObservableGauge<
+    AttributesTypes extends MetricAttributes = MetricAttributes
+  >(
     name: string,
     options?: MetricOptions
   ): ObservableGauge<AttributesTypes>;
@@ -107,7 +114,9 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObservableCounter<AttributesTypes extends MetricAttributes = MetricAttributes>(
+  createObservableCounter<
+    AttributesTypes extends MetricAttributes = MetricAttributes
+  >(
     name: string,
     options?: MetricOptions
   ): ObservableCounter<AttributesTypes>;
@@ -120,7 +129,9 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObservableUpDownCounter<AttributesTypes extends MetricAttributes = MetricAttributes>(
+  createObservableUpDownCounter<
+    AttributesTypes extends MetricAttributes = MetricAttributes
+  >(
     name: string,
     options?: MetricOptions
   ): ObservableUpDownCounter<AttributesTypes>;
@@ -139,7 +150,9 @@ export interface Meter {
    * @param callback the batch observable callback
    * @param observables the observables associated with this batch observable callback
    */
-  addBatchObservableCallback<AttributesTypes extends MetricAttributes = MetricAttributes>(
+  addBatchObservableCallback<
+    AttributesTypes extends MetricAttributes = MetricAttributes
+  >(
     callback: BatchObservableCallback<AttributesTypes>,
     observables: Observable<AttributesTypes>[]
   ): void;
@@ -153,7 +166,9 @@ export interface Meter {
    * @param callback the batch observable callback
    * @param observables the observables associated with this batch observable callback
    */
-  removeBatchObservableCallback<AttributesTypes extends MetricAttributes = MetricAttributes>(
+  removeBatchObservableCallback<
+    AttributesTypes extends MetricAttributes = MetricAttributes
+  >(
     callback: BatchObservableCallback<AttributesTypes>,
     observables: Observable<AttributesTypes>[]
   ): void;

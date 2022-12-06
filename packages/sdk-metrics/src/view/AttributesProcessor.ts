@@ -29,7 +29,10 @@ export abstract class AttributesProcessor {
    * @param context The active context when the instrument is synchronous.
    * `undefined` otherwise.
    */
-  abstract process(incoming: MetricAttributes, context?: Context): MetricAttributes;
+  abstract process(
+    incoming: MetricAttributes,
+    context?: Context
+  ): MetricAttributes;
 
   static Noop() {
     return NOOP;
@@ -54,10 +57,15 @@ export class FilteringAttributesProcessor extends AttributesProcessor {
   process(incoming: MetricAttributes, _context: Context): MetricAttributes {
     const filteredAttributes: MetricAttributes = {};
     Object.keys(incoming)
-      .filter(attributeName => this._allowedAttributeNames.includes(attributeName))
-      .forEach(attributeName => filteredAttributes[attributeName] = incoming[attributeName]);
+      .filter(attributeName =>
+        this._allowedAttributeNames.includes(attributeName)
+      )
+      .forEach(
+        attributeName =>
+          (filteredAttributes[attributeName] = incoming[attributeName])
+      );
     return filteredAttributes;
   }
 }
 
-const NOOP = new NoopAttributesProcessor;
+const NOOP = new NoopAttributesProcessor();

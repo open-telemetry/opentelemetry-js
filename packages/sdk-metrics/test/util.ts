@@ -24,12 +24,15 @@ import {
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { InstrumentDescriptor, InstrumentType } from '../src/InstrumentDescriptor';
+import {
+  InstrumentDescriptor,
+  InstrumentType,
+} from '../src/InstrumentDescriptor';
 import {
   MetricData,
   DataPoint,
   DataPointType,
-  ScopeMetrics
+  ScopeMetrics,
 } from '../src/export/MetricData';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
@@ -39,13 +42,15 @@ import { AggregationTemporality } from '../src/export/AggregationTemporality';
 export type Measurement = {
   value: number;
   // TODO: use common attributes
-  attributes: MetricAttributes
+  attributes: MetricAttributes;
   context?: Context;
 };
 
-export const defaultResource = Resource.default().merge(new Resource({
-  resourceKey: 'my-resource',
-}));
+export const defaultResource = Resource.default().merge(
+  new Resource({
+    resourceKey: 'my-resource',
+  })
+);
 
 export const defaultInstrumentDescriptor: InstrumentDescriptor = {
   name: 'default_metric',
@@ -58,13 +63,18 @@ export const defaultInstrumentDescriptor: InstrumentDescriptor = {
 export const defaultInstrumentationScope: InstrumentationScope = {
   name: 'default',
   version: '1.0.0',
-  schemaUrl: 'https://opentelemetry.io/schemas/1.7.0'
+  schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
 };
 
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
-export const commonAttributes: MetricAttributes[] = [{}, { 1: '1' }, { a: '2' }, new (class Foo {
-  a = '1';
-})];
+export const commonAttributes: MetricAttributes[] = [
+  {},
+  { 1: '1' },
+  { a: '2' },
+  new (class Foo {
+    a = '1';
+  })(),
+];
 
 export const sleep = (time: number) =>
   new Promise<void>(resolve => {
@@ -84,7 +94,7 @@ export function assertMetricData(
   actual: unknown,
   dataPointType?: DataPointType,
   instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
-  aggregationTemporality?: AggregationTemporality,
+  aggregationTemporality?: AggregationTemporality
 ): asserts actual is MetricData {
   const it = actual as MetricData;
   if (instrumentDescriptor != null) {
@@ -106,13 +116,17 @@ export function assertDataPoint(
   attributes: MetricAttributes,
   point: Histogram | number,
   startTime?: HrTime,
-  endTime?: HrTime,
+  endTime?: HrTime
 ): asserts actual is DataPoint<unknown> {
   const it = actual as DataPoint<unknown>;
   assert.deepStrictEqual(it.attributes, attributes);
   assert.deepStrictEqual(it.value, point);
   if (startTime) {
-    assert.deepStrictEqual(it.startTime, startTime, 'startTime should be equal');
+    assert.deepStrictEqual(
+      it.startTime,
+      startTime,
+      'startTime should be equal'
+    );
   } else {
     assert(Array.isArray(it.startTime));
     assert.strictEqual(it.startTime.length, 2, 'startTime should be equal');
@@ -125,25 +139,39 @@ export function assertDataPoint(
   }
 }
 
-export function assertMeasurementEqual(actual: unknown, expected: Measurement): asserts actual is Measurement {
+export function assertMeasurementEqual(
+  actual: unknown,
+  expected: Measurement
+): asserts actual is Measurement {
   // NOTE: Node.js v8 assert.strictEquals treat two NaN as different values.
   if (Number.isNaN(expected.value)) {
     assert(Number.isNaN((actual as Measurement).value));
   } else {
     assert.strictEqual((actual as Measurement).value, expected.value);
   }
-  assert.deepStrictEqual((actual as Measurement).attributes, expected.attributes);
+  assert.deepStrictEqual(
+    (actual as Measurement).attributes,
+    expected.attributes
+  );
   assert.deepStrictEqual((actual as Measurement).context, expected.context);
 }
 
-export function assertPartialDeepStrictEqual<T>(actual: unknown, expected: T, message?: string): asserts actual is T {
+export function assertPartialDeepStrictEqual<T>(
+  actual: unknown,
+  expected: T,
+  message?: string
+): asserts actual is T {
   assert.strictEqual(typeof actual, typeof expected, message);
   if (typeof expected !== 'object' && typeof expected !== 'function') {
     return;
   }
   const ownNames = Object.getOwnPropertyNames(expected);
   for (const ownName of ownNames) {
-    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], `${ownName} not equals: ${message ?? '<no-message>'}`);
+    assert.deepStrictEqual(
+      (actual as any)[ownName],
+      (expected as any)[ownName],
+      `${ownName} not equals: ${message ?? '<no-message>'}`
+    );
   }
 }
 

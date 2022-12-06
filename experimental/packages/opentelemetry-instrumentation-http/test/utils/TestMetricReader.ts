@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-import {
-  MetricReader,
-  PushMetricExporter
-} from '@opentelemetry/sdk-metrics';
+import { MetricReader, PushMetricExporter } from '@opentelemetry/sdk-metrics';
 
 export class TestMetricReader extends MetricReader {
   constructor(private _exporter: PushMetricExporter) {
     super({
-      aggregationTemporalitySelector: _exporter.selectAggregationTemporality?.bind(_exporter),
+      aggregationTemporalitySelector:
+        _exporter.selectAggregationTemporality?.bind(_exporter),
     });
   }
 

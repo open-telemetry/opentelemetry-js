@@ -42,7 +42,14 @@ describe('Sampler', () => {
 
   it('Sampler return values should fit SamplerResult', () => {
     function assertResult<T extends Sampler>(sampler: T) {
-      const result = sampler.shouldSample(context.active(), 'trace-id', 'span-name', SpanKind.INTERNAL, {}, []);
+      const result = sampler.shouldSample(
+        context.active(),
+        'trace-id',
+        'span-name',
+        SpanKind.INTERNAL,
+        {},
+        []
+      );
       assertAssignable<SamplingResult>(result);
       assertAssignable<SamplingDecision>(result.decision);
     }

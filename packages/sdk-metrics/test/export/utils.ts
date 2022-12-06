@@ -19,7 +19,7 @@ import {
   AggregationTemporalitySelector,
   InstrumentType,
   MetricReader,
-  PushMetricExporter
+  PushMetricExporter,
 } from '../../src';
 import * as assert from 'assert';
 
@@ -29,7 +29,7 @@ const instrumentTypes = [
   InstrumentType.UP_DOWN_COUNTER,
   InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
   InstrumentType.HISTOGRAM,
-  InstrumentType.OBSERVABLE_GAUGE
+  InstrumentType.OBSERVABLE_GAUGE,
 ];
 
 /**
@@ -37,11 +37,16 @@ const instrumentTypes = [
  * @param reader
  * @param expectedSelector
  */
-export function assertAggregationSelector(reader: MetricReader | PushMetricExporter, expectedSelector: AggregationSelector) {
+export function assertAggregationSelector(
+  reader: MetricReader | PushMetricExporter,
+  expectedSelector: AggregationSelector
+) {
   for (const instrumentType of instrumentTypes) {
-    assert.strictEqual(reader.selectAggregation?.(instrumentType),
+    assert.strictEqual(
+      reader.selectAggregation?.(instrumentType),
       expectedSelector(instrumentType),
-      `incorrect aggregation selection for ${InstrumentType[instrumentType]}`);
+      `incorrect aggregation selection for ${InstrumentType[instrumentType]}`
+    );
   }
 }
 
@@ -50,10 +55,15 @@ export function assertAggregationSelector(reader: MetricReader | PushMetricExpor
  * @param reader
  * @param expectedSelector
  */
-export function assertAggregationTemporalitySelector(reader: MetricReader | PushMetricExporter, expectedSelector: AggregationTemporalitySelector) {
+export function assertAggregationTemporalitySelector(
+  reader: MetricReader | PushMetricExporter,
+  expectedSelector: AggregationTemporalitySelector
+) {
   for (const instrumentType of instrumentTypes) {
-    assert.strictEqual(reader.selectAggregationTemporality?.(instrumentType),
+    assert.strictEqual(
+      reader.selectAggregationTemporality?.(instrumentType),
       expectedSelector(instrumentType),
-      `incorrect aggregation temporality selection for ${InstrumentType[instrumentType]}`);
+      `incorrect aggregation temporality selection for ${InstrumentType[instrumentType]}`
+    );
   }
 }

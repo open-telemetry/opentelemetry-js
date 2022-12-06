@@ -20,7 +20,7 @@ import {
   assertScopeMetrics,
   assertMetricData,
   assertPartialDeepStrictEqual,
-  defaultResource
+  defaultResource,
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
@@ -82,8 +82,12 @@ describe('MeterProvider', () => {
       meterProvider.getMeter('meter1', 'v1.0.1');
       meterProvider.getMeter('meter1', 'v1.0.1');
       // name+version+schemaUrl pair 4
-      meterProvider.getMeter('meter1', 'v1.0.1', { schemaUrl: 'https://opentelemetry.io/schemas/1.4.0' });
-      meterProvider.getMeter('meter1', 'v1.0.1', { schemaUrl: 'https://opentelemetry.io/schemas/1.4.0' });
+      meterProvider.getMeter('meter1', 'v1.0.1', {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+      });
+      meterProvider.getMeter('meter1', 'v1.0.1', {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+      });
 
       // Perform collection.
       const { resourceMetrics, errors } = await reader.collect();
@@ -95,15 +99,15 @@ describe('MeterProvider', () => {
       // InstrumentationScope matches from de-duplicated meters.
       assertScopeMetrics(resourceMetrics.scopeMetrics[0], {
         name: 'meter1',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
       assertScopeMetrics(resourceMetrics.scopeMetrics[1], {
         name: 'meter2',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
       assertScopeMetrics(resourceMetrics.scopeMetrics[2], {
         name: 'meter1',
-        version: 'v1.0.1'
+        version: 'v1.0.1',
       });
       assertScopeMetrics(resourceMetrics.scopeMetrics[3], {
         name: 'meter1',
@@ -123,8 +127,8 @@ describe('MeterProvider', () => {
             name: 'renamed-instrument',
             description: 'my renamed instrument',
             instrumentName: 'non-renamed-instrument',
-          })
-        ]
+          }),
+        ],
       });
 
       const reader = new TestMetricReader();
@@ -145,45 +149,54 @@ describe('MeterProvider', () => {
       // InstrumentationScope matches the only created Meter.
       assertScopeMetrics(resourceMetrics.scopeMetrics[0], {
         name: 'meter1',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
 
       // Collected only one Metric.
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
-        name: 'renamed-instrument',
-        type: InstrumentType.COUNTER,
-        description: 'my renamed instrument'
-      });
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.COUNTER,
+          description: 'my renamed instrument',
+        }
+      );
 
       // Only one DataPoint added.
-      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics[0].dataPoints.length, 1);
+      assert.strictEqual(
+        resourceMetrics.scopeMetrics[0].metrics[0].dataPoints.length,
+        1
+      );
 
       // DataPoint matches attributes and point.
-      assertPartialDeepStrictEqual(resourceMetrics.scopeMetrics[0].metrics[0].dataPoints[0], {
-        // MetricAttributes are still there.
-        attributes: {
-          attrib1: 'attrib_value1',
-          attrib2: 'attrib_value2'
-        },
-        // Value that has been added to the counter.
-        value: 1
-      });
+      assertPartialDeepStrictEqual(
+        resourceMetrics.scopeMetrics[0].metrics[0].dataPoints[0],
+        {
+          // MetricAttributes are still there.
+          attributes: {
+            attrib1: 'attrib_value1',
+            attrib2: 'attrib_value2',
+          },
+          // Value that has been added to the counter.
+          value: 1,
+        }
+      );
     });
 
     it('with attributeKeys should drop non-listed attributes', async () => {
-
       // Add view to drop all attributes except 'attrib1'
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
           new View({
             attributeKeys: ['attrib1'],
-            instrumentName: 'non-renamed-instrument'
-          })
-        ]
+            instrumentName: 'non-renamed-instrument',
+          }),
+        ],
       });
 
       const reader = new TestMetricReader();
@@ -204,30 +217,40 @@ describe('MeterProvider', () => {
       // InstrumentationScope matches the only created Meter.
       assertScopeMetrics(resourceMetrics.scopeMetrics[0], {
         name: 'meter1',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
 
       // Collected only one Metric.
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
-        name: 'non-renamed-instrument',
-        type: InstrumentType.COUNTER,
-      });
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'non-renamed-instrument',
+          type: InstrumentType.COUNTER,
+        }
+      );
 
       // Only one DataPoint added.
-      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics[0].dataPoints.length, 1);
+      assert.strictEqual(
+        resourceMetrics.scopeMetrics[0].metrics[0].dataPoints.length,
+        1
+      );
 
       // DataPoint matches attributes and point.
-      assertPartialDeepStrictEqual(resourceMetrics.scopeMetrics[0].metrics[0].dataPoints[0], {
-        // 'attrib_1' is still here but 'attrib_2' is not.
-        attributes: {
-          attrib1: 'attrib_value1'
-        },
-        // Value that has been added to the counter.
-        value: 1
-      });
+      assertPartialDeepStrictEqual(
+        resourceMetrics.scopeMetrics[0].metrics[0].dataPoints[0],
+        {
+          // 'attrib_1' is still here but 'attrib_2' is not.
+          attributes: {
+            attrib1: 'attrib_value1',
+          },
+          // Value that has been added to the counter.
+          value: 1,
+        }
+      );
     });
 
     it('with no meter name should apply view to instruments of all meters', async () => {
@@ -235,8 +258,11 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({ name: 'renamed-instrument', instrumentName: 'test-counter' })
-        ]
+          new View({
+            name: 'renamed-instrument',
+            instrumentName: 'test-counter',
+          }),
+        ],
       });
 
       const reader = new TestMetricReader();
@@ -264,32 +290,40 @@ describe('MeterProvider', () => {
       // First InstrumentationScope matches the first created Meter.
       assertScopeMetrics(resourceMetrics.scopeMetrics[0], {
         name: 'meter1',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
 
       // Collected one Metric on 'meter1'
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
-        name: 'renamed-instrument',
-        type: InstrumentType.COUNTER,
-      });
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.COUNTER,
+        }
+      );
 
       // Second InstrumentationScope matches the second created Meter.
       assertScopeMetrics(resourceMetrics.scopeMetrics[1], {
         name: 'meter2',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
 
       // Collected one Metric on 'meter2'
       assert.strictEqual(resourceMetrics.scopeMetrics[1].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SUM, {
-        name: 'renamed-instrument',
-        type: InstrumentType.COUNTER
-      });
+      assertMetricData(
+        resourceMetrics.scopeMetrics[1].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.COUNTER,
+        }
+      );
     });
 
     it('with meter name should apply view to only the selected meter', async () => {
@@ -300,9 +334,9 @@ describe('MeterProvider', () => {
           new View({
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
-            meterName: 'meter1'
-          })
-        ]
+            meterName: 'meter1',
+          }),
+        ],
       });
 
       const reader = new TestMetricReader();
@@ -330,32 +364,40 @@ describe('MeterProvider', () => {
       // First InstrumentationScope matches the first created Meter.
       assertScopeMetrics(resourceMetrics.scopeMetrics[0], {
         name: 'meter1',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
 
       // Collected one Metric on 'meter1'
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
-        name: 'renamed-instrument',
-        type: InstrumentType.COUNTER
-      });
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.COUNTER,
+        }
+      );
 
       // Second InstrumentationScope matches the second created Meter.
       assertScopeMetrics(resourceMetrics.scopeMetrics[1], {
         name: 'meter2',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
 
       // Collected one Metric on 'meter2'
       assert.strictEqual(resourceMetrics.scopeMetrics[1].metrics.length, 1);
 
       // No updated name on 'test-counter'.
-      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SUM, {
-        name: 'test-counter',
-        type: InstrumentType.COUNTER
-      });
+      assertMetricData(
+        resourceMetrics.scopeMetrics[1].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'test-counter',
+          type: InstrumentType.COUNTER,
+        }
+      );
     });
 
     it('with different instrument types does not throw', async () => {
@@ -366,14 +408,14 @@ describe('MeterProvider', () => {
           new View({
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
-            meterName: 'meter1'
+            meterName: 'meter1',
           }),
           new View({
             name: 'renamed-instrument',
             instrumentName: 'test-histogram',
-            meterName: 'meter1'
-          })
-        ]
+            meterName: 'meter1',
+          }),
+        ],
       });
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
@@ -397,21 +439,29 @@ describe('MeterProvider', () => {
       // InstrumentationScope matches the only created Meter.
       assertScopeMetrics(resourceMetrics.scopeMetrics[0], {
         name: 'meter1',
-        version: 'v1.0.0'
+        version: 'v1.0.0',
       });
 
       // Two metrics are collected ('renamed-instrument'-Counter and 'renamed-instrument'-Histogram)
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
 
       // Both 'renamed-instrument' are still exported with their types.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
-        name: 'renamed-instrument',
-        type: InstrumentType.COUNTER
-      });
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.HISTOGRAM, {
-        name: 'renamed-instrument',
-        type: InstrumentType.HISTOGRAM
-      });
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.COUNTER,
+        }
+      );
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[1],
+        DataPointType.HISTOGRAM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.HISTOGRAM,
+        }
+      );
     });
   });
 
@@ -431,9 +481,13 @@ describe('MeterProvider', () => {
       await meterProvider.shutdown();
 
       assert.strictEqual(reader1ShutdownSpy.callCount, 1);
-      assert.deepStrictEqual(reader1ShutdownSpy.args[0][0], { timeoutMillis: 1234 });
+      assert.deepStrictEqual(reader1ShutdownSpy.args[0][0], {
+        timeoutMillis: 1234,
+      });
       assert.strictEqual(reader2ShutdownSpy.callCount, 1);
-      assert.deepStrictEqual(reader2ShutdownSpy.args[0][0], { timeoutMillis: 1234 });
+      assert.deepStrictEqual(reader2ShutdownSpy.args[0][0], {
+        timeoutMillis: 1234,
+      });
     });
   });
 
@@ -451,11 +505,19 @@ describe('MeterProvider', () => {
       await meterProvider.forceFlush({ timeoutMillis: 1234 });
       await meterProvider.forceFlush({ timeoutMillis: 5678 });
       assert.strictEqual(reader1ForceFlushSpy.callCount, 2);
-      assert.deepStrictEqual(reader1ForceFlushSpy.args[0][0], { timeoutMillis: 1234 });
-      assert.deepStrictEqual(reader1ForceFlushSpy.args[1][0], { timeoutMillis: 5678 });
+      assert.deepStrictEqual(reader1ForceFlushSpy.args[0][0], {
+        timeoutMillis: 1234,
+      });
+      assert.deepStrictEqual(reader1ForceFlushSpy.args[1][0], {
+        timeoutMillis: 5678,
+      });
       assert.strictEqual(reader2ForceFlushSpy.callCount, 2);
-      assert.deepStrictEqual(reader2ForceFlushSpy.args[0][0], { timeoutMillis: 1234 });
-      assert.deepStrictEqual(reader2ForceFlushSpy.args[1][0], { timeoutMillis: 5678 });
+      assert.deepStrictEqual(reader2ForceFlushSpy.args[0][0], {
+        timeoutMillis: 1234,
+      });
+      assert.deepStrictEqual(reader2ForceFlushSpy.args[1][0], {
+        timeoutMillis: 5678,
+      });
 
       await meterProvider.shutdown();
       await meterProvider.forceFlush();

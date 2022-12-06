@@ -104,12 +104,15 @@ describe('SumAggregator', () => {
           },
         ],
       };
-      assert.deepStrictEqual(aggregator.toMetricData(
-        defaultInstrumentDescriptor,
-        AggregationTemporality.CUMULATIVE,
-        [[{}, accumulation]],
-        endTime,
-      ), expected);
+      assert.deepStrictEqual(
+        aggregator.toMetricData(
+          defaultInstrumentDescriptor,
+          AggregationTemporality.CUMULATIVE,
+          [[{}, accumulation]],
+          endTime
+        ),
+        expected
+      );
     });
   });
 });

@@ -28,7 +28,12 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(value, attributes, api.context.active(), [0, 0]);
+          metricProcessor.record(
+            value,
+            attributes,
+            api.context.active(),
+            [0, 0]
+          );
         }
       }
     });
@@ -38,7 +43,12 @@ describe('DeltaMetricProcessor', () => {
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricProcessor.record(value, attributes, api.context.active(), [0, 0]);
+          metricProcessor.record(
+            value,
+            attributes,
+            api.context.active(),
+            [0, 0]
+          );
         }
       }
     });

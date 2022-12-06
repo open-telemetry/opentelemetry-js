@@ -65,7 +65,7 @@ export class ConsoleSpanExporter implements SpanExporter {
       attributes: span.attributes,
       status: span.status,
       events: span.events,
-      links: span.links
+      links: span.links,
     };
   }
 

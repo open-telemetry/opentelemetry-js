@@ -15,7 +15,10 @@
  */
 
 import { PatternPredicate } from './Predicate';
-import { AttributesProcessor, FilteringAttributesProcessor } from './AttributesProcessor';
+import {
+  AttributesProcessor,
+  FilteringAttributesProcessor,
+} from './AttributesProcessor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { Aggregation } from './Aggregation';
@@ -107,11 +110,13 @@ export type ViewOptions = {
 };
 
 function isSelectorNotProvided(options: ViewOptions): boolean {
-  return (options.instrumentName == null &&
+  return (
+    options.instrumentName == null &&
     options.instrumentType == null &&
     options.meterName == null &&
     options.meterVersion == null &&
-    options.meterSchemaUrl == null);
+    options.meterSchemaUrl == null
+  );
 }
 
 /**
@@ -183,15 +188,21 @@ export class View {
 
     // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
     // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
-    if (viewOptions.name != null &&
+    if (
+      viewOptions.name != null &&
       (viewOptions?.instrumentName == null ||
-        PatternPredicate.hasWildcard(viewOptions.instrumentName))) {
-      throw new Error('Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.');
+        PatternPredicate.hasWildcard(viewOptions.instrumentName))
+    ) {
+      throw new Error(
+        'Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.'
+      );
     }
 
     // Create AttributesProcessor if attributeKeys are defined set.
     if (viewOptions.attributeKeys != null) {
-      this.attributesProcessor = new FilteringAttributesProcessor(viewOptions.attributeKeys);
+      this.attributesProcessor = new FilteringAttributesProcessor(
+        viewOptions.attributeKeys
+      );
     } else {
       this.attributesProcessor = AttributesProcessor.Noop();
     }
@@ -206,7 +217,7 @@ export class View {
     this.meterSelector = new MeterSelector({
       name: viewOptions.meterName,
       version: viewOptions.meterVersion,
-      schemaUrl: viewOptions.meterSchemaUrl
+      schemaUrl: viewOptions.meterSchemaUrl,
     });
   }
 }

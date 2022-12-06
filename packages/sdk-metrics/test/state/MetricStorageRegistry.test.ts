@@ -25,22 +25,26 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   getDescriptionResolutionRecipe,
-  getTypeConflictResolutionRecipe, getUnitConflictResolutionRecipe,
-  getValueTypeConflictResolutionRecipe
+  getTypeConflictResolutionRecipe,
+  getUnitConflictResolutionRecipe,
+  getValueTypeConflictResolutionRecipe,
 } from '../../src/view/RegistrationConflicts';
 
 class TestMetricStorage extends MetricStorage {
   collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    collectionTime: HrTime,
+    collectionTime: HrTime
   ): Maybe<MetricData> {
     return undefined;
   }
 }
 
 describe('MetricStorageRegistry', () => {
-  let spyLoggerWarn: sinon.SinonStub<[message: string, ...args: unknown[]], void>;
+  let spyLoggerWarn: sinon.SinonStub<
+    [message: string, ...args: unknown[]],
+    void
+  >;
 
   beforeEach(() => {
     spyLoggerWarn = sinon.stub(diag, 'warn');
@@ -69,7 +73,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       });
 
       registry.register(storage);
@@ -88,14 +92,14 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       });
       const storage2 = new TestMetricStorage({
         name: 'instrument2',
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       });
 
       registry.registerForCollector(collectorHandle, storage);
@@ -103,7 +107,10 @@ describe('MetricStorageRegistry', () => {
       registry.registerForCollector(collectorHandle2, storage2);
 
       assert.deepStrictEqual(registry.getStorages(collectorHandle), [storage]);
-      assert.deepStrictEqual(registry.getStorages(collectorHandle2), [storage, storage2]);
+      assert.deepStrictEqual(registry.getStorages(collectorHandle2), [
+        storage,
+        storage2,
+      ]);
     });
   });
 
@@ -118,11 +125,17 @@ describe('MetricStorageRegistry', () => {
       const storage = new TestMetricStorage(existingDescriptor);
       const otherStorage = new TestMetricStorage(otherDescriptor);
 
-      assert.strictEqual(registry.findOrUpdateCompatibleStorage(existingDescriptor), null);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleStorage(existingDescriptor),
+        null
+      );
       registry.register(storage);
       assertLogNotCalled();
 
-      assert.strictEqual(registry.findOrUpdateCompatibleStorage(otherDescriptor), null);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleStorage(otherDescriptor),
+        null
+      );
       // warned
       assertLogCalledOnce();
       assertFirstLogContains(expectedLog);
@@ -139,7 +152,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const otherDescriptor = {
@@ -147,12 +160,14 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.UP_DOWN_COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
-      testConflictingRegistration(existingDescriptor,
+      testConflictingRegistration(
+        existingDescriptor,
         otherDescriptor,
-        getTypeConflictResolutionRecipe(existingDescriptor, otherDescriptor));
+        getTypeConflictResolutionRecipe(existingDescriptor, otherDescriptor)
+      );
     });
 
     it('warn when instrument with same name and different value type is already registered', () => {
@@ -161,7 +176,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const otherDescriptor = {
@@ -169,12 +184,17 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.INT
+        valueType: ValueType.INT,
       };
 
-      testConflictingRegistration(existingDescriptor,
+      testConflictingRegistration(
+        existingDescriptor,
         otherDescriptor,
-        getValueTypeConflictResolutionRecipe(existingDescriptor, otherDescriptor));
+        getValueTypeConflictResolutionRecipe(
+          existingDescriptor,
+          otherDescriptor
+        )
+      );
     });
 
     it('warn when instrument with same name and different unit is already registered', () => {
@@ -183,7 +203,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const otherDescriptor = {
@@ -191,12 +211,14 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: 'ms',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
-      testConflictingRegistration(existingDescriptor,
+      testConflictingRegistration(
+        existingDescriptor,
         otherDescriptor,
-        getUnitConflictResolutionRecipe(existingDescriptor, otherDescriptor));
+        getUnitConflictResolutionRecipe(existingDescriptor, otherDescriptor)
+      );
     });
 
     it('warn when instrument with same name and different description is already registered', () => {
@@ -205,7 +227,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const otherDescriptor = {
@@ -213,7 +235,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'longer description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const registry = new MetricStorageRegistry();
@@ -222,17 +244,28 @@ describe('MetricStorageRegistry', () => {
       const otherStorage = new TestMetricStorage(otherDescriptor);
 
       // register the first storage.
-      assert.strictEqual(registry.findOrUpdateCompatibleStorage(existingDescriptor), null);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleStorage(existingDescriptor),
+        null
+      );
       registry.register(storage);
       // register the second storage.
-      assert.strictEqual(registry.findOrUpdateCompatibleStorage(otherDescriptor), storage);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleStorage(otherDescriptor),
+        storage
+      );
       // original storage now has the updated (longer) description.
-      assert.strictEqual(otherStorage.getInstrumentDescriptor().description, otherDescriptor.description);
+      assert.strictEqual(
+        otherStorage.getInstrumentDescriptor().description,
+        otherDescriptor.description
+      );
 
       // log called exactly once
       assertLogCalledOnce();
       // added resolution recipe to the log
-      assertFirstLogContains(getDescriptionResolutionRecipe(existingDescriptor, otherDescriptor));
+      assertFirstLogContains(
+        getDescriptionResolutionRecipe(existingDescriptor, otherDescriptor)
+      );
     });
 
     it('should return the existing instrument if a compatible async instrument is already registered', () => {
@@ -242,13 +275,16 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.OBSERVABLE_COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const storage = new TestMetricStorage(descriptor);
 
       registry.register(storage);
-      assert.strictEqual(registry.findOrUpdateCompatibleStorage(descriptor), storage);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleStorage(descriptor),
+        storage
+      );
     });
 
     it('should return the existing instrument if a compatible sync instrument is already registered', () => {
@@ -258,13 +294,16 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const storage = new TestMetricStorage(descriptor);
 
       registry.register(storage);
-      assert.strictEqual(registry.findOrUpdateCompatibleStorage(descriptor), storage);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleStorage(descriptor),
+        storage
+      );
     });
 
     function assertLogNotCalled() {
@@ -276,7 +315,10 @@ describe('MetricStorageRegistry', () => {
     }
 
     function assertFirstLogContains(expectedString: string) {
-      assert.ok(spyLoggerWarn.args[0].includes(expectedString), 'Logs did not include: ' + expectedString);
+      assert.ok(
+        spyLoggerWarn.args[0].includes(expectedString),
+        'Logs did not include: ' + expectedString
+      );
     }
   });
 
@@ -287,7 +329,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const otherDescriptor = {
@@ -295,7 +337,7 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.UP_DOWN_COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
 
       const registry = new MetricStorageRegistry();
@@ -303,11 +345,23 @@ describe('MetricStorageRegistry', () => {
       const storage = new TestMetricStorage(existingDescriptor);
       const otherStorage = new TestMetricStorage(otherDescriptor);
 
-      assert.strictEqual(registry.findOrUpdateCompatibleCollectorStorage(collectorHandle, existingDescriptor), null);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleCollectorStorage(
+          collectorHandle,
+          existingDescriptor
+        ),
+        null
+      );
       registry.registerForCollector(collectorHandle, storage);
 
       // Should not return an existing metric storage.
-      assert.strictEqual(registry.findOrUpdateCompatibleCollectorStorage(collectorHandle, otherDescriptor), null);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleCollectorStorage(
+          collectorHandle,
+          otherDescriptor
+        ),
+        null
+      );
       registry.registerForCollector(collectorHandle, otherStorage);
 
       // registered both storages
@@ -321,16 +375,28 @@ describe('MetricStorageRegistry', () => {
         type: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
-        valueType: ValueType.DOUBLE
+        valueType: ValueType.DOUBLE,
       };
       const registry = new MetricStorageRegistry();
 
       const storage = new TestMetricStorage(descriptor);
 
-      assert.strictEqual(registry.findOrUpdateCompatibleCollectorStorage(collectorHandle, descriptor), null);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleCollectorStorage(
+          collectorHandle,
+          descriptor
+        ),
+        null
+      );
       registry.registerForCollector(collectorHandle, storage);
 
-      assert.strictEqual(registry.findOrUpdateCompatibleCollectorStorage(collectorHandle2, descriptor), null);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleCollectorStorage(
+          collectorHandle2,
+          descriptor
+        ),
+        null
+      );
       registry.registerForCollector(collectorHandle2, storage);
 
       // registered the storage for each collector

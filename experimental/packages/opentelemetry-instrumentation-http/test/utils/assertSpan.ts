@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { isValidSpanId, SpanKind, SpanStatus, Exception } from '@opentelemetry/api';
+import {
+  isValidSpanId,
+  SpanKind,
+  SpanStatus,
+  Exception,
+} from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -73,18 +78,20 @@ export const assertSpan = (
 
     const eventAttributes = span.events[0].attributes;
     assert.ok(eventAttributes != null);
-    assert.deepStrictEqual(
-      Object.keys(eventAttributes),
-      ['exception.type', 'exception.message', 'exception.stacktrace']
-    );
+    assert.deepStrictEqual(Object.keys(eventAttributes), [
+      'exception.type',
+      'exception.message',
+      'exception.stacktrace',
+    ]);
   } else {
     assert.strictEqual(span.events.length, 0);
   }
 
   assert.deepStrictEqual(
     span.status,
-    validations.forceStatus ||
-    { code: utils.parseResponseStatus(span.kind, validations.httpStatusCode) }
+    validations.forceStatus || {
+      code: utils.parseResponseStatus(span.kind, validations.httpStatusCode),
+    }
   );
 
   assert.ok(span.endTime, 'must be finished');

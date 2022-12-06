@@ -24,7 +24,7 @@ import {
   isTimeInput,
   otperformance,
   sanitizeAttributes,
-  timeInputToHrTime
+  timeInputToHrTime,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -76,7 +76,7 @@ export class Span implements api.Span, ReadableSpan {
     parentSpanId?: string,
     links: api.Link[] = [],
     startTime?: api.TimeInput,
-    clock: Clock = otperformance,
+    clock: Clock = otperformance
   ) {
     this._clock = clock;
     this.name = spanName;
@@ -90,7 +90,8 @@ export class Span implements api.Span, ReadableSpan {
     this._spanLimits = parentTracer.getSpanLimits();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
-    this._attributeValueLengthLimit = this._spanLimits.attributeValueLengthLimit || 0;
+    this._attributeValueLengthLimit =
+      this._spanLimits.attributeValueLengthLimit || 0;
   }
 
   spanContext(): api.SpanContext {
@@ -111,7 +112,7 @@ export class Span implements api.Span, ReadableSpan {
 
     if (
       Object.keys(this.attributes).length >=
-      this._spanLimits.attributeCountLimit! &&
+        this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return this;
@@ -206,15 +207,17 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: api.Exception, time: api.TimeInput = this._clock.now()): void {
+  recordException(
+    exception: api.Exception,
+    time: api.TimeInput = this._clock.now()
+  ): void {
     const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[
-          SemanticAttributes.EXCEPTION_TYPE
-        ] = exception.code.toString();
+        attributes[SemanticAttributes.EXCEPTION_TYPE] =
+          exception.code.toString();
       } else if (exception.name) {
         attributes[SemanticAttributes.EXCEPTION_TYPE] = exception.name;
       }
@@ -247,7 +250,9 @@ export class Span implements api.Span, ReadableSpan {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
-      api.diag.warn(`Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`);
+      api.diag.warn(
+        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+      );
     }
     return this._ended;
   }
@@ -290,7 +295,9 @@ export class Span implements api.Span, ReadableSpan {
 
     // Array of strings
     if (Array.isArray(value)) {
-      return (value as []).map(val => typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val);
+      return (value as []).map(val =>
+        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
+      );
     }
 
     // Other types, no need to apply value length limit
