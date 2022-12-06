@@ -319,6 +319,7 @@ describe('BatchSpanProcessorBase', () => {
       beforeEach(() => {
         processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       });
+
       it('should call an async callback when flushing is complete', done => {
         const span = createSampledSpan('test');
         processor.onStart(span, ROOT_CONTEXT);
@@ -381,6 +382,7 @@ describe('BatchSpanProcessorBase', () => {
         });
       });
     });
+
     describe('flushing spans with exporter triggering instrumentation', () => {
       beforeEach(() => {
         const contextManager = new TestStackContextManager().enable();
@@ -408,7 +410,6 @@ describe('BatchSpanProcessorBase', () => {
       });
     });
   });
-
   describe('maxQueueSize', () => {
     let processor: BatchSpanProcessor;
 
