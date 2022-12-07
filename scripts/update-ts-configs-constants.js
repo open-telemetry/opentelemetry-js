@@ -61,6 +61,8 @@ function getEsnextTsConfig(pkgRoot, projectRoot) {
   };
 }
 
+// Helper to convert windows path style to posix to ensure platform independent
+// tsconfig generation.
 function toPosix(p) {
   return p.split(path.sep).join(path.posix.sep);
 }
