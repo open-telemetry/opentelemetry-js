@@ -148,6 +148,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         // don't wait anymore for export, this way the next batch can start
         reject(new Error('Timeout'));
       }, this._exportTimeoutMillis);
+      unrefTimer(timer);
       // prevent downstream exporter calls from generating spans
       context.with(suppressTracing(context.active()), () => {
         // Reset the finished spans buffer here because the next invocations of the _flush method
