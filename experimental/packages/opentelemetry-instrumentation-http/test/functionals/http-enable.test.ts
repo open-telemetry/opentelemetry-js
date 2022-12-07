@@ -249,6 +249,16 @@ describe('HttpInstrumentation', () => {
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/premature-close')) {
+            response.destroy();
+            return;
+          }
+          if (request.url?.includes('/hang')) {
+            // write response headers.
+            response.write('');
+            // hang the request.
+            return;
+          }
           if (request.url?.includes('/ignored')) {
             provider.getTracer('test').startSpan('some-span').end();
           }
@@ -839,6 +849,57 @@ describe('HttpInstrumentation', () => {
             done();
           });
         });
+      });
+
+      it('should have 2 ended span when client prematurely close', async () => {
+        const promise = new Promise<void>((resolve, reject) => {
+          const req = http.get(`${protocol}://${hostname}:${serverPort}/hang`, res => {
+            res.on('close', () => {});
+          });
+          // close the socket.
+          setTimeout(() => {
+            req.destroy();
+          }, 10);
+
+          req.on('error', reject);
+
+          req.on('close', () => {
+            // yield to server to end the span.
+            setTimeout(resolve, 10);
+          });
+        });
+
+        await promise;
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const [serverSpan, clientSpan] = spans.sort((lhs, rhs) => lhs.kind - rhs.kind);
+        assert.strictEqual(serverSpan.kind, SpanKind.SERVER);
+        assert.ok(Object.keys(serverSpan.attributes).length >= 6);
+
+        assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
+        assert.ok(Object.keys(clientSpan.attributes).length >= 6);
+      });
+
+      it('should have 2 ended span when server prematurely close', async () => {
+        const promise = new Promise<void>(resolve => {
+          const req = http.get(`${protocol}://${hostname}:${serverPort}/premature-close`);
+          req.on('error', err => {
+            resolve();
+          });
+        });
+
+        await promise;
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const [serverSpan, clientSpan] = spans.sort((lhs, rhs) => lhs.kind - rhs.kind);
+        assert.strictEqual(serverSpan.kind, SpanKind.SERVER);
+        assert.ok(Object.keys(serverSpan.attributes).length >= 6);
+
+        assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(clientSpan.status.code, SpanStatusCode.ERROR);
+        assert.ok(Object.keys(clientSpan.attributes).length >= 6);
       });
     });
 

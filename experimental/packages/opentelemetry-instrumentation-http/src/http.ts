@@ -479,10 +479,15 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           instrumentation._headerCapture.server.captureRequestHeaders(span, header => request.headers[header]);
 
           // After 'error', no further events other than 'close' should be emitted.
-          response.on('finish', () => {
+          let hasError = false;
+          response.on('close', () => {
+            if (hasError) {
+              return;
+            }
             instrumentation._onServerResponseFinish(request, response, span, metricAttributes, startTime);
           });
           response.on(errorMonitor, (err: Err) => {
+            hasError = true;
             instrumentation._onServerResponseError(span, metricAttributes, startTime, err);
           });
 
