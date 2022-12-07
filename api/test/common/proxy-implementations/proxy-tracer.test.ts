@@ -174,9 +174,9 @@ describe('ProxyTracer', () => {
       tracer.startSpan(name, options, ctx);
 
       // Assert the proxy tracer has the full API of the NoopTracer
-      assert.strictEqual(
-        NoopTracer.prototype.startSpan.length,
-        ProxyTracer.prototype.startSpan.length
+      assert.ok(
+        ProxyTracer.prototype.startSpan.length >=
+          NoopTracer.prototype.startSpan.length
       );
       assert.deepStrictEqual(Object.getOwnPropertyNames(NoopTracer.prototype), [
         'constructor',

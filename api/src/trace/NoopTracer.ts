@@ -31,7 +31,11 @@ const contextApi = ContextAPI.getInstance();
  */
 export class NoopTracer implements Tracer {
   // startSpan starts a noop span.
-  startSpan(name: string, options?: SpanOptions, context?: Context): Span {
+  startSpan(
+    name: string,
+    options?: SpanOptions,
+    context = contextApi.active()
+  ): Span {
     const root = Boolean(options?.root);
     if (root) {
       return new NonRecordingSpan();
