@@ -474,6 +474,29 @@ describe('ExponentialHistogramAccumulation', () => {
       assertHistogramsEqual(acc0, acc1)
     });
   });
+
+  describe('toPointValue()', () => {
+    it('returns accurate representation of histogram internals', () => {
+      const acc = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        acc.record(2 << i);
+      }
+
+      const pv = acc.toPointValue()
+
+      assert.strictEqual(pv.scale, acc.scale());
+      assert.strictEqual(pv.min, acc.min());
+      assert.strictEqual(pv.max, acc.max());
+      assert.strictEqual(pv.sum, acc.sum());
+      assert.strictEqual(pv.count, acc.count());
+      assert.strictEqual(pv.zeroCount, acc.zeroCount());
+      assert.strictEqual(pv.positive.offset, acc.positive().offset());
+      assert.deepStrictEqual(pv.positive.counts, acc.positive().counts());
+      assert.strictEqual(pv.negative.offset, acc.negative().offset());
+      assert.deepStrictEqual(pv.negative.counts, acc.negative().counts());
+    });
+  });
 });
 
 function getCounts(buckets: Buckets): Array<number> {

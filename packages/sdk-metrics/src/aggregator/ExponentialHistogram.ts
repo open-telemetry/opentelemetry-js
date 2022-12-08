@@ -97,23 +97,22 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   toPointValue(): InternalHistogram {
-    //todo: implement
     return {
-      hasMinMax: true,
-      min: 0,
-      max: 0,
-      sum: 0,
+      hasMinMax: this._recordMinMax,
+      min: this.min(),
+      max: this.max(),
+      sum: this.sum(),
       positive: {
-        offset: 0,
-        counts: [0],
+        offset: this.positive().offset(),
+        counts: this.positive().counts(),
       },
       negative: {
-        offset: 0,
-        counts: [0],
+        offset: this.negative().offset(),
+        counts: this.negative().counts(),
       },
-      count: 0,
-      scale: 0,
-      zeroCount: 0,
+      count: this.count(),
+      scale: this.scale(),
+      zeroCount: this.zeroCount(),
     };
   }
 
