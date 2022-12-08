@@ -41,7 +41,7 @@ export class Buckets {
       this.indexBase,
       this.indexStart,
       this.indexEnd,
-    )
+    );
   }
 
   length(): number {
@@ -87,7 +87,7 @@ export class Buckets {
    * @param bucketIndex
    * @param increment
    */
-   decrementBucket(bucketIndex: number, decrement: number) {
+  decrementBucket(bucketIndex: number, decrement: number) {
     this.backing.decrement(bucketIndex, decrement);
   }
 
@@ -103,19 +103,18 @@ export class Buckets {
    */
   trim() {
     for(let i = 0; i < this.length(); i++) {
-        if(this.at(i) !== 0) {
-          this.indexStart += i
-          break;
-        }
-        else if(i == this.length() - 1) {
-          //the entire array is zeroed out
-          this.indexStart = this.indexEnd = this.indexBase = 0;
-          return;
-        }
+      if(this.at(i) !== 0) {
+        this.indexStart += i;
+        break;
+      } else if(i === this.length() - 1) {
+        //the entire array is zeroed out
+        this.indexStart = this.indexEnd = this.indexBase = 0;
+        return;
+      }
     }
 
     for(let i = this.length() - 1; i >= 0; i--) {
-      console.log(i)
+      console.log(i);
       if(this.at(i) !== 0 ) {
         this.indexEnd -= this.length() - i - 1;
         break;

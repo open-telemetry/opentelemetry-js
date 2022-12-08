@@ -183,7 +183,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       this.positive().clone(),
       this.negative().clone(),
       this._mapping,
-    )
+    );
   }
 
   /**
@@ -398,7 +398,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   private _minScale(other: ExponentialHistogramAccumulation):number {
-    let minScale = Math.min(this.scale(), other.scale());
+    const minScale = Math.min(this.scale(), other.scale());
 
     const ourHighLowPos = this.highLowAtScale(this.positive(), minScale);
     const otherHighLowPos = other.highLowAtScale(other.positive(), minScale);

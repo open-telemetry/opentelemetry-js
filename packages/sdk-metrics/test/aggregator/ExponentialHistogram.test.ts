@@ -296,7 +296,7 @@ describe('ExponentialHistogramAccumulation', () => {
         aHist.merge(bHist);
 
         assertHistogramsEqual(aHist, cHist);
-      }
+      };
 
       const factor = 1024.0;
       const count = 16;
@@ -305,12 +305,12 @@ describe('ExponentialHistogramAccumulation', () => {
       const sizes = [2, 6, 8, 9, 16];
       const increments = [1, 0x100, 0x10000, 0x100000000];
 
-      for(let mean of means) {
-        for(let stddev of stddevs) {
+      for(const mean of means) {
+        for(const stddev of stddevs) {
           const values = Array.from({length: count}, () => mean + Math.random() * stddev);
           for(let part = 1; part < count; part++) {
-            for(let size of sizes) {
-              for (let incr of increments) {
+            for(const size of sizes) {
+              for (const incr of increments) {
                 testMergeExhaustive(values.slice(0, part), values.slice(part, count), size, incr);
               }
             }
@@ -354,11 +354,11 @@ describe('ExponentialHistogramAccumulation', () => {
       for(let i = 0; i < 4; i++) {
         const v1 = 2 << i;
 
-        if( i % 2 == 0) {
+        if( i % 2 === 0) {
           acc0.record(v1);
         }
 
-        if( i % 2 == 1 ) {
+        if( i % 2 === 1 ) {
           acc1.record(v1);
         }
 
@@ -390,11 +390,11 @@ describe('ExponentialHistogramAccumulation', () => {
       for(let i = 0; i < 4; i++) {
         const v1 = 2 << i;
 
-        if( i % 2 == 1 ) {
+        if( i % 2 === 1 ) {
           acc0.record(v1);
         }
 
-        if( i % 2 == 0) {
+        if( i % 2 === 0) {
           acc1.record(v1);
         }
 
@@ -451,9 +451,9 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
 
       for(let i = 0; i < 4; i++) {
-        const v = 2 << i
+        const v = 2 << i;
         acc0.record(v);
-        acc1.record(v)
+        acc1.record(v);
       }
 
       assertHistogramsEqual(acc0, acc1);
@@ -471,7 +471,7 @@ describe('ExponentialHistogramAccumulation', () => {
       assert.notDeepStrictEqual(getCounts(acc0.positive()), getCounts(acc2.positive()));
 
       // ensure acc0 wasn't mutated
-      assertHistogramsEqual(acc0, acc1)
+      assertHistogramsEqual(acc0, acc1);
     });
   });
 
@@ -483,7 +483,7 @@ describe('ExponentialHistogramAccumulation', () => {
         acc.record(2 << i);
       }
 
-      const pv = acc.toPointValue()
+      const pv = acc.toPointValue();
 
       assert.strictEqual(pv.scale, acc.scale());
       assert.strictEqual(pv.min, acc.min());
