@@ -69,36 +69,20 @@ type IncrementResult = {
 
 export class ExponentialHistogramAccumulation implements Accumulation {
   static DEFAULT_MAX_SIZE = 160;
-  public startTime: HrTime;
-  private _maxSize: number;
-  //private _recordMinMax: boolean;
-  private _sum: number;
-  private _count: number;
-  private _zeroCount: number;
-  private _min: number;
-  private _max: number;
-  private _positive: Buckets;
-  private _negative: Buckets;
-  private _mapping: Mapping;
 
   constructor(
-    startTime: HrTime,
-    maxSize: number = ExponentialHistogramAccumulation.DEFAULT_MAX_SIZE,
-    _recordMinMax = true,
-  ) {
-    this.startTime = startTime;
-    this._maxSize =
-      maxSize || ExponentialHistogramAccumulation.DEFAULT_MAX_SIZE;
-    //this._recordMinMax = recordMinMax;
-    this._sum = 0;
-    this._count = 0;
-    this._zeroCount = 0;
-    this._min = Number.POSITIVE_INFINITY;
-    this._max = Number.NEGATIVE_INFINITY;
-    this._positive = new Buckets();
-    this._negative = new Buckets();
-    this._mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE);
-  }
+    public startTime: HrTime = startTime,
+    private _maxSize = ExponentialHistogramAccumulation.DEFAULT_MAX_SIZE,
+    private _recordMinMax = true,
+    private _sum = 0,
+    private _count = 0,
+    private _zeroCount = 0,
+    private _min = Number.POSITIVE_INFINITY,
+    private _max = Number.NEGATIVE_INFINITY,
+    private _positive = new Buckets(),
+    private _negative = new Buckets(),
+    private _mapping: Mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE),
+  ) {}
 
   /**
    * record supports updating a histogram with a single count.
@@ -181,6 +165,26 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     this._positive.clear();
     this._negative.clear();
     this._mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE);
+  }
+
+  /**
+   * clone returns a deep copy of self
+   * @returns {ExponentialHistogram}
+   */
+  clone(): ExponentialHistogramAccumulation {
+    return new ExponentialHistogramAccumulation(
+      this.startTime,
+      this._maxSize,
+      this._recordMinMax,
+      this._sum,
+      this._count,
+      this._zeroCount,
+      this._min,
+      this._max,
+      this.positive().clone(),
+      this.negative().clone(),
+      this._mapping,
+    )
   }
 
   /**

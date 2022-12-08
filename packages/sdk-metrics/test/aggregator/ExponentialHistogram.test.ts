@@ -445,6 +445,35 @@ describe('ExponentialHistogramAccumulation', () => {
       assertHistogramsEqual(acc0, acc2);
     });
   });
+  describe('clone()', () => {
+    it('makes a deep copy', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        const v = 2 << i
+        acc0.record(v);
+        acc1.record(v)
+      }
+
+      assertHistogramsEqual(acc0, acc1);
+
+      const acc2 = acc0.clone();
+
+      assertHistogramsEqual(acc0, acc2);
+      assert.strictEqual(acc0.scale(), acc2.scale());
+      assert.deepStrictEqual(getCounts(acc0.positive()), getCounts(acc2.positive()));
+
+      acc2.record(2 << 5);
+
+      // no longer equal
+      assert.notStrictEqual(acc0.scale(), acc2.scale());
+      assert.notDeepStrictEqual(getCounts(acc0.positive()), getCounts(acc2.positive()));
+
+      // ensure acc0 wasn't mutated
+      assertHistogramsEqual(acc0, acc1)
+    });
+  });
 });
 
 function getCounts(buckets: Buckets): Array<number> {

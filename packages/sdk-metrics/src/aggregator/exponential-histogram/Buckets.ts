@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 export class Buckets {
-  backing: BucketsBacking;
-  indexBase: number;
-  indexStart: number;
-  indexEnd: number;
-
-  constructor() {
-    this.backing = new BucketsBacking();
-    this.indexBase = 0;
-    this.indexStart = 0;
-    this.indexEnd = 0;
-  }
+  constructor(
+    public backing = new BucketsBacking(),
+    public indexBase = 0,
+    public indexStart = 0,
+    public indexEnd = 0,
+  ) {}
 
   //todo: can probably delete
   toString(): string {
@@ -33,6 +28,20 @@ export class Buckets {
 
   offset(): number {
     return this.indexStart;
+  }
+
+  // returns the counts from the backing array as-is
+  counts(): number[] {
+    return this.backing.counts();
+  }
+
+  clone(): Buckets {
+    return new Buckets(
+      this.backing.clone(),
+      this.indexBase,
+      this.indexStart,
+      this.indexEnd,
+    )
   }
 
   length(): number {
@@ -172,7 +181,9 @@ export class Buckets {
 }
 
 class BucketsBacking {
-  private _counts = [0];
+  constructor(
+    private _counts = [0],
+  ) {}
 
   toString(): string {
     return `[${this._counts.join(',')}]`;
@@ -180,6 +191,10 @@ class BucketsBacking {
 
   size(): number {
     return this._counts.length;
+  }
+
+  counts(): number[] {
+    return this._counts;
   }
 
   growTo(newSize: number, oldPositiveLimit: number, newPositiveLimit: number) {
@@ -229,5 +244,9 @@ class BucketsBacking {
     for (let i = 0; i < this._counts.length; i++) {
       this._counts[i] = 0;
     }
+  }
+
+  clone(): BucketsBacking {
+    return new BucketsBacking([...this._counts]);
   }
 }
