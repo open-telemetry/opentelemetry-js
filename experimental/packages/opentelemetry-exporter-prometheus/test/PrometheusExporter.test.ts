@@ -93,6 +93,23 @@ describe('PrometheusExporter', () => {
       });
     });
 
+    it('should start on startServer() using listen options', done => {
+      const port = PrometheusExporter.DEFAULT_OPTIONS.port;
+      const url = `http://localhost:${port}/monitoring/metrics`;
+      const options = { host: 'localhost', path: '/monitoring', port: port };
+      const exporter = new PrometheusExporter({ preventServerStart: true });
+
+      exporter.startServer(options).then(() => {
+        assert.strictEqual(exporter.getServerListenOptions(), options);
+        http.get(url, (res: any) => {
+          assert.strictEqual(res.statusCode, 200);
+          exporter.shutdown().then(() => {
+            return done();
+          });
+        });
+      });
+    });
+
     it('should listen on the default port and default endpoint', done => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
@@ -128,6 +145,15 @@ describe('PrometheusExporter', () => {
       );
     });
 
+    it('should listen on a custom server if provided', () => {
+      const server = http.createServer();
+      const exporter = new PrometheusExporter({ server }, async () => {
+        await exporter.shutdown();
+      });
+
+      assert.strictEqual(exporter['_server'], server);
+    });
+
     it('should unref the server to allow graceful termination', () => {
       const mockServer = sinon.createStubInstance(http.Server);
       const createStub = sinon.stub(http, 'createServer');
@@ -144,8 +170,9 @@ describe('PrometheusExporter', () => {
       const exporter = new PrometheusExporter({}, async () => {
         await exporter.shutdown();
       });
-      assert.strictEqual(exporter['_host'], '127.0.0.1');
-      assert.strictEqual(exporter['_port'], 1234);
+
+      assert.strictEqual(exporter.getServerListenOptions().host, '127.0.0.1');
+      assert.strictEqual(exporter.getServerListenOptions().port, 1234);
     });
 
     it('should not require endpoints to start with a slash', done => {
@@ -631,6 +658,48 @@ describe('PrometheusExporter', () => {
               });
             })
             .on('error', errorHandler(done));
+        }
+      );
+    });
+
+    it('should allow other listeners on the same server', done => {
+      const provider = new MeterProvider();
+      const server = http.createServer((request, response) => {
+        const baseUrl = 'http://localhost:9464';
+        const url = new URL(request.url as string, baseUrl);
+
+        if (url.pathname === '/health') {
+          response.statusCode = 200;
+          response.setHeader('content-type', 'application/json');
+
+          response.end('{ok:"OK"})');
+        }
+      });
+
+      const exporter = new PrometheusExporter(
+        {
+          server,
+        },
+        () => {
+          provider.addMetricReader(exporter);
+
+          const port = exporter.getServerListenOptions().port;
+          const health = request(`http://localhost:${port}/health`);
+          const metrics = request(`http://localhost:${port}/metrics`);
+
+          Promise.all([health, metrics])
+            .then(entries => {
+              assert.strictEqual(entries[0], '{ok:"OK"})');
+              assert.deepStrictEqual(entries[1].split('\n'), [
+                ...serializedDefaultResourceLines,
+                '# no registered metrics',
+              ]);
+
+              exporter.shutdown().then(() => {
+                return done();
+              });
+            })
+            .catch(done);
         }
       );
     });

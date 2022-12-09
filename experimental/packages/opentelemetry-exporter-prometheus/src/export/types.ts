@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { Server } from 'http';
+
 /**
  * Configuration interface for prometheus exporter
  */
@@ -56,4 +58,11 @@ export interface ExporterConfig {
    * @default false
    */
   preventServerStart?: boolean;
+
+  /**
+   * HTTP Server where the Prometheus exporter request listener is will be attached.
+   *
+   * @default undefined (create a new server)
+   */
+  server?: Server;
 }

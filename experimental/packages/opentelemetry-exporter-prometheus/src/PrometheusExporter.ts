@@ -21,11 +21,62 @@ import {
   AggregationTemporality,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
+import {
+  createServer,
+  IncomingMessage,
+  RequestListener,
+  Server,
+  ServerResponse,
+} from 'http';
 import { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
 /** Node.js v8.x compat */
 import { URL } from 'url';
+import { AddressInfo, ListenOptions } from 'net';
+
+/**
+ * Creates http server if one is not provider and attaches the prometheus RequestListener to it
+ */
+function prepareServer(
+  config: ExporterConfig,
+  requestHandler: RequestListener
+): Server {
+  const server = config.server ?? createServer();
+
+  server.addListener('request', requestHandler);
+
+  return server;
+}
+
+/**
+ * Creates ListenOptions object using the provided ExporterConfig or default values
+ */
+function createListenOptions(config: ExporterConfig): ListenOptions {
+  const host =
+    config.host ||
+    process.env.OTEL_EXPORTER_PROMETHEUS_HOST ||
+    PrometheusExporter.DEFAULT_OPTIONS.host;
+  const port = Number(
+    config.port ||
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT ||
+      PrometheusExporter.DEFAULT_OPTIONS.port
+  );
+
+  return { host, port };
+}
+
+/**
+ * Formats a endpoint string ensuring no double slash
+ */
+function formatEndpoint(...args: (string | undefined)[]): string {
+  return (
+    '/' +
+    args
+      .flatMap(e => e?.split('/'))
+      .filter(e => e !== '')
+      .join('/')
+  );
+}
 
 export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
@@ -36,13 +87,11 @@ export class PrometheusExporter extends MetricReader {
     appendTimestamp: true,
   };
 
-  private readonly _host?: string;
-  private readonly _port: number;
-  private readonly _baseUrl: string;
-  private readonly _endpoint: string;
   private readonly _server: Server;
+  private readonly _endpoint: string;
   private readonly _prefix?: string;
   private readonly _appendTimestamp: boolean;
+  private _listenOptions: ListenOptions;
   private _serializer: PrometheusSerializer;
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
@@ -60,33 +109,25 @@ export class PrometheusExporter extends MetricReader {
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
     });
-    this._host =
-      config.host ||
-      process.env.OTEL_EXPORTER_PROMETHEUS_HOST ||
-      PrometheusExporter.DEFAULT_OPTIONS.host;
-    this._port =
-      config.port ||
-      Number(process.env.OTEL_EXPORTER_PROMETHEUS_PORT) ||
-      PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =
       typeof config.appendTimestamp === 'boolean'
         ? config.appendTimestamp
         : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
     // unref to prevent prometheus exporter from holding the process open on exit
-    this._server = createServer(this._requestHandler).unref();
+    this._server = prepareServer(config, this._requestHandler).unref();
     this._serializer = new PrometheusSerializer(
       this._prefix,
       this._appendTimestamp
     );
 
-    this._baseUrl = `http://${this._host}:${this._port}/`;
-    this._endpoint = (
+    this._listenOptions = createListenOptions(config);
+    this._endpoint = formatEndpoint(
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
-    ).replace(/^([^/])/, '/$1');
+    );
 
     if (config.preventServerStart !== true) {
-      this.startServer()
+      this.startServer(this._listenOptions)
         .then(callback)
         .catch(err => diag.error(err));
     } else if (callback) {
@@ -135,22 +176,30 @@ export class PrometheusExporter extends MetricReader {
 
   /**
    * Starts the Prometheus export server
+   *
+   * @param options Listening options
    */
-  startServer(): Promise<void> {
+  startServer(options?: ListenOptions): Promise<void> {
+    if (options !== undefined) {
+      this._listenOptions = options;
+    }
+
     return new Promise(resolve => {
-      this._server.listen(
-        {
-          port: this._port,
-          host: this._host,
-        },
-        () => {
-          diag.debug(
-            `Prometheus exporter server started: ${this._host}:${this._port}/${this._endpoint}`
-          );
-          resolve();
-        }
-      );
+      this._server.listen(this._listenOptions, () => {
+        const address = this._server.address() as AddressInfo;
+        const baseUrl = `http://${address.address}:${address.port}${this._endpoint}`;
+
+        diag.debug(`Prometheus exporter server started: ${baseUrl}`);
+        resolve();
+      });
     });
+  }
+
+  /**
+   * Request handler that responds with the current state of metrics
+   */
+  public getServerListenOptions(): ListenOptions {
+    return this._listenOptions;
   }
 
   /**
@@ -176,10 +225,12 @@ export class PrometheusExporter extends MetricReader {
     request: IncomingMessage,
     response: ServerResponse
   ) => {
-    if (
-      request.url != null &&
-      new URL(request.url, this._baseUrl).pathname === this._endpoint
-    ) {
+    const baseUrl = `http://${this._listenOptions?.host}:${this._listenOptions?.port}`;
+    const endpoint = formatEndpoint(this._listenOptions?.path, this._endpoint);
+    const url = new URL(formatEndpoint(request.url), baseUrl);
+    const pathname = url?.pathname;
+
+    if (pathname === endpoint) {
       this._exportMetrics(response);
     } else {
       this._notFound(response);
