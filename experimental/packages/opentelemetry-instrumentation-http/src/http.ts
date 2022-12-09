@@ -487,7 +487,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       };
 
       const startTime = hrTime();
-      const metricAttributes = utils.getIncomingRequestMetricAttributes(spanAttributes);
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributes(spanAttributes);
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(
@@ -524,11 +525,22 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             if (hasError) {
               return;
             }
-            instrumentation._onServerResponseFinish(request, response, span, metricAttributes, startTime);
+            instrumentation._onServerResponseFinish(
+              request,
+              response,
+              span,
+              metricAttributes,
+              startTime
+            );
           });
           response.on(errorMonitor, (err: Err) => {
             hasError = true;
-            instrumentation._onServerResponseError(span, metricAttributes, startTime, err);
+            instrumentation._onServerResponseError(
+              span,
+              metricAttributes,
+              startTime,
+              err
+            );
           });
 
           return safeExecuteInTheMiddle(
@@ -684,18 +696,29 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     };
   }
 
-  private _onServerResponseFinish(request: http.IncomingMessage, response: http.ServerResponse, span: Span, metricAttributes: MetricAttributes, startTime: HrTime) {
+  private _onServerResponseFinish(
+    request: http.IncomingMessage,
+    response: http.ServerResponse,
+    span: Span,
+    metricAttributes: MetricAttributes,
+    startTime: HrTime
+  ) {
     const attributes = utils.getIncomingRequestAttributesOnResponse(
       request,
       response
     );
-    metricAttributes = Object.assign(metricAttributes, utils.getIncomingRequestMetricAttributesOnResponse(attributes));
+    metricAttributes = Object.assign(
+      metricAttributes,
+      utils.getIncomingRequestMetricAttributesOnResponse(attributes)
+    );
 
-    this._headerCapture.server.captureResponseHeaders(span, header => response.getHeader(header));
+    this._headerCapture.server.captureResponseHeaders(span, header =>
+      response.getHeader(header)
+    );
 
-    span
-      .setAttributes(attributes)
-      .setStatus({ code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode) });
+    span.setAttributes(attributes).setStatus({
+      code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode),
+    });
 
     if (this._getConfig().applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(
@@ -705,7 +728,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             request,
             response
           ),
-        () => { },
+        () => {},
         true
       );
     }
@@ -713,7 +736,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }
 
-  private _onServerResponseError(span: Span, metricAttributes: MetricAttributes, startTime: HrTime, error: Err) {
+  private _onServerResponseError(
+    span: Span,
+    metricAttributes: MetricAttributes,
+    startTime: HrTime,
+    error: Err
+  ) {
     utils.setSpanWithError(span, error);
     this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }

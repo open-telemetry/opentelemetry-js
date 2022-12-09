@@ -846,9 +846,12 @@ describe('HttpInstrumentation', () => {
 
       it('should have 2 ended span when client prematurely close', async () => {
         const promise = new Promise<void>((resolve, reject) => {
-          const req = http.get(`${protocol}://${hostname}:${serverPort}/hang`, res => {
-            res.on('close', () => {});
-          });
+          const req = http.get(
+            `${protocol}://${hostname}:${serverPort}/hang`,
+            res => {
+              res.on('close', () => {});
+            }
+          );
           // close the socket.
           setTimeout(() => {
             req.destroy();
@@ -866,7 +869,9 @@ describe('HttpInstrumentation', () => {
 
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 2);
-        const [serverSpan, clientSpan] = spans.sort((lhs, rhs) => lhs.kind - rhs.kind);
+        const [serverSpan, clientSpan] = spans.sort(
+          (lhs, rhs) => lhs.kind - rhs.kind
+        );
         assert.strictEqual(serverSpan.kind, SpanKind.SERVER);
         assert.ok(Object.keys(serverSpan.attributes).length >= 6);
 
@@ -876,7 +881,9 @@ describe('HttpInstrumentation', () => {
 
       it('should have 2 ended span when server prematurely close', async () => {
         const promise = new Promise<void>(resolve => {
-          const req = http.get(`${protocol}://${hostname}:${serverPort}/premature-close`);
+          const req = http.get(
+            `${protocol}://${hostname}:${serverPort}/premature-close`
+          );
           req.on('error', err => {
             resolve();
           });
@@ -886,7 +893,9 @@ describe('HttpInstrumentation', () => {
 
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 2);
-        const [serverSpan, clientSpan] = spans.sort((lhs, rhs) => lhs.kind - rhs.kind);
+        const [serverSpan, clientSpan] = spans.sort(
+          (lhs, rhs) => lhs.kind - rhs.kind
+        );
         assert.strictEqual(serverSpan.kind, SpanKind.SERVER);
         assert.ok(Object.keys(serverSpan.attributes).length >= 6);
 
