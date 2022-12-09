@@ -31,7 +31,10 @@ import { MetricCollectorHandle } from './MetricCollector';
  *
  * Stores and aggregates {@link MetricData} for synchronous instruments.
  */
-export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStorage implements WritableMetricStorage {
+export class SyncMetricStorage<T extends Maybe<Accumulation>>
+  extends MetricStorage
+  implements WritableMetricStorage
+{
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
@@ -45,7 +48,12 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
-  record(value: number, attributes: MetricAttributes, context: Context, recordTime: HrTime) {
+  record(
+    value: number,
+    attributes: MetricAttributes,
+    context: Context,
+    recordTime: HrTime
+  ) {
     attributes = this._attributesProcessor.process(attributes, context);
     this._deltaMetricStorage.record(value, attributes, context, recordTime);
   }
@@ -59,7 +67,7 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
   collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    collectionTime: HrTime,
+    collectionTime: HrTime
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 

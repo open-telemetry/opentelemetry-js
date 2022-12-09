@@ -20,7 +20,8 @@ import {
   TextMapPropagator,
   SpanContext,
   TextMapGetter,
-  TextMapSetter, trace,
+  TextMapSetter,
+  trace,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';

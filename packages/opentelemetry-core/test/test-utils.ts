@@ -17,13 +17,16 @@
 import * as assert from 'assert';
 
 interface ErrorLikeConstructor {
-  new(): Error;
+  new (): Error;
 }
 
 /**
  * Node.js v8.x and browser compatible `assert.rejects`.
  */
-export async function assertRejects(actual: any, expected: RegExp | ErrorLikeConstructor) {
+export async function assertRejects(
+  actual: any,
+  expected: RegExp | ErrorLikeConstructor
+) {
   let rejected;
   try {
     if (typeof actual === 'function') {

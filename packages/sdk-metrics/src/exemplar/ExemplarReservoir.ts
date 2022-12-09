@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, isSpanContextValid, trace, MetricAttributes } from '@opentelemetry/api';
+import {
+  Context,
+  HrTime,
+  isSpanContextValid,
+  trace,
+  MetricAttributes,
+} from '@opentelemetry/api';
 import { Exemplar } from './Exemplar';
-
 
 /**
  * An interface for an exemplar reservoir of samples.
  */
 export interface ExemplarReservoir {
-
   /** Offers a measurement to be sampled. */
   offer(
     value: number,
@@ -42,7 +46,6 @@ export interface ExemplarReservoir {
   collect(pointAttributes: MetricAttributes): Exemplar[];
 }
 
-
 class ExemplarBucket {
   private value: number = 0;
   private attributes: MetricAttributes = {};
@@ -51,7 +54,12 @@ class ExemplarBucket {
   private traceId?: string;
   private _offered: boolean = false;
 
-  offer(value: number, timestamp: HrTime, attributes: MetricAttributes, ctx: Context) {
+  offer(
+    value: number,
+    timestamp: HrTime,
+    attributes: MetricAttributes,
+    ctx: Context
+  ) {
     this.value = value;
     this.timestamp = timestamp;
     this.attributes = attributes;
@@ -77,7 +85,7 @@ class ExemplarBucket {
       value: this.value,
       timestamp: this.timestamp,
       spanId: this.spanId,
-      traceId: this.traceId
+      traceId: this.traceId,
     };
     this.attributes = {};
     this.value = 0;
@@ -89,20 +97,26 @@ class ExemplarBucket {
   }
 }
 
-
-export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoir {
+export abstract class FixedSizeExemplarReservoirBase
+  implements ExemplarReservoir
+{
   protected _reservoirStorage: ExemplarBucket[];
   protected _size: number;
 
   constructor(size: number) {
     this._size = size;
     this._reservoirStorage = new Array<ExemplarBucket>(size);
-    for(let i = 0; i < this._size; i++) {
+    for (let i = 0; i < this._size; i++) {
       this._reservoirStorage[i] = new ExemplarBucket();
     }
   }
 
-  abstract offer(value: number, timestamp: HrTime, attributes: MetricAttributes, ctx: Context): void;
+  abstract offer(
+    value: number,
+    timestamp: HrTime,
+    attributes: MetricAttributes,
+    ctx: Context
+  ): void;
 
   maxSize(): number {
     return this._size;

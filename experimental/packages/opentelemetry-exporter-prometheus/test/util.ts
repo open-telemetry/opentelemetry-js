@@ -28,11 +28,19 @@ export function mockHrTime() {
   sinon.stub(perf_hooks.performance, 'now').returns(mockedHrTimeMs);
 }
 
-export const serviceName = Resource.default().attributes[SemanticResourceAttributes.SERVICE_NAME]?.toString()
-  .replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
-export const sdkLanguage = Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]?.toString()
-  .replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
-export const sdkName = Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME]?.toString()
-  .replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
-export const sdkVersion = Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]?.toString()
-  .replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
+export const serviceName = Resource.default()
+  .attributes[SemanticResourceAttributes.SERVICE_NAME]?.toString()
+  .replace(/\\/g, '\\\\')
+  .replace(/\n/g, '\\n');
+export const sdkLanguage = Resource.default()
+  .attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]?.toString()
+  .replace(/\\/g, '\\\\')
+  .replace(/\n/g, '\\n');
+export const sdkName = Resource.default()
+  .attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME]?.toString()
+  .replace(/\\/g, '\\\\')
+  .replace(/\n/g, '\\n');
+export const sdkVersion = Resource.default()
+  .attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]?.toString()
+  .replace(/\\/g, '\\\\')
+  .replace(/\n/g, '\\n');

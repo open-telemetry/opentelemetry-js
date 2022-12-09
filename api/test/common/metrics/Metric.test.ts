@@ -17,90 +17,90 @@
 import { Counter, UpDownCounter, Histogram } from '../../../src';
 
 describe('Metric', () => {
-  describe('Counter', () =>{
+  describe('Counter', () => {
     it('enable not to define any type', () => {
       const counter: Counter = {
-        add(_value: number, _attribute: unknown) {}
+        add(_value: number, _attribute: unknown) {},
       };
       counter.add(1, { 'some-attribute': 'value' });
     });
 
     it('enable to use with type', () => {
       type Attributes = {
-        'some-attribute': string
+        'some-attribute': string;
       };
       const counter: Counter<Attributes> = {
-        add(_value: number, _attribute: Attributes) {}
+        add(_value: number, _attribute: Attributes) {},
       };
       counter.add(1, { 'some-attribute': 'value' });
     });
 
     it('disable wrong attributes by typing', () => {
       type Attributes = {
-        'some-attribute': string
+        'some-attribute': string;
       };
       const counter: Counter<Attributes> = {
-        add(_value: number, _attribute: Attributes) {}
+        add(_value: number, _attribute: Attributes) {},
       };
       // @ts-expect-error Expacting the type of Attributes
       counter.add(1, { 'another-attribute': 'value' });
     });
   });
 
-  describe('UpDownCounter', () =>{
+  describe('UpDownCounter', () => {
     it('enable not to define any type', () => {
       const counter: UpDownCounter = {
-        add(_value: number, _attribute: unknown) {}
+        add(_value: number, _attribute: unknown) {},
       };
       counter.add(1, { 'some-attribute': 'value' });
     });
 
     it('enable to use with type', () => {
       type Attributes = {
-        'some-attribute': string
+        'some-attribute': string;
       };
       const counter: UpDownCounter<Attributes> = {
-        add(_value: number, _attribute: Attributes) {}
+        add(_value: number, _attribute: Attributes) {},
       };
       counter.add(1, { 'some-attribute': 'value' });
     });
 
     it('disable wrong attributes by typing', () => {
       type Attributes = {
-        'some-attribute': string
+        'some-attribute': string;
       };
       const counter: UpDownCounter<Attributes> = {
-        add(_value: number, _attribute: Attributes) {}
+        add(_value: number, _attribute: Attributes) {},
       };
       // @ts-expect-error Expacting the type of Attributes
       counter.add(1, { 'another-attribute': 'value' });
     });
   });
 
-  describe('Histogram', () =>{
+  describe('Histogram', () => {
     it('enable not to define any type', () => {
       const counter: Histogram = {
-        record(_value: number, _attribute: unknown) {}
+        record(_value: number, _attribute: unknown) {},
       };
       counter.record(1, { 'some-attribute': 'value' });
     });
 
     it('enable to use with type', () => {
       type Attributes = {
-        'some-attribute': string
+        'some-attribute': string;
       };
       const counter: Histogram<Attributes> = {
-        record(_value: number, _attribute: Attributes) {}
+        record(_value: number, _attribute: Attributes) {},
       };
       counter.record(1, { 'some-attribute': 'value' });
     });
 
     it('disable wrong attributes by typing', () => {
       type Attributes = {
-        'some-attribute': string
+        'some-attribute': string;
       };
       const counter: Histogram<Attributes> = {
-        record(_value: number, _attribute: Attributes) {}
+        record(_value: number, _attribute: Attributes) {},
       };
       // @ts-expect-error Expacting the type of Attributes
       counter.record(1, { 'another-attribute': 'value' });

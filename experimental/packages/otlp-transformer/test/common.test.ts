@@ -20,24 +20,31 @@ import * as assert from 'assert';
 describe('common', () => {
   describe('toAnyValue', () => {
     it('serializes an array', () => {
-      const anyValue = toAnyValue([1, 'two', false, 2.5, new Uint8Array([0, 1, 2]), { somekey: 'somevalue' }]);
+      const anyValue = toAnyValue([
+        1,
+        'two',
+        false,
+        2.5,
+        new Uint8Array([0, 1, 2]),
+        { somekey: 'somevalue' },
+      ]);
       assert.deepStrictEqual(anyValue, {
         arrayValue: {
           values: [
             {
-              intValue: 1
+              intValue: 1,
             },
             {
-              stringValue: 'two'
+              stringValue: 'two',
             },
             {
-              boolValue: false
+              boolValue: false,
             },
             {
-              doubleValue: 2.5
+              doubleValue: 2.5,
             },
             {
-              bytesValue: new Uint8Array([0, 1, 2])
+              bytesValue: new Uint8Array([0, 1, 2]),
             },
             {
               kvlistValue: {
@@ -45,14 +52,14 @@ describe('common', () => {
                   {
                     key: 'somekey',
                     value: {
-                      stringValue: 'somevalue'
-                    }
-                  }
-                ]
-              }
+                      stringValue: 'somevalue',
+                    },
+                  },
+                ],
+              },
             },
-          ]
-        }
+          ],
+        },
       });
     });
   });

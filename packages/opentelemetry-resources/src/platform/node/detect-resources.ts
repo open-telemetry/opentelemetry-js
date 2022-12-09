@@ -52,7 +52,6 @@ export const detectResources = async (
   );
 };
 
-
 /**
  * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
  *

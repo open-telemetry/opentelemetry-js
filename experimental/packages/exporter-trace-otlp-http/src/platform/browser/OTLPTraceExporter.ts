@@ -20,9 +20,12 @@ import {
   OTLPExporterConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
-  OTLPExporterBrowserBase
+  OTLPExporterBrowserBase,
 } from '@opentelemetry/otlp-exporter-base';
-import { createExportTraceServiceRequest, IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  createExportTraceServiceRequest,
+  IExportTraceServiceRequest,
+} from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
@@ -31,11 +34,9 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURC
  * Collector Trace Exporter for Web
  */
 export class OTLPTraceExporter
-  extends OTLPExporterBrowserBase<
-    ReadableSpan,
-    IExportTraceServiceRequest
-  >
-  implements SpanExporter {
+  extends OTLPExporterBrowserBase<ReadableSpan, IExportTraceServiceRequest>
+  implements SpanExporter
+{
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
     this._headers = Object.assign(
@@ -53,9 +54,12 @@ export class OTLPTraceExporter
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-          ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
-          : DEFAULT_COLLECTOR_URL;
+      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+      ? appendResourcePathToUrl(
+          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
+          DEFAULT_COLLECTOR_RESOURCE_PATH
+        )
+      : DEFAULT_COLLECTOR_URL;
   }
 }

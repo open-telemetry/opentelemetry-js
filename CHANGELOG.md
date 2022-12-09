@@ -11,6 +11,9 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
+* feat(instrumentation-grpc): set net.peer.name and net.peer.port on client spans [#3430](https://github.com/open-telemetry/opentelemetry-js/pull/3430)
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): use default Resource to comply with semantic conventions [#3411](https://github.com/open-telemetry/opentelemetry-js/pull/3411) @pichlermarc
@@ -23,6 +26,9 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* chore: automatically generate tsconfigs [#3432](https://github.com/open-telemetry/opentelemetry-js/pull/3432) @legendecas
+* chore: enforce format with prettier [#3444](https://github.com/open-telemetry/opentelemetry-js/pull/3444) @legendecas
 
 ## 1.8.0
 

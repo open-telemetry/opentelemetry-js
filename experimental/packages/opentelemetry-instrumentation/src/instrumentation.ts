@@ -32,7 +32,8 @@ import * as types from './types';
  * Base abstract internal class for instrumenting node and web plugins
  */
 export abstract class InstrumentationAbstract<T = any>
-implements types.Instrumentation {
+  implements types.Instrumentation
+{
   protected _config: types.InstrumentationConfig;
 
   private _tracer: Tracer;
@@ -56,6 +57,7 @@ implements types.Instrumentation {
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
 
     this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
+    this._updateMetricInstruments();
   }
 
   /* Api to wrap instrumented method */
@@ -81,6 +83,15 @@ implements types.Instrumentation {
       this.instrumentationName,
       this.instrumentationVersion
     );
+
+    this._updateMetricInstruments();
+  }
+
+  /**
+   * Sets the new metric instruments with the current Meter.
+   */
+  protected _updateMetricInstruments(): void {
+    return;
   }
 
   /* Returns InstrumentationConfig */

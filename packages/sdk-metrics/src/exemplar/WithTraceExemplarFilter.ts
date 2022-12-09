@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, isSpanContextValid, trace, TraceFlags, MetricAttributes } from '@opentelemetry/api';
+import {
+  Context,
+  HrTime,
+  isSpanContextValid,
+  trace,
+  TraceFlags,
+  MetricAttributes,
+} from '@opentelemetry/api';
 import { ExemplarFilter } from './ExemplarFilter';
 
 export class WithTraceExemplarFilter implements ExemplarFilter {
-
   shouldSample(
     value: number,
     timestamp: HrTime,
@@ -26,8 +32,7 @@ export class WithTraceExemplarFilter implements ExemplarFilter {
     ctx: Context
   ): boolean {
     const spanContext = trace.getSpanContext(ctx);
-    if (!spanContext || !isSpanContextValid(spanContext))
-      return false;
+    if (!spanContext || !isSpanContextValid(spanContext)) return false;
     return spanContext.traceFlags & TraceFlags.SAMPLED ? true : false;
   }
 }

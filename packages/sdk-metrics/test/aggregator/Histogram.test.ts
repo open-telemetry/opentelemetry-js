@@ -20,16 +20,13 @@ import {
   AggregationTemporality,
   InstrumentType,
   DataPointType,
-  MetricData
+  MetricData,
 } from '../../src';
 import {
   HistogramAccumulation,
-  HistogramAggregator
+  HistogramAggregator,
 } from '../../src/aggregator';
-import {
-  commonValues,
-  defaultInstrumentDescriptor
-} from '../util';
+import { commonValues, defaultInstrumentDescriptor } from '../util';
 
 describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
@@ -75,13 +72,13 @@ describe('HistogramAggregator', () => {
       assert.deepStrictEqual(aggregator.merge(prev, delta).toPointValue(), {
         buckets: {
           boundaries: [1, 10, 100],
-          counts: [4, 0, 0, 0]
+          counts: [4, 0, 0, 0],
         },
         count: 4,
         hasMinMax: true,
         max: -5,
         min: -30,
-        sum: -65
+        sum: -65,
       });
     });
   });
@@ -110,7 +107,7 @@ describe('HistogramAggregator', () => {
         sum: 13,
         hasMinMax: false,
         min: Infinity,
-        max: -Infinity
+        max: -Infinity,
       });
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
@@ -144,17 +141,20 @@ describe('HistogramAggregator', () => {
               count: 2,
               sum: 1,
               min: 0,
-              max: 1
+              max: 1,
             },
           },
         ],
       };
-      assert.deepStrictEqual(aggregator.toMetricData(
-        defaultInstrumentDescriptor,
-        AggregationTemporality.CUMULATIVE,
-        [[{}, accumulation]],
-        endTime,
-      ), expected);
+      assert.deepStrictEqual(
+        aggregator.toMetricData(
+          defaultInstrumentDescriptor,
+          AggregationTemporality.CUMULATIVE,
+          [[{}, accumulation]],
+          endTime
+        ),
+        expected
+      );
     });
 
     it('should transform to expected data with recordMinMax = false', () => {
@@ -183,17 +183,20 @@ describe('HistogramAggregator', () => {
               count: 2,
               sum: 1,
               min: undefined,
-              max: undefined
+              max: undefined,
             },
           },
         ],
       };
-      assert.deepStrictEqual(aggregator.toMetricData(
-        defaultInstrumentDescriptor,
-        AggregationTemporality.CUMULATIVE,
-        [[{}, accumulation]],
-        endTime,
-      ), expected);
+      assert.deepStrictEqual(
+        aggregator.toMetricData(
+          defaultInstrumentDescriptor,
+          AggregationTemporality.CUMULATIVE,
+          [[{}, accumulation]],
+          endTime
+        ),
+        expected
+      );
     });
 
     function testSum(instrumentType: InstrumentType, expectSum: boolean) {
@@ -217,23 +220,30 @@ describe('HistogramAggregator', () => {
         },
         AggregationTemporality.CUMULATIVE,
         [[{}, accumulation]],
-        endTime,
+        endTime
       );
 
       assert.notStrictEqual(aggregatedData, undefined);
-      assert.strictEqual(aggregatedData?.dataPoints[0].value.sum, expectSum ? 5 : undefined);
+      assert.strictEqual(
+        aggregatedData?.dataPoints[0].value.sum,
+        expectSum ? 5 : undefined
+      );
     }
 
     describe('should have undefined sum when used with', () => {
       it('UpDownCounter', () => testSum(InstrumentType.UP_DOWN_COUNTER, false));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, false));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_GAUGE, false));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, false));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.OBSERVABLE_GAUGE, false));
     });
 
     describe('should include sum with', () => {
       it('UpDownCounter', () => testSum(InstrumentType.COUNTER, true));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.HISTOGRAM, true));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_COUNTER, true));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.HISTOGRAM, true));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.OBSERVABLE_COUNTER, true));
     });
   });
 });

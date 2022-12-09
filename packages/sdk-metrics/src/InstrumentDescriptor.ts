@@ -40,7 +40,11 @@ export interface InstrumentDescriptor {
   readonly valueType: ValueType;
 }
 
-export function createInstrumentDescriptor(name: string, type: InstrumentType, options?: MetricOptions): InstrumentDescriptor {
+export function createInstrumentDescriptor(
+  name: string,
+  type: InstrumentType,
+  options?: MetricOptions
+): InstrumentDescriptor {
   return {
     name,
     type,
@@ -50,7 +54,10 @@ export function createInstrumentDescriptor(name: string, type: InstrumentType, o
   };
 }
 
-export function createInstrumentDescriptorWithView(view: View, instrument: InstrumentDescriptor): InstrumentDescriptor {
+export function createInstrumentDescriptorWithView(
+  view: View,
+  instrument: InstrumentDescriptor
+): InstrumentDescriptor {
   return {
     name: view.name ?? instrument.name,
     description: view.description ?? instrument.description,
@@ -60,9 +67,14 @@ export function createInstrumentDescriptorWithView(view: View, instrument: Instr
   };
 }
 
-export function isDescriptorCompatibleWith(descriptor: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
-  return descriptor.name === otherDescriptor.name
-    && descriptor.unit === otherDescriptor.unit
-    && descriptor.type === otherDescriptor.type
-    && descriptor.valueType === otherDescriptor.valueType;
+export function isDescriptorCompatibleWith(
+  descriptor: InstrumentDescriptor,
+  otherDescriptor: InstrumentDescriptor
+) {
+  return (
+    descriptor.name === otherDescriptor.name &&
+    descriptor.unit === otherDescriptor.unit &&
+    descriptor.type === otherDescriptor.type &&
+    descriptor.valueType === otherDescriptor.valueType
+  );
 }
