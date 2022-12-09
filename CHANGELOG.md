@@ -22,6 +22,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.name`
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
+* fix(core): fix precision loss in numberToHrtime [#3480](https://github.com/open-telemetry/opentelemetry-js/pull/3480) @legendecas
 
 ### :books: (Refine Doc)
 
