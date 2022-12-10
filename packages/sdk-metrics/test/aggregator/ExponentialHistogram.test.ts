@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-import { ExponentialHistogramAccumulation } from '../../src/aggregator/ExponentialHistogram';
+import { HrTime, ValueType } from '@opentelemetry/api';
+import {
+  AggregationTemporality,
+  DataPointType,
+  InstrumentType,
+  MetricData,
+} from '../../src';
+import { ExponentialHistogramAccumulation, ExponentialHistogramAggregator } from '../../src/aggregator/ExponentialHistogram';
 import { Buckets } from '../../src/aggregator/exponential-histogram/Buckets';
 import { Mapping } from '../../src/aggregator/exponential-histogram//mapping/types';
 import { ExponentMapping } from '../../src/aggregator/exponential-histogram//mapping/ExponentMapping';
 import { LogarithmMapping } from '../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
 import * as assert from 'assert';
 import { assertInEpsilon, assertInDelta } from './exponential-histogram/helpers';
+import { defaultInstrumentDescriptor } from '../util';
 
 describe('ExponentialHistogramAccumulation', () => {
   describe('record', () => {
@@ -476,7 +484,7 @@ describe('ExponentialHistogramAccumulation', () => {
   });
 
   describe('toPointValue()', () => {
-    it('returns accurate representation of histogram internals', () => {
+    it('returns representation of histogram internals', () => {
       const acc = new ExponentialHistogramAccumulation([0, 0], 4);
 
       for(let i = 0; i < 4; i++) {
@@ -495,6 +503,226 @@ describe('ExponentialHistogramAccumulation', () => {
       assert.deepStrictEqual(pv.positive.counts, acc.positive().counts());
       assert.strictEqual(pv.negative.offset, acc.negative().offset());
       assert.deepStrictEqual(pv.negative.counts, acc.negative().counts());
+    });
+  });
+});
+
+describe('ExponentialHistogramAggregation', () => {
+  describe('merge', () => {
+    it('merges and does not mutate args', () => {
+      const agg = new ExponentialHistogramAggregator(4, true);
+      const acc0 = agg.createAccumulation([0, 0]);
+      const acc1 = agg.createAccumulation([0, 0]);
+      const acc2 = agg.createAccumulation([0, 0]);
+
+      acc0.record(2 << 0);
+      acc0.record(2 << 1);
+      acc0.record(2 << 3);
+
+      acc1.record(2 << 0);
+      acc1.record(2 << 2);
+      acc1.record(2 << 3);
+
+      acc2.record(2 << 0);
+      acc2.record(2 << 0);
+      acc2.record(2 << 1);
+      acc2.record(2 << 2);
+      acc2.record(2 << 3);
+      acc2.record(2 << 3);
+
+      // snapshots before merging
+      const acc0Snapshot = acc0.toPointValue();
+      const acc1Snapshot = acc1.toPointValue();
+
+      const result = agg.merge(acc0, acc1);
+
+      // merge is as expected
+      assertHistogramsEqual(result, acc2);
+
+      // merged histos are not mutated
+      assert.deepStrictEqual(acc0.toPointValue(), acc0Snapshot);
+      assert.deepStrictEqual(acc1.toPointValue(), acc1Snapshot);
+    });
+  });
+
+  describe('diff', () => {
+    it('diffs and does not mutate args', () => {
+      const agg = new ExponentialHistogramAggregator(4, true);
+      const acc0 = agg.createAccumulation([0, 0]);
+      const acc1 = agg.createAccumulation([0, 0]);
+      const acc2 = agg.createAccumulation([0, 0]);
+
+      acc0.record(2 << 0);
+      acc0.record(2 << 1);
+      acc0.record(2 << 3);
+
+      acc1.record(2 << 0);
+      acc1.record(2 << 0);
+      acc1.record(2 << 1);
+      acc1.record(2 << 2);
+      acc1.record(2 << 3);
+      acc1.record(2 << 3);
+
+      acc2.record(2 << 0);
+      acc2.record(2 << 2);
+      acc2.record(2 << 3);
+
+      // snapshots before diff
+      const acc0Snapshot = acc0.toPointValue();
+      const acc1Snapshot = acc1.toPointValue();
+
+      const result = agg.diff(acc0, acc1);
+
+      // diff as expected
+      assertHistogramsEqual(result, acc2);
+
+      // diffed histos are not mutated
+      assert.deepStrictEqual(acc0.toPointValue(), acc0Snapshot);
+      assert.deepStrictEqual(acc1.toPointValue(), acc1Snapshot);
+    });
+  });
+
+  describe('toMetricData', () => {
+    it('should transform to expected data with recordMinMax = true', () => {
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1,1];
+
+      const agg = new ExponentialHistogramAggregator(4, true);
+      const acc = agg.createAccumulation(startTime);
+
+      acc.record(2);
+      acc.record(-2);
+      acc.record(4);
+      acc.record(-4);
+
+      const result = agg.toMetricData(
+        defaultInstrumentDescriptor,
+        AggregationTemporality.CUMULATIVE,
+        [[{}, acc]],
+        endTime,
+      );
+
+      const expected: MetricData = {
+        descriptor: defaultInstrumentDescriptor,
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            startTime,
+            endTime,
+            value: {
+              min: -4,
+              max: 4,
+              sum: 0,
+              positive: {
+                offset: 1,
+                counts: [1, 0, 1, 0]
+              },
+              negative: {
+                offset: 1,
+                counts: [1, 0, 1, 0]
+              },
+              count: 4,
+              scale: 1,
+              zeroCount: 0
+            }
+          },
+        ],
+      };
+
+      assert.deepStrictEqual(result, expected);
+    });
+
+    it('should transform to expected data with recordMinMax = false', () => {
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1,1];
+
+      const agg = new ExponentialHistogramAggregator(4, false);
+      const acc = agg.createAccumulation(startTime);
+
+      acc.record(2);
+      acc.record(-2);
+      acc.record(4);
+      acc.record(-4);
+
+      const result = agg.toMetricData(
+        defaultInstrumentDescriptor,
+        AggregationTemporality.CUMULATIVE,
+        [[{}, acc]],
+        endTime,
+      );
+
+      const expected: MetricData = {
+        descriptor: defaultInstrumentDescriptor,
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            startTime,
+            endTime,
+            value: {
+              min: undefined,
+              max: undefined,
+              sum: 0,
+              positive: {
+                offset: 1,
+                counts: [1, 0, 1, 0]
+              },
+              negative: {
+                offset: 1,
+                counts: [1, 0, 1, 0]
+              },
+              count: 4,
+              scale: 1,
+              zeroCount: 0
+            }
+          },
+        ],
+      };
+
+      assert.deepStrictEqual(result, expected);
+    });
+
+    function testSum(instrumentType: InstrumentType, expectSum: boolean) {
+      const agg = new ExponentialHistogramAggregator(4, true);
+
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
+
+      const acc = agg.createAccumulation(startTime);
+      acc.record(0);
+      acc.record(1);
+      acc.record(4);
+
+      const aggregatedData = agg.toMetricData(
+        {
+          name: 'default_metric',
+          description: 'a simple instrument',
+          type: instrumentType,
+          unit: '1',
+          valueType: ValueType.DOUBLE,
+        },
+        AggregationTemporality.CUMULATIVE,
+        [[{}, acc]],
+        endTime,
+      );
+
+      assert.notStrictEqual(aggregatedData, undefined);
+      assert.strictEqual(aggregatedData?.dataPoints[0].value.sum, expectSum ? 5 : undefined);
+    }
+
+    describe('should have undefined sum when used with', () => {
+      it('UpDownCounter', () => testSum(InstrumentType.UP_DOWN_COUNTER, false));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, false));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_GAUGE, false));
+    });
+
+    describe('should include sum with', () => {
+      it('UpDownCounter', () => testSum(InstrumentType.COUNTER, true));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.HISTOGRAM, true));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_COUNTER, true));
     });
   });
 });

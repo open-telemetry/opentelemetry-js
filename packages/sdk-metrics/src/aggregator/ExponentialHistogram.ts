@@ -530,33 +530,25 @@ implements Aggregator<ExponentialHistogramAccumulation> {
    */
   merge(
     previous: ExponentialHistogramAccumulation,
-    _delta: ExponentialHistogramAccumulation
+    delta: ExponentialHistogramAccumulation
   ): ExponentialHistogramAccumulation {
-    //todo: implement
+    const result = delta.clone();
+    result.merge(previous);
 
-    // const previousValue = previous.toPointValue();
-    // const deltaValue = delta.toPointValue();
-
-    return new ExponentialHistogramAccumulation(
-      previous.startTime
-    );
+    return result;
   }
 
   /**
    * Returns a new DELTA aggregation by comparing two cumulative measurements.
    */
   diff(
-    _previous: ExponentialHistogramAccumulation,
+    previous: ExponentialHistogramAccumulation,
     current: ExponentialHistogramAccumulation
   ): ExponentialHistogramAccumulation {
-    //todo: implement
+    const result = current.clone();
+    result.diff(previous);
 
-    // const previousValue = previous.toPointValue();
-    // const currentValue = current.toPointValue();
-
-    return new ExponentialHistogramAccumulation(
-      current.startTime,
-    );
+    return result;
   }
 
   toMetricData(
@@ -573,6 +565,7 @@ implements Aggregator<ExponentialHistogramAccumulation> {
         const pointValue = accumulation.toPointValue();
 
         // determine if instrument allows negative values.
+        // todo: expo histo negatives?
         const allowsNegativeValues =
           descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
           descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
@@ -586,18 +579,17 @@ implements Aggregator<ExponentialHistogramAccumulation> {
             min: pointValue.hasMinMax ? pointValue.min : undefined,
             max: pointValue.hasMinMax ? pointValue.max : undefined,
             sum: !allowsNegativeValues ? pointValue.sum : undefined,
-            //todo: implement
             positive: {
-              offset: 0,
-              counts: [0],
+              offset: pointValue.positive.offset,
+              counts: pointValue.positive.counts,
             },
             negative: {
-              offset: 0,
-              counts: [0],
+              offset: pointValue.negative.offset,
+              counts: pointValue.negative.counts,
             },
             count: pointValue.count,
-            scale: 0,
-            zeroCount: 0,
+            scale: pointValue.scale,
+            zeroCount: pointValue.zeroCount,
           },
         };
       }),
