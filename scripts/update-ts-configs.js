@@ -32,6 +32,7 @@ const {
   getDefaultTsConfig,
   getEsmTsConfig,
   getEsnextTsConfig,
+  toPosix
 } = require('./update-ts-configs-constants');
 
 const packageJsonDependencyFields = ['dependencies', 'peerDependencies', 'devDependencies'];
@@ -99,13 +100,13 @@ function writeRootTsConfigJson(pkgRoot, projectRoot, lernaProjects) {
   const tsconfig = readJSON(tsconfigPath);
   const references = Array.from(lernaProjects.values())
     .filter(it => it.isTsProject)
-    .map(it => path.relative(pkgRoot, path.join(projectRoot, it.dir))).sort();
+    .map(it => toPosix(path.relative(pkgRoot, path.join(projectRoot, it.dir)))).sort();
   tsconfig.references = references.map(path => {
-    return { path }
+    return { path: toPosix(path) }
   });
   tsconfig.typedocOptions.entryPoints = Array.from(lernaProjects.values())
     .filter(it => !it.private && it.isTsProject)
-    .map(it => path.relative(pkgRoot, path.join(projectRoot, it.dir))).sort();
+    .map(it => toPosix(path.relative(pkgRoot, path.join(projectRoot, it.dir)))).sort();
   writeJSON(tsconfigPath, tsconfig, dryRun);
 
   for (const tsconfigName of ['tsconfig.esm.json', 'tsconfig.esnext.json']) {
@@ -113,9 +114,9 @@ function writeRootTsConfigJson(pkgRoot, projectRoot, lernaProjects) {
     const tsconfig = readJSON(tsconfigPath);
     const references = Array.from(lernaProjects.values())
       .filter(it => it.isTsProject && it.hasMultiTarget)
-      .map(it => path.relative(pkgRoot, path.join(projectRoot, it.dir))).sort();
+      .map(it => toPosix(path.relative(pkgRoot, path.join(projectRoot, it.dir)))).sort();
     tsconfig.references = references.map(pkgPath => {
-      return { path: path.join(pkgPath, tsconfigName), }
+      return { path: toPosix(path.join(pkgPath, tsconfigName)), }
     });
     writeJSON(tsconfigPath, tsconfig, dryRun);
   }
@@ -131,7 +132,7 @@ function writeMultiTargetTsConfigs(pkgRoot, projectRoot, references) {
     const tsconfigPath = path.join(pkgRoot, tsconfigName);
     let tsconfig = getTsConfig(pkgRoot, projectRoot);
     tsconfig.references = references.map(path => {
-      return { path };
+      return { path: toPosix(path) };
     });
     tsconfig = readAndMaybeMergeTsConfig(tsconfigPath, tsconfig);
     writeJSON(tsconfigPath, tsconfig, dryRun);
@@ -142,7 +143,7 @@ function writeSingleTargetTsConfig(pkgRoot, projectRoot, references) {
   const tsconfigPath = path.join(pkgRoot, 'tsconfig.json');
   let tsconfig = getDefaultTsConfig(pkgRoot, projectRoot);
   tsconfig.references = references.map(path => {
-    return { path }
+    return { path: toPosix(path) }
   });
   tsconfig = readAndMaybeMergeTsConfig(tsconfigPath, tsconfig);
   writeJSON(tsconfigPath, tsconfig, dryRun);
