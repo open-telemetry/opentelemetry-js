@@ -374,7 +374,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should sanitize names', async () => {
-      const counter = meter.createCounter('counter.bad-name');
+      const counter = meter.createCounter('counter..bad-name');
 
       counter.add(10, { key1: 'attributeValue1' });
 
