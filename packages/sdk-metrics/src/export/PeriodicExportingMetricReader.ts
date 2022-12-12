@@ -115,7 +115,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     } else {
       resourceMetrics.resource
         .waitForAsyncAttributes()
-        .then(await doExport, err =>
+        .then(doExport, err =>
           diag.debug('Error while resolving async portion of resource: ', err)
         );
     }
