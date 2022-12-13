@@ -52,7 +52,7 @@ export class PatternPredicate implements Predicate {
     return `^${pattern.replace(ESCAPE, '\\$&').replace('*', '.*')}$`;
   }
 
-  static hasWildcard(pattern: string): boolean{
+  static hasWildcard(pattern: string): boolean {
     return pattern.includes('*');
   }
 }

@@ -23,14 +23,15 @@ import { RequireInTheMiddleSingleton } from '../../src/platform/node/RequireInTh
 const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
 
 type AugmentedExports = {
-  __ritmOnRequires?: string[]
+  __ritmOnRequires?: string[];
 };
 
-const makeOnRequiresStub = (label: string): sinon.SinonStub => sinon.stub().callsFake(((exports: AugmentedExports) => {
-  exports.__ritmOnRequires ??= [];
-  exports.__ritmOnRequires.push(label);
-  return exports;
-}) as RequireInTheMiddle.OnRequireFn);
+const makeOnRequiresStub = (label: string): sinon.SinonStub =>
+  sinon.stub().callsFake(((exports: AugmentedExports) => {
+    exports.__ritmOnRequires ??= [];
+    exports.__ritmOnRequires.push(label);
+    return exports;
+  }) as RequireInTheMiddle.OnRequireFn);
 
 describe('RequireInTheMiddleSingleton', () => {
   describe('register', () => {
@@ -43,11 +44,20 @@ describe('RequireInTheMiddleSingleton', () => {
 
     before(() => {
       requireInTheMiddleSingleton.register('fs', onRequireFsStub);
-      requireInTheMiddleSingleton.register('fs/promises', onRequireFsPromisesStub);
+      requireInTheMiddleSingleton.register(
+        'fs/promises',
+        onRequireFsPromisesStub
+      );
       requireInTheMiddleSingleton.register('codecov', onRequireCodecovStub);
-      requireInTheMiddleSingleton.register('codecov/lib/codecov.js', onRequireCodecovLibStub);
+      requireInTheMiddleSingleton.register(
+        'codecov/lib/codecov.js',
+        onRequireCodecovLibStub
+      );
       requireInTheMiddleSingleton.register('cpx', onRequireCpxStub);
-      requireInTheMiddleSingleton.register('cpx/lib/copy-sync.js', onRequireCpxLibStub);
+      requireInTheMiddleSingleton.register(
+        'cpx/lib/copy-sync.js',
+        onRequireCpxLibStub
+      );
     });
 
     beforeEach(() => {
@@ -62,7 +72,10 @@ describe('RequireInTheMiddleSingleton', () => {
     it('should return a hooked object', () => {
       const moduleName = 'm';
       const onRequire = makeOnRequiresStub('m');
-      const hooked = requireInTheMiddleSingleton.register(moduleName, onRequire);
+      const hooked = requireInTheMiddleSingleton.register(
+        moduleName,
+        onRequire
+      );
       assert.deepStrictEqual(hooked, { moduleName, onRequire });
     });
 
@@ -71,7 +84,12 @@ describe('RequireInTheMiddleSingleton', () => {
         it('should call `onRequire`', () => {
           const exports = require('fs');
           assert.deepStrictEqual(exports.__ritmOnRequires, ['fs']);
-          sinon.assert.calledOnceWithExactly(onRequireFsStub, exports, 'fs', undefined);
+          sinon.assert.calledOnceWithExactly(
+            onRequireFsStub,
+            exports,
+            'fs',
+            undefined
+          );
           sinon.assert.notCalled(onRequireFsPromisesStub);
         });
       });
@@ -88,9 +106,14 @@ describe('RequireInTheMiddleSingleton', () => {
       describe('AND module name matches', () => {
         it('should call `onRequire`', () => {
           const exports = require('fs/promises');
-          assert.deepStrictEqual(exports.__ritmOnRequires, ['fs', 'fs-promises']);
-          sinon.assert.calledOnceWithExactly(onRequireFsPromisesStub, exports, 'fs/promises', undefined);
-          sinon.assert.calledOnceWithMatch(onRequireFsStub, { __ritmOnRequires: ['fs', 'fs-promises'] }, 'fs/promises', undefined);
+          assert.deepStrictEqual(exports.__ritmOnRequires, ['fs-promises']);
+          sinon.assert.calledOnceWithExactly(
+            onRequireFsPromisesStub,
+            exports,
+            'fs/promises',
+            undefined
+          );
+          sinon.assert.notCalled(onRequireFsStub);
         });
       });
     });
@@ -102,23 +125,56 @@ describe('RequireInTheMiddleSingleton', () => {
         it('should call `onRequire`', () => {
           const exports = require('codecov');
           assert.deepStrictEqual(exports.__ritmOnRequires, ['codecov']);
-          sinon.assert.calledWithExactly(onRequireCodecovStub, exports, 'codecov', baseDir);
-          sinon.assert.calledWithMatch(onRequireCodecovStub, { __ritmOnRequires: ['codecov', 'codecov-lib'] }, modulePath, baseDir);
-          sinon.assert.calledWithMatch(onRequireCodecovLibStub, { __ritmOnRequires: ['codecov', 'codecov-lib'] }, modulePath, baseDir);
+          sinon.assert.calledWithExactly(
+            onRequireCodecovStub,
+            exports,
+            'codecov',
+            baseDir
+          );
+          sinon.assert.calledWithMatch(
+            onRequireCodecovStub,
+            { __ritmOnRequires: ['codecov', 'codecov-lib'] },
+            modulePath,
+            baseDir
+          );
+          sinon.assert.calledWithMatch(
+            onRequireCodecovLibStub,
+            { __ritmOnRequires: ['codecov', 'codecov-lib'] },
+            modulePath,
+            baseDir
+          );
         }).timeout(30000);
       });
     });
 
     describe('non-core module with sub-path', () => {
       describe('AND module name matches', () => {
-        const baseDir = path.resolve(path.dirname(require.resolve('cpx')), '..');
+        const baseDir = path.resolve(
+          path.dirname(require.resolve('cpx')),
+          '..'
+        );
         const modulePath = path.join('cpx', 'lib', 'copy-sync.js');
         it('should call `onRequire`', () => {
           const exports = require('cpx/lib/copy-sync');
           assert.deepStrictEqual(exports.__ritmOnRequires, ['cpx', 'cpx-lib']);
-          sinon.assert.calledWithMatch(onRequireCpxStub, { __ritmOnRequires: ['cpx', 'cpx-lib'] }, modulePath, baseDir);
-          sinon.assert.calledWithExactly(onRequireCpxStub, exports, modulePath, baseDir);
-          sinon.assert.calledWithExactly(onRequireCpxLibStub, exports, modulePath, baseDir);
+          sinon.assert.calledWithMatch(
+            onRequireCpxStub,
+            { __ritmOnRequires: ['cpx', 'cpx-lib'] },
+            modulePath,
+            baseDir
+          );
+          sinon.assert.calledWithExactly(
+            onRequireCpxStub,
+            exports,
+            modulePath,
+            baseDir
+          );
+          sinon.assert.calledWithExactly(
+            onRequireCpxLibStub,
+            exports,
+            modulePath,
+            baseDir
+          );
         });
       });
     });

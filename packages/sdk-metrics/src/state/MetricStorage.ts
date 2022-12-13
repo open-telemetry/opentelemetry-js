@@ -18,7 +18,10 @@ import { HrTime } from '@opentelemetry/api';
 import { MetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
-import { createInstrumentDescriptor, InstrumentDescriptor } from '../InstrumentDescriptor';
+import {
+  createInstrumentDescriptor,
+  InstrumentDescriptor,
+} from '../InstrumentDescriptor';
 
 /**
  * Internal interface.
@@ -26,8 +29,7 @@ import { createInstrumentDescriptor, InstrumentDescriptor } from '../InstrumentD
  * Represents a storage from which we can collect metrics.
  */
 export abstract class MetricStorage {
-  constructor(protected _instrumentDescriptor: InstrumentDescriptor) {
-  }
+  constructor(protected _instrumentDescriptor: InstrumentDescriptor) {}
 
   /**
    * Collects the metrics from this storage.
@@ -38,21 +40,22 @@ export abstract class MetricStorage {
   abstract collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    collectionTime: HrTime,
+    collectionTime: HrTime
   ): Maybe<MetricData>;
 
   getInstrumentDescriptor(): Readonly<InstrumentDescriptor> {
     return this._instrumentDescriptor;
   }
 
-  updateDescription(description: string): void{
+  updateDescription(description: string): void {
     this._instrumentDescriptor = createInstrumentDescriptor(
       this._instrumentDescriptor.name,
       this._instrumentDescriptor.type,
       {
         description: description,
         valueType: this._instrumentDescriptor.valueType,
-        unit: this._instrumentDescriptor.unit
-      });
+        unit: this._instrumentDescriptor.unit,
+      }
+    );
   }
 }

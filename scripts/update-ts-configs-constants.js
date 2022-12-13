@@ -18,7 +18,7 @@ const path = require('path');
 
 function getDefaultTsConfig(pkgRoot, projectRoot) {
   return {
-    extends: path.relative(pkgRoot, path.join(projectRoot, 'tsconfig.base.json')),
+    extends: toPosix(path.relative(pkgRoot, path.join(projectRoot, 'tsconfig.base.json'))),
     compilerOptions: {
       rootDir: '.',
       outDir: 'build',
@@ -33,7 +33,7 @@ function getDefaultTsConfig(pkgRoot, projectRoot) {
 
 function getEsmTsConfig(pkgRoot, projectRoot) {
   return {
-    extends: path.relative(pkgRoot, path.join(projectRoot, 'tsconfig.base.esm.json')),
+    extends: toPosix(path.relative(pkgRoot, path.join(projectRoot, 'tsconfig.base.esm.json'))),
     compilerOptions: {
       rootDir: 'src',
       outDir: 'build/esm',
@@ -48,7 +48,7 @@ function getEsmTsConfig(pkgRoot, projectRoot) {
 
 function getEsnextTsConfig(pkgRoot, projectRoot) {
   return {
-    extends: path.relative(pkgRoot, path.join(projectRoot, 'tsconfig.base.esnext.json')),
+    extends: toPosix(path.relative(pkgRoot, path.join(projectRoot, 'tsconfig.base.esnext.json'))),
     compilerOptions: {
       rootDir: 'src',
       outDir: 'build/esnext',
@@ -61,8 +61,15 @@ function getEsnextTsConfig(pkgRoot, projectRoot) {
   };
 }
 
+// Helper to convert windows path style to posix to ensure platform independent
+// tsconfig generation.
+function toPosix(p) {
+  return p.split(path.sep).join(path.posix.sep);
+}
+
 module.exports = {
   getDefaultTsConfig,
   getEsmTsConfig,
   getEsnextTsConfig,
+  toPosix
 };

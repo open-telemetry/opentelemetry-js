@@ -62,7 +62,7 @@ export class NoopMeter implements Meter {
    */
   createObservableGauge(
     _name: string,
-    _options?: MetricOptions,
+    _options?: MetricOptions
   ): ObservableGauge {
     return NOOP_OBSERVABLE_GAUGE_METRIC;
   }
@@ -72,7 +72,7 @@ export class NoopMeter implements Meter {
    */
   createObservableCounter(
     _name: string,
-    _options?: MetricOptions,
+    _options?: MetricOptions
   ): ObservableCounter {
     return NOOP_OBSERVABLE_COUNTER_METRIC;
   }
@@ -82,7 +82,7 @@ export class NoopMeter implements Meter {
    */
   createObservableUpDownCounter(
     _name: string,
-    _options?: MetricOptions,
+    _options?: MetricOptions
   ): ObservableUpDownCounter {
     return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
   }
@@ -90,7 +90,10 @@ export class NoopMeter implements Meter {
   /**
    * @see {@link Meter.addBatchObservableCallback}
    */
-  addBatchObservableCallback(_callback: BatchObservableCallback, _observables: Observable[]): void {}
+  addBatchObservableCallback(
+    _callback: BatchObservableCallback,
+    _observables: Observable[]
+  ): void {}
 
   /**
    * @see {@link Meter.removeBatchObservableCallback}
@@ -104,7 +107,10 @@ export class NoopCounterMetric extends NoopMetric implements Counter {
   add(_value: number, _attributes: MetricAttributes): void {}
 }
 
-export class NoopUpDownCounterMetric extends NoopMetric implements UpDownCounter {
+export class NoopUpDownCounterMetric
+  extends NoopMetric
+  implements UpDownCounter
+{
   add(_value: number, _attributes: MetricAttributes): void {}
 }
 
@@ -118,11 +124,17 @@ export class NoopObservableMetric {
   removeCallback(_callback: ObservableCallback) {}
 }
 
-export class NoopObservableCounterMetric extends NoopObservableMetric implements ObservableCounter {}
+export class NoopObservableCounterMetric
+  extends NoopObservableMetric
+  implements ObservableCounter {}
 
-export class NoopObservableGaugeMetric extends NoopObservableMetric implements ObservableGauge {}
+export class NoopObservableGaugeMetric
+  extends NoopObservableMetric
+  implements ObservableGauge {}
 
-export class NoopObservableUpDownCounterMetric extends NoopObservableMetric implements ObservableUpDownCounter {}
+export class NoopObservableUpDownCounterMetric
+  extends NoopObservableMetric
+  implements ObservableUpDownCounter {}
 
 export const NOOP_METER = new NoopMeter();
 
@@ -134,7 +146,8 @@ export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric();
 // Asynchronous instruments
 export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableCounterMetric();
 export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableGaugeMetric();
-export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableUpDownCounterMetric();
+export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC =
+  new NoopObservableUpDownCounterMetric();
 
 /**
  * Create a no-op Meter

@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Counter,
-  Meter,
-  ObservableResult
-} from '@opentelemetry/api';
+import { Counter, Meter, ObservableResult } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -30,7 +26,7 @@ import {
   sdkLanguage,
   sdkName,
   sdkVersion,
-  serviceName
+  serviceName,
 } from './util';
 import { SinonStubbedInstance } from 'sinon';
 
@@ -39,7 +35,7 @@ const infoLine = `target_info{service_name="${serviceName}",telemetry_sdk_langua
 const serializedDefaultResourceLines = [
   '# HELP target_info Target metadata',
   '# TYPE target_info gauge',
-  infoLine
+  infoLine,
 ];
 
 describe('PrometheusExporter', () => {
@@ -135,7 +131,7 @@ describe('PrometheusExporter', () => {
     it('should unref the server to allow graceful termination', () => {
       const mockServer = sinon.createStubInstance(http.Server);
       const createStub = sinon.stub(http, 'createServer');
-      createStub.returns((mockServer as any) as http.Server);
+      createStub.returns(mockServer as any as http.Server);
       const exporter = new PrometheusExporter({}, async () => {
         await exporter.shutdown();
       });
@@ -217,20 +213,18 @@ describe('PrometheusExporter', () => {
 
     it('should able to call getMetricsRequestHandler function to generate response with metrics', async () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
-      const mockRequest: SinonStubbedInstance<http.IncomingMessage> = sinon.createStubInstance(
-        http.IncomingMessage
-      );
-      const mockResponse: SinonStubbedInstance<http.ServerResponse> = sinon.createStubInstance(
-        http.ServerResponse
-      );
+      const mockRequest: SinonStubbedInstance<http.IncomingMessage> =
+        sinon.createStubInstance(http.IncomingMessage);
+      const mockResponse: SinonStubbedInstance<http.ServerResponse> =
+        sinon.createStubInstance(http.ServerResponse);
       let resolve: () => void;
       const deferred = new Promise<void>(res => {
         resolve = res;
       });
       mockResponse.end.callsFake(() => resolve() as any);
       exporter.getMetricsRequestHandler(
-        (mockRequest as unknown) as http.IncomingMessage,
-        (mockResponse as unknown) as http.ServerResponse
+        mockRequest as unknown as http.IncomingMessage,
+        mockResponse as unknown as http.ServerResponse
       );
       await deferred;
       sinon.assert.calledOnce(mockResponse.setHeader);
@@ -289,7 +283,7 @@ describe('PrometheusExporter', () => {
         'metric_observable_gauge',
         {
           description: 'a test description',
-        },
+        }
       );
       observableGauge.addCallback((observableResult: ObservableResult) => {
         observableResult.observe(getCpuUsage(), {
@@ -358,7 +352,7 @@ describe('PrometheusExporter', () => {
 
       assert.deepStrictEqual(lines, [
         ...serializedDefaultResourceLines,
-        '# no registered metrics'
+        '# no registered metrics',
       ]);
     });
 
@@ -380,7 +374,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should sanitize names', async () => {
-      const counter = meter.createCounter('counter.bad-name');
+      const counter = meter.createCounter('counter..bad-name');
 
       counter.add(10, { key1: 'attributeValue1' });
 
@@ -423,7 +417,7 @@ describe('PrometheusExporter', () => {
         'metric_observable_counter',
         {
           description: 'a test description',
-        },
+        }
       );
       observableCounter.addCallback((observableResult: ObservableResult) => {
         observableResult.observe(getValue(), {
@@ -452,13 +446,15 @@ describe('PrometheusExporter', () => {
         'metric_observable_up_down_counter',
         {
           description: 'a test description',
-        },
+        }
       );
-      observableUpDownCounter.addCallback((observableResult: ObservableResult) => {
-        observableResult.observe(getValue(), {
-          key1: 'attributeValue1',
-        });
-      });
+      observableUpDownCounter.addCallback(
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getValue(), {
+            key1: 'attributeValue1',
+          });
+        }
+      );
 
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');

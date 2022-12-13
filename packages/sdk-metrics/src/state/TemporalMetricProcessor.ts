@@ -15,7 +15,11 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { Accumulation, AccumulationRecord, Aggregator } from '../aggregator/types';
+import {
+  Accumulation,
+  AccumulationRecord,
+  Aggregator,
+} from '../aggregator/types';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AggregationTemporality } from '../export/AggregationTemporality';
@@ -48,8 +52,14 @@ interface LastReportedHistory<T extends Maybe<Accumulation>> {
  * of metrics and reports given temporality values.
  */
 export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
-  private _unreportedAccumulations = new Map<MetricCollectorHandle, AttributeHashMap<T>[]>();
-  private _reportHistory = new Map<MetricCollectorHandle, LastReportedHistory<T>>();
+  private _unreportedAccumulations = new Map<
+    MetricCollectorHandle,
+    AttributeHashMap<T>[]
+  >();
+  private _reportHistory = new Map<
+    MetricCollectorHandle,
+    LastReportedHistory<T>
+  >();
 
   constructor(private _aggregator: Aggregator<T>) {}
 
@@ -67,10 +77,11 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     collectors: MetricCollectorHandle[],
     instrumentDescriptor: InstrumentDescriptor,
     currentAccumulations: AttributeHashMap<T>,
-    collectionTime: HrTime,
+    collectionTime: HrTime
   ): Maybe<MetricData> {
     this._stashAccumulations(collectors, currentAccumulations);
-    const unreportedAccumulations = this._getMergedUnreportedAccumulations(collector);
+    const unreportedAccumulations =
+      this._getMergedUnreportedAccumulations(collector);
 
     let result = unreportedAccumulations;
     let aggregationTemporality: AggregationTemporality;
@@ -96,13 +107,23 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       if (aggregationTemporality === AggregationTemporality.CUMULATIVE) {
         // We need to make sure the current delta recording gets merged into the previous cumulative
         // for the next cumulative recording.
-        result = TemporalMetricProcessor.merge(last.accumulations, unreportedAccumulations, this._aggregator);
+        result = TemporalMetricProcessor.merge(
+          last.accumulations,
+          unreportedAccumulations,
+          this._aggregator
+        );
       } else {
-        result = TemporalMetricProcessor.calibrateStartTime(last.accumulations, unreportedAccumulations, lastCollectionTime);
+        result = TemporalMetricProcessor.calibrateStartTime(
+          last.accumulations,
+          unreportedAccumulations,
+          lastCollectionTime
+        );
       }
     } else {
       // Call into user code to select aggregation temporality for the instrument.
-      aggregationTemporality = collector.selectAggregationTemporality(instrumentDescriptor.type);
+      aggregationTemporality = collector.selectAggregationTemporality(
+        instrumentDescriptor.type
+      );
     }
 
     // Update last reported (cumulative) accumulation.
@@ -116,10 +137,14 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       instrumentDescriptor,
       aggregationTemporality,
       AttributesMapToAccumulationRecords(result),
-      /* endTime */ collectionTime);
+      /* endTime */ collectionTime
+    );
   }
 
-  private _stashAccumulations(collectors: MetricCollectorHandle[], currentAccumulation: AttributeHashMap<T>) {
+  private _stashAccumulations(
+    collectors: MetricCollectorHandle[],
+    currentAccumulation: AttributeHashMap<T>
+  ) {
     collectors.forEach(it => {
       let stash = this._unreportedAccumulations.get(it);
       if (stash === undefined) {
@@ -143,7 +168,11 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     return result;
   }
 
-  static merge<T extends Maybe<Accumulation>>(last: AttributeHashMap<T>, current: AttributeHashMap<T>, aggregator: Aggregator<T>) {
+  static merge<T extends Maybe<Accumulation>>(
+    last: AttributeHashMap<T>,
+    current: AttributeHashMap<T>,
+    aggregator: Aggregator<T>
+  ) {
     const result = last;
     const iterator = current.entries();
     let next = iterator.next();
@@ -168,7 +197,11 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
    * Calibrate the reported metric streams' startTime to lastCollectionTime. Leaves
    * the new stream to be the initial observation time unchanged.
    */
-  static calibrateStartTime<T extends Maybe<Accumulation>>(last: AttributeHashMap<T>, current: AttributeHashMap<T>, lastCollectionTime: HrTime) {
+  static calibrateStartTime<T extends Maybe<Accumulation>>(
+    last: AttributeHashMap<T>,
+    current: AttributeHashMap<T>,
+    lastCollectionTime: HrTime
+  ) {
     for (const [key, hash] of last.keys()) {
       const currentAccumulation = current.get(key, hash);
       currentAccumulation?.setStartTime(lastCollectionTime);
@@ -178,6 +211,8 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
 }
 
 // TypeScript complains about converting 3 elements tuple to AccumulationRecord<T>.
-function AttributesMapToAccumulationRecords<T>(map: AttributeHashMap<T>): AccumulationRecord<T>[] {
+function AttributesMapToAccumulationRecords<T>(
+  map: AttributeHashMap<T>
+): AccumulationRecord<T>[] {
   return Array.from(map.entries()) as unknown as AccumulationRecord<T>[];
 }

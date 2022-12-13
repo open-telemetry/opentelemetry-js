@@ -23,7 +23,13 @@ import { DataPointType } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { SyncMetricStorage } from '../../src/state/SyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
-import { assertMetricData, assertDataPoint, commonAttributes, commonValues, defaultInstrumentDescriptor } from '../util';
+import {
+  assertMetricData,
+  assertDataPoint,
+  commonAttributes,
+  commonValues,
+  defaultInstrumentDescriptor,
+} from '../util';
 
 const deltaCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
@@ -66,7 +72,8 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            [3, 3]);
+            [3, 3]
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -78,7 +85,8 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            [4, 4]);
+            [4, 4]
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 0);
@@ -89,7 +97,8 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             [deltaCollector],
-            [6, 6]);
+            [6, 6]
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -113,7 +122,8 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            [3, 3]);
+            [3, 3]
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -125,7 +135,8 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            [4, 4]);
+            [4, 4]
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -137,7 +148,8 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            [6, 6]);
+            [6, 6]
+          );
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);

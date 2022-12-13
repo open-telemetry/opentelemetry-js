@@ -19,7 +19,7 @@ import { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
 import {
   CompressionAlgorithm,
   OTLPExporterError,
-  sendWithHttp
+  sendWithHttp,
 } from '@opentelemetry/otlp-exporter-base';
 import type * as protobuf from 'protobufjs';
 import * as root from './generated/root';
@@ -27,16 +27,18 @@ import * as root from './generated/root';
 export interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
   create(properties?: T): R;
   encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
-  decode(reader: (protobuf.Reader | Uint8Array), length?: number): R;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
 }
 
 export function getExportRequestProto<ServiceRequest>(
-  clientType: ServiceClientType,
+  clientType: ServiceClientType
 ): ExportRequestType<ServiceRequest> {
   if (clientType === ServiceClientType.SPANS) {
-    return root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
+    return root.opentelemetry.proto.collector.trace.v1
+      .ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
   } else {
-    return root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest as unknown as ExportRequestType<ServiceRequest>;
+    return root.opentelemetry.proto.collector.metrics.v1
+      .ExportMetricsServiceRequest as unknown as ExportRequestType<ServiceRequest>;
   }
 }
 
@@ -49,7 +51,9 @@ export function send<ExportItem, ServiceRequest>(
 ): void {
   const serviceRequest = collector.convert(objects);
 
-  const exportRequestType = getExportRequestProto<ServiceRequest>(collector.getServiceClientType());
+  const exportRequestType = getExportRequestProto<ServiceRequest>(
+    collector.getServiceClientType()
+  );
   const message = exportRequestType.create(serviceRequest);
   if (message) {
     const body = exportRequestType.encode(message).finish();

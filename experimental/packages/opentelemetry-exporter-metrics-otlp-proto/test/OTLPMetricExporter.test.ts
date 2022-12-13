@@ -16,7 +16,10 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
-import { getExportRequestProto, ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
+import {
+  getExportRequestProto,
+  ServiceClientType,
+} from '@opentelemetry/otlp-proto-exporter-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
@@ -30,9 +33,15 @@ import {
   mockCounter,
   MockedResponse,
   mockObservableGauge,
-  mockHistogram, collect, setUp, shutdown,
+  mockHistogram,
+  collect,
+  setUp,
+  shutdown,
 } from './metricsHelper';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationTemporality,
+  ResourceMetrics,
+} from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
@@ -42,7 +51,8 @@ let fakeRequest: PassThrough;
 
 describe('OTLPMetricExporter - node with proto over http', () => {
   let collectorExporter: OTLPMetricExporter;
-  let collectorExporterConfig: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions;
+  let collectorExporterConfig: OTLPExporterNodeConfigBase &
+    OTLPMetricExporterOptions;
   let metrics: ResourceMetrics;
 
   afterEach(() => {
@@ -109,7 +119,8 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
     it('should not add root path when signal url defined in env contains path', () => {
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
+        'http://foo.bar/v1/metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
         collectorExporter._otlpExporter.url,
@@ -118,7 +129,8 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
     it('should not add root path when signal url defined in env contains path and ends in /', () => {
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics/';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
+        'http://foo.bar/v1/metrics/';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
         collectorExporter._otlpExporter.url,
@@ -153,7 +165,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        temporalityPreference: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE,
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       setUp();
@@ -180,8 +192,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
     });
 
     it('should open the connection', done => {
-      collectorExporter.export(metrics, () => {
-      });
+      collectorExporter.export(metrics, () => {});
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -197,8 +208,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
     });
 
     it('should set custom headers', done => {
-      collectorExporter.export(metrics, () => {
-      });
+      collectorExporter.export(metrics, () => {});
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
@@ -213,8 +223,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
     });
 
     it('should have keep alive and keepAliveMsecs option set', done => {
-      collectorExporter.export(metrics, () => {
-      });
+      collectorExporter.export(metrics, () => {});
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
@@ -236,18 +245,29 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       let buff = Buffer.from('');
 
       fakeRequest.on('end', () => {
-        const ExportTraceServiceRequestProto = getExportRequestProto(ServiceClientType.METRICS);
+        const ExportTraceServiceRequestProto = getExportRequestProto(
+          ServiceClientType.METRICS
+        );
         const data = ExportTraceServiceRequestProto.decode(buff);
         const json = data?.toJSON() as IExportMetricsServiceRequest;
 
         // The order of the metrics is not guaranteed.
-        const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
-        const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge');
-        const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+        const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
+          it => it.descriptor.name === 'int-counter'
+        );
+        const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
+          it => it.descriptor.name === 'double-observable-gauge'
+        );
+        const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
+          it => it.descriptor.name === 'int-histogram'
+        );
 
-        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
-        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
-        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
+        const metric1 =
+          json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+        const metric2 =
+          json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+        const metric3 =
+          json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureExportedCounterIsCorrect(
@@ -255,7 +275,10 @@ describe('OTLPMetricExporter - node with proto over http', () => {
           metric1.sum?.dataPoints[0].timeUnixNano,
           metric1.sum?.dataPoints[0].startTimeUnixNano
         );
-        assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
+        assert.ok(
+          typeof metric2 !== 'undefined',
+          "observable gauge doesn't exist"
+        );
         ensureExportedObservableGaugeIsCorrect(
           metric2,
           metric2.gauge?.dataPoints[0].timeUnixNano,
@@ -282,7 +305,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       });
 
       const clock = sinon.useFakeTimers();
-      collectorExporter.export(metrics, () => { });
+      collectorExporter.export(metrics, () => {});
       clock.tick(200);
       clock.restore();
     });

@@ -18,7 +18,10 @@ import { CollectionResult } from '../../src/export/MetricData';
 import { MetricProducer } from '../../src/export/MetricProducer';
 import { defaultResource } from '../util';
 
-export const emptyResourceMetrics = { resource: defaultResource, scopeMetrics: [] };
+export const emptyResourceMetrics = {
+  resource: defaultResource,
+  scopeMetrics: [],
+};
 
 export class TestMetricProducer implements MetricProducer {
   async collect(): Promise<CollectionResult> {

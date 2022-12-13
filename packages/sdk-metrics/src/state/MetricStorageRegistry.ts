@@ -15,9 +15,15 @@
  */
 
 import { MetricStorage } from './MetricStorage';
-import { InstrumentDescriptor, isDescriptorCompatibleWith } from '../InstrumentDescriptor';
+import {
+  InstrumentDescriptor,
+  isDescriptorCompatibleWith,
+} from '../InstrumentDescriptor';
 import * as api from '@opentelemetry/api';
-import { getConflictResolutionRecipe, getIncompatibilityDetails } from '../view/RegistrationConflicts';
+import {
+  getConflictResolutionRecipe,
+  getIncompatibilityDetails,
+} from '../view/RegistrationConflicts';
 import { MetricCollectorHandle } from './MetricCollector';
 
 type StorageMap = Map<string, MetricStorage[]>;
@@ -27,9 +33,12 @@ type StorageMap = Map<string, MetricStorage[]>;
  */
 export class MetricStorageRegistry {
   private readonly _sharedRegistry: StorageMap = new Map();
-  private readonly _perCollectorRegistry = new Map<MetricCollectorHandle, StorageMap>();
+  private readonly _perCollectorRegistry = new Map<
+    MetricCollectorHandle,
+    StorageMap
+  >();
 
-  static create(){
+  static create() {
     return new MetricStorageRegistry();
   }
 
@@ -53,7 +62,10 @@ export class MetricStorageRegistry {
     this._registerStorage(storage, this._sharedRegistry);
   }
 
-  registerForCollector(collector: MetricCollectorHandle, storage: MetricStorage) {
+  registerForCollector(
+    collector: MetricCollectorHandle,
+    storage: MetricStorage
+  ) {
     let storageMap = this._perCollectorRegistry.get(collector);
     if (storageMap == null) {
       storageMap = new Map();
@@ -62,7 +74,9 @@ export class MetricStorageRegistry {
     this._registerStorage(storage, storageMap);
   }
 
-  findOrUpdateCompatibleStorage<T extends MetricStorage>(expectedDescriptor: InstrumentDescriptor): T | null {
+  findOrUpdateCompatibleStorage<T extends MetricStorage>(
+    expectedDescriptor: InstrumentDescriptor
+  ): T | null {
     const storages = this._sharedRegistry.get(expectedDescriptor.name);
     if (storages === undefined) {
       return null;
@@ -73,7 +87,10 @@ export class MetricStorageRegistry {
     return this._findOrUpdateCompatibleStorage<T>(expectedDescriptor, storages);
   }
 
-  findOrUpdateCompatibleCollectorStorage<T extends MetricStorage>(collector: MetricCollectorHandle, expectedDescriptor: InstrumentDescriptor): T | null {
+  findOrUpdateCompatibleCollectorStorage<T extends MetricStorage>(
+    collector: MetricCollectorHandle,
+    expectedDescriptor: InstrumentDescriptor
+  ): T | null {
     const storageMap = this._perCollectorRegistry.get(collector);
     if (storageMap === undefined) {
       return null;
@@ -101,7 +118,10 @@ export class MetricStorageRegistry {
     storages.push(storage);
   }
 
-  private _findOrUpdateCompatibleStorage<T extends MetricStorage>(expectedDescriptor: InstrumentDescriptor, existingStorages: MetricStorage[]): T | null {
+  private _findOrUpdateCompatibleStorage<T extends MetricStorage>(
+    expectedDescriptor: InstrumentDescriptor,
+    existingStorages: MetricStorage[]
+  ): T | null {
     let compatibleStorage = null;
 
     for (const existingStorage of existingStorages) {
@@ -110,30 +130,37 @@ export class MetricStorageRegistry {
       if (isDescriptorCompatibleWith(existingDescriptor, expectedDescriptor)) {
         // Use the longer description if it does not match.
         if (existingDescriptor.description !== expectedDescriptor.description) {
-          if (expectedDescriptor.description.length > existingDescriptor.description.length) {
+          if (
+            expectedDescriptor.description.length >
+            existingDescriptor.description.length
+          ) {
             existingStorage.updateDescription(expectedDescriptor.description);
           }
 
-          api.diag.warn('A view or instrument with the name ',
+          api.diag.warn(
+            'A view or instrument with the name ',
             expectedDescriptor.name,
             ' has already been registered, but has a different description and is incompatible with another registered view.\n',
             'Details:\n',
             getIncompatibilityDetails(existingDescriptor, expectedDescriptor),
             'The longer description will be used.\nTo resolve the conflict:',
-            getConflictResolutionRecipe(existingDescriptor, expectedDescriptor));
+            getConflictResolutionRecipe(existingDescriptor, expectedDescriptor)
+          );
         }
         // Storage is fully compatible. There will never be more than one pre-existing fully compatible storage.
         compatibleStorage = existingStorage as T;
       } else {
         // The implementation SHOULD warn about duplicate instrument registration
         // conflicts after applying View configuration.
-        api.diag.warn('A view or instrument with the name ',
+        api.diag.warn(
+          'A view or instrument with the name ',
           expectedDescriptor.name,
           ' has already been registered and is incompatible with another registered view.\n',
           'Details:\n',
           getIncompatibilityDetails(existingDescriptor, expectedDescriptor),
           'To resolve the conflict:\n',
-          getConflictResolutionRecipe(existingDescriptor, expectedDescriptor));
+          getConflictResolutionRecipe(existingDescriptor, expectedDescriptor)
+        );
       }
     }
 

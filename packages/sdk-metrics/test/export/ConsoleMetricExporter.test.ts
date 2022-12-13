@@ -23,16 +23,16 @@ import { defaultResource } from '../util';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { assertAggregationTemporalitySelector } from './utils';
-import {
-  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
-} from '../../src/export/AggregationSelector';
-import {
-  AggregationTemporality,
-  InstrumentType
-} from '../../src';
+import { DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR } from '../../src/export/AggregationSelector';
+import { AggregationTemporality, InstrumentType } from '../../src';
 
-
-async function waitForNumberOfExports(exporter: sinon.SinonSpy<[metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void], void>, numberOfExports: number): Promise<void> {
+async function waitForNumberOfExports(
+  exporter: sinon.SinonSpy<
+    [metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void],
+    void
+  >,
+  numberOfExports: number
+): Promise<void> {
   if (numberOfExports <= 0) {
     throw new Error('numberOfExports must be greater than or equal to 0');
   }
@@ -63,7 +63,7 @@ describe('ConsoleMetricExporter', () => {
       meterReader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 100,
-        exportTimeoutMillis: 100
+        exportTimeoutMillis: 100,
       });
       meterProvider.addMetricReader(meterReader);
     });
@@ -82,7 +82,9 @@ describe('ConsoleMetricExporter', () => {
       counter.add(10, counterAttribute);
       counter.add(10, counterAttribute);
 
-      const histogram = meter.createHistogram('histogram', { description: 'a histogram' });
+      const histogram = meter.createHistogram('histogram', {
+        description: 'a histogram',
+      });
       histogram.record(10);
       histogram.record(100);
       histogram.record(1000);
@@ -97,20 +99,27 @@ describe('ConsoleMetricExporter', () => {
       const consoleMetric = consoleArgs[0];
       const keys = Object.keys(consoleMetric).sort().join(',');
 
-      const expectedKeys = [
-        'dataPointType',
-        'dataPoints',
-        'descriptor',
-      ].join(',');
+      const expectedKeys = ['dataPointType', 'dataPoints', 'descriptor'].join(
+        ','
+      );
 
-      assert.ok(firstResourceMetric.resource.attributes.resourceKey === 'my-resource', 'resourceKey');
+      assert.ok(
+        firstResourceMetric.resource.attributes.resourceKey === 'my-resource',
+        'resourceKey'
+      );
       assert.ok(keys === expectedKeys, 'expectedKeys');
       assert.ok(consoleMetric.descriptor.name === 'counter_total', 'name');
-      assert.ok(consoleMetric.descriptor.description === 'a test description', 'description');
+      assert.ok(
+        consoleMetric.descriptor.description === 'a test description',
+        'description'
+      );
       assert.ok(consoleMetric.descriptor.type === 'COUNTER', 'type');
       assert.ok(consoleMetric.descriptor.unit === '', 'unit');
       assert.ok(consoleMetric.descriptor.valueType === 1, 'valueType');
-      assert.ok(consoleMetric.dataPoints[0].attributes.key1 === 'attributeValue1', 'ensure metric attributes exists');
+      assert.ok(
+        consoleMetric.dataPoints[0].attributes.key1 === 'attributeValue1',
+        'ensure metric attributes exists'
+      );
 
       assert.ok(spyExport.calledOnce);
     });
@@ -119,17 +128,28 @@ describe('ConsoleMetricExporter', () => {
   describe('constructor', () => {
     it('with no arguments should select cumulative temporality', () => {
       const exporter = new ConsoleMetricExporter();
-      assertAggregationTemporalitySelector(exporter, DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+      assertAggregationTemporalitySelector(
+        exporter,
+        DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
+      );
     });
 
     it('with empty options should select cumulative temporality', () => {
       const exporter = new ConsoleMetricExporter({});
-      assertAggregationTemporalitySelector(exporter, DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+      assertAggregationTemporalitySelector(
+        exporter,
+        DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
+      );
     });
 
     it('with cumulative preference should select cumulative temporality', () => {
-      const exporter = new ConsoleMetricExporter({ temporalitySelector: _ => AggregationTemporality.CUMULATIVE });
-      assertAggregationTemporalitySelector(exporter, _ => AggregationTemporality.CUMULATIVE);
+      const exporter = new ConsoleMetricExporter({
+        temporalitySelector: _ => AggregationTemporality.CUMULATIVE,
+      });
+      assertAggregationTemporalitySelector(
+        exporter,
+        _ => AggregationTemporality.CUMULATIVE
+      );
     });
 
     it('with mixed preference should select matching temporality', () => {
@@ -146,7 +166,9 @@ describe('ConsoleMetricExporter', () => {
             return AggregationTemporality.CUMULATIVE;
         }
       };
-      const exporter = new ConsoleMetricExporter({ temporalitySelector: selector });
+      const exporter = new ConsoleMetricExporter({
+        temporalitySelector: selector,
+      });
       assertAggregationTemporalitySelector(exporter, selector);
     });
   });

@@ -15,7 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { validateKey, validateValue } from '../../../src/trace/internal/tracestate-validators';
+import {
+  validateKey,
+  validateValue,
+} from '../../../src/trace/internal/tracestate-validators';
 
 describe('validators', () => {
   describe('validateKey', () => {

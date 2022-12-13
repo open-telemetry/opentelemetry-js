@@ -20,7 +20,8 @@ import {
   Link,
   SpanAttributes,
   SpanKind,
-  TraceFlags, trace,
+  TraceFlags,
+  trace,
 } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
 import { AlwaysOffSampler } from './AlwaysOffSampler';

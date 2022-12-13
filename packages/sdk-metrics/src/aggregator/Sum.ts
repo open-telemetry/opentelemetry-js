@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { Sum, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } from './types';
+import {
+  Sum,
+  AggregatorKind,
+  Aggregator,
+  Accumulation,
+  AccumulationRecord,
+} from './types';
 import { HrTime } from '@opentelemetry/api';
 import { DataPointType, SumMetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -22,7 +28,12 @@ import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
 export class SumAccumulation implements Accumulation {
-  constructor(public startTime: HrTime, public monotonic: boolean, private _current: number = 0, public reset = false) {}
+  constructor(
+    public startTime: HrTime,
+    public monotonic: boolean,
+    private _current: number = 0,
+    public reset = false
+  ) {}
 
   record(value: number): void {
     if (this.monotonic && value < 0) {
@@ -44,7 +55,7 @@ export class SumAccumulation implements Accumulation {
 export class SumAggregator implements Aggregator<SumAccumulation> {
   public kind: AggregatorKind.SUM = AggregatorKind.SUM;
 
-  constructor (public monotonic: boolean) {}
+  constructor(public monotonic: boolean) {}
 
   createAccumulation(startTime: HrTime) {
     return new SumAccumulation(startTime, this.monotonic);
@@ -57,9 +68,18 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
     const prevPv = previous.toPointValue();
     const deltaPv = delta.toPointValue();
     if (delta.reset) {
-      return new SumAccumulation(delta.startTime, this.monotonic, deltaPv, delta.reset);
+      return new SumAccumulation(
+        delta.startTime,
+        this.monotonic,
+        deltaPv,
+        delta.reset
+      );
     }
-    return new SumAccumulation(previous.startTime, this.monotonic, prevPv + deltaPv);
+    return new SumAccumulation(
+      previous.startTime,
+      this.monotonic,
+      prevPv + deltaPv
+    );
   }
 
   /**
@@ -73,17 +93,27 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
      * greater than the current one, a reset is deemed to be happened.
      * Return the current point value to prevent the value from been reset.
      */
-    if (this.monotonic && (prevPv > currPv)) {
-      return new SumAccumulation(current.startTime, this.monotonic, currPv, true);
+    if (this.monotonic && prevPv > currPv) {
+      return new SumAccumulation(
+        current.startTime,
+        this.monotonic,
+        currPv,
+        true
+      );
     }
-    return new SumAccumulation(current.startTime, this.monotonic, currPv - prevPv);
+    return new SumAccumulation(
+      current.startTime,
+      this.monotonic,
+      currPv - prevPv
+    );
   }
 
   toMetricData(
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<SumAccumulation>[],
-    endTime: HrTime): Maybe<SumMetricData> {
+    endTime: HrTime
+  ): Maybe<SumMetricData> {
     return {
       descriptor,
       aggregationTemporality,
@@ -96,7 +126,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
           value: accumulation.toPointValue(),
         };
       }),
-      isMonotonic: this.monotonic
+      isMonotonic: this.monotonic,
     };
   }
 }

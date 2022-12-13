@@ -16,6 +16,10 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix(instrumentation-xhr): http.url attribute should be absolute [#3200](https://github.com/open-telemetry/opentelemetry-js/pull/3200) @t2t2
 * fix(instrumentation-grpc): always set grpc semcov status code attribute with numeric value [#3076](https://github.com/open-telemetry/opentelemetry-js/pull/3076) @blumamir
+* fix(instrumentation): only call `onRequire` for full matches on core modules with sub-paths [#3451](https://github.com/open-telemetry/opentelemetry-js/pull/3451) @mhassan1
+* fix(instrumentation): add back support for absolute paths via `require-in-the-middle` [#3457](https://github.com/open-telemetry/opentelemetry-js/pull/3457) @mhassan1
+* fix(prometheus-sanitization): replace repeated `_` with a single `_` [3470](https://github.com/open-telemetry/opentelemetry-js/pull/3470) @samimusallam
+* fix(prometheus-serializer): correct string used for NaN [#3477](https://github.com/open-telemetry/opentelemetry-js/pull/3477) @JacksonWeber
 
 ### :books: (Refine Doc)
 
