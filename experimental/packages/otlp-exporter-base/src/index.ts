@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './OTLPExporterBase';
-export * from './platform';
-export * from './types';
-export * from './util';
+export { OTLPExporterNodeBase,
+    sendWithHttp,
+    createHttpAgent,
+    configureCompression,
+    OTLPExporterNodeConfigBase,
+    CompressionAlgorithm,
+    OTLPExporterBrowserBase,
+    sendWithXhr } from './platform';
+

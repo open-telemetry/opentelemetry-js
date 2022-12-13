@@ -13,5 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './node';
-export * from './browser';
+
+export { OTLPProtoExporterNodeBase } from './node';
+export { OTLPProtoExporterBrowserBase } from './browser';
+export { ServiceClientType } from './types';

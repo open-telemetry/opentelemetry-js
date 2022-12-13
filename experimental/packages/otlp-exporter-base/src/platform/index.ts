@@ -13,5 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './node';
-export * from './browser';
+
+export { OTLPExporterNodeBase,
+            sendWithHttp,
+            createHttpAgent,
+            configureCompression,
+            OTLPExporterNodeConfigBase,
+            CompressionAlgorithm } from './node';
+
+export { OTLPExporterBrowserBase, sendWithXhr } from './browser';
