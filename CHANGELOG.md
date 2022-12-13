@@ -6,6 +6,8 @@ For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
 
 ## Unreleased
+* fix(selenium-tests): updated webpack version for selenium test issue
+  [#3397](https://github.com/open-telemetry/opentelemetry-js/issues/3397) @SaumyaBhushan
 
 ### :boom: Breaking Change
 
