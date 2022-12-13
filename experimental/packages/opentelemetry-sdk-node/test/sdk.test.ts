@@ -626,6 +626,36 @@ describe('Node SDK', () => {
 
       await sdk.shutdown();
     });
+
+    describe('detectResources should be no-op', async () => {
+      beforeEach(() => {
+        process.env.OTEL_RESOURCE_ATTRIBUTES =
+          'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
+      });
+
+      afterEach(() => {
+        delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+      });
+
+      it('detectResources will not read resources from env or manually', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+          resourceDetectors: [
+            processDetector,
+            {
+              async detect(): Promise<Resource> {
+                return new Resource({ customAttr: 'someValue' });
+              },
+            },
+            envDetector,
+          ],
+        });
+        await sdk.detectResources();
+        const resource = sdk['_resource'];
+
+        assert.deepStrictEqual(resource, Resource.empty());
+      });
+    });
   });
 });
 
