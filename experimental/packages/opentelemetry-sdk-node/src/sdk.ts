@@ -80,7 +80,7 @@ export class NodeSDK {
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     if (getEnv().OTEL_SDK_DISABLED) {
       this._disabled = true;
-      // Finish the instantiation of SDK class
+      // Finish the instantiation of SDK object
       // Functions with possible side-effects are set to no-op
     }
 
