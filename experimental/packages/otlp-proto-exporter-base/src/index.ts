@@ -17,4 +17,7 @@ export {
   OTLPProtoExporterNodeBase,
   OTLPProtoExporterBrowserBase,
   ServiceClientType,
+  ExportRequestType,
+  getExportRequestProto,
+  send,
 } from './platform';
