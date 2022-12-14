@@ -14,4 +14,3 @@
  * limitations under the License.
  */
 export { OTLPProtoExporterBrowserBase } from './OTLPProtoExporterBrowserBase';
-export { ServiceClientType } from '../types';

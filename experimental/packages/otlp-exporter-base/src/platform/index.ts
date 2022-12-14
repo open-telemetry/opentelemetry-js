@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-export { OTLPExporterNodeBase,
-            sendWithHttp,
-            createHttpAgent,
-            configureCompression,
-            OTLPExporterNodeConfigBase,
-            CompressionAlgorithm } from './node';
-
+export {
+  OTLPExporterNodeBase,
+  sendWithHttp,
+  createHttpAgent,
+  configureCompression,
+  OTLPExporterNodeConfigBase,
+  CompressionAlgorithm,
+} from './node';
 export { OTLPExporterBrowserBase, sendWithXhr } from './browser';
