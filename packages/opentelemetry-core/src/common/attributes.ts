@@ -14,28 +14,56 @@
  * limitations under the License.
  */
 
-import { diag, SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
+import { diag, AttributeValue, Attributes } from '@opentelemetry/api';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
-export function sanitizeAttributes(attributes: unknown): SpanAttributes {
-  const out: SpanAttributes = {};
+const valueSanitizers: ReadonlyMap<
+  string,
+  (val: AttributeValue) => AttributeValue | undefined
+> = new Map([[SemanticAttributes.HTTP_URL, sanitizeHttpUrl]]);
+
+export function sanitizeAttribute(
+  key: string,
+  val: AttributeValue
+): AttributeValue | undefined {
+  let out: AttributeValue | undefined = undefined;
+
+  if (!isAttributeKey(key)) {
+    diag.warn(`Invalid attribute key: ${key}`);
+    return out;
+  }
+  if (!isAttributeValue(val)) {
+    diag.warn(`Invalid attribute value set for key: ${key}`);
+    return out;
+  }
+
+  let copyVal: AttributeValue;
+
+  if (Array.isArray(val)) {
+    copyVal = val.slice();
+  } else {
+    copyVal = val;
+  }
+
+  const valueSanitizer = valueSanitizers.get(key);
+  if (typeof valueSanitizer === 'undefined') {
+    return copyVal;
+  }
+
+  return valueSanitizer(copyVal);
+}
+
+export function sanitizeAttributes(attributes: unknown): Attributes {
+  const out: Attributes = {};
 
   if (typeof attributes !== 'object' || attributes == null) {
     return out;
   }
 
   for (const [key, val] of Object.entries(attributes)) {
-    if (!isAttributeKey(key)) {
-      diag.warn(`Invalid attribute key: ${key}`);
-      continue;
-    }
-    if (!isAttributeValue(val)) {
-      diag.warn(`Invalid attribute value set for key: ${key}`);
-      continue;
-    }
-    if (Array.isArray(val)) {
-      out[key] = val.slice();
-    } else {
-      out[key] = val;
+    const sanitizedVal = sanitizeAttribute(key, val);
+    if (typeof sanitizedVal !== 'undefined') {
+      out[key] = sanitizedVal;
     }
   }
 
@@ -46,7 +74,7 @@ export function isAttributeKey(key: unknown): key is string {
   return typeof key === 'string' && key.length > 0;
 }
 
-export function isAttributeValue(val: unknown): val is SpanAttributeValue {
+export function isAttributeValue(val: unknown): val is AttributeValue {
   if (val == null) {
     return true;
   }
@@ -93,4 +121,35 @@ function isValidPrimitiveAttributeValue(val: unknown): boolean {
   }
 
   return false;
+}
+
+function sanitizeHttpUrl(val: AttributeValue): AttributeValue | undefined {
+  let out: AttributeValue | undefined;
+
+  if (typeof val !== 'string') {
+    diag.warn(
+      `Invalid attribute value set for key: ${
+        SemanticAttributes.HTTP_URL
+      }. Unable to sanitize ${Array.isArray(val) ? 'array' : typeof val} value.`
+    );
+
+    return val;
+  }
+
+  try {
+    const valUrl = new URL(val);
+
+    valUrl.username = '';
+    valUrl.password = '';
+
+    out = valUrl.toString();
+  } catch (err: unknown) {
+    diag.warn(
+      `Invalid attribute value set for key: ${SemanticAttributes.HTTP_URL}. Unable to sanitize invalid URL.`
+    );
+
+    out = val;
+  }
+
+  return out;
 }

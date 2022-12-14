@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(opentelemetry-core): sanitize `http.url` attributes to remove usernames and passwords [#3487](https://github.com/open-telemetry/opentelemetry-js/pull/3487) @daniel-white
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)

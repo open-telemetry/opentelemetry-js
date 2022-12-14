@@ -37,7 +37,11 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
-import { invalidAttributes, validAttributes } from './util';
+import {
+  invalidAttributes,
+  sanitizedValidAttributes,
+  validAttributes,
+} from './util';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -264,7 +268,7 @@ describe('Span', () => {
           span.setAttribute(k, v as unknown as SpanAttributeValue);
         }
 
-        assert.deepStrictEqual(span.attributes, validAttributes);
+        assert.deepStrictEqual(span.attributes, sanitizedValidAttributes);
       });
 
       it('should be able to overwrite attributes', () => {
@@ -712,7 +716,7 @@ describe('Span', () => {
       span.setAttributes(validAttributes);
       span.setAttributes(invalidAttributes as unknown as SpanAttributes);
 
-      assert.deepStrictEqual(span.attributes, validAttributes);
+      assert.deepStrictEqual(span.attributes, sanitizedValidAttributes);
     });
   });
 
@@ -746,7 +750,10 @@ describe('Span', () => {
 
       assert.strictEqual(span.events.length, 1);
       assert.deepStrictEqual(span.events[0].name, 'rev');
-      assert.deepStrictEqual(span.events[0].attributes, validAttributes);
+      assert.deepStrictEqual(
+        span.events[0].attributes,
+        sanitizedValidAttributes
+      );
     });
   });
 

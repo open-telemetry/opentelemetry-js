@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+
 export const validAttributes = {
   string: 'string',
   number: 0,
@@ -21,6 +23,12 @@ export const validAttributes = {
   'array<string>': ['str1', 'str2'],
   'array<number>': [1, 2],
   'array<bool>': [true, false],
+  [SemanticAttributes.HTTP_URL]: 'http://user:pass@host:port/path?query',
+};
+
+export const sanitizedValidAttributes = {
+  ...validAttributes,
+  [SemanticAttributes.HTTP_URL]: 'http://host:port/path?query',
 };
 
 export const invalidAttributes = {
