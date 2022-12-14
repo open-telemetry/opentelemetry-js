@@ -500,9 +500,9 @@ describe('ExponentialHistogramAccumulation', () => {
       assert.strictEqual(pv.count, acc.count());
       assert.strictEqual(pv.zeroCount, acc.zeroCount());
       assert.strictEqual(pv.positive.offset, acc.positive().offset());
-      assert.deepStrictEqual(pv.positive.counts, acc.positive().counts());
+      assert.deepStrictEqual(pv.positive.bucketCounts, acc.positive().counts());
       assert.strictEqual(pv.negative.offset, acc.negative().offset());
-      assert.deepStrictEqual(pv.negative.counts, acc.negative().counts());
+      assert.deepStrictEqual(pv.negative.bucketCounts, acc.negative().counts());
     });
   });
 });
@@ -617,11 +617,11 @@ describe('ExponentialHistogramAggregation', () => {
               sum: 0,
               positive: {
                 offset: 1,
-                counts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1, 0]
               },
               negative: {
                 offset: 1,
-                counts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1, 0]
               },
               count: 4,
               scale: 1,
@@ -668,11 +668,11 @@ describe('ExponentialHistogramAggregation', () => {
               sum: 0,
               positive: {
                 offset: 1,
-                counts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1, 0]
               },
               negative: {
                 offset: 1,
-                counts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1, 0]
               },
               count: 4,
               scale: 1,

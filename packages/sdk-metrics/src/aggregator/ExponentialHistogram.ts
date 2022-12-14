@@ -42,11 +42,11 @@ import * as util from './exponential-histogram//util';
 interface InternalHistogram {
   positive: {
     offset: number;
-    counts: number[];
+    bucketCounts: number[];
   };
   negative: {
     offset: number;
-    counts: number[];
+    bucketCounts: number[];
   };
   hasMinMax: boolean;
   min: number;
@@ -104,11 +104,11 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       sum: this.sum(),
       positive: {
         offset: this.positive().offset(),
-        counts: this.positive().counts(),
+        bucketCounts: this.positive().counts(),
       },
       negative: {
         offset: this.negative().offset(),
-        counts: this.negative().counts(),
+        bucketCounts: this.negative().counts(),
       },
       count: this.count(),
       scale: this.scale(),
@@ -581,11 +581,11 @@ implements Aggregator<ExponentialHistogramAccumulation> {
             sum: !allowsNegativeValues ? pointValue.sum : undefined,
             positive: {
               offset: pointValue.positive.offset,
-              counts: pointValue.positive.counts,
+              bucketCounts: pointValue.positive.bucketCounts,
             },
             negative: {
               offset: pointValue.negative.offset,
-              counts: pointValue.negative.counts,
+              bucketCounts: pointValue.negative.bucketCounts,
             },
             count: pointValue.count,
             scale: pointValue.scale,

@@ -71,11 +71,11 @@ export interface ExponentialHistogram {
   zeroCount: number;
   positive: {
     offset: number;
-    counts: number[];
+    bucketCounts: number[];
   };
   negative: {
     offset: number;
-    counts: number[];
+    bucketCounts: number[];
   };
   min?: number;
   max?: number;
