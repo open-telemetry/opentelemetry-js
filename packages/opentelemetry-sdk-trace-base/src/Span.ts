@@ -41,7 +41,6 @@ import {
   isTimeInputHrTime,
   otperformance,
   sanitizeAttributes,
-  timeInputToHrTime,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
