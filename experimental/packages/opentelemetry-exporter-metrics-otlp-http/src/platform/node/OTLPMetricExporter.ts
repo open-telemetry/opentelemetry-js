@@ -15,22 +15,27 @@
  */
 
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
-import { getEnv, baggageUtils} from '@opentelemetry/core';
+import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
 import {
   OTLPExporterNodeBase,
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded
+  appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/otlp-exporter-base';
-import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  createExportMetricsServiceRequest,
+  IExportMetricsServiceRequest,
+} from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
-class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics, IExportMetricsServiceRequest> {
-
+class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
+  ResourceMetrics,
+  IExportMetricsServiceRequest
+> {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(config);
     this.headers = Object.assign(
@@ -49,10 +54,15 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics, IExpor
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
-        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-          ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
-          : DEFAULT_COLLECTOR_URL;
+      ? appendRootPathToUrlIfNeeded(
+          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+        )
+      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+      ? appendResourcePathToUrl(
+          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
+          DEFAULT_COLLECTOR_RESOURCE_PATH
+        )
+      : DEFAULT_COLLECTOR_URL;
   }
 }
 

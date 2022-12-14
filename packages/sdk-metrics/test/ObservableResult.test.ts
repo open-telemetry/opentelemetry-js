@@ -20,15 +20,21 @@ import { InstrumentType } from '../src';
 import { ObservableInstrument } from '../src/Instruments';
 import {
   BatchObservableResultImpl,
-  ObservableResultImpl
+  ObservableResultImpl,
 } from '../src/ObservableResult';
 import { ObservableRegistry } from '../src/state/ObservableRegistry';
-import { commonAttributes, commonValues, defaultInstrumentDescriptor } from './util';
+import {
+  commonAttributes,
+  commonValues,
+  defaultInstrumentDescriptor,
+} from './util';
 
 describe('ObservableResultImpl', () => {
   describe('observe', () => {
     it('should observe common values', () => {
-      const observableResult = new ObservableResultImpl(defaultInstrumentDescriptor);
+      const observableResult = new ObservableResultImpl(
+        defaultInstrumentDescriptor
+      );
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
           observableResult.observe(value, attributes);
@@ -37,7 +43,9 @@ describe('ObservableResultImpl', () => {
     });
 
     it('should deduplicate observations', () => {
-      const observableResult = new ObservableResultImpl(defaultInstrumentDescriptor);
+      const observableResult = new ObservableResultImpl(
+        defaultInstrumentDescriptor
+      );
       observableResult.observe(1, {});
       observableResult.observe(2, {});
 
@@ -64,7 +72,11 @@ describe('BatchObservableResultImpl', () => {
   describe('observe', () => {
     it('should observe common values', () => {
       const observableResult = new BatchObservableResultImpl();
-      const observable = new ObservableInstrument(defaultInstrumentDescriptor, [], new ObservableRegistry());
+      const observable = new ObservableInstrument(
+        defaultInstrumentDescriptor,
+        [],
+        new ObservableRegistry()
+      );
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
           observableResult.observe(observable, value, attributes);
@@ -75,8 +87,16 @@ describe('BatchObservableResultImpl', () => {
     it('should deduplicate observations', () => {
       const observableResult = new BatchObservableResultImpl();
       const observableRegistry = new ObservableRegistry();
-      const observable1 = new ObservableInstrument(defaultInstrumentDescriptor, [], observableRegistry);
-      const observable2 = new ObservableInstrument(defaultInstrumentDescriptor, [], observableRegistry);
+      const observable1 = new ObservableInstrument(
+        defaultInstrumentDescriptor,
+        [],
+        observableRegistry
+      );
+      const observable2 = new ObservableInstrument(
+        defaultInstrumentDescriptor,
+        [],
+        observableRegistry
+      );
       observableResult.observe(observable1, 1, {});
       observableResult.observe(observable1, 2, {});
       observableResult.observe(observable2, 4, {});
@@ -93,13 +113,17 @@ describe('BatchObservableResultImpl', () => {
 
     it('should trunc value if ValueType is INT', () => {
       const observableResult = new BatchObservableResultImpl();
-      const observable = new ObservableInstrument({
-        name: 'test',
-        description: '',
-        type: InstrumentType.COUNTER,
-        unit: '',
-        valueType: ValueType.INT,
-      }, [], new ObservableRegistry());
+      const observable = new ObservableInstrument(
+        {
+          name: 'test',
+          description: '',
+          type: InstrumentType.COUNTER,
+          unit: '',
+          valueType: ValueType.INT,
+        },
+        [],
+        new ObservableRegistry()
+      );
 
       observableResult.observe(observable, 1.1, {});
       assert.strictEqual(observableResult._buffer.get(observable)?.get({}), 1);

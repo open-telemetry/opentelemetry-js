@@ -27,9 +27,13 @@ import {
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader,
-  View
+  View,
 } from '@opentelemetry/sdk-metrics';
-import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry/otlp-transformer';
+import {
+  IExportMetricsServiceRequest,
+  IKeyValue,
+  IMetric,
+} from '@opentelemetry/otlp-transformer';
 import { Stream } from 'stream';
 
 export class TestMetricReader extends MetricReader {
@@ -66,13 +70,11 @@ export function setUp() {
       new View({
         aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
         instrumentName: 'int-histogram',
-      })
-    ]
+      }),
+    ],
   });
   reader = new TestMetricReader();
-  meterProvider.addMetricReader(
-    reader
-  );
+  meterProvider.addMetricReader(reader);
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 
@@ -92,13 +94,10 @@ export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void
 ): ObservableGauge {
   const name = 'double-observable-gauge';
-  const observableGauge = meter.createObservableGauge(
-    name,
-    {
-      description: 'sample observable gauge description',
-      valueType: ValueType.DOUBLE,
-    },
-  );
+  const observableGauge = meter.createObservableGauge(name, {
+    description: 'sample observable gauge description',
+    valueType: ValueType.DOUBLE,
+  });
   observableGauge.addCallback(callback);
 
   return observableGauge;
@@ -113,9 +112,7 @@ export function mockHistogram(): Histogram {
   });
 }
 
-export function ensureProtoAttributesAreCorrect(
-  attributes: IKeyValue[]
-) {
+export function ensureProtoAttributesAreCorrect(attributes: IKeyValue[]) {
   assert.deepStrictEqual(
     attributes,
     [

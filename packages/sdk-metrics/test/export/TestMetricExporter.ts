@@ -15,11 +15,18 @@
  */
 
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import { AggregationTemporality, PushMetricExporter, ResourceMetrics } from '../../src';
+import {
+  AggregationTemporality,
+  PushMetricExporter,
+  ResourceMetrics,
+} from '../../src';
 
 export class TestMetricExporter implements PushMetricExporter {
   resourceMetricsList: ResourceMetrics[] = [];
-  export(resourceMetrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
+  export(
+    resourceMetrics: ResourceMetrics,
+    resultCallback: (result: ExportResult) => void
+  ): void {
     this.resourceMetricsList.push(resourceMetrics);
     process.nextTick(() => resultCallback({ code: ExportResultCode.SUCCESS }));
   }

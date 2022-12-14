@@ -23,6 +23,7 @@ import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: grpc.status | grpcJs.status
@@ -37,7 +38,12 @@ export const assertSpan = (
   component: string,
   span: ReadableSpan,
   kind: SpanKind,
-  validations: { name: string; status: grpc.status | grpcJs.status }
+  validations: {
+    name: string;
+    status: grpc.status | grpcJs.status;
+    netPeerName?: string;
+    netPeerPort?: number;
+  }
 ) => {
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
@@ -55,11 +61,30 @@ export const assertSpan = (
     assert.ok(span.spanContext());
   }
 
+  if (
+    span.kind === SpanKind.CLIENT &&
+    validations.netPeerName !== undefined &&
+    validations.netPeerPort !== undefined
+  ) {
+    assert.strictEqual(
+      span.attributes[SemanticAttributes.NET_PEER_NAME],
+      validations.netPeerName
+    );
+    assert.strictEqual(
+      span.attributes[SemanticAttributes.NET_PEER_PORT],
+      validations.netPeerPort
+    );
+  }
+
   // validations
   assert.strictEqual(span.name, validations.name);
   assert.strictEqual(
     span.status.code,
     grpcStatusCodeToOpenTelemetryStatusCode(validations.status)
+  );
+  assert.strictEqual(
+    span.attributes[SemanticAttributes.RPC_GRPC_STATUS_CODE],
+    validations.status
   );
 };
 

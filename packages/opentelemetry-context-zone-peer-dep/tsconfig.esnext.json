@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.base.esnext.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "build/esnext",
+    "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "files": [
@@ -10,5 +10,10 @@
   ],
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../api"
+    }
   ]
 }

@@ -17,9 +17,11 @@
 import * as assert from 'assert';
 import { InstrumentType } from '../../src';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
-import { defaultInstrumentationScope, defaultInstrumentDescriptor } from '../util';
+import {
+  defaultInstrumentationScope,
+  defaultInstrumentDescriptor,
+} from '../util';
 import { View } from '../../src';
-
 
 describe('ViewRegistry', () => {
   describe('findViews', () => {
@@ -30,20 +32,26 @@ describe('ViewRegistry', () => {
         registry.addView(new View({ name: 'bar', instrumentName: 'bar' }));
 
         {
-          const views = registry.findViews({
-            ...defaultInstrumentDescriptor,
-            name: 'foo'
-          }, defaultInstrumentationScope);
+          const views = registry.findViews(
+            {
+              ...defaultInstrumentDescriptor,
+              name: 'foo',
+            },
+            defaultInstrumentationScope
+          );
 
           assert.strictEqual(views.length, 1);
           assert.strictEqual(views[0].name, 'foo');
         }
 
         {
-          const views = registry.findViews({
-            ...defaultInstrumentDescriptor,
-            name: 'bar'
-          }, defaultInstrumentationScope);
+          const views = registry.findViews(
+            {
+              ...defaultInstrumentDescriptor,
+              name: 'bar',
+            },
+            defaultInstrumentationScope
+          );
 
           assert.strictEqual(views.length, 1);
           assert.strictEqual(views[0].name, 'bar');
@@ -52,32 +60,42 @@ describe('ViewRegistry', () => {
 
       it('should match view with instrument type', () => {
         const registry = new ViewRegistry();
-        registry.addView(new View({
-          name: 'counter',
-          instrumentName: 'default_metric',
-          instrumentType: InstrumentType.COUNTER
-        }));
-        registry.addView(new View({
-          name: 'histogram',
-          instrumentName: 'default_metric',
-          instrumentType: InstrumentType.HISTOGRAM
-        }));
+        registry.addView(
+          new View({
+            name: 'counter',
+            instrumentName: 'default_metric',
+            instrumentType: InstrumentType.COUNTER,
+          })
+        );
+        registry.addView(
+          new View({
+            name: 'histogram',
+            instrumentName: 'default_metric',
+            instrumentType: InstrumentType.HISTOGRAM,
+          })
+        );
 
         {
-          const views = registry.findViews({
-            ...defaultInstrumentDescriptor,
-            type: InstrumentType.COUNTER
-          }, defaultInstrumentationScope);
+          const views = registry.findViews(
+            {
+              ...defaultInstrumentDescriptor,
+              type: InstrumentType.COUNTER,
+            },
+            defaultInstrumentationScope
+          );
 
           assert.strictEqual(views.length, 1);
           assert.strictEqual(views[0].name, 'counter');
         }
 
         {
-          const views = registry.findViews({
-            ...defaultInstrumentDescriptor,
-            type: InstrumentType.HISTOGRAM
-          }, defaultInstrumentationScope);
+          const views = registry.findViews(
+            {
+              ...defaultInstrumentDescriptor,
+              type: InstrumentType.HISTOGRAM,
+            },
+            defaultInstrumentationScope
+          );
 
           assert.strictEqual(views.length, 1);
           assert.strictEqual(views[0].name, 'histogram');
@@ -88,8 +106,20 @@ describe('ViewRegistry', () => {
     describe('MeterSelector', () => {
       it('should match view with meter name', () => {
         const registry = new ViewRegistry();
-        registry.addView(new View({ name: 'foo', instrumentName: 'default_metric', meterName: 'foo' }));
-        registry.addView(new View({ name: 'bar', instrumentName: 'default_metric', meterName: 'bar' }));
+        registry.addView(
+          new View({
+            name: 'foo',
+            instrumentName: 'default_metric',
+            meterName: 'foo',
+          })
+        );
+        registry.addView(
+          new View({
+            name: 'bar',
+            instrumentName: 'default_metric',
+            meterName: 'bar',
+          })
+        );
 
         {
           const views = registry.findViews(defaultInstrumentDescriptor, {
@@ -104,7 +134,7 @@ describe('ViewRegistry', () => {
         {
           const views = registry.findViews(defaultInstrumentDescriptor, {
             ...defaultInstrumentationScope,
-            name: 'bar'
+            name: 'bar',
           });
 
           assert.strictEqual(views.length, 1);

@@ -40,7 +40,8 @@ import {
   isTimeInput,
   isTimeInputHrTime,
   otperformance,
-  sanitizeAttributes
+  sanitizeAttributes,
+  timeInputToHrTime,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -117,7 +118,8 @@ export class Span implements APISpan, ReadableSpan {
     this._spanLimits = parentTracer.getSpanLimits();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
-    this._attributeValueLengthLimit = this._spanLimits.attributeValueLengthLimit || 0;
+    this._attributeValueLengthLimit =
+      this._spanLimits.attributeValueLengthLimit || 0;
   }
 
   spanContext(): SpanContext {
@@ -138,7 +140,7 @@ export class Span implements APISpan, ReadableSpan {
 
     if (
       Object.keys(this.attributes).length >=
-      this._spanLimits.attributeCountLimit! &&
+        this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return this;
@@ -266,9 +268,8 @@ export class Span implements APISpan, ReadableSpan {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[
-          SemanticAttributes.EXCEPTION_TYPE
-        ] = exception.code.toString();
+        attributes[SemanticAttributes.EXCEPTION_TYPE] =
+          exception.code.toString();
       } else if (exception.name) {
         attributes[SemanticAttributes.EXCEPTION_TYPE] = exception.name;
       }
@@ -301,7 +302,9 @@ export class Span implements APISpan, ReadableSpan {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
-      diag.warn(`Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`);
+      diag.warn(
+        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+      );
     }
     return this._ended;
   }
@@ -344,7 +347,9 @@ export class Span implements APISpan, ReadableSpan {
 
     // Array of strings
     if (Array.isArray(value)) {
-      return (value as []).map(val => typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val);
+      return (value as []).map(val =>
+        typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val
+      );
     }
 
     // Other types, no need to apply value length limit

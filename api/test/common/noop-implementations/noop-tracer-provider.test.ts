@@ -23,9 +23,13 @@ describe('NoopTracerProvider', () => {
     const tracerProvider = new NoopTracerProvider();
 
     assert.ok(tracerProvider.getTracer('tracer-name') instanceof NoopTracer);
-    assert.ok(tracerProvider.getTracer('tracer-name', 'v1') instanceof NoopTracer);
-    assert.ok(tracerProvider.getTracer('tracer-name', 'v1', {
-      schemaUrl: 'https://opentelemetry.io/schemas/1.7.0'
-    }) instanceof NoopTracer);
+    assert.ok(
+      tracerProvider.getTracer('tracer-name', 'v1') instanceof NoopTracer
+    );
+    assert.ok(
+      tracerProvider.getTracer('tracer-name', 'v1', {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
+      }) instanceof NoopTracer
+    );
   });
 });

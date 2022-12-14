@@ -15,7 +15,13 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Aggregator, SumAggregator, DropAggregator, LastValueAggregator, HistogramAggregator } from '../aggregator';
+import {
+  Aggregator,
+  SumAggregator,
+  DropAggregator,
+  LastValueAggregator,
+  HistogramAggregator,
+} from '../aggregator';
 import { Accumulation } from '../aggregator/types';
 import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -26,7 +32,9 @@ import { Maybe } from '../utils';
  * Aggregation provides a set of built-in aggregations via static methods.
  */
 export abstract class Aggregation {
-  abstract createAggregator(instrument: InstrumentDescriptor): Aggregator<Maybe<Accumulation>>;
+  abstract createAggregator(
+    instrument: InstrumentDescriptor
+  ): Aggregator<Maybe<Accumulation>>;
 
   static Drop(): Aggregation {
     return DROP_AGGREGATION;
@@ -93,7 +101,10 @@ export class LastValueAggregation extends Aggregation {
  * The default histogram aggregation.
  */
 export class HistogramAggregation extends Aggregation {
-  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000], true);
+  private static DEFAULT_INSTANCE = new HistogramAggregator(
+    [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
+    true
+  );
   createAggregator(_instrument: InstrumentDescriptor) {
     return HistogramAggregation.DEFAULT_INSTANCE;
   }
@@ -157,7 +168,9 @@ export class DefaultAggregation extends Aggregation {
     return DROP_AGGREGATION;
   }
 
-  createAggregator(instrument: InstrumentDescriptor): Aggregator<Maybe<Accumulation>> {
+  createAggregator(
+    instrument: InstrumentDescriptor
+  ): Aggregator<Maybe<Accumulation>> {
     return this._resolve(instrument).createAggregator(instrument);
   }
 }

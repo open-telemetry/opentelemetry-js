@@ -17,7 +17,6 @@
 import { TraceState } from '../trace_state';
 import { TraceStateImpl } from './tracestate-impl';
 
-
 export function createTraceState(rawTraceState?: string): TraceState {
   return new TraceStateImpl(rawTraceState);
 }

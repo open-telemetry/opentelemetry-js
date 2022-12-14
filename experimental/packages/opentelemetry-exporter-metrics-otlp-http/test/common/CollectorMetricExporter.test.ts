@@ -15,9 +15,7 @@
  */
 
 import { ExportResultCode } from '@opentelemetry/core';
-import {
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -25,19 +23,21 @@ import {
   mockCounter,
   mockObservableGauge,
   setUp,
-  shutdown
+  shutdown,
 } from '../metricsHelper';
 import {
   OTLPExporterBase,
-  OTLPExporterConfigBase
+  OTLPExporterConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
 
-class OTLPMetricExporter extends OTLPExporterBase<CollectorExporterConfig,
+class OTLPMetricExporter extends OTLPExporterBase<
+  CollectorExporterConfig,
   ResourceMetrics,
-  IExportMetricsServiceRequest> {
+  IExportMetricsServiceRequest
+> {
   onInit() {}
 
   onShutdown() {}
@@ -78,13 +78,10 @@ describe('OTLPMetricExporter - common', () => {
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       const counter = mockCounter();
-      mockObservableGauge(
-        observableResult => {
-          observableResult.observe(3, {});
-          observableResult.observe(6, {});
-        },
-        'double-observable-gauge3'
-      );
+      mockObservableGauge(observableResult => {
+        observableResult.observe(3, {});
+        observableResult.observe(6, {});
+      }, 'double-observable-gauge3');
       counter.add(1);
 
       const { resourceMetrics, errors } = await collect();
@@ -137,7 +134,7 @@ describe('OTLPMetricExporter - common', () => {
     describe('when exporter is shutdown', () => {
       it(
         'should not export anything but return callback with code' +
-        ' "FailedNotRetryable"',
+          ' "FailedNotRetryable"',
         async () => {
           await collectorExporter.shutdown();
           spySend.resetHistory();
@@ -187,10 +184,7 @@ describe('OTLPMetricExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(
-        OTLPMetricExporter.prototype,
-        'onShutdown'
-      );
+      onShutdownSpy = sinon.stub(OTLPMetricExporter.prototype, 'onShutdown');
       collectorExporterConfig = {
         hostname: 'foo',
         url: 'http://foo.bar.com',

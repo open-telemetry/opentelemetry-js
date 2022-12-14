@@ -38,9 +38,7 @@ import {
   View,
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import {
-  assertServiceResource,
-} from './util/resource-assertions';
+import { assertServiceResource } from './util/resource-assertions';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
@@ -56,7 +54,7 @@ import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExpo
 import {
   envDetector,
   processDetector,
-  Resource
+  Resource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
@@ -91,9 +89,21 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
-      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
-      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
+      assert.strictEqual(
+        context['_getContextManager'](),
+        ctxManager,
+        'context manager should not change'
+      );
+      assert.strictEqual(
+        propagation['_getGlobalPropagator'](),
+        propagator,
+        'propagator should not change'
+      );
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       delete env.OTEL_TRACES_EXPORTER;
     });
@@ -109,12 +119,14 @@ describe('Node SDK', () => {
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
       assert.ok(
-        context['_getContextManager']().constructor.name === DefaultContextManager.name
+        context['_getContextManager']().constructor.name ===
+          DefaultContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
       );
-      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
+      const apiTracerProvider =
+        trace.getTracerProvider() as ProxyTracerProvider;
       assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
     });
 
@@ -132,12 +144,14 @@ describe('Node SDK', () => {
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
       assert.ok(
-        context['_getContextManager']().constructor.name === DefaultContextManager.name
+        context['_getContextManager']().constructor.name ===
+          DefaultContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
       );
-      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
+      const apiTracerProvider =
+        trace.getTracerProvider() as ProxyTracerProvider;
       assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
     });
 
@@ -149,7 +163,7 @@ describe('Node SDK', () => {
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 100,
-        exportTimeoutMillis: 100
+        exportTimeoutMillis: 100,
       });
 
       const sdk = new NodeSDK({
@@ -159,9 +173,21 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
-      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
-      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
+      assert.strictEqual(
+        context['_getContextManager'](),
+        ctxManager,
+        'context manager should not change'
+      );
+      assert.strictEqual(
+        propagation['_getGlobalPropagator'](),
+        propagator,
+        'propagator should not change'
+      );
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
@@ -170,7 +196,10 @@ describe('Node SDK', () => {
     });
   });
 
-  async function waitForNumberOfMetrics(exporter: InMemoryMetricExporter, numberOfMetrics: number): Promise<void> {
+  async function waitForNumberOfMetrics(
+    exporter: InMemoryMetricExporter,
+    numberOfMetrics: number
+  ): Promise<void> {
     if (numberOfMetrics <= 0) {
       throw new Error('numberOfMetrics must be greater than or equal to 0');
     }
@@ -187,11 +216,13 @@ describe('Node SDK', () => {
     // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
     // which sets up an exporter and affects the context manager
     env.OTEL_TRACES_EXPORTER = 'none';
-    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const exporter = new InMemoryMetricExporter(
+      AggregationTemporality.CUMULATIVE
+    );
     const metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
-      exportTimeoutMillis: 100
+      exportTimeoutMillis: 100,
     });
 
     const sdk = new NodeSDK({
@@ -201,16 +232,28 @@ describe('Node SDK', () => {
           name: 'test-view',
           instrumentName: 'test_counter',
           instrumentType: InstrumentType.COUNTER,
-        })
+        }),
       ],
       autoDetectResources: false,
     });
 
     await sdk.start();
 
-    assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
-    assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
-    assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
+    assert.strictEqual(
+      context['_getContextManager'](),
+      ctxManager,
+      'context manager should not change'
+    );
+    assert.strictEqual(
+      propagation['_getGlobalPropagator'](),
+      propagator,
+      'propagator should not change'
+    );
+    assert.strictEqual(
+      (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+      delegate,
+      'tracer provider should not have changed'
+    );
 
     const meterProvider = metrics.getMeterProvider() as MeterProvider;
     assert.ok(meterProvider);
@@ -227,21 +270,32 @@ describe('Node SDK', () => {
     assert.ok(firstExportedMetric, 'should have one exported metric');
     const [firstScopeMetric] = firstExportedMetric.scopeMetrics;
     assert.ok(firstScopeMetric, 'should have one scope metric');
-    assert.ok(firstScopeMetric.scope.name === 'NodeSDKViews', 'scope should match created view');
-    assert.ok(firstScopeMetric.metrics.length > 0, 'should have at least one metrics entry');
+    assert.ok(
+      firstScopeMetric.scope.name === 'NodeSDKViews',
+      'scope should match created view'
+    );
+    assert.ok(
+      firstScopeMetric.metrics.length > 0,
+      'should have at least one metrics entry'
+    );
     const [firstMetricRecord] = firstScopeMetric.metrics;
-    assert.ok(firstMetricRecord.descriptor.name === 'test-view', 'should have renamed counter metric');
+    assert.ok(
+      firstMetricRecord.descriptor.name === 'test-view',
+      'should have renamed counter metric'
+    );
 
     await sdk.shutdown();
     delete env.OTEL_TRACES_EXPORTER;
   });
 
   it('should throw error when calling configureMeterProvider when views are already configured', () => {
-    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const exporter = new InMemoryMetricExporter(
+      AggregationTemporality.CUMULATIVE
+    );
     const metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
-      exportTimeoutMillis: 100
+      exportTimeoutMillis: 100,
     });
 
     const sdk = new NodeSDK({
@@ -251,33 +305,40 @@ describe('Node SDK', () => {
           name: 'test-view',
           instrumentName: 'test_counter',
           instrumentType: InstrumentType.COUNTER,
-        })
+        }),
       ],
       autoDetectResources: false,
     });
 
-    assert.throws(() => {
-      sdk.configureMeterProvider({
-        reader: metricReader,
-        views: [
-          new View({
-            name: 'test-view',
-            instrumentName: 'test_counter',
-            instrumentType: InstrumentType.COUNTER,
-          })
-        ]
-      });
-    }, (error: Error) => {
-      return error.message.includes('Views passed but Views have already been configured');
-    });
+    assert.throws(
+      () => {
+        sdk.configureMeterProvider({
+          reader: metricReader,
+          views: [
+            new View({
+              name: 'test-view',
+              instrumentName: 'test_counter',
+              instrumentType: InstrumentType.COUNTER,
+            }),
+          ],
+        });
+      },
+      (error: Error) => {
+        return error.message.includes(
+          'Views passed but Views have already been configured'
+        );
+      }
+    );
   });
 
   it('should throw error when calling configureMeterProvider when metricReader is already configured', () => {
-    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const exporter = new InMemoryMetricExporter(
+      AggregationTemporality.CUMULATIVE
+    );
     const metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
-      exportTimeoutMillis: 100
+      exportTimeoutMillis: 100,
     });
 
     const sdk = new NodeSDK({
@@ -287,18 +348,23 @@ describe('Node SDK', () => {
           name: 'test-view',
           instrumentName: 'test_counter',
           instrumentType: InstrumentType.COUNTER,
-        })
+        }),
       ],
       autoDetectResources: false,
     });
 
-    assert.throws(() => {
-      sdk.configureMeterProvider({
-        reader: metricReader,
-      });
-    }, (error: Error) => {
-      return error.message.includes('MetricReader passed but MetricReader has already been configured.');
-    });
+    assert.throws(
+      () => {
+        sdk.configureMeterProvider({
+          reader: metricReader,
+        });
+      },
+      (error: Error) => {
+        return error.message.includes(
+          'MetricReader passed but MetricReader has already been configured.'
+        );
+      }
+    );
   });
 
   describe('detectResources', async () => {
@@ -315,20 +381,20 @@ describe('Node SDK', () => {
       it('returns a merged resource', async () => {
         const sdk = new NodeSDK({
           autoDetectResources: true,
-          resourceDetectors: [processDetector, {
-            async detect(): Promise<Resource> {
-              return new Resource({'customAttr': 'someValue'});
-            }
-          },
-          envDetector]
+          resourceDetectors: [
+            processDetector,
+            {
+              async detect(): Promise<Resource> {
+                return new Resource({ customAttr: 'someValue' });
+              },
+            },
+            envDetector,
+          ],
         });
         await sdk.detectResources();
         const resource = sdk['_resource'];
 
-        assert.strictEqual(
-          resource.attributes['customAttr'],
-          'someValue'
-        );
+        assert.strictEqual(resource.attributes['customAttr'], 'someValue');
 
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -343,12 +409,15 @@ describe('Node SDK', () => {
       it('returns a merged resource', async () => {
         const sdk = new NodeSDK({
           autoDetectResources: true,
-          resourceDetectors: [processDetector, {
-            detect() {
-              throw new Error('Buggy detector');
-            }
-          },
-          envDetector]
+          resourceDetectors: [
+            processDetector,
+            {
+              detect() {
+                throw new Error('Buggy detector');
+              },
+            },
+            envDetector,
+          ],
         });
 
         await sdk.detectResources();
@@ -487,7 +556,8 @@ describe('Node SDK', () => {
     });
 
     it('should configure service name via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.name=resource-env-set-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=resource-env-set-name';
       const sdk = new NodeSDK();
 
       await sdk.start();
@@ -500,7 +570,8 @@ describe('Node SDK', () => {
     });
 
     it('should favor config set service name over OTEL_RESOURCE_ATTRIBUTES env set service name', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.name=resource-env-set-name';
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
+        'service.name=resource-env-set-name';
       const sdk = new NodeSDK({
         serviceName: 'config-set-name',
       });
@@ -521,7 +592,10 @@ describe('setup exporter from env', () => {
   let stubLoggerError: Sinon.SinonStub;
 
   beforeEach(() => {
-    spyGetOtlpProtocol = Sinon.spy(TracerProviderWithEnvExporters, 'getOtlpProtocol');
+    spyGetOtlpProtocol = Sinon.spy(
+      TracerProviderWithEnvExporters,
+      'getOtlpProtocol'
+    );
     stubLoggerError = Sinon.stub(diag, 'warn');
   });
   afterEach(() => {
@@ -531,7 +605,8 @@ describe('setup exporter from env', () => {
   it('use default exporter TracerProviderWithEnvExporters when user does not provide span processor or trace exporter to sdk config', async () => {
     const sdk = new NodeSDK();
     await sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
     assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
     assert(listOfProcessors.length === 1);
@@ -540,12 +615,15 @@ describe('setup exporter from env', () => {
   it('ignore env exporter when user provides exporter to sdk config', async () => {
     const traceExporter = new ConsoleSpanExporter();
     const sdk = new NodeSDK({
-      traceExporter
+      traceExporter,
     });
     await sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false);
+    assert(
+      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
+    );
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
@@ -554,12 +632,15 @@ describe('setup exporter from env', () => {
     const traceExporter = new ConsoleSpanExporter();
     const spanProcessor = new SimpleSpanProcessor(traceExporter);
     const sdk = new NodeSDK({
-      spanProcessor
+      spanProcessor,
     });
     await sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false);
+    assert(
+      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
+    );
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor === false);
@@ -568,12 +649,15 @@ describe('setup exporter from env', () => {
     env.OTEL_TRACES_EXPORTER = 'console';
     const traceExporter = new OTLPTraceExporter();
     const sdk = new NodeSDK({
-      traceExporter
+      traceExporter,
     });
     await sdk.start();
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false);
+    assert(
+      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
+    );
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
@@ -585,7 +669,8 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK();
     await sdk.start();
 
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
     assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
@@ -597,7 +682,8 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK();
     await sdk.start();
 
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
     const activeProcessor = sdk['_tracerProvider']?.getActiveSpanProcessor();
 
     assert(listOfProcessors.length === 0);
@@ -609,7 +695,10 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK();
     await sdk.start();
 
-    assert.strictEqual(stubLoggerError.args[0][0], 'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.');
+    assert.strictEqual(
+      stubLoggerError.args[0][0],
+      'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.'
+    );
     delete env.OTEL_TRACES_EXPORTER;
   });
   it('do not use any exporters when empty value is provided for exporter', async () => {
@@ -617,7 +706,8 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK();
     await sdk.start();
 
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
     const activeProcessor = sdk['_tracerProvider']?.getActiveSpanProcessor();
 
     assert(listOfProcessors.length === 0);
@@ -630,7 +720,8 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK();
     await sdk.start();
 
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
     assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
@@ -643,7 +734,8 @@ describe('setup exporter from env', () => {
     await sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[0][0], 'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
+      stubLoggerError.args[0][0],
+      'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
     );
     delete env.OTEL_TRACES_EXPORTER;
   });
@@ -653,11 +745,13 @@ describe('setup exporter from env', () => {
     await sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[0][0], 'Unrecognized OTEL_TRACES_EXPORTER value: invalid.'
+      stubLoggerError.args[0][0],
+      'Unrecognized OTEL_TRACES_EXPORTER value: invalid.'
     );
 
     assert.strictEqual(
-      stubLoggerError.args[1][0], 'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
+      stubLoggerError.args[1][0],
+      'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
     );
 
     delete env.OTEL_TRACES_EXPORTER;
@@ -668,7 +762,8 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK();
     await sdk.start();
 
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
     assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
     assert(listOfProcessors.length === 3);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
@@ -683,7 +778,8 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK();
     await sdk.start();
 
-    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
     assert(listOfProcessors.length === 2);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
     assert(listOfProcessors[1] instanceof BatchSpanProcessor);

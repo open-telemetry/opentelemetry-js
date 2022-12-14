@@ -21,7 +21,7 @@ import { LoggerOptions } from './LoggerOptions';
  * A registry for creating named {@link Logger}s.
  */
 export interface LoggerProvider {
-    /**
+  /**
    * Returns a Logger, creating one if one with the given name, version, and
    * schemaUrl pair is not already created.
    *

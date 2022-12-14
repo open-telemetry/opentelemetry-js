@@ -47,7 +47,7 @@ export function epochMillisToHrTime(epochMillis: number): api.HrTime {
 export function getTimeOrigin(): number {
   let timeOrigin = performance.timeOrigin;
   if (typeof timeOrigin !== 'number') {
-    const perf: TimeOriginLegacy = (performance as unknown) as TimeOriginLegacy;
+    const perf: TimeOriginLegacy = performance as unknown as TimeOriginLegacy;
     timeOrigin = perf.timing && perf.timing.fetchStart;
   }
   return timeOrigin;
@@ -165,7 +165,9 @@ export function isTimeInputHrTime(value: unknown): value is api.HrTime {
  * check if input value is a correct types.TimeInput
  * @param value
  */
-export function isTimeInput(value: unknown): value is api.HrTime | number | Date {
+export function isTimeInput(
+  value: unknown
+): value is api.HrTime | number | Date {
   return (
     isTimeInputHrTime(value) ||
     typeof value === 'number' ||

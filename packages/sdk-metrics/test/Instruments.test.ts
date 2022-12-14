@@ -25,16 +25,19 @@ import {
   MetricReader,
   DataPoint,
   DataPointType,
-  Histogram
+  Histogram,
 } from '../src';
-import { TestDeltaMetricReader, TestMetricReader } from './export/TestMetricReader';
+import {
+  TestDeltaMetricReader,
+  TestMetricReader,
+} from './export/TestMetricReader';
 import {
   assertMetricData,
   assertDataPoint,
   commonValues,
   commonAttributes,
   defaultResource,
-  defaultInstrumentationScope
+  defaultInstrumentationScope,
 } from './util';
 import { ObservableResult, ValueType } from '@opentelemetry/api';
 
@@ -212,7 +215,7 @@ describe('Instruments', () => {
           {
             attributes: { foo: 'bar' },
             value: 5,
-          }
+          },
         ],
       });
     });
@@ -238,7 +241,7 @@ describe('Instruments', () => {
           {
             attributes: { foo: 'bar' },
             value: 5.1,
-          }
+          },
         ],
       });
     });
@@ -254,7 +257,6 @@ describe('Instruments', () => {
 
       for (const values of commonValues) {
         for (const attributes of commonAttributes) {
-
           histogram.record(values, attributes);
         }
       }
@@ -301,7 +303,7 @@ describe('Instruments', () => {
               count: 2,
               sum: 10,
               max: 10,
-              min: 0
+              min: 0,
             },
           },
           {
@@ -314,7 +316,7 @@ describe('Instruments', () => {
               count: 2,
               sum: 100,
               max: 100,
-              min: 0
+              min: 0,
             },
           },
         ],
@@ -356,9 +358,9 @@ describe('Instruments', () => {
               count: 2,
               sum: 110,
               min: 20,
-              max: 90
+              max: 90,
             },
-          }
+          },
         ],
       });
 
@@ -383,9 +385,9 @@ describe('Instruments', () => {
               count: 4,
               sum: 220,
               min: 10,
-              max: 100
+              max: 100,
             },
-          }
+          },
         ],
       });
     });
@@ -426,7 +428,7 @@ describe('Instruments', () => {
               count: 2,
               sum: 10.1,
               max: 10,
-              min: 0.1
+              min: 0.1,
             },
           },
           {
@@ -439,7 +441,7 @@ describe('Instruments', () => {
               count: 2,
               sum: 100.1,
               max: 100,
-              min: 0.1
+              min: 0.1,
             },
           },
         ],
@@ -527,7 +529,8 @@ describe('Instruments', () => {
           }
         }
       });
-      const observableUpDownCounter = meter.createObservableUpDownCounter('test');
+      const observableUpDownCounter =
+        meter.createObservableUpDownCounter('test');
       observableUpDownCounter.addCallback(callback);
 
       await deltaReader.collect();
@@ -537,7 +540,8 @@ describe('Instruments', () => {
     it('should observe values', async () => {
       const { meter, cumulativeReader } = setup();
       let callCount = 0;
-      const observableUpDownCounter = meter.createObservableUpDownCounter('test');
+      const observableUpDownCounter =
+        meter.createObservableUpDownCounter('test');
       observableUpDownCounter.addCallback(observableResult => {
         observableResult.observe(++callCount);
         observableResult.observe(1, { foo: 'bar' });
@@ -650,9 +654,13 @@ describe('Instruments', () => {
 
 function setup() {
   const meterProvider = new MeterProvider({ resource: defaultResource });
-  const meter = meterProvider.getMeter(defaultInstrumentationScope.name, defaultInstrumentationScope.version, {
-    schemaUrl: defaultInstrumentationScope.schemaUrl,
-  });
+  const meter = meterProvider.getMeter(
+    defaultInstrumentationScope.name,
+    defaultInstrumentationScope.version,
+    {
+      schemaUrl: defaultInstrumentationScope.schemaUrl,
+    }
+  );
   const deltaReader = new TestDeltaMetricReader();
   meterProvider.addMetricReader(deltaReader);
   const cumulativeReader = new TestMetricReader();
@@ -675,7 +683,10 @@ interface ValidateMetricData {
   isMonotonic?: boolean;
 }
 
-async function validateExport(reader: MetricReader, expected: ValidateMetricData) {
+async function validateExport(
+  reader: MetricReader,
+  expected: ValidateMetricData
+) {
   const { resourceMetrics, errors } = await reader.collect();
 
   assert.strictEqual(errors.length, 0);
@@ -690,11 +701,7 @@ async function validateExport(reader: MetricReader, expected: ValidateMetricData
 
   const metric = metrics[0];
 
-  assertMetricData(
-    metric,
-    expected.dataPointType,
-    expected.descriptor ?? null,
-  );
+  assertMetricData(metric, expected.dataPointType, expected.descriptor ?? null);
 
   if (expected.dataPoints == null) {
     return;

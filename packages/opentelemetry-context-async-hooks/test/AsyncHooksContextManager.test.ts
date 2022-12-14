@@ -430,7 +430,7 @@ for (const contextManagerClass of [
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
         const patchedEE = contextManager.bind(context, ee);
-        const handler = () => { };
+        const handler = () => {};
         patchedEE.once('test', handler);
         assert.strictEqual(patchedEE.listeners('test').length, 1);
         patchedEE.off('test', handler);
@@ -502,7 +502,7 @@ for (const contextManagerClass of [
         const otherContext = ROOT_CONTEXT.setValue(key1, 3);
         const patchedEE = otherContextManager.bind(
           otherContext,
-          contextManager.bind(context, ee),
+          contextManager.bind(context, ee)
         );
         const handler = () => {
           assert.strictEqual(contextManager.active(), context);

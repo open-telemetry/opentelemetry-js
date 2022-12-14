@@ -14,7 +14,7 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc -w",
+    "watch": "tsc --watch --build",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
@@ -59,7 +59,7 @@
     "mocha": "10.0.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "14.0.0",
+    "sinon": "15.0.0",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4"

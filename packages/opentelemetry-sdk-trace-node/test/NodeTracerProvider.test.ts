@@ -136,7 +136,11 @@ describe('NodeTracerProvider', () => {
 
       const span = provider
         .getTracer('default')
-        .startSpan('child-span', {}, trace.setSpan(ROOT_CONTEXT, sampledParent));
+        .startSpan(
+          'child-span',
+          {},
+          trace.setSpan(ROOT_CONTEXT, sampledParent)
+        );
       assert.ok(span instanceof Span);
       assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
@@ -148,7 +152,9 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
       assert.ok(span.resource instanceof Resource);
       assert.equal(
-        span.resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
+        span.resource.attributes[
+          SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE
+        ],
         'nodejs'
       );
     });
@@ -247,14 +253,9 @@ describe('NodeTracerProvider', () => {
     });
   });
 
-
   describe('Custom TracerProvider through inheritance', () => {
     class DummyPropagator implements TextMapPropagator {
-      inject(
-        context: Context,
-        carrier: any,
-        setter: TextMapSetter<any>
-      ): void {
+      inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
         throw new Error('Method not implemented.');
       }
       extract(
@@ -296,16 +297,12 @@ describe('NodeTracerProvider', () => {
         protected static override readonly _registeredPropagators = new Map<
           string,
           () => TextMapPropagator
-            >([
-              ['custom-propagator', () => propagator],
-            ]);
+        >([['custom-propagator', () => propagator]]);
 
         protected static override readonly _registeredExporters = new Map<
           string,
           () => SpanExporter
-            >([
-              ['custom-exporter', () => new DummyExporter()],
-            ]);
+        >([['custom-exporter', () => new DummyExporter()]]);
       }
 
       const provider = new CustomTracerProvider({});
@@ -327,25 +324,25 @@ describe('NodeTracerProvider', () => {
         protected static override readonly _registeredPropagators = new Map<
           string,
           () => TextMapPropagator
-            >([
-              ['custom-propagator', () => propagator],
-            ]);
+        >([['custom-propagator', () => propagator]]);
 
         protected static override readonly _registeredExporters = new Map<
           string,
           () => SpanExporter
-            >([
-              ['custom-exporter', () => new DummyExporter()],
-            ]);
+        >([['custom-exporter', () => new DummyExporter()]]);
 
-        protected override  _getPropagator(name: string): TextMapPropagator | undefined {
+        protected override _getPropagator(
+          name: string
+        ): TextMapPropagator | undefined {
           return (
             super._getPropagator(name) ||
             CustomTracerProvider._registeredPropagators.get(name)?.()
           );
         }
 
-        protected override _getSpanExporter(name: string): SpanExporter | undefined {
+        protected override _getSpanExporter(
+          name: string
+        ): SpanExporter | undefined {
           return (
             super._getSpanExporter(name) ||
             CustomTracerProvider._registeredExporters.get(name)?.()

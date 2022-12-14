@@ -55,7 +55,7 @@ export function ensureHeadersContain(
     assert.strictEqual(
       v,
       actual[k],
-      `Expected ${ actual } to contain ${ k }: ${ v }`
+      `Expected ${actual} to contain ${k}: ${v}`
     );
   });
 }
