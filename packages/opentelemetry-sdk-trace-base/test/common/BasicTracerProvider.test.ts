@@ -42,6 +42,7 @@ import {
   AlwaysOnSampler,
   AlwaysOffSampler,
 } from '../../src';
+import { env } from 'process';
 
 class DummyPropagator implements TextMapPropagator {
   inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
@@ -89,6 +90,29 @@ describe('BasicTracerProvider', () => {
       it('should use noop span processor by default', () => {
         const tracer = new BasicTracerProvider();
         assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+      });
+      it('should use noop span processor by default and no diag error', () => {
+        const errorStub = sinon.spy(diag, 'error');
+        const tracer = new BasicTracerProvider();
+        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+
+        sinon.assert.notCalled(errorStub);
+      });
+    });
+
+    describe('when user sets unavailable exporter', () => {
+      it('should use noop span processor by default and show diag error', () => {
+        const errorStub = sinon.spy(diag, 'error');
+        env.OTEL_TRACES_EXPORTER = 'someExporter';
+
+        const tracer = new BasicTracerProvider();
+        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+
+        sinon.assert.calledWith(
+          errorStub,
+          'Exporter "someExporter" requested through environment variable is unavailable.'
+        );
+        delete env.OTEL_TRACES_EXPORTER;
       });
     });
 
