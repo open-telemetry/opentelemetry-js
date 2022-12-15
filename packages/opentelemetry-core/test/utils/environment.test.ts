@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { calculateEnv } from '../../src/platform';
+import { calculateEnv, getEnv } from '../../src/platform';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
@@ -152,6 +152,20 @@ describe('environment', () => {
           `Variable '${key}' doesn't match`
         );
       });
+    });
+
+    it('memoized version of getEnv works as expected', () => {
+      mockEnvironment({
+        OTEL_LOG_LEVEL: 'waRn',
+      });
+
+      const getEnvFirstInvocationResult = getEnv();
+      const getEnvSecondInvocationResult = getEnv();
+
+      assert.deepEqual(
+        getEnvFirstInvocationResult,
+        getEnvSecondInvocationResult
+      );
     });
   });
 
