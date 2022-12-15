@@ -19,6 +19,7 @@ import {
   AggregationTemporality,
   DataPoint,
   DataPointType,
+  ExponentialHistogram,
   Histogram,
   MetricData,
   ResourceMetrics,
@@ -27,6 +28,7 @@ import {
 import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
+  IExponentialHistogramDataPoint,
   IHistogramDataPoint,
   IMetric,
   INumberDataPoint,
@@ -90,13 +92,18 @@ export function toMetric(metricData: MetricData): IMetric {
       aggregationTemporality,
       dataPoints: toHistogramDataPoints(metricData),
     };
+  } else if (metricData.dataPointType === DataPointType.EXPONENTIAL_HISTOGRAM ){
+    out.exponentialHistogram = {
+      aggregationTemporality,
+      dataPoints: toExponentialHistogramDataPoints(metricData)
+    };
   }
 
   return out;
 }
 
 function toSingularDataPoint(
-  dataPoint: DataPoint<number> | DataPoint<Histogram>,
+  dataPoint: DataPoint<number> | DataPoint<Histogram> | DataPoint<ExponentialHistogram>,
   valueType: ValueType
 ) {
   const out: INumberDataPoint = {
@@ -133,6 +140,35 @@ function toHistogramDataPoints(metricData: MetricData): IHistogramDataPoint[] {
       max: histogram.max,
       startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
       timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
+    };
+  });
+}
+
+function toExponentialHistogramDataPoints(
+  metricData: MetricData
+): IExponentialHistogramDataPoint[] {
+  return metricData.dataPoints.map(dataPoint => {
+    const histogram = dataPoint.value as ExponentialHistogram;
+    return {
+      attributes: toAttributes(dataPoint.attributes),
+      count: histogram.count,
+      min: histogram.min,
+      max: histogram.max,
+      sum: histogram.sum,
+      positive: {
+        offset: histogram.positive.offset,
+        bucketCounts: histogram.positive.bucketCounts,
+      },
+      negative: {
+        offset: histogram.negative.offset,
+        bucketCounts: histogram.negative.bucketCounts,
+      },
+      scale: histogram.scale,
+      zeroCount: histogram.zeroCount,
+      startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
+      timeUnixNano: hrTimeToNanoseconds(
+        dataPoint.endTime
+      ),
     };
   });
 }
