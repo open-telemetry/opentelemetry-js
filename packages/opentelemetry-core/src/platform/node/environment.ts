@@ -25,13 +25,35 @@ import {
 /**
  * Gets the environment variables
  */
-export function getEnv(): Required<ENVIRONMENT> {
+export function calculateEnv(): Required<ENVIRONMENT> {
   const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
-  return Object.assign(
+  // const mergedEnv = {
+  //   HOSTNAME: os.hostname(),
+  //   ...DEFAULT_ENVIRONMENT,
+  //   ...processEnv,
+  // };
+
+  const mergedEnv = Object.assign(
     {
       HOSTNAME: os.hostname(),
     },
     DEFAULT_ENVIRONMENT,
     processEnv
   );
+
+  return mergedEnv;
+}
+
+let cache: Required<ENVIRONMENT>;
+
+// memo version of calculateEnv
+export function getEnv(): Required<ENVIRONMENT> {
+  if (cache) {
+    return cache;
+  }
+
+  const calculatedEnv = calculateEnv();
+  cache = calculatedEnv;
+
+  return calculatedEnv;
 }

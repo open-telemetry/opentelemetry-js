@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getEnv } from '../../src/platform';
+import { calculateEnv } from '../../src/platform';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
@@ -96,7 +96,7 @@ describe('environment', () => {
         OTEL_EXPORTER_OTLP_TIMEOUT: 15000,
         OTEL_EXPORTER_OTLP_TRACES_TIMEOUT: 12000,
       });
-      const env = getEnv();
+      const env = calculateEnv();
       assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.ERROR);
       assert.strictEqual(env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT, 40);
@@ -138,12 +138,12 @@ describe('environment', () => {
       mockEnvironment({
         OTEL_LOG_LEVEL: 'waRn',
       });
-      const env = getEnv();
+      const env = calculateEnv();
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.WARN);
     });
 
     it('should parse environment variables and use defaults', () => {
-      const env = getEnv();
+      const env = calculateEnv();
       Object.keys(DEFAULT_ENVIRONMENT).forEach(envKey => {
         const key = envKey as keyof ENVIRONMENT;
         assert.strictEqual(
@@ -162,7 +162,7 @@ describe('environment', () => {
         OTEL_TRACES_SAMPLER: TracesSamplerValues.AlwaysOff,
       });
       removeMockEnvironment();
-      const env = getEnv();
+      const env = calculateEnv();
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.INFO);
       assert.strictEqual(
         env.OTEL_TRACES_SAMPLER,
