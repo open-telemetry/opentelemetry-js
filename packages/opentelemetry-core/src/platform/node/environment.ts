@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import * as os from 'os';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
@@ -27,19 +26,10 @@ import {
  */
 export function calculateEnv(): Required<ENVIRONMENT> {
   const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
-  // const mergedEnv = {
-  //   HOSTNAME: os.hostname(),
-  //   ...DEFAULT_ENVIRONMENT,
-  //   ...processEnv,
-  // };
-
-  const mergedEnv = Object.assign(
-    {
-      HOSTNAME: os.hostname(),
-    },
-    DEFAULT_ENVIRONMENT,
-    processEnv
-  );
+  const mergedEnv = {
+    ...DEFAULT_ENVIRONMENT,
+    ...processEnv,
+  };
 
   return mergedEnv;
 }
