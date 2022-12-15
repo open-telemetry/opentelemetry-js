@@ -80,8 +80,8 @@ export class NodeSDK {
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     if (getEnv().OTEL_SDK_DISABLED) {
       this._disabled = true;
-      // Finish the instantiation of SDK object
-      // Functions with possible side-effects are set to no-op
+      // Functions with possible side-effects are set
+      // to no-op via the _disabled flag
     }
 
     this._resource = configuration.resource ?? new Resource({});

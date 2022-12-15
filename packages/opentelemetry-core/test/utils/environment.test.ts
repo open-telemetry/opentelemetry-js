@@ -136,12 +136,30 @@ describe('environment', () => {
       assert.strictEqual(env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, 12000);
     });
 
-    it('should parse OTEL_SDK_DISABLED despite casing', () => {
+    it('should parse OTEL_SDK_DISABLED truthy value despite casing', () => {
       mockEnvironment({
         OTEL_SDK_DISABLED: 'TrUe',
       });
       const env = getEnv();
       assert.strictEqual(env.OTEL_SDK_DISABLED, true);
+    });
+
+    describe('OTEL_SDK_DISABLED falsy values', () => {
+      it('should parse OTEL_SDK_DISABLED falsy value despite casing', () => {
+        mockEnvironment({
+          OTEL_SDK_DISABLED: 'FaLse',
+        });
+        const env = getEnv();
+        assert.strictEqual(env.OTEL_SDK_DISABLED, false);
+      });
+
+      it('should parse OTEL_SDK_DISABLED empty string as false', () => {
+        mockEnvironment({
+          OTEL_SDK_DISABLED: '',
+        });
+        const env = getEnv();
+        assert.strictEqual(env.OTEL_SDK_DISABLED, false);
+      });
     });
 
     it('should parse OTEL_LOG_LEVEL despite casing', () => {
