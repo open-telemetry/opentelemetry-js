@@ -18,6 +18,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation-grpc): always set grpc semcov status code attribute with numeric value [#3076](https://github.com/open-telemetry/opentelemetry-js/pull/3076) @blumamir
 * fix(instrumentation): only call `onRequire` for full matches on core modules with sub-paths [#3451](https://github.com/open-telemetry/opentelemetry-js/pull/3451) @mhassan1
 * fix(instrumentation): add back support for absolute paths via `require-in-the-middle` [#3457](https://github.com/open-telemetry/opentelemetry-js/pull/3457) @mhassan1
+* fix(sdk-node): fix exporter to be read only OTEL_TRACES_EXPORTER is set to a valid exporter [3492] @svetlanabrennan
 
 ### :books: (Refine Doc)
 
