@@ -15,8 +15,10 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import {
   context,
+  ROOT_CONTEXT,
   Span,
   SpanContext,
   SpanKind,
@@ -27,6 +29,10 @@ import { NonRecordingSpan } from '../../../src/trace/NonRecordingSpan';
 import { NoopTracer } from '../../../src/trace/NoopTracer';
 
 describe('NoopTracer', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   it('should not crash', () => {
     const tracer = new NoopTracer();
 
@@ -53,6 +59,23 @@ describe('NoopTracer', () => {
       {},
       trace.setSpanContext(context.active(), parent)
     );
+    assert(span.spanContext().traceId === parent.traceId);
+    assert(span.spanContext().spanId === parent.spanId);
+    assert(span.spanContext().traceFlags === parent.traceFlags);
+  });
+
+  it('should propagate valid spanContext on the span (from current context)', () => {
+    const tracer = new NoopTracer();
+    const parent: SpanContext = {
+      traceId: 'd4cda95b652f4a1592b449dd92ffda3b',
+      spanId: '6e0c63ffe4e34c42',
+      traceFlags: TraceFlags.NONE,
+    };
+
+    const ctx = trace.setSpanContext(ROOT_CONTEXT, parent);
+    const activeStub = sinon.stub(context, 'active');
+    activeStub.returns(ctx);
+    const span = tracer.startSpan('test-1');
     assert(span.spanContext().traceId === parent.traceId);
     assert(span.spanContext().spanId === parent.spanId);
     assert(span.spanContext().traceFlags === parent.traceFlags);
