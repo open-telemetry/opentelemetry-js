@@ -92,10 +92,10 @@ export function toMetric(metricData: MetricData): IMetric {
       aggregationTemporality,
       dataPoints: toHistogramDataPoints(metricData),
     };
-  } else if (metricData.dataPointType === DataPointType.EXPONENTIAL_HISTOGRAM ){
+  } else if (metricData.dataPointType === DataPointType.EXPONENTIAL_HISTOGRAM) {
     out.exponentialHistogram = {
       aggregationTemporality,
-      dataPoints: toExponentialHistogramDataPoints(metricData)
+      dataPoints: toExponentialHistogramDataPoints(metricData),
     };
   }
 
@@ -103,7 +103,10 @@ export function toMetric(metricData: MetricData): IMetric {
 }
 
 function toSingularDataPoint(
-  dataPoint: DataPoint<number> | DataPoint<Histogram> | DataPoint<ExponentialHistogram>,
+  dataPoint:
+    | DataPoint<number>
+    | DataPoint<Histogram>
+    | DataPoint<ExponentialHistogram>,
   valueType: ValueType
 ) {
   const out: INumberDataPoint = {
@@ -166,9 +169,7 @@ function toExponentialHistogramDataPoints(
       scale: histogram.scale,
       zeroCount: histogram.zeroCount,
       startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-      timeUnixNano: hrTimeToNanoseconds(
-        dataPoint.endTime
-      ),
+      timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
     };
   });
 }

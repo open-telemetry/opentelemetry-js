@@ -32,10 +32,7 @@ export function assertInEpsilon(
   );
 }
 
-export function assertInDelta(
-  actual: number,
-  expected: number,
-  delta: number) {
+export function assertInDelta(actual: number, expected: number, delta: number) {
   const actualDelta = Math.abs(expected - actual);
   assert.ok(
     actualDelta < delta,

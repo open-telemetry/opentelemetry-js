@@ -57,15 +57,14 @@ interface InternalHistogram {
   zeroCount: number;
 }
 
-type HighLow = {
-  high: number;
-  low: number;
-};
-
-type IncrementResult = {
-  success: boolean;
-  highLow?: HighLow;
-};
+// HighLow is a utility class used for computing a common scale for
+// two exponential histogram accumulations
+class HighLow {
+  static combine(h1: HighLow, h2: HighLow): HighLow {
+    return new HighLow(Math.min(h1.low, h2.low), Math.max(h1.high, h2.high));
+  }
+  constructor(public low: number, public high: number) {}
+}
 
 export class ExponentialHistogramAccumulation implements Accumulation {
   static DEFAULT_MAX_SIZE = 160;
@@ -81,21 +80,29 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     private _max = Number.NEGATIVE_INFINITY,
     private _positive = new Buckets(),
     private _negative = new Buckets(),
-    private _mapping: Mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE),
+    private _mapping: Mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE)
   ) {}
 
   /**
-   * record supports updating a histogram with a single count.
+   * record updates a histogram with a single count
    * @param {Number} value
    */
   record(value: number) {
     this.updateByIncrement(value, 1);
   }
 
+  /**
+   * Sets the start time for this accumulation
+   * @param {HrTime} startTime
+   */
   setStartTime(startTime: HrTime): void {
     this.startTime = startTime;
   }
 
+  /**
+   * Returns the datapoint representation of this accumulation
+   * @param {HrTime} startTime
+   */
   toPointValue(): InternalHistogram {
     return {
       hasMinMax: this._recordMinMax,
@@ -116,26 +123,44 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     };
   }
 
+  /**
+   * @returns {Number} The sum of values recorded by this accumulation
+   */
   sum(): number {
     return this._sum;
   }
 
+  /**
+   * @returns {Number} The minimum value recorded by this accumulation
+   */
   min(): number {
     return this._min;
   }
 
+  /**
+   * @returns {Number} The maximum value recorded by this accumulation
+   */
   max(): number {
     return this._max;
   }
 
+  /**
+   * @returns {Number} The count of values recorded by this accumulation
+   */
   count(): number {
     return this._count;
   }
 
+  /**
+   * @returns {Number} The number of 0 values recorded by this accumulation
+   */
   zeroCount(): number {
     return this._zeroCount;
   }
 
+  /**
+   * @returns {Number} The scale used by thie accumulation
+   */
   scale(): number {
     if (this._count === this._zeroCount) {
       // all zeros! scale doesn't matter, use zero
@@ -144,46 +169,20 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     return this._mapping.scale();
   }
 
+  /**
+   * positive holds the postive values
+   * @returns {Buckets}
+   */
   positive(): Buckets {
     return this._positive;
   }
 
+  /**
+   * negative holds the negative values by their absolute value
+   * @returns {Buckets}
+   */
   negative(): Buckets {
     return this._negative;
-  }
-
-  /**
-   * Clear resets a histogram to the empty state without changing backing array.
-   */
-  clear() {
-    this._sum = 0;
-    this._count = 0;
-    this._zeroCount = 0;
-    this._min = 0;
-    this._max = 0;
-    this._positive.clear();
-    this._negative.clear();
-    this._mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE);
-  }
-
-  /**
-   * clone returns a deep copy of self
-   * @returns {ExponentialHistogram}
-   */
-  clone(): ExponentialHistogramAccumulation {
-    return new ExponentialHistogramAccumulation(
-      this.startTime,
-      this._maxSize,
-      this._recordMinMax,
-      this._sum,
-      this._count,
-      this._zeroCount,
-      this._min,
-      this._max,
-      this.positive().clone(),
-      this.negative().clone(),
-      this._mapping,
-    );
   }
 
   /**
@@ -211,46 +210,25 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     this._sum += value * increment;
 
     if (value > 0) {
-      this._update(this._positive, value, increment);
+      this._updateBuckets(this._positive, value, increment);
     } else {
-      this._update(this._negative, -value, increment);
+      this._updateBuckets(this._negative, -value, increment);
     }
   }
 
   /**
-   * highLowAtScale is used by merge and diff to compute an ideal
-   * combined scale
-   * @param buckets
-   * @param scale
-   * @returns {HighLow}
-   */
-  highLowAtScale(buckets: Buckets, scale: number): HighLow {
-    if(buckets.length() === 0) {
-      return {
-        low: 0,
-        high: -1,
-      };
-    }
-    const shift = this.scale() - scale;
-    return {
-      low: util.rightShift(buckets.indexStart, shift),
-      high: util.rightShift(buckets.indexEnd, shift),
-    };
-  }
-
-  /**
-   * Merge combines data from other into self
+   * merge combines data from other into self
    * @param {ExponentialHistogramAccumulation} other
    */
   merge(other: ExponentialHistogramAccumulation) {
-    if(this._count === 0) {
+    if (this._count === 0) {
       this._min = other.min();
       this._max = other.max();
-    } else if ( other.count() !== 0 ) {
-      if(other.min() < this.min()) {
+    } else if (other.count() !== 0) {
+      if (other.min() < this.min()) {
         this._min = other.min();
       }
-      if(other.max() > this.max()) {
+      if (other.max() > this.max()) {
         this._max = other.max();
       }
     }
@@ -268,7 +246,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   /**
-   * Diff substracts other from self
+   * diff substracts other from self
    * @param {ExponentialHistogramAccumulation} other
    */
   diff(other: ExponentialHistogramAccumulation) {
@@ -281,67 +259,99 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     const minScale = this._minScale(other);
 
     this._downscale(this.scale() - minScale);
+
     this._diffBuckets(this.positive(), other, other.positive(), minScale);
     this._diffBuckets(this.negative(), other, other.negative(), minScale);
   }
 
-  private _update(buckets: Buckets, value: number, increment: number) {
-    let index = this._mapping.mapToIndex(value);
-    let result = this._incrementIndexby(buckets, index, increment);
-    if (result.success) {
-      return;
-    }
-
-    this._downscale(this._changeScale(result.highLow!, this._maxSize));
-
-    index = this._mapping.mapToIndex(value);
-
-    result = this._incrementIndexby(buckets, index, increment);
-    if (!result.success) {
-      throw new Error('downscale logic error');
-    }
+  /**
+   * clone returns a deep copy of self
+   * @returns {ExponentialHistogramAccumulation}
+   */
+  clone(): ExponentialHistogramAccumulation {
+    return new ExponentialHistogramAccumulation(
+      this.startTime,
+      this._maxSize,
+      this._recordMinMax,
+      this._sum,
+      this._count,
+      this._zeroCount,
+      this._min,
+      this._max,
+      this.positive().clone(),
+      this.negative().clone(),
+      this._mapping
+    );
   }
 
-  private _incrementIndexby(
-    buckets: Buckets,
-    index: number,
-    increment: number
-  ): IncrementResult {
-    if (increment === 0) {
-      // Skipping a bunch of work for 0 increment.
-      return {success: true};
-    }
+  /**
+   * _updateBuckets maps the incoming value to a bucket index for the current
+   * scale. If the bucket index is outside of the range of the backing array,
+   * it will rescale the backing array and update the mapping for the new scale.
+   */
+  private _updateBuckets(buckets: Buckets, value: number, increment: number) {
+    let index = this._mapping.mapToIndex(value);
+
+    // rescale the mapping if needed
+    let rescalingNeeded = false;
+    let high = 0;
+    let low = 0;
+
     if (buckets.length() === 0) {
       buckets.indexStart = index;
       buckets.indexEnd = buckets.indexStart;
       buckets.indexBase = buckets.indexStart;
-    } else if (index < buckets.indexStart) {
+    } else if (
+      index < buckets.indexStart &&
+      buckets.indexEnd - index >= this._maxSize
+    ) {
+      rescalingNeeded = true;
+      low = index;
+      high = buckets.indexEnd;
+    } else if (
+      index > buckets.indexEnd &&
+      index - buckets.indexStart >= this._maxSize
+    ) {
+      rescalingNeeded = true;
+      low = buckets.indexStart;
+      high = index;
+    }
+
+    // rescale and compute index at new scale
+    if (rescalingNeeded) {
+      const change = this._changeScale(high, low);
+      this._downscale(change);
+      index = this._mapping.mapToIndex(value);
+    }
+
+    this._incrementIndexBy(buckets, index, increment);
+  }
+
+  /**
+   * _incrementIndexBy increments the count of the bucket specified by `index`.
+   * If the index is outside of the range [buckets.indexStart, buckets.indexEnd]
+   * the boundaries of the backing array will be adjusted and more buckets will
+   * be added if needed.
+   */
+  private _incrementIndexBy(
+    buckets: Buckets,
+    index: number,
+    increment: number
+  ) {
+    if (increment === 0) {
+      // nothing to do for a zero increment, can happen during a merge operation
+      return;
+    }
+
+    if (index < buckets.indexStart) {
       const span = buckets.indexEnd - index;
-      if (span >= this._maxSize) {
-        // rescale needed: mapped value to right
-        return {
-          success: false,
-          highLow: {
-            low: index,
-            high: buckets.indexEnd,
-          },
-        };
-      } else if (span >= buckets.backing.size()) {
+      if (span >= buckets.backing.length()) {
         this._grow(buckets, span + 1);
       }
       buckets.indexStart = index;
     } else if (index > buckets.indexEnd) {
       const span = index - buckets.indexStart;
-      if (span >= this._maxSize) {
-        //rescale needed: mapped value to the left
-        return {
-          success: false,
-          highLow: {
-            low: buckets.indexStart,
-            high: index,
-          },
-        };
-      } else if (span >= buckets.backing.size()) {
+      if (span >= buckets.backing.length()) {
         this._grow(buckets, span + 1);
       }
       buckets.indexEnd = index;
@@ -349,14 +359,18 @@ export class ExponentialHistogramAccumulation implements Accumulation {
 
     let bucketIndex = index - buckets.indexBase;
     if (bucketIndex < 0) {
-      bucketIndex += buckets.backing.size();
+      bucketIndex += buckets.backing.length();
     }
     buckets.incrementBucket(bucketIndex, increment);
-    return {success: true};
   }
 
+  /**
+   * grow resizes the backing array by doubling in size up to maxSize.
+   * This extends the array with a bunch of zeros and copies the
+   * existing counts to the same position.
+   */
   private _grow(buckets: Buckets, needed: number) {
-    const size = buckets.backing.size();
+    const size = buckets.backing.length();
     const bias = buckets.indexBase - buckets.indexStart;
     const oldPositiveLimit = size - bias;
     let newSize = util.powTwoRoundedUp(needed);
@@ -367,22 +381,28 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     buckets.backing.growTo(newSize, oldPositiveLimit, newPositiveLimit);
   }
 
-  private _changeScale(hl: HighLow, size: number): number {
+  /**
+   * _changeScale computes how much downscaling is needed by shifting the
+   * high and low values until they are separated by no more than size.
+   */
+  private _changeScale(high: number, low: number): number {
     let change = 0;
-    while (hl.high - hl.low >= size) {
-      hl.high >>= 1;
-      hl.low >>= 1;
+    while (high - low >= this._maxSize) {
+      high = util.rightShift(high, 1);
+      low = util.rightShift(low, 1);
       change++;
     }
     return change;
   }
 
+  /**
+   * _downscale subtracts `change` from the current mapping scale.
+   */
   private _downscale(change: number) {
     if (change === 0) {
       return;
     }
     if (change < 0) {
-      // todo: do not throw
       throw new Error(`impossible change of scale: ${this.scale}`);
     }
     const newScale = this._mapping.scale() - change;
@@ -397,29 +417,50 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     }
   }
 
-  private _minScale(other: ExponentialHistogramAccumulation):number {
+  /**
+   * _minScale is used by diff and merge to compute an ideal combined scale
+   */
+  private _minScale(other: ExponentialHistogramAccumulation): number {
     const minScale = Math.min(this.scale(), other.scale());
 
-    const ourHighLowPos = this.highLowAtScale(this.positive(), minScale);
-    const otherHighLowPos = other.highLowAtScale(other.positive(), minScale);
-    const highLowPos = {
-      low: Math.min(ourHighLowPos.low, otherHighLowPos.low),
-      high: Math.max(ourHighLowPos.high, otherHighLowPos.high),
-    };
+    const highLowPos = HighLow.combine(
+      this._highLowAtScale(this.positive(), this.scale(), minScale),
+      this._highLowAtScale(other.positive(), other.scale(), minScale)
+    );
 
-    const ourHighLowNeg = this.highLowAtScale(this.negative(), minScale);
-    const otherHighLowNeg = other.highLowAtScale(other.negative(), minScale);
-    const highLowNeg = {
-      low: Math.min(ourHighLowNeg.low, otherHighLowNeg.low),
-      high: Math.max(ourHighLowNeg.high, otherHighLowNeg.high),
-    };
+    const highLowNeg = HighLow.combine(
+      this._highLowAtScale(this.negative(), this.scale(), minScale),
+      this._highLowAtScale(other.negative(), other.scale(), minScale)
+    );
 
     return Math.min(
-      minScale - this._changeScale(highLowPos, this._maxSize),
-      minScale - this._changeScale(highLowNeg, this._maxSize),
+      minScale - this._changeScale(highLowPos.high, highLowPos.low),
+      minScale - this._changeScale(highLowNeg.high, highLowNeg.low)
     );
   }
 
+  /**
+   * _highLowAtScale is used by diff and merge to compute an ideal combined scale.
+   */
+  private _highLowAtScale(
+    buckets: Buckets,
+    currentScale: number,
+    newScale: number
+  ): HighLow {
+    if (buckets.length() === 0) {
+      return new HighLow(0, -1);
+    }
+    const shift = currentScale - newScale;
+    return new HighLow(
+      util.rightShift(buckets.indexStart, shift),
+      util.rightShift(buckets.indexEnd, shift)
+    );
+  }
+
+  /**
+   * _mergeBuckets translates index values from another histogram and
+   * adds the values into the corresponding buckets of this histogram.
+   */
   private _mergeBuckets(
     ours: Buckets,
     other: ExponentialHistogramAccumulation,
@@ -429,19 +470,19 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     const theirOffset = theirs.offset();
     const theirChange = other.scale() - scale;
 
-    for(let i=0; i < theirs.length(); i++) {
-      const result = this._incrementIndexby(
+    for (let i = 0; i < theirs.length(); i++) {
+      this._incrementIndexBy(
         ours,
         util.rightShift(theirOffset + i, theirChange),
-        theirs.at(i),
+        theirs.at(i)
       );
-      if( !result.success ) {
-        // this should not happen
-        // todo: log
-      }
     }
   }
 
+  /**
+   * _diffBuckets translates index values from another histogram and
+   * subtracts the values in the corresponding buckets of this histogram.
+   */
   private _diffBuckets(
     ours: Buckets,
     other: ExponentialHistogramAccumulation,
@@ -451,66 +492,33 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     const theirOffset = theirs.offset();
     const theirChange = other.scale() - scale;
 
-    for(let i=0; i < theirs.length(); i++) {
+    for (let i = 0; i < theirs.length(); i++) {
       const ourIndex = util.rightShift(theirOffset + i, theirChange);
       let bucketIndex = ourIndex - ours.indexBase;
       if (bucketIndex < 0) {
-        bucketIndex += ours.backing.size();
+        bucketIndex += ours.backing.length();
       }
       ours.decrementBucket(bucketIndex, theirs.at(i));
     }
 
     ours.trim();
   }
-
-  printBucketInternals() {
-    console.log('offsets');
-    console.log({
-      indexBase: this.positive().indexBase,
-      indexStart: this.positive().indexStart,
-      indexEnd: this.positive().indexEnd,
-    });
-    console.log('raw buckets');
-    console.log(this.positive().toString());
-  }
-
-  // todo: delete, for debugging
-  printBuckets() {
-    console.log('positive:');
-    this._printBuckets(this._positive);
-    //console.log('negative:');
-    //this._printBuckets(this._negative);
-  }
-
-  // todo: delete, for debugging
-  private _printBuckets(buckets: Buckets) {
-    if (buckets.length() === 0) {
-      console.log('[]');
-      return;
-    }
-    let result = '[';
-    for (let i = 0; i < buckets.length(); i++) {
-      const index = buckets.offset() + i;
-      const lower = this._mapping.lowerBoundary(index);
-      const count = buckets.at(i);
-      result += `${index}=${count}(${lower.toFixed(2)}),`;
-    }
-    result = result.replace(/,$/, ']');
-    console.log(result);
-  }
 }
 
 /**
- * Basic aggregator which observes events and counts them in pre-defined buckets
- * and provides the total sum and count of all observations.
+ * Aggregator for ExponentialHistogramAccumlations
  */
 export class ExponentialHistogramAggregator
-implements Aggregator<ExponentialHistogramAccumulation> {
-  public kind: AggregatorKind.EXPONENTIAL_HISTOGRAM = AggregatorKind.EXPONENTIAL_HISTOGRAM;
+  implements Aggregator<ExponentialHistogramAccumulation>
+{
+  public kind: AggregatorKind.EXPONENTIAL_HISTOGRAM =
+    AggregatorKind.EXPONENTIAL_HISTOGRAM;
 
   /**
-   * @param _maxSize Maximum number of buckets for each of the positive and negative ranges, exclusive of the zero-bucket.
-   * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
+   * @param _maxSize Maximum number of buckets for each of the positive
+   *    and negative ranges, exclusive of the zero-bucket.
+   * @param _recordMinMax If set to true, min and max will be recorded.
+   *    Otherwise, min and max will not be recorded.
    */
   constructor(
     readonly _maxSize: number,
@@ -565,7 +573,6 @@ implements Aggregator<ExponentialHistogramAccumulation> {
         const pointValue = accumulation.toPointValue();
 
         // determine if instrument allows negative values.
-        // todo: expo histo negatives?
         const allowsNegativeValues =
           descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
           descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||

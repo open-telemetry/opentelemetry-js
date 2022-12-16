@@ -67,7 +67,7 @@ export interface Histogram {
 export interface ExponentialHistogram {
   count: number;
   sum?: number;
-  scale: number
+  scale: number;
   zeroCount: number;
   positive: {
     offset: number;

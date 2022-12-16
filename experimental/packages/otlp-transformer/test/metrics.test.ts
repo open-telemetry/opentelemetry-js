@@ -270,11 +270,12 @@ describe('Metrics', () => {
       sum: number,
       scale: number,
       zeroCount: number,
-      positive: {offset: number, bucketCounts: number[]},
-      negative: {offset: number, bucketCounts: number[]},
+      positive: { offset: number; bucketCounts: number[] },
+      negative: { offset: number; bucketCounts: number[] },
       aggregationTemporality: AggregationTemporality,
       min?: number,
-      max?: number): MetricData {
+      max?: number
+    ): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -300,8 +301,8 @@ describe('Metrics', () => {
             startTime: START_TIME,
             endTime: END_TIME,
             attributes: ATTRIBUTES,
-          }
-        ]
+          },
+        ],
       };
     }
 
@@ -651,18 +652,21 @@ describe('Metrics', () => {
 
     describe('serializes an exponential histogram metric record', () => {
       it('with min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest(
-          [
-            createResourceMetrics(
-              [
-                createExponentialHistogramMetrics(
-                  3, 10, 1, 0, {offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0]},
-                  {offset: 0, bucketCounts: [0]}, AggregationTemporality.CUMULATIVE, 1, 8
-                )
-              ]
-            )
-          ]
-        );
+        const exportRequest = createExportMetricsServiceRequest([
+          createResourceMetrics([
+            createExponentialHistogramMetrics(
+              3,
+              10,
+              1,
+              0,
+              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+              { offset: 0, bucketCounts: [0] },
+              AggregationTemporality.CUMULATIVE,
+              1,
+              8
+            ),
+          ]),
+        ]);
 
         assert.ok(exportRequest);
 
@@ -681,7 +685,8 @@ describe('Metrics', () => {
                       description: 'this is a description',
                       unit: '1',
                       exponentialHistogram: {
-                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        aggregationTemporality:
+                          EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
                         dataPoints: [
                           {
                             attributes: expectedAttributes,
@@ -691,8 +696,11 @@ describe('Metrics', () => {
                             max: 8,
                             zeroCount: 0,
                             scale: 1,
-                            positive: {offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0]},
-                            negative: {offset: 0, bucketCounts: [0]},
+                            positive: {
+                              offset: 0,
+                              bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0],
+                            },
+                            negative: { offset: 0, bucketCounts: [0] },
                             startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                             timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           },
@@ -708,18 +716,19 @@ describe('Metrics', () => {
       });
 
       it('without min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest(
-          [
-            createResourceMetrics(
-              [
-                createExponentialHistogramMetrics(
-                  3, 10, 1, 0, {offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0]},
-                  {offset: 0, bucketCounts: [0]}, AggregationTemporality.CUMULATIVE
-                )
-              ]
-            )
-          ]
-        );
+        const exportRequest = createExportMetricsServiceRequest([
+          createResourceMetrics([
+            createExponentialHistogramMetrics(
+              3,
+              10,
+              1,
+              0,
+              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+              { offset: 0, bucketCounts: [0] },
+              AggregationTemporality.CUMULATIVE
+            ),
+          ]),
+        ]);
 
         assert.ok(exportRequest);
 
@@ -738,7 +747,8 @@ describe('Metrics', () => {
                       description: 'this is a description',
                       unit: '1',
                       exponentialHistogram: {
-                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        aggregationTemporality:
+                          EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
                         dataPoints: [
                           {
                             attributes: expectedAttributes,
@@ -748,8 +758,11 @@ describe('Metrics', () => {
                             max: undefined,
                             zeroCount: 0,
                             scale: 1,
-                            positive: {offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0]},
-                            negative: {offset: 0, bucketCounts: [0]},
+                            positive: {
+                              offset: 0,
+                              bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0],
+                            },
+                            negative: { offset: 0, bucketCounts: [0] },
                             startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                             timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           },
@@ -762,9 +775,7 @@ describe('Metrics', () => {
             },
           ],
         });
-
       });
     });
-
   });
 });

@@ -13,14 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function leftShift(value: number, numBits: number): number {
-  return value * Math.pow(2, numBits);
+
+/**
+ * Note the implementations of leftShift, righShift, and ldexp are
+ * naive, but functionally correct. We need the ability to bit shift
+ * numbers up to 52-bits and support for negative shifts, which the
+ * native bit shift operators do not support. We can look into providing
+ * more optimized versions of these ourselves, or take a dependency
+ * on a third-party library if needed.
+ */
+
+/**
+ * Left shift that supports numbers > 32bits and negative shifts
+ * @param value
+ * @param shift
+ * @returns {number}
+ */
+export function leftShift(value: number, shift: number): number {
+  return value * Math.pow(2, shift);
 }
 
-export function rightShift(value: number, numBits: number): number {
-  return Math.floor(value * Math.pow(2, -numBits));
+/**
+ * Right shift that supports numbers > 32bits and negative shifts
+ * @param value
+ * @param shift
+ * @returns {number}
+ */
+export function rightShift(value: number, shift: number): number {
+  return Math.floor(value * Math.pow(2, -shift));
 }
 
+/**
+ * ldexp returns frac × 2**exp. With the following special cases:
+ *   ldexp(±0, exp) = ±0
+ *   ldexp(±Inf, exp) = ±Inf
+ *   ldexp(NaN, exp) = NaN
+ * @param frac
+ * @param exp
+ * @returns {number}
+ */
 export function ldexp(frac: number, exp: number): number {
   if (
     frac === 0 ||
@@ -33,7 +64,7 @@ export function ldexp(frac: number, exp: number): number {
   return frac * Math.pow(2, exp);
 }
 
-// note: v is expected to be an int32
+// we expect v to be positive and <= 32 bits, it's safe to use `>>`.
 export function powTwoRoundedUp(v: number): number {
   // The following expression computes the least power-of-two
   // that is >= v.  There are a number of tricky ways to

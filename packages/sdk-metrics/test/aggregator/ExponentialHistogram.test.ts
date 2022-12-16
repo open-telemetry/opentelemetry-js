@@ -21,13 +21,19 @@ import {
   InstrumentType,
   MetricData,
 } from '../../src';
-import { ExponentialHistogramAccumulation, ExponentialHistogramAggregator } from '../../src/aggregator/ExponentialHistogram';
+import {
+  ExponentialHistogramAccumulation,
+  ExponentialHistogramAggregator,
+} from '../../src/aggregator/ExponentialHistogram';
 import { Buckets } from '../../src/aggregator/exponential-histogram/Buckets';
 import { Mapping } from '../../src/aggregator/exponential-histogram//mapping/types';
 import { ExponentMapping } from '../../src/aggregator/exponential-histogram//mapping/ExponentMapping';
 import { LogarithmMapping } from '../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
 import * as assert from 'assert';
-import { assertInEpsilon, assertInDelta } from './exponential-histogram/helpers';
+import {
+  assertInEpsilon,
+  assertInDelta,
+} from './exponential-histogram/helpers';
 import { defaultInstrumentDescriptor } from '../util';
 
 describe('ExponentialHistogramAccumulation', () => {
@@ -148,7 +154,7 @@ describe('ExponentialHistogramAccumulation', () => {
               for (let step = maxSize; step < 4 * maxSize; step++) {
                 const accumulation = new ExponentialHistogramAccumulation(
                   [0, 0],
-                  maxSize,
+                  maxSize
                 );
                 let mapper = getMapping(initScale);
 
@@ -217,7 +223,7 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
       const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
         const v2 = 1 / (1 << i);
 
@@ -252,7 +258,7 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
       const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
         const v2 = 2 / (1 << i);
 
@@ -287,7 +293,12 @@ describe('ExponentialHistogramAccumulation', () => {
     });
 
     it('handles exhaustive test case', () => {
-      const testMergeExhaustive =  (a: number[], b: number[], size: number, incr: number) => {
+      const testMergeExhaustive = (
+        a: number[],
+        b: number[],
+        size: number,
+        incr: number
+      ) => {
         const aHist = new ExponentialHistogramAccumulation([0, 0], size);
         const bHist = new ExponentialHistogramAccumulation([0, 0], size);
         const cHist = new ExponentialHistogramAccumulation([0, 0], size);
@@ -313,13 +324,21 @@ describe('ExponentialHistogramAccumulation', () => {
       const sizes = [2, 6, 8, 9, 16];
       const increments = [1, 0x100, 0x10000, 0x100000000];
 
-      for(const mean of means) {
-        for(const stddev of stddevs) {
-          const values = Array.from({length: count}, () => mean + Math.random() * stddev);
-          for(let part = 1; part < count; part++) {
-            for(const size of sizes) {
+      for (const mean of means) {
+        for (const stddev of stddevs) {
+          const values = Array.from(
+            { length: count },
+            () => mean + Math.random() * stddev
+          );
+          for (let part = 1; part < count; part++) {
+            for (const size of sizes) {
               for (const incr of increments) {
-                testMergeExhaustive(values.slice(0, part), values.slice(part, count), size, incr);
+                testMergeExhaustive(
+                  values.slice(0, part),
+                  values.slice(part, count),
+                  size,
+                  incr
+                );
               }
             }
           }
@@ -332,7 +351,7 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
 
         acc0.record(v1);
@@ -359,14 +378,14 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
       const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
 
-        if( i % 2 === 0) {
+        if (i % 2 === 0) {
           acc0.record(v1);
         }
 
-        if( i % 2 === 1 ) {
+        if (i % 2 === 1) {
           acc1.record(v1);
         }
 
@@ -395,14 +414,14 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
       const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
 
-        if( i % 2 === 1 ) {
+        if (i % 2 === 1) {
           acc0.record(v1);
         }
 
-        if( i % 2 === 0) {
+        if (i % 2 === 0) {
           acc1.record(v1);
         }
 
@@ -430,7 +449,7 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
       const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         const v1 = 2 << i;
 
         acc1.record(v1);
@@ -458,7 +477,7 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
       const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         const v = 2 << i;
         acc0.record(v);
         acc1.record(v);
@@ -470,13 +489,19 @@ describe('ExponentialHistogramAccumulation', () => {
 
       assertHistogramsEqual(acc0, acc2);
       assert.strictEqual(acc0.scale(), acc2.scale());
-      assert.deepStrictEqual(getCounts(acc0.positive()), getCounts(acc2.positive()));
+      assert.deepStrictEqual(
+        getCounts(acc0.positive()),
+        getCounts(acc2.positive())
+      );
 
       acc2.record(2 << 5);
 
       // no longer equal
       assert.notStrictEqual(acc0.scale(), acc2.scale());
-      assert.notDeepStrictEqual(getCounts(acc0.positive()), getCounts(acc2.positive()));
+      assert.notDeepStrictEqual(
+        getCounts(acc0.positive()),
+        getCounts(acc2.positive())
+      );
 
       // ensure acc0 wasn't mutated
       assertHistogramsEqual(acc0, acc1);
@@ -487,7 +512,7 @@ describe('ExponentialHistogramAccumulation', () => {
     it('returns representation of histogram internals', () => {
       const acc = new ExponentialHistogramAccumulation([0, 0], 4);
 
-      for(let i = 0; i < 4; i++) {
+      for (let i = 0; i < 4; i++) {
         acc.record(2 << i);
       }
 
@@ -585,7 +610,7 @@ describe('ExponentialHistogramAggregation', () => {
   describe('toMetricData', () => {
     it('should transform to expected data with recordMinMax = true', () => {
       const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1,1];
+      const endTime: HrTime = [1, 1];
 
       const agg = new ExponentialHistogramAggregator(4, true);
       const acc = agg.createAccumulation(startTime);
@@ -599,7 +624,7 @@ describe('ExponentialHistogramAggregation', () => {
         defaultInstrumentDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
-        endTime,
+        endTime
       );
 
       const expected: MetricData = {
@@ -617,16 +642,16 @@ describe('ExponentialHistogramAggregation', () => {
               sum: 0,
               positive: {
                 offset: 1,
-                bucketCounts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1],
               },
               negative: {
                 offset: 1,
-                bucketCounts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1],
               },
               count: 4,
               scale: 1,
-              zeroCount: 0
-            }
+              zeroCount: 0,
+            },
           },
         ],
       };
@@ -636,7 +661,7 @@ describe('ExponentialHistogramAggregation', () => {
 
     it('should transform to expected data with recordMinMax = false', () => {
       const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1,1];
+      const endTime: HrTime = [1, 1];
 
       const agg = new ExponentialHistogramAggregator(4, false);
       const acc = agg.createAccumulation(startTime);
@@ -650,7 +675,7 @@ describe('ExponentialHistogramAggregation', () => {
         defaultInstrumentDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
-        endTime,
+        endTime
       );
 
       const expected: MetricData = {
@@ -668,16 +693,16 @@ describe('ExponentialHistogramAggregation', () => {
               sum: 0,
               positive: {
                 offset: 1,
-                bucketCounts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1],
               },
               negative: {
                 offset: 1,
-                bucketCounts: [1, 0, 1, 0]
+                bucketCounts: [1, 0, 1],
               },
               count: 4,
               scale: 1,
-              zeroCount: 0
-            }
+              zeroCount: 0,
+            },
           },
         ],
       };
@@ -706,23 +731,30 @@ describe('ExponentialHistogramAggregation', () => {
         },
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
-        endTime,
+        endTime
       );
 
       assert.notStrictEqual(aggregatedData, undefined);
-      assert.strictEqual(aggregatedData?.dataPoints[0].value.sum, expectSum ? 5 : undefined);
+      assert.strictEqual(
+        aggregatedData?.dataPoints[0].value.sum,
+        expectSum ? 5 : undefined
+      );
     }
 
     describe('should have undefined sum when used with', () => {
       it('UpDownCounter', () => testSum(InstrumentType.UP_DOWN_COUNTER, false));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, false));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_GAUGE, false));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, false));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.OBSERVABLE_GAUGE, false));
     });
 
     describe('should include sum with', () => {
       it('UpDownCounter', () => testSum(InstrumentType.COUNTER, true));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.HISTOGRAM, true));
-      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_COUNTER, true));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.HISTOGRAM, true));
+      it('ObservableUpDownCounter', () =>
+        testSum(InstrumentType.OBSERVABLE_COUNTER, true));
     });
   });
 });
@@ -751,12 +783,12 @@ function getMapping(scale: number): Mapping {
 
 function assertHistogramsEqual(
   actual: ExponentialHistogramAccumulation,
-  expected: ExponentialHistogramAccumulation,
+  expected: ExponentialHistogramAccumulation
 ) {
   const actualSum = actual.sum();
   const expectedSum = expected.sum();
 
-  if(actualSum === 0 || expectedSum === 0) {
+  if (actualSum === 0 || expectedSum === 0) {
     assertInDelta(actualSum, expectedSum, 1e-6);
   } else {
     assertInEpsilon(actualSum, expectedSum, 1e-6);
@@ -779,7 +811,7 @@ function assertHistogramsEqual(
 
 function bucketsToString(buckets: Buckets): string {
   let str = `[@${buckets.offset()}`;
-  for(let i = 0; i < buckets.length(); i++) {
+  for (let i = 0; i < buckets.length(); i++) {
     str += buckets.at(i).toString();
   }
   str += ']\n';

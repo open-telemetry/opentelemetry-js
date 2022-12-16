@@ -14,38 +14,59 @@
  * limitations under the License.
  */
 export class Buckets {
+  /**
+   * The term index refers to the number of the exponential histogram bucket
+   * used to determine its boundaries. The lower boundary of a bucket is
+   * determined by base ** index and the upper boundary of a bucket is
+   * determined by base ** (index + 1). index values are signed to account
+   * for values less than or equal to 1.
+   *
+   * indexBase is the index of the 0th position in the
+   * backing array, i.e., backing[0] is the count
+   * in the bucket with index `indexBase`.
+   *
+   * indexStart is the smallest index value represented
+   * in the backing array.
+   *
+   * indexEnd is the largest index value represented in
+   * the backing array.
+   */
   constructor(
     public backing = new BucketsBacking(),
     public indexBase = 0,
     public indexStart = 0,
-    public indexEnd = 0,
+    public indexEnd = 0
   ) {}
 
-  //todo: can probably delete
-  toString(): string {
-    return this.backing.toString();
-  }
-
+  /**
+   * Offset is the bucket index of the smallest entry in the counts array
+   * @returns {number}
+   */
   offset(): number {
     return this.indexStart;
   }
 
-  // returns the counts from the backing array as-is
+  /**
+   * An array of counts, where count[i] carries the count
+   * of the bucket at index (offset+i).  count[i] is the count of
+   * values greater than base^(offset+i) and less than or equal to
+   * base^(offset+i+1).
+   * @returns {number} The logical counts based on the backing array
+   */
   counts(): number[] {
-    return this.backing.counts();
+    const counts = new Array<number>(this.length());
+    for(let i = 0; i < this.length(); i++) {
+      counts[i] = this.at(i);
+    }
+    return counts;
   }
 
-  clone(): Buckets {
-    return new Buckets(
-      this.backing.clone(),
-      this.indexBase,
-      this.indexStart,
-      this.indexEnd,
-    );
-  }
-
+  /**
+   * Buckets is a view into the backing array.
+   * @returns {number}
+   */
   length(): number {
-    if (this.backing.size() === 0) {
+    if (this.backing.length() === 0) {
       return 0;
     }
 
@@ -60,12 +81,12 @@ export class Buckets {
    * At returns the count of the bucket at a position in the logical
    * array of counts.
    * @param position
-   * @returns
+   * @returns {number}
    */
   at(position: number): number {
     const bias = this.indexBase - this.indexStart;
     if (position < bias) {
-      position += this.backing.size();
+      position += this.backing.length();
     }
 
     position -= bias;
@@ -92,30 +113,24 @@ export class Buckets {
   }
 
   /**
-   * clear zeros the backing array.
-   */
-  clear() {}
-
-  /**
    * trim removes leading and / or trailing zero buckets (which can occur
    * after diffing two histos) and rotates the backing array so that the
    * smallest non-zero index is in the 0th position of the backing array
    */
   trim() {
-    for(let i = 0; i < this.length(); i++) {
-      if(this.at(i) !== 0) {
+    for (let i = 0; i < this.length(); i++) {
+      if (this.at(i) !== 0) {
         this.indexStart += i;
         break;
-      } else if(i === this.length() - 1) {
+      } else if (i === this.length() - 1) {
         //the entire array is zeroed out
         this.indexStart = this.indexEnd = this.indexBase = 0;
         return;
       }
     }
 
-    for(let i = this.length() - 1; i >= 0; i--) {
-      console.log(i);
-      if(this.at(i) !== 0 ) {
+    for (let i = this.length() - 1; i >= 0; i--) {
+      if (this.at(i) !== 0) {
         this.indexEnd -= this.length() - i - 1;
         break;
       }
@@ -125,8 +140,8 @@ export class Buckets {
   }
 
   /**
-   *
-   * @param {number} by - expected to be int32
+   * downscale first rotates, then collapses 2**`by`-to-1 buckets.
+   * @param by
    */
   downscale(by: number) {
     this._rotate();
@@ -148,29 +163,50 @@ export class Buckets {
       }
       outpos++;
     }
-
+    // note `by` will always be > 0 and < 32-bits, so `>>` is safe to use
     this.indexStart >>= by;
     this.indexEnd >>= by;
     this.indexBase = this.indexStart;
   }
 
+  /**
+   * Clone returns a deep copy of Buckets
+   * @returns {Buckets}
+   */
+  clone(): Buckets {
+    return new Buckets(
+      this.backing.clone(),
+      this.indexBase,
+      this.indexStart,
+      this.indexEnd
+    );
+  }
+
+  /**
+   * _rotate shifts the backing array contents so that indexStart ==
+   * indexBase to simplify the downscale logic.
+   */
   private _rotate() {
     const bias = this.indexBase - this.indexStart;
 
     if (bias === 0) {
       return;
-    } else if( bias > 0) {
-      this.backing.reverse(0, this.backing.size());
+    } else if (bias > 0) {
+      this.backing.reverse(0, this.backing.length());
       this.backing.reverse(0, bias);
-      this.backing.reverse(bias, this.backing.size());
+      this.backing.reverse(bias, this.backing.length());
     } else {
       // negative bias, this can happen when diffing two histograms
-      this.backing.reverse(0, this.backing.size());
-      this.backing.reverse(0, this.backing.size() + bias);
+      this.backing.reverse(0, this.backing.length());
+      this.backing.reverse(0, this.backing.length() + bias);
     }
     this.indexBase = this.indexStart;
   }
 
+  /**
+   * _relocateBucket adds the count in counts[src] to counts[dest] and
+   * resets count[src] to zero.
+   */
   private _relocateBucket(dest: number, src: number) {
     if (dest === src) {
       return;
@@ -179,23 +215,32 @@ export class Buckets {
   }
 }
 
+/**
+ * BucketsBacking holds the raw buckets and some utility methods to
+ * manage them.
+ */
 class BucketsBacking {
-  constructor(
-    private _counts = [0],
-  ) {}
+  constructor(private _counts = [0]) {}
 
-  toString(): string {
-    return `[${this._counts.join(',')}]`;
-  }
-
-  size(): number {
+  /**
+   * length returns the physical size of the backing array, which
+   * is >= buckets.length()
+   */
+  length(): number {
     return this._counts.length;
   }
 
-  counts(): number[] {
-    return this._counts;
+  /**
+   * countAt returns the count in a specific bucket
+   */
+  countAt(pos: number): number {
+    return this._counts[pos];
   }
 
+  /**
+   * growTo grows a backing array and copies old entries
+   * into their correct new positions.
+   */
   growTo(newSize: number, oldPositiveLimit: number, newPositiveLimit: number) {
     const tmp = new Array<number>(newSize).fill(0);
     tmp.splice(
@@ -207,6 +252,9 @@ class BucketsBacking {
     this._counts = tmp;
   }
 
+  /**
+   * reverse the items in the backing array in the range [from, limit).
+   */
   reverse(from: number, limit: number) {
     const num = Math.floor((from + limit) / 2) - from;
     for (let i = 0; i < num; i++) {
@@ -216,16 +264,26 @@ class BucketsBacking {
     }
   }
 
+  /**
+   * emptyBucket empties the count from a bucket, for
+   * moving into another.
+   */
   emptyBucket(src: number): number {
     const tmp = this._counts[src];
     this._counts[src] = 0;
     return tmp;
   }
 
+  /**
+   * increments a bucket by `increment`
+   */
   increment(bucketIndex: number, increment: number) {
     this._counts[bucketIndex] += increment;
   }
 
+  /**
+   * decrements a bucket by `decrement`
+   */
   decrement(bucketIndex: number, decrement: number) {
     if (this._counts[bucketIndex] >= decrement) {
       this._counts[bucketIndex] -= decrement;
@@ -235,16 +293,9 @@ class BucketsBacking {
     }
   }
 
-  countAt(pos: number): number {
-    return this._counts[pos];
-  }
-
-  reset() {
-    for (let i = 0; i < this._counts.length; i++) {
-      this._counts[i] = 0;
-    }
-  }
-
+  /**
+   * clone returns a deep copy of BucketsBacking
+   */
   clone(): BucketsBacking {
     return new BucketsBacking([...this._counts]);
   }

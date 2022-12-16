@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {ExponentMapping} from '../../../src/aggregator/exponential-histogram/mapping/ExponentMapping';
+import { ExponentMapping } from '../../../src/aggregator/exponential-histogram/mapping/ExponentMapping';
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
 import * as util from '../../../src/aggregator/exponential-histogram/util';
 import * as assert from 'assert';
@@ -167,7 +167,7 @@ describe('ExponentMapping', () => {
       // Max values
       // below is equivalent to [0x1.FFFFFFFFFFFFFp1023, 63],
       [
-        Array.from({length: 13}, (_, x) => 0xf * Math.pow(16, -x - 1)).reduce(
+        Array.from({ length: 13 }, (_, x) => 0xf * Math.pow(16, -x - 1)).reduce(
           (x, y) => x + y,
           1
         ) * Math.pow(2, 1023),

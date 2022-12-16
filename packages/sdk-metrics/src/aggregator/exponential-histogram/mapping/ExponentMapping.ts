@@ -15,8 +15,12 @@
  */
 import * as ieee754 from './ieee754';
 import * as util from '../util';
-import {Mapping, MappingError} from './types';
+import { Mapping, MappingError } from './types';
 
+/**
+ * ExponentMapping implements a exponential mapping functions for
+ * for scales <=0. For scales > 0 LogarithmMapping should be used.
+ */
 export class ExponentMapping implements Mapping {
   static readonly MIN_SCALE = -10;
   static readonly MAX_SCALE = 0;
@@ -34,6 +38,11 @@ export class ExponentMapping implements Mapping {
     new ExponentMapping(0),
   ];
 
+  /**
+   * Returns the pre-built mapping for the given scale
+   * @param scale An integer >= -10 and <= 0
+   * @returns {ExponentMapping}
+   */
   public static get(scale: number) {
     if (scale > ExponentMapping.MAX_SCALE) {
       throw new MappingError(
@@ -53,6 +62,11 @@ export class ExponentMapping implements Mapping {
 
   private constructor(private readonly _shift: number) {}
 
+  /**
+   * Maps positive floating point values to indexes corresponding to scale
+   * @param value
+   * @returns {number} index for provided value at the current scale
+   */
   mapToIndex(value: number): number {
     if (value < ieee754.MIN_VALUE) {
       return this._minNormalLowerBoundaryIndex();
@@ -70,6 +84,12 @@ export class ExponentMapping implements Mapping {
     return util.rightShift(exp + correction, this._shift);
   }
 
+  /**
+   * Returns the lower bucket boundary for the given index for scale
+   *
+   * @param index
+   * @returns {number}
+   */
   lowerBoundary(index: number): number {
     const minIndex = this._minNormalLowerBoundaryIndex();
     if (index < minIndex) {
@@ -87,6 +107,10 @@ export class ExponentMapping implements Mapping {
     return util.ldexp(1, util.leftShift(index, this._shift));
   }
 
+  /**
+   * The scale used by this mapping
+   * @returns {number}
+   */
   scale(): number {
     if (this._shift === 0) {
       return 0;

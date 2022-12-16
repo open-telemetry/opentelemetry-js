@@ -15,8 +15,12 @@
  */
 import * as ieee754 from './ieee754';
 import * as util from '../util';
-import {Mapping, MappingError} from './types';
+import { Mapping, MappingError } from './types';
 
+/**
+ * LogarithmMapping implements exponential mapping functions for scale > 0.
+ * For scales <= 0 the exponent mapping should be used.
+ */
 export class LogarithmMapping implements Mapping {
   static readonly MIN_SCALE = 1;
   static readonly MAX_SCALE = 20;
@@ -25,7 +29,7 @@ export class LogarithmMapping implements Mapping {
   /**
    * get creates or returns a memoized logarithm mapping function for
    * the given scale. used for scales > 0.
-   * @param scale - a number greater than 0
+   * @param scale - a number > 0 and <= 20
    * @returns {LogarithmMapping}
    */
   static get(scale: number): LogarithmMapping {
@@ -58,6 +62,11 @@ export class LogarithmMapping implements Mapping {
     this._inverseFactor = util.ldexp(Math.LN2, -scale);
   }
 
+  /**
+   * Maps positive floating point values to indexes corresponding to scale
+   * @param value
+   * @returns {number} index for provided value at the current scale
+   */
   mapToIndex(value: number): number {
     if (value <= ieee754.MIN_VALUE) {
       return this._minNormalLowerBoundaryIndex() - 1;
@@ -79,6 +88,12 @@ export class LogarithmMapping implements Mapping {
     return index;
   }
 
+  /**
+   * Returns the lower bucket boundary for the given index for scale
+   *
+   * @param index
+   * @returns {number}
+   */
   lowerBoundary(index: number): number {
     const maxIndex = this._maxNormalLowerBoundaryIndex();
     if (index >= maxIndex) {
@@ -112,6 +127,10 @@ export class LogarithmMapping implements Mapping {
     return Math.exp(index * this._inverseFactor);
   }
 
+  /**
+   * The scale used by this mapping
+   * @returns {number}
+   */
   scale(): number {
     return this._scale;
   }

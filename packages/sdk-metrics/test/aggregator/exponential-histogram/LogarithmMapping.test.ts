@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {LogarithmMapping} from '../../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
+import { LogarithmMapping } from '../../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
 import * as util from '../../../src/aggregator/exponential-histogram//util';
 import * as assert from 'assert';
-import {assertInEpsilon} from './helpers';
+import { assertInEpsilon } from './helpers';
 
 describe('LogarithmMapping', () => {
   it('throws for invalid scale', () => {
