@@ -162,7 +162,7 @@ describe('environment', () => {
       const getEnvFirstInvocationResult = getEnv();
       const getEnvSecondInvocationResult = getEnv();
 
-      assert.deepEqual(
+      assert.strictEqual(
         getEnvFirstInvocationResult,
         getEnvSecondInvocationResult
       );
