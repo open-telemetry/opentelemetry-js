@@ -30,7 +30,11 @@ export interface ObservableResult<
    * one values associated with the same attributes values, SDK may pick the
    * last one or simply drop the entire observable result.
    */
-  observe(value: number, attributes?: AttributesTypes): void;
+  observe(
+    this: ObservableResult<AttributesTypes>,
+    value: number,
+    attributes?: AttributesTypes
+  ): void;
 }
 
 /**
@@ -49,6 +53,7 @@ export interface BatchObservableResult<
    * last one or simply drop the entire observable result.
    */
   observe(
+    this: BatchObservableResult<AttributesTypes>,
     metric: Observable<AttributesTypes>,
     value: number,
     attributes?: AttributesTypes
