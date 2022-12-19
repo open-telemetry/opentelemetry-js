@@ -65,7 +65,7 @@ describe('detectResourcesSync', () => {
   });
 
   describeNode('logging', () => {
-    it("logs when a detector's async attributes promise rejects or resolves", async () => {
+    it("logs when a detector's async attributes promise rejects", async () => {
       const debugStub = sinon.spy(diag, 'debug');
 
       // use a class so it has a name
@@ -85,24 +85,16 @@ describe('detectResourcesSync', () => {
           );
         }
       }
-      class DetectorAsync implements Detector {
-        async detect() {
-          return new Resource({ sync: 'fromsync', async: 'fromasync' });
-        }
-      }
 
       const resource = detectResourcesSync({
-        detectors: [
-          new DetectorRejects(),
-          new DetectorOk(),
-          new DetectorAsync(),
-        ],
+        detectors: [new DetectorRejects(), new DetectorOk()],
       });
 
       await resource.waitForAsyncAttributes();
-      assert.ok(debugStub.calledWithMatch('DetectorRejects failed: reject'));
-      assert.ok(debugStub.calledWithMatch('DetectorOk found resource.'));
-      assert.ok(debugStub.calledWithMatch('DetectorAsync found resource.'));
+
+      assert.ok(
+        debugStub.calledWithMatch("The resource's async promise rejected: %s")
+      );
     });
   });
 });

@@ -68,13 +68,13 @@ export class Resource {
         this._attributes = Object.assign({}, this._attributes, asyncAttributes);
         this._asyncAttributesHaveResolved = true;
         return asyncAttributes;
+      },
+      err => {
+        diag.debug("The resource's async promise rejected: %s", err);
+        this._asyncAttributesHaveResolved = true;
+        return {};
       }
     );
-    this._asyncAttributesPromise?.catch(err => {
-      diag.debug("The resource's async promise rejected: %s", err);
-      this._asyncAttributesHaveResolved = true;
-      return {};
-    });
   }
 
   get attributes(): ResourceAttributes {
@@ -124,8 +124,8 @@ export class Resource {
     let mergedAsyncAttributesPromise: Promise<ResourceAttributes> | undefined;
     if (this._asyncAttributesPromise && other._asyncAttributesPromise) {
       mergedAsyncAttributesPromise = Promise.all([
-        this._asyncAttributesPromise.catch(() => ({})),
-        other._asyncAttributesPromise.catch(() => ({})),
+        this._asyncAttributesPromise,
+        other._asyncAttributesPromise,
       ]).then(([thisAttributes, otherAttributes]) => {
         return Object.assign({}, thisAttributes, otherAttributes);
       });
