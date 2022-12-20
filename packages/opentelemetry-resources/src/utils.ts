@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
+import { Attributes } from '@opentelemetry/api';
+
 export const isPromiseLike = <R>(val: any): val is PromiseLike<R> => {
   return (
     val !== null && typeof val === 'object' && typeof val.then === 'function'
   );
+};
+
+export const getAsyncAttributesIfNotResolved = (
+  asyncAttributesHaveResolved: boolean,
+  asyncAttributesPromise?: Promise<Attributes>
+): Promise<Attributes> | undefined => {
+  if (!asyncAttributesHaveResolved) {
+    return asyncAttributesPromise;
+  }
+  return undefined;
 };

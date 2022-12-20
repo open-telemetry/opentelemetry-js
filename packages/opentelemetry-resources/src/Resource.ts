@@ -19,6 +19,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
+import { getAsyncAttributesIfNotResolved } from './utils';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -116,7 +117,18 @@ export class Resource {
     );
 
     let mergedAsyncAttributesPromise: Promise<ResourceAttributes> | undefined;
-    if (this._asyncAttributesPromise && other._asyncAttributesPromise) {
+
+    const thisAsyncAttributesIfNotResolved = getAsyncAttributesIfNotResolved(
+      this._asyncAttributesHaveResolved,
+      this._asyncAttributesPromise
+    );
+
+    const otherAsyncAttributesIfNotResolved = getAsyncAttributesIfNotResolved(
+      other._asyncAttributesHaveResolved,
+      other._asyncAttributesPromise
+    );
+
+    if (thisAsyncAttributesIfNotResolved && otherAsyncAttributesIfNotResolved) {
       mergedAsyncAttributesPromise = Promise.all([
         this._asyncAttributesPromise,
         other._asyncAttributesPromise,
@@ -125,7 +137,7 @@ export class Resource {
       });
     } else {
       mergedAsyncAttributesPromise =
-        this._asyncAttributesPromise ?? other._asyncAttributesPromise;
+        thisAsyncAttributesIfNotResolved ?? otherAsyncAttributesIfNotResolved;
     }
 
     return new Resource(mergedAttributes, mergedAsyncAttributesPromise);
