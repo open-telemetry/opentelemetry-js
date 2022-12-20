@@ -26,7 +26,6 @@ import { defaultServiceName } from './platform';
  */
 export class Resource {
   static readonly EMPTY = new Resource({});
-  private _attributes: ResourceAttributes;
   private _asyncAttributesPromise: Promise<ResourceAttributes> | undefined;
   private _asyncAttributesHaveResolved: boolean;
 
@@ -58,14 +57,13 @@ export class Resource {
      * information about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on attributes.
      */
-    attributes: ResourceAttributes,
+    public attributes: ResourceAttributes,
     asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
-    this._attributes = attributes;
     this._asyncAttributesHaveResolved = asyncAttributesPromise == null;
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
       asyncAttributes => {
-        this._attributes = Object.assign({}, this._attributes, asyncAttributes);
+        this.attributes = Object.assign({}, this.attributes, asyncAttributes);
         this._asyncAttributesHaveResolved = true;
         return asyncAttributes;
       },
@@ -75,10 +73,6 @@ export class Resource {
         return {};
       }
     );
-  }
-
-  get attributes(): ResourceAttributes {
-    return this._attributes;
   }
 
   /**
