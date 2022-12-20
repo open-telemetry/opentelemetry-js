@@ -93,7 +93,7 @@ export class Resource {
   }
 
   /**
-   * Returns a promise that resolves when all async attributes have finished being added to
+   * Returns a promise that will never be rejected. Resolves when all async attributes have finished being added to
    * this Resource's attributes. This is useful in exporters to block until resource detection
    * has finished.
    */
