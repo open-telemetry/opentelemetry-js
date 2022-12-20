@@ -31,12 +31,10 @@ import { isPromiseLike } from './utils';
 export const detectResources = async (
   config: ResourceDetectionConfig = {}
 ): Promise<Resource> => {
-  const internalConfig: ResourceDetectionConfig = Object.assign(config);
-
   const resources: Resource[] = await Promise.all(
-    (internalConfig.detectors || []).map(async d => {
+    (config.detectors || []).map(async d => {
       try {
-        const resource = await d.detect(internalConfig);
+        const resource = await d.detect(config);
         diag.debug(`${d.constructor.name} found resource.`, resource);
         return resource;
       } catch (e) {
@@ -64,11 +62,9 @@ export const detectResources = async (
 export const detectResourcesSync = (
   config: ResourceDetectionConfig = {}
 ): Resource => {
-  const internalConfig: ResourceDetectionConfig = Object.assign(config);
-
-  const resources: Resource[] = (internalConfig.detectors ?? []).map(d => {
+  const resources: Resource[] = (config.detectors ?? []).map(d => {
     try {
-      const resourceOrPromise = d.detect(internalConfig);
+      const resourceOrPromise = d.detect(config);
       let resource: Resource;
       if (isPromiseLike<Resource>(resourceOrPromise)) {
         const createPromise = async () => {
