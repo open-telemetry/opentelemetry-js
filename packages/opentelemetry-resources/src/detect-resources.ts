@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { Resource } from '../../Resource';
-import { ResourceDetectionConfig } from '../../config';
+import { Resource } from './Resource';
+import { ResourceDetectionConfig } from './config';
 import { diag } from '@opentelemetry/api';
-import { isPromiseLike } from '../utils';
+import * as util from 'util';
+import { isPromiseLike } from './utils';
 
 /**
  * Runs all resource detectors and returns the results merged into a single Resource. Promise
@@ -44,6 +45,9 @@ export const detectResources = async (
       }
     })
   );
+
+  // Future check if verbose logging is enabled issue #1903
+  logResources(resources);
 
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
@@ -86,8 +90,33 @@ export const detectResourcesSync = (
     }
   });
 
-  return resources.reduce(
+  const mergedResources = resources.reduce(
     (acc, resource) => acc.merge(resource),
     Resource.empty()
   );
+  void mergedResources.waitForAsyncAttributes().then(() => {
+    // Future check if verbose logging is enabled issue #1903
+    logResources(resources);
+  });
+  return mergedResources;
+};
+
+/**
+ * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
+ *
+ * @param resources The array of {@link Resource} that should be logged. Empty entries will be ignored.
+ */
+const logResources = (resources: Array<Resource>) => {
+  resources.forEach(resource => {
+    // Print only populated resources
+    if (Object.keys(resource.attributes).length > 0) {
+      const resourceDebugString = util.inspect(resource.attributes, {
+        depth: 2,
+        breakLength: Infinity,
+        sorted: true,
+        compact: false,
+      });
+      diag.verbose(resourceDebugString);
+    }
+  });
 };
