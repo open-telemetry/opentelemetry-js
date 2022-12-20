@@ -15,35 +15,12 @@
  */
 
 /**
- * Note the implementations of leftShift, righShift, and ldexp are
- * naive, but functionally correct. We need the ability to bit shift
- * numbers up to 52-bits and support for negative shifts, which the
- * native bit shift operators do not support. We can look into providing
- * more optimized versions of these ourselves, or take a dependency
- * on a third-party library if needed.
- */
-
-/**
- * Left shift that supports numbers > 32bits and negative shifts
- * @param value
- * @param shift
- * @returns {number}
- */
-export function leftShift(value: number, shift: number): number {
-  return value * Math.pow(2, shift);
-}
-
-/**
- * Right shift that supports numbers > 32bits and negative shifts
- * @param value
- * @param shift
- * @returns {number}
- */
-export function rightShift(value: number, shift: number): number {
-  return Math.floor(value * Math.pow(2, -shift));
-}
-
-/**
+ * Note: other languages provide this as a built in function. This is
+ * a naive, but functionally correct implementation. Ultimately, this is
+ * used to compute the lower bucket boundaries for the Exponent and
+ * Logarithm mappings. This would not run in normal application code
+ * using the exponential histogram.
+ *
  * ldexp returns frac × 2**exp. With the following special cases:
  *   ldexp(±0, exp) = ±0
  *   ldexp(±Inf, exp) = ±Inf
@@ -64,7 +41,6 @@ export function ldexp(frac: number, exp: number): number {
   return frac * Math.pow(2, exp);
 }
 
-// we expect v to be positive and <= 32 bits, it's safe to use `>>`.
 export function powTwoRoundedUp(v: number): number {
   // The following expression computes the least power-of-two
   // that is >= v.  There are a number of tricky ways to

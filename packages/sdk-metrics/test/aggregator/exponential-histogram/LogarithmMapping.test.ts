@@ -15,7 +15,6 @@
  */
 import { LogarithmMapping } from '../../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
-import * as util from '../../../src/aggregator/exponential-histogram//util';
 import * as assert from 'assert';
 import { assertInEpsilon } from './helpers';
 
@@ -80,8 +79,7 @@ describe('LogarithmMapping', () => {
 
       // the max index is one less than the first index that
       // overflows Number.MAX_VALUE
-      const maxIndex =
-        util.leftShift(ieee754.MAX_NORMAL_EXPONENT + 1, scale) - 1;
+      const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) << scale) - 1;
 
       assert.strictEqual(index, maxIndex);
 
@@ -110,8 +108,7 @@ describe('LogarithmMapping', () => {
       const mapping = LogarithmMapping.get(scale);
       const minIndex = mapping.mapToIndex(ieee754.MIN_VALUE);
 
-      const expectedMinIndex =
-        util.leftShift(ieee754.MIN_NORMAL_EXPONENT, scale) - 1;
+      const expectedMinIndex = (ieee754.MIN_NORMAL_EXPONENT << scale) - 1;
       assert.strictEqual(minIndex, expectedMinIndex);
 
       const expectedBoundary = roundedBoundary(scale, expectedMinIndex);
@@ -159,8 +156,7 @@ describe('LogarithmMapping', () => {
     ) {
       const mapping = LogarithmMapping.get(scale);
       const index = mapping.mapToIndex(ieee754.MAX_VALUE);
-      const maxIndex =
-        util.leftShift(ieee754.MAX_NORMAL_EXPONENT + 1, scale) - 1;
+      const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) << scale) - 1;
       assert.strictEqual(maxIndex, index);
 
       const boundary = mapping.lowerBoundary(index);

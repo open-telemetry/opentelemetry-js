@@ -55,7 +55,7 @@ export class Buckets {
    */
   counts(): number[] {
     const counts = new Array<number>(this.length());
-    for(let i = 0; i < this.length(); i++) {
+    for (let i = 0; i < this.length(); i++) {
       counts[i] = this.at(i);
     }
     return counts;

@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as util from '../util';
-
 export const SIGNIFICAND_WIDTH = 52;
 
 /**
@@ -87,7 +85,7 @@ export function getSignificand(value: number): number {
   const hiBits = dv.getUint32(0);
   const loBits = dv.getUint32(4);
   // extract the significand bits from the hi bits and left shift 32 places
-  const significandHiBits = util.leftShift(hiBits & SIGNIFICAND_MASK, 32);
+  const significandHiBits = (hiBits & SIGNIFICAND_MASK) * Math.pow(2, 32);
   // combine the hi and lo bits and return
   return significandHiBits + loBits;
 }

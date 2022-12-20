@@ -75,7 +75,7 @@ export class LogarithmMapping implements Mapping {
     // exact power of two special case
     if (ieee754.getSignificand(value) === 0) {
       const exp = ieee754.getNormalBase2(value);
-      return util.leftShift(exp, this._scale) - 1;
+      return (exp << this._scale) - 1;
     }
 
     // non-power of two cases. use Math.floor to round the scaled logarithm
@@ -98,10 +98,7 @@ export class LogarithmMapping implements Mapping {
     const maxIndex = this._maxNormalLowerBoundaryIndex();
     if (index >= maxIndex) {
       if (index === maxIndex) {
-        return (
-          2 *
-          Math.exp((index - util.leftShift(1, this._scale)) / this._scaleFactor)
-        );
+        return 2 * Math.exp((index - (1 << this._scale)) / this._scaleFactor);
       }
       throw new MappingError(
         `overflow: ${index} is > maximum lower boundary: ${maxIndex}`
@@ -113,11 +110,7 @@ export class LogarithmMapping implements Mapping {
       if (index === minIndex) {
         return ieee754.MIN_VALUE;
       } else if (index === minIndex - 1) {
-        return (
-          Math.exp(
-            (index + util.leftShift(1, this._scale)) / this._scaleFactor
-          ) / 2
-        );
+        return Math.exp((index + (1 << this._scale)) / this._scaleFactor) / 2;
       }
       throw new MappingError(
         `overflow: ${index} is < minimum lower boundary: ${minIndex}`
@@ -136,10 +129,10 @@ export class LogarithmMapping implements Mapping {
   }
 
   private _minNormalLowerBoundaryIndex(): number {
-    return util.leftShift(ieee754.MIN_NORMAL_EXPONENT, this._scale);
+    return ieee754.MIN_NORMAL_EXPONENT << this._scale;
   }
 
   private _maxNormalLowerBoundaryIndex(): number {
-    return util.leftShift(ieee754.MAX_NORMAL_EXPONENT + 1, this._scale) - 1;
+    return ((ieee754.MAX_NORMAL_EXPONENT + 1) << this._scale) - 1;
   }
 }

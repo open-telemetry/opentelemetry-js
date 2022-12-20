@@ -388,8 +388,8 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   private _changeScale(high: number, low: number): number {
     let change = 0;
     while (high - low >= this._maxSize) {
-      high = util.rightShift(high, 1);
-      low = util.rightShift(low, 1);
+      high >>= 1;
+      low >>= 1;
       change++;
     }
     return change;
@@ -451,10 +451,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       return new HighLow(0, -1);
     }
     const shift = currentScale - newScale;
-    return new HighLow(
-      util.rightShift(buckets.indexStart, shift),
-      util.rightShift(buckets.indexEnd, shift)
-    );
+    return new HighLow(buckets.indexStart >> shift, buckets.indexEnd >> shift);
   }
 
   /**
@@ -473,7 +470,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     for (let i = 0; i < theirs.length(); i++) {
       this._incrementIndexBy(
         ours,
-        util.rightShift(theirOffset + i, theirChange),
+        (theirOffset + i) >> theirChange,
         theirs.at(i)
       );
     }
@@ -493,7 +490,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     const theirChange = other.scale() - scale;
 
     for (let i = 0; i < theirs.length(); i++) {
-      const ourIndex = util.rightShift(theirOffset + i, theirChange);
+      const ourIndex = (theirOffset + i) >> theirChange;
       let bucketIndex = ourIndex - ours.indexBase;
       if (bucketIndex < 0) {
         bucketIndex += ours.backing.length();

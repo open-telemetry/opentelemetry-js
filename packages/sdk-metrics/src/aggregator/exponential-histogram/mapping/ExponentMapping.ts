@@ -75,13 +75,15 @@ export class ExponentMapping implements Mapping {
     const exp = ieee754.getNormalBase2(value);
 
     // In case the value is an exact power of two, compute a
-    // correction of -1:
-    const correction = util.rightShift(
+    // correction of -1. Note, we are using a custom _rightShift
+    // to accomodate a 52-bit argument, which the native bitwise
+    // operators do not support
+    const correction = this._rightShift(
       ieee754.getSignificand(value) - 1,
       ieee754.SIGNIFICAND_WIDTH
     );
 
-    return util.rightShift(exp + correction, this._shift);
+    return (exp + correction) >> this._shift;
   }
 
   /**
@@ -104,7 +106,7 @@ export class ExponentMapping implements Mapping {
       );
     }
 
-    return util.ldexp(1, util.leftShift(index, this._shift));
+    return util.ldexp(1, index << this._shift);
   }
 
   /**
@@ -129,5 +131,9 @@ export class ExponentMapping implements Mapping {
 
   private _maxNormalLowerBoundaryIndex(): number {
     return ieee754.MAX_NORMAL_EXPONENT >> this._shift;
+  }
+
+  private _rightShift(value: number, shift: number): number {
+    return Math.floor(value * Math.pow(2, -shift));
   }
 }

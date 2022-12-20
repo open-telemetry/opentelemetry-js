@@ -15,7 +15,6 @@
  */
 import { ExponentMapping } from '../../../src/aggregator/exponential-histogram/mapping/ExponentMapping';
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
-import * as util from '../../../src/aggregator/exponential-histogram/util';
 import * as assert from 'assert';
 
 describe('ExponentMapping', () => {
@@ -233,8 +232,7 @@ describe('ExponentMapping', () => {
     ) {
       const mapping = ExponentMapping.get(scale);
       const index = mapping.mapToIndex(ieee754.MAX_VALUE);
-      const maxIndex =
-        util.rightShift(ieee754.MAX_NORMAL_EXPONENT + 1, -scale) - 1;
+      const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) >> -scale) - 1;
       assert.strictEqual(
         index,
         maxIndex,
@@ -259,11 +257,8 @@ describe('ExponentMapping', () => {
     ) {
       const mapping = ExponentMapping.get(scale);
       const minIndex = mapping.mapToIndex(ieee754.MIN_VALUE);
-      let expectedMinIndex = util.rightShift(
-        ieee754.MIN_NORMAL_EXPONENT,
-        -scale
-      );
-      if (ieee754.MIN_NORMAL_EXPONENT % util.leftShift(1, -scale) === 0) {
+      let expectedMinIndex = ieee754.MIN_NORMAL_EXPONENT >> -scale;
+      if (ieee754.MIN_NORMAL_EXPONENT % (1 << -scale) === 0) {
         expectedMinIndex--;
       }
       assert.strictEqual(
