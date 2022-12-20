@@ -530,6 +530,16 @@ describe('ExponentialHistogramAccumulation', () => {
       assert.deepStrictEqual(pv.negative.bucketCounts, acc.negative().counts());
     });
   });
+
+  describe('min max size', () => {
+    it('auto-corrects to min max', () => {
+      const acc: any = new ExponentialHistogramAccumulation([0, 0], 0);
+      assert.strictEqual(
+        acc['_maxSize'],
+        ExponentialHistogramAccumulation.MIN_MAX_SIZE
+      );
+    });
+  });
 });
 
 describe('ExponentialHistogramAggregation', () => {

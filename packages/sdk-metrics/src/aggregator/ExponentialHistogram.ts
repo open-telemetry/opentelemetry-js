@@ -24,7 +24,7 @@ import {
   DataPointType,
   ExponentialHistogramMetricData,
 } from '../export/MetricData';
-import { HrTime } from '@opentelemetry/api';
+import { diag, HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
@@ -68,6 +68,7 @@ class HighLow {
 
 export class ExponentialHistogramAccumulation implements Accumulation {
   static DEFAULT_MAX_SIZE = 160;
+  static MIN_MAX_SIZE = 2;
 
   constructor(
     public startTime: HrTime = startTime,
@@ -81,7 +82,14 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     private _positive = new Buckets(),
     private _negative = new Buckets(),
     private _mapping: Mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE)
-  ) {}
+  ) {
+    if (this._maxSize < ExponentialHistogramAccumulation.MIN_MAX_SIZE) {
+      diag.warn(`Exponential Histogram Max Size set to ${this._maxSize}, \
+                changing to the minimum size of: \
+                ${ExponentialHistogramAccumulation.MIN_MAX_SIZE}`);
+      this._maxSize = ExponentialHistogramAccumulation.MIN_MAX_SIZE;
+    }
+  }
 
   /**
    * record updates a histogram with a single count
