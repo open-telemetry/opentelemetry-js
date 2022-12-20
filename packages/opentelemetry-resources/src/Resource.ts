@@ -62,7 +62,7 @@ export class Resource {
     asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
     this._attributes = attributes;
-    this._asyncAttributesHaveResolved = asyncAttributesPromise === undefined;
+    this._asyncAttributesHaveResolved = asyncAttributesPromise == null;
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
       asyncAttributes => {
         this._attributes = Object.assign({}, this._attributes, asyncAttributes);
