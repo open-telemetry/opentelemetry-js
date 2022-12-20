@@ -17,11 +17,10 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { SDK_INFO } from '@opentelemetry/core';
-import { Resource } from '../src';
+import { Resource, ResourceAttributes } from '../src';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { describeBrowser, describeNode } from './util';
 import { diag } from '@opentelemetry/api';
-import { ResourceAttributes } from '../build/esnext';
 
 describe('Resource', () => {
   const resource1 = new Resource({
