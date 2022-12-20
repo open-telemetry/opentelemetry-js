@@ -21,6 +21,7 @@ import { Resource } from '../src';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { describeBrowser, describeNode } from './util';
 import { diag } from '@opentelemetry/api';
+import { ResourceAttributes } from '../build/esnext';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -142,9 +143,17 @@ describe('Resource', () => {
     });
 
     it('should merge async attributes into sync attributes once resolved', async () => {
+      //async attributes that resolve after 1 second
+      const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
+        setTimeout(
+          () => resolve({ async: 'fromasync', shared: 'fromasync' }),
+          1000
+        );
+      });
+
       const resource = new Resource(
         { sync: 'fromsync', shared: 'fromsync' },
-        Promise.resolve({ async: 'fromasync', shared: 'fromasync' })
+        asyncAttributes
       );
 
       await resource.waitForAsyncAttributes();
