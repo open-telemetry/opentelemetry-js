@@ -93,7 +93,7 @@ describe('detectResourcesSync', () => {
       await resource.waitForAsyncAttributes();
 
       assert.ok(
-        debugStub.calledWithMatch("The resource's async promise rejected: %s")
+        debugStub.calledWithMatch("The resource's async promise rejected")
       );
     });
   });

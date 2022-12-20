@@ -445,6 +445,14 @@ describe('Node SDK', () => {
           return call.args.some(callarg => arg === callarg);
         });
       };
+      const callArgsIncludes = (
+        mockedFunction: sinon.SinonSpy,
+        arg: any
+      ): boolean => {
+        return mockedFunction.getCalls().some(call => {
+          return call.args.some(callarg => arg.includes(callarg));
+        });
+      };
       const callArgsMatches = (
         mockedFunction: sinon.SinonSpy,
         regex: RegExp
@@ -475,7 +483,10 @@ describe('Node SDK', () => {
 
         // Test that the Env Detector successfully found its resource and populated it with the right values.
         assert.ok(
-          callArgsContains(mockedLoggerMethod, 'EnvDetector found resource.')
+          !callArgsIncludes(
+            mockedLoggerMethod,
+            "The resource's async promise rejected"
+          )
         );
         // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
         assert.ok(
