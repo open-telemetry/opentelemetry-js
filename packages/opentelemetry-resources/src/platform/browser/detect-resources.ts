@@ -17,6 +17,7 @@
 import { Resource } from '../../Resource';
 import { ResourceDetectionConfig } from '../../config';
 import { diag } from '@opentelemetry/api';
+import { isPromiseLike } from '../utils';
 
 /**
  * Runs all resource detectors and returns the results merged into a single Resource. Promise
@@ -65,7 +66,7 @@ export const detectResourcesSync = (
     try {
       const resourceOrPromise = d.detect(internalConfig);
       let resource: Resource;
-      if (resourceOrPromise instanceof Promise) {
+      if (isPromiseLike<Resource>(resourceOrPromise)) {
         const createPromise = async () => {
           const resolved = await resourceOrPromise;
           await resolved.waitForAsyncAttributes();
