@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, diag, TraceFlags } from '@opentelemetry/api';
+import { Context, TraceFlags } from '@opentelemetry/api';
 import {
   internal,
   ExportResultCode,
@@ -80,9 +80,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
     } else {
       span.resource
         .waitForAsyncAttributes()
-        .then(doExport, err =>
-          diag.debug('Error while resolving async portion of resource: ', err)
-        );
+        .then(doExport, err => globalErrorHandler(err));
     }
   }
 
