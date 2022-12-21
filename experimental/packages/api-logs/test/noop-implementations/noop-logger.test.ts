@@ -32,6 +32,9 @@ describe('NoopLogger', () => {
 
   it('calling emitLogRecord should not crash', () => {
     const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitLogRecord({ severityNumber: SeverityNumber.TRACE, body: 'log body' });
+    logger.emitLogRecord({
+      severityNumber: SeverityNumber.TRACE,
+      body: 'log body',
+    });
   });
 });
