@@ -12,6 +12,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation-grpc): added grpc metadata client side attributes in instrumentation [#3386](https://github.com/open-telemetry/opentelemetry-js/pull/3386)
 * feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every meter provider update.
 * feat(api-logs): add the `SeverityNumber` enumeration. [#3443](https://github.com/open-telemetry/opentelemetry-js/pull/3443/) @fuaiyi
+
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-xhr): http.url attribute should be absolute [#3200](https://github.com/open-telemetry/opentelemetry-js/pull/3200) @t2t2
