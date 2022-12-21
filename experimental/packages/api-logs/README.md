@@ -42,7 +42,7 @@ const logger = api.logs.getLogger(name, version);
 logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
 
 // logging an event in a log appender
-logger.emitLogRecord({ severityNumber: 1, body: 'log data' });
+logger.emitLogRecord({ severityNumber: SeverityNumber.TRACE, body: 'log data' });
 ```
 
 ## Useful links
