@@ -207,7 +207,6 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       this._min = value;
     }
 
-    // Note: Not checking for overflow here. TODO.
     this._count += increment;
 
     if (value === 0) {
@@ -411,6 +410,8 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       return;
     }
     if (change < 0) {
+      // Note: this should be impossible. If we get here it's because
+      // there is a bug in the implementation.
       throw new Error(`impossible change of scale: ${this.scale}`);
     }
     const newScale = this._mapping.scale() - change;

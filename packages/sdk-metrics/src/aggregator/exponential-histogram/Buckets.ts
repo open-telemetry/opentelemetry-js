@@ -54,11 +54,7 @@ export class Buckets {
    * @returns {number} The logical counts based on the backing array
    */
   counts(): number[] {
-    const counts = new Array<number>(this.length());
-    for (let i = 0; i < this.length(); i++) {
-      counts[i] = this.at(i);
-    }
-    return counts;
+    return Array.from({ length: this.length() }, (_, i) => this.at(i));
   }
 
   /**
@@ -163,7 +159,7 @@ export class Buckets {
       }
       outpos++;
     }
-    // note `by` will always be > 0 and < 32-bits, so `>>` is safe to use
+
     this.indexStart >>= by;
     this.indexEnd >>= by;
     this.indexBase = this.indexStart;
@@ -288,7 +284,8 @@ class BucketsBacking {
     if (this._counts[bucketIndex] >= decrement) {
       this._counts[bucketIndex] -= decrement;
     } else {
-      // should not happen, todo: log
+      // this should not happen, but we're being defensive against
+      // negative counts.
       this._counts[bucketIndex] = 0;
     }
   }

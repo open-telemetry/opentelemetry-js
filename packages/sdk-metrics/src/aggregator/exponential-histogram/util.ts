@@ -16,10 +16,8 @@
 
 /**
  * Note: other languages provide this as a built in function. This is
- * a naive, but functionally correct implementation. Ultimately, this is
- * used to compute the lower bucket boundaries for the Exponent and
- * Logarithm mappings. This would not run in normal application code
- * using the exponential histogram.
+ * a naive, but functionally correct implementation. This is used sparingly,
+ * when creating a new mapping in a running application.
  *
  * ldexp returns frac × 2**exp. With the following special cases:
  *   ldexp(±0, exp) = ±0
