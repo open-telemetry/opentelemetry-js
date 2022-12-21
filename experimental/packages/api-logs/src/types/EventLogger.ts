@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { LogRecord } from './LogRecord';
+import { EventRecord } from './EventRecord';
 
 export interface EventLogger {
   /**
-   * Emit a log event.
+   * Emit a event.
    *
    * @param eventName the Event name.
-   * @param logRecord the LogRecord representing the Event.
+   * @param logRecord the record data representing the Event.
    */
-  emitLogEvent(eventName: string, logRecord: LogRecord): void;
+  emitEvent(eventName: string, eventRecord: EventRecord): void;
 }
