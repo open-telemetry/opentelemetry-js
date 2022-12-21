@@ -191,6 +191,10 @@ export class NodeSDK {
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public async start(): Promise<void> {
+    registerInstrumentations({
+      instrumentations: this._instrumentations,
+    });
+
     if (this._autoDetectResources) {
       await this.detectResources();
     }
@@ -238,10 +242,6 @@ export class NodeSDK {
 
       metrics.setGlobalMeterProvider(meterProvider);
     }
-
-    registerInstrumentations({
-      instrumentations: this._instrumentations,
-    });
   }
 
   public shutdown(): Promise<void> {
