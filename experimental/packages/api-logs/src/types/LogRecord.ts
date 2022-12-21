@@ -14,18 +14,56 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import { Attributes, Context, TimeInput } from '@opentelemetry/api';
+
+export enum SeverityNumber {
+  UNSPECIFIED = 0,
+  TRACE = 1,
+  TRACE2 = 2,
+  TRACE3 = 3,
+  TRACE4 = 4,
+  DEBUG = 5,
+  DEBUG2 = 6,
+  DEBUG3 = 7,
+  DEBUG4 = 8,
+  INFO = 9,
+  INFO2 = 10,
+  INFO3 = 11,
+  INFO4 = 12,
+  WARN = 13,
+  WARN2 = 14,
+  WARN3 = 15,
+  WARN4 = 16,
+  ERROR = 17,
+  ERROR2 = 18,
+  ERROR3 = 19,
+  ERROR4 = 20,
+  FATAL = 21,
+  FATAL2 = 22,
+  FATAL3 = 23,
+  FATAL4 = 24,
+}
 
 export interface LogRecord {
   /**
-   * The time when the log record occurred as UNIX Epoch time in nanoseconds.
+   * The time when the log record occurred
    */
-  timestamp?: number;
+  time?: TimeInput;
+
+  /**
+   * The time when the log record was observed by the collection system
+   */
+  observedTime?: TimeInput;
+
+  /**
+   * The Context including TraceContext of the log record
+   */
+  context?: Context;
 
   /**
    * Numerical value of the severity.
    */
-  severityNumber?: number;
+  severityNumber?: SeverityNumber;
 
   /**
    * The severity text.
@@ -41,19 +79,4 @@ export interface LogRecord {
    * Attributes that define the log record.
    */
   attributes?: Attributes;
-
-  /**
-   * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
-   */
-  traceFlags?: number;
-
-  /**
-   * A unique identifier for a trace.
-   */
-  traceId?: string;
-
-  /**
-   * A unique identifier for a span within a trace.
-   */
-  spanId?: string;
 }

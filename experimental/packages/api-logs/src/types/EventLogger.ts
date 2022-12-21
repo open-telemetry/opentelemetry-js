@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import { LogRecord } from './LogRecord';
 
-export interface LoggerOptions {
+export interface EventLogger {
   /**
-   * The schemaUrl of the tracer or instrumentation library
-   * @default ''
+   * Emit a log event.
+   *
+   * @param eventName the Event name.
+   * @param logRecord the LogRecord representing the Event.
    */
-  schemaUrl?: string;
-
-  /**
-   * Specifies whether the Trace Context should automatically be passed on to the LogRecords emitted by the Logger.
-   * @default true
-   */
-  includeTraceContext?: boolean;
-
-  /**
-   * The instrumentation scope attributes to associate with emitted telemetry
-   */
-  scopeAttributes?: Attributes;
+  emitLogEvent(eventName: string, logRecord: LogRecord): void;
 }

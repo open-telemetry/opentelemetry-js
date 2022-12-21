@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import { EventLogger } from './EventLogger';
+import { Logger } from './Logger';
+import { LoggerProvider } from './LoggerProvider';
 
-export interface LoggerOptions {
+/**
+ * A registry for creating named {@link EventLogger}s.
+ */
+export interface EventLoggerProvider extends LoggerProvider {
   /**
-   * The schemaUrl of the tracer or instrumentation library
-   * @default ''
+   * Returns a EventLogger instance and is responsible for emitting Events as LogRecords.
+   *
+   * @param logger the delegate Logger used to emit Events as LogRecords.
+   * @param domain the domain of emitted events, used to set the event.domain attribute.
    */
-  schemaUrl?: string;
-
-  /**
-   * Specifies whether the Trace Context should automatically be passed on to the LogRecords emitted by the Logger.
-   * @default true
-   */
-  includeTraceContext?: boolean;
-
-  /**
-   * The instrumentation scope attributes to associate with emitted telemetry
-   */
-  scopeAttributes?: Attributes;
+  getEventLogger(logger: Logger, domain: string): EventLogger;
 }

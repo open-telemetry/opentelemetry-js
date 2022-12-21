@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import { SeverityNumber } from '../../src';
 import { NoopLogger } from '../../src/NoopLogger';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
@@ -24,13 +25,11 @@ describe('NoopLogger', () => {
     assert(logger instanceof NoopLogger);
   });
 
-  it('calling emitEvent should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
-  });
-
   it('calling emitLogRecord should not crash', () => {
     const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitLogRecord({ severityNumber: 1, body: 'log body' });
+    logger.emitLogRecord({
+      severityNumber: SeverityNumber.TRACE,
+      body: 'log body',
+    });
   });
 });
