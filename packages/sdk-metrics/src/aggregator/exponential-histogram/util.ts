@@ -38,3 +38,17 @@ export function ldexp(frac: number, exp: number): number {
   }
   return frac * Math.pow(2, exp);
 }
+
+export function powTwoRoundedUp(v: number): number {
+  // The following expression computes the least power-of-two
+  // that is >= v.  There are a number of tricky ways to
+  // do this, see https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  v++;
+  return v;
+}
