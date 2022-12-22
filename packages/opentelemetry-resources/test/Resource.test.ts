@@ -194,6 +194,52 @@ describe('Resource', () => {
       });
     });
 
+    it('should merge async attributes correctly when resource1 fulfils after resource2', async () => {
+      const resource1 = new Resource(
+        {},
+        Promise.resolve({ promise1: 'promise1val', shared: 'promise1val' })
+      );
+
+      const resource2 = new Resource({
+        promise2: 'promise2val',
+        shared: 'promise2val',
+      });
+
+      const merged = resource1.merge(resource2);
+      await merged.waitForAsyncAttributes();
+      assert.deepStrictEqual(merged.attributes, {
+        promise1: 'promise1val',
+        promise2: 'promise2val',
+        // same behavior as for synchronous attributes
+        shared: 'promise2val',
+      });
+    });
+
+    it('should merge async attributes correctly when resource2 fulfils after resource1', async () => {
+      const resource1 = new Resource(
+        { shared: 'promise1val' },
+        Promise.resolve({ promise1: 'promise1val' })
+      );
+
+      //async attributes that resolve after 1 second
+      const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
+        setTimeout(
+          () => resolve({ promise2: 'promise2val', shared: 'promise2val' }),
+          1500
+        );
+      });
+      const resource2 = new Resource({}, asyncAttributes);
+
+      const merged = resource1.merge(resource2);
+      await merged.waitForAsyncAttributes();
+      assert.deepStrictEqual(merged.attributes, {
+        promise1: 'promise1val',
+        promise2: 'promise2val',
+        // same behavior as for synchronous attributes
+        shared: 'promise2val',
+      });
+    });
+
     it('should log when promise rejects', async () => {
       const debugStub = sinon.spy(diag, 'debug');
       // should be possible to catch failure with waitForAsyncAttributes()
