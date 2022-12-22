@@ -11,6 +11,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-metrics): exponential histogram export [#3506](https://github.com/open-telemetry/opentelemetry-js/pull/3506) @mwear
 * feat(sdk-metrics): add exponential histogram accumulation / aggregator [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505) @mwear
 
 ### :bug: (Bug Fix)
