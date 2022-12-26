@@ -36,17 +36,17 @@ export function calculateEnv(): Required<ENVIRONMENT> {
   return mergedEnv;
 }
 
-let calculateEnvCache: Required<ENVIRONMENT>;
+let parsedEnvCache: Required<ENVIRONMENT>;
 
 /**
  * Memoized version of calculateEnv
  * */
 export function getEnv(): Required<ENVIRONMENT> {
-  if (calculateEnvCache) {
-    return calculateEnvCache;
+  if (parsedEnvCache) {
+    return parsedEnvCache;
   }
 
-  calculateEnvCache = calculateEnv();
+  parsedEnvCache = calculateEnv();
 
-  return calculateEnvCache;
+  return parsedEnvCache;
 }
