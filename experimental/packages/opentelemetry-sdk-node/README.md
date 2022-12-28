@@ -139,6 +139,10 @@ Configure tracing parameters. These are the same trace parameters used to [confi
 
 Configure the [service name](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service).
 
+## Disable the SDK from the environment
+
+Disable the SDK by setting the `OTEL_SDK_DISABLED` environment variable to `true`.  
+
 ## Configure Trace Exporter from  Environment
 
 This is an alternative to programmatically configuring an exporter or span processor. This package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor.
@@ -156,10 +160,6 @@ This is an alternative to programmatically configuring an exporter or span proce
 | OTEL_EXPORTER_OTLP_PROTOCOL | The transport protocol to use on OTLP trace, metric, and log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
 | OTEL_EXPORTER_OTLP_TRACES_PROTOCOL | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
 | OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
-
-### Disable the SDK from the environment
-
-Disable the SDK by setting the `OTEL_SDK_DISABLED` environment variable to `true`.  
 
 
 Additionally, you can specify other applicable environment variables that apply to each exporter such as the following:
