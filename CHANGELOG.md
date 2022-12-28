@@ -22,6 +22,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.name`
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
+* fix(sdk-metrics): use Date.now() for instrument recording timestamps [#3514](https://github.com/open-telemetry/opentelemetry-js/pull/3514) @MisterSquishy
 * fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
 
 ### :books: (Refine Doc)
