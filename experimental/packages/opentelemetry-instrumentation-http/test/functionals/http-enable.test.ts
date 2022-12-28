@@ -100,6 +100,14 @@ export const responseHookFunction = (
   response: IncomingMessage | ServerResponse
 ): void => {
   span.setAttribute('custom response hook attribute', 'response');
+  // IncomingMessage (Readable) 'end'.
+  response.on('end', () => {
+    span.setAttribute('custom incoming message attribute', 'end');
+  });
+  // ServerResponse (writable) 'finish'.
+  response.on('finish', () => {
+    span.setAttribute('custom server response attribute', 'finish');
+  });
 };
 
 export const startIncomingSpanHookFunction = (
@@ -251,6 +259,16 @@ describe('HttpInstrumentation', () => {
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/premature-close')) {
+            response.destroy();
+            return;
+          }
+          if (request.url?.includes('/hang')) {
+            // write response headers.
+            response.write('');
+            // hang the request.
+            return;
+          }
           if (request.url?.includes('/ignored')) {
             provider.getTracer('test').startSpan('some-span').end();
           }
@@ -771,6 +789,7 @@ describe('HttpInstrumentation', () => {
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
 
+        // server request
         assert.strictEqual(
           incomingSpan.attributes['custom request hook attribute'],
           'request'
@@ -779,12 +798,17 @@ describe('HttpInstrumentation', () => {
           incomingSpan.attributes['custom response hook attribute'],
           'response'
         );
+        assert.strictEqual(
+          incomingSpan.attributes['custom server response attribute'],
+          'finish'
+        );
         assert.strictEqual(incomingSpan.attributes['guid'], 'user_guid');
         assert.strictEqual(
           incomingSpan.attributes['span kind'],
           SpanKind.CLIENT
         );
 
+        // client request
         assert.strictEqual(
           outgoingSpan.attributes['custom request hook attribute'],
           'request'
@@ -792,6 +816,10 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(
           outgoingSpan.attributes['custom response hook attribute'],
           'response'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['custom incoming message attribute'],
+          'end'
         );
         assert.strictEqual(outgoingSpan.attributes['guid'], 'user_guid');
         assert.strictEqual(
@@ -814,6 +842,66 @@ describe('HttpInstrumentation', () => {
             done();
           });
         });
+      });
+
+      it('should have 2 ended span when client prematurely close', async () => {
+        const promise = new Promise<void>((resolve, reject) => {
+          const req = http.get(
+            `${protocol}://${hostname}:${serverPort}/hang`,
+            res => {
+              res.on('close', () => {});
+            }
+          );
+          // close the socket.
+          setTimeout(() => {
+            req.destroy();
+          }, 10);
+
+          req.on('error', reject);
+
+          req.on('close', () => {
+            // yield to server to end the span.
+            setTimeout(resolve, 10);
+          });
+        });
+
+        await promise;
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const [serverSpan, clientSpan] = spans.sort(
+          (lhs, rhs) => lhs.kind - rhs.kind
+        );
+        assert.strictEqual(serverSpan.kind, SpanKind.SERVER);
+        assert.ok(Object.keys(serverSpan.attributes).length >= 6);
+
+        assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
+        assert.ok(Object.keys(clientSpan.attributes).length >= 6);
+      });
+
+      it('should have 2 ended span when server prematurely close', async () => {
+        const promise = new Promise<void>(resolve => {
+          const req = http.get(
+            `${protocol}://${hostname}:${serverPort}/premature-close`
+          );
+          req.on('error', err => {
+            resolve();
+          });
+        });
+
+        await promise;
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const [serverSpan, clientSpan] = spans.sort(
+          (lhs, rhs) => lhs.kind - rhs.kind
+        );
+        assert.strictEqual(serverSpan.kind, SpanKind.SERVER);
+        assert.ok(Object.keys(serverSpan.attributes).length >= 6);
+
+        assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
+        assert.strictEqual(clientSpan.status.code, SpanStatusCode.ERROR);
+        assert.ok(Object.keys(clientSpan.attributes).length >= 6);
       });
     });
 
