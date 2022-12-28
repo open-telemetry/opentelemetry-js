@@ -85,6 +85,9 @@
       "path": "experimental/packages/opentelemetry-instrumentation"
     },
     {
+      "path": "experimental/packages/opentelemetry-instrumentation-agent"
+    },
+    {
       "path": "experimental/packages/opentelemetry-instrumentation-fetch"
     },
     {

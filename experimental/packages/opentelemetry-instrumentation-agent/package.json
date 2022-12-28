@@ -1,0 +1,67 @@
+{
+  "name": "@opentelemetry/instrumentation-agent",
+  "version": "0.34.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "OpenTelemetry auto-instrumentation agent for NodeJS",
+  "author": "OpenTelemetry Authors",
+  "Update homepage location": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-agent",
+  "license": "Apache-2.0",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run compile",
+    "compile": "tsc --build",
+    "version": "node ../../scripts/version-update.js",
+    "clean": "tsc --build --clean",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "prewatch": "npm run precompile",
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "watch": "tsc --build --watch"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "agent",
+    "browser",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats",
+    "monitoring"
+  ],
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "devDependencies": {
+    "@types/node": "18.6.5",
+    "typescript": "4.4.4",
+    "@types/mocha": "9.1.1",
+    "@types/sinon": "10.0.13",
+    "codecov": "3.8.3",
+    "mocha": "10.0.0",
+    "nyc": "15.1.0",
+    "sinon": "14.0.0",
+    "ts-mocha": "10.0.0"
+  }
+}
