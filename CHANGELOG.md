@@ -11,6 +11,16 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.9.0
+
+### :rocket: (Enhancement)
+
 * feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
 * feat(instrumentation-grpc): set net.peer.name and net.peer.port on client spans [#3430](https://github.com/open-telemetry/opentelemetry-js/pull/3430)
 
@@ -23,8 +33,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
 * fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
