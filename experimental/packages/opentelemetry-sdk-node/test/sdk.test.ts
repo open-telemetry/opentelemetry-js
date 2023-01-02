@@ -585,6 +585,78 @@ describe('Node SDK', () => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
   });
+
+  describe('A disabled SDK should be no-op', () => {
+    beforeEach(() => {
+      env.OTEL_SDK_DISABLED = 'true';
+    });
+
+    afterEach(() => {
+      delete env.OTEL_SDK_DISABLED;
+    });
+
+    it('should not register a trace provider', async () => {
+      const sdk = new NodeSDK({});
+      await sdk.start();
+
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'sdk.start() should not change the global tracer provider'
+      );
+
+      await sdk.shutdown();
+    });
+
+    it('should not register a meter provider if a reader is provided', async () => {
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        autoDetectResources: false,
+      });
+      await sdk.start();
+
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+
+      await sdk.shutdown();
+    });
+
+    describe('detectResources should be no-op', async () => {
+      beforeEach(() => {
+        process.env.OTEL_RESOURCE_ATTRIBUTES =
+          'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
+      });
+
+      afterEach(() => {
+        delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+      });
+
+      it('detectResources will not read resources from env or manually', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+          resourceDetectors: [
+            processDetector,
+            {
+              async detect(): Promise<Resource> {
+                return new Resource({ customAttr: 'someValue' });
+              },
+            },
+            envDetector,
+          ],
+        });
+        await sdk.detectResources();
+        const resource = sdk['_resource'];
+
+        assert.deepStrictEqual(resource, Resource.empty());
+      });
+    });
+  });
 });
 
 describe('setup exporter from env', () => {
