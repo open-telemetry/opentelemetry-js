@@ -47,5 +47,4 @@ describe('OTLPTraceExporter - web', () => {
       assert.strictEqual(collectorTraceExporter.url, 'http://foo.bar.com');
     });
   });
-
 });
