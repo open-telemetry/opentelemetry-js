@@ -48,13 +48,4 @@ describe('OTLPTraceExporter - web', () => {
     });
   });
 
-  describe('exporter', () => {
-    beforeEach(() => {
-      const collectorExporterConfig = {
-        hostname: 'foo',
-        url: 'http://foo.bar.com',
-      };
-      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
-    });
-  });
 });
