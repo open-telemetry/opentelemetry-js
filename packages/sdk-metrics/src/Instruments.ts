@@ -57,7 +57,12 @@ export class SyncInstrument {
       );
       value = Math.trunc(value);
     }
-    this._writableMetricStorage.record(value, attributes, context, timeInputToHrTime(Date.now()));
+    this._writableMetricStorage.record(
+      value,
+      attributes,
+      context,
+      timeInputToHrTime(Date.now())
+    );
   }
 }
 
