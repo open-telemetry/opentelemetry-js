@@ -272,6 +272,10 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Upgrade guidelines
 
+### 0.34.0 to 0.35.0
+
+- `@opentelemetry/sdk-node` changed `await start()` to now be synchronous
+
 ### 0.28.x to 0.29.x
 
 - `@opentelemetry/exporter-trace-otlp-http` is now exporting `scopeSpans` instead of `instrumentationLibrarySpans`
