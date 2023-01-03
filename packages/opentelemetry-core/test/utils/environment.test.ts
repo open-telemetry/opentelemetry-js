@@ -75,6 +75,7 @@ describe('environment', () => {
         HOSTNAME: 'hostname',
         KUBERNETES_SERVICE_HOST: 'https://k8s.host/',
         NAMESPACE: 'namespace',
+        OTEL_SDK_DISABLED: 'true',
         OTEL_BSP_MAX_EXPORT_BATCH_SIZE: 40,
         OTEL_BSP_SCHEDULE_DELAY: 50,
         OTEL_EXPORTER_JAEGER_AGENT_HOST: 'host.domain.com',
@@ -98,6 +99,7 @@ describe('environment', () => {
       });
       const env = getEnv();
       assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
+      assert.strictEqual(env.OTEL_SDK_DISABLED, true);
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.ERROR);
       assert.strictEqual(env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT, 40);
       assert.strictEqual(env.OTEL_ATTRIBUTE_COUNT_LIMIT, 50);
@@ -132,6 +134,27 @@ describe('environment', () => {
       assert.strictEqual(env.OTEL_TRACES_SAMPLER_ARG, '0.5');
       assert.strictEqual(env.OTEL_EXPORTER_OTLP_TIMEOUT, 15000);
       assert.strictEqual(env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT, 12000);
+    });
+
+    it('should parse OTEL_SDK_DISABLED truthy value despite casing', () => {
+      mockEnvironment({
+        OTEL_SDK_DISABLED: 'TrUe',
+      });
+      const env = getEnv();
+      assert.strictEqual(env.OTEL_SDK_DISABLED, true);
+    });
+
+    describe('OTEL_SDK_DISABLED falsy values', () => {
+      const falsyValues = ['False', ''];
+      for (const falsyValue of falsyValues) {
+        it(`should parse falsy value: ${falsyValue}`, () => {
+          mockEnvironment({
+            OTEL_SDK_DISABLED: falsyValue,
+          });
+          const env = getEnv();
+          assert.strictEqual(env.OTEL_SDK_DISABLED, false);
+        });
+      }
     });
 
     it('should parse OTEL_LOG_LEVEL despite casing', () => {
