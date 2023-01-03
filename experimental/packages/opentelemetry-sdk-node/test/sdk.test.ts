@@ -585,6 +585,78 @@ describe('Node SDK', () => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
   });
+
+  describe('A disabled SDK should be no-op', () => {
+    beforeEach(() => {
+      env.OTEL_SDK_DISABLED = 'true';
+    });
+
+    afterEach(() => {
+      delete env.OTEL_SDK_DISABLED;
+    });
+
+    it('should not register a trace provider', async () => {
+      const sdk = new NodeSDK({});
+      await sdk.start();
+
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'sdk.start() should not change the global tracer provider'
+      );
+
+      await sdk.shutdown();
+    });
+
+    it('should not register a meter provider if a reader is provided', async () => {
+      const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100,
+      });
+
+      const sdk = new NodeSDK({
+        metricReader: metricReader,
+        autoDetectResources: false,
+      });
+      await sdk.start();
+
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+
+      await sdk.shutdown();
+    });
+
+    describe('detectResources should be no-op', async () => {
+      beforeEach(() => {
+        process.env.OTEL_RESOURCE_ATTRIBUTES =
+          'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
+      });
+
+      afterEach(() => {
+        delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+      });
+
+      it('detectResources will not read resources from env or manually', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+          resourceDetectors: [
+            processDetector,
+            {
+              async detect(): Promise<Resource> {
+                return new Resource({ customAttr: 'someValue' });
+              },
+            },
+            envDetector,
+          ],
+        });
+        await sdk.detectResources();
+        const resource = sdk['_resource'];
+
+        assert.deepStrictEqual(resource, Resource.empty());
+      });
+    });
+  });
 });
 
 describe('setup exporter from env', () => {
@@ -697,21 +769,30 @@ describe('setup exporter from env', () => {
 
     assert.strictEqual(
       stubLoggerError.args[0][0],
-      'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.'
+      'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
     );
     delete env.OTEL_TRACES_EXPORTER;
   });
-  it('do not use any exporters when empty value is provided for exporter', async () => {
+  it('use default otlp exporter when user does not set exporter via env or config', async () => {
+    const sdk = new NodeSDK();
+    await sdk.start();
+
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+    assert(listOfProcessors.length === 1);
+    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+  });
+  it('use default otlp exporter when empty value is provided for exporter via env', async () => {
     env.OTEL_TRACES_EXPORTER = '';
     const sdk = new NodeSDK();
     await sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    const activeProcessor = sdk['_tracerProvider']?.getActiveSpanProcessor();
-
-    assert(listOfProcessors.length === 0);
-    assert(activeProcessor instanceof NoopSpanProcessor);
+    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+    assert(listOfProcessors.length === 1);
+    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     env.OTEL_TRACES_EXPORTER = '';
   });
 
