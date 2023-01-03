@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { timeInputToHrTime } from '@opentelemetry/core';
+import { numberToHrtime } from '@opentelemetry/core';
 import { AggregationTemporalitySelector } from '../export/AggregationSelector';
 import { CollectionResult } from '../export/MetricData';
 import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer';
@@ -36,7 +36,7 @@ export class MetricCollector implements MetricProducer {
   ) {}
 
   async collect(options?: MetricCollectOptions): Promise<CollectionResult> {
-    const collectionTime = timeInputToHrTime(Date.now());
+    const collectionTime = numberToHrtime(Date.now());
     const meterCollectionPromises = Array.from(
       this._sharedState.meterSharedStates.values()
     ).map(meterSharedState =>

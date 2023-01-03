@@ -29,7 +29,7 @@ import {
   ObservableGauge,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
-import { timeInputToHrTime } from '@opentelemetry/core';
+import { numberToHrtime } from '@opentelemetry/core';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { ObservableRegistry } from './state/ObservableRegistry';
 import {
@@ -61,7 +61,7 @@ export class SyncInstrument {
       value,
       attributes,
       context,
-      timeInputToHrTime(Date.now())
+      numberToHrtime(Date.now())
     );
   }
 }
