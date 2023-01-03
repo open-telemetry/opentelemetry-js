@@ -11,6 +11,8 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation-http): monitor error events with events.errorMonitor [#3402](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @legendecas
 * feat(instrumentation-grpc): added grpc metadata client side attributes in instrumentation [#3386](https://github.com/open-telemetry/opentelemetry-js/pull/3386)
 * feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every meter provider update.
+* feat(api-logs): add the `SeverityNumber` enumeration. [#3443](https://github.com/open-telemetry/opentelemetry-js/pull/3443/) @fuaiyi
+* feat(sdk-node): configure no-op sdk with `OTEL_SDK_DISABLED` environment variable [#3485](https://github.com/open-telemetry/opentelemetry-js/pull/3485/files/2211c78aec39aeb6b4b3dae71844edf8ce234d20)  @RazGvili
 
 ### :bug: (Bug Fix)
 
@@ -20,6 +22,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation): add back support for absolute paths via `require-in-the-middle` [#3457](https://github.com/open-telemetry/opentelemetry-js/pull/3457) @mhassan1
 * fix(prometheus-sanitization): replace repeated `_` with a single `_` [3470](https://github.com/open-telemetry/opentelemetry-js/pull/3470) @samimusallam
 * fix(prometheus-serializer): correct string used for NaN [#3477](https://github.com/open-telemetry/opentelemetry-js/pull/3477) @JacksonWeber
+* fix(instrumentation-http): close server span when response finishes [#3407](https://github.com/open-telemetry/opentelemetry-js/pull/3407) @legendecas
 
 ### :books: (Refine Doc)
 
