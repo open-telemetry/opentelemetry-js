@@ -275,7 +275,7 @@ export class BasicTracerProvider implements TracerProvider {
 
   protected _buildExporterFromEnv(): SpanExporter | undefined {
     const exporterName = getEnv().OTEL_TRACES_EXPORTER;
-    if (exporterName === 'none') return;
+    if (exporterName === 'none' || exporterName === '') return;
     const exporter = this._getSpanExporter(exporterName);
     if (!exporter) {
       diag.error(
