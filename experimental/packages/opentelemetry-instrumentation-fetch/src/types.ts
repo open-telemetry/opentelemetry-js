@@ -41,5 +41,8 @@ export interface SpanData {
   entries: PerformanceResourceTiming[];
   observer?: PerformanceObserver;
   spanUrl: string;
+  // startTime of the span from the epoch.
   startTime: api.HrTime;
+  // startTime of the span used to calculate durations.
+  startHrTime: api.HrTime;
 }

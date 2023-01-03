@@ -55,8 +55,12 @@ export interface XhrMem {
   span: api.Span;
   // span url - not available on types.Span
   spanUrl?: string;
-  // startTime of send function - used to filter cors preflight requests
-  sendStartTime?: api.HrTime;
+  // startTime of the span from the epoch.
+  startTime: api.HrTime;
+  // startTime of the span used to calculate durations.
+  startHrTime: api.HrTime;
+  // startTime of send function - used to filter cors preflight requests.
+  sendStartHrTime?: api.HrTime;
   // resources created between send and end plus some additional timeout
   createdResources?: {
     observer: PerformanceObserver;

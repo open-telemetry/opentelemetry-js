@@ -27,6 +27,7 @@ import {
   hrTimeToMicroseconds,
   hrTimeToTimeStamp,
   isTimeInput,
+  hrTimeAdd,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -148,6 +149,48 @@ describe('time', () => {
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [9, 800000000]);
+    });
+
+    it('should handle negative duration', () => {
+      const startTime: api.HrTime = [22, 400000000];
+      const endTime: api.HrTime = [12, 200000000];
+
+      const output = hrTimeDuration(startTime, endTime);
+      assert.deepStrictEqual(output, [-11, 800000000]);
+    });
+  });
+
+  describe('#hrTimeAdd', () => {
+    it('should return duration', () => {
+      const startTime: api.HrTime = [22, 100000000];
+      const endTime: api.HrTime = [32, 800000000];
+
+      const output = hrTimeAdd(startTime, endTime);
+      assert.deepStrictEqual(output, [54, 900000000]);
+    });
+
+    it('should handle nanosecond overflow', () => {
+      const startTime: api.HrTime = [22, 400000000];
+      const endTime: api.HrTime = [32, 800000000];
+
+      const output = hrTimeAdd(startTime, endTime);
+      assert.deepStrictEqual(output, [55, 200000000]);
+    });
+
+    it('should handle negative seconds', () => {
+      const startTime: api.HrTime = [22, 400000000];
+      const endTime: api.HrTime = [-12, 200000000];
+
+      const output = hrTimeAdd(startTime, endTime);
+      assert.deepStrictEqual(output, [10, 600000000]);
+    });
+
+    it('should handle negative nanoseconds', () => {
+      const startTime: api.HrTime = [22, 400000000];
+      const endTime: api.HrTime = [0, -600000000];
+
+      const output = hrTimeAdd(startTime, endTime);
+      assert.deepStrictEqual(output, [21, 800000000]);
     });
   });
 

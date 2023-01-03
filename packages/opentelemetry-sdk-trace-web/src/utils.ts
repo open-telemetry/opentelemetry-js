@@ -22,7 +22,10 @@ import {
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
 import * as api from '@opentelemetry/api';
 import {
+  hrTimeAdd,
+  hrTimeDuration,
   hrTimeToNanoseconds,
+  numberToHrtime,
   timeInputToHrTime,
   urlMatches,
 } from '@opentelemetry/core';
@@ -44,8 +47,23 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * @param key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+export function hasKey<O extends object>(
+  obj: O,
+  key: keyof any
+): key is keyof O {
   return key in obj;
+}
+
+function calcEpochHrTime(
+  startTime: api.HrTime,
+  startHrTime: api.HrTime,
+  hrTime: api.HrTime
+): api.HrTime {
+  // Calculate the duration from the hrTimes.
+  const duration = hrTimeDuration(startHrTime, hrTime);
+  // Calculate the endTime from the epoch and the duration.
+  const endTime = hrTimeAdd(startTime, duration);
+  return endTime;
 }
 
 /**
@@ -57,13 +75,20 @@ export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
 export function addSpanNetworkEvent(
   span: api.Span,
   performanceName: string,
-  entries: PerformanceEntries
+  entries: PerformanceEntries,
+  startTime: api.HrTime,
+  startHrTime: api.HrTime
 ): api.Span | undefined {
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
   ) {
-    span.addEvent(performanceName, entries[performanceName]);
+    const entryTime = calcEpochHrTime(
+      startTime,
+      startHrTime,
+      numberToHrtime(entries[performanceName]!)
+    );
+    span.addEvent(performanceName, entryTime);
     return span;
   }
   return undefined;
@@ -76,17 +101,55 @@ export function addSpanNetworkEvent(
  */
 export function addSpanNetworkEvents(
   span: api.Span,
-  resource: PerformanceEntries
+  resource: PerformanceEntries,
+  startTime: api.HrTime,
+  startHrTime: api.HrTime
 ): void {
-  addSpanNetworkEvent(span, PTN.FETCH_START, resource);
-  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
-  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
-  addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-  addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
-  addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
-  addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
-  addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
-  addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
+  addSpanNetworkEvent(span, PTN.FETCH_START, resource, startTime, startHrTime);
+  addSpanNetworkEvent(
+    span,
+    PTN.DOMAIN_LOOKUP_START,
+    resource,
+    startTime,
+    startHrTime
+  );
+  addSpanNetworkEvent(
+    span,
+    PTN.DOMAIN_LOOKUP_END,
+    resource,
+    startTime,
+    startHrTime
+  );
+  addSpanNetworkEvent(
+    span,
+    PTN.CONNECT_START,
+    resource,
+    startTime,
+    startHrTime
+  );
+  addSpanNetworkEvent(
+    span,
+    PTN.SECURE_CONNECTION_START,
+    resource,
+    startTime,
+    startHrTime
+  );
+  addSpanNetworkEvent(span, PTN.CONNECT_END, resource, startTime, startHrTime);
+  addSpanNetworkEvent(
+    span,
+    PTN.REQUEST_START,
+    resource,
+    startTime,
+    startHrTime
+  );
+  addSpanNetworkEvent(
+    span,
+    PTN.RESPONSE_START,
+    resource,
+    startTime,
+    startHrTime
+  );
+  addSpanNetworkEvent(span, PTN.RESPONSE_END, resource, startTime, startHrTime);
   const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
   if (encodedLength !== undefined) {
     span.setAttribute(

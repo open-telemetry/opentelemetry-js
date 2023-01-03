@@ -33,7 +33,7 @@ const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
  * This is represented in HrTime format as [1609504210, 150000000].
  * @param epochMillis
  */
-function numberToHrtime(epochMillis: number): api.HrTime {
+export function numberToHrtime(epochMillis: number): api.HrTime {
   const epochSeconds = epochMillis / 1000;
   // Decimals only.
   const seconds = Math.trunc(epochSeconds);
@@ -63,20 +63,10 @@ export function hrTime(performanceNow?: number): api.HrTime {
     typeof performanceNow === 'number' ? performanceNow : performance.now()
   );
 
-  let seconds = timeOrigin[0] + now[0];
-  let nanos = timeOrigin[1] + now[1];
-
-  // Nanoseconds
-  if (nanos > SECOND_TO_NANOSECONDS) {
-    nanos -= SECOND_TO_NANOSECONDS;
-    seconds += 1;
-  }
-
-  return [seconds, nanos];
+  return hrTimeAdd(timeOrigin, now);
 }
 
 /**
- *
  * Converts a TimeInput to an HrTime, defaults to _hrtime().
  * @param time
  */
@@ -119,6 +109,25 @@ export function hrTimeDuration(
   }
 
   return [seconds, nanos];
+}
+
+/**
+ * Calculate the arithmetic sum of two provided HrTime and return the sum
+ * in a new HrTime.
+ */
+export function hrTimeAdd(time1: api.HrTime, time2: api.HrTime): api.HrTime {
+  const out: api.HrTime = [time1[0] + time2[0], time1[1] + time2[1]];
+
+  if (out[1] > SECOND_TO_NANOSECONDS) {
+    out[0] = out[0] + Math.floor(out[1] / SECOND_TO_NANOSECONDS);
+    out[1] = out[1] % SECOND_TO_NANOSECONDS;
+  } else if (out[1] < 0) {
+    out[0] -= 1;
+    // negate
+    out[1] += SECOND_TO_NANOSECONDS;
+  }
+
+  return out;
 }
 
 /**

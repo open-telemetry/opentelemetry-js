@@ -15,7 +15,9 @@
  */
 
 import {
+  hrTimeAdd,
   hrTimeToNanoseconds,
+  numberToHrtime,
   otperformance as performance,
 } from '@opentelemetry/core';
 import * as core from '@opentelemetry/core';
@@ -37,6 +39,9 @@ import {
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 
 const SECOND_TO_NANOSECONDS = 1e9;
+// Stub startTime and startHrTime that are identical to indicate that there is no time shifts.
+const startTime: HrTime = [0, 0];
+const startHrTime: HrTime = [0, 0];
 
 function createHrTime(startTime: HrTime, addToStart: number): HrTime {
   let seconds = startTime[0];
@@ -115,7 +120,7 @@ describe('utils', () => {
 
       assert.strictEqual(addEventSpy.callCount, 0);
 
-      addSpanNetworkEvents(span, entries);
+      addSpanNetworkEvents(span, entries, startTime, startHrTime);
 
       assert.strictEqual(addEventSpy.callCount, 9);
       assert.strictEqual(setAttributeSpy.callCount, 2);
@@ -134,7 +139,7 @@ describe('utils', () => {
 
       assert.strictEqual(setAttributeSpy.callCount, 0);
 
-      addSpanNetworkEvents(span, entries);
+      addSpanNetworkEvents(span, entries, startTime, startHrTime);
 
       assert.strictEqual(addEventSpy.callCount, 0);
       assert.strictEqual(setAttributeSpy.callCount, 1);
@@ -154,13 +159,22 @@ describe('utils', () => {
 
           assert.strictEqual(addEventSpy.callCount, 0);
 
-          addSpanNetworkEvent(span, PTN.FETCH_START, entries);
+          addSpanNetworkEvent(
+            span,
+            PTN.FETCH_START,
+            entries,
+            startTime,
+            startHrTime
+          );
 
           assert.strictEqual(addEventSpy.callCount, 1);
           const args = addEventSpy.args[0];
 
           assert.strictEqual(args[0], 'fetchStart');
-          assert.strictEqual(args[1], value);
+          assert.deepStrictEqual(
+            args[1],
+            hrTimeAdd([0, 0], numberToHrtime(value))
+          );
         });
       });
     });
@@ -179,7 +193,9 @@ describe('utils', () => {
         addSpanNetworkEvent(
           span,
           PTN.FETCH_START,
-          entries as PerformanceEntries
+          entries as PerformanceEntries,
+          startTime,
+          startHrTime
         );
 
         assert.strictEqual(addEventSpy.callCount, 0);
@@ -197,7 +213,7 @@ describe('utils', () => {
 
         assert.strictEqual(addEventSpy.callCount, 0);
 
-        addSpanNetworkEvent(span, 'foo', entries);
+        addSpanNetworkEvent(span, 'foo', entries, startTime, startHrTime);
 
         assert.strictEqual(
           addEventSpy.callCount,

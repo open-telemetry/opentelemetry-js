@@ -27,7 +27,12 @@ import { AttributeNames } from './enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
-import { _globalThis } from '@opentelemetry/core';
+import {
+  hrTimeAdd,
+  hrTimeDuration,
+  numberToHrtime,
+  _globalThis,
+} from '@opentelemetry/core';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -96,21 +101,37 @@ export class FetchInstrumentation extends InstrumentationBase<
    */
   private _addChildSpan(
     span: api.Span,
+    spanData: SpanData,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
+    const preflightStartTime = this._calcEpochHrTime(
+      spanData,
+      numberToHrtime(
+        corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START]
+      )
+    );
+    const preflightEndTime = this._calcEpochHrTime(
+      spanData,
+      numberToHrtime(
+        corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
+      )
+    );
     const childSpan = this.tracer.startSpan(
       'CORS Preflight',
       {
-        startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
+        startTime: preflightStartTime,
       },
       api.trace.setSpan(api.context.active(), span)
     );
     if (!this._getConfig().ignoreNetworkEvents) {
-      web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      web.addSpanNetworkEvents(
+        childSpan,
+        corsPreFlightRequest,
+        spanData.startTime,
+        spanData.startHrTime
+      );
     }
-    childSpan.end(
-      corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
-    );
+    childSpan.end(preflightEndTime);
   }
 
   /**
@@ -190,7 +211,8 @@ export class FetchInstrumentation extends InstrumentationBase<
    */
   private _createSpan(
     url: string,
-    options: Partial<Request | RequestInit> = {}
+    options: Partial<Request | RequestInit> = {},
+    startTime: api.HrTime
   ): api.Span | undefined {
     if (core.isUrlIgnored(url, this._getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
@@ -205,21 +227,22 @@ export class FetchInstrumentation extends InstrumentationBase<
         [SemanticAttributes.HTTP_METHOD]: method,
         [SemanticAttributes.HTTP_URL]: url,
       },
+      startTime,
     });
   }
 
   /**
    * Finds appropriate resource and add network events to the span
    * @param span
-   * @param resourcesObserver
+   * @param spanData
    * @param endTime
    */
   private _findResourceAndAddNetworkEvents(
     span: api.Span,
-    resourcesObserver: SpanData,
+    spanData: SpanData,
     endTime: api.HrTime
   ): void {
-    let resources: PerformanceResourceTiming[] = resourcesObserver.entries;
+    let resources: PerformanceResourceTiming[] = spanData.entries;
     if (!resources.length) {
       if (!performance.getEntriesByType) {
         return;
@@ -232,8 +255,8 @@ export class FetchInstrumentation extends InstrumentationBase<
       ) as PerformanceResourceTiming[];
     }
     const resource = web.getResource(
-      resourcesObserver.spanUrl,
-      resourcesObserver.startTime,
+      spanData.spanUrl,
+      spanData.startHrTime,
       endTime,
       resources,
       this._usedResources,
@@ -246,11 +269,16 @@ export class FetchInstrumentation extends InstrumentationBase<
 
       const corsPreFlightRequest = resource.corsPreFlightRequest;
       if (corsPreFlightRequest) {
-        this._addChildSpan(span, corsPreFlightRequest);
+        this._addChildSpan(span, spanData, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
       if (!this._getConfig().ignoreNetworkEvents) {
-        web.addSpanNetworkEvents(span, mainRequest);
+        web.addSpanNetworkEvents(
+          span,
+          mainRequest,
+          spanData.startTime,
+          spanData.startHrTime
+        );
       }
     }
   }
@@ -276,16 +304,29 @@ export class FetchInstrumentation extends InstrumentationBase<
     spanData: SpanData,
     response: FetchResponse
   ) {
-    const endTime = core.hrTime();
+    const endHrTime = core.hrTime();
     this._addFinalSpanAttributes(span, response);
 
     setTimeout(() => {
       spanData.observer?.disconnect();
-      this._findResourceAndAddNetworkEvents(span, spanData, endTime);
+      this._findResourceAndAddNetworkEvents(span, spanData, endHrTime);
       this._tasksCount--;
       this._clearResources();
+
+      const endTime = this._calcEpochHrTime(spanData, endHrTime);
       span.end(endTime);
     }, OBSERVER_WAIT_TIME_MS);
+  }
+
+  /**
+   * Calculate the epoch time from the given span data and the hrTime.
+   */
+  private _calcEpochHrTime(spanData: SpanData, hrTime: api.HrTime): api.HrTime {
+    // Calculate the duration from the hrTimes.
+    const duration = hrTimeDuration(spanData.startHrTime, hrTime);
+    // Calculate the endTime from the epoch and the duration.
+    const endTime = hrTimeAdd(spanData.startTime, duration);
+    return endTime;
   }
 
   /**
@@ -300,15 +341,19 @@ export class FetchInstrumentation extends InstrumentationBase<
       ): Promise<Response> {
         const self = this;
         const url = web.parseUrl(
-          args[0] instanceof Request ? args[0].url : args[0]
+          args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
         const options = args[0] instanceof Request ? args[0] : args[1] || {};
-        const createdSpan = plugin._createSpan(url, options);
+        const spanData = plugin._prepareSpanData(url);
+        const createdSpan = plugin._createSpan(
+          url,
+          options,
+          spanData.startTime
+        );
         if (!createdSpan) {
           return original.apply(this, args);
         }
-        const spanData = plugin._prepareSpanData(url);
 
         function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
@@ -431,10 +476,11 @@ export class FetchInstrumentation extends InstrumentationBase<
    * @param spanUrl
    */
   private _prepareSpanData(spanUrl: string): SpanData {
-    const startTime = core.hrTime();
+    const startTime = numberToHrtime(Date.now());
+    const startHrTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
     if (typeof PerformanceObserver !== 'function') {
-      return { entries, startTime, spanUrl };
+      return { entries, startHrTime, startTime, spanUrl };
     }
 
     const observer = new PerformanceObserver(list => {
@@ -448,7 +494,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     observer.observe({
       entryTypes: ['resource'],
     });
-    return { entries, observer, startTime, spanUrl };
+    return { entries, observer, startHrTime, startTime, spanUrl };
   }
 
   /**

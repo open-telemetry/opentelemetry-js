@@ -21,7 +21,14 @@ import {
   InstrumentationConfig,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import {
+  hrTimeAdd,
+  hrTime,
+  hrTimeDuration,
+  isUrlIgnored,
+  numberToHrtime,
+  otperformance,
+} from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
@@ -134,14 +141,29 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _addChildSpan(
     span: api.Span,
+    xhrMem: XhrMem,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
     api.context.with(api.trace.setSpan(api.context.active(), span), () => {
+      const startTime = this._calcEpochHrTime(
+        xhrMem,
+        numberToHrtime(corsPreFlightRequest[PTN.FETCH_START])
+      );
+      const endTime = this._calcEpochHrTime(
+        xhrMem,
+        numberToHrtime(corsPreFlightRequest[PTN.RESPONSE_END])
+      );
+
       const childSpan = this.tracer.startSpan('CORS Preflight', {
-        startTime: corsPreFlightRequest[PTN.FETCH_START],
+        startTime,
       });
-      addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-      childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
+      addSpanNetworkEvents(
+        childSpan,
+        corsPreFlightRequest,
+        xhrMem.startTime,
+        xhrMem.startHrTime
+      );
+      childSpan.end(endTime);
     });
   }
 
@@ -255,10 +277,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     xhrMem: XhrMem,
     span: api.Span,
     spanUrl?: string,
-    startTime?: api.HrTime,
-    endTime?: api.HrTime
+    startHrTime?: api.HrTime,
+    endHrTime?: api.HrTime
   ): void {
-    if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) {
+    if (!spanUrl || !startHrTime || !endHrTime || !xhrMem.createdResources) {
       return;
     }
 
@@ -277,8 +299,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     const resource = getResource(
       parseUrl(spanUrl).href,
-      startTime,
-      endTime,
+      startHrTime,
+      endHrTime,
       resources,
       this._usedResources
     );
@@ -289,10 +311,15 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
       const corsPreFlightRequest = resource.corsPreFlightRequest;
       if (corsPreFlightRequest) {
-        this._addChildSpan(span, corsPreFlightRequest);
+        this._addChildSpan(span, xhrMem, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      addSpanNetworkEvents(span, mainRequest);
+      addSpanNetworkEvents(
+        span,
+        mainRequest,
+        xhrMem.startTime,
+        xhrMem.startHrTime
+      );
     }
   }
 
@@ -331,12 +358,15 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
     const spanName = `HTTP ${method.toUpperCase()}`;
 
+    const startTime = Date.now();
+    const startHrTime = hrTime();
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
         [SemanticAttributes.HTTP_METHOD]: method,
         [SemanticAttributes.HTTP_URL]: parseUrl(url).toString(),
       },
+      startTime,
     });
 
     currentSpan.addEvent(EventNames.METHOD_OPEN);
@@ -346,9 +376,22 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     this._xhrMem.set(xhr, {
       span: currentSpan,
       spanUrl: url,
+      startTime: numberToHrtime(startTime),
+      startHrTime,
     });
 
     return currentSpan;
+  }
+
+  /**
+   * Calculate the epoch time from the given span data and the hrTime.
+   */
+  private _calcEpochHrTime(xhrMem: XhrMem, hrTime: api.HrTime): api.HrTime {
+    // Calculate the duration from the hrTimes.
+    const duration = hrTimeDuration(xhrMem.startHrTime, hrTime);
+    // Calculate the endTime from the epoch and the duration.
+    const endTime = hrTimeAdd(xhrMem.startTime, duration);
+    return endTime;
   }
 
   /**
@@ -389,7 +432,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     function endSpanTimeout(
       eventName: string,
       xhrMem: XhrMem,
-      endTime: api.HrTime
+      endHrTime: api.HrTime
     ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
@@ -397,15 +440,16 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         callbackToRemoveEvents();
       }
 
-      const { span, spanUrl, sendStartTime } = xhrMem;
+      const { span, spanUrl, sendStartHrTime } = xhrMem;
+      const endTime = plugin._calcEpochHrTime(xhrMem, endHrTime);
 
       if (span) {
         plugin._findResourceAndAddNetworkEvents(
           xhrMem,
           span,
           spanUrl,
-          sendStartTime,
-          endTime
+          sendStartHrTime,
+          endHrTime
         );
         span.addEvent(eventName, endTime);
         plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
@@ -482,7 +526,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             api.trace.setSpan(api.context.active(), currentSpan),
             () => {
               plugin._tasksCount++;
-              xhrMem.sendStartTime = hrTime();
+              xhrMem.sendStartHrTime = hrTime();
               currentSpan.addEvent(EventNames.METHOD_SEND);
 
               this.addEventListener('abort', onAbort);
