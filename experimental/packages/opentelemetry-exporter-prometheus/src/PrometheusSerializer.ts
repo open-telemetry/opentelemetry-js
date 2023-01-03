@@ -106,7 +106,7 @@ function enforcePrometheusNamingConvention(
 
 function valueString(value: number) {
   if (Number.isNaN(value)) {
-    return 'Nan';
+    return 'NaN';
   } else if (!Number.isFinite(value)) {
     if (value < 0) {
       return '-Inf';
