@@ -187,7 +187,7 @@ export class NodeSDK {
     if (this._disabled) {
       return;
     }
-    
+
     const internalConfig: ResourceDetectionConfig = {
       detectors: this._resourceDetectors,
     };
