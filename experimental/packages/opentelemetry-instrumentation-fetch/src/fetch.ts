@@ -276,7 +276,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     spanData: SpanData,
     response: FetchResponse
   ) {
-    const endTime = core.hrTime();
+    const endTime = core.epochMillisToHrTime(Date.now());
     this._addFinalSpanAttributes(span, response);
 
     setTimeout(() => {
