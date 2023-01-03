@@ -96,7 +96,7 @@ export class MetricStorageRegistry {
       return null;
     }
 
-    const storages = this._sharedRegistry.get(expectedDescriptor.name);
+    const storages = storageMap.get(expectedDescriptor.name);
     if (storages === undefined) {
       return null;
     }
