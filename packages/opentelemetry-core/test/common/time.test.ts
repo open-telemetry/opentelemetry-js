@@ -105,13 +105,29 @@ describe('time', () => {
     it('should convert Date hrTime', () => {
       const timeInput = new Date(1609297640313);
       const output = timeInputToHrTime(timeInput);
-      assert.deepStrictEqual(output, [1609297640, 312999964]);
+      assert.deepStrictEqual(output, [1609297640, 313000000]);
     });
 
     it('should convert epoch milliseconds hrTime', () => {
       const timeInput = Date.now();
       const output = timeInputToHrTime(timeInput);
       assert.deepStrictEqual(output[0], Math.trunc(timeInput / 1000));
+    });
+
+    it('should convert arbitrary epoch milliseconds (with sub-millis precision) hrTime', () => {
+      sinon.stub(performance, 'timeOrigin').value(111.5);
+      const inputs = [
+        // [ input, expected ]
+        [1609297640313, [1609297640, 313000000]],
+        // inevitable precision loss without decimal arithmetics.
+        [1609297640313.333, [1609297640, 313333008]],
+        // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+        [1609297640313.333333333, [1609297640, 313333252]],
+      ] as const;
+      for (const [idx, input] of inputs.entries()) {
+        const output = timeInputToHrTime(input[0]);
+        assert.deepStrictEqual(output, input[1], `input[${idx}]: ${input}`);
+      }
     });
 
     it('should convert performance.now() hrTime', () => {
