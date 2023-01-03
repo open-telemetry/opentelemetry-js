@@ -19,7 +19,6 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
-import { getAsyncAttributesIfNotResolved } from './utils';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -27,6 +26,7 @@ import { getAsyncAttributesIfNotResolved } from './utils';
  */
 export class Resource {
   static readonly EMPTY = new Resource({});
+  private _syncAttributes: ResourceAttributes;
   private _asyncAttributesPromise: Promise<ResourceAttributes> | undefined;
   private _asyncAttributesHaveResolved: boolean;
 
@@ -62,6 +62,7 @@ export class Resource {
     asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
     this._asyncAttributesHaveResolved = asyncAttributesPromise == null;
+    this._syncAttributes = attributes;
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
       asyncAttributes => {
         this.attributes = Object.assign({}, this.attributes, asyncAttributes);
@@ -110,36 +111,27 @@ export class Resource {
     if (!other) return this;
 
     // SpanAttributes from other resource overwrite attributes from this resource.
-    const mergedAttributes = Object.assign(
-      {},
-      this.attributes,
-      other.attributes
-    );
+    const mergedSyncAttributes = {
+      ...this._syncAttributes,
+      ...other._syncAttributes,
+    };
 
-    let mergedAsyncAttributesPromise: Promise<ResourceAttributes> | undefined;
-
-    const thisAsyncAttributesIfNotResolved = getAsyncAttributesIfNotResolved(
-      this._asyncAttributesHaveResolved,
-      this._asyncAttributesPromise
-    );
-
-    const otherAsyncAttributesIfNotResolved = getAsyncAttributesIfNotResolved(
-      other._asyncAttributesHaveResolved,
-      other._asyncAttributesPromise
-    );
-
-    if (thisAsyncAttributesIfNotResolved && otherAsyncAttributesIfNotResolved) {
-      mergedAsyncAttributesPromise = Promise.all([
-        this._asyncAttributesPromise,
-        other._asyncAttributesPromise,
-      ]).then(([thisAttributes, otherAttributes]) => {
-        return Object.assign({}, thisAttributes, otherAttributes);
-      });
-    } else {
-      mergedAsyncAttributesPromise =
-        thisAsyncAttributesIfNotResolved ?? otherAsyncAttributesIfNotResolved;
+    if (!this._asyncAttributesPromise && !other._asyncAttributesPromise) {
+      return new Resource(mergedSyncAttributes);
     }
 
-    return new Resource(mergedAttributes, mergedAsyncAttributesPromise);
+    const mergedAttributesPromise = Promise.all([
+      this._asyncAttributesPromise,
+      other._asyncAttributesPromise,
+    ]).then(([thisAsyncAttributes, otherAsyncAttributes]) => {
+      return {
+        ...this._syncAttributes,
+        ...thisAsyncAttributes,
+        ...other._syncAttributes,
+        ...otherAsyncAttributes,
+      };
+    });
+
+    return new Resource(mergedSyncAttributes, mergedAttributesPromise);
   }
 }
