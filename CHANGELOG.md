@@ -23,6 +23,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
 * fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
+* fix(sdk-metrics): collect metrics when periodic exporting metric reader flushes [#3517](https://github.com/open-telemetry/opentelemetry-js/pull/3517) @legendecas
 
 ### :books: (Refine Doc)
 
