@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { MeterProvider, InstrumentType, DataPointType } from '../src';
+import { MeterProvider, DataPointType } from '../src';
 import {
   assertScopeMetrics,
   assertMetricData,
@@ -161,7 +161,6 @@ describe('MeterProvider', () => {
         DataPointType.SUM,
         {
           name: 'renamed-instrument',
-          type: InstrumentType.COUNTER,
           description: 'my renamed instrument',
         }
       );
@@ -229,7 +228,6 @@ describe('MeterProvider', () => {
         DataPointType.SUM,
         {
           name: 'non-renamed-instrument',
-          type: InstrumentType.COUNTER,
         }
       );
 
@@ -302,7 +300,6 @@ describe('MeterProvider', () => {
         DataPointType.SUM,
         {
           name: 'renamed-instrument',
-          type: InstrumentType.COUNTER,
         }
       );
 
@@ -321,7 +318,6 @@ describe('MeterProvider', () => {
         DataPointType.SUM,
         {
           name: 'renamed-instrument',
-          type: InstrumentType.COUNTER,
         }
       );
     });
@@ -376,7 +372,6 @@ describe('MeterProvider', () => {
         DataPointType.SUM,
         {
           name: 'renamed-instrument',
-          type: InstrumentType.COUNTER,
         }
       );
 
@@ -395,7 +390,6 @@ describe('MeterProvider', () => {
         DataPointType.SUM,
         {
           name: 'test-counter',
-          type: InstrumentType.COUNTER,
         }
       );
     });
@@ -451,7 +445,6 @@ describe('MeterProvider', () => {
         DataPointType.SUM,
         {
           name: 'renamed-instrument',
-          type: InstrumentType.COUNTER,
         }
       );
       assertMetricData(
@@ -459,7 +452,6 @@ describe('MeterProvider', () => {
         DataPointType.HISTOGRAM,
         {
           name: 'renamed-instrument',
-          type: InstrumentType.HISTOGRAM,
         }
       );
     });

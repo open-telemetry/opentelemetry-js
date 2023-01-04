@@ -22,10 +22,7 @@ import {
   LastValueAggregator,
   SumAggregator,
 } from '../../src/aggregator';
-import {
-  InstrumentDescriptor,
-  InstrumentType,
-} from '../../src/InstrumentDescriptor';
+import { MetricDescriptor, InstrumentType } from '../../src/Descriptor';
 import {
   Aggregation,
   DefaultAggregation,
@@ -35,7 +32,7 @@ import {
   LastValueAggregation,
   SumAggregation,
 } from '../../src/view/Aggregation';
-import { defaultInstrumentDescriptor } from '../util';
+import { defaultMetricDescriptor } from '../util';
 
 interface AggregationConstructor {
   new (...args: any[]): Aggregation;
@@ -59,67 +56,73 @@ describe('Aggregation', () => {
     for (const [key, type] of staticMembers) {
       const aggregation = (Aggregation[key] as () => Aggregation)();
       assert(aggregation instanceof type);
-      assert(aggregation.createAggregator(defaultInstrumentDescriptor));
+      assert(aggregation.createAggregator(defaultMetricDescriptor));
     }
   });
 });
 
 describe('DefaultAggregation', () => {
   describe('createAggregator', () => {
-    it('should create aggregators for instrument descriptors', () => {
+    it('should create aggregators for descriptors', () => {
       // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation
-      const expectations: [InstrumentDescriptor, AggregatorConstructor][] = [
-        [
-          { ...defaultInstrumentDescriptor, type: InstrumentType.COUNTER },
-          SumAggregator,
-        ],
+      const expectations: [MetricDescriptor, AggregatorConstructor][] = [
         [
           {
-            ...defaultInstrumentDescriptor,
-            type: InstrumentType.OBSERVABLE_COUNTER,
+            ...defaultMetricDescriptor,
+            originalInstrumentType: InstrumentType.COUNTER,
           },
           SumAggregator,
         ],
         [
           {
-            ...defaultInstrumentDescriptor,
-            type: InstrumentType.UP_DOWN_COUNTER,
+            ...defaultMetricDescriptor,
+            originalInstrumentType: InstrumentType.OBSERVABLE_COUNTER,
           },
           SumAggregator,
         ],
         [
           {
-            ...defaultInstrumentDescriptor,
-            type: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+            ...defaultMetricDescriptor,
+            originalInstrumentType: InstrumentType.UP_DOWN_COUNTER,
           },
           SumAggregator,
         ],
         [
           {
-            ...defaultInstrumentDescriptor,
-            type: InstrumentType.OBSERVABLE_GAUGE,
+            ...defaultMetricDescriptor,
+            originalInstrumentType: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+          },
+          SumAggregator,
+        ],
+        [
+          {
+            ...defaultMetricDescriptor,
+            originalInstrumentType: InstrumentType.OBSERVABLE_GAUGE,
           },
           LastValueAggregator,
         ],
         [
-          { ...defaultInstrumentDescriptor, type: InstrumentType.HISTOGRAM },
+          {
+            ...defaultMetricDescriptor,
+            originalInstrumentType: InstrumentType.HISTOGRAM,
+          },
           HistogramAggregator,
         ],
         // unknown instrument type
         [
           {
-            ...defaultInstrumentDescriptor,
-            type: -1 as unknown as InstrumentType,
+            ...defaultMetricDescriptor,
+            originalInstrumentType: -1 as unknown as InstrumentType,
           },
           DropAggregator,
         ],
       ];
 
       const aggregation = new DefaultAggregation();
-      for (const [instrumentDescriptor, type] of expectations) {
+      for (const [descriptor, type] of expectations) {
         assert(
-          aggregation.createAggregator(instrumentDescriptor) instanceof type,
-          `${InstrumentType[instrumentDescriptor.type]}`
+          aggregation.createAggregator(descriptor) instanceof type,
+          `${InstrumentType[descriptor.originalInstrumentType]}`
         );
       }
     });
@@ -130,7 +133,7 @@ describe('HistogramAggregator', () => {
   describe('createAggregator', () => {
     it('should create histogram aggregators with boundaries', () => {
       const aggregator = new HistogramAggregation().createAggregator(
-        defaultInstrumentDescriptor
+        defaultMetricDescriptor
       );
       assert(aggregator instanceof HistogramAggregator);
       assert.deepStrictEqual(
@@ -167,7 +170,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
     it('should create histogram aggregators with boundaries', () => {
       const aggregator1 = new ExplicitBucketHistogramAggregation([
         100, 10, 1,
-      ]).createAggregator(defaultInstrumentDescriptor);
+      ]).createAggregator(defaultMetricDescriptor);
       assert(aggregator1 instanceof HistogramAggregator);
       assert.deepStrictEqual(aggregator1['_boundaries'], [1, 10, 100]);
 
@@ -179,7 +182,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
         1000,
         Infinity,
         Infinity,
-      ]).createAggregator(defaultInstrumentDescriptor);
+      ]).createAggregator(defaultMetricDescriptor);
       assert(aggregator2 instanceof HistogramAggregator);
       assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000]);
     });
@@ -188,7 +191,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
       it('with min/max recording by default', () => {
         const aggregator = new ExplicitBucketHistogramAggregation([
           100, 10, 1,
-        ]).createAggregator(defaultInstrumentDescriptor);
+        ]).createAggregator(defaultMetricDescriptor);
         assert.deepStrictEqual(aggregator['_recordMinMax'], true);
       });
 
@@ -196,7 +199,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
         const aggregator = new ExplicitBucketHistogramAggregation(
           [100, 10, 1],
           true
-        ).createAggregator(defaultInstrumentDescriptor);
+        ).createAggregator(defaultMetricDescriptor);
         assert.deepStrictEqual(aggregator['_recordMinMax'], true);
       });
 
@@ -204,7 +207,7 @@ describe('ExplicitBucketHistogramAggregation', () => {
         const aggregator = new ExplicitBucketHistogramAggregation(
           [100, 10, 1],
           false
-        ).createAggregator(defaultInstrumentDescriptor);
+        ).createAggregator(defaultMetricDescriptor);
         assert.deepStrictEqual(aggregator['_recordMinMax'], false);
       });
     });

@@ -17,10 +17,7 @@
 import * as assert from 'assert';
 import { InstrumentType } from '../../src';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
-import {
-  defaultInstrumentationScope,
-  defaultInstrumentDescriptor,
-} from '../util';
+import { defaultInstrumentationScope, defaultMetricDescriptor } from '../util';
 import { View } from '../../src';
 
 describe('ViewRegistry', () => {
@@ -34,7 +31,7 @@ describe('ViewRegistry', () => {
         {
           const views = registry.findViews(
             {
-              ...defaultInstrumentDescriptor,
+              ...defaultMetricDescriptor,
               name: 'foo',
             },
             defaultInstrumentationScope
@@ -47,7 +44,7 @@ describe('ViewRegistry', () => {
         {
           const views = registry.findViews(
             {
-              ...defaultInstrumentDescriptor,
+              ...defaultMetricDescriptor,
               name: 'bar',
             },
             defaultInstrumentationScope
@@ -78,8 +75,8 @@ describe('ViewRegistry', () => {
         {
           const views = registry.findViews(
             {
-              ...defaultInstrumentDescriptor,
-              type: InstrumentType.COUNTER,
+              ...defaultMetricDescriptor,
+              originalInstrumentType: InstrumentType.COUNTER,
             },
             defaultInstrumentationScope
           );
@@ -91,8 +88,8 @@ describe('ViewRegistry', () => {
         {
           const views = registry.findViews(
             {
-              ...defaultInstrumentDescriptor,
-              type: InstrumentType.HISTOGRAM,
+              ...defaultMetricDescriptor,
+              originalInstrumentType: InstrumentType.HISTOGRAM,
             },
             defaultInstrumentationScope
           );
@@ -122,7 +119,7 @@ describe('ViewRegistry', () => {
         );
 
         {
-          const views = registry.findViews(defaultInstrumentDescriptor, {
+          const views = registry.findViews(defaultMetricDescriptor, {
             ...defaultInstrumentationScope,
             name: 'foo',
           });
@@ -132,7 +129,7 @@ describe('ViewRegistry', () => {
         }
 
         {
-          const views = registry.findViews(defaultInstrumentDescriptor, {
+          const views = registry.findViews(defaultMetricDescriptor, {
             ...defaultInstrumentationScope,
             name: 'bar',
           });

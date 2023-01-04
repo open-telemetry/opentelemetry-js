@@ -15,7 +15,7 @@
  */
 
 import { InstrumentationScope } from '@opentelemetry/core';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { MetricDescriptor } from '../Descriptor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { View } from './View';
@@ -27,10 +27,7 @@ export class ViewRegistry {
     this._registeredViews.push(view);
   }
 
-  findViews(
-    instrument: InstrumentDescriptor,
-    meter: InstrumentationScope
-  ): View[] {
+  findViews(instrument: MetricDescriptor, meter: InstrumentationScope): View[] {
     const views = this._registeredViews.filter(registeredView => {
       return (
         this._matchInstrument(registeredView.instrumentSelector, instrument) &&
@@ -43,11 +40,11 @@ export class ViewRegistry {
 
   private _matchInstrument(
     selector: InstrumentSelector,
-    instrument: InstrumentDescriptor
+    instrument: MetricDescriptor
   ): boolean {
     return (
       (selector.getType() === undefined ||
-        instrument.type === selector.getType()) &&
+        instrument.originalInstrumentType === selector.getType()) &&
       selector.getNameFilter().match(instrument.name)
     );
   }

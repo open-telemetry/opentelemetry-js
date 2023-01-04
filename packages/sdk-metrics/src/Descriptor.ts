@@ -32,49 +32,81 @@ export enum InstrumentType {
 /**
  * An interface describing the instrument.
  */
-export interface InstrumentDescriptor {
+export interface Descriptor {
   readonly name: string;
   readonly description: string;
   readonly unit: string;
-  readonly type: InstrumentType;
   readonly valueType: ValueType;
 }
 
-export function createInstrumentDescriptor(
+/**
+ * An interface describing the instrument.
+ * @deprecated Please use {@link Descriptor} instead.
+ */
+export interface InstrumentDescriptor extends Descriptor {
+  /**
+   * The original instrument's type.
+   * @deprecated Any necessary information about a metric's properties is available in the data point.
+   */
+  readonly type: InstrumentType;
+}
+
+/**
+ * An interface describing an actual instrument or virtual instrument (created by views).
+ */
+export interface MetricDescriptor extends Descriptor {
+  /**
+   * The original instrument's descriptor.
+   */
+  readonly originalInstrumentType: InstrumentType;
+}
+
+export function toExternal(descriptor: MetricDescriptor): InstrumentDescriptor {
+  return {
+    name: descriptor.name,
+    description: descriptor.description,
+    unit: descriptor.unit,
+    type: descriptor.originalInstrumentType,
+    valueType: descriptor.valueType,
+  };
+}
+
+export function createDescriptor(
   name: string,
   type: InstrumentType,
   options?: MetricOptions
-): InstrumentDescriptor {
+): MetricDescriptor {
   return {
     name,
-    type,
+    originalInstrumentType: type,
     description: options?.description ?? '',
     unit: options?.unit ?? '',
     valueType: options?.valueType ?? ValueType.DOUBLE,
   };
 }
 
-export function createInstrumentDescriptorWithView(
+export function createDescriptorWithView(
   view: View,
-  instrument: InstrumentDescriptor
-): InstrumentDescriptor {
+  instrument: MetricDescriptor
+): MetricDescriptor {
   return {
     name: view.name ?? instrument.name,
     description: view.description ?? instrument.description,
-    type: instrument.type,
+    originalInstrumentType: instrument.originalInstrumentType,
     unit: instrument.unit,
     valueType: instrument.valueType,
   };
 }
 
 export function isDescriptorCompatibleWith(
-  descriptor: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  descriptor: MetricDescriptor,
+  otherDescriptor: MetricDescriptor
 ) {
   return (
     descriptor.name === otherDescriptor.name &&
     descriptor.unit === otherDescriptor.unit &&
-    descriptor.type === otherDescriptor.type &&
+    descriptor.originalInstrumentType ===
+      otherDescriptor.originalInstrumentType &&
     descriptor.valueType === otherDescriptor.valueType
   );
 }

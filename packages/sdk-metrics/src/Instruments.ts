@@ -29,8 +29,8 @@ import {
   ObservableGauge,
   ObservableUpDownCounter,
 } from '@opentelemetry/api';
+import { MetricDescriptor } from './Descriptor';
 import { millisToHrTime } from '@opentelemetry/core';
-import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { ObservableRegistry } from './state/ObservableRegistry';
 import {
   AsyncWritableMetricStorage,
@@ -40,7 +40,7 @@ import {
 export class SyncInstrument {
   constructor(
     private _writableMetricStorage: WritableMetricStorage,
-    protected _descriptor: InstrumentDescriptor
+    protected _descriptor: MetricDescriptor
   ) {}
 
   protected _record(
@@ -122,10 +122,10 @@ export class ObservableInstrument implements Observable {
   /** @internal */
   _metricStorages: AsyncWritableMetricStorage[];
   /** @internal */
-  _descriptor: InstrumentDescriptor;
+  _descriptor: MetricDescriptor;
 
   constructor(
-    descriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     metricStorages: AsyncWritableMetricStorage[],
     private _observableRegistry: ObservableRegistry
   ) {

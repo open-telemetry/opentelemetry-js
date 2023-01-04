@@ -16,7 +16,7 @@
 
 import { HrTime } from '@opentelemetry/api';
 import { Accumulation, Aggregator } from '../aggregator/types';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { MetricDescriptor } from '../Descriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
 import { MetricData } from '../export/MetricData';
@@ -40,11 +40,11 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
   constructor(
-    _instrumentDescriptor: InstrumentDescriptor,
+    _descriptor: MetricDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: AttributesProcessor
   ) {
-    super(_instrumentDescriptor);
+    super(_descriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
@@ -74,7 +74,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
     return this._temporalMetricStorage.buildMetrics(
       collector,
       collectors,
-      this._instrumentDescriptor,
+      this._descriptor,
       accumulations,
       collectionTime
     );

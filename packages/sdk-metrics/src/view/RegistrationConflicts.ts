@@ -15,18 +15,20 @@
  */
 
 import { InstrumentSelectorCriteria } from './InstrumentSelector';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { MetricDescriptor } from '../Descriptor';
 
 export function getIncompatibilityDetails(
-  existing: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  existing: MetricDescriptor,
+  otherDescriptor: MetricDescriptor
 ) {
   let incompatibility = '';
   if (existing.unit !== otherDescriptor.unit) {
     incompatibility += `\t- Unit '${existing.unit}' does not match '${otherDescriptor.unit}'\n`;
   }
-  if (existing.type !== otherDescriptor.type) {
-    incompatibility += `\t- Type '${existing.type}' does not match '${otherDescriptor.type}'\n`;
+  if (
+    existing.originalInstrumentType !== otherDescriptor.originalInstrumentType
+  ) {
+    incompatibility += `\t- Type '${existing.originalInstrumentType}' does not match '${otherDescriptor.originalInstrumentType}'\n`;
   }
   if (existing.valueType !== otherDescriptor.valueType) {
     incompatibility += `\t- Value Type '${existing.valueType}' does not match '${otherDescriptor.valueType}'\n`;
@@ -39,26 +41,26 @@ export function getIncompatibilityDetails(
 }
 
 export function getValueTypeConflictResolutionRecipe(
-  existing: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  existing: MetricDescriptor,
+  otherDescriptor: MetricDescriptor
 ) {
   return `\t- use valueType '${existing.valueType}' on instrument creation or use an instrument name other than '${otherDescriptor.name}'`;
 }
 
 export function getUnitConflictResolutionRecipe(
-  existing: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  existing: MetricDescriptor,
+  otherDescriptor: MetricDescriptor
 ) {
   return `\t- use unit '${existing.unit}' on instrument creation or use an instrument name other than '${otherDescriptor.name}'`;
 }
 
 export function getTypeConflictResolutionRecipe(
-  existing: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  existing: MetricDescriptor,
+  otherDescriptor: MetricDescriptor
 ) {
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
-    type: otherDescriptor.type,
+    type: otherDescriptor.originalInstrumentType,
   };
 
   const selectorString = JSON.stringify(selector);
@@ -67,12 +69,12 @@ export function getTypeConflictResolutionRecipe(
 }
 
 export function getDescriptionResolutionRecipe(
-  existing: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  existing: MetricDescriptor,
+  otherDescriptor: MetricDescriptor
 ): string {
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
-    type: otherDescriptor.type,
+    type: otherDescriptor.originalInstrumentType,
   };
 
   const selectorString = JSON.stringify(selector);
@@ -83,8 +85,8 @@ export function getDescriptionResolutionRecipe(
 }
 
 export function getConflictResolutionRecipe(
-  existing: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  existing: MetricDescriptor,
+  otherDescriptor: MetricDescriptor
 ): string {
   // Conflicts that cannot be solved via views.
   if (existing.valueType !== otherDescriptor.valueType) {
@@ -96,7 +98,9 @@ export function getConflictResolutionRecipe(
   }
 
   // Conflicts that can be solved via views.
-  if (existing.type !== otherDescriptor.type) {
+  if (
+    existing.originalInstrumentType !== otherDescriptor.originalInstrumentType
+  ) {
     // this will automatically solve possible description conflicts.
     return getTypeConflictResolutionRecipe(existing, otherDescriptor);
   }

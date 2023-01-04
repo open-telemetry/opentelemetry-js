@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentType } from '../Descriptor';
 import { Aggregation } from '../view/Aggregation';
 import { AggregationTemporality } from './AggregationTemporality';
 

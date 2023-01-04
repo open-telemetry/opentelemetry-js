@@ -19,8 +19,7 @@ import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import {
-  InstrumentDescriptor,
-  InstrumentType,
+  Descriptor,
   MeterProvider,
   MetricReader,
   DataPoint,
@@ -61,7 +60,6 @@ describe('Instruments', () => {
           name: 'test',
           description: 'foobar',
           unit: 'kB',
-          type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
         },
       });
@@ -82,7 +80,6 @@ describe('Instruments', () => {
           name: 'test',
           description: '',
           unit: '',
-          type: InstrumentType.COUNTER,
           valueType: ValueType.INT,
         },
         dataPointType: DataPointType.SUM,
@@ -181,7 +178,6 @@ describe('Instruments', () => {
           name: 'test',
           description: 'foobar',
           unit: 'kB',
-          type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.DOUBLE,
         },
       });
@@ -202,7 +198,6 @@ describe('Instruments', () => {
           name: 'test',
           description: '',
           unit: '',
-          type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.INT,
         },
         dataPointType: DataPointType.SUM,
@@ -266,7 +261,6 @@ describe('Instruments', () => {
           name: 'test',
           description: 'foobar',
           unit: 'kB',
-          type: InstrumentType.HISTOGRAM,
           valueType: ValueType.DOUBLE,
         },
       });
@@ -288,7 +282,6 @@ describe('Instruments', () => {
           name: 'test',
           description: '',
           unit: '',
-          type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
         },
         dataPointType: DataPointType.HISTOGRAM,
@@ -343,7 +336,6 @@ describe('Instruments', () => {
           name: 'test',
           description: '',
           unit: '',
-          type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
         },
         dataPointType: DataPointType.HISTOGRAM,
@@ -370,7 +362,6 @@ describe('Instruments', () => {
           name: 'test',
           description: '',
           unit: '',
-          type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
         },
         dataPointType: DataPointType.HISTOGRAM,
@@ -677,7 +668,7 @@ function setup() {
 interface ValidateMetricData {
   resource?: Resource;
   instrumentationScope?: InstrumentationScope;
-  descriptor?: InstrumentDescriptor;
+  descriptor?: Partial<Descriptor>;
   dataPointType?: DataPointType;
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
   isMonotonic?: boolean;

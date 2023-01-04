@@ -48,7 +48,7 @@ export { InMemoryMetricExporter } from './export/InMemoryMetricExporter';
 
 export { ConsoleMetricExporter } from './export/ConsoleMetricExporter';
 
-export { InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
+export { InstrumentType, InstrumentDescriptor, Descriptor } from './Descriptor';
 
 export { MeterProvider, MeterProviderOptions } from './MeterProvider';
 

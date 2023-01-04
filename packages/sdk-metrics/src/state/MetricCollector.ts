@@ -19,7 +19,7 @@ import { AggregationTemporalitySelector } from '../export/AggregationSelector';
 import { CollectionResult } from '../export/MetricData';
 import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
-import { InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentType } from '../Descriptor';
 import { ForceFlushOptions, ShutdownOptions } from '../types';
 import { FlatMap } from '../utils';
 import { MeterProviderSharedState } from './MeterProviderSharedState';

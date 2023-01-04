@@ -21,7 +21,7 @@ import {
   Aggregator,
 } from '../aggregator/types';
 import { MetricData } from '../export/MetricData';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { MetricDescriptor } from '../Descriptor';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
@@ -67,7 +67,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
    * Builds the {@link MetricData} streams to report against a specific MetricCollector.
    * @param collector The information of the MetricCollector.
    * @param collectors The registered collectors.
-   * @param instrumentDescriptor The instrumentation descriptor that these metrics generated with.
+   * @param descriptor The instrumentation descriptor that these metrics generated with.
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param collectionTime The current collection timestamp.
    * @returns The {@link MetricData} points or `null`.
@@ -75,7 +75,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   buildMetrics(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    instrumentDescriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     currentAccumulations: AttributeHashMap<T>,
     collectionTime: HrTime
   ): Maybe<MetricData> {
@@ -122,7 +122,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     } else {
       // Call into user code to select aggregation temporality for the instrument.
       aggregationTemporality = collector.selectAggregationTemporality(
-        instrumentDescriptor.type
+        descriptor.originalInstrumentType
       );
     }
 
@@ -134,7 +134,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     });
 
     return this._aggregator.toMetricData(
-      instrumentDescriptor,
+      descriptor,
       aggregationTemporality,
       AttributesMapToAccumulationRecords(result),
       /* endTime */ collectionTime

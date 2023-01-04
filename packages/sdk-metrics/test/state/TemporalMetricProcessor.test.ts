@@ -26,7 +26,8 @@ import { TemporalMetricProcessor } from '../../src/state/TemporalMetricProcessor
 import {
   assertMetricData,
   assertDataPoint,
-  defaultInstrumentDescriptor,
+  defaultMetricDescriptor,
+  defaultExpectedDescriptor,
 } from '../util';
 
 const deltaCollector1: MetricCollectorHandle = {
@@ -62,7 +63,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [2, 2]
           );
@@ -70,7 +71,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -82,7 +83,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [4, 4]
           );
@@ -90,7 +91,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -102,7 +103,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [5, 5]
           );
@@ -110,7 +111,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 0);
@@ -134,7 +135,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [2, 2]
           );
@@ -142,7 +143,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -153,7 +154,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector2,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [3, 3]
           );
@@ -161,7 +162,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -187,7 +188,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [2, 2]
           );
@@ -195,7 +196,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -207,7 +208,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [4, 4]
           );
@@ -215,7 +216,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -239,7 +240,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [2, 2]
           );
@@ -247,7 +248,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -259,7 +260,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [4, 4]
           );
@@ -267,7 +268,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.DELTA
           );
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -277,7 +278,7 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultInstrumentDescriptor,
+            defaultMetricDescriptor,
             deltaMetricStorage.collect(),
             [5, 5]
           );
@@ -285,7 +286,7 @@ describe('TemporalMetricProcessor', () => {
           assertMetricData(
             metric,
             DataPointType.SUM,
-            defaultInstrumentDescriptor,
+            defaultExpectedDescriptor,
             AggregationTemporality.CUMULATIVE
           );
           assert.strictEqual(metric.dataPoints.length, 1);

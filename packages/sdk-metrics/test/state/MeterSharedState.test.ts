@@ -80,7 +80,7 @@ describe('MeterSharedState', () => {
 
       assert.strictEqual(metricStorages.length, 1);
       assert.strictEqual(
-        metricStorages[0].getInstrumentDescriptor().name,
+        metricStorages[0].getDescriptor().name,
         'test-counter'
       );
     });
@@ -103,7 +103,7 @@ describe('MeterSharedState', () => {
 
       assert.strictEqual(metricStorages.length, 1);
       assert.strictEqual(
-        metricStorages[0].getInstrumentDescriptor().name,
+        metricStorages[0].getDescriptor().name,
         'test-counter'
       );
     });
@@ -133,7 +133,7 @@ describe('MeterSharedState', () => {
       assert.strictEqual(readerAggregationSelectorSpy.callCount, 1);
       assert.strictEqual(metricStorages.length, 1);
       assert.strictEqual(
-        metricStorages[0].getInstrumentDescriptor().name,
+        metricStorages[0].getDescriptor().name,
         'test-counter'
       );
     });
@@ -165,13 +165,13 @@ describe('MeterSharedState', () => {
       // Should select aggregation with the metric reader.
       assert.strictEqual(metricStorages.length, 1);
       assert.strictEqual(
-        metricStorages[0].getInstrumentDescriptor().name,
+        metricStorages[0].getDescriptor().name,
         'test-counter'
       );
 
       assert.strictEqual(metricStorages2.length, 1);
       assert.strictEqual(
-        metricStorages2[0].getInstrumentDescriptor().name,
+        metricStorages2[0].getDescriptor().name,
         'test-counter'
       );
 

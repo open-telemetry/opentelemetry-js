@@ -15,8 +15,9 @@
  */
 
 import {
-  Context,
   BatchObservableCallback,
+  Context,
+  HrTime,
   MetricAttributes,
   ObservableCallback,
   ValueType,
@@ -25,17 +26,18 @@ import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import {
+  Descriptor,
   InstrumentDescriptor,
   InstrumentType,
-} from '../src/InstrumentDescriptor';
+  MetricDescriptor,
+} from '../src/Descriptor';
 import {
-  MetricData,
   DataPoint,
   DataPointType,
+  MetricData,
   ScopeMetrics,
 } from '../src/export/MetricData';
 import { isNotNullish } from '../src/utils';
-import { HrTime } from '@opentelemetry/api';
 import { Histogram } from '../src/aggregator/types';
 import { AggregationTemporality } from '../src/export/AggregationTemporality';
 
@@ -52,7 +54,15 @@ export const defaultResource = Resource.default().merge(
   })
 );
 
-export const defaultInstrumentDescriptor: InstrumentDescriptor = {
+export const defaultMetricDescriptor: MetricDescriptor = {
+  name: 'default_metric',
+  description: 'a simple instrument',
+  originalInstrumentType: InstrumentType.COUNTER,
+  unit: '1',
+  valueType: ValueType.DOUBLE,
+};
+
+export const defaultExpectedDescriptor: InstrumentDescriptor = {
   name: 'default_metric',
   description: 'a simple instrument',
   type: InstrumentType.COUNTER,
@@ -93,12 +103,12 @@ export function assertScopeMetrics(
 export function assertMetricData(
   actual: unknown,
   dataPointType?: DataPointType,
-  instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
+  descriptor: Partial<Descriptor> | null = defaultExpectedDescriptor,
   aggregationTemporality?: AggregationTemporality
 ): asserts actual is MetricData {
   const it = actual as MetricData;
-  if (instrumentDescriptor != null) {
-    assertPartialDeepStrictEqual(it.descriptor, instrumentDescriptor);
+  if (descriptor != null) {
+    assertPartialDeepStrictEqual(it.descriptor, descriptor);
   }
   if (isNotNullish(dataPointType)) {
     assert.strictEqual(it.dataPointType, dataPointType);

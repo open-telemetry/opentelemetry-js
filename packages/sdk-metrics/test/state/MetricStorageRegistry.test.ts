@@ -19,7 +19,7 @@ import { diag, ValueType } from '@opentelemetry/api';
 import { MetricStorage } from '../../src/state/MetricStorage';
 import { HrTime } from '@opentelemetry/api';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
-import { MetricData, InstrumentDescriptor, InstrumentType } from '../../src';
+import { MetricData, InstrumentType } from '../../src';
 import { Maybe } from '../../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -29,6 +29,7 @@ import {
   getUnitConflictResolutionRecipe,
   getValueTypeConflictResolutionRecipe,
 } from '../../src/view/RegistrationConflicts';
+import { MetricDescriptor } from '../../src/Descriptor';
 
 class TestMetricStorage extends MetricStorage {
   collect(
@@ -70,7 +71,7 @@ describe('MetricStorageRegistry', () => {
       const registry = new MetricStorageRegistry();
       const storage = new TestMetricStorage({
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -89,14 +90,14 @@ describe('MetricStorageRegistry', () => {
       const registry = new MetricStorageRegistry();
       const storage = new TestMetricStorage({
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
       });
       const storage2 = new TestMetricStorage({
         name: 'instrument2',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -116,8 +117,8 @@ describe('MetricStorageRegistry', () => {
 
   describe('findOrUpdateCompatibleStorage', () => {
     function testConflictingRegistration(
-      existingDescriptor: InstrumentDescriptor,
-      otherDescriptor: InstrumentDescriptor,
+      existingDescriptor: MetricDescriptor,
+      otherDescriptor: MetricDescriptor,
       expectedLog: string
     ) {
       const registry = new MetricStorageRegistry();
@@ -149,7 +150,7 @@ describe('MetricStorageRegistry', () => {
     it('warn when instrument with same name and different type is already registered', () => {
       const existingDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -157,7 +158,7 @@ describe('MetricStorageRegistry', () => {
 
       const otherDescriptor = {
         name: 'instrument',
-        type: InstrumentType.UP_DOWN_COUNTER,
+        originalInstrumentType: InstrumentType.UP_DOWN_COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -173,7 +174,7 @@ describe('MetricStorageRegistry', () => {
     it('warn when instrument with same name and different value type is already registered', () => {
       const existingDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -181,7 +182,7 @@ describe('MetricStorageRegistry', () => {
 
       const otherDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.INT,
@@ -200,7 +201,7 @@ describe('MetricStorageRegistry', () => {
     it('warn when instrument with same name and different unit is already registered', () => {
       const existingDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -208,7 +209,7 @@ describe('MetricStorageRegistry', () => {
 
       const otherDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: 'ms',
         valueType: ValueType.DOUBLE,
@@ -224,7 +225,7 @@ describe('MetricStorageRegistry', () => {
     it('warn when instrument with same name and different description is already registered', () => {
       const existingDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -232,7 +233,7 @@ describe('MetricStorageRegistry', () => {
 
       const otherDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'longer description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -256,7 +257,7 @@ describe('MetricStorageRegistry', () => {
       );
       // original storage now has the updated (longer) description.
       assert.strictEqual(
-        otherStorage.getInstrumentDescriptor().description,
+        otherStorage.getDescriptor().description,
         otherDescriptor.description
       );
 
@@ -272,7 +273,7 @@ describe('MetricStorageRegistry', () => {
       const registry = new MetricStorageRegistry();
       const descriptor = {
         name: 'instrument',
-        type: InstrumentType.OBSERVABLE_COUNTER,
+        originalInstrumentType: InstrumentType.OBSERVABLE_COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -291,7 +292,7 @@ describe('MetricStorageRegistry', () => {
       const registry = new MetricStorageRegistry();
       const descriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -326,7 +327,7 @@ describe('MetricStorageRegistry', () => {
     it('register conflicting metric storages for collector', () => {
       const existingDescriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -334,7 +335,7 @@ describe('MetricStorageRegistry', () => {
 
       const otherDescriptor = {
         name: 'instrument',
-        type: InstrumentType.UP_DOWN_COUNTER,
+        originalInstrumentType: InstrumentType.UP_DOWN_COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -372,7 +373,7 @@ describe('MetricStorageRegistry', () => {
     it('register the same metric storage for each collector', () => {
       const descriptor = {
         name: 'instrument',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         description: 'description',
         unit: '1',
         valueType: ValueType.DOUBLE,

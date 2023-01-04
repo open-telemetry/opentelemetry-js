@@ -26,7 +26,11 @@ import {
   HistogramAccumulation,
   HistogramAggregator,
 } from '../../src/aggregator';
-import { commonValues, defaultInstrumentDescriptor } from '../util';
+import {
+  commonValues,
+  defaultExpectedDescriptor,
+  defaultMetricDescriptor,
+} from '../util';
 
 describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
@@ -125,7 +129,7 @@ describe('HistogramAggregator', () => {
       accumulation.record(1);
 
       const expected: MetricData = {
-        descriptor: defaultInstrumentDescriptor,
+        descriptor: defaultExpectedDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -148,7 +152,7 @@ describe('HistogramAggregator', () => {
       };
       assert.deepStrictEqual(
         aggregator.toMetricData(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
           endTime
@@ -167,7 +171,7 @@ describe('HistogramAggregator', () => {
       accumulation.record(1);
 
       const expected: MetricData = {
-        descriptor: defaultInstrumentDescriptor,
+        descriptor: defaultExpectedDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -190,7 +194,7 @@ describe('HistogramAggregator', () => {
       };
       assert.deepStrictEqual(
         aggregator.toMetricData(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
           endTime
@@ -214,7 +218,7 @@ describe('HistogramAggregator', () => {
         {
           name: 'default_metric',
           description: 'a simple instrument',
-          type: instrumentType,
+          originalInstrumentType: instrumentType,
           unit: '1',
           valueType: ValueType.DOUBLE,
         },

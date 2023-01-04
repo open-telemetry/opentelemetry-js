@@ -19,7 +19,7 @@ import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { CollectionResult } from './MetricData';
 import { callWithTimeout } from '../utils';
-import { InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentType } from '../Descriptor';
 import {
   CollectionOptions,
   ForceFlushOptions,

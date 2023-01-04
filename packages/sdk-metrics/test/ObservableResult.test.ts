@@ -26,14 +26,14 @@ import { ObservableRegistry } from '../src/state/ObservableRegistry';
 import {
   commonAttributes,
   commonValues,
-  defaultInstrumentDescriptor,
+  defaultMetricDescriptor,
 } from './util';
 
 describe('ObservableResultImpl', () => {
   describe('observe', () => {
     it('should observe common values', () => {
       const observableResult = new ObservableResultImpl(
-        defaultInstrumentDescriptor
+        defaultMetricDescriptor
       );
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
@@ -44,7 +44,7 @@ describe('ObservableResultImpl', () => {
 
     it('should deduplicate observations', () => {
       const observableResult = new ObservableResultImpl(
-        defaultInstrumentDescriptor
+        defaultMetricDescriptor
       );
       observableResult.observe(1, {});
       observableResult.observe(2, {});
@@ -58,7 +58,7 @@ describe('ObservableResultImpl', () => {
       const observableResult = new ObservableResultImpl({
         name: 'test',
         description: '',
-        type: InstrumentType.COUNTER,
+        originalInstrumentType: InstrumentType.COUNTER,
         unit: '',
         valueType: ValueType.INT,
       });
@@ -73,7 +73,7 @@ describe('BatchObservableResultImpl', () => {
     it('should observe common values', () => {
       const observableResult = new BatchObservableResultImpl();
       const observable = new ObservableInstrument(
-        defaultInstrumentDescriptor,
+        defaultMetricDescriptor,
         [],
         new ObservableRegistry()
       );
@@ -88,12 +88,12 @@ describe('BatchObservableResultImpl', () => {
       const observableResult = new BatchObservableResultImpl();
       const observableRegistry = new ObservableRegistry();
       const observable1 = new ObservableInstrument(
-        defaultInstrumentDescriptor,
+        defaultMetricDescriptor,
         [],
         observableRegistry
       );
       const observable2 = new ObservableInstrument(
-        defaultInstrumentDescriptor,
+        defaultMetricDescriptor,
         [],
         observableRegistry
       );
@@ -117,7 +117,7 @@ describe('BatchObservableResultImpl', () => {
         {
           name: 'test',
           description: '',
-          type: InstrumentType.COUNTER,
+          originalInstrumentType: InstrumentType.COUNTER,
           unit: '',
           valueType: ValueType.INT,
         },

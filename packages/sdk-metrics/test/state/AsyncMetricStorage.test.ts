@@ -26,7 +26,7 @@ import { ObservableRegistry } from '../../src/state/ObservableRegistry';
 import {
   assertMetricData,
   assertDataPoint,
-  defaultInstrumentDescriptor,
+  defaultMetricDescriptor,
   ObservableCallbackDelegate,
 } from '../util';
 import { ObservableInstrument } from '../../src/Instruments';
@@ -48,12 +48,12 @@ describe('AsyncMetricStorage', () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           [metricStorage],
           observableRegistry
         );
@@ -159,12 +159,12 @@ describe('AsyncMetricStorage', () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           [metricStorage],
           observableRegistry
         );
@@ -253,12 +253,12 @@ describe('AsyncMetricStorage', () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(false),
           new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           [metricStorage],
           observableRegistry
         );
@@ -350,12 +350,12 @@ describe('AsyncMetricStorage', () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           [metricStorage],
           observableRegistry
         );
@@ -483,12 +483,12 @@ describe('AsyncMetricStorage', () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           [metricStorage],
           observableRegistry
         );
@@ -578,12 +578,12 @@ describe('AsyncMetricStorage', () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(false),
           new NoopAttributesProcessor()
         );
         const observable = new ObservableInstrument(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           [metricStorage],
           observableRegistry
         );

@@ -28,7 +28,7 @@ import {
   assertDataPoint,
   commonAttributes,
   commonValues,
-  defaultInstrumentDescriptor,
+  defaultMetricDescriptor,
 } from '../util';
 
 const deltaCollector: MetricCollectorHandle = {
@@ -43,7 +43,7 @@ describe('SyncMetricStorage', () => {
   describe('record', () => {
     it('no exceptions on record', () => {
       const metricStorage = new SyncMetricStorage(
-        defaultInstrumentDescriptor,
+        defaultMetricDescriptor,
         new SumAggregator(true),
         new NoopAttributesProcessor()
       );
@@ -61,7 +61,7 @@ describe('SyncMetricStorage', () => {
       const collectors = [deltaCollector];
       it('should collect and reset memos', async () => {
         const metricStorage = new SyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
@@ -111,7 +111,7 @@ describe('SyncMetricStorage', () => {
       const collectors = [cumulativeCollector];
       it('should collect cumulative metrics', async () => {
         const metricStorage = new SyncMetricStorage(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );

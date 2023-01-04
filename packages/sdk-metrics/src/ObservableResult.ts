@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/api';
 import { AttributeHashMap } from './state/HashMap';
 import { isObservableInstrument, ObservableInstrument } from './Instruments';
-import { InstrumentDescriptor } from '.';
+import { MetricDescriptor } from './Descriptor';
 
 /**
  * The class implements {@link ObservableResult} interface.
@@ -35,7 +35,7 @@ export class ObservableResultImpl implements ObservableResult {
    */
   _buffer = new AttributeHashMap<number>();
 
-  constructor(private _descriptor: InstrumentDescriptor) {}
+  constructor(private _descriptor: MetricDescriptor) {}
 
   /**
    * Observe a measurement of the value associated with the given attributes.

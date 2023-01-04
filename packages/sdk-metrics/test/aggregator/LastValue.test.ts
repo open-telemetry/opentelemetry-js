@@ -23,7 +23,11 @@ import {
   LastValueAggregator,
 } from '../../src/aggregator';
 import { MetricData, DataPointType } from '../../src/export/MetricData';
-import { commonValues, defaultInstrumentDescriptor } from '../util';
+import {
+  commonValues,
+  defaultExpectedDescriptor,
+  defaultMetricDescriptor,
+} from '../util';
 
 describe('LastValueAggregator', () => {
   let clock: sinon.SinonFakeTimers;
@@ -146,7 +150,7 @@ describe('LastValueAggregator', () => {
       accumulation.record(4);
 
       const expected: MetricData = {
-        descriptor: defaultInstrumentDescriptor,
+        descriptor: defaultExpectedDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.GAUGE,
         dataPoints: [
@@ -160,7 +164,7 @@ describe('LastValueAggregator', () => {
       };
       assert.deepStrictEqual(
         aggregator.toMetricData(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
           endTime

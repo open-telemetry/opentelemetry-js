@@ -18,10 +18,7 @@ import { HrTime } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { MetricCollectOptions } from '../export/MetricProducer';
 import { ScopeMetrics } from '../export/MetricData';
-import {
-  createInstrumentDescriptorWithView,
-  InstrumentDescriptor,
-} from '../InstrumentDescriptor';
+import { createDescriptorWithView, MetricDescriptor } from '../Descriptor';
 import { Meter } from '../Meter';
 import { isNotNullish, Maybe } from '../utils';
 import { AsyncMetricStorage } from './AsyncMetricStorage';
@@ -50,7 +47,7 @@ export class MeterSharedState {
     this.meter = new Meter(this);
   }
 
-  registerMetricStorage(descriptor: InstrumentDescriptor) {
+  registerMetricStorage(descriptor: MetricDescriptor) {
     const storages = this._registerMetricStorage(descriptor, SyncMetricStorage);
 
     if (storages.length === 1) {
@@ -59,7 +56,7 @@ export class MeterSharedState {
     return new MultiMetricStorage(storages);
   }
 
-  registerAsyncMetricStorage(descriptor: InstrumentDescriptor) {
+  registerAsyncMetricStorage(descriptor: MetricDescriptor) {
     const storages = this._registerMetricStorage(
       descriptor,
       AsyncMetricStorage
@@ -111,19 +108,13 @@ export class MeterSharedState {
   private _registerMetricStorage<
     MetricStorageType extends MetricStorageConstructor,
     R extends InstanceType<MetricStorageType>
-  >(
-    descriptor: InstrumentDescriptor,
-    MetricStorageType: MetricStorageType
-  ): R[] {
+  >(descriptor: MetricDescriptor, MetricStorageType: MetricStorageType): R[] {
     const views = this._meterProviderSharedState.viewRegistry.findViews(
       descriptor,
       this._instrumentationScope
     );
     let storages = views.map(view => {
-      const viewDescriptor = createInstrumentDescriptorWithView(
-        view,
-        descriptor
-      );
+      const viewDescriptor = createDescriptorWithView(view, descriptor);
       const compatibleStorage =
         this.metricStorageRegistry.findOrUpdateCompatibleStorage<R>(
           viewDescriptor
@@ -144,7 +135,9 @@ export class MeterSharedState {
     // Fallback to the per-collector aggregations if no view is configured for the instrument.
     if (storages.length === 0) {
       const perCollectorAggregations =
-        this._meterProviderSharedState.selectAggregations(descriptor.type);
+        this._meterProviderSharedState.selectAggregations(
+          descriptor.originalInstrumentType
+        );
       const collectorStorages = perCollectorAggregations.map(
         ([collector, aggregation]) => {
           const compatibleStorage =
@@ -179,7 +172,7 @@ interface ScopeMetricsResult {
 
 interface MetricStorageConstructor {
   new (
-    instrumentDescriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     aggregator: Aggregator<Maybe<Accumulation>>,
     attributesProcessor: AttributesProcessor
   ): MetricStorage;

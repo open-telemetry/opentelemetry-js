@@ -22,7 +22,7 @@ import {
 } from './types';
 import { DataPointType, HistogramMetricData } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
+import { MetricDescriptor, InstrumentType, toExternal } from '../Descriptor';
 import { binarySearchLB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
@@ -207,13 +207,13 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   }
 
   toMetricData(
-    descriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
     endTime: HrTime
   ): Maybe<HistogramMetricData> {
     return {
-      descriptor,
+      descriptor: toExternal(descriptor),
       aggregationTemporality,
       dataPointType: DataPointType.HISTOGRAM,
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
@@ -221,9 +221,12 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
 
         // determine if instrument allows negative values.
         const allowsNegativeValues =
-          descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
-          descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
-          descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
+          descriptor.originalInstrumentType ===
+            InstrumentType.UP_DOWN_COUNTER ||
+          descriptor.originalInstrumentType ===
+            InstrumentType.OBSERVABLE_GAUGE ||
+          descriptor.originalInstrumentType ===
+            InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
 
         return {
           attributes,

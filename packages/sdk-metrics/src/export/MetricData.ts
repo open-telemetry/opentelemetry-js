@@ -16,8 +16,8 @@
 
 import { HrTime, MetricAttributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
+import { InstrumentDescriptor } from '../Descriptor';
 import { IResource } from '@opentelemetry/resources';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
 import { Histogram } from '../aggregator/types';
 

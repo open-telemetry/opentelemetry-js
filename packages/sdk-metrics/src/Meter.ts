@@ -26,10 +26,7 @@ import {
   BatchObservableCallback,
   Observable,
 } from '@opentelemetry/api';
-import {
-  createInstrumentDescriptor,
-  InstrumentType,
-} from './InstrumentDescriptor';
+import { createDescriptor, InstrumentType } from './Descriptor';
 import {
   CounterInstrument,
   HistogramInstrument,
@@ -50,7 +47,7 @@ export class Meter implements IMeter {
    * Create a {@link Histogram} instrument.
    */
   createHistogram(name: string, options?: MetricOptions): Histogram {
-    const descriptor = createInstrumentDescriptor(
+    const descriptor = createDescriptor(
       name,
       InstrumentType.HISTOGRAM,
       options
@@ -63,11 +60,7 @@ export class Meter implements IMeter {
    * Create a {@link Counter} instrument.
    */
   createCounter(name: string, options?: MetricOptions): Counter {
-    const descriptor = createInstrumentDescriptor(
-      name,
-      InstrumentType.COUNTER,
-      options
-    );
+    const descriptor = createDescriptor(name, InstrumentType.COUNTER, options);
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new CounterInstrument(storage, descriptor);
   }
@@ -76,7 +69,7 @@ export class Meter implements IMeter {
    * Create a {@link UpDownCounter} instrument.
    */
   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter {
-    const descriptor = createInstrumentDescriptor(
+    const descriptor = createDescriptor(
       name,
       InstrumentType.UP_DOWN_COUNTER,
       options
@@ -92,7 +85,7 @@ export class Meter implements IMeter {
     name: string,
     options?: MetricOptions
   ): ObservableGauge {
-    const descriptor = createInstrumentDescriptor(
+    const descriptor = createDescriptor(
       name,
       InstrumentType.OBSERVABLE_GAUGE,
       options
@@ -113,7 +106,7 @@ export class Meter implements IMeter {
     name: string,
     options?: MetricOptions
   ): ObservableCounter {
-    const descriptor = createInstrumentDescriptor(
+    const descriptor = createDescriptor(
       name,
       InstrumentType.OBSERVABLE_COUNTER,
       options
@@ -134,7 +127,7 @@ export class Meter implements IMeter {
     name: string,
     options?: MetricOptions
   ): ObservableUpDownCounter {
-    const descriptor = createInstrumentDescriptor(
+    const descriptor = createDescriptor(
       name,
       InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
       options

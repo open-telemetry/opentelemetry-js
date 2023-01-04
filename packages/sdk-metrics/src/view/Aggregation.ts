@@ -23,7 +23,7 @@ import {
   HistogramAggregator,
 } from '../aggregator';
 import { Accumulation } from '../aggregator/types';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
+import { MetricDescriptor, InstrumentType } from '../Descriptor';
 import { Maybe } from '../utils';
 
 /**
@@ -33,7 +33,7 @@ import { Maybe } from '../utils';
  */
 export abstract class Aggregation {
   abstract createAggregator(
-    instrument: InstrumentDescriptor
+    instrument: MetricDescriptor
   ): Aggregator<Maybe<Accumulation>>;
 
   static Drop(): Aggregation {
@@ -62,7 +62,7 @@ export abstract class Aggregation {
  */
 export class DropAggregation extends Aggregation {
   private static DEFAULT_INSTANCE = new DropAggregator();
-  createAggregator(_instrument: InstrumentDescriptor) {
+  createAggregator(_instrument: MetricDescriptor) {
     return DropAggregation.DEFAULT_INSTANCE;
   }
 }
@@ -73,8 +73,8 @@ export class DropAggregation extends Aggregation {
 export class SumAggregation extends Aggregation {
   private static MONOTONIC_INSTANCE = new SumAggregator(true);
   private static NON_MONOTONIC_INSTANCE = new SumAggregator(false);
-  createAggregator(instrument: InstrumentDescriptor) {
-    switch (instrument.type) {
+  createAggregator(instrument: MetricDescriptor) {
+    switch (instrument.originalInstrumentType) {
       case InstrumentType.COUNTER:
       case InstrumentType.OBSERVABLE_COUNTER:
       case InstrumentType.HISTOGRAM: {
@@ -92,7 +92,7 @@ export class SumAggregation extends Aggregation {
  */
 export class LastValueAggregation extends Aggregation {
   private static DEFAULT_INSTANCE = new LastValueAggregator();
-  createAggregator(_instrument: InstrumentDescriptor) {
+  createAggregator(_instrument: MetricDescriptor) {
     return LastValueAggregation.DEFAULT_INSTANCE;
   }
 }
@@ -105,7 +105,7 @@ export class HistogramAggregation extends Aggregation {
     [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
     true
   );
-  createAggregator(_instrument: InstrumentDescriptor) {
+  createAggregator(_instrument: MetricDescriptor) {
     return HistogramAggregation.DEFAULT_INSTANCE;
   }
 }
@@ -139,7 +139,7 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
     this._boundaries = boundaries.slice(minusInfinityIndex + 1, infinityIndex);
   }
 
-  createAggregator(_instrument: InstrumentDescriptor) {
+  createAggregator(_instrument: MetricDescriptor) {
     return new HistogramAggregator(this._boundaries, this._recordMinMax);
   }
 }
@@ -148,9 +148,9 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
  * The default aggregation.
  */
 export class DefaultAggregation extends Aggregation {
-  private _resolve(instrument: InstrumentDescriptor): Aggregation {
+  private _resolve(instrument: MetricDescriptor): Aggregation {
     // cast to unknown to disable complaints on the (unreachable) fallback.
-    switch (instrument.type as unknown) {
+    switch (instrument.originalInstrumentType as unknown) {
       case InstrumentType.COUNTER:
       case InstrumentType.UP_DOWN_COUNTER:
       case InstrumentType.OBSERVABLE_COUNTER:
@@ -164,12 +164,14 @@ export class DefaultAggregation extends Aggregation {
         return HISTOGRAM_AGGREGATION;
       }
     }
-    api.diag.warn(`Unable to recognize instrument type: ${instrument.type}`);
+    api.diag.warn(
+      `Unable to recognize instrument type: ${instrument.originalInstrumentType}`
+    );
     return DROP_AGGREGATION;
   }
 
   createAggregator(
-    instrument: InstrumentDescriptor
+    instrument: MetricDescriptor
   ): Aggregator<Maybe<Accumulation>> {
     return this._resolve(instrument).createAggregator(instrument);
   }

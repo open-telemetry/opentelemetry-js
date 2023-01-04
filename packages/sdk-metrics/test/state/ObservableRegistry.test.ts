@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { ObservableInstrument } from '../../src/Instruments';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
-import { defaultInstrumentDescriptor } from '../util';
+import { defaultMetricDescriptor } from '../util';
 
 describe('ObservableRegistry', () => {
   const callback1 = () => {};
@@ -29,12 +29,12 @@ describe('ObservableRegistry', () => {
   beforeEach(() => {
     observableRegistry = new ObservableRegistry();
     instrument1 = new ObservableInstrument(
-      defaultInstrumentDescriptor,
+      defaultMetricDescriptor,
       [],
       observableRegistry
     );
     instrument2 = new ObservableInstrument(
-      defaultInstrumentDescriptor,
+      defaultMetricDescriptor,
       [],
       observableRegistry
     );

@@ -19,7 +19,11 @@ import * as assert from 'assert';
 import { AggregationTemporality } from '../../src';
 import { SumAccumulation, SumAggregator } from '../../src/aggregator';
 import { MetricData, DataPointType } from '../../src/export/MetricData';
-import { commonValues, defaultInstrumentDescriptor } from '../util';
+import {
+  commonValues,
+  defaultExpectedDescriptor,
+  defaultMetricDescriptor,
+} from '../util';
 
 describe('SumAggregator', () => {
   describe('createAccumulation', () => {
@@ -91,7 +95,7 @@ describe('SumAggregator', () => {
       accumulation.record(2);
 
       const expected: MetricData = {
-        descriptor: defaultInstrumentDescriptor,
+        descriptor: defaultExpectedDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.SUM,
         isMonotonic: true,
@@ -106,7 +110,7 @@ describe('SumAggregator', () => {
       };
       assert.deepStrictEqual(
         aggregator.toMetricData(
-          defaultInstrumentDescriptor,
+          defaultMetricDescriptor,
           AggregationTemporality.CUMULATIVE,
           [[{}, accumulation]],
           endTime

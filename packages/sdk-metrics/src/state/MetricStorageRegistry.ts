@@ -15,10 +15,7 @@
  */
 
 import { MetricStorage } from './MetricStorage';
-import {
-  InstrumentDescriptor,
-  isDescriptorCompatibleWith,
-} from '../InstrumentDescriptor';
+import { MetricDescriptor, isDescriptorCompatibleWith } from '../Descriptor';
 import * as api from '@opentelemetry/api';
 import {
   getConflictResolutionRecipe,
@@ -75,7 +72,7 @@ export class MetricStorageRegistry {
   }
 
   findOrUpdateCompatibleStorage<T extends MetricStorage>(
-    expectedDescriptor: InstrumentDescriptor
+    expectedDescriptor: MetricDescriptor
   ): T | null {
     const storages = this._sharedRegistry.get(expectedDescriptor.name);
     if (storages === undefined) {
@@ -89,7 +86,7 @@ export class MetricStorageRegistry {
 
   findOrUpdateCompatibleCollectorStorage<T extends MetricStorage>(
     collector: MetricCollectorHandle,
-    expectedDescriptor: InstrumentDescriptor
+    expectedDescriptor: MetricDescriptor
   ): T | null {
     const storageMap = this._perCollectorRegistry.get(collector);
     if (storageMap === undefined) {
@@ -107,7 +104,7 @@ export class MetricStorageRegistry {
   }
 
   private _registerStorage(storage: MetricStorage, storageMap: StorageMap) {
-    const descriptor = storage.getInstrumentDescriptor();
+    const descriptor = storage.getDescriptor();
     const storages = storageMap.get(descriptor.name);
 
     if (storages === undefined) {
@@ -119,13 +116,13 @@ export class MetricStorageRegistry {
   }
 
   private _findOrUpdateCompatibleStorage<T extends MetricStorage>(
-    expectedDescriptor: InstrumentDescriptor,
+    expectedDescriptor: MetricDescriptor,
     existingStorages: MetricStorage[]
   ): T | null {
     let compatibleStorage = null;
 
     for (const existingStorage of existingStorages) {
-      const existingDescriptor = existingStorage.getInstrumentDescriptor();
+      const existingDescriptor = existingStorage.getDescriptor();
 
       if (isDescriptorCompatibleWith(existingDescriptor, expectedDescriptor)) {
         // Use the longer description if it does not match.
