@@ -391,7 +391,7 @@ describe('Node SDK', () => {
             envDetector,
           ],
         });
-        await sdk.detectResources();
+        sdk.detectResources();
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes();
 
@@ -666,7 +666,7 @@ describe('Node SDK', () => {
             envDetector,
           ],
         });
-        await sdk.detectResources();
+        sdk.detectResources();
         const resource = sdk['_resource'];
 
         assert.deepStrictEqual(resource, Resource.empty());
