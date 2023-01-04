@@ -242,15 +242,14 @@ describe('Resource', () => {
 
     it('should log when promise rejects', async () => {
       const debugStub = sinon.spy(diag, 'debug');
-      // should be possible to catch failure with waitForAsyncAttributes()
-      try {
-        await assert.rejects(
-          new Resource(
-            {},
-            Promise.reject(new Error('rejected'))
-          ).waitForAsyncAttributes()
-        );
-      } catch (err) {}
+
+      const resource = new Resource({}, Promise.reject(new Error('rejected')));
+      await resource.waitForAsyncAttributes();
+
+      assert.ok(
+        debugStub.calledWithMatch("The resource's async promise rejected")
+      );
+
       // will log after yielding to event loop
       await new Promise(resolve => setTimeout(resolve));
       assert.ok(debugStub.calledOnce);
