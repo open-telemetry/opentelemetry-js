@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 1.4.0
 
 ### :rocket: (Enhancement)
 
@@ -13,8 +13,6 @@ All notable changes to this project will be documented in this file.
 * fix(api): deprecate MetricAttributes and MetricAttributeValue [#3406](https://github.com/open-telemetry/opentelemetry-js/pull/3406) @blumamir
 * fix(api): use active context as default in NoopTracer [#3476](https://github.com/open-telemetry/opentelemetry-js/pull/3476) @flarna
 * fix(api): declare this parameter type in observable callbacks [#3497](https://github.com/open-telemetry/opentelemetry-js/pull/3497) @legendecas
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
