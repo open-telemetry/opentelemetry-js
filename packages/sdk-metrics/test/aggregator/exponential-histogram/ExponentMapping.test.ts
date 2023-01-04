@@ -240,7 +240,7 @@ describe('ExponentMapping', () => {
       scale++
     ) {
       const mapping = ExponentMapping.get(scale);
-      const index = mapping.mapToIndex(ieee754.MAX_VALUE);
+      const index = mapping.mapToIndex(Number.MAX_VALUE);
       const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) >> -scale) - 1;
       assert.strictEqual(
         index,

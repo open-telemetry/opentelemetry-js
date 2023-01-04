@@ -46,11 +46,6 @@ export const MIN_NORMAL_EXPONENT = -EXPONENT_BIAS + 1;
 export const MAX_NORMAL_EXPONENT = EXPONENT_BIAS;
 
 /**
- * MAX_VALUE is the largest normal number
- */
-export const MAX_VALUE = Number.MAX_VALUE;
-
-/**
  * MIN_VALUE is the smallest normal number
  */
 export const MIN_VALUE = Math.pow(2, -1022);

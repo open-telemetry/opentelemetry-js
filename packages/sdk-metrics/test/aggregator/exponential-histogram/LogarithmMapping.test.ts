@@ -75,7 +75,7 @@ describe('LogarithmMapping', () => {
       scale++
     ) {
       const mapping = LogarithmMapping.get(scale);
-      const index = mapping.mapToIndex(ieee754.MAX_VALUE);
+      const index = mapping.mapToIndex(Number.MAX_VALUE);
 
       // the max index is one less than the first index that
       // overflows Number.MAX_VALUE
@@ -87,13 +87,13 @@ describe('LogarithmMapping', () => {
       const base = mapping.lowerBoundary(1);
 
       assert.ok(
-        boundary < ieee754.MAX_VALUE,
-        `expected boundary: ${boundary} to be < max value: ${ieee754.MAX_VALUE}`
+        boundary < Number.MAX_VALUE,
+        `expected boundary: ${boundary} to be < max value: ${Number.MAX_VALUE}`
       );
 
       assertInEpsilon(
         base - 1,
-        (ieee754.MAX_VALUE - boundary) / boundary,
+        (Number.MAX_VALUE - boundary) / boundary,
         10e-6
       );
     }
@@ -155,17 +155,17 @@ describe('LogarithmMapping', () => {
       scale++
     ) {
       const mapping = LogarithmMapping.get(scale);
-      const index = mapping.mapToIndex(ieee754.MAX_VALUE);
+      const index = mapping.mapToIndex(Number.MAX_VALUE);
       const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) << scale) - 1;
       assert.strictEqual(maxIndex, index);
 
       const boundary = mapping.lowerBoundary(index);
       const base = mapping.lowerBoundary(1);
 
-      assert.ok(boundary < ieee754.MAX_VALUE);
+      assert.ok(boundary < Number.MAX_VALUE);
       assertInEpsilon(
         base - 1,
-        (ieee754.MAX_VALUE - boundary) / boundary,
+        (Number.MAX_VALUE - boundary) / boundary,
         1e-6
       );
 
