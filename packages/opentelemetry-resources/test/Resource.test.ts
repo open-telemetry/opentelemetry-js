@@ -146,7 +146,7 @@ describe('Resource', () => {
       const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
         setTimeout(
           () => resolve({ async: 'fromasync', shared: 'fromasync' }),
-          1000
+          1
         );
       });
 
@@ -225,7 +225,7 @@ describe('Resource', () => {
       const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
         setTimeout(
           () => resolve({ promise2: 'promise2val', shared: 'promise2val' }),
-          1500
+          1
         );
       });
       const resource2 = new Resource({}, asyncAttributes);
