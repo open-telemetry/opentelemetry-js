@@ -185,9 +185,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         } else {
           Promise.all(
             pendingResources.map(resource => resource.waitForAsyncAttributes())
-          ).then(doExport, err =>
-            diag.debug('Error while resolving async portion of resource: ', err)
-          );
+          ).then(doExport, err => globalErrorHandler(err));
         }
       });
     });
