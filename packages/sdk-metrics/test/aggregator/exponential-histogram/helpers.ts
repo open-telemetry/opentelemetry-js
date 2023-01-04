@@ -21,7 +21,7 @@ export function assertInEpsilon(
   epsilon: number
 ) {
   assert.ok(!Number.isNaN(actual), 'unexpected NaN for actual argument');
-  assert.ok(!Number.isNaN(expected), 'unexpected NaN for exepected argument');
+  assert.ok(!Number.isNaN(expected), 'unexpected NaN for expected argument');
   assert.ok(actual !== 0, 'unexpected 0 for actual argument');
 
   const relErr = Math.abs(actual - expected) / Math.abs(actual);

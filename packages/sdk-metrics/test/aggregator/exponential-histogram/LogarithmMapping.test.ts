@@ -27,7 +27,7 @@ describe('LogarithmMapping', () => {
 
   it('maps values for scale 1', () => {
     const mapping = LogarithmMapping.get(1);
-    assert.strictEqual(1, mapping.scale());
+    assert.strictEqual(mapping.scale(), 1);
 
     const expectedMappings = [
       [15, 7],

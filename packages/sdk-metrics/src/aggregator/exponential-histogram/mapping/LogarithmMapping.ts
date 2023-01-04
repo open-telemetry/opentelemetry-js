@@ -42,14 +42,10 @@ export class LogarithmMapping implements Mapping {
       );
     }
 
-    let mapping = this._PREBUILT_MAPPINGS.get(scale);
-    if (mapping) {
-      return mapping;
+    if (!this._PREBUILT_MAPPINGS.has(scale)) {
+      this._PREBUILT_MAPPINGS.set(scale, new LogarithmMapping(scale));
     }
-
-    mapping = new LogarithmMapping(scale);
-    this._PREBUILT_MAPPINGS.set(scale, mapping);
-    return mapping;
+    return this._PREBUILT_MAPPINGS.get(scale);
   }
 
   private readonly _scale: number;

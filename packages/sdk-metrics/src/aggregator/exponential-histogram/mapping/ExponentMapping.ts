@@ -18,25 +18,15 @@ import * as util from '../util';
 import { Mapping, MappingError } from './types';
 
 /**
- * ExponentMapping implements a exponential mapping functions for
- * for scales <=0. For scales > 0 LogarithmMapping should be used.
+ * ExponentMapping implements exponential mapping functions for
+ * scales <=0. For scales > 0 LogarithmMapping should be used.
  */
 export class ExponentMapping implements Mapping {
   static readonly MIN_SCALE = -10;
   static readonly MAX_SCALE = 0;
-  private static readonly _PREBUILT_MAPPINGS = [
-    new ExponentMapping(10),
-    new ExponentMapping(9),
-    new ExponentMapping(8),
-    new ExponentMapping(7),
-    new ExponentMapping(6),
-    new ExponentMapping(5),
-    new ExponentMapping(4),
-    new ExponentMapping(3),
-    new ExponentMapping(2),
-    new ExponentMapping(1),
-    new ExponentMapping(0),
-  ];
+  private static readonly _PREBUILT_MAPPINGS = Array(11)
+    .fill(10)
+    .map((v, i) => new ExponentMapping(v - i))
 
   /**
    * Returns the pre-built mapping for the given scale
@@ -76,7 +66,7 @@ export class ExponentMapping implements Mapping {
 
     // In case the value is an exact power of two, compute a
     // correction of -1. Note, we are using a custom _rightShift
-    // to accomodate a 52-bit argument, which the native bitwise
+    // to accommodate a 52-bit argument, which the native bitwise
     // operators do not support
     const correction = this._rightShift(
       ieee754.getSignificand(value) - 1,

@@ -27,7 +27,7 @@ const EXPONENT_MASK = 0x7ff00000;
  */
 const SIGNIFICAND_MASK = 0xfffff;
 
-/*
+/**
  * EXPONENT_BIAS is the exponent bias specified for encoding
  * the IEEE 754 double-precision floating point exponent: 1023
  */
@@ -39,7 +39,7 @@ const EXPONENT_BIAS = 1023;
  */
 export const MIN_NORMAL_EXPONENT = -EXPONENT_BIAS + 1;
 
-/*
+/**
  * MAX_NORMAL_EXPONENT is the maximum exponent of a normalized
  * floating point: 1023.
  */
