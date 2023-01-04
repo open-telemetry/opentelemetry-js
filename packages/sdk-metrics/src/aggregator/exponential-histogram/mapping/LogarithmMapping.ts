@@ -45,7 +45,7 @@ export class LogarithmMapping implements Mapping {
     if (!this._PREBUILT_MAPPINGS.has(scale)) {
       this._PREBUILT_MAPPINGS.set(scale, new LogarithmMapping(scale));
     }
-    return this._PREBUILT_MAPPINGS.get(scale);
+    return this._PREBUILT_MAPPINGS.get(scale)!;
   }
 
   private readonly _scale: number;
