@@ -18,6 +18,9 @@ import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/
 import * as assert from 'assert';
 import { assertInEpsilon } from './helpers';
 
+const MIN_SCALE = 1;
+const MAX_SCALE = 20;
+
 describe('LogarithmMapping', () => {
   it('throws for invalid scale', () => {
     assert.throws(() => {
@@ -70,8 +73,8 @@ describe('LogarithmMapping', () => {
 
   it('handles max index for each scale', () => {
     for (
-      let scale = LogarithmMapping.MIN_SCALE;
-      scale <= LogarithmMapping.MAX_SCALE;
+      let scale = MIN_SCALE;
+      scale <= MAX_SCALE;
       scale++
     ) {
       const mapping = LogarithmMapping.get(scale);
@@ -101,8 +104,8 @@ describe('LogarithmMapping', () => {
 
   it('handles min index for each scale', () => {
     for (
-      let scale = LogarithmMapping.MIN_SCALE;
-      scale <= LogarithmMapping.MAX_SCALE;
+      let scale = MIN_SCALE;
+      scale <= MAX_SCALE;
       scale++
     ) {
       const mapping = LogarithmMapping.get(scale);
@@ -150,8 +153,8 @@ describe('LogarithmMapping', () => {
 
   it('maps max float to max index for each scale', () => {
     for (
-      let scale = LogarithmMapping.MIN_SCALE;
-      scale <= LogarithmMapping.MAX_SCALE;
+      let scale = MIN_SCALE;
+      scale <= MAX_SCALE;
       scale++
     ) {
       const mapping = LogarithmMapping.get(scale);

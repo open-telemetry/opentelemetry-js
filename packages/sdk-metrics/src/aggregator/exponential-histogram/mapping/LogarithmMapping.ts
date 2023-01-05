@@ -17,13 +17,14 @@ import * as ieee754 from './ieee754';
 import * as util from '../util';
 import { Mapping, MappingError } from './types';
 
+const MIN_SCALE = 1;
+const MAX_SCALE = 20;
+
 /**
  * LogarithmMapping implements exponential mapping functions for scale > 0.
  * For scales <= 0 the exponent mapping should be used.
  */
 export class LogarithmMapping implements Mapping {
-  static readonly MIN_SCALE = 1;
-  static readonly MAX_SCALE = 20;
   private static _PREBUILT_MAPPINGS = new Map<number, LogarithmMapping>();
 
   /**
@@ -34,11 +35,11 @@ export class LogarithmMapping implements Mapping {
    */
   static get(scale: number): LogarithmMapping {
     if (
-      scale > LogarithmMapping.MAX_SCALE ||
-      scale < LogarithmMapping.MIN_SCALE
+      scale > MAX_SCALE ||
+      scale < MIN_SCALE
     ) {
       throw new MappingError(
-        `logarithm mapping requires scale in the range [${LogarithmMapping.MIN_SCALE}, ${LogarithmMapping.MAX_SCALE}]`
+        `logarithm mapping requires scale in the range [${MIN_SCALE}, ${MAX_SCALE}]`
       );
     }
 

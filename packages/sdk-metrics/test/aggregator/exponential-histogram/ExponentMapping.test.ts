@@ -17,6 +17,9 @@ import { ExponentMapping } from '../../../src/aggregator/exponential-histogram/m
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
 import * as assert from 'assert';
 
+const MIN_SCALE = -10;
+const MAX_SCALE = 0;
+
 describe('ExponentMapping', () => {
   it('maps expected values for scale 0', () => {
     const mapping = ExponentMapping.get(0);
@@ -67,8 +70,8 @@ describe('ExponentMapping', () => {
   });
 
   it('maps expected values for min scale', () => {
-    const mapping = ExponentMapping.get(ExponentMapping.MIN_SCALE);
-    assert.strictEqual(mapping.scale(), ExponentMapping.MIN_SCALE);
+    const mapping = ExponentMapping.get(MIN_SCALE);
+    assert.strictEqual(mapping.scale(), MIN_SCALE);
 
     const expectedMappings = [
       [1.000001, 0],
@@ -229,14 +232,14 @@ describe('ExponentMapping', () => {
       ExponentMapping.get(1);
     });
     assert.throws(() => {
-      ExponentMapping.get(ExponentMapping.MIN_SCALE - 1);
+      ExponentMapping.get(MIN_SCALE - 1);
     });
   });
 
   it('handles max index for all scales', () => {
     for (
-      let scale = ExponentMapping.MIN_SCALE;
-      scale <= ExponentMapping.MAX_SCALE;
+      let scale = MIN_SCALE;
+      scale <= MAX_SCALE;
       scale++
     ) {
       const mapping = ExponentMapping.get(scale);
@@ -260,8 +263,8 @@ describe('ExponentMapping', () => {
 
   it('handles min index for all scales', () => {
     for (
-      let scale = ExponentMapping.MIN_SCALE;
-      scale <= ExponentMapping.MAX_SCALE;
+      let scale = MIN_SCALE;
+      scale <= MAX_SCALE;
       scale++
     ) {
       const mapping = ExponentMapping.get(scale);
