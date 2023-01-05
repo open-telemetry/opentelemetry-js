@@ -13,6 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * The functions and constants in this file allow us to interact
+ * with the internal representation of an IEEE 64-bit floating point
+ * number. We need to work with all 64-bits, thus, care needs to be
+ * taken when working with Javascript's bitwise operators (<<, >>, &,
+ * |, etc) as they truncate operands to 32-bits. In order to work around
+ * this we work with the 64-bits as two 32-bit halves, perform bitwise
+ * operations on them independently, and combine the results (if needed).
+ */
+
 export const SIGNIFICAND_WIDTH = 52;
 
 /**
@@ -79,7 +90,8 @@ export function getSignificand(value: number): number {
   // access the raw 64-bit float as two 32-bit uints
   const hiBits = dv.getUint32(0);
   const loBits = dv.getUint32(4);
-  // extract the significand bits from the hi bits and left shift 32 places
+  // extract the significand bits from the hi bits and left shift 32 places note:
+  // we can't use the native << operator as it will truncate the result to 32-bits
   const significandHiBits = (hiBits & SIGNIFICAND_MASK) * Math.pow(2, 32);
   // combine the hi and lo bits and return
   return significandHiBits + loBits;
