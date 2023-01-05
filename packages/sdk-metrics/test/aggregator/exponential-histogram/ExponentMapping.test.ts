@@ -237,11 +237,7 @@ describe('ExponentMapping', () => {
   });
 
   it('handles max index for all scales', () => {
-    for (
-      let scale = MIN_SCALE;
-      scale <= MAX_SCALE;
-      scale++
-    ) {
+    for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
       const mapping = ExponentMapping.get(scale);
       const index = mapping.mapToIndex(Number.MAX_VALUE);
       const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) >> -scale) - 1;
@@ -262,11 +258,7 @@ describe('ExponentMapping', () => {
   });
 
   it('handles min index for all scales', () => {
-    for (
-      let scale = MIN_SCALE;
-      scale <= MAX_SCALE;
-      scale++
-    ) {
+    for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
       const mapping = ExponentMapping.get(scale);
       const minIndex = mapping.mapToIndex(ieee754.MIN_VALUE);
       let expectedMinIndex = ieee754.MIN_NORMAL_EXPONENT >> -scale;

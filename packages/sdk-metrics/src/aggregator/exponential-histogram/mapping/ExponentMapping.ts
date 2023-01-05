@@ -25,10 +25,9 @@ const MAX_SCALE = 0;
  * scales <=0. For scales > 0 LogarithmMapping should be used.
  */
 export class ExponentMapping implements Mapping {
-
   private static readonly _PREBUILT_MAPPINGS = Array(11)
     .fill(10)
-    .map((v, i) => new ExponentMapping(v - i))
+    .map((v, i) => new ExponentMapping(v - i));
 
   /**
    * Returns the pre-built mapping for the given scale
@@ -37,9 +36,7 @@ export class ExponentMapping implements Mapping {
    */
   public static get(scale: number) {
     if (scale > MAX_SCALE) {
-      throw new MappingError(
-        `exponent mapping requires scale <= ${MAX_SCALE}`
-      );
+      throw new MappingError(`exponent mapping requires scale <= ${MAX_SCALE}`);
     }
     if (scale < MIN_SCALE) {
       throw new MappingError(
@@ -47,9 +44,7 @@ export class ExponentMapping implements Mapping {
       );
     }
 
-    return ExponentMapping._PREBUILT_MAPPINGS[
-      scale - MIN_SCALE
-    ];
+    return ExponentMapping._PREBUILT_MAPPINGS[scale - MIN_SCALE];
   }
 
   private constructor(private readonly _shift: number) {}

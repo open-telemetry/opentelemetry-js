@@ -34,10 +34,7 @@ export class LogarithmMapping implements Mapping {
    * @returns {LogarithmMapping}
    */
   static get(scale: number): LogarithmMapping {
-    if (
-      scale > MAX_SCALE ||
-      scale < MIN_SCALE
-    ) {
+    if (scale > MAX_SCALE || scale < MIN_SCALE) {
       throw new MappingError(
         `logarithm mapping requires scale in the range [${MIN_SCALE}, ${MAX_SCALE}]`
       );

@@ -72,11 +72,7 @@ describe('LogarithmMapping', () => {
   });
 
   it('handles max index for each scale', () => {
-    for (
-      let scale = MIN_SCALE;
-      scale <= MAX_SCALE;
-      scale++
-    ) {
+    for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
       const mapping = LogarithmMapping.get(scale);
       const index = mapping.mapToIndex(Number.MAX_VALUE);
 
@@ -103,11 +99,7 @@ describe('LogarithmMapping', () => {
   });
 
   it('handles min index for each scale', () => {
-    for (
-      let scale = MIN_SCALE;
-      scale <= MAX_SCALE;
-      scale++
-    ) {
+    for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
       const mapping = LogarithmMapping.get(scale);
       const minIndex = mapping.mapToIndex(ieee754.MIN_VALUE);
 
@@ -152,11 +144,7 @@ describe('LogarithmMapping', () => {
   });
 
   it('maps max float to max index for each scale', () => {
-    for (
-      let scale = MIN_SCALE;
-      scale <= MAX_SCALE;
-      scale++
-    ) {
+    for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
       const mapping = LogarithmMapping.get(scale);
       const index = mapping.mapToIndex(Number.MAX_VALUE);
       const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) << scale) - 1;
@@ -166,11 +154,7 @@ describe('LogarithmMapping', () => {
       const base = mapping.lowerBoundary(1);
 
       assert.ok(boundary < Number.MAX_VALUE);
-      assertInEpsilon(
-        base - 1,
-        (Number.MAX_VALUE - boundary) / boundary,
-        1e-6
-      );
+      assertInEpsilon(base - 1, (Number.MAX_VALUE - boundary) / boundary, 1e-6);
 
       //one larger will overflow
       assert.throws(() => {
