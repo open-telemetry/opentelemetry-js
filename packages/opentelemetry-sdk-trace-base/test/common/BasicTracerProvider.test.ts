@@ -90,6 +90,29 @@ describe('BasicTracerProvider', () => {
         const tracer = new BasicTracerProvider();
         assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
       });
+      it('should use noop span processor by default and no diag error', () => {
+        const errorStub = sinon.spy(diag, 'error');
+        const tracer = new BasicTracerProvider();
+        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+
+        sinon.assert.notCalled(errorStub);
+      });
+    });
+
+    describe('when user sets unavailable exporter', () => {
+      it('should use noop span processor by default and show diag error', () => {
+        const errorStub = sinon.spy(diag, 'error');
+        envSource.OTEL_TRACES_EXPORTER = 'someExporter';
+
+        const tracer = new BasicTracerProvider();
+        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+
+        sinon.assert.calledWith(
+          errorStub,
+          'Exporter "someExporter" requested through environment variable is unavailable.'
+        );
+        delete envSource.OTEL_TRACES_EXPORTER;
+      });
     });
 
     describe('when "sampler" option defined', () => {
