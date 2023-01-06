@@ -254,5 +254,5 @@ describe('time', () => {
       const output = addHrTimes([-10, SECOND_TO_NANOSECONDS - 10], [-10, 20]);
       assert.deepStrictEqual(output, [-19, 10]);
     });
-  })
+  });
 });
