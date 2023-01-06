@@ -259,7 +259,10 @@ describe('OpenTracing Shim', () => {
         const adjustment = otSpan['_performanceOffset'];
 
         assert.strictEqual(otSpan.links.length, 1);
-        assert.deepStrictEqual(hrTimeToMilliseconds(otSpan.startTime), Math.round(now + adjustment + performance.timeOrigin));
+        assert.deepStrictEqual(
+          hrTimeToMilliseconds(otSpan.startTime),
+          Math.round(now + adjustment + performance.timeOrigin)
+        );
         assert.deepStrictEqual(otSpan.attributes, opentracingOptions.tags);
       });
     });
@@ -490,7 +493,10 @@ describe('OpenTracing Shim', () => {
       const now = performance.now();
       span.finish(now);
       const adjustment = otSpan['_performanceOffset'];
-      assert.deepStrictEqual(hrTimeToMilliseconds(otSpan.endTime), Math.round(now + adjustment + performance.timeOrigin));
+      assert.deepStrictEqual(
+        hrTimeToMilliseconds(otSpan.endTime),
+        Math.round(now + adjustment + performance.timeOrigin)
+      );
     });
 
     it('can set and retrieve baggage', () => {

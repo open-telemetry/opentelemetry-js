@@ -27,7 +27,7 @@ import {
   SpanKind,
   SpanStatus,
   SpanStatusCode,
-  TimeInput
+  TimeInput,
 } from '@opentelemetry/api';
 import {
   addHrTimes,
@@ -81,7 +81,6 @@ export class Span implements APISpan, ReadableSpan {
   private readonly _performanceOffset: number;
   private readonly _startTimeProvided: boolean;
 
-
   /**
    * Constructs a new Span instance.
    *
@@ -96,7 +95,7 @@ export class Span implements APISpan, ReadableSpan {
     parentSpanId?: string,
     links: Link[] = [],
     startTime?: TimeInput,
-    _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
+    _deprecatedClock?: unknown // keeping this argument even though it is unused to ensure backwards compatibility
   ) {
     this.name = spanName;
     this._spanContext = spanContext;
@@ -106,9 +105,9 @@ export class Span implements APISpan, ReadableSpan {
 
     const now = Date.now();
     this._performanceStartTime = otperformance.now();
-    this._performanceOffset = now - (this._performanceStartTime + getTimeOrigin());
+    this._performanceOffset =
+      now - (this._performanceStartTime + getTimeOrigin());
     this._startTimeProvided = startTime != null;
-
 
     this.startTime = this._getTime(startTime ?? now);
 
