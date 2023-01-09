@@ -390,7 +390,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       eventName: string,
       xhrMem: XhrMem,
       performanceEndTime: api.HrTime,
-      endTime: number,
+      endTime: number
     ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
