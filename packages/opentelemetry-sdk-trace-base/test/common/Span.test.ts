@@ -168,7 +168,7 @@ describe('Span', () => {
       SpanKind.SERVER,
       undefined,
       [],
-      startTime,
+      startTime
     );
     const eventTimeMS = 123;
     const spanStartTime = hrTimeToMilliseconds(span.startTime);
