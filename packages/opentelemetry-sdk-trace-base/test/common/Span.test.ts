@@ -159,6 +159,7 @@ describe('Span', () => {
   });
 
   it('should have an entered time for event', () => {
+    const startTime = Date.now();
     const span = new Span(
       tracer,
       ROOT_CONTEXT,
@@ -167,11 +168,11 @@ describe('Span', () => {
       SpanKind.SERVER,
       undefined,
       [],
-      0
+      startTime,
     );
-    const timeMS = 123;
+    const eventTimeMS = 123;
     const spanStartTime = hrTimeToMilliseconds(span.startTime);
-    const eventTime = spanStartTime + timeMS;
+    const eventTime = spanStartTime + eventTimeMS;
 
     span.addEvent('my-event', undefined, eventTime);
 
