@@ -142,7 +142,7 @@ describe('Resource', () => {
     });
 
     it('should merge async attributes into sync attributes once resolved', async () => {
-      //async attributes that resolve after 1 second
+      //async attributes that resolve after 1 ms
       const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
         setTimeout(
           () => resolve({ async: 'fromasync', shared: 'fromasync' }),
@@ -221,7 +221,7 @@ describe('Resource', () => {
         Promise.resolve({ promise1: 'promise1val' })
       );
 
-      //async attributes that resolve after 1 second
+      //async attributes that resolve after 1 ms
       const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
         setTimeout(
           () => resolve({ promise2: 'promise2val', shared: 'promise2val' }),

@@ -35,18 +35,28 @@ import { SpanExporter } from './SpanExporter';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
+  private _unresolvedResources: Set<Promise<void>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+    this._unresolvedResources = new Set<Promise<void>>();
   }
 
-  forceFlush(): Promise<void> {
-    // do nothing as all spans are being exported without waiting
+  async forceFlush(): Promise<void> {
+    // await unresolved resources before resolving
+    for (const unresolvedResource of this._unresolvedResources) {
+      await unresolvedResource;
+    }
+
     return Promise.resolve();
   }
 
-  // does nothing.
-  onStart(_span: Span, _parentContext: Context): void {}
+  onStart(_span: Span, _parentContext: Context): void {
+    // store the resource's unresolved promise
+    if (!_span.resource.asyncAttributesHaveResolved()) {
+      this._unresolvedResources.add(_span.resource.waitForAsyncAttributes());
+    }
+  }
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {

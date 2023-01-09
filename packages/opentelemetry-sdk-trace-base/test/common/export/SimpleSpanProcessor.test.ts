@@ -36,6 +36,7 @@ import {
 } from '../../../src';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
+import { Resource, ResourceAttributes } from '@opentelemetry/resources';
 
 describe('SimpleSpanProcessor', () => {
   let provider: BasicTracerProvider;
@@ -149,6 +150,41 @@ describe('SimpleSpanProcessor', () => {
   });
 
   describe('force flush', () => {
+    it('should await unresolved resources', async () => {
+      const processor = new SimpleSpanProcessor(exporter);
+      const providerWithAsyncResource = new BasicTracerProvider({
+        resource: new Resource(
+          {},
+          new Promise<ResourceAttributes>(resolve => {
+            setTimeout(() => resolve({ async: 'fromasync' }), 1);
+          })
+        ),
+      });
+      const spanContext: SpanContext = {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const span = new Span(
+        providerWithAsyncResource.getTracer('default'),
+        ROOT_CONTEXT,
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
+      processor.onStart(span, ROOT_CONTEXT);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+
+      processor.onEnd(span);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+
+      await processor.forceFlush();
+      assert.strictEqual(exporter.getFinishedSpans().length, 1);
+
+      await processor.shutdown();
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
+
     describe('when flushing complete', () => {
       it('should call an async callback', done => {
         const processor = new SimpleSpanProcessor(exporter);
