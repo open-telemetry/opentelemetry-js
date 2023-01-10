@@ -84,10 +84,22 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
       Array.from(new Set(getEnv().OTEL_TRACES_EXPORTER.split(',')))
     );
 
-    if (traceExportersList.length === 0 || traceExportersList[0] === 'none') {
+    if (traceExportersList[0] === 'none') {
       diag.warn(
-        'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.'
+        'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
       );
+    } else if (traceExportersList.length === 0) {
+      diag.warn('OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.');
+
+      traceExportersList = ['otlp'];
+      this.createExportersFromList(traceExportersList);
+
+      this._spanProcessors = this.configureSpanProcessors(
+        this._configuredExporters
+      );
+      this._spanProcessors.forEach(processor => {
+        this.addSpanProcessor(processor);
+      });
     } else {
       if (
         traceExportersList.length > 1 &&
@@ -99,16 +111,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
         traceExportersList = ['otlp'];
       }
 
-      traceExportersList.forEach(exporterName => {
-        const exporter = this._getSpanExporter(exporterName);
-        if (exporter) {
-          this._configuredExporters.push(exporter);
-        } else {
-          diag.warn(
-            `Unrecognized OTEL_TRACES_EXPORTER value: ${exporterName}.`
-          );
-        }
-      });
+      this.createExportersFromList(traceExportersList);
 
       if (this._configuredExporters.length > 0) {
         this._spanProcessors = this.configureSpanProcessors(
@@ -134,6 +137,17 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     if (this._hasSpanProcessors) {
       super.register(config);
     }
+  }
+
+  private createExportersFromList(exporterList: string[]) {
+    exporterList.forEach(exporterName => {
+      const exporter = this._getSpanExporter(exporterName);
+      if (exporter) {
+        this._configuredExporters.push(exporter);
+      } else {
+        diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value: ${exporterName}.`);
+      }
+    });
   }
 
   private configureSpanProcessors(

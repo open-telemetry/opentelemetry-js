@@ -769,21 +769,30 @@ describe('setup exporter from env', () => {
 
     assert.strictEqual(
       stubLoggerError.args[0][0],
-      'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.'
+      'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
     );
     delete env.OTEL_TRACES_EXPORTER;
   });
-  it('do not use any exporters when empty value is provided for exporter', async () => {
+  it('use default otlp exporter when user does not set exporter via env or config', async () => {
+    const sdk = new NodeSDK();
+    await sdk.start();
+
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+    assert(listOfProcessors.length === 1);
+    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+  });
+  it('use default otlp exporter when empty value is provided for exporter via env', async () => {
     env.OTEL_TRACES_EXPORTER = '';
     const sdk = new NodeSDK();
     await sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    const activeProcessor = sdk['_tracerProvider']?.getActiveSpanProcessor();
-
-    assert(listOfProcessors.length === 0);
-    assert(activeProcessor instanceof NoopSpanProcessor);
+    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+    assert(listOfProcessors.length === 1);
+    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     env.OTEL_TRACES_EXPORTER = '';
   });
 
