@@ -19,7 +19,7 @@ import { MappingError, Mapping } from './types';
 
 const MIN_SCALE = -10;
 const MAX_SCALE = 20;
-const PREBUILT_MAPPINGS = Array.from({ length: 30 }, (_, i) => {
+const PREBUILT_MAPPINGS = Array.from({ length: 31 }, (_, i) => {
   if (i > 10) {
     return new LogarithmMapping(i - 10);
   }

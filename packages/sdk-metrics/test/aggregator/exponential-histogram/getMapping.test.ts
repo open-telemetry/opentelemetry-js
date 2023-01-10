@@ -23,7 +23,7 @@ const MAX_SCALE = 20;
 
 describe('getMapping', () => {
   it('returns correct mapping for all scales', () => {
-    for (let scale = MIN_SCALE; scale < MAX_SCALE; scale++) {
+    for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
       const mapping = getMapping(scale);
       if (scale > 0) {
         assert.ok(mapping instanceof LogarithmMapping);
