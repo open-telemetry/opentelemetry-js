@@ -445,14 +445,6 @@ describe('Node SDK', () => {
           return call.args.some(callarg => arg === callarg);
         });
       };
-      const callArgsIncludes = (
-        mockedFunction: sinon.SinonSpy,
-        arg: any
-      ): boolean => {
-        return mockedFunction.getCalls().some(call => {
-          return call.args.some(callarg => arg.includes(callarg));
-        });
-      };
       const callArgsMatches = (
         mockedFunction: sinon.SinonSpy,
         regex: RegExp
@@ -470,6 +462,7 @@ describe('Node SDK', () => {
         // This test depends on the env detector to be functioning as intended
         const mockedLoggerMethod = Sinon.fake();
         const mockedVerboseLoggerMethod = Sinon.fake();
+
         diag.setLogger(
           {
             debug: mockedLoggerMethod,
@@ -479,14 +472,11 @@ describe('Node SDK', () => {
         );
 
         sdk.detectResources();
-        await sdk['_resource'].waitForAsyncAttributes().catch(() => {});
+        await sdk['_resource'].waitForAsyncAttributes();
 
         // Test that the Env Detector successfully found its resource and populated it with the right values.
         assert.ok(
-          !callArgsIncludes(
-            mockedLoggerMethod,
-            "The resource's async promise rejected"
-          )
+          callArgsContains(mockedLoggerMethod, 'EnvDetector found resource.')
         );
         // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
         assert.ok(

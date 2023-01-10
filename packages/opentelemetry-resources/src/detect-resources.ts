@@ -76,7 +76,11 @@ export const detectResourcesSync = (
         resource = resourceOrPromise;
       }
 
-      void resource.waitForAsyncAttributes();
+      void resource
+        .waitForAsyncAttributes()
+        .then(() =>
+          diag.debug(`${d.constructor.name} found resource.`, resource)
+        );
 
       return resource;
     } catch (e) {
