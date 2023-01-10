@@ -27,7 +27,7 @@ const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
  * Converts a number of milliseconds from epoch to HrTime([seconds, remainder in nanoseconds]).
  * @param epochMillis
  */
-export function epochMillisToHrTime(epochMillis: number): api.HrTime {
+export function millisToHrTime(epochMillis: number): api.HrTime {
   const epochSeconds = epochMillis / 1000;
   // Decimals only.
   const seconds = Math.trunc(epochSeconds);
@@ -50,8 +50,8 @@ export function getTimeOrigin(): number {
  * @param performanceNow
  */
 export function hrTime(performanceNow?: number): api.HrTime {
-  const timeOrigin = epochMillisToHrTime(getTimeOrigin());
-  const now = epochMillisToHrTime(
+  const timeOrigin = millisToHrTime(getTimeOrigin());
+  const now = millisToHrTime(
     typeof performanceNow === 'number' ? performanceNow : performance.now()
   );
 
@@ -73,10 +73,10 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
       return hrTime(time);
     } else {
       // epoch milliseconds or performance.timeOrigin
-      return epochMillisToHrTime(time);
+      return millisToHrTime(time);
     }
   } else if (time instanceof Date) {
-    return epochMillisToHrTime(time.getTime());
+    return millisToHrTime(time.getTime());
   } else {
     throw TypeError('Invalid input type');
   }
@@ -174,7 +174,7 @@ export function addHrTimes(time1: api.HrTime, time2: api.HrTime): api.HrTime {
   const out = [time1[0] + time2[0], time1[1] + time2[1]] as api.HrTime;
 
   // Nanoseconds
-  if (out[1] > SECOND_TO_NANOSECONDS) {
+  if (out[1] >= SECOND_TO_NANOSECONDS) {
     out[1] -= SECOND_TO_NANOSECONDS;
     out[0] += 1;
   }

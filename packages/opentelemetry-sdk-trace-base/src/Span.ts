@@ -31,7 +31,7 @@ import {
 } from '@opentelemetry/api';
 import {
   addHrTimes,
-  epochMillisToHrTime,
+  millisToHrTime,
   getTimeOrigin,
   hrTime,
   hrTimeDuration,
@@ -235,11 +235,11 @@ export class Span implements APISpan, ReadableSpan {
     }
 
     if (typeof inp === 'number') {
-      return epochMillisToHrTime(inp);
+      return millisToHrTime(inp);
     }
 
     if (inp instanceof Date) {
-      return epochMillisToHrTime(inp.valueOf());
+      return millisToHrTime(inp.getTime());
     }
 
     if (isTimeInputHrTime(inp)) {
@@ -249,11 +249,11 @@ export class Span implements APISpan, ReadableSpan {
     if (this._startTimeProvided) {
       // if user provided a time for the start manually
       // we can't use duration to calculate event/end times
-      return epochMillisToHrTime(Date.now());
+      return millisToHrTime(Date.now());
     }
 
     const msDuration = otperformance.now() - this._performanceStartTime;
-    return addHrTimes(this.startTime, epochMillisToHrTime(msDuration));
+    return addHrTimes(this.startTime, millisToHrTime(msDuration));
   }
 
   isRecording(): boolean {
