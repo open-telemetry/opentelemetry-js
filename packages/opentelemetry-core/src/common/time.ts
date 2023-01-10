@@ -167,12 +167,16 @@ export function isTimeInput(
   );
 }
 
+/**
+ * Given 2 HrTime formatted times, return their sum as an HrTime.
+ */
 export function addHrTimes(time1: api.HrTime, time2: api.HrTime): api.HrTime {
-  const out: api.HrTime = [time1[0] + time2[0], time1[1] + time2[1]];
+  const out = [time1[0] + time2[0], time1[1] + time2[1]] as api.HrTime;
 
+  // Nanoseconds
   if (out[1] > SECOND_TO_NANOSECONDS) {
-    out[0] = out[0] + Math.floor(out[1] / SECOND_TO_NANOSECONDS);
-    out[1] = out[1] % SECOND_TO_NANOSECONDS;
+    out[1] -= SECOND_TO_NANOSECONDS;
+    out[0] += 1;
   }
 
   return out;
