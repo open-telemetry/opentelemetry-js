@@ -22,14 +22,8 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 20;
 
 describe('LogarithmMapping', () => {
-  it('throws for invalid scale', () => {
-    assert.throws(() => {
-      LogarithmMapping.get(-1);
-    });
-  });
-
   it('maps values for scale 1', () => {
-    const mapping = LogarithmMapping.get(1);
+    const mapping = new LogarithmMapping(1);
     assert.strictEqual(mapping.scale(), 1);
 
     const expectedMappings = [
@@ -59,7 +53,7 @@ describe('LogarithmMapping', () => {
 
   it('computes boundary', () => {
     [1, 2, 3, 4, 10, 15].forEach(scale => {
-      const mapping = LogarithmMapping.get(scale);
+      const mapping = new LogarithmMapping(scale);
       [-100, -10, -1, 0, 1, 10, 100].forEach(index => {
         const boundary = mapping.lowerBoundary(index);
         const mappedIndex = mapping.mapToIndex(boundary);
@@ -73,7 +67,7 @@ describe('LogarithmMapping', () => {
 
   it('handles max index for each scale', () => {
     for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
-      const mapping = LogarithmMapping.get(scale);
+      const mapping = new LogarithmMapping(scale);
       const index = mapping.mapToIndex(Number.MAX_VALUE);
 
       // the max index is one less than the first index that
@@ -100,7 +94,7 @@ describe('LogarithmMapping', () => {
 
   it('handles min index for each scale', () => {
     for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
-      const mapping = LogarithmMapping.get(scale);
+      const mapping = new LogarithmMapping(scale);
       const minIndex = mapping.mapToIndex(ieee754.MIN_VALUE);
 
       const expectedMinIndex = (ieee754.MIN_NORMAL_EXPONENT << scale) - 1;
@@ -145,7 +139,7 @@ describe('LogarithmMapping', () => {
 
   it('maps max float to max index for each scale', () => {
     for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
-      const mapping = LogarithmMapping.get(scale);
+      const mapping = new LogarithmMapping(scale);
       const index = mapping.mapToIndex(Number.MAX_VALUE);
       const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) << scale) - 1;
       assert.strictEqual(maxIndex, index);

@@ -22,7 +22,7 @@ const MAX_SCALE = 0;
 
 describe('ExponentMapping', () => {
   it('maps expected values for scale 0', () => {
-    const mapping = ExponentMapping.get(0);
+    const mapping = new ExponentMapping(0);
     assert.strictEqual(mapping.scale(), 0);
 
     const expectedMappings = [
@@ -70,7 +70,7 @@ describe('ExponentMapping', () => {
   });
 
   it('maps expected values for min scale', () => {
-    const mapping = ExponentMapping.get(MIN_SCALE);
+    const mapping = new ExponentMapping(MIN_SCALE);
     assert.strictEqual(mapping.scale(), MIN_SCALE);
 
     const expectedMappings = [
@@ -93,7 +93,7 @@ describe('ExponentMapping', () => {
   });
 
   it('maps expected values for scale -1', () => {
-    const mapping = ExponentMapping.get(-1);
+    const mapping = new ExponentMapping(-1);
     assert.strictEqual(mapping.scale(), -1);
 
     const expectedMappings = [
@@ -130,7 +130,7 @@ describe('ExponentMapping', () => {
   });
 
   it('maps expected values for scale -4', () => {
-    const mapping = ExponentMapping.get(-4);
+    const mapping = new ExponentMapping(-4);
     assert.strictEqual(mapping.scale(), -4);
 
     const expectedMappings = [
@@ -227,18 +227,9 @@ describe('ExponentMapping', () => {
     });
   });
 
-  it('throws errors for invalid scales', () => {
-    assert.throws(() => {
-      ExponentMapping.get(1);
-    });
-    assert.throws(() => {
-      ExponentMapping.get(MIN_SCALE - 1);
-    });
-  });
-
   it('handles max index for all scales', () => {
     for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
-      const mapping = ExponentMapping.get(scale);
+      const mapping = new ExponentMapping(scale);
       const index = mapping.mapToIndex(Number.MAX_VALUE);
       const maxIndex = ((ieee754.MAX_NORMAL_EXPONENT + 1) >> -scale) - 1;
       assert.strictEqual(
@@ -259,7 +250,7 @@ describe('ExponentMapping', () => {
 
   it('handles min index for all scales', () => {
     for (let scale = MIN_SCALE; scale <= MAX_SCALE; scale++) {
-      const mapping = ExponentMapping.get(scale);
+      const mapping = new ExponentMapping(scale);
       const minIndex = mapping.mapToIndex(ieee754.MIN_VALUE);
       let expectedMinIndex = ieee754.MIN_NORMAL_EXPONENT >> -scale;
       if (ieee754.MIN_NORMAL_EXPONENT % (1 << -scale) === 0) {

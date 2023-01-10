@@ -17,37 +17,16 @@ import * as ieee754 from './ieee754';
 import * as util from '../util';
 import { Mapping, MappingError } from './types';
 
-const MIN_SCALE = -10;
-const MAX_SCALE = 0;
-
 /**
  * ExponentMapping implements exponential mapping functions for
  * scales <=0. For scales > 0 LogarithmMapping should be used.
  */
 export class ExponentMapping implements Mapping {
-  private static readonly _PREBUILT_MAPPINGS = Array(11)
-    .fill(10)
-    .map((v, i) => new ExponentMapping(v - i));
+  private readonly _shift: number;
 
-  /**
-   * Returns the pre-built mapping for the given scale
-   * @param scale An integer >= -10 and <= 0
-   * @returns {ExponentMapping}
-   */
-  public static get(scale: number) {
-    if (scale > MAX_SCALE) {
-      throw new MappingError(`exponent mapping requires scale <= ${MAX_SCALE}`);
-    }
-    if (scale < MIN_SCALE) {
-      throw new MappingError(
-        `exponent mapping requires a scale > ${MIN_SCALE}`
-      );
-    }
-
-    return ExponentMapping._PREBUILT_MAPPINGS[scale - MIN_SCALE];
+  constructor(scale: number) {
+    this._shift = -scale;
   }
-
-  private constructor(private readonly _shift: number) {}
 
   /**
    * Maps positive floating point values to indexes corresponding to scale
