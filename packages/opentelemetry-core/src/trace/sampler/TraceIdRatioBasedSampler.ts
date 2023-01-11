@@ -19,6 +19,8 @@ import {
   SamplingDecision,
   SamplingResult,
   isValidTraceId,
+  Context,
+  trace,
 } from '@opentelemetry/api';
 
 /**
@@ -33,12 +35,13 @@ export class TraceIdRatioBasedSampler implements Sampler {
     this._upperBound = Math.floor(this._ratio * 0xffffffff);
   }
 
-  shouldSample(context: unknown, traceId: string): SamplingResult {
+  shouldSample(context: Context, traceId: string): SamplingResult {
     return {
       decision:
         isValidTraceId(traceId) && this._accumulate(traceId) < this._upperBound
           ? SamplingDecision.RECORD_AND_SAMPLED
           : SamplingDecision.NOT_RECORD,
+      traceState: trace.getSpanContext(context)?.traceState,
     };
   }
 

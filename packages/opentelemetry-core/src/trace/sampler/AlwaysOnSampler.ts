@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
+import {
+  Context,
+  Sampler,
+  SamplingDecision,
+  SamplingResult,
+  trace,
+} from '@opentelemetry/api';
 
 /**
  * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
  * Sampler that samples all traces.
  */
 export class AlwaysOnSampler implements Sampler {
-  shouldSample(): SamplingResult {
+  shouldSample(context: Context): SamplingResult {
     return {
       decision: SamplingDecision.RECORD_AND_SAMPLED,
+      traceState: trace.getSpanContext(context)?.traceState,
     };
   }
 

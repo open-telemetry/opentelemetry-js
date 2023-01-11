@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isValidTraceId } from '@opentelemetry/api';
+import { Context, isValidTraceId, trace } from '@opentelemetry/api';
 import { Sampler, SamplingDecision, SamplingResult } from '../Sampler';
 
 /** Sampler that samples a given fraction of traces based of trace id deterministically. */
@@ -26,12 +26,13 @@ export class TraceIdRatioBasedSampler implements Sampler {
     this._upperBound = Math.floor(this._ratio * 0xffffffff);
   }
 
-  shouldSample(context: unknown, traceId: string): SamplingResult {
+  shouldSample(context: Context, traceId: string): SamplingResult {
     return {
       decision:
         isValidTraceId(traceId) && this._accumulate(traceId) < this._upperBound
           ? SamplingDecision.RECORD_AND_SAMPLED
           : SamplingDecision.NOT_RECORD,
+      traceState: trace.getSpanContext(context)?.traceState,
     };
   }
 
