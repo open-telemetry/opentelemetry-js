@@ -22,6 +22,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.name`
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
+* fix(sdk-trace): make spans resilient to clock drift [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
 * fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
 * fix(sdk-metrics): fix duplicated registration of metrics for collectors [#3488](https://github.com/open-telemetry/opentelemetry-js/pull/3488) @legendecas
 * fix(core): fix precision loss in numberToHrtime [#3480](https://github.com/open-telemetry/opentelemetry-js/pull/3480) @legendecas

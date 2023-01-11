@@ -27,6 +27,7 @@ import {
   hrTimeToMicroseconds,
   hrTimeToTimeStamp,
   isTimeInput,
+  addHrTimes,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -222,6 +223,36 @@ describe('time', () => {
     });
     it('should return FALSE for undefined', () => {
       assert.strictEqual(isTimeInput(undefined), false);
+    });
+  });
+
+  describe('#addHrTimes', () => {
+    const NANOSECOND_DIGITS = 9;
+    const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
+
+    it('should add two positive times', () => {
+      const output = addHrTimes([10, 20], [30, 40]);
+      assert.deepStrictEqual(output, [40, 60]);
+    });
+    it('should add two negative times', () => {
+      const output = addHrTimes([-10, 20], [-30, 40]);
+      assert.deepStrictEqual(output, [-40, 60]);
+    });
+    it('should add a positive and negative time (result positive)', () => {
+      const output = addHrTimes([-10, 20], [30, 40]);
+      assert.deepStrictEqual(output, [20, 60]);
+    });
+    it('should add a positive and negative time (result negative)', () => {
+      const output = addHrTimes([10, 20], [-30, 40]);
+      assert.deepStrictEqual(output, [-20, 60]);
+    });
+    it('should overflow nanoseconds to seconds', () => {
+      const output = addHrTimes([10, SECOND_TO_NANOSECONDS - 10], [10, 20]);
+      assert.deepStrictEqual(output, [21, 10]);
+    });
+    it('should overflow nanoseconds to seconds (negative)', () => {
+      const output = addHrTimes([-10, SECOND_TO_NANOSECONDS - 10], [-10, 20]);
+      assert.deepStrictEqual(output, [-19, 10]);
     });
   });
 });
