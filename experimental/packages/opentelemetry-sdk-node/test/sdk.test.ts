@@ -553,6 +553,7 @@ describe('Node SDK', () => {
 
       sdk.start();
       const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes();
 
       assertServiceResource(resource, {
         name: 'config-set-name',
