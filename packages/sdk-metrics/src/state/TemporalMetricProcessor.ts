@@ -122,7 +122,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     } else {
       // Call into user code to select aggregation temporality for the instrument.
       aggregationTemporality = collector.selectAggregationTemporality(
-        descriptor.originalInstrumentType
+        descriptor.type
       );
     }
 

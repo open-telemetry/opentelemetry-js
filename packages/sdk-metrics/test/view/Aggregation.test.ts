@@ -69,42 +69,42 @@ describe('DefaultAggregation', () => {
         [
           {
             ...defaultMetricDescriptor,
-            originalInstrumentType: InstrumentType.COUNTER,
+            type: InstrumentType.COUNTER,
           },
           SumAggregator,
         ],
         [
           {
             ...defaultMetricDescriptor,
-            originalInstrumentType: InstrumentType.OBSERVABLE_COUNTER,
+            type: InstrumentType.OBSERVABLE_COUNTER,
           },
           SumAggregator,
         ],
         [
           {
             ...defaultMetricDescriptor,
-            originalInstrumentType: InstrumentType.UP_DOWN_COUNTER,
+            type: InstrumentType.UP_DOWN_COUNTER,
           },
           SumAggregator,
         ],
         [
           {
             ...defaultMetricDescriptor,
-            originalInstrumentType: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+            type: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
           },
           SumAggregator,
         ],
         [
           {
             ...defaultMetricDescriptor,
-            originalInstrumentType: InstrumentType.OBSERVABLE_GAUGE,
+            type: InstrumentType.OBSERVABLE_GAUGE,
           },
           LastValueAggregator,
         ],
         [
           {
             ...defaultMetricDescriptor,
-            originalInstrumentType: InstrumentType.HISTOGRAM,
+            type: InstrumentType.HISTOGRAM,
           },
           HistogramAggregator,
         ],
@@ -112,7 +112,7 @@ describe('DefaultAggregation', () => {
         [
           {
             ...defaultMetricDescriptor,
-            originalInstrumentType: -1 as unknown as InstrumentType,
+            type: -1 as unknown as InstrumentType,
           },
           DropAggregator,
         ],
@@ -122,7 +122,7 @@ describe('DefaultAggregation', () => {
       for (const [descriptor, type] of expectations) {
         assert(
           aggregation.createAggregator(descriptor) instanceof type,
-          `${InstrumentType[descriptor.originalInstrumentType]}`
+          `${InstrumentType[descriptor.type]}`
         );
       }
     });

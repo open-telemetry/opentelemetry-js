@@ -53,12 +53,13 @@ export interface InstrumentDescriptor extends Descriptor {
 
 /**
  * An interface describing an actual instrument or virtual instrument (created by views).
+ * Only intended for internal use. For exporting descriptor data, use {@link Descriptor} instead.
  */
 export interface MetricDescriptor extends Descriptor {
   /**
-   * The original instrument's descriptor.
+   * The original instrument's type.
    */
-  readonly originalInstrumentType: InstrumentType;
+  readonly type: InstrumentType;
 }
 
 export function toExternal(descriptor: MetricDescriptor): InstrumentDescriptor {
@@ -66,7 +67,7 @@ export function toExternal(descriptor: MetricDescriptor): InstrumentDescriptor {
     name: descriptor.name,
     description: descriptor.description,
     unit: descriptor.unit,
-    type: descriptor.originalInstrumentType,
+    type: descriptor.type,
     valueType: descriptor.valueType,
   };
 }
@@ -78,7 +79,7 @@ export function createDescriptor(
 ): MetricDescriptor {
   return {
     name,
-    originalInstrumentType: type,
+    type: type,
     description: options?.description ?? '',
     unit: options?.unit ?? '',
     valueType: options?.valueType ?? ValueType.DOUBLE,
@@ -92,7 +93,7 @@ export function createDescriptorWithView(
   return {
     name: view.name ?? instrument.name,
     description: view.description ?? instrument.description,
-    originalInstrumentType: instrument.originalInstrumentType,
+    type: instrument.type,
     unit: instrument.unit,
     valueType: instrument.valueType,
   };
@@ -105,8 +106,7 @@ export function isDescriptorCompatibleWith(
   return (
     descriptor.name === otherDescriptor.name &&
     descriptor.unit === otherDescriptor.unit &&
-    descriptor.originalInstrumentType ===
-      otherDescriptor.originalInstrumentType &&
+    descriptor.type === otherDescriptor.type &&
     descriptor.valueType === otherDescriptor.valueType
   );
 }

@@ -76,7 +76,7 @@ describe('ViewRegistry', () => {
           const views = registry.findViews(
             {
               ...defaultMetricDescriptor,
-              originalInstrumentType: InstrumentType.COUNTER,
+              type: InstrumentType.COUNTER,
             },
             defaultInstrumentationScope
           );
@@ -89,7 +89,7 @@ describe('ViewRegistry', () => {
           const views = registry.findViews(
             {
               ...defaultMetricDescriptor,
-              originalInstrumentType: InstrumentType.HISTOGRAM,
+              type: InstrumentType.HISTOGRAM,
             },
             defaultInstrumentationScope
           );

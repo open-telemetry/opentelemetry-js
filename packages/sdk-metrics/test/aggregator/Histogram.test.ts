@@ -218,7 +218,7 @@ describe('HistogramAggregator', () => {
         {
           name: 'default_metric',
           description: 'a simple instrument',
-          originalInstrumentType: instrumentType,
+          type: instrumentType,
           unit: '1',
           valueType: ValueType.DOUBLE,
         },

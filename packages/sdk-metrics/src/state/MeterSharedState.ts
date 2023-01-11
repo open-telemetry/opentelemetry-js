@@ -135,9 +135,7 @@ export class MeterSharedState {
     // Fallback to the per-collector aggregations if no view is configured for the instrument.
     if (storages.length === 0) {
       const perCollectorAggregations =
-        this._meterProviderSharedState.selectAggregations(
-          descriptor.originalInstrumentType
-        );
+        this._meterProviderSharedState.selectAggregations(descriptor.type);
       const collectorStorages = perCollectorAggregations.map(
         ([collector, aggregation]) => {
           const compatibleStorage =

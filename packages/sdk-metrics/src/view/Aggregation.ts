@@ -74,7 +74,7 @@ export class SumAggregation extends Aggregation {
   private static MONOTONIC_INSTANCE = new SumAggregator(true);
   private static NON_MONOTONIC_INSTANCE = new SumAggregator(false);
   createAggregator(instrument: MetricDescriptor) {
-    switch (instrument.originalInstrumentType) {
+    switch (instrument.type) {
       case InstrumentType.COUNTER:
       case InstrumentType.OBSERVABLE_COUNTER:
       case InstrumentType.HISTOGRAM: {
@@ -150,7 +150,7 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
 export class DefaultAggregation extends Aggregation {
   private _resolve(instrument: MetricDescriptor): Aggregation {
     // cast to unknown to disable complaints on the (unreachable) fallback.
-    switch (instrument.originalInstrumentType as unknown) {
+    switch (instrument.type as unknown) {
       case InstrumentType.COUNTER:
       case InstrumentType.UP_DOWN_COUNTER:
       case InstrumentType.OBSERVABLE_COUNTER:
@@ -164,9 +164,7 @@ export class DefaultAggregation extends Aggregation {
         return HISTOGRAM_AGGREGATION;
       }
     }
-    api.diag.warn(
-      `Unable to recognize instrument type: ${instrument.originalInstrumentType}`
-    );
+    api.diag.warn(`Unable to recognize instrument type: ${instrument.type}`);
     return DROP_AGGREGATION;
   }
 

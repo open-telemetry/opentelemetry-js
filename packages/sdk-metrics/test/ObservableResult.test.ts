@@ -58,7 +58,7 @@ describe('ObservableResultImpl', () => {
       const observableResult = new ObservableResultImpl({
         name: 'test',
         description: '',
-        originalInstrumentType: InstrumentType.COUNTER,
+        type: InstrumentType.COUNTER,
         unit: '',
         valueType: ValueType.INT,
       });
@@ -117,7 +117,7 @@ describe('BatchObservableResultImpl', () => {
         {
           name: 'test',
           description: '',
-          originalInstrumentType: InstrumentType.COUNTER,
+          type: InstrumentType.COUNTER,
           unit: '',
           valueType: ValueType.INT,
         },

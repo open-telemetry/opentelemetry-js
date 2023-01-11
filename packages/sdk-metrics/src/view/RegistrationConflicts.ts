@@ -25,10 +25,8 @@ export function getIncompatibilityDetails(
   if (existing.unit !== otherDescriptor.unit) {
     incompatibility += `\t- Unit '${existing.unit}' does not match '${otherDescriptor.unit}'\n`;
   }
-  if (
-    existing.originalInstrumentType !== otherDescriptor.originalInstrumentType
-  ) {
-    incompatibility += `\t- Type '${existing.originalInstrumentType}' does not match '${otherDescriptor.originalInstrumentType}'\n`;
+  if (existing.type !== otherDescriptor.type) {
+    incompatibility += `\t- Type '${existing.type}' does not match '${otherDescriptor.type}'\n`;
   }
   if (existing.valueType !== otherDescriptor.valueType) {
     incompatibility += `\t- Value Type '${existing.valueType}' does not match '${otherDescriptor.valueType}'\n`;
@@ -60,7 +58,7 @@ export function getTypeConflictResolutionRecipe(
 ) {
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
-    type: otherDescriptor.originalInstrumentType,
+    type: otherDescriptor.type,
   };
 
   const selectorString = JSON.stringify(selector);
@@ -74,7 +72,7 @@ export function getDescriptionResolutionRecipe(
 ): string {
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
-    type: otherDescriptor.originalInstrumentType,
+    type: otherDescriptor.type,
   };
 
   const selectorString = JSON.stringify(selector);
@@ -98,9 +96,7 @@ export function getConflictResolutionRecipe(
   }
 
   // Conflicts that can be solved via views.
-  if (
-    existing.originalInstrumentType !== otherDescriptor.originalInstrumentType
-  ) {
+  if (existing.type !== otherDescriptor.type) {
     // this will automatically solve possible description conflicts.
     return getTypeConflictResolutionRecipe(existing, otherDescriptor);
   }

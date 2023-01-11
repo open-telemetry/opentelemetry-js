@@ -47,7 +47,7 @@ export abstract class MetricStorage {
   updateDescription(description: string): void {
     this._descriptor = createDescriptor(
       this._descriptor.name,
-      this._descriptor.originalInstrumentType,
+      this._descriptor.type,
       {
         description: description,
         valueType: this._descriptor.valueType,

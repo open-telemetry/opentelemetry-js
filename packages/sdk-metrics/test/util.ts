@@ -57,7 +57,7 @@ export const defaultResource = Resource.default().merge(
 export const defaultMetricDescriptor: MetricDescriptor = {
   name: 'default_metric',
   description: 'a simple instrument',
-  originalInstrumentType: InstrumentType.COUNTER,
+  type: InstrumentType.COUNTER,
   unit: '1',
   valueType: ValueType.DOUBLE,
 };

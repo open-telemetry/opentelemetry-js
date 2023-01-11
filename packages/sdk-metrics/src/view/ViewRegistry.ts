@@ -44,7 +44,7 @@ export class ViewRegistry {
   ): boolean {
     return (
       (selector.getType() === undefined ||
-        instrument.originalInstrumentType === selector.getType()) &&
+        instrument.type === selector.getType()) &&
       selector.getNameFilter().match(instrument.name)
     );
   }
