@@ -81,8 +81,7 @@ export class Resource {
    * Check if async attributes have resolved. This is useful to avoid awaiting
    * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
    *
-   * @returns true if no async attributes promise was provided or if the promise has resolved
-   * and been merged together with the sync attributes.
+   * @returns true if the resource "attributes" property is settled to its final value
    */
   asyncAttributesHaveResolved(): boolean {
     return this._asyncAttributesHaveResolved;
