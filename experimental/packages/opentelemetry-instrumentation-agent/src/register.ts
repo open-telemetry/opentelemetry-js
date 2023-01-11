@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as opentelemetry from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
+import { diag, DiagConsoleLogger } from '@opentelemetry/api';
+import { getEnv } from '@opentelemetry/core';
 
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+diag.setLogger(new DiagConsoleLogger(), getEnv().OTEL_LOG_LEVEL);
 
 const sdk = new opentelemetry.NodeSDK({
   autoDetectResources: true,

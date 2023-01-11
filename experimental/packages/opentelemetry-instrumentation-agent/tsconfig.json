@@ -5,7 +5,9 @@
     "rootDir": "."
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "test/test-app/app.js"
   ],
   "references": []
 }
