@@ -660,6 +660,7 @@ describe('Node SDK', () => {
         });
         sdk.detectResources();
         const resource = sdk['_resource'];
+        await resource.waitForAsyncAttributes();
 
         assert.deepStrictEqual(resource, Resource.empty());
       });
