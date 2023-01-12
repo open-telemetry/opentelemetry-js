@@ -27,11 +27,7 @@ const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
  * Converts a number of milliseconds from epoch to HrTime([seconds, remainder in nanoseconds]).
  * @param epochMillis
  */
-<<<<<<< HEAD
-export function numberToHrtime(epochMillis: number): api.HrTime {
-=======
 export function millisToHrTime(epochMillis: number): api.HrTime {
->>>>>>> 08f597f3a3d71a4852b0afbba120af15ca038121
   const epochSeconds = epochMillis / 1000;
   // Decimals only.
   const seconds = Math.trunc(epochSeconds);
