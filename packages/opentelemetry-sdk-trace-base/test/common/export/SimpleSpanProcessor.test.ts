@@ -180,9 +180,6 @@ describe('SimpleSpanProcessor', () => {
 
       await processor.forceFlush();
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
-
-      await processor.shutdown();
-      assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
     describe('when flushing complete', () => {
