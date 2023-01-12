@@ -187,7 +187,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
             pendingResources.map(resource => resource.waitForAsyncAttributes())
           ).then(doExport, err => {
             globalErrorHandler(err);
-            resolve(err);
+            reject(err);
           });
         }
       });
