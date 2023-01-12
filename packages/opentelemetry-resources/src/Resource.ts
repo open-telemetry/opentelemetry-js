@@ -28,7 +28,14 @@ export class Resource {
   static readonly EMPTY = new Resource({});
   private _syncAttributes: ResourceAttributes;
   private _asyncAttributesPromise: Promise<ResourceAttributes> | undefined;
-  private _asyncAttributesHaveResolved: boolean;
+
+  /**
+   * Check if async attributes have resolved. This is useful to avoid awaiting
+   * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
+   *
+   * @returns true if the resource "attributes" property is settled to its final value
+   */
+  public asyncAttributesHaveResolved: boolean;
 
   /**
    * Returns an empty Resource
@@ -61,30 +68,20 @@ export class Resource {
     public attributes: ResourceAttributes,
     asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
-    this._asyncAttributesHaveResolved = asyncAttributesPromise == null;
+    this.asyncAttributesHaveResolved = asyncAttributesPromise == null;
     this._syncAttributes = attributes;
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
       asyncAttributes => {
         this.attributes = Object.assign({}, this.attributes, asyncAttributes);
-        this._asyncAttributesHaveResolved = true;
+        this.asyncAttributesHaveResolved = true;
         return asyncAttributes;
       },
       err => {
         diag.debug("The resource's async promise rejected: %s", err);
-        this._asyncAttributesHaveResolved = true;
+        this.asyncAttributesHaveResolved = true;
         return {};
       }
     );
-  }
-
-  /**
-   * Check if async attributes have resolved. This is useful to avoid awaiting
-   * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
-   *
-   * @returns true if the resource "attributes" property is settled to its final value
-   */
-  asyncAttributesHaveResolved(): boolean {
-    return this._asyncAttributesHaveResolved;
   }
 
   /**
@@ -93,7 +90,7 @@ export class Resource {
    * has finished.
    */
   async waitForAsyncAttributes(): Promise<void> {
-    if (!this._asyncAttributesHaveResolved) {
+    if (!this.asyncAttributesHaveResolved) {
       await this._asyncAttributesPromise;
     }
   }

@@ -53,7 +53,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
   onStart(_span: Span, _parentContext: Context): void {
     // store the resource's unresolved promise
-    if (!_span.resource.asyncAttributesHaveResolved()) {
+    if (!_span.resource.asyncAttributesHaveResolved) {
       this._unresolvedResources.add(_span.resource.waitForAsyncAttributes());
     }
   }
@@ -85,7 +85,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
         });
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
-    if (span.resource.asyncAttributesHaveResolved()) {
+    if (span.resource.asyncAttributesHaveResolved) {
       void doExport();
     } else {
       span.resource

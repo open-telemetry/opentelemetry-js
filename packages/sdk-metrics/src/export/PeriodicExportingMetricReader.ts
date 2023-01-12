@@ -110,7 +110,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     };
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
-    if (resourceMetrics.resource.asyncAttributesHaveResolved()) {
+    if (resourceMetrics.resource.asyncAttributesHaveResolved) {
       await doExport();
     } else {
       resourceMetrics.resource

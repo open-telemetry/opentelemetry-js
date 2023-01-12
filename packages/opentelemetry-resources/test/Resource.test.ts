@@ -102,8 +102,8 @@ describe('Resource', () => {
       assert.strictEqual(Resource.empty(), Resource.empty());
     });
 
-    it('should return true for asyncAttributesHaveResolved() immediately', () => {
-      assert.ok(Resource.empty().asyncAttributesHaveResolved());
+    it('should return true for asyncAttributesHaveResolved immediately', () => {
+      assert.ok(Resource.empty().asyncAttributesHaveResolved);
     });
   });
 
@@ -112,13 +112,13 @@ describe('Resource', () => {
       sinon.restore();
     });
 
-    it('should return true for asyncAttributesHaveResolved() if no promise provided', () => {
-      assert.ok(new Resource({ foo: 'bar' }).asyncAttributesHaveResolved());
-      assert.ok(Resource.empty().asyncAttributesHaveResolved());
-      assert.ok(Resource.default().asyncAttributesHaveResolved());
+    it('should return true for asyncAttributesHaveResolved if no promise provided', () => {
+      assert.ok(new Resource({ foo: 'bar' }).asyncAttributesHaveResolved);
+      assert.ok(Resource.empty().asyncAttributesHaveResolved);
+      assert.ok(Resource.default().asyncAttributesHaveResolved);
     });
 
-    it('should return true for asyncAttributesHaveResolved() once promise finishes', async () => {
+    it('should return true for asyncAttributesHaveResolved once promise finishes', async () => {
       const clock = sinon.useFakeTimers();
       const resourceResolve = new Resource(
         {},
@@ -134,10 +134,10 @@ describe('Resource', () => {
       );
 
       for (const resource of [resourceResolve, resourceReject]) {
-        assert.ok(!resource.asyncAttributesHaveResolved());
+        assert.ok(!resource.asyncAttributesHaveResolved);
         await clock.nextAsync();
         await resource.waitForAsyncAttributes();
-        assert.ok(resource.asyncAttributesHaveResolved());
+        assert.ok(resource.asyncAttributesHaveResolved);
       }
     });
 
