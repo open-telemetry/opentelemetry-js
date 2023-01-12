@@ -401,7 +401,22 @@ describe('MetricStorageRegistry', () => {
 
       // registered the storage for each collector
       assert.deepStrictEqual(registry.getStorages(collectorHandle), [storage]);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleCollectorStorage(
+          collectorHandle,
+          descriptor
+        ),
+        storage
+      );
+
       assert.deepStrictEqual(registry.getStorages(collectorHandle2), [storage]);
+      assert.strictEqual(
+        registry.findOrUpdateCompatibleCollectorStorage(
+          collectorHandle2,
+          descriptor
+        ),
+        storage
+      );
     });
   });
 });

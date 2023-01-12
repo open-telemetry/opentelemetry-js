@@ -11,7 +11,16 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.9.0
+
+### :rocket: (Enhancement)
+
 * feat(instrumentation-grpc): set net.peer.name and net.peer.port on client spans [#3430](https://github.com/open-telemetry/opentelemetry-js/pull/3430)
 
 ### :bug: (Bug Fix)
@@ -23,9 +32,10 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
 * fix(sdk-metrics): use Date.now() for instrument recording timestamps [#3514](https://github.com/open-telemetry/opentelemetry-js/pull/3514) @MisterSquishy
+* fix(sdk-trace): make spans resilient to clock drift [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
 * fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
-
-### :books: (Refine Doc)
+* fix(sdk-metrics): fix duplicated registration of metrics for collectors [#3488](https://github.com/open-telemetry/opentelemetry-js/pull/3488) @legendecas
+* fix(core): fix precision loss in numberToHrtime [#3480](https://github.com/open-telemetry/opentelemetry-js/pull/3480) @legendecas
 
 ### :house: (Internal)
 
