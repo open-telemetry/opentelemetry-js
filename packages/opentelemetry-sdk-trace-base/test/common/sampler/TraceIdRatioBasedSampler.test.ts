@@ -18,11 +18,12 @@ import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { TraceIdRatioBasedSampler } from '../../../src/sampler/TraceIdRatioBasedSampler';
 
-const spanContext = (traceId = '1') =>
+const spanContext = (traceId = '1', traceState?: api.TraceState) =>
   api.trace.setSpanContext(api.ROOT_CONTEXT, {
     traceId,
     spanId: '1.1',
     traceFlags: api.TraceFlags.NONE,
+    traceState,
   });
 
 const traceId = (part: string) => ('0'.repeat(32) + part).slice(-32);
@@ -169,6 +170,16 @@ describe('TraceIdRatioBasedSampler', () => {
         decision: api.SamplingDecision.NOT_RECORD,
         traceState: undefined,
       }
+    );
+  });
+
+  it('should forward the traceState', () => {
+    const sampler = new TraceIdRatioBasedSampler(1);
+    const traceState = api.createTraceState();
+    assert.strictEqual(
+      sampler.shouldSample(spanContext(traceId('1'), traceState), traceId('1'))
+        .traceState,
+      traceState
     );
   });
 

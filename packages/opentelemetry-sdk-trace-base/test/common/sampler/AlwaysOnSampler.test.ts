@@ -30,4 +30,18 @@ describe('AlwaysOnSampler', () => {
       traceState: undefined,
     });
   });
+
+  it('should forward the traceState', () => {
+    const sampler = new AlwaysOnSampler();
+    const traceState = api.createTraceState();
+    assert.deepStrictEqual(
+      sampler.shouldSample(
+        api.trace.setSpanContext(api.ROOT_CONTEXT, {
+          ...api.INVALID_SPAN_CONTEXT,
+          traceState,
+        })
+      ).traceState,
+      traceState
+    );
+  });
 });
