@@ -44,17 +44,19 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
   async forceFlush(): Promise<void> {
     // await unresolved resources before resolving
-    for (const unresolvedResource of this._unresolvedResources) {
-      await unresolvedResource;
-    }
-
-    return Promise.resolve();
+    await Promise.all(Array.from(this._unresolvedResources));
   }
 
   onStart(_span: Span, _parentContext: Context): void {
     // store the resource's unresolved promise
     if (!_span.resource.asyncAttributesHaveResolved) {
-      this._unresolvedResources.add(_span.resource.waitForAsyncAttributes());
+      const resourcePromise = _span.resource.waitForAsyncAttributes();
+
+      this._unresolvedResources.add(resourcePromise);
+
+      void resourcePromise.then(() =>
+        this._unresolvedResources.delete(resourcePromise)
+      );
     }
   }
 
