@@ -118,7 +118,7 @@ describe('Resource', () => {
       assert.ok(Resource.default().asyncAttributesHaveResolved);
     });
 
-    it('should return true for asyncAttributesHaveResolved once promise finishes', async () => {
+    it('should return true for asyncAttributesHaveResolved once promise settles', async () => {
       const clock = sinon.useFakeTimers();
       const resourceResolve = new Resource(
         {},
