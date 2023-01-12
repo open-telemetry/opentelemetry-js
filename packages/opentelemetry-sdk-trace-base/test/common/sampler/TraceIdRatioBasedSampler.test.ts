@@ -18,11 +18,12 @@ import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { TraceIdRatioBasedSampler } from '../../../src/sampler/TraceIdRatioBasedSampler';
 
-const spanContext = (traceId = '1') => ({
-  traceId,
-  spanId: '1.1',
-  traceFlags: api.TraceFlags.NONE,
-});
+const spanContext = (traceId = '1') =>
+  api.trace.setSpanContext(api.ROOT_CONTEXT, {
+    traceId,
+    spanId: '1.1',
+    traceFlags: api.TraceFlags.NONE,
+  });
 
 const traceId = (part: string) => ('0'.repeat(32) + part).slice(-32);
 
@@ -59,6 +60,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+        traceState: undefined,
       }
     );
   });
@@ -69,6 +71,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+        traceState: undefined,
       }
     );
   });
@@ -79,6 +82,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
@@ -89,6 +93,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
@@ -100,6 +105,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
@@ -111,6 +117,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
@@ -122,6 +129,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
@@ -132,6 +140,7 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler.shouldSample(spanContext(traceId('1')), traceId('1')),
       {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+        traceState: undefined,
       }
     );
 
@@ -142,6 +151,7 @@ describe('TraceIdRatioBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
@@ -150,12 +160,14 @@ describe('TraceIdRatioBasedSampler', () => {
     const sampler = new TraceIdRatioBasedSampler(1);
     assert.deepStrictEqual(sampler.shouldSample(spanContext(''), ''), {
       decision: api.SamplingDecision.NOT_RECORD,
+      traceState: undefined,
     });
 
     assert.deepStrictEqual(
       sampler.shouldSample(spanContext(traceId('g')), traceId('g')),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
@@ -167,17 +179,21 @@ describe('TraceIdRatioBasedSampler', () => {
     const id1 = traceId((Math.floor(0xffffffff * 0.1) - 1).toString(16));
     assert.deepStrictEqual(sampler10.shouldSample(spanContext(id1), id1), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      traceState: undefined,
     });
     assert.deepStrictEqual(sampler20.shouldSample(spanContext(id1), id1), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      traceState: undefined,
     });
 
     const id2 = traceId((Math.floor(0xffffffff * 0.2) - 1).toString(16));
     assert.deepStrictEqual(sampler10.shouldSample(spanContext(id2), id2), {
       decision: api.SamplingDecision.NOT_RECORD,
+      traceState: undefined,
     });
     assert.deepStrictEqual(sampler20.shouldSample(spanContext(id2), id2), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      traceState: undefined,
     });
 
     const id2delta = traceId(Math.floor(0xffffffff * 0.2).toString(16));
@@ -185,12 +201,14 @@ describe('TraceIdRatioBasedSampler', () => {
       sampler10.shouldSample(spanContext(id2delta), id2delta),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
     assert.deepStrictEqual(
       sampler20.shouldSample(spanContext(id2delta), id2delta),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+        traceState: undefined,
       }
     );
   });
