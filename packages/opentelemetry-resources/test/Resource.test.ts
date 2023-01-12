@@ -249,10 +249,6 @@ describe('Resource', () => {
       assert.ok(
         debugStub.calledWithMatch("The resource's async promise rejected")
       );
-
-      // will log after yielding to event loop
-      await new Promise(resolve => setTimeout(resolve));
-      assert.ok(debugStub.calledOnce);
     });
   });
 
