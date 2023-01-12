@@ -84,7 +84,7 @@ export const detectResourcesSync = (
 
       return resource;
     } catch (e) {
-      diag.debug(`${d.constructor.name} failed: ${e.message}`);
+      diag.error(`${d.constructor.name} failed: ${e.message}`);
       return Resource.empty();
     }
   });
