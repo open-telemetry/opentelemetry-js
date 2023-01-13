@@ -17,6 +17,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* chore: fix cross project links and missing implicitly exported types [#3533](https://github.com/open-telemetry/opentelemetry-js/pull/3533) @legendecas
+
 ## 1.9.0
 
 ### :rocket: (Enhancement)
