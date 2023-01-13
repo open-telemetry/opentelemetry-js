@@ -591,10 +591,10 @@ describe('export with retry - real http request destroyed', () => {
 
   beforeEach(() => {
     server = sinon.fakeServer.create({
-      autoRespond: true
+      autoRespond: true,
     });
     collectorExporterConfig = {
-      timeoutMillis: 1500
+      timeoutMillis: 1500,
     };
   });
 
@@ -612,10 +612,13 @@ describe('export with retry - real http request destroyed', () => {
       spans.push(Object.assign({}, mockedReadableSpan));
 
       let retry = 0;
-      server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
-        retry++;
-        xhr.respond(503);
-      });
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          xhr.respond(503);
+        }
+      );
 
       collectorTraceExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
@@ -632,13 +635,13 @@ describe('export with retry - real http request destroyed', () => {
       spans.push(Object.assign({}, mockedReadableSpan));
 
       let retry = 0;
-      server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
-        retry++;
-        xhr.respond(
-          503,
-          {'Retry-After': 3}
-        );
-      });
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          xhr.respond(503, { 'Retry-After': 3 });
+        }
+      );
 
       collectorTraceExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
@@ -654,15 +657,15 @@ describe('export with retry - real http request destroyed', () => {
       spans.push(Object.assign({}, mockedReadableSpan));
 
       let retry = 0;
-      server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
-        retry++;
-        const d = new Date();
-        d.setSeconds(d.getSeconds() + 1);
-        xhr.respond(
-          503,
-          {'Retry-After': d}
-        );
-      });
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          const d = new Date();
+          d.setSeconds(d.getSeconds() + 1);
+          xhr.respond(503, { 'Retry-After': d });
+        }
+      );
 
       collectorTraceExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
@@ -678,15 +681,15 @@ describe('export with retry - real http request destroyed', () => {
       spans.push(Object.assign({}, mockedReadableSpan));
 
       let retry = 0;
-      server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
-        retry++;
-        const d = new Date();
-        d.setSeconds(d.getSeconds() + 120);
-        xhr.respond(
-          503,
-          {'Retry-After': d}
-        );
-      });
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          const d = new Date();
+          d.setSeconds(d.getSeconds() + 120);
+          xhr.respond(503, { 'Retry-After': d });
+        }
+      );
 
       collectorTraceExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
