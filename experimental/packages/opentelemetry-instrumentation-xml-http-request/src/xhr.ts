@@ -389,7 +389,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     function endSpanTimeout(
       eventName: string,
       xhrMem: XhrMem,
-      endTime: api.HrTime
+      performanceEndTime: api.HrTime,
+      endTime: number
     ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
@@ -405,7 +406,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
           span,
           spanUrl,
           sendStartTime,
-          endTime
+          performanceEndTime
         );
         span.addEvent(eventName, endTime);
         plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
@@ -427,13 +428,14 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       if (xhrMem.span) {
         plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
       }
-      const endTime = hrTime();
+      const performanceEndTime = hrTime();
+      const endTime = Date.now();
 
       // the timeout is needed as observer doesn't have yet information
       // when event "load" is called. Also the time may differ depends on
       // browser and speed of computer
       setTimeout(() => {
-        endSpanTimeout(eventName, xhrMem, endTime);
+        endSpanTimeout(eventName, xhrMem, performanceEndTime, endTime);
       }, OBSERVER_WAIT_TIME_MS);
     }
 

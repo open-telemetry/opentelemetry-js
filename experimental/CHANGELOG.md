@@ -8,6 +8,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+* fix(sdk-node): register instrumentations early [#3502](https://github.com/open-telemetry/opentelemetry-js/pull/3502) @flarna
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.35.0
+
+### :rocket: (Enhancement)
+
 * feat(instrumentation-http): monitor error events with events.errorMonitor [#3402](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @legendecas
 * feat(instrumentation-grpc): added grpc metadata client side attributes in instrumentation [#3386](https://github.com/open-telemetry/opentelemetry-js/pull/3386)
 * feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every meter provider update.
@@ -23,10 +35,9 @@ All notable changes to experimental packages in this project will be documented 
 * fix(prometheus-sanitization): replace repeated `_` with a single `_` [3470](https://github.com/open-telemetry/opentelemetry-js/pull/3470) @samimusallam
 * fix(prometheus-serializer): correct string used for NaN [#3477](https://github.com/open-telemetry/opentelemetry-js/pull/3477) @JacksonWeber
 * fix(instrumentation-http): close server span when response finishes [#3407](https://github.com/open-telemetry/opentelemetry-js/pull/3407) @legendecas
-* fix(sdk-node): register instrumentations early [#3502](https://github.com/open-telemetry/opentelemetry-js/pull/3502) @flarna
+* fix(instrumentation-fetch): make spans resilient to clock drift by using Date.now [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
+* fix(instrumentation-xml-http-request): make spans resilient to clock drift by using Date.now [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
 * fix(sdk-node): fix exporter to be read only OTEL_TRACES_EXPORTER is set to a valid exporter [3492] @svetlanabrennan
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
