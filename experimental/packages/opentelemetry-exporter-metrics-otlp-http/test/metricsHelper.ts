@@ -22,7 +22,7 @@ import {
   ObservableCounter,
   ObservableGauge,
   ObservableUpDownCounter,
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { InstrumentationScope, VERSION } from '@opentelemetry/core';
@@ -30,13 +30,13 @@ import {
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader,
-  View
+  View,
 } from '@opentelemetry/sdk-metrics';
 import {
   IExportMetricsServiceRequest,
   IKeyValue,
   IMetric,
-  IResource
+  IResource,
 } from '@opentelemetry/otlp-transformer';
 
 if (typeof Buffer === 'undefined') {
@@ -62,17 +62,17 @@ export const HISTOGRAM_AGGREGATION_VIEW = new View({
   instrumentName: 'int-histogram',
 });
 
-const defaultResource = Resource.default().merge(new Resource({
-  service: 'ui',
-  version: 1,
-  cost: 112.12,
-}));
+const defaultResource = Resource.default().merge(
+  new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  })
+);
 
 let meterProvider = new MeterProvider({ resource: defaultResource });
 let reader = new TestMetricReader();
-meterProvider.addMetricReader(
-  reader
-);
+meterProvider.addMetricReader(reader);
 let meter = meterProvider.getMeter('default', '0.0.1');
 
 export async function collect() {
@@ -82,9 +82,7 @@ export async function collect() {
 export function setUp(views?: View[]) {
   meterProvider = new MeterProvider({ resource: defaultResource, views });
   reader = new TestMetricReader();
-  meterProvider.addMetricReader(
-    reader
-  );
+  meterProvider.addMetricReader(reader);
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 
@@ -104,13 +102,10 @@ export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-observable-gauge'
 ): ObservableGauge {
-  const observableGauge = meter.createObservableGauge(
-    name,
-    {
-      description: 'sample observable gauge description',
-      valueType: ValueType.DOUBLE,
-    }
-  );
+  const observableGauge = meter.createObservableGauge(name, {
+    description: 'sample observable gauge description',
+    valueType: ValueType.DOUBLE,
+  });
   observableGauge.addCallback(callback);
 
   return observableGauge;
@@ -124,18 +119,14 @@ export function mockDoubleCounter(): Counter {
   });
 }
 
-
 export function mockObservableCounter(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-observable-counter'
 ): ObservableCounter {
-  const observableCounter = meter.createObservableCounter(
-    name,
-    {
-      description: 'sample observable counter description',
-      valueType: ValueType.DOUBLE,
-    }
-  );
+  const observableCounter = meter.createObservableCounter(name, {
+    description: 'sample observable counter description',
+    valueType: ValueType.DOUBLE,
+  });
   observableCounter.addCallback(callback);
 
   return observableCounter;
@@ -145,13 +136,10 @@ export function mockObservableUpDownCounter(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-up-down-observable-counter'
 ): ObservableUpDownCounter {
-  const observableUpDownCounter = meter.createObservableUpDownCounter(
-    name,
-    {
-      description: 'sample observable up down counter description',
-      valueType: ValueType.DOUBLE,
-    },
-  );
+  const observableUpDownCounter = meter.createObservableUpDownCounter(name, {
+    description: 'sample observable up down counter description',
+    valueType: ValueType.DOUBLE,
+  });
   observableUpDownCounter.addCallback(callback);
 
   return observableUpDownCounter;
@@ -180,9 +168,7 @@ export const mockedInstrumentationLibraries: InstrumentationScope[] = [
   },
 ];
 
-export function ensureAttributesAreCorrect(
-  attributes: IKeyValue[]
-) {
+export function ensureAttributesAreCorrect(attributes: IKeyValue[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -197,12 +183,13 @@ export function ensureAttributesAreCorrect(
   );
 }
 
-export function ensureWebResourceIsCorrect(
-  resource: IResource
-) {
+export function ensureWebResourceIsCorrect(resource: IResource) {
   assert.strictEqual(resource.attributes.length, 7);
   assert.strictEqual(resource.attributes[0].key, 'service.name');
-  assert.strictEqual(resource.attributes[0].value.stringValue, 'unknown_service');
+  assert.strictEqual(
+    resource.attributes[0].value.stringValue,
+    'unknown_service'
+  );
   assert.strictEqual(resource.attributes[1].key, 'telemetry.sdk.language');
   assert.strictEqual(resource.attributes[1].value.stringValue, 'webjs');
   assert.strictEqual(resource.attributes[2].key, 'telemetry.sdk.name');
@@ -285,7 +272,7 @@ export function ensureObservableGaugeIsCorrect(
           startTimeUnixNano: startTime,
           timeUnixNano: time,
         },
-      ]
+      ],
     },
   });
 }
@@ -311,7 +298,7 @@ export function ensureObservableCounterIsCorrect(
           timeUnixNano: time,
         },
       ],
-      aggregationTemporality: 2
+      aggregationTemporality: 2,
     },
   });
 }
@@ -337,7 +324,7 @@ export function ensureObservableUpDownCounterIsCorrect(
           timeUnixNano: time,
         },
       ],
-      aggregationTemporality: 2
+      aggregationTemporality: 2,
     },
   });
 }
@@ -367,7 +354,7 @@ export function ensureHistogramIsCorrect(
           explicitBounds,
         },
       ],
-      aggregationTemporality: 2
+      aggregationTemporality: 2,
     },
   });
 }

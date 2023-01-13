@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { TracerProvider } from '@opentelemetry/api';
-import { MeterProvider } from '@opentelemetry/api-metrics';
+import { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import { Instrumentation } from './types';
 import { AutoLoaderResult, InstrumentationOption } from './types_internal';
 
@@ -77,6 +76,8 @@ export function enableInstrumentations(
  * Disable instrumentations
  * @param instrumentations
  */
-export function disableInstrumentations(instrumentations: Instrumentation[]): void {
+export function disableInstrumentations(
+  instrumentations: Instrumentation[]
+): void {
   instrumentations.forEach(instrumentation => instrumentation.disable());
 }

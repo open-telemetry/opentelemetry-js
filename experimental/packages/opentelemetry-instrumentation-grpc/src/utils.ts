@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-import { SpanStatusCode, SpanStatus } from '@opentelemetry/api';
+import { SpanStatusCode, SpanStatus, Span } from '@opentelemetry/api';
 import type * as grpcTypes from 'grpc';
 import type * as grpcJsTypes from '@grpc/grpc-js';
 import { IgnoreMatcher } from './types';
+
+// e.g., "dns:otel-productcatalogservice:8080" or "otel-productcatalogservice:8080" or "127.0.0.1:8080"
+export const URI_REGEX =
+  /(?:([A-Za-z0-9+.-]+):(?:\/\/)?)?(?<name>[A-Za-z0-9+.-]+):(?<port>[0-9+.-]+)$/;
 
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
@@ -100,13 +104,46 @@ export const _methodIsIgnored = (
  * Return method and service values getting from grpc name/path
  * @param name the grpc name/path
  */
-export const _extractMethodAndService = (name: string): { service: string, method: string } => {
+export const _extractMethodAndService = (
+  name: string
+): { service: string; method: string } => {
   const serviceMethod = name.replace(/^\//, '').split('/');
   const service = serviceMethod.shift() || '';
   const method = serviceMethod.join('/');
 
-  return ({
+  return {
     service,
-    method
-  });
+    method,
+  };
 };
+
+export function metadataCapture(
+  type: 'request' | 'response',
+  metadataToAdd: string[]
+) {
+  const normalizedMetadataAttributes = new Map(
+    metadataToAdd.map(value => [
+      value.toLowerCase(),
+      value.toLowerCase().replace(/-/g, '_'),
+    ])
+  );
+
+  return (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => {
+    for (const [
+      capturedMetadata,
+      normalizedMetadata,
+    ] of normalizedMetadataAttributes) {
+      const metadataValues = metadata
+        .get(capturedMetadata)
+        .flatMap(value => (typeof value === 'string' ? value.toString() : []));
+
+      if (metadataValues === undefined || metadataValues === []) {
+        continue;
+      }
+
+      const key = `rpc.${type}.metadata.${normalizedMetadata}`;
+
+      span.setAttribute(key, metadataValues);
+    }
+  };
+}

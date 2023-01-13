@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 {
-  const testsContext = require.context('./', true, /test$/);
+  const testsContext = require.context('./common', true);
   testsContext.keys().forEach(testsContext);
 }

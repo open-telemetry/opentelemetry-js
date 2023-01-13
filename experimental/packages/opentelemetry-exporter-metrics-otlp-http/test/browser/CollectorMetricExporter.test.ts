@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
-import { Counter, Histogram, } from '@opentelemetry/api-metrics';
+import {
+  diag,
+  DiagLogger,
+  DiagLogLevel,
+  Counter,
+  Histogram,
+} from '@opentelemetry/api';
 import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
-import { AggregationTemporality, ResourceMetrics, } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationTemporality,
+  ResourceMetrics,
+} from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
 import {
   collect,
   ensureCounterIsCorrect,
-  ensureExportMetricsServiceRequestIsSet, ensureHeadersContain,
+  ensureExportMetricsServiceRequestIsSet,
+  ensureHeadersContain,
   ensureHistogramIsCorrect,
   ensureObservableGaugeIsCorrect,
-  ensureWebResourceIsCorrect, HISTOGRAM_AGGREGATION_VIEW,
+  ensureWebResourceIsCorrect,
+  HISTOGRAM_AGGREGATION_VIEW,
   mockCounter,
   mockHistogram,
   mockObservableGauge,
@@ -53,13 +63,10 @@ describe('OTLPMetricExporter - web', () => {
     stubBeacon = sinon.stub(navigator, 'sendBeacon');
 
     const counter: Counter = mockCounter();
-    mockObservableGauge(
-      observableResult => {
-        observableResult.observe(3, {});
-        observableResult.observe(6, {});
-      },
-      'double-observable-gauge2'
-    );
+    mockObservableGauge(observableResult => {
+      observableResult.observe(3, {});
+      observableResult.observe(6, {});
+    }, 'double-observable-gauge2');
     const histogram: Histogram = mockHistogram();
 
     counter.add(1);
@@ -73,14 +80,13 @@ describe('OTLPMetricExporter - web', () => {
     // Need to stub/spy on the underlying logger as the "diag" instance is global
     debugStub = sinon.stub();
     errorStub = sinon.stub();
-    const nop = () => {
-    };
+    const nop = () => {};
     const diagLogger: DiagLogger = {
       debug: debugStub,
       error: errorStub,
       info: nop,
       verbose: nop,
-      warn: nop
+      warn: nop,
     };
     diag.setLogger(diagLogger, DiagLogLevel.DEBUG);
   });
@@ -96,13 +102,12 @@ describe('OTLPMetricExporter - web', () => {
       beforeEach(() => {
         collectorExporter = new OTLPMetricExporter({
           url: 'http://foo.bar.com',
-          temporalityPreference: AggregationTemporality.CUMULATIVE
+          temporalityPreference: AggregationTemporality.CUMULATIVE,
         });
       });
 
       it('should successfully send metrics using sendBeacon', done => {
-        collectorExporter.export(metrics, () => {
-        });
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(async () => {
           const args = stubBeacon.args[0];
@@ -112,22 +117,36 @@ describe('OTLPMetricExporter - web', () => {
           const json = JSON.parse(body) as IExportMetricsServiceRequest;
 
           // The order of the metrics is not guaranteed.
-          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
-          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge2');
-          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
+            it => it.descriptor.name === 'int-counter'
+          );
+          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
+            it => it.descriptor.name === 'double-observable-gauge2'
+          );
+          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
+            it => it.descriptor.name === 'int-histogram'
+          );
 
-          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
-          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
-          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
+          const metric1 =
+            json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+          const metric2 =
+            json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+          const metric3 =
+            json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
 
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime)
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+                .endTime
+            ),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+                .startTime
+            )
           );
-
 
           assert.ok(
             typeof metric2 !== 'undefined',
@@ -135,8 +154,14 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].startTime),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+                .endTime
+            ),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+                .startTime
+            ),
             6,
             'double-observable-gauge2'
           );
@@ -147,8 +172,14 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].startTime),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+                .endTime
+            ),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+                .startTime
+            ),
             [0, 100],
             [0, 2, 0]
           );
@@ -171,8 +202,7 @@ describe('OTLPMetricExporter - web', () => {
       it('should log the successful message', done => {
         stubBeacon.returns(true);
 
-        collectorExporter.export(metrics, () => {
-        });
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const response: any = debugStub.args[2][0];
@@ -200,7 +230,7 @@ describe('OTLPMetricExporter - web', () => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new OTLPMetricExporter({
           url: 'http://foo.bar.com',
-          temporalityPreference: AggregationTemporality.CUMULATIVE
+          temporalityPreference: AggregationTemporality.CUMULATIVE,
         });
         // Overwrites the start time to make tests consistent
         Object.defineProperty(collectorExporter, '_startTime', {
@@ -213,8 +243,7 @@ describe('OTLPMetricExporter - web', () => {
       });
 
       it('should successfully send the metrics using XMLHttpRequest', done => {
-        collectorExporter.export(metrics, () => {
-        });
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -224,19 +253,34 @@ describe('OTLPMetricExporter - web', () => {
           const body = request.requestBody;
           const json = JSON.parse(body) as IExportMetricsServiceRequest;
           // The order of the metrics is not guaranteed.
-          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
-          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge2');
-          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
+            it => it.descriptor.name === 'int-counter'
+          );
+          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
+            it => it.descriptor.name === 'double-observable-gauge2'
+          );
+          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
+            it => it.descriptor.name === 'int-histogram'
+          );
 
-          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
-          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
-          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
+          const metric1 =
+            json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+          const metric2 =
+            json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+          const metric3 =
+            json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime)
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+                .endTime
+            ),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+                .startTime
+            )
           );
 
           assert.ok(
@@ -245,8 +289,14 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].startTime),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+                .endTime
+            ),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+                .startTime
+            ),
             6,
             'double-observable-gauge2'
           );
@@ -257,8 +307,14 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].startTime),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+                .endTime
+            ),
+            hrTimeToNanoseconds(
+              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+                .startTime
+            ),
             [0, 100],
             [0, 2, 0]
           );
@@ -275,8 +331,7 @@ describe('OTLPMetricExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        collectorExporter.export(metrics, () => {
-        });
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -305,8 +360,7 @@ describe('OTLPMetricExporter - web', () => {
         });
       });
       it('should send custom headers', done => {
-        collectorExporter.export(metrics, () => {
-        });
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -325,12 +379,14 @@ describe('OTLPMetricExporter - web', () => {
       foo: 'bar',
       bar: 'baz',
     };
-    let collectorExporterConfig: (OTLPExporterConfigBase & OTLPMetricExporterOptions) | undefined;
+    let collectorExporterConfig:
+      | (OTLPExporterConfigBase & OTLPMetricExporterOptions)
+      | undefined;
 
     beforeEach(() => {
       collectorExporterConfig = {
         headers: customHeaders,
-        temporalityPreference: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE,
       };
       server = sinon.fakeServer.create();
     });
@@ -341,13 +397,10 @@ describe('OTLPMetricExporter - web', () => {
 
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
-        collectorExporter = new OTLPMetricExporter(
-          collectorExporterConfig
-        );
+        collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       });
       it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorExporter.export(metrics, () => {
-        });
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -364,14 +417,11 @@ describe('OTLPMetricExporter - web', () => {
     describe('when "sendBeacon" is NOT available', () => {
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
-        collectorExporter = new OTLPMetricExporter(
-          collectorExporterConfig
-        );
+        collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       });
 
       it('should successfully send metrics using XMLHttpRequest', done => {
-        collectorExporter.export(metrics, () => {
-        });
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -455,7 +505,8 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
   });
   it('should not add root path when signal url defined in env contains path and ends in /', () => {
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics/';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
+      'http://foo.bar/v1/metrics/';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
       collectorExporter._otlpExporter.url,
@@ -467,9 +518,12 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPMetricExporter({
       headers: {},
-      temporalityPreference: AggregationTemporality.CUMULATIVE
+      temporalityPreference: AggregationTemporality.CUMULATIVE,
     });
-    assert.strictEqual(collectorExporter['_otlpExporter']['_headers'].foo, 'bar');
+    assert.strictEqual(
+      collectorExporter['_otlpExporter']['_headers'].foo,
+      'bar'
+    );
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
   it('should override global headers config with signal headers defined via env', () => {
@@ -477,10 +531,16 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPMetricExporter({
       headers: {},
-      temporalityPreference: AggregationTemporality.CUMULATIVE
+      temporalityPreference: AggregationTemporality.CUMULATIVE,
     });
-    assert.strictEqual(collectorExporter['_otlpExporter']['_headers'].foo, 'boo');
-    assert.strictEqual(collectorExporter['_otlpExporter']['_headers'].bar, 'foo');
+    assert.strictEqual(
+      collectorExporter['_otlpExporter']['_headers'].foo,
+      'boo'
+    );
+    assert.strictEqual(
+      collectorExporter['_otlpExporter']['_headers'].bar,
+      'foo'
+    );
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });

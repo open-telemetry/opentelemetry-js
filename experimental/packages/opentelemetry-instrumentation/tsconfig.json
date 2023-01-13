@@ -1,9 +1,10 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "rootDir": "."
   },
+  "files": [],
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
@@ -13,7 +14,7 @@
       "path": "../../../api"
     },
     {
-      "path": "../opentelemetry-api-metrics"
+      "path": "../../../packages/sdk-metrics"
     }
   ]
 }

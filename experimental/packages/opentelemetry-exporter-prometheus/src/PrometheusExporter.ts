@@ -15,20 +15,13 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import {
-  globalErrorHandler,
-} from '@opentelemetry/core';
+import { globalErrorHandler } from '@opentelemetry/core';
 import {
   Aggregation,
   AggregationTemporality,
-  MetricReader
+  MetricReader,
 } from '@opentelemetry/sdk-metrics';
-import {
-  createServer,
-  IncomingMessage,
-  Server,
-  ServerResponse
-} from 'http';
+import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
 /** Node.js v8.x compat */
@@ -64,7 +57,8 @@ export class PrometheusExporter extends MetricReader {
   constructor(config: ExporterConfig = {}, callback?: () => void) {
     super({
       aggregationSelector: _instrumentType => Aggregation.Default(),
-      aggregationTemporalitySelector: _instrumentType => AggregationTemporality.CUMULATIVE
+      aggregationTemporalitySelector: _instrumentType =>
+        AggregationTemporality.CUMULATIVE,
     });
     this._host =
       config.host ||
@@ -127,7 +121,7 @@ export class PrometheusExporter extends MetricReader {
             diag.debug('Prometheus exporter was stopped');
           } else {
             if (
-              ((err as unknown) as { code: string }).code !==
+              (err as unknown as { code: string }).code !==
               'ERR_SERVER_NOT_RUNNING'
             ) {
               globalErrorHandler(err);
@@ -182,7 +176,10 @@ export class PrometheusExporter extends MetricReader {
     request: IncomingMessage,
     response: ServerResponse
   ) => {
-    if (request.url != null && new URL(request.url, this._baseUrl).pathname === this._endpoint) {
+    if (
+      request.url != null &&
+      new URL(request.url, this._baseUrl).pathname === this._endpoint
+    ) {
       this._exportMetrics(response);
     } else {
       this._notFound(response);
@@ -195,19 +192,21 @@ export class PrometheusExporter extends MetricReader {
   private _exportMetrics = (response: ServerResponse) => {
     response.statusCode = 200;
     response.setHeader('content-type', 'text/plain');
-    this.collect()
-      .then(
-        collectionResult => {
-          const { resourceMetrics, errors } = collectionResult;
-          if (errors.length) {
-            diag.error('PrometheusExporter: metrics collection errors', ...errors);
-          }
-          response.end(this._serializer.serialize(resourceMetrics));
-        },
-        err => {
-          response.end(`# failed to export metrics: ${err}`);
+    this.collect().then(
+      collectionResult => {
+        const { resourceMetrics, errors } = collectionResult;
+        if (errors.length) {
+          diag.error(
+            'PrometheusExporter: metrics collection errors',
+            ...errors
+          );
         }
-      );
+        response.end(this._serializer.serialize(resourceMetrics));
+      },
+      err => {
+        response.end(`# failed to export metrics: ${err}`);
+      }
+    );
   };
 
   /**

@@ -21,6 +21,8 @@ import {
   InstrumentationConfig,
 } from '../../src';
 
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
+
 interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
 }
@@ -54,13 +56,36 @@ describe('BaseInstrumentation', () => {
 
   describe('constructor', () => {
     it('should enable instrumentation by default', () => {
-      let called = false;
+      let enableCalled = false;
+      let updateMetricInstrumentsCalled = false;
       class TestInstrumentation2 extends TestInstrumentation {
         override enable() {
+          enableCalled = true;
+        }
+        override _updateMetricInstruments() {
+          updateMetricInstrumentsCalled = true;
+        }
+      }
+      instrumentation = new TestInstrumentation2();
+      assert.strictEqual(enableCalled, true);
+      assert.strictEqual(updateMetricInstrumentsCalled, true);
+    });
+  });
+
+  describe('setMeterProvider', () => {
+    let otelTestingMeterProvider: MeterProvider;
+    beforeEach(() => {
+      otelTestingMeterProvider = new MeterProvider();
+    });
+    it('should call _updateMetricInstruments', () => {
+      let called = true;
+      class TestInstrumentation2 extends TestInstrumentation {
+        override _updateMetricInstruments() {
           called = true;
         }
       }
       instrumentation = new TestInstrumentation2();
+      instrumentation.setMeterProvider(otelTestingMeterProvider);
       assert.strictEqual(called, true);
     });
   });

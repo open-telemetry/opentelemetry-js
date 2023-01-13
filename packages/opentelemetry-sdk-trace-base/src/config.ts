@@ -15,11 +15,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import {
-  getEnv,
-  TracesSamplerValues,
-  ENVIRONMENT,
-} from '@opentelemetry/core';
+import { getEnv, TracesSamplerValues, ENVIRONMENT } from '@opentelemetry/core';
 import { Sampler } from './Sampler';
 import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
 import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
@@ -48,7 +44,8 @@ export function loadDefaultConfig() {
       attributeCountLimit: getEnv().OTEL_ATTRIBUTE_COUNT_LIMIT,
     },
     spanLimits: {
-      attributeValueLengthLimit: getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeValueLengthLimit:
+        getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
       attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
       linkCountLimit: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
       eventCountLimit: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
@@ -77,10 +74,14 @@ export function buildSamplerFromEnv(
         root: new AlwaysOffSampler(),
       });
     case TracesSamplerValues.TraceIdRatio:
-      return new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment));
+      return new TraceIdRatioBasedSampler(
+        getSamplerProbabilityFromEnv(environment)
+      );
     case TracesSamplerValues.ParentBasedTraceIdRatio:
       return new ParentBasedSampler({
-        root: new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment)),
+        root: new TraceIdRatioBasedSampler(
+          getSamplerProbabilityFromEnv(environment)
+        ),
       });
     default:
       diag.error(

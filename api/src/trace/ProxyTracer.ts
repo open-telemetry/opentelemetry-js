@@ -60,7 +60,11 @@ export class ProxyTracer implements Tracer {
       return this._delegate;
     }
 
-    const tracer = this._provider.getDelegateTracer(this.name, this.version, this.options);
+    const tracer = this._provider.getDelegateTracer(
+      this.name,
+      this.version,
+      this.options
+    );
 
     if (!tracer) {
       return NOOP_TRACER;
@@ -72,5 +76,9 @@ export class ProxyTracer implements Tracer {
 }
 
 export interface TracerDelegator {
-  getDelegateTracer(name: string, version?: string, options?: TracerOptions): Tracer | undefined;
+  getDelegateTracer(
+    name: string,
+    version?: string,
+    options?: TracerOptions
+  ): Tracer | undefined;
 }

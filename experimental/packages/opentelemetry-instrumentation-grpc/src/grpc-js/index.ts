@@ -20,7 +20,7 @@ import {
   isWrapped,
 } from '@opentelemetry/instrumentation';
 import { InstrumentationBase } from '@opentelemetry/instrumentation';
-import { GrpcInstrumentationConfig } from '../types';
+import { GrpcInstrumentationConfig, metadataCaptureType } from '../types';
 import {
   ServerCallWithMeta,
   SendUnaryDataCallback,
@@ -49,17 +49,20 @@ import {
   getMetadata,
 } from './clientUtils';
 import { EventEmitter } from 'events';
-import { _extractMethodAndService } from '../utils';
+import { _extractMethodAndService, metadataCapture, URI_REGEX } from '../utils';
 import { AttributeValues } from '../enums/AttributeValues';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
+  private _metadataCapture: metadataCaptureType;
+
   constructor(
     name: string,
     version: string,
-    config?: GrpcInstrumentationConfig,
+    config?: GrpcInstrumentationConfig
   ) {
     super(name, version, config);
+    this._metadataCapture = this._createMetadataCapture();
   }
 
   init() {
@@ -122,6 +125,11 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     return super.getConfig();
   }
 
+  override setConfig(config?: GrpcInstrumentationConfig): void {
+    super.setConfig(config);
+    this._metadataCapture = this._createMetadataCapture();
+  }
+
   /**
    * Patch for grpc.Server.prototype.register(...) function. Provides auto-instrumentation for
    * client_stream, server_stream, bidi, unary server handler calls.
@@ -182,7 +190,9 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                 kind: SpanKind.SERVER,
               };
 
-              instrumentation._diag.debug(`patch func: ${JSON.stringify(spanOptions)}`);
+              instrumentation._diag.debug(
+                `patch func: ${JSON.stringify(spanOptions)}`
+              );
 
               context.with(
                 propagation.extract(ROOT_CONTEXT, call.metadata, {
@@ -195,7 +205,8 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [SemanticAttributes.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
+                      [SemanticAttributes.RPC_SYSTEM]:
+                        AttributeValues.RPC_SYSTEM,
                       [SemanticAttributes.RPC_METHOD]: method,
                       [SemanticAttributes.RPC_SERVICE]: service,
                     });
@@ -298,8 +309,32 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
             [SemanticAttributes.RPC_METHOD]: method,
             [SemanticAttributes.RPC_SERVICE]: service,
           });
+        // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
+        const parsedUri = URI_REGEX.exec(this.getChannel().getTarget());
+        if (parsedUri != null && parsedUri.groups != null) {
+          span.setAttribute(
+            SemanticAttributes.NET_PEER_NAME,
+            parsedUri.groups['name']
+          );
+          span.setAttribute(
+            SemanticAttributes.NET_PEER_PORT,
+            parseInt(parsedUri.groups['port'])
+          );
+        }
+
+        instrumentation._metadataCapture.client.captureRequestMetadata(
+          span,
+          metadata
+        );
+
         return context.with(trace.setSpan(context.active(), span), () =>
-          makeGrpcClientRemoteCall(original, args, metadata, this)(span)
+          makeGrpcClientRemoteCall(
+            instrumentation._metadataCapture,
+            original,
+            args,
+            metadata,
+            this
+          )(span)
         );
       }
       Object.assign(clientMethodTrace, original);
@@ -333,5 +368,22 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         );
       }
     });
+  }
+
+  private _createMetadataCapture(): metadataCaptureType {
+    const config = this.getConfig();
+
+    return {
+      client: {
+        captureRequestMetadata: metadataCapture(
+          'request',
+          config.metadataToSpanAttributes?.client?.requestMetadata ?? []
+        ),
+        captureResponseMetadata: metadataCapture(
+          'response',
+          config.metadataToSpanAttributes?.client?.responseMetadata ?? []
+        ),
+      },
+    };
   }
 }

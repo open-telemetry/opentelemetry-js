@@ -89,11 +89,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
   constructor(config?: XMLHttpRequestInstrumentationConfig) {
-    super(
-      '@opentelemetry/instrumentation-xml-http-request',
-      VERSION,
-      config
-    );
+    super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
   }
 
   init() {}
@@ -181,8 +177,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   }
 
   private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
-    const applyCustomAttributesOnSpan = this._getConfig()
-      .applyCustomAttributesOnSpan;
+    const applyCustomAttributesOnSpan =
+      this._getConfig().applyCustomAttributesOnSpan;
     if (typeof applyCustomAttributesOnSpan === 'function') {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, xhr),
@@ -245,7 +241,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _clearResources() {
     if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
-      ((otperformance as unknown) as Performance).clearResourceTimings();
+      (otperformance as unknown as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -274,7 +270,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       // ts thinks this is the perf_hooks module, but it is the browser performance api
-      resources = ((otperformance as unknown) as Performance).getEntriesByType(
+      resources = (otperformance as unknown as Performance).getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
     }
@@ -339,7 +335,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       kind: api.SpanKind.CLIENT,
       attributes: {
         [SemanticAttributes.HTTP_METHOD]: method,
-        [SemanticAttributes.HTTP_URL]: url,
+        [SemanticAttributes.HTTP_URL]: parseUrl(url).toString(),
       },
     });
 
@@ -393,7 +389,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     function endSpanTimeout(
       eventName: string,
       xhrMem: XhrMem,
-      endTime: api.HrTime
+      performanceEndTime: api.HrTime,
+      endTime: number
     ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
@@ -409,7 +406,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
           span,
           spanUrl,
           sendStartTime,
-          endTime
+          performanceEndTime
         );
         span.addEvent(eventName, endTime);
         plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
@@ -431,13 +428,14 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       if (xhrMem.span) {
         plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
       }
-      const endTime = hrTime();
+      const performanceEndTime = hrTime();
+      const endTime = Date.now();
 
       // the timeout is needed as observer doesn't have yet information
       // when event "load" is called. Also the time may differ depends on
       // browser and speed of computer
       setTimeout(() => {
-        endSpanTimeout(eventName, xhrMem, endTime);
+        endSpanTimeout(eventName, xhrMem, performanceEndTime, endTime);
       }, OBSERVER_WAIT_TIME_MS);
     }
 

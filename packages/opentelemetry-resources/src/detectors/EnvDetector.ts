@@ -117,7 +117,7 @@ class EnvDetector implements Detector {
       if (!this._isValid(value)) {
         throw new Error(`Attribute value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
       }
-      attributes[key] = value;
+      attributes[key] = decodeURIComponent(value);
     }
     return attributes;
   }
@@ -130,13 +130,14 @@ class EnvDetector implements Detector {
    * @returns Whether the String is valid.
    */
   private _isValid(name: string): boolean {
-    return name.length <= this._MAX_LENGTH && this._isPrintableString(name);
+    return name.length <= this._MAX_LENGTH && this._isBaggageOctetString(name);
   }
 
-  private _isPrintableString(str: string): boolean {
+  // https://www.w3.org/TR/baggage/#definition
+  private _isBaggageOctetString(str: string): boolean {
     for (let i = 0; i < str.length; i++) {
-      const ch: string = str.charAt(i);
-      if (ch < ' ' || ch >= '~') {
+      const ch = str.charCodeAt(i);
+      if (ch < 0x21 || ch === 0x2c || ch === 0x3b || ch === 0x5c || ch > 0x7e) {
         return false;
       }
     }

@@ -4,9 +4,7 @@
   <strong>
     <a href="https://opentelemetry.io/docs/js/getting-started/">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
+    <a href="https://open-telemetry.github.io/opentelemetry-js">API and SDK Reference</a>
   </strong>
 </p>
 
@@ -41,43 +39,15 @@
 
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
 
-## Compatibility Matrix
+## Quick Start
 
-| API Version | Core version | Experimental Packages |
-| ----------- | ------------ | --------------------- |
-| 1.2.x       | 1.7.x        | 0.33.x                |
-| 1.2.x       | 1.6.x        | 0.32.x                |
-| 1.1.x       | 1.5.x        | 0.31.x                |
-| 1.1.x       | 1.4.x        | 0.30.x                |
-| 1.1.x       | 1.2.x, 1.3.x | 0.29.x                |
-| 1.1.x       | 1.1.x        | 0.28.x                |
-| 1.0.x       | 1.0.x        | 0.26.x, 0.27.x        |
-| 1.0.x       | 0.26.x       | -----                 |
-| 1.0.x       | 0.25.x       | -----                 |
-| 1.0.x       | 0.24.x       | -----                 |
-| 1.0.x       | 0.23.x       | -----                 |
-| 1.0.x       | 0.22.x       | -----                 |
-| 0.21.x      | 0.21.x       | -----                 |
-| 0.20.x      | 0.20.x       | -----                 |
-| v1.0.0-rc.3 | 0.19.x       | -----                 |
-| 0.18.x      | 0.18.x       | -----                 |
-|             | 0.17.x       | -----                 |
-|             | 0.16.x       | -----                 |
-|             | 0.15.x       | -----                 |
-|             | 0.14.x       | -----                 |
-|             | 0.13.x       | -----                 |
-|             | 0.12.x       | -----                 |
-|             | 0.11.x       | -----                 |
+The following describes how to set up tracing for a basic web application.
+For more detailed documentation, see the website at <https://opentelemetry.io/docs/instrumentation/js/>.
 
-## Versioning
+### Installation
 
-The current version for each package can be found in the respective `package.json` file for that module. For additional details see the [versioning and stability][spec-versioning] document in the specification.
-
-## Quick start
-
-### Application Owner
-
-#### Install Dependencies
+Dependencies with the `latest` tag on NPM should be compatible with each other.
+See the [version compatibility matrix](#package-version-compatibility) below for more information.
 
 ```shell
 npm install --save @opentelemetry/api
@@ -87,7 +57,7 @@ npm install --save @opentelemetry/auto-instrumentations-node
 
 **Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
 
-#### Instantiate Tracing
+### Set up Tracing
 
 ```js
 // tracing.js
@@ -127,7 +97,7 @@ process.on('SIGTERM', () => {
 });
 ```
 
-#### Run Your Application
+### Run Your Application
 
 ```shell
 node -r ./tracing.js app.js
@@ -135,7 +105,7 @@ node -r ./tracing.js app.js
 
 The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](https://opentelemetry.io/docs/js/getting-started/). For more information about automatic instrumentation see [@opentelemetry/sdk-trace-node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/sdk-trace-base][otel-tracing]
 
-### Library Author
+## Library Author
 
 If you are a library author looking to build OpenTelemetry into your library, please see [the documentation][docs]. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an [Application Owner](#application-owner) uses a different SDK implementation.
 
@@ -160,13 +130,39 @@ Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, becaus
 Automated browser tests are run in the latest version of Headless Chrome.
 There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.
 
+## Package Version Compatibility
+
+OpenTelemetry is released as a set of distinct packages in 3 categories: API, stable SDK, and experimental.
+The API is located at [/api](/api/), the stable SDK packages are in the [/packages](/packages/) directory, and the experimental packages are listed in the [/experimental/packages](/experimental/packages/) directory.
+There may also be API packages for experimental signals in the experimental directory.
+All stable packages are released with the same version, and all experimental packages are released with the same version.
+The below table describes which versions of each set of packages are expected to work together.
+
+| API   | Stable Packages | Experimental Packages |
+| ----- | --------------- | --------------------- |
+| 1.3.x | 1.9.x           | 0.35.x                |
+| 1.3.x | 1.8.x           | 0.34.x                |
+| 1.2.x | 1.7.x           | 0.33.x                |
+| 1.2.x | 1.6.x           | 0.32.x                |
+| 1.1.x | 1.5.x           | 0.31.x                |
+| 1.1.x | 1.4.x           | 0.30.x                |
+| 1.1.x | 1.3.x           | 0.29.x                |
+| 1.1.x | 1.2.x           | 0.29.x                |
+| 1.1.x | 1.1.x           | 0.28.x                |
+| 1.0.x | 1.0.x           | 0.27.x                |
+| 1.0.x | 1.0.x           | 0.26.x                |
+
+## Versioning
+
+The current version for each package can be found in the respective `package.json` file for that module. For additional details see the [versioning and stability][spec-versioning] document in the specification.
+
 ## Feature Status
 
-| Signal  | API Status  | SDK Status        |
-| ------- | ----------- | ----------------- |
-| Tracing | Stable      | Release Candidate |
-| Metrics | Development | Development       |
-| Logs    | Roadmap     | Roadmap           |
+| Signal  | API Status  | SDK Status  |
+| ------- | ----------- | ----------- |
+| Tracing | Stable      | Stable      |
+| Metrics | Stable      | Stable      |
+| Logs    | Development | Development |
 
 For a more detailed breakdown of feature support see the [specification compliance matrix][compliance-matrix].
 
@@ -554,7 +550,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web
-[otel-api]: https://github.com/open-telemetry/opentelemetry-js-api
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
 [otel-propagator-b3]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3
 

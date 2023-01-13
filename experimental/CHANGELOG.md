@@ -8,13 +8,55 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.35.0
+
+### :rocket: (Enhancement)
+
+* feat(instrumentation-http): monitor error events with events.errorMonitor [#3402](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @legendecas
+* feat(instrumentation-grpc): added grpc metadata client side attributes in instrumentation [#3386](https://github.com/open-telemetry/opentelemetry-js/pull/3386)
+* feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every meter provider update.
+* feat(api-logs): add the `SeverityNumber` enumeration. [#3443](https://github.com/open-telemetry/opentelemetry-js/pull/3443/) @fuaiyi
+* feat(sdk-node): configure no-op sdk with `OTEL_SDK_DISABLED` environment variable [#3485](https://github.com/open-telemetry/opentelemetry-js/pull/3485/files/2211c78aec39aeb6b4b3dae71844edf8ce234d20)  @RazGvili
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-xhr): http.url attribute should be absolute [#3200](https://github.com/open-telemetry/opentelemetry-js/pull/3200) @t2t2
+* fix(instrumentation-grpc): always set grpc semcov status code attribute with numeric value [#3076](https://github.com/open-telemetry/opentelemetry-js/pull/3076) @blumamir
+* fix(instrumentation): only call `onRequire` for full matches on core modules with sub-paths [#3451](https://github.com/open-telemetry/opentelemetry-js/pull/3451) @mhassan1
+* fix(instrumentation): add back support for absolute paths via `require-in-the-middle` [#3457](https://github.com/open-telemetry/opentelemetry-js/pull/3457) @mhassan1
+* fix(prometheus-sanitization): replace repeated `_` with a single `_` [3470](https://github.com/open-telemetry/opentelemetry-js/pull/3470) @samimusallam
+* fix(prometheus-serializer): correct string used for NaN [#3477](https://github.com/open-telemetry/opentelemetry-js/pull/3477) @JacksonWeber
+* fix(instrumentation-http): close server span when response finishes [#3407](https://github.com/open-telemetry/opentelemetry-js/pull/3407) @legendecas
+* fix(instrumentation-fetch): make spans resilient to clock drift by using Date.now [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
+* fix(instrumentation-xml-http-request): make spans resilient to clock drift by using Date.now [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
+* fix(sdk-node): fix exporter to be read only OTEL_TRACES_EXPORTER is set to a valid exporter [3492] @svetlanabrennan
+
+### :house: (Internal)
+
+* chore(otlp-proto-exporter-base): upgrade protobufjs to 7.1.2 and relax versioning [#3433](https://github.com/open-telemetry/opentelemetry-js/pull/3433) @seemk
+
+## 0.34.0
+
+* `@opentelemetry/sdk-metrics` moved to [packages/sdk-metrics](../packages/sdk-metrics)
+* `@opentelemetry/api-metrics` deprecated and merged into [api](../api)
+
+### :rocket: (Enhancement)
+
 * feat(metrics-sdk): Add tracing suppresing for Metrics Export [#3332](https://github.com/open-telemetry/opentelemetry-js/pull/3332) @hectorhdzg
 * feat(instrumentation): implement `require-in-the-middle` singleton [#3161](https://github.com/open-telemetry/opentelemetry-js/pull/3161) @mhassan1
 * feat(sdk-node): configure trace exporter with environment variables [#3143](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @svetlanabrennan
 * feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
 * feat(prometheus): serialize resource as target_info gauge [#3300](https://github.com/open-telemetry/opentelemetry-js/pull/3300) @pichlermarc
+* feat(detectors): add browser detector module [#3292](https://github.com/open-telemetry/opentelemetry-js/pull/3292) @abinet18
 * deps: remove unused proto-loader dependencies and update grpc-js and proto-loader versions [#3337](https://github.com/open-telemetry/opentelemetry-js/pull/3337) @seemk
 * feat(metrics-exporters): configure temporality via environment variable [#3305](https://github.com/open-telemetry/opentelemetry-js/pull/3305) @pichlermarc
+* feat(console-metric-exporter): add temporality configuration [#3387](https://github.com/open-telemetry/opentelemetry-js/pull/3387) @pichlermarc
 * feat(otlp-exporter-base): add retries [#3207](https://github.com/open-telemetry/opentelemetry-js/pull/3207) @svetlanabrennan
 
 ### :bug: (Bug Fix)
@@ -31,6 +73,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * ci(instrumentation-http): remove got devDependency
   [#3347](https://github.com/open-telemetry/opentelemetry-js/issues/3347) @dyladan
+* deps(instrumentation-http): move sdk-metrics to dev dependencies [#3380](https://github.com/open-telemetry/opentelemetry-js/issues/3380) @pichlermarc
 
 ## 0.33.0
 
@@ -128,10 +171,11 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
-* fix(sdk-metrics-base): fix PeriodicExportingMetricReader keeping Node.js process from exiting
-  [#3106](https://github.com/open-telemetry/opentelemetry-js/pull/3106) @seemk
-* fix(otlp-proto): fixes [#2791](https://github.com/open-telemetry/opentelemetry-js/issues/2791) otlp proto exporters no longer share a single global proto definition
-  [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
+* fix(instrumentation-grpc): always set grpc semcov status code attribute with numeric value [#3076](https://github.com/open-telemetry/opentelemetry-js/pull/3076) @blumamir
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
 
 ## 0.30.0
 

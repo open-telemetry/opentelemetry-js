@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ValueType } from '@opentelemetry/api-metrics';
+import { ValueType } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
   InstrumentType,
   MetricData,
-  ResourceMetrics
+  ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
@@ -93,14 +93,17 @@ describe('Metrics', () => {
               },
               {
                 stringValue: 'attribute value 2',
-              }
-            ]
+              },
+            ],
           },
         },
       },
     ];
 
-    function createCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+    function createCounterData(
+      value: number,
+      aggregationTemporality: AggregationTemporality
+    ): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -118,12 +121,15 @@ describe('Metrics', () => {
             startTime: START_TIME,
             endTime: END_TIME,
             attributes: ATTRIBUTES,
-          }
-        ]
+          },
+        ],
       };
     }
 
-    function createUpDownCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+    function createUpDownCounterData(
+      value: number,
+      aggregationTemporality: AggregationTemporality
+    ): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -140,13 +146,16 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: ATTRIBUTES
-          }
-        ]
+            attributes: ATTRIBUTES,
+          },
+        ],
       };
     }
 
-    function createObservableCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+    function createObservableCounterData(
+      value: number,
+      aggregationTemporality: AggregationTemporality
+    ): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -164,12 +173,15 @@ describe('Metrics', () => {
             startTime: START_TIME,
             endTime: END_TIME,
             attributes: ATTRIBUTES,
-          }
-        ]
+          },
+        ],
       };
     }
 
-    function createObservableUpDownCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+    function createObservableUpDownCounterData(
+      value: number,
+      aggregationTemporality: AggregationTemporality
+    ): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -187,11 +199,10 @@ describe('Metrics', () => {
             startTime: START_TIME,
             endTime: END_TIME,
             attributes: ATTRIBUTES,
-          }
-        ]
+          },
+        ],
       };
     }
-
 
     function createObservableGaugeData(value: number): MetricData {
       return {
@@ -210,17 +221,20 @@ describe('Metrics', () => {
             startTime: START_TIME,
             endTime: END_TIME,
             attributes: ATTRIBUTES,
-          }
-        ]
+          },
+        ],
       };
     }
 
-    function createHistogramMetrics(count: number,
+    function createHistogramMetrics(
+      count: number,
       sum: number,
       boundaries: number[],
-      counts: number[], aggregationTemporality: AggregationTemporality,
+      counts: number[],
+      aggregationTemporality: AggregationTemporality,
       min?: number,
-      max?: number): MetricData {
+      max?: number
+    ): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -240,14 +254,14 @@ describe('Metrics', () => {
               max: max,
               buckets: {
                 boundaries: boundaries,
-                counts: counts
-              }
+                counts: counts,
+              },
             },
             startTime: START_TIME,
             endTime: END_TIME,
             attributes: ATTRIBUTES,
-          }
-        ]
+          },
+        ],
       };
     }
 
@@ -257,22 +271,23 @@ describe('Metrics', () => {
       });
       return {
         resource: resource,
-        scopeMetrics:
-          [
-            {
-              scope: {
-                name: 'mylib',
-                version: '0.1.0',
-                schemaUrl: expectedSchemaUrl
-              },
-              metrics: metricData,
-            }
-          ]
+        scopeMetrics: [
+          {
+            scope: {
+              name: 'mylib',
+              version: '0.1.0',
+              schemaUrl: expectedSchemaUrl,
+            },
+            metrics: metricData,
+          },
+        ],
       };
     }
 
     it('serializes a monotonic sum metric record', () => {
-      const metrics = createResourceMetrics([createCounterData(10, AggregationTemporality.DELTA)]);
+      const metrics = createResourceMetrics([
+        createCounterData(10, AggregationTemporality.DELTA),
+      ]);
       const exportRequest = createExportMetricsServiceRequest([metrics]);
       assert.ok(exportRequest);
 
@@ -299,7 +314,8 @@ describe('Metrics', () => {
                           asInt: 10,
                         },
                       ],
-                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      aggregationTemporality:
+                        EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
                       isMonotonic: true,
                     },
                   },
@@ -312,7 +328,9 @@ describe('Metrics', () => {
     });
 
     it('serializes a non-monotonic sum metric record', () => {
-      const metrics = createResourceMetrics([createUpDownCounterData(10, AggregationTemporality.DELTA)]);
+      const metrics = createResourceMetrics([
+        createUpDownCounterData(10, AggregationTemporality.DELTA),
+      ]);
       const exportRequest = createExportMetricsServiceRequest([metrics]);
       assert.ok(exportRequest);
 
@@ -339,7 +357,8 @@ describe('Metrics', () => {
                           asInt: 10,
                         },
                       ],
-                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      aggregationTemporality:
+                        EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
                       isMonotonic: false,
                     },
                   },
@@ -352,9 +371,11 @@ describe('Metrics', () => {
     });
 
     it('serializes an observable monotonic sum metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest(
-        [createResourceMetrics([createObservableCounterData(10, AggregationTemporality.DELTA)])]
-      );
+      const exportRequest = createExportMetricsServiceRequest([
+        createResourceMetrics([
+          createObservableCounterData(10, AggregationTemporality.DELTA),
+        ]),
+      ]);
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -380,7 +401,8 @@ describe('Metrics', () => {
                           asInt: 10,
                         },
                       ],
-                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      aggregationTemporality:
+                        EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
                       isMonotonic: true,
                     },
                   },
@@ -393,9 +415,11 @@ describe('Metrics', () => {
     });
 
     it('serializes an observable non-monotonic sum metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest(
-        [createResourceMetrics([createObservableUpDownCounterData(10, AggregationTemporality.DELTA)])]
-      );
+      const exportRequest = createExportMetricsServiceRequest([
+        createResourceMetrics([
+          createObservableUpDownCounterData(10, AggregationTemporality.DELTA),
+        ]),
+      ]);
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -421,7 +445,8 @@ describe('Metrics', () => {
                           asInt: 10,
                         },
                       ],
-                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      aggregationTemporality:
+                        EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
                       isMonotonic: false,
                     },
                   },
@@ -434,9 +459,9 @@ describe('Metrics', () => {
     });
 
     it('serializes a gauge metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest(
-        [createResourceMetrics([createObservableGaugeData(10.5)])]
-      );
+      const exportRequest = createExportMetricsServiceRequest([
+        createResourceMetrics([createObservableGaugeData(10.5)]),
+      ]);
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -474,9 +499,19 @@ describe('Metrics', () => {
 
     describe('serializes a histogram metric record', () => {
       it('with min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest(
-          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, 1, 8)])]
-        );
+        const exportRequest = createExportMetricsServiceRequest([
+          createResourceMetrics([
+            createHistogramMetrics(
+              2,
+              9,
+              [5],
+              [1, 1],
+              AggregationTemporality.CUMULATIVE,
+              1,
+              8
+            ),
+          ]),
+        ]);
         assert.ok(exportRequest);
 
         assert.deepStrictEqual(exportRequest, {
@@ -494,7 +529,8 @@ describe('Metrics', () => {
                       description: 'this is a description',
                       unit: '1',
                       histogram: {
-                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        aggregationTemporality:
+                          EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
                         dataPoints: [
                           {
                             attributes: expectedAttributes,
@@ -519,9 +555,17 @@ describe('Metrics', () => {
       });
 
       it('without min/max', () => {
-        const exportRequest = createExportMetricsServiceRequest(
-          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE)])]
-        );
+        const exportRequest = createExportMetricsServiceRequest([
+          createResourceMetrics([
+            createHistogramMetrics(
+              2,
+              9,
+              [5],
+              [1, 1],
+              AggregationTemporality.CUMULATIVE
+            ),
+          ]),
+        ]);
         assert.ok(exportRequest);
 
         assert.deepStrictEqual(exportRequest, {
@@ -539,7 +583,8 @@ describe('Metrics', () => {
                       description: 'this is a description',
                       unit: '1',
                       histogram: {
-                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        aggregationTemporality:
+                          EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
                         dataPoints: [
                           {
                             attributes: expectedAttributes,

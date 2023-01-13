@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  diag,
-} from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
@@ -25,9 +23,12 @@ import {
 import * as assert from 'assert';
 import * as Sinon from 'sinon';
 import { env } from 'process';
-import { OTLPTraceExporter as OTLPProtoTraceExporter, OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
-import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
+import {
+  OTLPTraceExporter as OTLPProtoTraceExporter,
+  OTLPTraceExporter,
+} from '@opentelemetry/exporter-trace-otlp-proto';
+import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExporter';
@@ -37,7 +38,10 @@ describe('set up trace exporter with env exporters', () => {
   let stubLoggerError: Sinon.SinonStub;
 
   beforeEach(() => {
-    spyGetOtlpProtocol = Sinon.spy(TracerProviderWithEnvExporters, 'getOtlpProtocol');
+    spyGetOtlpProtocol = Sinon.spy(
+      TracerProviderWithEnvExporters,
+      'getOtlpProtocol'
+    );
     stubLoggerError = Sinon.stub(diag, 'warn');
   });
   afterEach(() => {
@@ -92,15 +96,29 @@ describe('set up trace exporter with env exporters', () => {
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
-    it('do not use any exporters when empty value is provided for exporter', async () => {
-      env.OTEL_TRACES_EXPORTER = '';
+    it('use default otlp exporter when user does not set exporter via env or config', async () => {
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk['_spanProcessors'];
+      const listOfProcessors = sdk['_spanProcessors']!;
       const listOfExporters = sdk['_configuredExporters'];
 
-      assert(spyGetOtlpProtocol.notCalled);
-      assert(listOfExporters.length === 0);
-      assert(listOfProcessors === undefined);
+      assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
+      assert(listOfExporters.length === 1);
+
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    });
+    it('use default otlp exporter when empty value is provided for exporter via env', async () => {
+      env.OTEL_TRACES_EXPORTER = '';
+      const sdk = new TracerProviderWithEnvExporters();
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
+
+      assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
+      assert(listOfExporters.length === 1);
+
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+
       env.OTEL_TRACES_EXPORTER = '';
     });
     it('do not use any exporters when none value is only provided', async () => {
@@ -118,7 +136,10 @@ describe('set up trace exporter with env exporters', () => {
       env.OTEL_TRACES_EXPORTER = 'none';
       new TracerProviderWithEnvExporters();
 
-      assert.strictEqual(stubLoggerError.args[0][0], 'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.');
+      assert.strictEqual(
+        stubLoggerError.args[0][0],
+        'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
+      );
       delete env.OTEL_TRACES_EXPORTER;
     });
     it('use default exporter when none value is provided with other exports', async () => {
@@ -140,7 +161,8 @@ describe('set up trace exporter with env exporters', () => {
       new TracerProviderWithEnvExporters();
 
       assert.strictEqual(
-        stubLoggerError.args[0][0], 'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
+        stubLoggerError.args[0][0],
+        'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
       );
       delete env.OTEL_TRACES_EXPORTER;
     });
@@ -149,11 +171,13 @@ describe('set up trace exporter with env exporters', () => {
       new TracerProviderWithEnvExporters();
 
       assert.strictEqual(
-        stubLoggerError.args[0][0], 'Unrecognized OTEL_TRACES_EXPORTER value: invalid.'
+        stubLoggerError.args[0][0],
+        'Unrecognized OTEL_TRACES_EXPORTER value: invalid.'
       );
 
       assert.strictEqual(
-        stubLoggerError.args[1][0], 'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
+        stubLoggerError.args[1][0],
+        'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
       );
 
       delete env.OTEL_TRACES_EXPORTER;
@@ -163,7 +187,13 @@ describe('set up trace exporter with env exporters', () => {
       new TracerProviderWithEnvExporters();
 
       assert.strictEqual(
-        stubLoggerError.args[0][0], 'Unsupported OTLP traces protocol: invalid. Using http/protobuf.'
+        stubLoggerError.args[0][0],
+        'OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.'
+      );
+
+      assert.strictEqual(
+        stubLoggerError.args[1][0],
+        'Unsupported OTLP traces protocol: invalid. Using http/protobuf.'
       );
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
     });

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { trace } from '@opentelemetry/api';
-import { metrics } from '@opentelemetry/api-metrics';
+import { trace, metrics } from '@opentelemetry/api';
 import {
   disableInstrumentations,
   enableInstrumentations,

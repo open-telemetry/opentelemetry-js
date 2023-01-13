@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import { Tracer, TracerProvider } from '@opentelemetry/api';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { InstrumentationBase, registerInstrumentations } from '../../src';
 import {
+  Tracer,
+  TracerProvider,
   Meter,
   MeterOptions,
   MeterProvider,
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { InstrumentationBase, registerInstrumentations } from '../../src';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
@@ -89,11 +90,9 @@ describe('autoLoader', () => {
           unload();
           unload = undefined;
         }
-        instrumentation = new FooInstrumentation(
-          'foo',
-          '1',
-          { enabled: false }
-        );
+        instrumentation = new FooInstrumentation('foo', '1', {
+          enabled: false,
+        });
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
         setMeterProviderSpy = sinon.stub(instrumentation, 'setMeterProvider');

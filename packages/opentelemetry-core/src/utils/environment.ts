@@ -24,6 +24,18 @@ const DEFAULT_LIST_SEPARATOR = ',';
  * Environment interface to define all names
  */
 
+const ENVIRONMENT_BOOLEAN_KEYS = ['OTEL_SDK_DISABLED'] as const;
+
+type ENVIRONMENT_BOOLEANS = {
+  [K in typeof ENVIRONMENT_BOOLEAN_KEYS[number]]?: boolean;
+};
+
+function isEnvVarABoolean(key: unknown): key is keyof ENVIRONMENT_BOOLEANS {
+  return (
+    ENVIRONMENT_BOOLEAN_KEYS.indexOf(key as keyof ENVIRONMENT_BOOLEANS) > -1
+  );
+}
+
 const ENVIRONMENT_NUMBERS_KEYS = [
   'OTEL_BSP_EXPORT_TIMEOUT',
   'OTEL_BSP_MAX_EXPORT_BATCH_SIZE',
@@ -88,26 +100,27 @@ export type ENVIRONMENT = {
   OTEL_TRACES_EXPORTER?: string;
   OTEL_TRACES_SAMPLER_ARG?: string;
   OTEL_TRACES_SAMPLER?: string;
-  OTEL_EXPORTER_OTLP_INSECURE?: string,
-  OTEL_EXPORTER_OTLP_TRACES_INSECURE?: string,
-  OTEL_EXPORTER_OTLP_METRICS_INSECURE?: string,
-  OTEL_EXPORTER_OTLP_CERTIFICATE?: string,
-  OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE?: string,
-  OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE?: string,
-  OTEL_EXPORTER_OTLP_COMPRESSION?: string,
-  OTEL_EXPORTER_OTLP_TRACES_COMPRESSION?: string,
-  OTEL_EXPORTER_OTLP_METRICS_COMPRESSION?: string
-  OTEL_EXPORTER_OTLP_CLIENT_KEY?: string,
-  OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY?: string,
-  OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY?: string,
-  OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE?: string,
-  OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE?: string,
-  OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE?: string,
-  OTEL_EXPORTER_OTLP_PROTOCOL?: string,
-  OTEL_EXPORTER_OTLP_TRACES_PROTOCOL?: string,
-  OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?: string,
-  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE?: string
-} & ENVIRONMENT_NUMBERS &
+  OTEL_EXPORTER_OTLP_INSECURE?: string;
+  OTEL_EXPORTER_OTLP_TRACES_INSECURE?: string;
+  OTEL_EXPORTER_OTLP_METRICS_INSECURE?: string;
+  OTEL_EXPORTER_OTLP_CERTIFICATE?: string;
+  OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE?: string;
+  OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE?: string;
+  OTEL_EXPORTER_OTLP_COMPRESSION?: string;
+  OTEL_EXPORTER_OTLP_TRACES_COMPRESSION?: string;
+  OTEL_EXPORTER_OTLP_METRICS_COMPRESSION?: string;
+  OTEL_EXPORTER_OTLP_CLIENT_KEY?: string;
+  OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY?: string;
+  OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY?: string;
+  OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE?: string;
+  OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE?: string;
+  OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE?: string;
+  OTEL_EXPORTER_OTLP_PROTOCOL?: string;
+  OTEL_EXPORTER_OTLP_TRACES_PROTOCOL?: string;
+  OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?: string;
+  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE?: string;
+} & ENVIRONMENT_BOOLEANS &
+  ENVIRONMENT_NUMBERS &
   ENVIRONMENT_LISTS;
 
 export type RAW_ENVIRONMENT = {
@@ -122,6 +135,7 @@ export const DEFAULT_ATTRIBUTE_COUNT_LIMIT = 128;
  * Default environment variables
  */
 export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
+  OTEL_SDK_DISABLED: false,
   CONTAINER_NAME: '',
   ECS_CONTAINER_METADATA_URI_V4: '',
   ECS_CONTAINER_METADATA_URI: '',
@@ -154,11 +168,11 @@ export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_SERVICE_NAME: '',
   OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT: DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   OTEL_ATTRIBUTE_COUNT_LIMIT: DEFAULT_ATTRIBUTE_COUNT_LIMIT,
-  OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT: DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT ,
+  OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT: DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   OTEL_SPAN_EVENT_COUNT_LIMIT: 128,
   OTEL_SPAN_LINK_COUNT_LIMIT: 128,
-  OTEL_TRACES_EXPORTER: 'otlp',
+  OTEL_TRACES_EXPORTER: '',
   OTEL_TRACES_SAMPLER: TracesSamplerValues.ParentBasedAlwaysOn,
   OTEL_TRACES_SAMPLER_ARG: '',
   OTEL_EXPORTER_OTLP_INSECURE: '',
@@ -179,8 +193,27 @@ export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf',
   OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: 'http/protobuf',
   OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: 'http/protobuf',
-  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: 'cumulative'
+  OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE: 'cumulative',
 };
+
+/**
+ * @param key
+ * @param environment
+ * @param values
+ */
+function parseBoolean(
+  key: keyof ENVIRONMENT_BOOLEANS,
+  environment: ENVIRONMENT,
+  values: RAW_ENVIRONMENT
+) {
+  if (typeof values[key] === 'undefined') {
+    return;
+  }
+
+  const value = String(values[key]);
+  // support case-insensitive "true"
+  environment[key] = value.toLowerCase() === 'true';
+}
 
 /**
  * Parses a variable as number with number validation
@@ -277,7 +310,9 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
         break;
 
       default:
-        if (isEnvVarANumber(key)) {
+        if (isEnvVarABoolean(key)) {
+          parseBoolean(key, environment, values);
+        } else if (isEnvVarANumber(key)) {
           parseNumber(key, environment, values);
         } else if (isEnvVarAList(key)) {
           parseStringList(key, environment, values);
@@ -298,7 +333,7 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
  * populating default values.
  */
 export function getEnvWithoutDefaults(): ENVIRONMENT {
-  return typeof process !== 'undefined' ?
-    parseEnvironment(process.env as RAW_ENVIRONMENT) :
-    parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
+  return typeof process !== 'undefined'
+    ? parseEnvironment(process.env as RAW_ENVIRONMENT)
+    : parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
 }

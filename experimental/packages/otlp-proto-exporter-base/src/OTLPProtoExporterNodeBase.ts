@@ -20,14 +20,16 @@ import {
   OTLPExporterNodeBase as OTLPExporterBaseMain,
   CompressionAlgorithm,
   OTLPExporterError,
-  OTLPExporterNodeConfigBase
+  OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 
-type SendFn = <ExportItem, ServiceRequest>(collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,
+type SendFn = <ExportItem, ServiceRequest>(
+  collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   compression: CompressionAlgorithm,
   onSuccess: () => void,
-  onError: (error: OTLPExporterError) => void) => void;
+  onError: (error: OTLPExporterError) => void
+) => void;
 
 /**
  * Collector Exporter abstract base class
@@ -49,8 +51,7 @@ export abstract class OTLPProtoExporterNodeBase<
   ): void {
     const promise = new Promise<void>((resolve, reject) => {
       this._send(this, objects, this.compression, resolve, reject);
-    })
-      .then(onSuccess, onError);
+    }).then(onSuccess, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {

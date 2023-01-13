@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
-import { metrics } from '@opentelemetry/api-metrics';
+import { ContextManager, TextMapPropagator, metrics } from '@opentelemetry/api';
 import {
   InstrumentationOption,
-  registerInstrumentations
+  registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
   Detector,
@@ -26,17 +25,21 @@ import {
   envDetector,
   processDetector,
   Resource,
-  ResourceDetectionConfig
+  ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import {
+  NodeTracerConfig,
+  NodeTracerProvider,
+} from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
+import { getEnv } from '@opentelemetry/core';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -44,11 +47,11 @@ export type MeterProviderConfig = {
   /**
    * Reference to the MetricReader instance by the NodeSDK
    */
-  reader?: MetricReader
+  reader?: MetricReader;
   /**
    * List of {@link View}s that should be passed to the MeterProvider
    */
-  views?: View[]
+  views?: View[];
 };
 export class NodeSDK {
   private _tracerProviderConfig?: {
@@ -69,12 +72,23 @@ export class NodeSDK {
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
 
+  private _disabled?: boolean;
+
   /**
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
+    if (getEnv().OTEL_SDK_DISABLED) {
+      this._disabled = true;
+      // Functions with possible side-effects are set
+      // to no-op via the _disabled flag
+    }
+
     this._resource = configuration.resource ?? new Resource({});
-    this._resourceDetectors = configuration.resourceDetectors ?? [envDetector, processDetector];
+    this._resourceDetectors = configuration.resourceDetectors ?? [
+      envDetector,
+      processDetector,
+    ];
 
     this._serviceName = configuration.serviceName;
 
@@ -157,7 +171,9 @@ export class NodeSDK {
 
     // make sure we do not override existing reader with another reader.
     if (this._meterProviderConfig.reader != null && config.reader != null) {
-      throw new Error('MetricReader passed but MetricReader has already been configured.');
+      throw new Error(
+        'MetricReader passed but MetricReader has already been configured.'
+      );
     }
 
     // set reader, but make sure we do not override existing reader with null/undefined.
@@ -168,6 +184,10 @@ export class NodeSDK {
 
   /** Detect resource attributes */
   public async detectResources(): Promise<void> {
+    if (this._disabled) {
+      return;
+    }
+
     const internalConfig: ResourceDetectionConfig = {
       detectors: this._resourceDetectors,
     };
@@ -184,20 +204,28 @@ export class NodeSDK {
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public async start(): Promise<void> {
+    if (this._disabled) {
+      return;
+    }
+
     if (this._autoDetectResources) {
       await this.detectResources();
     }
 
-    this._resource = this._serviceName === undefined
-      ? this._resource
-      : this._resource.merge(new Resource(
-        { [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName }
-      ));
+    this._resource =
+      this._serviceName === undefined
+        ? this._resource
+        : this._resource.merge(
+            new Resource({
+              [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName,
+            })
+          );
 
-    const Provider =
-      this._tracerProviderConfig ? NodeTracerProvider : TracerProviderWithEnvExporters;
+    const Provider = this._tracerProviderConfig
+      ? NodeTracerProvider
+      : TracerProviderWithEnvExporters;
 
-    const tracerProvider = new Provider ({
+    const tracerProvider = new Provider({
       ...this._tracerProviderConfig?.tracerConfig,
       resource: this._resource,
     });
@@ -245,8 +273,7 @@ export class NodeSDK {
     return (
       Promise.all(promises)
         // return void instead of the array from Promise.all
-        .then(() => {
-        })
+        .then(() => {})
     );
   }
 }

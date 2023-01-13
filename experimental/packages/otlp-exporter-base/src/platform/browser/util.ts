@@ -42,9 +42,7 @@ export function sendWithBeacon(
     diag.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
-    const error = new OTLPExporterError(
-      `sendBeacon - cannot send ${body}`
-    );
+    const error = new OTLPExporterError(`sendBeacon - cannot send ${body}`);
     onError(error);
   }
 }
@@ -151,6 +149,7 @@ export function sendWithXhr(
       if (reqIsDestroyed) {
         const err = new OTLPExporterError(
           'Request Timeout'
+
         );
         onError(err);
       }

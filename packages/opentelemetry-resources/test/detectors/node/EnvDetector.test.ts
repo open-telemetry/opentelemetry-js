@@ -25,7 +25,7 @@ describeNode('envDetector() on Node.js', () => {
   describe('with valid env', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'k8s.pod.name="pod-xyz-123",k8s.cluster.name="c1",k8s.namespace.name="default",k8s.deployment.name="deployment name"';
+        'k8s.pod.name="pod-xyz-123",k8s.cluster.name="c1",k8s.namespace.name="default",k8s.deployment.name="deployment%20name"';
     });
 
     after(() => {
@@ -38,9 +38,30 @@ describeNode('envDetector() on Node.js', () => {
         podName: 'pod-xyz-123',
         clusterName: 'c1',
         namespaceName: 'default',
-        deploymentName: 'deployment name'
+        deploymentName: 'deployment name',
       });
     });
+  });
+
+  describe('with invalid env', () => {
+    const values = ['k8s.deployment.name="with spaces"'];
+
+    for (const value of values) {
+      describe(`value: '${value}'`, () => {
+        before(() => {
+          process.env.OTEL_RESOURCE_ATTRIBUTES = value;
+        });
+
+        after(() => {
+          delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+        });
+
+        it('should return empty resource', async () => {
+          const resource: Resource = await envDetector.detect();
+          assertEmptyResource(resource);
+        });
+      });
+    }
   });
 
   describe('with empty env', () => {

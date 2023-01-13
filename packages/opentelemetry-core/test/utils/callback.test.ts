@@ -26,10 +26,7 @@ describe('callback', () => {
       const that = {};
       const future = new BindOnceFuture(stub, that);
 
-      await Promise.all([
-        future.call(1),
-        future.call(2),
-      ]);
+      await Promise.all([future.call(1), future.call(2)]);
       await future.call(3);
       await future.promise;
 

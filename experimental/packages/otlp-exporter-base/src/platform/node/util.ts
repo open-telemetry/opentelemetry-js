@@ -207,12 +207,18 @@ export function createHttpAgent(
   }
 }
 
-export function configureCompression(compression: CompressionAlgorithm | undefined): CompressionAlgorithm {
+export function configureCompression(
+  compression: CompressionAlgorithm | undefined
+): CompressionAlgorithm {
   if (compression) {
     return compression;
   } else {
-    const definedCompression = getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION || getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
-    return definedCompression === CompressionAlgorithm.GZIP ? CompressionAlgorithm.GZIP : CompressionAlgorithm.NONE;
+    const definedCompression =
+      getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
+      getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+    return definedCompression === CompressionAlgorithm.GZIP
+      ? CompressionAlgorithm.GZIP
+      : CompressionAlgorithm.NONE;
   }
 }
 

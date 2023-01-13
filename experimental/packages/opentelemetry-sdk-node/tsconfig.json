@@ -1,8 +1,8 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "rootDir": "."
   },
   "include": [
     "src/**/*.ts",
@@ -37,6 +37,9 @@
       "path": "../../../packages/opentelemetry-semantic-conventions"
     },
     {
+      "path": "../../../packages/sdk-metrics"
+    },
+    {
       "path": "../exporter-trace-otlp-grpc"
     },
     {
@@ -46,13 +49,7 @@
       "path": "../exporter-trace-otlp-proto"
     },
     {
-      "path": "../opentelemetry-api-metrics"
-    },
-    {
       "path": "../opentelemetry-instrumentation"
-    },
-    {
-      "path": "../opentelemetry-sdk-metrics"
     }
   ]
 }

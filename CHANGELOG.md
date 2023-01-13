@@ -2,9 +2,53 @@
 
 All notable changes to this project will be documented in this file.
 
+For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
+For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
+
 ## Unreleased
 
 ### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.9.0
+
+### :rocket: (Enhancement)
+
+* feat(instrumentation-grpc): set net.peer.name and net.peer.port on client spans [#3430](https://github.com/open-telemetry/opentelemetry-js/pull/3430)
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): use default Resource to comply with semantic conventions [#3411](https://github.com/open-telemetry/opentelemetry-js/pull/3411) @pichlermarc
+  * Metrics exported by the SDK now contain the following resource attributes by default:
+    * `service.name`
+    * `telemetry.sdk.name`
+    * `telemetry.sdk.language`
+    * `telemetry.sdk.version`
+* fix(sdk-trace): make spans resilient to clock drift [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
+* fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
+* fix(sdk-metrics): fix duplicated registration of metrics for collectors [#3488](https://github.com/open-telemetry/opentelemetry-js/pull/3488) @legendecas
+* fix(core): fix precision loss in numberToHrtime [#3480](https://github.com/open-telemetry/opentelemetry-js/pull/3480) @legendecas
+
+### :house: (Internal)
+
+* chore: automatically generate tsconfigs [#3432](https://github.com/open-telemetry/opentelemetry-js/pull/3432) @legendecas
+* chore: enforce format with prettier [#3444](https://github.com/open-telemetry/opentelemetry-js/pull/3444) @legendecas
+
+## 1.8.0
+
+* `@opentelemetry/sdk-metrics` has been promoted to stable
+* `@opentelemetry/api-metrics` has been merged into `@opentelemetry/api` and deprecated
+
+### :boom: Breaking Change
+
+* feat(api): merge api-metrics into api [#3374](https://github.com/open-telemetry/opentelemetry-js/pull/3374) @legendecas
 
 ### :rocket: (Enhancement)
 
@@ -17,12 +61,29 @@ All notable changes to this project will be documented in this file.
   [#3327](https://github.com/open-telemetry/opentelemetry-js/pull/3327) @dyladan
 * fix(resources): fix EnvDetector throwing errors when attribute values contain spaces
   [#3295](https://github.com/open-telemetry/opentelemetry-js/issues/3295)
+* fix(trace): fix an issue which caused negative span durations in web based spans
+  [#3359](https://github.com/open-telemetry/opentelemetry-js/pull/3359) @dyladan
+* fix(resources): strict OTEL_RESOURCE_ATTRIBUTES baggage octet decoding
+  [#3341](https://github.com/open-telemetry/opentelemetry-js/pull/3341) @legendecas
 
 ### :books: (Refine Doc)
+
+* doc: Added Metrics documentation [#3360](https://github.com/open-telemetry/opentelemetry-js/pull/3360) @weyert
+* docs(api): fix counter negative value wording [#3396](https://github.com/open-telemetry/opentelemetry-js/pull/3396) @legendecas
 
 ### :house: (Internal)
 
 * ci: run browser tests without circle [#3328](https://github.com/open-telemetry/opentelemetry-js/pull/3328) @dyladan
+
+## Metrics API 1.0.0
+
+Metrics API is now stable and generally available.
+There are no changes between 1.0.0 and the previous 0.33.0 version.
+
+### :boom: Breaking Change
+
+* Add semver check to metrics API [#3357](https://github.com/open-telemetry/opentelemetry-js/pull/3357) @dyladan
+  * Previously API versions were only considered compatible if the API was exactly the same
 
 ## 1.7.0
 

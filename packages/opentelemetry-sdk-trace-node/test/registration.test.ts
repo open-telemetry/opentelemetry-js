@@ -55,7 +55,8 @@ describe('API registration', () => {
 
     assertInstanceOf(context['_getContextManager'](), DefaultContextManager);
     assertInstanceOf(
-      propagation['_getGlobalPropagator'](), CompositePropagator
+      propagation['_getGlobalPropagator'](),
+      CompositePropagator
     );
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
 
@@ -87,10 +88,15 @@ describe('API registration', () => {
       contextManager: null,
     });
 
-    assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
+    assert.strictEqual(
+      context['_getContextManager'](),
+      ctxManager,
+      'context manager should not change'
+    );
 
     assertInstanceOf(
-      propagation['_getGlobalPropagator'](), CompositePropagator
+      propagation['_getGlobalPropagator'](),
+      CompositePropagator
     );
 
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;

@@ -184,7 +184,10 @@ describe('fetch', () => {
           response.status = 405;
           response.statusText = 'OK';
           resolve(new window.Response('foo', response));
-        } else if ((input instanceof Request && input.url === url) || input === url) {
+        } else if (
+          (input instanceof Request && input.url === url) ||
+          input === url
+        ) {
           response.status = 200;
           response.statusText = 'OK';
           resolve(new window.Response(JSON.stringify(response), response));
@@ -241,39 +244,46 @@ describe('fetch', () => {
     // this process is scheduled at the same time the fetch promise is resolved
     // due to this we can't rely on getData resolution to know that the span has ended
     let resolveEndSpan: (value: unknown) => void;
-    const spanEnded = new Promise(r => resolveEndSpan = r);
-    const readSpy = sinon.spy(window.ReadableStreamDefaultReader.prototype, 'read');
-    const endSpanStub: sinon.SinonStub<any> = sinon.stub(FetchInstrumentation.prototype, '_endSpan' as any)
+    const spanEnded = new Promise(r => (resolveEndSpan = r));
+    const readSpy = sinon.spy(
+      window.ReadableStreamDefaultReader.prototype,
+      'read'
+    );
+    const endSpanStub: sinon.SinonStub<any> = sinon
+      .stub(FetchInstrumentation.prototype, '_endSpan' as any)
       .callsFake(async function (this: FetchInstrumentation, ...args: any[]) {
         resolveEndSpan({});
         return endSpanStub.wrappedMethod.apply(this, args);
       });
 
     rootSpan = webTracerWithZone.startSpan('root');
-    await api.context.with(api.trace.setSpan(api.context.active(), rootSpan), async () => {
-      fakeNow = 0;
-      try {
-        const responsePromise = getData(fileUrl, method);
-        fakeNow = 300;
-        const response = await responsePromise;
+    await api.context.with(
+      api.trace.setSpan(api.context.active(), rootSpan),
+      async () => {
+        fakeNow = 0;
+        try {
+          const responsePromise = getData(fileUrl, method);
+          fakeNow = 300;
+          const response = await responsePromise;
 
-        // if the url is not ignored, body.read should be called by now
-        // awaiting for the span to end
-        if (readSpy.callCount > 0) await spanEnded;
+          // if the url is not ignored, body.read should be called by now
+          // awaiting for the span to end
+          if (readSpy.callCount > 0) await spanEnded;
 
-        // this is a bit tricky as the only way to get all request headers from
-        // fetch is to use json()
-        lastResponse = await response.json();
-        const headers: { [key: string]: string } = {};
-        Object.keys(lastResponse.headers).forEach(key => {
-          headers[key.toLowerCase()] = lastResponse.headers[key];
-        });
-        lastResponse.headers = headers;
-      } catch (e) {
-        lastResponse = undefined;
+          // this is a bit tricky as the only way to get all request headers from
+          // fetch is to use json()
+          lastResponse = await response.json();
+          const headers: { [key: string]: string } = {};
+          Object.keys(lastResponse.headers).forEach(key => {
+            headers[key.toLowerCase()] = lastResponse.headers[key];
+          });
+          lastResponse.headers = headers;
+        } catch (e) {
+          lastResponse = undefined;
+        }
+        await sinon.clock.runAllAsync();
       }
-      await sinon.clock.runAllAsync();
-    });
+    );
   };
 
   beforeEach(() => {
@@ -541,7 +551,7 @@ describe('fetch', () => {
 
     it('should keep custom headers with a request object and a headers object', () => {
       const r = new Request('url', {
-        headers: new Headers({'foo': 'bar'})
+        headers: new Headers({ foo: 'bar' }),
       });
       window.fetch(r).catch(() => {});
       assert.ok(r.headers.get('foo') === 'bar');
@@ -550,7 +560,7 @@ describe('fetch', () => {
     it('should keep custom headers with url, untyped request object and typed headers object', () => {
       const url = 'url';
       const init = {
-        headers: new Headers({'foo': 'bar'})
+        headers: new Headers({ foo: 'bar' }),
       };
       window.fetch(url, init).catch(() => {});
       assert.ok(init.headers.get('foo') === 'bar');
@@ -559,7 +569,7 @@ describe('fetch', () => {
     it('should keep custom headers with url, untyped request object and untyped headers object', () => {
       const url = 'url';
       const init = {
-        headers: {'foo': 'bar'}
+        headers: { foo: 'bar' },
       };
       window.fetch(url, init).catch(() => {});
       assert.ok(init.headers['foo'] === 'bar');
@@ -567,11 +577,14 @@ describe('fetch', () => {
 
     it('should pass request object as first parameter to the original function (#2411)', () => {
       const r = new Request(url);
-      return window.fetch(r).then(() => {
-        assert.ok(true);
-      }, (response: Response) => {
-        assert.fail(response.statusText);
-      });
+      return window.fetch(r).then(
+        () => {
+          assert.ok(true);
+        },
+        (response: Response) => {
+          assert.fail(response.statusText);
+        }
+      );
     });
 
     it('should NOT clear the resources', () => {
@@ -625,7 +638,7 @@ describe('fetch', () => {
   describe('applyCustomAttributesOnSpan option', () => {
     const prepare = async (
       url: string,
-      applyCustomAttributesOnSpan: FetchCustomAttributeFunction,
+      applyCustomAttributesOnSpan: FetchCustomAttributeFunction
     ) => {
       const propagateTraceHeaderCorsUrls = [url];
 
@@ -640,12 +653,9 @@ describe('fetch', () => {
     });
 
     it('applies attributes when the request is succesful', async () => {
-      await prepare(
-        url,
-        span => {
-          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
-        },
-      );
+      await prepare(url, span => {
+        span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+      });
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const attributes = span.attributes;
 
@@ -653,12 +663,9 @@ describe('fetch', () => {
     });
 
     it('applies custom attributes when the request fails', async () => {
-      await prepare(
-        badUrl,
-        span => {
-          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
-        },
-      );
+      await prepare(badUrl, span => {
+        span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+      });
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const attributes = span.attributes;
 
@@ -716,11 +723,14 @@ describe('fetch', () => {
     });
     it('should pass request object as the first parameter to the original function (#2411)', () => {
       const r = new Request(url);
-      return window.fetch(r).then(() => {
-        assert.ok(true);
-      }, (response: Response) => {
-        assert.fail(response.statusText);
-      });
+      return window.fetch(r).then(
+        () => {
+          assert.ok(true);
+        },
+        (response: Response) => {
+          assert.fail(response.statusText);
+        }
+      );
     });
   });
 
@@ -835,6 +845,17 @@ describe('fetch', () => {
         events[6].name,
         PTN.REQUEST_START,
         `event ${PTN.REQUEST_START} is not defined`
+      );
+    });
+
+    it('should have an absolute http.url attribute', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const attributes = span.attributes;
+
+      assert.strictEqual(
+        attributes[SemanticAttributes.HTTP_URL],
+        location.origin + '/get',
+        `attributes ${SemanticAttributes.HTTP_URL} is wrong`
       );
     });
   });

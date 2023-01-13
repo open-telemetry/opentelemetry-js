@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import {
+  MetricAttributes,
   SpanAttributes,
   SpanStatusCode,
   Span,
@@ -35,7 +36,6 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 /**
  * Get an absolute url
@@ -69,7 +69,10 @@ export const getAbsoluteUrl = (
 /**
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
-export const parseResponseStatus = (kind: SpanKind, statusCode?: number): SpanStatusCode => {
+export const parseResponseStatus = (
+  kind: SpanKind,
+  statusCode?: number
+): SpanStatusCode => {
   const upperBound = kind === SpanKind.CLIENT ? 400 : 500;
   // 1xx, 2xx, 3xx are OK on client and server
   // 4xx is OK on server
@@ -139,10 +142,7 @@ export const isIgnored = (
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
  */
-export const setSpanWithError = (
-  span: Span,
-  error: Err
-): void => {
+export const setSpanWithError = (span: Span, error: Err): void => {
   const message = error.message;
 
   span.setAttributes({
@@ -169,9 +169,8 @@ export const setRequestContentLengthAttribute = (
   if (isCompressed(request.headers)) {
     attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH] = length;
   } else {
-    attributes[
-      SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-    ] = length;
+    attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] =
+      length;
   }
 };
 
@@ -190,9 +189,8 @@ export const setResponseContentLengthAttribute = (
   if (isCompressed(response.headers)) {
     attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = length;
   } else {
-    attributes[
-      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
-    ] = length;
+    attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] =
+      length;
   }
 };
 
@@ -225,7 +223,12 @@ export const isCompressed = (
 export const getRequestInfo = (
   options: url.URL | RequestOptions | string,
   extraOptions?: RequestOptions
-): { origin: string; pathname: string; method: string; optionsParsed: RequestOptions; } => {
+): {
+  origin: string;
+  pathname: string;
+  method: string;
+  optionsParsed: RequestOptions;
+} => {
   let pathname = '/';
   let origin = '';
   let optionsParsed: RequestOptions;
@@ -265,22 +268,29 @@ export const getRequestInfo = (
     if (!pathname && optionsParsed.path) {
       pathname = url.parse(optionsParsed.path).pathname || '/';
     }
-    const hostname = optionsParsed.host || (optionsParsed.port != null ? `${optionsParsed.hostname}${optionsParsed.port}` : optionsParsed.hostname);
+    const hostname =
+      optionsParsed.host ||
+      (optionsParsed.port != null
+        ? `${optionsParsed.hostname}${optionsParsed.port}`
+        : optionsParsed.hostname);
     origin = `${optionsParsed.protocol || 'http:'}//${hostname}`;
   }
 
   const headers = optionsParsed.headers ?? {};
-  optionsParsed.headers = Object.keys(headers).reduce((normalizedHeader, key) => {
-    normalizedHeader[key.toLowerCase()] = headers[key];
-    return normalizedHeader;
-  }, {} as OutgoingHttpHeaders);
+  optionsParsed.headers = Object.keys(headers).reduce(
+    (normalizedHeader, key) => {
+      normalizedHeader[key.toLowerCase()] = headers[key];
+      return normalizedHeader;
+    },
+    {} as OutgoingHttpHeaders
+  );
   // some packages return method in lowercase..
   // ensure upperCase for consistency
   const method = optionsParsed.method
     ? optionsParsed.method.toUpperCase()
     : 'GET';
 
-  return { origin, pathname, method, optionsParsed, };
+  return { origin, pathname, method, optionsParsed };
 };
 
 /**
@@ -297,13 +307,17 @@ export const isValidOptionsType = (options: unknown): boolean => {
 };
 
 export const extractHostnameAndPort = (
-  requestOptions: Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>
-): { hostname: string, port: number | string } => {
+  requestOptions: Pick<
+    ParsedRequestOptions,
+    'hostname' | 'host' | 'port' | 'protocol'
+  >
+): { hostname: string; port: number | string } => {
   if (requestOptions.hostname && requestOptions.port) {
     return { hostname: requestOptions.hostname, port: requestOptions.port };
   }
   const matches = requestOptions.host?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
-  const hostname = requestOptions.hostname || (matches === null ? 'localhost' : matches[1]);
+  const hostname =
+    requestOptions.hostname || (matches === null ? 'localhost' : matches[1]);
   let port = requestOptions.port;
   if (!port) {
     if (matches && matches[2]) {
@@ -323,7 +337,12 @@ export const extractHostnameAndPort = (
  */
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
-  options: { component: string; hostname: string; port: string | number, hookAttributes?: SpanAttributes }
+  options: {
+    component: string;
+    hostname: string;
+    port: string | number;
+    hookAttributes?: SpanAttributes;
+  }
 ): SpanAttributes => {
   const hostname = options.hostname;
   const port = options.port;
@@ -340,7 +359,8 @@ export const getOutgoingRequestAttributes = (
     [SemanticAttributes.HTTP_METHOD]: method,
     [SemanticAttributes.HTTP_TARGET]: requestOptions.path || '/',
     [SemanticAttributes.NET_PEER_NAME]: hostname,
-    [SemanticAttributes.HTTP_HOST]: requestOptions.headers?.host ?? `${hostname}:${port}`,
+    [SemanticAttributes.HTTP_HOST]:
+      requestOptions.headers?.host ?? `${hostname}:${port}`,
   };
 
   if (userAgent !== undefined) {
@@ -357,8 +377,10 @@ export const getOutgoingRequestMetricAttributes = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
-  metricAttributes[SemanticAttributes.NET_PEER_NAME] = spanAttributes[SemanticAttributes.NET_PEER_NAME];
+  metricAttributes[SemanticAttributes.HTTP_METHOD] =
+    spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_PEER_NAME] =
+    spanAttributes[SemanticAttributes.NET_PEER_NAME];
   //TODO: http.url attribute, it should susbtitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
@@ -386,7 +408,7 @@ export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
  * @param {{ hostname: string }} options used to pass data needed to create attributes
  */
 export const getOutgoingRequestAttributesOnResponse = (
-  response: IncomingMessage,
+  response: IncomingMessage
 ): SpanAttributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
@@ -415,9 +437,12 @@ export const getOutgoingRequestMetricAttributesOnResponse = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.NET_PEER_PORT] = spanAttributes[SemanticAttributes.NET_PEER_PORT];
-  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
-  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  metricAttributes[SemanticAttributes.NET_PEER_PORT] =
+    spanAttributes[SemanticAttributes.NET_PEER_PORT];
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] =
+    spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
+    spanAttributes[SemanticAttributes.HTTP_FLAVOR];
   return metricAttributes;
 };
 
@@ -428,7 +453,11 @@ export const getOutgoingRequestMetricAttributesOnResponse = (
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
-  options: { component: string; serverName?: string; hookAttributes?: SpanAttributes }
+  options: {
+    component: string;
+    serverName?: string;
+    hookAttributes?: SpanAttributes;
+  }
 ): SpanAttributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
@@ -484,10 +513,14 @@ export const getIncomingRequestMetricAttributes = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_SCHEME] = spanAttributes[SemanticAttributes.HTTP_SCHEME];
-  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
-  metricAttributes[SemanticAttributes.NET_HOST_NAME] = spanAttributes[SemanticAttributes.NET_HOST_NAME];
-  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  metricAttributes[SemanticAttributes.HTTP_SCHEME] =
+    spanAttributes[SemanticAttributes.HTTP_SCHEME];
+  metricAttributes[SemanticAttributes.HTTP_METHOD] =
+    spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_HOST_NAME] =
+    spanAttributes[SemanticAttributes.NET_HOST_NAME];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
+    spanAttributes[SemanticAttributes.HTTP_FLAVOR];
   //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
@@ -530,15 +563,25 @@ export const getIncomingRequestMetricAttributesOnResponse = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
-  metricAttributes[SemanticAttributes.NET_HOST_PORT] = spanAttributes[SemanticAttributes.NET_HOST_PORT];
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] =
+    spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.NET_HOST_PORT] =
+    spanAttributes[SemanticAttributes.NET_HOST_PORT];
   return metricAttributes;
 };
 
 export function headerCapture(type: 'request' | 'response', headers: string[]) {
-  const normalizedHeaders = new Map(headers.map(header => [header.toLowerCase(), header.toLowerCase().replace(/-/g, '_')]));
+  const normalizedHeaders = new Map(
+    headers.map(header => [
+      header.toLowerCase(),
+      header.toLowerCase().replace(/-/g, '_'),
+    ])
+  );
 
-  return (span: Span, getHeader: (key: string) => undefined | string | string[] | number) => {
+  return (
+    span: Span,
+    getHeader: (key: string) => undefined | string | string[] | number
+  ) => {
     for (const [capturedHeader, normalizedHeader] of normalizedHeaders) {
       const value = getHeader(capturedHeader);
 

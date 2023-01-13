@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-// Updates to this file should also be replicated to @opentelemetry/api and
-// @opentelemetry/api-metrics too.
+// Updates to this file should also be replicated to @opentelemetry/api too.
 
 /**
  * - globalThis (New standard)
@@ -28,8 +27,12 @@
 /** only globals that common to node and browsers are allowed */
 // eslint-disable-next-line node/no-unsupported-features/es-builtins, no-undef
 export const _globalThis: typeof globalThis =
-  typeof globalThis === 'object' ? globalThis :
-    typeof self === 'object' ? self :
-      typeof window === 'object' ? window :
-        typeof global === 'object' ? global :
-  {} as typeof globalThis;
+  typeof globalThis === 'object'
+    ? globalThis
+    : typeof self === 'object'
+    ? self
+    : typeof window === 'object'
+    ? window
+    : typeof global === 'object'
+    ? global
+    : ({} as typeof globalThis);

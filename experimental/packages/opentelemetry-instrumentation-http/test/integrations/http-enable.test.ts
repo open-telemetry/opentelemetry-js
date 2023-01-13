@@ -318,7 +318,7 @@ describe('HttpInstrumentation Integration tests', () => {
           `${protocol}://localhost:${mockServerPort}/`,
           options,
           (resp: http.IncomingMessage) => {
-            const res = (resp as unknown) as http.IncomingMessage & {
+            const res = resp as unknown as http.IncomingMessage & {
               req: http.IncomingMessage;
             };
 
@@ -371,7 +371,8 @@ describe('HttpInstrumentation Integration tests', () => {
 
       try {
         await httpRequest.get(
-          `${protocol}://localhost:${mockServerPort}/timeout`, {timeout: 1}
+          `${protocol}://localhost:${mockServerPort}/timeout`,
+          { timeout: 1 }
         );
       } catch (err) {
         assert.ok(err.message.startsWith('timeout'));
@@ -381,7 +382,10 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       assert.strictEqual(span.name, 'HTTP GET');
-      assert.strictEqual(span.attributes[SemanticAttributes.HTTP_HOST], `localhost:${mockServerPort}`);
+      assert.strictEqual(
+        span.attributes[SemanticAttributes.HTTP_HOST],
+        `localhost:${mockServerPort}`
+      );
     });
   });
 });

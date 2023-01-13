@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ContextAPI } from '../api/context';
 import { createContextKey } from '../context/context';
 import { Context } from '../context/types';
 import { Baggage } from './types';
@@ -31,6 +32,15 @@ const BAGGAGE_KEY = createContextKey('OpenTelemetry Baggage Key');
  */
 export function getBaggage(context: Context): Baggage | undefined {
   return (context.getValue(BAGGAGE_KEY) as Baggage) || undefined;
+}
+
+/**
+ * Retrieve the current baggage from the active/current context
+ *
+ * @returns {Baggage} Extracted baggage from the context
+ */
+export function getActiveBaggage(): Baggage | undefined {
+  return getBaggage(ContextAPI.getInstance().active());
 }
 
 /**

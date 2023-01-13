@@ -28,7 +28,10 @@ import {
   ensureHeadersContain,
   mockedReadableSpan,
 } from '../traceHelper';
-import { OTLPExporterConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
+import {
+  OTLPExporterConfigBase,
+  OTLPExporterError,
+} from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 describe('OTLPTraceExporter - web', () => {
@@ -91,14 +94,11 @@ describe('OTLPTraceExporter - web', () => {
 
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
 
       it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, () => {
-        });
+        collectorTraceExporter.export(spans, () => {});
 
         setTimeout(async () => {
           try {
@@ -106,17 +106,17 @@ describe('OTLPTraceExporter - web', () => {
             const url = args[0];
             const blob: Blob = args[1];
             const body = await blob.text();
-            const json = JSON.parse(
-              body
-            ) as IExportTraceServiceRequest;
-            const span1 =
-              json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+            const json = JSON.parse(body) as IExportTraceServiceRequest;
+            const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
             assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
             ensureSpanIsCorrect(span1);
 
             const resource = json.resourceSpans?.[0].resource;
-            assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
             ensureWebResourceIsCorrect(resource);
 
             assert.strictEqual(url, 'http://foo.bar.com');
@@ -135,22 +135,20 @@ describe('OTLPTraceExporter - web', () => {
       it('should log the successful message', done => {
         const spyLoggerDebug = sinon.stub();
         const spyLoggerError = sinon.stub();
-        const nop = () => {
-        };
+        const nop = () => {};
         const diagLogger: DiagLogger = {
           debug: spyLoggerDebug,
           error: spyLoggerError,
           info: nop,
           verbose: nop,
-          warn: nop
+          warn: nop,
         };
 
         diag.setLogger(diagLogger, DiagLogLevel.ALL);
 
         stubBeacon.returns(true);
 
-        collectorTraceExporter.export(spans, () => {
-        });
+        collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
           const response: any = spyLoggerDebug.args[2][0];
@@ -181,9 +179,7 @@ describe('OTLPTraceExporter - web', () => {
         clock = sinon.useFakeTimers();
 
         (window.navigator as any).sendBeacon = false;
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
         server = sinon.fakeServer.create();
       });
       afterEach(() => {
@@ -191,8 +187,7 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {
-        });
+        collectorTraceExporter.export(spans, () => {});
 
         queueMicrotask(() => {
           const request = server.requests[0];
@@ -200,11 +195,8 @@ describe('OTLPTraceExporter - web', () => {
           assert.strictEqual(request.url, 'http://foo.bar.com');
 
           const body = request.requestBody;
-          const json = JSON.parse(
-            body
-          ) as IExportTraceServiceRequest;
-          const span1 =
-            json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+          const json = JSON.parse(body) as IExportTraceServiceRequest;
+          const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           ensureSpanIsCorrect(span1);
@@ -224,20 +216,18 @@ describe('OTLPTraceExporter - web', () => {
       it('should log the successful message', done => {
         const spyLoggerDebug = sinon.stub();
         const spyLoggerError = sinon.stub();
-        const nop = () => {
-        };
+        const nop = () => {};
         const diagLogger: DiagLogger = {
           debug: spyLoggerDebug,
           error: spyLoggerError,
           info: nop,
           verbose: nop,
-          warn: nop
+          warn: nop,
         };
 
         diag.setLogger(diagLogger, DiagLogLevel.ALL);
 
-        collectorTraceExporter.export(spans, () => {
-        });
+        collectorTraceExporter.export(spans, () => {});
 
         queueMicrotask(() => {
           const request = server.requests[0];
@@ -268,8 +258,7 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should send custom headers', done => {
-        collectorTraceExporter.export(spans, () => {
-        });
+        collectorTraceExporter.export(spans, () => {});
 
         queueMicrotask(() => {
           const request = server.requests[0];
@@ -283,7 +272,6 @@ describe('OTLPTraceExporter - web', () => {
     });
   });
 
-
   describe('export - common', () => {
     let spySend: any;
     beforeEach(() => {
@@ -295,8 +283,7 @@ describe('OTLPTraceExporter - web', () => {
       const spans: ReadableSpan[] = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorTraceExporter.export(spans, () => {
-      });
+      collectorTraceExporter.export(spans, () => {});
       setTimeout(() => {
         const span1 = spySend.args[0][0][0] as ReadableSpan;
         assert.deepStrictEqual(spans[0], span1);
@@ -308,7 +295,7 @@ describe('OTLPTraceExporter - web', () => {
     describe('when exporter is shutdown', () => {
       it(
         'should not export anything but return callback with code' +
-        ' "FailedNotRetryable"',
+          ' "FailedNotRetryable"',
         async () => {
           const spans: ReadableSpan[] = [];
           spans.push(Object.assign({}, mockedReadableSpan));
@@ -385,13 +372,10 @@ describe('OTLPTraceExporter - web', () => {
         // located in sendWithXhr function called by the export method
         clock = sinon.useFakeTimers();
 
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
       it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorTraceExporter.export(spans, () => {
-        });
+        collectorTraceExporter.export(spans, () => {});
 
         queueMicrotask(() => {
           const [{ requestHeaders }] = server.requests;
@@ -414,14 +398,11 @@ describe('OTLPTraceExporter - web', () => {
         clock = sinon.useFakeTimers();
 
         (window.navigator as any).sendBeacon = false;
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
 
       it('should successfully send spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {
-        });
+        collectorTraceExporter.export(spans, () => {});
 
         queueMicrotask(() => {
           const [{ requestHeaders }] = server.requests;
@@ -465,7 +446,9 @@ describe('OTLPTraceExporter - web', () => {
         collectorExporterWithConcurrencyLimit.export(spans, callbackSpy);
       }
 
-      const failures = callbackSpy.args.filter(([result]) => result.code === ExportResultCode.FAILED);
+      const failures = callbackSpy.args.filter(
+        ([result]) => result.code === ExportResultCode.FAILED
+      );
 
       setTimeout(() => {
         // Expect 4 failures
