@@ -29,7 +29,7 @@ import {
   DEFAULT_EXPORT_INITIAL_BACKOFF,
   DEFAULT_EXPORT_BACKOFF_MULTIPLIER,
   DEFAULT_EXPORT_MAX_BACKOFF,
-  isExportRetryable
+  isExportRetryable,
 } from '../../util';
 
 /**
@@ -59,9 +59,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     reqIsDestroyed = true;
 
     if (req.destroyed) {
-      const err = new OTLPExporterError(
-        'Request Timeout'
-      );
+      const err = new OTLPExporterError('Request Timeout');
       onError(err);
     } else {
       // req.abort() was deprecated since v14
@@ -83,16 +81,17 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
-  const sendWithRetry = (retries = DEFAULT_EXPORT_MAX_ATTEMPTS, minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF) => {
+  const sendWithRetry = (
+    retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
+    minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
+  ) => {
     req = request(options, (res: http.IncomingMessage) => {
       let responseData = '';
       res.on('data', chunk => (responseData += chunk));
 
       res.on('aborted', () => {
         if (reqIsDestroyed) {
-          const err = new OTLPExporterError(
-            'Request Timeout'
-          );
+          const err = new OTLPExporterError('Request Timeout');
           onError(err);
         }
       });
@@ -105,7 +104,11 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
             // clear all timers since request was completed and promise was resolved
             clearTimeout(exporterTimer);
             clearTimeout(retryTimer);
-          } else if (res.statusCode && isExportRetryable(res.statusCode) && retries > 0) {
+          } else if (
+            res.statusCode &&
+            isExportRetryable(res.statusCode) &&
+            retries > 0
+          ) {
             let retryTime: number;
             minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
 
@@ -114,7 +117,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
               retryTime = retrieveThrottleTime(res.headers['retry-after']!);
             } else {
               // exponential backoff with jitter
-              retryTime = Math.round(Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay);
+              retryTime = Math.round(
+                Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) +
+                  minDelay
+              );
             }
 
             retryTimer = setTimeout(() => {
@@ -137,9 +143,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
     req.on('error', (error: Error | any) => {
       if (reqIsDestroyed) {
-        const err = new OTLPExporterError(
-          'Request Timeout', error.code
-        );
+        const err = new OTLPExporterError('Request Timeout', error.code);
         onError(err);
       } else {
         onError(error);
@@ -150,9 +154,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
     req.on('abort', () => {
       if (reqIsDestroyed) {
-        const err = new OTLPExporterError(
-          'Request Timeout'
-        );
+        const err = new OTLPExporterError('Request Timeout');
         onError(err);
       }
       clearTimeout(exporterTimer);
@@ -163,8 +165,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       case CompressionAlgorithm.GZIP: {
         req.setHeader('Content-Encoding', 'gzip');
         const dataStream = readableFromBuffer(data);
-        dataStream.on('error', onError)
-          .pipe(zlib.createGzip()).on('error', onError)
+        dataStream
+          .on('error', onError)
+          .pipe(zlib.createGzip())
+          .on('error', onError)
           .pipe(req);
 
         break;
@@ -227,7 +231,9 @@ function retrieveThrottleTime(retryAfter: string): number {
   if (isNaN(Number(retryAfter))) {
     const currentTime = new Date();
     const retryAfterDate = new Date(retryAfter);
-    const secondsDiff = Math.ceil((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
+    const secondsDiff = Math.ceil(
+      (retryAfterDate.getTime() - currentTime.getTime()) / 1000
+    );
 
     // if throttle date is set to now, difference in seconds might be less than 0
     if (secondsDiff <= 0) {
@@ -235,7 +241,7 @@ function retrieveThrottleTime(retryAfter: string): number {
     } else {
       return secondsDiff * 1000;
     }
-  // it's an integer
+    // it's an integer
   } else {
     return Number(retryAfter) * 1000;
   }

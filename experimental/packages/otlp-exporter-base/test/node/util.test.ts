@@ -228,12 +228,18 @@ describe('sendWithHttp', () => {
     // use fake timers to replace setTimeout in sendWithHttp function
     const clock = sinon.useFakeTimers();
 
-    sendWithHttp(exporter, data, 'application/json', () => {
-      // Show that we aren't setting the gzip encoding header
-      assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').notCalled);
-    }, (err: OTLPExporterError) => {
-      assert.fail(err);
-    });
+    sendWithHttp(
+      exporter,
+      data,
+      'application/json',
+      () => {
+        // Show that we aren't setting the gzip encoding header
+        assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').notCalled);
+      },
+      (err: OTLPExporterError) => {
+        assert.fail(err);
+      }
+    );
 
     clock.restore();
   });
@@ -257,15 +263,20 @@ describe('sendWithHttp', () => {
     // use fake timers to replace setTimeout in sendWithHttp function
     const clock = sinon.useFakeTimers();
 
-    sendWithHttp(exporter, data, 'application/json', () => {
-      // Show that we are setting the gzip encoding header
-      assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
-    }, (err: OTLPExporterError) => {
-      assert.fail(err);
-    });
+    sendWithHttp(
+      exporter,
+      data,
+      'application/json',
+      () => {
+        // Show that we are setting the gzip encoding header
+        assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
+      },
+      (err: OTLPExporterError) => {
+        assert.fail(err);
+      }
+    );
 
     clock.restore();
-
   });
 
   it('should work with gzip compression enabled even after multiple requests', () => {
@@ -299,12 +310,18 @@ describe('sendWithHttp', () => {
       // use fake timers to replace setTimeout in sendWithHttp function
       const clock = sinon.useFakeTimers();
 
-      sendWithHttp(exporter, data, 'application/json', () => {
-        // Show that we are setting the gzip encoding header
-        assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
-      }, (err: OTLPExporterError) => {
-        assert.fail(err);
-      });
+      sendWithHttp(
+        exporter,
+        data,
+        'application/json',
+        () => {
+          // Show that we are setting the gzip encoding header
+          assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
+        },
+        (err: OTLPExporterError) => {
+          assert.fail(err);
+        }
+      );
 
       clock.restore();
     }

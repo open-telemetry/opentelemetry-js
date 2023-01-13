@@ -20,7 +20,7 @@ import {
   DEFAULT_EXPORT_INITIAL_BACKOFF,
   DEFAULT_EXPORT_BACKOFF_MULTIPLIER,
   DEFAULT_EXPORT_MAX_BACKOFF,
-  isExportRetryable
+  isExportRetryable,
 } from '../../util';
 
 /**
@@ -73,21 +73,22 @@ export function sendWithXhr(
     reqIsDestroyed = true;
 
     if (xhr.readyState === XMLHttpRequest.DONE) {
-      const err = new OTLPExporterError(
-        'Request Timeout'
-      );
+      const err = new OTLPExporterError('Request Timeout');
       onError(err);
     } else {
       xhr.abort();
     }
   }, exporterTimeout);
 
-  const sendWithRetry = (retries = DEFAULT_EXPORT_MAX_ATTEMPTS, minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF) => {
+  const sendWithRetry = (
+    retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
+    minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
+  ) => {
     xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
     const defaultHeaders = {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json',
     };
 
@@ -113,10 +114,14 @@ export function sendWithXhr(
 
           // retry after interval specified in Retry-After header
           if (xhr.getResponseHeader('Retry-After')) {
-            retryTime = retrieveThrottleTime(xhr.getResponseHeader('Retry-After')!);
+            retryTime = retrieveThrottleTime(
+              xhr.getResponseHeader('Retry-After')!
+            );
           } else {
             // exponential backoff with jitter
-            retryTime = Math.round(Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay);
+            retryTime = Math.round(
+              Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay
+            );
           }
 
           retryTimer = setTimeout(() => {
@@ -136,9 +141,7 @@ export function sendWithXhr(
 
     xhr.onabort = () => {
       if (reqIsDestroyed) {
-        const err = new OTLPExporterError(
-          'Request Timeout'
-        );
+        const err = new OTLPExporterError('Request Timeout');
         onError(err);
       }
       clearTimeout(exporterTimer);
@@ -147,10 +150,7 @@ export function sendWithXhr(
 
     xhr.onerror = () => {
       if (reqIsDestroyed) {
-        const err = new OTLPExporterError(
-          'Request Timeout'
-
-        );
+        const err = new OTLPExporterError('Request Timeout');
         onError(err);
       }
       clearTimeout(exporterTimer);
@@ -166,7 +166,9 @@ function retrieveThrottleTime(retryAfter: string): number {
   if (typeof retryAfter === 'object') {
     const currentTime = new Date();
     const retryAfterDate = new Date(retryAfter);
-    const secondsDiff = Math.ceil((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
+    const secondsDiff = Math.ceil(
+      (retryAfterDate.getTime() - currentTime.getTime()) / 1000
+    );
 
     // if throttle date is set to now, difference in seconds might be less than 0
     if (secondsDiff <= 0) {
@@ -174,7 +176,7 @@ function retrieveThrottleTime(retryAfter: string): number {
     } else {
       return secondsDiff * 1000;
     }
-  // it's an integer
+    // it's an integer
   } else {
     return Number(retryAfter) * 1000;
   }
