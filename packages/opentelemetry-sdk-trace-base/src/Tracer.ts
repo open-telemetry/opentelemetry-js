@@ -117,8 +117,6 @@ export class Tracer implements api.Tracer {
       links
     );
 
-    // according to the spec an empty Tracestate means it should be cleared but
-    // to maintain backwards compatibility we ignore empty values
     traceState = samplingResult.traceState ?? traceState;
 
     const traceFlags =
