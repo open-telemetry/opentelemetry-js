@@ -31,6 +31,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * `telemetry.sdk.name`
     * `telemetry.sdk.language`
     * `telemetry.sdk.version`
+* fix(sdk-metrics): use Date.now() for instrument recording timestamps [#3514](https://github.com/open-telemetry/opentelemetry-js/pull/3514) @MisterSquishy
 * fix(sdk-trace): make spans resilient to clock drift [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
 * fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
 * fix(sdk-metrics): collect metrics when periodic exporting metric reader flushes [#3517](https://github.com/open-telemetry/opentelemetry-js/pull/3517) @legendecas
