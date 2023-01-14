@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### :bug: (Bug Fix)
+
+* fix(metrics): export `MetricsAPI` type [#3535](https://github.com/open-telemetry/opentelemetry-js/pull/3535)
+
 ## 1.4.0
 
 ### :rocket: (Enhancement)
