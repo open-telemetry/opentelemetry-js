@@ -90,7 +90,25 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   private async _runOnce(): Promise<void> {
-    const { resourceMetrics, errors } = await this.collect({});
+    try {
+      await callWithTimeout(this._doRun(), this._exportTimeout);
+    } catch (err) {
+      if (err instanceof TimeoutError) {
+        api.diag.error(
+          'Export took longer than %s milliseconds and timed out.',
+          this._exportTimeout
+        );
+        return;
+      }
+
+      globalErrorHandler(err);
+    }
+  }
+
+  private async _doRun(): Promise<void> {
+    const { resourceMetrics, errors } = await this.collect({
+      timeoutMillis: this._exportTimeout,
+    });
 
     if (errors.length > 0) {
       api.diag.error(
@@ -109,25 +127,15 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
   protected override onInitialized(): void {
     // start running the interval as soon as this reader is initialized and keep handle for shutdown.
-    this._interval = setInterval(async () => {
-      try {
-        await callWithTimeout(this._runOnce(), this._exportTimeout);
-      } catch (err) {
-        if (err instanceof TimeoutError) {
-          api.diag.error(
-            'Export took longer than %s milliseconds and timed out.',
-            this._exportTimeout
-          );
-          return;
-        }
-
-        globalErrorHandler(err);
-      }
+    this._interval = setInterval(() => {
+      // this._runOnce never rejects. Using void operator to suppress @typescript-eslint/no-floating-promises.
+      void this._runOnce();
     }, this._exportInterval);
     unrefTimer(this._interval);
   }
 
   protected async onForceFlush(): Promise<void> {
+    await this._runOnce();
     await this._exporter.forceFlush();
   }
 
