@@ -31,13 +31,5 @@ export type ResourceAttributes = SpanAttributes;
  * Promise<Resource> is deprecated in favor of this approach.
  */
 export interface Detector {
-  detect(config?: ResourceDetectionConfig): Promise<Resource>;
-}
-
-/**
- * Interface for a synchronous Resource Detector. In order to detect resources asynchronously, a detector
- * can pass a Promise as the second parameter to the Resource constructor.
- */
-export interface DetectorSync {
-  detect(config?: ResourceDetectionConfig): Resource;
+  detect(config?: ResourceDetectionConfig): Promise<Resource> | Resource;
 }
