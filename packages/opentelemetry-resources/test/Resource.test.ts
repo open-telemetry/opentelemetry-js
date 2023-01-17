@@ -189,7 +189,6 @@ describe('Resource', () => {
         promise1: 'promise1val',
         promise2: 'promise2val',
         promise4: 'promise4val',
-        // same behavior as for synchronous attributes
         shared: 'promise4val',
       });
     });
@@ -210,7 +209,6 @@ describe('Resource', () => {
       assert.deepStrictEqual(merged.attributes, {
         promise1: 'promise1val',
         promise2: 'promise2val',
-        // same behavior as for synchronous attributes
         shared: 'promise2val',
       });
     });
@@ -235,7 +233,6 @@ describe('Resource', () => {
       assert.deepStrictEqual(merged.attributes, {
         promise1: 'promise1val',
         promise2: 'promise2val',
-        // same behavior as for synchronous attributes
         shared: 'promise2val',
       });
     });
