@@ -44,7 +44,6 @@ export interface LogRecordLimits {
 export interface LoggerConfig {
   loggerSharedState: LoggerSharedState;
   instrumentationScope: InstrumentationScope;
-  includeTraceContext: boolean;
 }
 
 /** Interface configuration for a buffer. */

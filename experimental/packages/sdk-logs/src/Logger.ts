@@ -22,6 +22,10 @@ import { LogRecord } from './LogRecord';
 export class Logger implements logsAPI.Logger {
   constructor(private readonly config: LoggerConfig) {}
 
+  public emitEvent(event: logsAPI.LogEvent): void {
+    new LogRecord(this.config, event).emit();
+  }
+
   public emitLogRecord(logRecord: logsAPI.LogRecord): void {
     new LogRecord(this.config, logRecord).emit();
   }

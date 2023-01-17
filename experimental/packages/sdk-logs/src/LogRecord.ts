@@ -48,32 +48,20 @@ export class LogRecord implements ReadableLogRecord {
     logRecord: logsAPI.LogRecord
   ) {
     const {
-      time = hrTime(),
-      observedTime,
-      // if includeTraceContext is true, Gets the current trace context by default
-      context = this.config.includeTraceContext
-        ? api.context.active()
-        : undefined,
+      timestamp = hrTime(),
       severityNumber,
       severityText,
       body,
       attributes = {},
+      spanId,
+      traceFlags,
+      traceId,
     } = logRecord;
-    this.time = timeInputToHrTime(time);
-    this.observedTime =
-      observedTime === undefined
-        ? observedTime
-        : timeInputToHrTime(observedTime);
+    this.time = timeInputToHrTime(timestamp);
 
-    if (context) {
-      const spanContext = api.trace.getSpanContext(context);
-      if (spanContext && api.isSpanContextValid(spanContext)) {
-        this.spanId = spanContext.spanId;
-        this.traceId = spanContext.traceId;
-        this.traceFlags = spanContext.traceFlags;
-      }
-    }
-
+    this.spanId = spanId;
+    this.traceId = traceId;
+    this.traceFlags = traceFlags;
     this.severityNumber = severityNumber;
     this.severityText = severityText;
     this.body = body;
@@ -94,7 +82,7 @@ export class LogRecord implements ReadableLogRecord {
     this.config.loggerSharedState.activeProcessor.onEmit(this);
   }
 
-  private setAttribute(key: string, value?: AttributeValue): LogRecord {
+  public setAttribute(key: string, value?: AttributeValue): LogRecord {
     if (value === null || this._isLogRecordEmitted()) {
       return this;
     }
@@ -117,7 +105,7 @@ export class LogRecord implements ReadableLogRecord {
     return this;
   }
 
-  private setAttributes(attributes: Attributes): LogRecord {
+  public setAttributes(attributes: Attributes): LogRecord {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
