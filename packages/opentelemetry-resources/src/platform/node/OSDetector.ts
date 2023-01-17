@@ -16,7 +16,7 @@
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../Resource';
-import { Detector, ResourceAttributes } from '../../types';
+import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
 import { platform, release } from 'os';
 
@@ -24,8 +24,8 @@ import { platform, release } from 'os';
  * OSDetector detects the resources related to the operating system (OS) on
  * which the process represented by this resource is running.
  */
-class OSDetector implements Detector {
-  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
+class OSDetector implements DetectorSync {
+  detect(_config?: ResourceDetectionConfig): Resource {
     const attributes: ResourceAttributes = {
       [SemanticResourceAttributes.OS_TYPE]: this._normalizeType(platform()),
       [SemanticResourceAttributes.OS_VERSION]: release(),

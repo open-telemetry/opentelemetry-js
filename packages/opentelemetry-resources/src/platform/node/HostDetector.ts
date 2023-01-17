@@ -16,7 +16,7 @@
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../Resource';
-import { Detector, ResourceAttributes } from '../../types';
+import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
 import { arch, hostname } from 'os';
 
@@ -24,8 +24,8 @@ import { arch, hostname } from 'os';
  * HostDetector detects the resources related to the host current process is
  * running on. Currently only non-cloud-based attributes are included.
  */
-class HostDetector implements Detector {
-  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
+class HostDetector implements DetectorSync {
+  detect(_config?: ResourceDetectionConfig): Resource {
     const attributes: ResourceAttributes = {
       [SemanticResourceAttributes.HOST_NAME]: hostname(),
       [SemanticResourceAttributes.HOST_ARCH]: this._normalizeArch(arch()),

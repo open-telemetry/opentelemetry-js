@@ -18,14 +18,14 @@ import { diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../Resource';
-import { Detector, ResourceAttributes } from '../types';
+import { DetectorSync, ResourceAttributes } from '../types';
 import { ResourceDetectionConfig } from '../config';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
  * from the OTEL_RESOURCE_ATTRIBUTES environment variable.
  */
-class EnvDetector implements Detector {
+class EnvDetector implements DetectorSync {
   // Type, attribute keys, and attribute values should not exceed 256 characters.
   private readonly _MAX_LENGTH = 255;
 
@@ -52,7 +52,7 @@ class EnvDetector implements Detector {
    *
    * @param config The resource detection config
    */
-  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
+  detect(_config?: ResourceDetectionConfig): Resource {
     const attributes: ResourceAttributes = {};
     const env = getEnv();
 

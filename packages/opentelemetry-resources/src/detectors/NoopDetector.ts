@@ -15,10 +15,10 @@
  */
 
 import { Resource } from '../Resource';
-import { Detector } from '../types';
+import { DetectorSync } from '../types';
 
-export class NoopDetector implements Detector {
-  async detect(): Promise<Resource> {
+export class NoopDetector implements DetectorSync {
+  detect(): Resource {
     return new Resource({});
   }
 }
