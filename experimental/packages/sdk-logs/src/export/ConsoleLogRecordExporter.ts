@@ -44,15 +44,6 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
     return Promise.resolve();
   }
 
-  private _sendLogRecords(
-    logRecords: ReadableLogRecord[]
-  ): Promise<ExportResult> {
-    for (const logRecord of logRecords) {
-      console.dir(this._exportInfo(logRecord), { depth: 3 });
-    }
-    return Promise.resolve({ code: ExportResultCode.SUCCESS });
-  }
-
   /**
    * converts logRecord info into more readable format
    * @param span
@@ -60,9 +51,6 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
   private _exportInfo(logRecord: ReadableLogRecord) {
     return {
       timestamp: hrTimeToMicroseconds(logRecord.time),
-      observedTimestamp: logRecord.observedTime
-        ? hrTimeToMicroseconds(logRecord.observedTime)
-        : undefined,
       traceId: logRecord.traceId,
       spanId: logRecord.spanId,
       traceFlags: logRecord.traceFlags,
@@ -71,5 +59,19 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
       body: logRecord.body,
       attributes: logRecord.attributes,
     };
+  }
+
+  /**
+   * Showing logs  in console
+   * @param logRecords
+   * @param done
+   */
+  private _sendLogRecords(
+    logRecords: ReadableLogRecord[]
+  ): Promise<ExportResult> {
+    for (const logRecord of logRecords) {
+      console.dir(this._exportInfo(logRecord), { depth: 3 });
+    }
+    return Promise.resolve({ code: ExportResultCode.SUCCESS });
   }
 }

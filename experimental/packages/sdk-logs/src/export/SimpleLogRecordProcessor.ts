@@ -14,21 +14,36 @@
  * limitations under the License.
  */
 
-import type { ExportResult } from "@opentelemetry/core";
-import { ExportResultCode, globalErrorHandler } from "@opentelemetry/core";
+import type { ExportResult } from '@opentelemetry/core';
+import {
+  BindOnceFuture,
+  ExportResultCode,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 
-import type { LogRecordExporter } from "./LogRecordExporter";
-import type { LogRecordProcessor } from "../LogRecordProcessor";
-import type { ReadableLogRecord } from "./ReadableLogRecord";
+import type { LogRecordExporter } from './LogRecordExporter';
+import type { LogRecordProcessor } from '../LogRecordProcessor';
+import type { ReadableLogRecord } from './ReadableLogRecord';
 
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
-  constructor(private readonly _exporter: LogRecordExporter) {}
+  private _shutdownOnce: BindOnceFuture<void>;
+
+  constructor(private readonly _exporter: LogRecordExporter) {
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+  }
 
   public onEmit(logRecord: ReadableLogRecord): void {
+    if (this._shutdownOnce.isCalled) {
+      return;
+    }
+
     this._exporter.export([logRecord], (res: ExportResult) => {
       if (res.code !== ExportResultCode.SUCCESS) {
         globalErrorHandler(
-          res.error ?? new Error(`SimpleLogRecordProcessor: log record export failed (status ${res})`)
+          res.error ??
+            new Error(
+              `SimpleLogRecordProcessor: log record export failed (status ${res})`
+            )
         );
         return;
       }
@@ -41,6 +56,10 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
   }
 
   public shutdown(): Promise<void> {
+    return this._shutdownOnce.call();
+  }
+
+  private _shutdown(): Promise<void> {
     return this._exporter.shutdown();
   }
 }

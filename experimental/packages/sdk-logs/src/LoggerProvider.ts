@@ -16,19 +16,19 @@
 
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { Resource } from '@opentelemetry/resources';
-import { BindOnceFuture, merge } from '@opentelemetry/core';
+import { merge } from '@opentelemetry/core';
 
-import type { LoggerProviderConfig } from './types';
+import type { LoggerProviderConfig, LogRecordLimits } from './types';
 import type { LogRecordProcessor } from './LogRecordProcessor';
-import type { LoggerSharedState } from './LoggerSharedState';
 import { Logger } from './Logger';
 import { loadDefaultConfig } from './config';
 import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 
 export class LoggerProvider implements logsAPI.LoggerProvider {
-  private readonly _loggerSharedState: LoggerSharedState;
   private readonly _loggers: Map<string, Logger> = new Map();
-  private _shutdownOnceFeature: BindOnceFuture<void>;
+  private readonly _resource: Resource;
+  private readonly _logRecordLimits: LogRecordLimits;
+  private readonly _activeProcessor: MultiLogRecordProcessor;
 
   constructor(config: LoggerProviderConfig = {}) {
     const { resource, logRecordLimits, forceFlushTimeoutMillis } = merge(
@@ -36,13 +36,11 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       loadDefaultConfig(),
       config
     );
-    this._shutdownOnceFeature = new BindOnceFuture(this._showdownFeature, this);
-    this._loggerSharedState = {
-      resource: Resource.default().merge(resource ?? Resource.empty()),
-      activeProcessor: new MultiLogRecordProcessor(forceFlushTimeoutMillis),
-      shutdownOnceFeature: this._shutdownOnceFeature,
-      logRecordLimits,
-    };
+    this._resource = Resource.default().merge(resource ?? Resource.empty());
+    this._activeProcessor = new MultiLogRecordProcessor(
+      forceFlushTimeoutMillis
+    );
+    this._logRecordLimits = logRecordLimits;
   }
 
   /**
@@ -53,13 +51,16 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     version?: string,
     options?: logsAPI.LoggerOptions
   ): Logger {
-    const { schemaUrl = '' } = options || {};
+    const { schemaUrl = '', eventDomain } = options || {};
     const key = `${name}@${version || ''}:${schemaUrl}`;
     if (!this._loggers.has(key)) {
       this._loggers.set(
         key,
         new Logger({
-          loggerSharedState: this._loggerSharedState,
+          eventDomain,
+          resource: this._resource,
+          logRecordLimits: this._logRecordLimits,
+          activeProcessor: this._activeProcessor,
           instrumentationScope: { name, version, schemaUrl },
         })
       );
@@ -72,7 +73,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    * @param processor the new LogRecordProcessor to be added.
    */
   public addLogRecordProcessor(processor: LogRecordProcessor) {
-    this._loggerSharedState.activeProcessor.addLogRecordProcessor(processor);
+    this._activeProcessor.addLogRecordProcessor(processor);
   }
 
   /**
@@ -81,10 +82,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    * Returns a promise which is resolved when all flushes are complete.
    */
   public forceFlush(): Promise<void> {
-    if (this._shutdownOnceFeature.isCalled) {
-      return Promise.reject('can not flush, it is already shutdown');
-    }
-    return this._loggerSharedState.activeProcessor.forceFlush();
+    return this._activeProcessor.forceFlush();
   }
 
   /**
@@ -94,10 +92,6 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    * Returns a promise which is resolved when all flushes are complete.
    */
   public shutdown(): Promise<void> {
-    return this._shutdownOnceFeature.call();
-  }
-
-  private _showdownFeature(): Promise<void> {
-    return this._loggerSharedState.activeProcessor.shutdown();
+    return this._activeProcessor.shutdown();
   }
 }

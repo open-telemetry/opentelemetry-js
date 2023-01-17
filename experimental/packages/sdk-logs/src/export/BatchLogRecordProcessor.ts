@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-import type { ExportResult } from "@opentelemetry/core";
-import { diag } from "@opentelemetry/api";
-import { ExportResultCode, getEnv, globalErrorHandler, unrefTimer, callWithTimeout } from "@opentelemetry/core";
+import type { ExportResult } from '@opentelemetry/core';
+import { diag } from '@opentelemetry/api';
+import {
+  ExportResultCode,
+  getEnv,
+  globalErrorHandler,
+  unrefTimer,
+  callWithTimeout,
+  BindOnceFuture,
+} from '@opentelemetry/core';
 
-import type { BufferConfig } from "../types";
-import type { ReadableLogRecord } from "./ReadableLogRecord";
-import type { LogRecordExporter } from "./LogRecordExporter";
-import type { LogRecordProcessor } from "./../LogRecordProcessor";
+import type { BufferConfig } from '../types';
+import type { ReadableLogRecord } from './ReadableLogRecord';
+import type { LogRecordExporter } from './LogRecordExporter';
+import type { LogRecordProcessor } from './../LogRecordProcessor';
 
-export abstract class BatchLogRecordProcessorBase<T extends BufferConfig> implements LogRecordProcessor {
+export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
+  implements LogRecordProcessor
+{
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
@@ -31,31 +40,47 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig> implem
 
   private _finishedLogRecords: ReadableLogRecord[] = [];
   private _timer: NodeJS.Timeout | undefined;
+  private _shutdownOnce: BindOnceFuture<void>;
 
   constructor(private readonly _exporter: LogRecordExporter, config?: T) {
     const env = getEnv();
-    this._maxExportBatchSize = config?.maxExportBatchSize ?? env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
+    this._maxExportBatchSize =
+      config?.maxExportBatchSize ?? env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
     this._maxQueueSize = config?.maxQueueSize ?? env.OTEL_BSP_MAX_QUEUE_SIZE;
-    this._scheduledDelayMillis = config?.scheduledDelayMillis ?? env.OTEL_BSP_SCHEDULE_DELAY;
-    this._exportTimeoutMillis = config?.exportTimeoutMillis ?? env.OTEL_BSP_EXPORT_TIMEOUT;
+    this._scheduledDelayMillis =
+      config?.scheduledDelayMillis ?? env.OTEL_BSP_SCHEDULE_DELAY;
+    this._exportTimeoutMillis =
+      config?.exportTimeoutMillis ?? env.OTEL_BSP_EXPORT_TIMEOUT;
+
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
     if (this._maxExportBatchSize > this._maxQueueSize) {
       diag.warn(
-        "BatchLogRecordProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, setting maxExportBatchSize to match maxQueueSize"
+        'BatchLogRecordProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, setting maxExportBatchSize to match maxQueueSize'
       );
       this._maxExportBatchSize = this._maxQueueSize;
     }
   }
 
   public onEmit(logRecord: ReadableLogRecord): void {
+    if (this._shutdownOnce.isCalled) {
+      return;
+    }
     this._addToBuffer(logRecord);
   }
 
   public forceFlush(): Promise<void> {
+    if (this._shutdownOnce.isCalled) {
+      return this._shutdownOnce.promise;
+    }
     return this._flushAll();
   }
 
-  public async shutdown(): Promise<void> {
+  public shutdown(): Promise<void> {
+    return this._shutdownOnce.call();
+  }
+
+  private async _shutdown(): Promise<void> {
     this.onShutdown();
     await this._flushAll();
     await this._exporter.shutdown();
@@ -78,7 +103,9 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig> implem
   private _flushAll(): Promise<void> {
     return new Promise((resolve, reject) => {
       const promises = [];
-      const batchCount = Math.ceil(this._finishedLogRecords.length / this._maxExportBatchSize);
+      const batchCount = Math.ceil(
+        this._finishedLogRecords.length / this._maxExportBatchSize
+      );
       for (let i = 0; i < batchCount; i++) {
         promises.push(this._flushOneBatch());
       }
@@ -97,7 +124,9 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig> implem
     }
     return new Promise((resolve, reject) => {
       callWithTimeout(
-        this._export(this._finishedLogRecords.splice(0, this._maxExportBatchSize)),
+        this._export(
+          this._finishedLogRecords.splice(0, this._maxExportBatchSize)
+        ),
         this._exportTimeoutMillis
       )
         .then(() => resolve())
@@ -117,7 +146,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig> implem
             this._maybeStartTimer();
           }
         })
-        .catch((e) => {
+        .catch(e => {
           globalErrorHandler(e);
         });
     }, this._scheduledDelayMillis);
@@ -135,7 +164,12 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig> implem
     return new Promise((resolve, reject) => {
       this._exporter.export(logRecords, (res: ExportResult) => {
         if (res.code !== ExportResultCode.SUCCESS) {
-          reject(res.error ?? new Error(`BatchLogRecordProcessorBase: log record export failed (status ${res})`));
+          reject(
+            res.error ??
+              new Error(
+                `BatchLogRecordProcessorBase: log record export failed (status ${res})`
+              )
+          );
           return;
         }
         resolve(res);

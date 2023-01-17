@@ -16,8 +16,7 @@
 
 import type { Resource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
-
-import type { LoggerSharedState } from './LoggerSharedState';
+import type { LogRecordProcessor } from './LogRecordProcessor';
 
 export interface LoggerProviderConfig {
   /** Resource associated with trace telemetry  */
@@ -42,7 +41,10 @@ export interface LogRecordLimits {
 }
 
 export interface LoggerConfig {
-  loggerSharedState: LoggerSharedState;
+  eventDomain?: string;
+  activeProcessor: LogRecordProcessor;
+  resource: Resource;
+  logRecordLimits: LogRecordLimits;
   instrumentationScope: InstrumentationScope;
 }
 

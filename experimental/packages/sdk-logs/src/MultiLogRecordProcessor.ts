@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { callWithTimeout } from "@opentelemetry/core";
+import { callWithTimeout } from '@opentelemetry/core';
 
-import type { LogRecordProcessor } from "./LogRecordProcessor";
-import type { ReadableLogRecord } from "./export/ReadableLogRecord";
+import type { LogRecordProcessor } from './LogRecordProcessor';
+import type { ReadableLogRecord } from './export/ReadableLogRecord';
 
 /**
  * Implementation of the {@link LogRecordProcessor} that simply forwards all
@@ -34,14 +34,18 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
 
   public async forceFlush(): Promise<void> {
     const timeout = this._forceFlushTimeoutMillis;
-    await Promise.all(this._processors.map((processor) => callWithTimeout(processor.forceFlush(), timeout)));
+    await Promise.all(
+      this._processors.map(processor =>
+        callWithTimeout(processor.forceFlush(), timeout)
+      )
+    );
   }
 
   public onEmit(logRecord: ReadableLogRecord): void {
-    this._processors.forEach((processors) => processors.onEmit(logRecord));
+    this._processors.forEach(processors => processors.onEmit(logRecord));
   }
 
   public async shutdown(): Promise<void> {
-    await Promise.all(this._processors.map((processor) => processor.shutdown()));
+    await Promise.all(this._processors.map(processor => processor.shutdown()));
   }
 }

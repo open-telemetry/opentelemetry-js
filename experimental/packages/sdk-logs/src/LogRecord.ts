@@ -24,9 +24,9 @@ import {
   isAttributeValue,
 } from '@opentelemetry/core';
 
-import { Resource } from '@opentelemetry/resources';
-import { ReadableLogRecord } from './export/ReadableLogRecord';
-import { LoggerConfig } from './types';
+import type { Resource } from '@opentelemetry/resources';
+import type { ReadableLogRecord } from './export/ReadableLogRecord';
+import type { LoggerConfig } from './types';
 
 export class LogRecord implements ReadableLogRecord {
   readonly time: api.HrTime;
@@ -57,29 +57,25 @@ export class LogRecord implements ReadableLogRecord {
       traceFlags,
       traceId,
     } = logRecord;
-    this.time = timeInputToHrTime(timestamp);
 
+    this.time = timeInputToHrTime(timestamp);
     this.spanId = spanId;
     this.traceId = traceId;
     this.traceFlags = traceFlags;
     this.severityNumber = severityNumber;
     this.severityText = severityText;
     this.body = body;
-    this.resource = this.config.loggerSharedState.resource;
+    this.resource = this.config.resource;
     this.instrumentationScope = this.config.instrumentationScope;
     this.setAttributes(attributes);
   }
 
   public emit(): void {
-    if (this.config.loggerSharedState.shutdownOnceFeature.isCalled) {
-      api.diag.warn('can not emit, it is already shutdown');
-      return;
-    }
     if (this._isLogRecordEmitted()) {
       return;
     }
     this._isEmitted = true;
-    this.config.loggerSharedState.activeProcessor.onEmit(this);
+    this.config.activeProcessor.onEmit(this);
   }
 
   public setAttribute(key: string, value?: AttributeValue): LogRecord {
@@ -96,7 +92,7 @@ export class LogRecord implements ReadableLogRecord {
     }
     if (
       Object.keys(this.attributes).length >=
-        this.config.loggerSharedState.logRecordLimits.attributeCountLimit! &&
+        this.config.logRecordLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return this;
@@ -120,9 +116,7 @@ export class LogRecord implements ReadableLogRecord {
   }
 
   private _truncateToSize(value: AttributeValue): AttributeValue {
-    const limit =
-      this.config.loggerSharedState.logRecordLimits.attributeValueLengthLimit ||
-      0;
+    const limit = this.config.logRecordLimits.attributeValueLengthLimit || 0;
     // Check limit
     if (limit <= 0) {
       // Negative values are invalid, so do not truncate

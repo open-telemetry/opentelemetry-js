@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import type { ExportResult } from "@opentelemetry/core";
-import { ExportResultCode } from "@opentelemetry/core";
+import type { ExportResult } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 
-import type { ReadableLogRecord } from "./ReadableLogRecord";
-import type { LogRecordExporter } from "./LogRecordExporter";
+import type { ReadableLogRecord } from './ReadableLogRecord';
+import type { LogRecordExporter } from './LogRecordExporter';
 
 /**
  * This class can be used for testing purposes. It stores the exported LogRecords
@@ -28,12 +28,29 @@ import type { LogRecordExporter } from "./LogRecordExporter";
 export class InMemoryLogRecordExporter implements LogRecordExporter {
   private _finishedLogRecords: ReadableLogRecord[] = [];
 
-  public export(logs: ReadableLogRecord[], resultCallback: (result: ExportResult) => void) {
+  /**
+   * Indicates if the exporter has been "shutdown."
+   * When false, exported log records will not be stored in-memory.
+   */
+  protected _stopped = false;
+
+  public export(
+    logs: ReadableLogRecord[],
+    resultCallback: (result: ExportResult) => void
+  ) {
+    if (this._stopped) {
+      return resultCallback({
+        code: ExportResultCode.FAILED,
+        error: new Error('Exporter has been stopped'),
+      });
+    }
+
     this._finishedLogRecords.push(...logs);
     resultCallback({ code: ExportResultCode.SUCCESS });
   }
 
   public shutdown(): Promise<void> {
+    this._stopped = true;
     this.reset();
     return Promise.resolve();
   }
