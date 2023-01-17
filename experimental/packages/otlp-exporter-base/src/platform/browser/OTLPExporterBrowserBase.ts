@@ -18,9 +18,10 @@ import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../types';
 import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
-import { sendWithBeacon, sendWithXhr } from './util';
+import { sendWithBeacon, sendWithFetch, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { _globalThis } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -30,16 +31,21 @@ export abstract class OTLPExporterBrowserBase<
   ServiceRequest
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
-  private _useXHR: boolean = false;
+  private sendMethod: 'beacon' | 'xhr' | 'fetch' = 'beacon';
 
   /**
    * @param config
    */
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-    this._useXHR =
-      !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (this._useXHR) {
+    if (!!config.headers && typeof navigator.sendBeacon === 'function') {
+      this.sendMethod = 'beacon';
+    } else if (typeof XMLHttpRequest === 'function') {
+      this.sendMethod = 'xhr';
+    } else {
+      this.sendMethod = 'fetch';
+    }
+    if (this.sendMethod !== 'beacon') {
       this._headers = Object.assign(
         {},
         parseHeaders(config.headers),
@@ -53,11 +59,11 @@ export abstract class OTLPExporterBrowserBase<
   }
 
   onInit(): void {
-    window.addEventListener('unload', this.shutdown);
+    _globalThis.addEventListener('unload', this.shutdown);
   }
 
   onShutdown(): void {
-    window.removeEventListener('unload', this.shutdown);
+    _globalThis.removeEventListener('unload', this.shutdown);
   }
 
   send(
@@ -73,7 +79,7 @@ export abstract class OTLPExporterBrowserBase<
     const body = JSON.stringify(serviceRequest);
 
     const promise = new Promise<void>((resolve, reject) => {
-      if (this._useXHR) {
+      if (this.sendMethod === 'xhr') {
         sendWithXhr(
           body,
           this.url,
@@ -82,7 +88,16 @@ export abstract class OTLPExporterBrowserBase<
           resolve,
           reject
         );
-      } else {
+      } else if (this.sendMethod === 'fetch') {
+        sendWithFetch(
+          body,
+          this.url,
+          this._headers,
+          this.timeoutMillis,
+          resolve,
+          reject
+        );
+      } else if (this.sendMethod === 'beacon') {
         sendWithBeacon(
           body,
           this.url,

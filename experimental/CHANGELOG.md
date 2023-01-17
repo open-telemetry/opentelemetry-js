@@ -8,6 +8,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(otlp-exporter-base): Add fetch sender for ServiceWorker environment. [#3542](https://github.com/open-telemetry/opentelemetry-js/pull/3542) @sugi
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)

@@ -16,6 +16,11 @@
 import { diag } from '@opentelemetry/api';
 import { OTLPExporterError } from '../../types';
 
+const defaultHeaders = {
+  Accept: 'application/json',
+  'Content-Type': 'application/json',
+};
+
 /**
  * Send metrics/spans using browser navigator.sendBeacon
  * @param body
@@ -67,11 +72,6 @@ export function sendWithXhr(
   const xhr = new XMLHttpRequest();
   xhr.open('POST', url);
 
-  const defaultHeaders = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  };
-
   Object.entries({
     ...defaultHeaders,
     ...headers,
@@ -100,4 +100,58 @@ export function sendWithXhr(
       }
     }
   };
+}
+
+/**
+ * function to send metrics/spans using browser fetch
+ *     used when navigator.sendBeacon and XMLHttpRequest are not available
+ * @param body
+ * @param url
+ * @param headers
+ * @param onSuccess
+ * @param onError
+ */
+export function sendWithFetch(
+  body: string,
+  url: string,
+  headers: Record<string, string>,
+  exporterTimeout: number,
+  onSuccess: () => void,
+  onError: (error: OTLPExporterError) => void
+): void {
+  const controller = new AbortController();
+  const timerId = setTimeout(() => controller.abort(), exporterTimeout);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      ...defaultHeaders,
+      ...headers,
+    },
+    signal: controller.signal,
+    body,
+  })
+    .then(response => {
+      if (response.ok) {
+        response.text().then(
+          t => diag.debug('Request Success', t),
+          () => {}
+        );
+        onSuccess();
+      } else {
+        onError(
+          new OTLPExporterError(
+            `Request Error (${response.status} ${response.statusText})`,
+            response.status
+          )
+        );
+      }
+    })
+    .catch((e: Error) => {
+      if (e.name === 'AbortError') {
+        onError(new OTLPExporterError('Request Timeout'));
+      } else {
+        onError(new OTLPExporterError(`Request Fail: ${e.name} ${e.message}`));
+      }
+    })
+    .finally(() => clearTimeout(timerId));
 }
