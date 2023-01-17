@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { GetHeaders } from './types';
 
-export function prepareGetHeaders(
-  getExportRequestHeaders: GetHeaders
-): () => Record<string, string> | undefined {
-  return function () {
-    return getExportRequestHeaders();
-  };
-}
+import { _export } from './exporter';
+import { HttpClient } from './http-client';
+import {
+  createHttpExportClient,
+  HttpExportClient,
+  ExportOptions,
+} from './http-export';
+export {
+  _export,
+  createHttpExportClient,
+  HttpClient,
+  HttpExportClient,
+  ExportOptions,
+};

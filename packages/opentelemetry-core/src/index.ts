@@ -24,7 +24,15 @@ export * from './common/types';
 export * from './ExportResult';
 export * from './version';
 export * as baggageUtils from './baggage/utils';
-export * from './platform';
+export {
+  SDK_INFO,
+  _globalThis,
+  getEnv,
+  hexToBase64,
+  otperformance,
+  unrefTimer,
+  RandomIdGenerator,
+} from './platform';
 export * from './propagation/composite';
 export * from './trace/W3CTraceContextPropagator';
 export * from './trace/IdGenerator';
@@ -42,7 +50,4 @@ export * from './utils/url';
 export * from './utils/wrap';
 export * from './utils/callback';
 export * from './version';
-import { _export } from './internal/exporter';
-export const internal = {
-  _export,
-};
+export * as internal from './internal';

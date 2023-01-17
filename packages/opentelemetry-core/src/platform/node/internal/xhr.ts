@@ -14,4 +14,9 @@
  * limitations under the License.
  */
 
-export * from './node';
+import { RequestFunction } from '../../../internal/http-client';
+
+export const isXhrRequestAvailable = () => false;
+export const xhrRequest: RequestFunction = () => {
+  throw new Error('XMLHttpRequest is not implemented in Node.js');
+};

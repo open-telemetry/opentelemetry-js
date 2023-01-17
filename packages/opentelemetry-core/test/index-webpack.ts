@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 const testsContextCommon = require.context('.', true, /test$/);
-testsContextCommon.keys().forEach(testsContextCommon);
+// exclude platform/node tests from being required to avoid import node:http module.
+testsContextCommon.keys().forEach(id => {
+  if (id.match(/platform\/node/) == null) {
+    testsContextCommon(id);
+  }
+});
 
 const srcContext = require.context('.', true, /src$/);
 srcContext.keys().forEach(srcContext);

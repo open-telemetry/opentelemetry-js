@@ -28,22 +28,18 @@ describe('zipkin - header interceptor', () => {
         const exporter = new ZipkinExporter({
           getExportRequestHeaders,
         });
-        const oldFunction = exporter['_send'];
         exporter.export([span], () => {});
 
         assert.strictEqual(getExportRequestHeaders.callCount, 1);
-        assert.notStrictEqual(exporter['_getHeaders'], undefined);
-        assert.notStrictEqual(oldFunction, exporter['_send']);
+        assert.notStrictEqual(exporter['_getExportRequestHeaders'], undefined);
       });
     });
     describe('when callback is NOT defined', () => {
       it('should call callback before sending', () => {
         const span = Object.assign({}, mockedReadableSpan);
         const exporter = new ZipkinExporter();
-        const oldFunction = exporter['_send'];
-        assert.strictEqual(exporter['_getHeaders'], undefined);
+        assert.strictEqual(exporter['_getExportRequestHeaders'], undefined);
         exporter.export([span], () => {});
-        assert.strictEqual(oldFunction, exporter['_send']);
       });
     });
   });

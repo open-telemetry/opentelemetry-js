@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from './util';
+export { httpRequest, isHttpRequestAvailable } from './node-http';
+export { isSendBeaconRequestAvailable, sendBeaconRequest } from './send-beacon';
+export { isXhrRequestAvailable, xhrRequest } from './xhr';

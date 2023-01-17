@@ -60,6 +60,8 @@ function getReadableSpan() {
   return readableSpan;
 }
 
+api.diag.setLogger(new api.DiagConsoleLogger(), api.DiagLogLevel.ALL);
+
 describe('Zipkin Exporter - node', () => {
   describe('constructor', () => {
     it('should construct an exporter', () => {

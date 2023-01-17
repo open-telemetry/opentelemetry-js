@@ -21,3 +21,6 @@ export * from './RandomIdGenerator';
 export * from './performance';
 export * from './sdk-info';
 export * from './timer-util';
+
+import * as internal from './internal';
+export { internal };

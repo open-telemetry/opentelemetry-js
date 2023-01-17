@@ -15,9 +15,8 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode, getEnv, internal } from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import { prepareSend } from './platform/index';
 import * as zipkinTypes from './types';
 import {
   toZipkinSpan,
@@ -25,7 +24,6 @@ import {
   defaultStatusErrorTagName,
 } from './transform';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { prepareGetHeaders } from './utils';
 
 /**
  * Zipkin Exporter
@@ -34,16 +32,19 @@ export class ZipkinExporter implements SpanExporter {
   private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
+
   private _urlStr: string;
-  private _send: zipkinTypes.SendFunction;
-  private _getHeaders: zipkinTypes.GetHeaders | undefined;
+  private _getExportRequestHeaders: zipkinTypes.GetHeaders | undefined;
+  private _headers: Record<string, string> | undefined;
+  private _request: internal.HttpExportClient;
+
   private _serviceName?: string;
   private _isShutdown: boolean;
   private _sendingPromises: Promise<unknown>[] = [];
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
     this._urlStr = config.url || getEnv().OTEL_EXPORTER_ZIPKIN_ENDPOINT;
-    this._send = prepareSend(this._urlStr, config.headers);
+    this._headers = config.headers;
     this._serviceName = config.serviceName;
     this._statusCodeTagName =
       config.statusCodeTagName || defaultStatusCodeTagName;
@@ -51,11 +52,16 @@ export class ZipkinExporter implements SpanExporter {
       config.statusDescriptionTagName || defaultStatusErrorTagName;
     this._isShutdown = false;
     if (typeof config.getExportRequestHeaders === 'function') {
-      this._getHeaders = prepareGetHeaders(config.getExportRequestHeaders);
-    } else {
-      // noop
-      this._beforeSend = function () {};
+      this._getExportRequestHeaders = config.getExportRequestHeaders;
     }
+
+    const preferredClients: internal.HttpClient[] = ['node:http'];
+    if (config.headers && this._getExportRequestHeaders) {
+      preferredClients.push('XMLHttpReuqest');
+    } else {
+      preferredClients.push('sendBeacon', 'XMLHttpReuqest');
+    }
+    this._request = internal.createHttpExportClient(preferredClients);
   }
 
   /**
@@ -115,10 +121,11 @@ export class ZipkinExporter implements SpanExporter {
    * constructor
    * @default noop
    */
-  private _beforeSend() {
-    if (this._getHeaders) {
-      this._send = prepareSend(this._urlStr, this._getHeaders());
+  private _getHeaders() {
+    if (this._getExportRequestHeaders) {
+      return this._getExportRequestHeaders();
     }
+    return this._headers;
   }
 
   /**
@@ -141,11 +148,10 @@ export class ZipkinExporter implements SpanExporter {
         this._statusDescriptionTagName
       )
     );
-    this._beforeSend();
-    return this._send(zipkinSpans, (result: ExportResult) => {
-      if (done) {
-        return done(result);
-      }
+
+    const headers = this._getHeaders();
+    return this._request(this._urlStr, JSON.stringify(zipkinSpans), {
+      headers,
     });
   }
 }
