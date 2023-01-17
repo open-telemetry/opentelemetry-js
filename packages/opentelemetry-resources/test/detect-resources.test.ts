@@ -17,7 +17,7 @@
 import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Resource, Detector, detectResourcesSync } from '../src';
+import { Resource, Detector, detectResourcesSync, DetectorSync } from '../src';
 import { describeNode } from './util';
 
 describe('detectResourcesSync', () => {
@@ -42,7 +42,7 @@ describe('detectResourcesSync', () => {
   });
 
   it('handles resource detectors which return Resource with a promise inside', async () => {
-    const detector: Detector = {
+    const detector: DetectorSync = {
       detect() {
         return new Resource(
           { sync: 'fromsync' },
@@ -68,7 +68,7 @@ describe('detectResourcesSync', () => {
       const debugStub = sinon.spy(diag, 'debug');
 
       // use a class so it has a name
-      class DetectorRejects implements Detector {
+      class DetectorRejects implements DetectorSync {
         detect() {
           return new Resource(
             { sync: 'fromsync' },
@@ -76,7 +76,7 @@ describe('detectResourcesSync', () => {
           );
         }
       }
-      class DetectorOk implements Detector {
+      class DetectorOk implements DetectorSync {
         detect() {
           return new Resource(
             { sync: 'fromsync' },

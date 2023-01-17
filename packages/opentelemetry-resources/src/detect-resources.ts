@@ -19,6 +19,7 @@ import { ResourceDetectionConfig } from './config';
 import { diag } from '@opentelemetry/api';
 import * as util from 'util';
 import { isPromiseLike } from './utils';
+import { Detector, DetectorSync } from './types';
 
 /**
  * Runs all resource detectors and returns the results merged into a single Resource. Promise
@@ -62,32 +63,34 @@ export const detectResources = async (
 export const detectResourcesSync = (
   config: ResourceDetectionConfig = {}
 ): Resource => {
-  const resources: Resource[] = (config.detectors ?? []).map(d => {
-    try {
-      const resourceOrPromise = d.detect(config);
-      let resource: Resource;
-      if (isPromiseLike<Resource>(resourceOrPromise)) {
-        const createPromise = async () => {
-          const resolvedResource = await resourceOrPromise;
-          return resolvedResource.attributes;
-        };
-        resource = new Resource({}, createPromise());
-      } else {
-        resource = resourceOrPromise;
+  const resources: Resource[] = (config.detectors ?? []).map(
+    (d: Detector | DetectorSync) => {
+      try {
+        const resourceOrPromise = d.detect(config);
+        let resource: Resource;
+        if (isPromiseLike<Resource>(resourceOrPromise)) {
+          const createPromise = async () => {
+            const resolvedResource = await resourceOrPromise;
+            return resolvedResource.attributes;
+          };
+          resource = new Resource({}, createPromise());
+        } else {
+          resource = resourceOrPromise;
+        }
+
+        void resource
+          .waitForAsyncAttributes()
+          .then(() =>
+            diag.debug(`${d.constructor.name} found resource.`, resource)
+          );
+
+        return resource;
+      } catch (e) {
+        diag.error(`${d.constructor.name} failed: ${e.message}`);
+        return Resource.empty();
       }
-
-      void resource
-        .waitForAsyncAttributes()
-        .then(() =>
-          diag.debug(`${d.constructor.name} found resource.`, resource)
-        );
-
-      return resource;
-    } catch (e) {
-      diag.error(`${d.constructor.name} failed: ${e.message}`);
-      return Resource.empty();
     }
-  });
+  );
 
   const mergedResources = resources.reduce(
     (acc, resource) => acc.merge(resource),

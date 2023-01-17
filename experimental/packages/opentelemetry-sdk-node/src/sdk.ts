@@ -21,6 +21,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import {
   Detector,
+  DetectorSync,
   detectResourcesSync,
   envDetector,
   processDetector,
@@ -64,7 +65,7 @@ export class NodeSDK {
   private _instrumentations: InstrumentationOption[];
 
   private _resource: Resource;
-  private _resourceDetectors: Detector[];
+  private _resourceDetectors: Array<Detector | DetectorSync>;
 
   private _autoDetectResources: boolean;
 
