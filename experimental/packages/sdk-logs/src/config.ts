@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { getEnv } from "@opentelemetry/core";
+import { getEnv } from '@opentelemetry/core';
 
 export function loadDefaultConfig() {
   return {
     forceFlushTimeoutMillis: 30000,
     logRecordLimits: {
-      attributeValueLengthLimit: getEnv().OTEL_LOG_RECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeValueLengthLimit:
+        getEnv().OTEL_LOG_RECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT,
       attributeCountLimit: getEnv().OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT,
     },
   };
 }
 
-export const DEFAULT_EVENT_DOMAIN = "default";
+export const DEFAULT_EVENT_DOMAIN = 'default';

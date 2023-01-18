@@ -15,19 +15,19 @@
  */
 
 export const validAttributes = {
-  string: "string",
+  string: 'string',
   number: 0,
   bool: true,
-  "array<string>": ["str1", "str2"],
-  "array<number>": [1, 2],
-  "array<bool>": [true, false],
+  'array<string>': ['str1', 'str2'],
+  'array<number>': [1, 2],
+  'array<bool>': [true, false],
 };
 
 export const invalidAttributes = {
   // invalid attribute type object
-  object: { foo: "bar" },
+  object: { foo: 'bar' },
   // invalid attribute inhomogeneous array
-  "non-homogeneous-array": [0, ""],
+  'non-homogeneous-array': [0, ''],
   // This empty length attribute should not be set
-  "": "empty-key",
+  '': 'empty-key',
 };

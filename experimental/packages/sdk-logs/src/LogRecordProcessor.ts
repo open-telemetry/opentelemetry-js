@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ReadableLogRecord } from "./export/ReadableLogRecord";
+import type { ReadableLogRecord } from './export/ReadableLogRecord';
 
 export interface LogRecordProcessor {
   /**

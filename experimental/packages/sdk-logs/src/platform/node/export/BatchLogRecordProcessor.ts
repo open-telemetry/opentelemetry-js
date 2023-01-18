@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import type { BufferConfig } from "../../../types";
-import { BatchLogRecordProcessorBase } from "../../../export/BatchLogRecordProcessor";
+import type { BufferConfig } from '../../../types';
+import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessor';
 
 export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   protected onShutdown(): void {}

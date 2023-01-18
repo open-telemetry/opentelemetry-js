@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import * as assert from "assert";
+import * as assert from 'assert';
 
-import type { ReadableLogRecord } from "../../../src";
-import { InMemoryLogRecordExporter } from "../../../src";
+import type { ReadableLogRecord } from '../../../src';
+import { InMemoryLogRecordExporter } from '../../../src';
 
-describe("InMemoryLogRecordExporter", () => {
-  describe("export", () => {
-    it("should export information about log record", (done) => {
+describe('InMemoryLogRecordExporter', () => {
+  describe('export', () => {
+    it('should export information about log record', done => {
       const memoryExporter = new InMemoryLogRecordExporter();
       const logs: ReadableLogRecord[] = [];
       for (let i = 0; i < 10; i++) {
@@ -30,14 +30,17 @@ describe("InMemoryLogRecordExporter", () => {
       }
       memoryExporter.export(logs, () => {
         // @ts-expect-error
-        assert.strictEqual(memoryExporter._finishedLogRecords.length, logs.length);
+        assert.strictEqual(
+          memoryExporter._finishedLogRecords.length,
+          logs.length
+        );
         done();
       });
     });
   });
 
-  describe("shutdown", () => {
-    it("should clear all log records", (done) => {
+  describe('shutdown', () => {
+    it('should clear all log records', done => {
       const memoryExporter = new InMemoryLogRecordExporter();
       const logs: ReadableLogRecord[] = [];
       for (let i = 0; i < 10; i++) {
@@ -46,7 +49,10 @@ describe("InMemoryLogRecordExporter", () => {
       }
       memoryExporter.export(logs, () => {
         // @ts-expect-error
-        assert.strictEqual(memoryExporter._finishedLogRecords.length, logs.length);
+        assert.strictEqual(
+          memoryExporter._finishedLogRecords.length,
+          logs.length
+        );
         memoryExporter.shutdown();
         // @ts-expect-error
         assert.strictEqual(memoryExporter._finishedLogRecords.length, 0);
@@ -55,8 +61,8 @@ describe("InMemoryLogRecordExporter", () => {
     });
   });
 
-  describe("getFinishedLogRecords", () => {
-    it("should get all log records", (done) => {
+  describe('getFinishedLogRecords', () => {
+    it('should get all log records', done => {
       const memoryExporter = new InMemoryLogRecordExporter();
       const logs: ReadableLogRecord[] = [];
       for (let i = 0; i < 10; i++) {
@@ -64,14 +70,17 @@ describe("InMemoryLogRecordExporter", () => {
         logs.push({});
       }
       memoryExporter.export(logs, () => {
-        assert.strictEqual(memoryExporter.getFinishedLogRecords().length, logs.length);
+        assert.strictEqual(
+          memoryExporter.getFinishedLogRecords().length,
+          logs.length
+        );
         done();
       });
     });
   });
 
-  describe("reset", () => {
-    it("should clear all log records", (done) => {
+  describe('reset', () => {
+    it('should clear all log records', done => {
       const memoryExporter = new InMemoryLogRecordExporter();
       const logs: ReadableLogRecord[] = [];
       for (let i = 0; i < 10; i++) {
@@ -80,7 +89,10 @@ describe("InMemoryLogRecordExporter", () => {
       }
       memoryExporter.export(logs, () => {
         // @ts-expect-error
-        assert.strictEqual(memoryExporter._finishedLogRecords.length, logs.length);
+        assert.strictEqual(
+          memoryExporter._finishedLogRecords.length,
+          logs.length
+        );
         memoryExporter.reset();
         // @ts-expect-error
         assert.strictEqual(memoryExporter._finishedLogRecords.length, 0);

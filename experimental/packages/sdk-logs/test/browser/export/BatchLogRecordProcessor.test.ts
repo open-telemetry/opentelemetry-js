@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import * as assert from "assert";
-import * as sinon from "sinon";
+import * as assert from 'assert';
+import * as sinon from 'sinon';
 
-import { LogRecordExporter } from "../../../src";
-import { BatchLogRecordProcessor } from "../../../src/platform/browser/export/BatchLogRecordProcessor";
-import { InMemoryLogRecordExporter } from "./../../../src/export/InMemoryLogRecordExporter";
+import { LogRecordExporter } from '../../../src';
+import { BatchLogRecordProcessor } from '../../../src/platform/browser/export/BatchLogRecordProcessor';
+import { InMemoryLogRecordExporter } from './../../../src/export/InMemoryLogRecordExporter';
 
-const describeDocument = typeof document === "object" ? describe : describe.skip;
+const describeDocument =
+  typeof document === 'object' ? describe : describe.skip;
 
-describeDocument("BatchLogRecordProcessor - web main context", () => {
-  let visibilityState: VisibilityState = "visible";
+describeDocument('BatchLogRecordProcessor - web main context', () => {
+  let visibilityState: VisibilityState = 'visible';
   let exporter: LogRecordExporter;
   let processor: BatchLogRecordProcessor;
   let forceFlushSpy: sinon.SinonStub;
@@ -32,29 +33,29 @@ describeDocument("BatchLogRecordProcessor - web main context", () => {
   let pageHideEvent: Event;
 
   beforeEach(() => {
-    sinon.replaceGetter(document, "visibilityState", () => visibilityState);
-    visibilityState = "visible";
+    sinon.replaceGetter(document, 'visibilityState', () => visibilityState);
+    visibilityState = 'visible';
     exporter = new InMemoryLogRecordExporter();
     processor = new BatchLogRecordProcessor(exporter, {});
-    forceFlushSpy = sinon.stub(processor, "forceFlush");
-    visibilityChangeEvent = new Event("visibilitychange");
-    pageHideEvent = new Event("pagehide");
+    forceFlushSpy = sinon.stub(processor, 'forceFlush');
+    visibilityChangeEvent = new Event('visibilitychange');
+    pageHideEvent = new Event('pagehide');
   });
 
   afterEach(async () => {
     sinon.restore();
   });
 
-  describe("when document becomes hidden", () => {
+  describe('when document becomes hidden', () => {
     const testDocumentHide = (hideDocument: () => void) => {
-      it("should force flush log records", () => {
+      it('should force flush log records', () => {
         assert.strictEqual(forceFlushSpy.callCount, 0);
         hideDocument();
         assert.strictEqual(forceFlushSpy.callCount, 1);
       });
 
-      describe("AND shutdown has been called", () => {
-        it("should NOT force flush log records", async () => {
+      describe('AND shutdown has been called', () => {
+        it('should NOT force flush log records', async () => {
           assert.strictEqual(forceFlushSpy.callCount, 0);
           await processor.shutdown();
           hideDocument();
@@ -62,22 +63,22 @@ describeDocument("BatchLogRecordProcessor - web main context", () => {
         });
       });
 
-      describe("AND disableAutoFlushOnDocumentHide configuration option", () => {
-        it("set to false should force flush log records", () => {
+      describe('AND disableAutoFlushOnDocumentHide configuration option', () => {
+        it('set to false should force flush log records', () => {
           processor = new BatchLogRecordProcessor(exporter, {
             disableAutoFlushOnDocumentHide: false,
           });
-          forceFlushSpy = sinon.stub(processor, "forceFlush");
+          forceFlushSpy = sinon.stub(processor, 'forceFlush');
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 1);
         });
 
-        it("set to true should NOT force flush log records", () => {
+        it('set to true should NOT force flush log records', () => {
           processor = new BatchLogRecordProcessor(exporter, {
             disableAutoFlushOnDocumentHide: true,
           });
-          forceFlushSpy = sinon.stub(processor, "forceFlush");
+          forceFlushSpy = sinon.stub(processor, 'forceFlush');
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 0);
@@ -85,22 +86,22 @@ describeDocument("BatchLogRecordProcessor - web main context", () => {
       });
     };
 
-    describe("by the visibilitychange event", () => {
+    describe('by the visibilitychange event', () => {
       testDocumentHide(() => {
-        visibilityState = "hidden";
+        visibilityState = 'hidden';
         document.dispatchEvent(visibilityChangeEvent);
       });
     });
 
-    describe("by the pagehide event", () => {
+    describe('by the pagehide event', () => {
       testDocumentHide(() => {
         document.dispatchEvent(pageHideEvent);
       });
     });
   });
 
-  describe("when document becomes visible", () => {
-    it("should NOT force flush log records", () => {
+  describe('when document becomes visible', () => {
+    it('should NOT force flush log records', () => {
       assert.strictEqual(forceFlushSpy.callCount, 0);
       document.dispatchEvent(visibilityChangeEvent);
       assert.strictEqual(forceFlushSpy.callCount, 0);
@@ -108,8 +109,8 @@ describeDocument("BatchLogRecordProcessor - web main context", () => {
   });
 });
 
-describe("BatchLogRecordProcessor", () => {
-  it("without exception", async () => {
+describe('BatchLogRecordProcessor', () => {
+  it('without exception', async () => {
     const exporter = new InMemoryLogRecordExporter();
     const logRecordProcessor = new BatchLogRecordProcessor(exporter);
     assert.ok(logRecordProcessor instanceof BatchLogRecordProcessor);

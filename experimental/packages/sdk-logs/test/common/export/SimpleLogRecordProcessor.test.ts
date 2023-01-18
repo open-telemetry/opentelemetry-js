@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import { ExportResultCode, loggingErrorHandler, setGlobalErrorHandler } from "@opentelemetry/core";
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import {
+  ExportResultCode,
+  loggingErrorHandler,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
 
-import type { LogRecordExporter, ReadableLogRecord } from "./../../../src";
-import { SimpleLogRecordProcessor } from "./../../../src";
+import type { LogRecordExporter, ReadableLogRecord } from './../../../src';
+import { SimpleLogRecordProcessor } from './../../../src';
 
 const setup = (exporter?: LogRecordExporter) => {
   // @ts-expect-error
@@ -28,15 +32,15 @@ const setup = (exporter?: LogRecordExporter) => {
   return { processor };
 };
 
-describe("SimpleLogRecordProcessor", () => {
-  describe("constructor", () => {
-    it("should create a SimpleLogRecordProcessor instance", () => {
+describe('SimpleLogRecordProcessor', () => {
+  describe('constructor', () => {
+    it('should create a SimpleLogRecordProcessor instance', () => {
       assert.ok(setup().processor instanceof SimpleLogRecordProcessor);
     });
   });
 
-  describe("onEmit", () => {
-    it("should handle onEmit", async () => {
+  describe('onEmit', () => {
+    it('should handle onEmit', async () => {
       const exportSpy = sinon.spy();
       // @ts-expect-error
       const { processor } = setup({ export: exportSpy });
@@ -46,11 +50,16 @@ describe("SimpleLogRecordProcessor", () => {
       assert.ok(exportSpy.callCount === 1);
     });
 
-    it("should call globalErrorHandler when exporting fails", async () => {
-      const expectedError = new Error("Exporter failed");
+    it('should call globalErrorHandler when exporting fails', async () => {
+      const expectedError = new Error('Exporter failed');
       // @ts-expect-error
       const exporter: LogRecordExporter = {
-        export: (_, callback) => setTimeout(() => callback({ code: ExportResultCode.FAILED, error: expectedError }), 0),
+        export: (_, callback) =>
+          setTimeout(
+            () =>
+              callback({ code: ExportResultCode.FAILED, error: expectedError }),
+            0
+          ),
       };
       const { processor } = setup(exporter);
       // @ts-expect-error
@@ -58,7 +67,7 @@ describe("SimpleLogRecordProcessor", () => {
       const errorHandlerSpy = sinon.spy();
       setGlobalErrorHandler(errorHandlerSpy);
       processor.onEmit(logRecord);
-      await new Promise<void>((resolve) => setTimeout(() => resolve(), 0));
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 0));
       assert.strictEqual(errorHandlerSpy.callCount, 1);
       const [[error]] = errorHandlerSpy.args;
       assert.deepStrictEqual(error, expectedError);
@@ -67,8 +76,8 @@ describe("SimpleLogRecordProcessor", () => {
     });
   });
 
-  describe("shutdown", () => {
-    it("should handle shutdown", async () => {
+  describe('shutdown', () => {
+    it('should handle shutdown', async () => {
       const shutdownSpy = sinon.spy();
       // @ts-expect-error
       const { processor } = setup({ shutdown: shutdownSpy });

@@ -21,7 +21,6 @@ import { Resource } from '@opentelemetry/resources';
 import type { LogRecordProcessor } from './../../src/LogRecordProcessor';
 import { Logger, LoggerProvider } from '../../src';
 import { loadDefaultConfig } from '../../src/config';
-import { DEFAULT_EVENT_DOMAIN } from './../../src/config';
 
 describe('LoggerProvider', () => {
   afterEach(() => {

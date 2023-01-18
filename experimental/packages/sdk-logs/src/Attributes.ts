@@ -15,6 +15,6 @@
  */
 
 export const EVENT_LOGS_ATTRIBUTES = {
-  name: "event.name",
-  domain: "event.domain",
+  name: 'event.name',
+  domain: 'event.domain',
 };

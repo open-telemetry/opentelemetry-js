@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-export * from "./types";
-export * from "./LoggerProvider";
-export * from "./Logger";
-export * from "./LogRecord";
-export * from "./LogRecordProcessor";
-export * from "./export/ReadableLogRecord";
-export * from "./export/BatchLogRecordProcessor";
-export * from "./export/ConsoleLogRecordExporter";
-export * from "./export/LogRecordExporter";
-export * from "./export/SimpleLogRecordProcessor";
-export * from "./export/InMemoryLogRecordExporter";
-export * from "./platform";
+export * from './types';
+export * from './LoggerProvider';
+export * from './Logger';
+export * from './LogRecord';
+export * from './LogRecordProcessor';
+export * from './export/ReadableLogRecord';
+export * from './export/BatchLogRecordProcessor';
+export * from './export/ConsoleLogRecordExporter';
+export * from './export/LogRecordExporter';
+export * from './export/SimpleLogRecordProcessor';
+export * from './export/InMemoryLogRecordExporter';
+export * from './platform';
