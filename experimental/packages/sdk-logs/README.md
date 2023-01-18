@@ -23,12 +23,12 @@ npm install --save @opentelemetry/sdk-logs
 The basic setup of the SDK can be seen as followings:
 
 ```js
-const logsAPI = require("@opentelemetry/api-logs");
+const logsAPI = require('@opentelemetry/api-logs');
 const {
   LoggerProvider,
   SimpleLogRecordProcessor,
   ConsoleLogRecordExporter,
-} = require("@opentelemetry/sdk-logs");
+} = require('@opentelemetry/sdk-logs');
 
 // To start a logger, you first need to initialize the Logger provider.
 const loggerProvider = new LoggerProvider();
@@ -38,31 +38,26 @@ loggerProvider.addLogRecordProcessor(
 );
 
 //  To create a log record, you first need to get a Logger instance
-const logger = loggerProvider.getLogger("default");
+const logger = loggerProvider.getLogger('default');
 
 // You can also use global singleton
 logsAPI.logs.setGlobalLoggerProvider(loggerProvider);
-const logger = logsAPI.logs.getLogger("default");
+const logger = logsAPI.logs.getLogger('default');
 
 // logging an event in an instrumentation library
-logger
-  .getLogEvent("event-name", {
-    severityNumber: SeverityNumber.WARN,
-    severityText: "WARN",
-    body: "this is a log event body",
-    attributes: { "log.type": "LogEvent" },
-  })
-  .emit();
+logger.emitEvent({
+  name: 'event-name',
+  body: 'this is a log event body',
+  attributes: { 'log.type': 'LogEvent' },
+});
 
 // logging an event in a log appender
-logger
-  .getLogRecord({
-    severityNumber: SeverityNumber.INFO,
-    severityText: "INFO",
-    body: "this is a log record body",
-    attributes: { "log.type": "LogRecord" },
-  })
-  .emit();
+logger.emitLogRecord({
+  severityNumber: SeverityNumber.INFO,
+  severityText: 'INFO',
+  body: 'this is a log record body',
+  attributes: { 'log.type': 'LogRecord' },
+});
 ```
 
 ## Config
