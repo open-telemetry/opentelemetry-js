@@ -58,9 +58,9 @@ export interface SamplingResult {
   attributes?: Readonly<SpanAttributes>;
   /**
    * A {@link TraceState} that will be associated with the {@link Span} through
-   * the new {@link SpanContext}. Samplers SHOULD return the passed-in
-   * TraceState if they do not intend to change it. Leaving the value undefined
-   * will also leave the TraceState unchanged.
+   * the new {@link SpanContext}. Samplers SHOULD return the TraceState from
+   * the passed-in {@link Context} if they do not intend to change it. Leaving
+   * the value undefined will also leave the TraceState unchanged.
    */
   traceState?: TraceState;
 }
