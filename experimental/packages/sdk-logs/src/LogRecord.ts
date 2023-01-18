@@ -30,7 +30,6 @@ import type { LoggerConfig } from './types';
 
 export class LogRecord implements ReadableLogRecord {
   readonly time: api.HrTime;
-  readonly observedTime?: api.HrTime;
   readonly traceId?: string;
   readonly spanId?: string;
   readonly traceFlags?: number;
@@ -78,34 +77,32 @@ export class LogRecord implements ReadableLogRecord {
     this.config.activeProcessor.onEmit(this);
   }
 
-  public setAttribute(key: string, value?: AttributeValue): LogRecord {
+  public setAttribute(key: string, value?: AttributeValue) {
     if (value === null || this._isLogRecordEmitted()) {
-      return this;
+      return;
     }
     if (key.length === 0) {
       api.diag.warn(`Invalid attribute key: ${key}`);
-      return this;
+      return;
     }
     if (!isAttributeValue(value)) {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
-      return this;
+      return;
     }
     if (
       Object.keys(this.attributes).length >=
         this.config.logRecordLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
-      return this;
+      return;
     }
     this.attributes[key] = this._truncateToSize(value);
-    return this;
   }
 
-  public setAttributes(attributes: Attributes): LogRecord {
+  public setAttributes(attributes: Attributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
-    return this;
   }
 
   private _isLogRecordEmitted(): boolean {

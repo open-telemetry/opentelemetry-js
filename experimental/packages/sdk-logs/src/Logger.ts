@@ -25,13 +25,13 @@ export class Logger implements logsAPI.Logger {
   constructor(private readonly config: LoggerConfig) {}
 
   public emitEvent(event: logsAPI.LogEvent): void {
-    new LogRecord(this.config, event)
-      .setAttributes({
-        [EVENT_LOGS_ATTRIBUTES.name]: event.name,
-        [EVENT_LOGS_ATTRIBUTES.domain]:
-          event.domain ?? this.config.eventDomain ?? DEFAULT_EVENT_DOMAIN,
-      })
-      .emit();
+    const logRecord = new LogRecord(this.config, event);
+    logRecord.setAttributes({
+      [EVENT_LOGS_ATTRIBUTES.name]: event.name,
+      [EVENT_LOGS_ATTRIBUTES.domain]:
+        event.domain ?? this.config.eventDomain ?? DEFAULT_EVENT_DOMAIN,
+    });
+    logRecord.emit();
   }
 
   public emitLogRecord(logRecord: logsAPI.LogRecord): void {
