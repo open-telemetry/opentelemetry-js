@@ -22,7 +22,7 @@ import {
   LastValue,
 } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { hrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
+import { millisToHrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
 import { DataPointType, GaugeMetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -37,7 +37,7 @@ export class LastValueAccumulation implements Accumulation {
 
   record(value: number): void {
     this._current = value;
-    this.sampleTime = hrTime();
+    this.sampleTime = millisToHrTime(Date.now());
   }
 
   setStartTime(startTime: HrTime): void {

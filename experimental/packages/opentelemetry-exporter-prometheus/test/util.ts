@@ -15,17 +15,13 @@
  */
 
 import * as sinon from 'sinon';
-import * as perf_hooks from 'perf_hooks';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 export const mockedHrTimeMs = 1586347902211;
 
 export function mockHrTime() {
-  // We cannot stub core.now or core.timeOrigin since a property of
-  // ModuleNamespace can not be reconfigured.ß
-  sinon.stub(perf_hooks.performance, 'timeOrigin').value(0);
-  sinon.stub(perf_hooks.performance, 'now').returns(mockedHrTimeMs);
+  sinon.useFakeTimers(mockedHrTimeMs);
 }
 
 export const serviceName = Resource.default()
