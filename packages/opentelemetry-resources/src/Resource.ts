@@ -77,7 +77,7 @@ export class Resource {
         return asyncAttributes;
       },
       err => {
-        diag.debug("The resource's async promise rejected: %s", err);
+        diag.debug("a resource's async attributes promise rejected: %s", err);
         this.asyncAttributesHaveResolved = true;
         return {};
       }
