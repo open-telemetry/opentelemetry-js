@@ -13,6 +13,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix: avoid grpc types dependency [#FixMe](https://github.com/open-telemetry/opentelemetry-js/pull/FixMe) @flarna
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

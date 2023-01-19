@@ -25,7 +25,7 @@ import {
   findIndex,
 } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
-import { metadataCaptureType } from '../types';
+import { metadataCaptureType } from '../internal-types';
 import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 /**
