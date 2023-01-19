@@ -34,7 +34,7 @@ export class Resource {
   }
 
   /**
-   * Returns a Resource that indentifies the SDK in use.
+   * Returns a Resource that identifies the SDK in use.
    */
   static default(): Resource {
     return new Resource({
