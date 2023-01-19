@@ -244,7 +244,9 @@ describe('Resource', () => {
       await resource.waitForAsyncAttributes();
 
       assert.ok(
-        debugStub.calledWithMatch("The resource's async promise rejected")
+        debugStub.calledWithMatch(
+          "a resource's async attributes promise rejected"
+        )
       );
     });
   });
