@@ -74,6 +74,27 @@ describe('PrometheusExporter', () => {
       });
     });
 
+    it('should pass server error to callback when port is already in use', done => {
+      const firstExporter = new PrometheusExporter({}, error => {
+        if (error) {
+          // This should not happen as the port should not be already in use when the test starts.
+          done(error);
+        }
+      });
+      const secondExporter = new PrometheusExporter({}, error => {
+        firstExporter
+          .shutdown()
+          .then(() => secondExporter.shutdown())
+          .then(() =>
+            done(
+              error
+                ? undefined
+                : 'Second exporter should respond with EADDRINUSE but did not pass it to callback'
+            )
+          );
+      });
+    });
+
     it('should not start the server if preventServerStart is passed as an option', () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
       assert.ok(exporter['_server'].listening === false);

@@ -54,7 +54,7 @@ export class PrometheusExporter extends MetricReader {
    * @param config Exporter configuration
    * @param callback Callback to be called after a server was started
    */
-  constructor(config: ExporterConfig = {}, callback?: () => void) {
+  constructor(config: ExporterConfig = {}, callback?: (error?: Error) => void) {
     super({
       aggregationSelector: _instrumentType => Aggregation.Default(),
       aggregationTemporalitySelector: _instrumentType =>
@@ -87,8 +87,11 @@ export class PrometheusExporter extends MetricReader {
 
     if (config.preventServerStart !== true) {
       this.startServer()
-        .then(callback)
-        .catch(err => diag.error(err));
+        .then(() => callback?.())
+        .catch(err => {
+          diag.error(err);
+          callback?.(err);
+        });
     } else if (callback) {
       callback();
     }
@@ -137,7 +140,8 @@ export class PrometheusExporter extends MetricReader {
    * Starts the Prometheus export server
    */
   startServer(): Promise<void> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      this._server.on('error', reject);
       this._server.listen(
         {
           port: this._port,
@@ -156,7 +160,7 @@ export class PrometheusExporter extends MetricReader {
   /**
    * Request handler that responds with the current state of metrics
    * @param _request Incoming HTTP request of server instance
-   * @param response HTTP response objet used to response to request
+   * @param response HTTP response object used to response to request
    */
   public getMetricsRequestHandler(
     _request: IncomingMessage,
