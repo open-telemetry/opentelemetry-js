@@ -55,7 +55,7 @@ export function sendWithBeacon(
  * @param onError
  */
 export function sendWithXhr(
-  body: string,
+  body: string | Blob,
   url: string,
   headers: Record<string, string>,
   exporterTimeout: number,

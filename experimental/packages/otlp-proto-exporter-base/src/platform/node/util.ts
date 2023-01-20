@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ServiceClientType } from './types';
+import { ServiceClientType } from '../types';
 import { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
 import {
   CompressionAlgorithm,
@@ -22,7 +22,7 @@ import {
   sendWithHttp,
 } from '@opentelemetry/otlp-exporter-base';
 import type * as protobuf from 'protobufjs';
-import * as root from './generated/root';
+import * as root from '../../generated/root';
 
 export interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
   create(properties?: T): R;
