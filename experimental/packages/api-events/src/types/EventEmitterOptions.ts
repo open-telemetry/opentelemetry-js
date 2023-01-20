@@ -26,7 +26,7 @@ export interface EventEmitterOptions {
   /**
    * The default domain for events created by the EventEmitter.
    *
-   * The combination of event name and event domain uiquely identifies an event.
+   * The combination of event name and event domain uniquely identifies an event.
    * By supplying an event domain, it is possible to use the same event name across
    * different domains / use cases.
    *
