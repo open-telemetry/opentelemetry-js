@@ -30,5 +30,9 @@ export interface EventEmitterProvider {
    * @param options The options of the event emitter or instrumentation library.
    * @returns EventEmitter An event emitter with the given name and version
    */
-  getEventEmitter(name: string, version?: string, options?: EventEmitterOptions): EventEmitter;
+  getEventEmitter(
+    name: string,
+    version?: string,
+    options?: EventEmitterOptions
+  ): EventEmitter;
 }

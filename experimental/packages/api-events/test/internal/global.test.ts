@@ -15,7 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { _global, GLOBAL_EVENTS_API_KEY } from '../../src/internal/global-utils';
+import {
+  _global,
+  GLOBAL_EVENTS_API_KEY,
+} from '../../src/internal/global-utils';
 import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
 
 const api1 = require('../../src') as typeof import('../../src');
@@ -45,7 +48,10 @@ describe('Global Utils', () => {
     const newEventEmitterProvider = new NoopEventEmitterProvider();
     api1.events.setGlobalEventEmitterProvider(newEventEmitterProvider);
     assert.notStrictEqual(api1.events.getEventEmitterProvider(), original);
-    assert.strictEqual(api1.events.getEventEmitterProvider(), newEventEmitterProvider);
+    assert.strictEqual(
+      api1.events.getEventEmitterProvider(),
+      newEventEmitterProvider
+    );
   });
 
   it('should load an instance from one which was set in the other', () => {

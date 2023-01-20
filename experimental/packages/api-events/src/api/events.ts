@@ -38,7 +38,9 @@ export class EventsAPI {
     return this._instance;
   }
 
-  public setGlobalEventEmitterProvider(provider: EventEmitterProvider): EventEmitterProvider {
+  public setGlobalEventEmitterProvider(
+    provider: EventEmitterProvider
+  ): EventEmitterProvider {
     if (_global[GLOBAL_EVENTS_API_KEY]) {
       return this.getEventEmitterProvider();
     }
@@ -67,14 +69,18 @@ export class EventsAPI {
   /**
    * Returns a event emitter from the global event emitter provider.
    *
-   * @returns EventEmitter 
+   * @returns EventEmitter
    */
-  public getEventEmitter (
+  public getEventEmitter(
     name: string,
     version?: string,
-    options?: EventEmitterOptions 
+    options?: EventEmitterOptions
   ): EventEmitter {
-    return this.getEventEmitterProvider().getEventEmitter(name, version, options);
+    return this.getEventEmitterProvider().getEventEmitter(
+      name,
+      version,
+      options
+    );
   }
 
   /** Remove the global event emitter provider */

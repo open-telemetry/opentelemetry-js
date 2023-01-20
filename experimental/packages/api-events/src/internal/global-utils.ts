@@ -17,7 +17,9 @@
 import { EventEmitterProvider } from '../types/EventEmitterProvider';
 import { _globalThis } from '../platform';
 
-export const GLOBAL_EVENTS_API_KEY = Symbol.for('io.opentelemetry.js.api.events');
+export const GLOBAL_EVENTS_API_KEY = Symbol.for(
+  'io.opentelemetry.js.api.events'
+);
 
 type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{

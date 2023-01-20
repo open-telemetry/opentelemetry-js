@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { EventEmitterProvider} from './types/EventEmitterProvider';
+import { EventEmitterProvider } from './types/EventEmitterProvider';
 import { EventEmitter } from './types/EventEmitter';
 import { EventEmitterOptions } from './types/EventEmitterOptions';
 import { NoopEventEmitter } from './NoopEventEmitter';
 
 export class NoopEventEmitterProvider implements EventEmitterProvider {
-  getEventEmitter (
+  getEventEmitter(
     _name: string,
     _version?: string | undefined,
     _options?: EventEmitterOptions | undefined

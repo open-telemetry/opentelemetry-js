@@ -35,7 +35,9 @@ describe('API', () => {
 
     it('should use the global event emitter provider', () => {
       events.setGlobalEventEmitterProvider(new TestEventEmitterProvider());
-      const eventEmitter = events.getEventEmitterProvider().getEventEmitter('name');
+      const eventEmitter = events
+        .getEventEmitterProvider()
+        .getEventEmitter('name');
       assert.deepStrictEqual(eventEmitter, dummyEventEmitter);
     });
 

@@ -22,9 +22,13 @@ describe('NoopLoggerProvider', () => {
   it('should not crash', () => {
     const eventEmitterProvider = new NoopEventEmitterProvider();
 
-    assert.ok(eventEmitterProvider.getEventEmitter('emitter-name') instanceof NoopEventEmitter);
     assert.ok(
-      eventEmitterProvider.getEventEmitter('emitter-name', 'v1') instanceof NoopEventEmitter 
+      eventEmitterProvider.getEventEmitter('emitter-name') instanceof
+        NoopEventEmitter
+    );
+    assert.ok(
+      eventEmitterProvider.getEventEmitter('emitter-name', 'v1') instanceof
+        NoopEventEmitter
     );
     assert.ok(
       eventEmitterProvider.getEventEmitter('emitter-name', 'v1', {

@@ -27,7 +27,7 @@ describe('NoopEventEmitter', () => {
   it('calling emit should not crash', () => {
     const logger = new NoopEventEmitterProvider().getEventEmitter('test-noop');
     logger.emit({
-      name: 'event name'
+      name: 'event name',
     });
   });
 });
