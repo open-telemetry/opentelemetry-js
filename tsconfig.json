@@ -55,6 +55,9 @@
       "path": "api"
     },
     {
+      "path": "experimental/packages/api-events"
+    },
+    {
       "path": "experimental/packages/api-logs"
     },
     {

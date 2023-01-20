@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat (api-logs): separate Events API into its own package [3550](https://github.com/open-telemetry/opentelemetry-js/pull/3550) @martinkuba
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
