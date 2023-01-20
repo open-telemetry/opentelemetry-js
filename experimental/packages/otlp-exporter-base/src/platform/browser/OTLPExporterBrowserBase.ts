@@ -38,7 +38,7 @@ export abstract class OTLPExporterBrowserBase<
    */
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-    if (!!config.headers && typeof navigator.sendBeacon === 'function') {
+    if (!config.headers && typeof navigator.sendBeacon === 'function') {
       this.sendMethod = 'beacon';
     } else if (typeof XMLHttpRequest === 'function') {
       this.sendMethod = 'xhr';

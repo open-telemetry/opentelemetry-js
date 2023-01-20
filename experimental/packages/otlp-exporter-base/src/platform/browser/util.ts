@@ -140,7 +140,7 @@ export function sendWithFetch(
       } else {
         onError(
           new OTLPExporterError(
-            `Request Error (${response.status} ${response.statusText})`,
+            `Failed to export with fetch: (${response.status} ${response.statusText})`,
             response.status
           )
         );

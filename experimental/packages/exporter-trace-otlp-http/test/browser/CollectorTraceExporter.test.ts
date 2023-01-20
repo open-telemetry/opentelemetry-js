@@ -33,6 +33,8 @@ import {
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { FetchMockStatic, MockCall } from 'fetch-mock/esm/client';
+const fetchMock = require('fetch-mock/esm/client').default as FetchMockStatic;
 
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;
@@ -270,6 +272,140 @@ describe('OTLPTraceExporter - web', () => {
         });
       });
     });
+
+    describe('when both "sendBeacon" and "XMLHTTPRequest" are NOT available (service worker env)', () => {
+      let clock: sinon.SinonFakeTimers;
+      let stubXhr: sinon.SinonStub;
+      const url = 'http://foo.bar.com';
+      beforeEach(() => {
+        clock = sinon.useFakeTimers();
+
+        stubBeacon.value(undefined);
+        stubXhr = sinon.stub(globalThis, 'XMLHttpRequest').value(undefined);
+        fetchMock.mock(url, 200);
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+      });
+      afterEach(() => {
+        sinon.restore();
+        clock.restore();
+        fetchMock.restore();
+      });
+
+      it('should successfully send the spans using fetch', done => {
+        collectorTraceExporter.export(spans, () => {
+          try {
+            assert.ok(fetchMock.called(url));
+            const request = fetchMock.lastCall(url)?.[1];
+            assert.ok(request);
+            assert.strictEqual(request.method, 'POST');
+
+            const body = request.body?.toString();
+            assert.ok(body);
+            const json = JSON.parse(body) as IExportTraceServiceRequest;
+            const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+
+            assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
+            ensureSpanIsCorrect(span1);
+
+            const resource = json.resourceSpans?.[0].resource;
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            ensureWebResourceIsCorrect(resource);
+
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubXhr.callCount, 0);
+            ensureExportTraceServiceRequestIsSet(json);
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+      });
+
+      it('should log the successful message', done => {
+        const spyLoggerDebug = sinon.stub();
+        const spyLoggerError = sinon.stub();
+        const nop = () => {};
+        const diagLogger: DiagLogger = {
+          debug: spyLoggerDebug,
+          error: spyLoggerError,
+          info: nop,
+          verbose: nop,
+          warn: nop,
+        };
+
+        diag.setLogger(diagLogger, DiagLogLevel.ALL);
+
+        collectorTraceExporter.export(spans, () => {
+          try {
+            assert.strictEqual(fetchMock.calls('*').length, 1);
+            assert.ok(fetchMock.called(url));
+
+            assert.strictEqual(
+              spyLoggerDebug.args[spyLoggerDebug.callCount - 1][0],
+              'Request Success'
+            );
+            assert.strictEqual(spyLoggerError.args.length, 0);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubXhr.callCount, 0);
+
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+      });
+
+      it('should log the error message', done => {
+        fetchMock.restore();
+        fetchMock.mock(url, 400);
+        collectorTraceExporter.export(spans, result => {
+          try {
+            assert.ok(fetchMock.called(url));
+            assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+            assert.ok(result.error?.message.includes('Failed to export'));
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubXhr.callCount, 0);
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+      });
+
+      it('should send custom headers', done => {
+        collectorTraceExporter = new OTLPTraceExporter(
+          Object.assign({}, collectorExporterConfig, {
+            headers: {
+              'My-Custom-Header1': '123',
+              'My-Custom-Header2': 'abc',
+            },
+          })
+        );
+
+        collectorTraceExporter.export(spans, () => {
+          try {
+            assert.ok(fetchMock.called(url));
+            const request = fetchMock.lastCall(url)?.[1];
+            assert.ok(request);
+            assert.ok(request.headers);
+            const sentHeadersObj = Object.fromEntries(
+              Object.entries(request.headers)
+            );
+            assert.strictEqual(sentHeadersObj['My-Custom-Header1'], '123');
+            assert.strictEqual(sentHeadersObj['My-Custom-Header2'], 'abc');
+
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubXhr.callCount, 0);
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+      });
+    });
   });
 
   describe('export - common', () => {
@@ -430,6 +566,66 @@ describe('OTLPTraceExporter - web', () => {
 
           done();
         });
+      });
+    });
+
+    describe('when both "sendBeacon" and "XMLHttpRequest" are NOT available', () => {
+      let clock: sinon.SinonFakeTimers;
+      let stubXhr: sinon.SinonStub;
+      beforeEach(() => {
+        clock = sinon.useFakeTimers();
+
+        stubBeacon.value(undefined);
+        stubXhr = sinon.stub(globalThis, 'XMLHttpRequest').value(undefined);
+        fetchMock.mock('*', 200);
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+      });
+      afterEach(() => {
+        sinon.restore();
+        clock.restore();
+        fetchMock.restore();
+      });
+
+      const assertRequesetHeaders = (
+        call: MockCall | undefined,
+        expected: Record<string, string>
+      ) => {
+        assert.ok(call);
+        const headers = call[1]?.headers;
+        assert.ok(headers, 'invalid header');
+        ensureHeadersContain(
+          Object.fromEntries(Object.entries(headers)),
+          expected
+        );
+      };
+
+      it('should successfully send spans using XMLHttpRequest', done => {
+        collectorTraceExporter.export(spans, () => {
+          try {
+            assert.ok(fetchMock.called('*'));
+            assertRequesetHeaders(fetchMock.lastCall('*'), customHeaders);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubOpen.callCount, 0);
+            assert.strictEqual(stubXhr.callCount, 0);
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+      });
+      it('should log the timeout request error message', done => {
+        collectorTraceExporter.export(spans, result => {
+          try {
+            assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+            const error = result.error as OTLPExporterError;
+            assert.ok(error !== undefined);
+            assert.strictEqual(error.message, 'Request Timeout');
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
+        clock.tick(10000);
       });
     });
   });
