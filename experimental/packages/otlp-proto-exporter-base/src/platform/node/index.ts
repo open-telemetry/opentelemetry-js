@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export { OTLPExporterBrowserBase } from './OTLPExporterBrowserBase';
-export { sendWithXhr } from './util';
+export { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
+export { ExportRequestType, getExportRequestProto, send } from './util';

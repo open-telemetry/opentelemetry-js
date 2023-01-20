@@ -24,6 +24,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat(instrumentation-grpc): set net.peer.name and net.peer.port on client spans [#3430](https://github.com/open-telemetry/opentelemetry-js/pull/3430)
+* feat(exporter-trace-otlp-proto): Add protobuf otlp trace exporter support for browser [#3208](https://github.com/open-telemetry/opentelemetry-js/pull/3208) @pkanal
 
 ### :bug: (Bug Fix)
 
