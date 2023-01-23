@@ -3,18 +3,26 @@
   "version": "0.35.0",
   "description": "OpenTelemetry OTLP-HTTP-protobuf Exporter base (for internal use only)",
   "main": "build/src/index.js",
+  "module": "build/esm/index.js",
+  "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
+  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
+    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "npm run protos && tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "npm run protos && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "protos": "npm run submodule && node scripts/protos.js",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "npm run protos && tsc -w",
+    "watch": "npm run protos && tsc -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
@@ -33,6 +41,12 @@
     "node": ">=14"
   },
   "files": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts",
+    "build/esnext/**/*.js",
+    "build/esnext/**/*.js.map",
+    "build/esnext/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
