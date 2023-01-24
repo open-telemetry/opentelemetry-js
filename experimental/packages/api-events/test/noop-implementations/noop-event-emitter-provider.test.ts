@@ -27,8 +27,11 @@ describe('NoopLoggerProvider', () => {
         NoopEventEmitter
     );
     assert.ok(
-      eventEmitterProvider.getEventEmitter('emitter-name', 'domain', 'v1') instanceof
-        NoopEventEmitter
+      eventEmitterProvider.getEventEmitter(
+        'emitter-name',
+        'domain',
+        'v1'
+      ) instanceof NoopEventEmitter
     );
     assert.ok(
       eventEmitterProvider.getEventEmitter('emitter-name', 'domain', 'v1', {
