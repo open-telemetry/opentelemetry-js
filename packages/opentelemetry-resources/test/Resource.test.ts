@@ -93,6 +93,24 @@ describe('Resource', () => {
     assert.strictEqual(resource.attributes['custom.boolean'], true);
   });
 
+  it('should log when accessing attributes before async attributes promise has settled', () => {
+    const debugStub = sinon.spy(diag, 'error');
+    const resource = new Resource(
+      {},
+      new Promise(resolve => {
+        setTimeout(resolve, 1);
+      })
+    );
+
+    resource.attributes;
+
+    assert.ok(
+      debugStub.calledWithMatch(
+        'Accessing resource attributes before async attributes settled'
+      )
+    );
+  });
+
   describe('.empty()', () => {
     it('should return an empty resource (except required service name)', () => {
       const resource = Resource.empty();
@@ -124,13 +142,13 @@ describe('Resource', () => {
       const resourceResolve = new Resource(
         {},
         new Promise(resolve => {
-          setTimeout(resolve, 100);
+          setTimeout(resolve, 1);
         })
       );
       const resourceReject = new Resource(
         {},
         new Promise((_, reject) => {
-          setTimeout(reject, 200);
+          setTimeout(reject, 1);
         })
       );
 
