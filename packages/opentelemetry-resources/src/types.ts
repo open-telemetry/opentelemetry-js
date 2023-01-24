@@ -26,9 +26,7 @@ import { SpanAttributes } from '@opentelemetry/api';
 export type ResourceAttributes = SpanAttributes;
 
 /**
- * Interface for a Resource Detector. In order to detect resources asynchronously, a detector
- * can pass a Promise as the second parameter to the Resource constructor. Returning a
- * Promise<Resource> is deprecated in favor of this approach.
+ * @deprecated please use {@link DetectorSync}
  */
 export interface Detector {
   detect(config?: ResourceDetectionConfig): Promise<Resource>;
