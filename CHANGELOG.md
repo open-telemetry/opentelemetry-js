@@ -13,6 +13,9 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(otlp-proto-exporter-base): Match Accept header with Content-Type in the proto exporter
+ [#3562](https://github.com/open-telemetry/opentelemetry-js/pull/3562) @scheler
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
