@@ -177,7 +177,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
           });
         const pendingResources = spans
           .map(span => span.resource)
-          .filter(resource => !resource.asyncAttributesHaveResolved);
+          .filter(resource => resource.asyncAttributesPending);
 
         // Avoid scheduling a promise to make the behavior more predictable and easier to test
         if (pendingResources.length === 0) {

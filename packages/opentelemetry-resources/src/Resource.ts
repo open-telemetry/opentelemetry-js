@@ -33,9 +33,9 @@ export class Resource {
    * Check if async attributes have resolved. This is useful to avoid awaiting
    * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
    *
-   * @returns true if the resource "attributes" property is settled to its final value
+   * @returns true if the resource "attributes" property is not yet settled to its final value
    */
-  public asyncAttributesHaveResolved: boolean;
+  public asyncAttributesPending: boolean;
 
   /**
    * Returns an empty Resource
@@ -65,23 +65,33 @@ export class Resource {
      * information about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on attributes.
      */
-    public attributes: ResourceAttributes,
+    private _attributes: ResourceAttributes,
     asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
-    this.asyncAttributesHaveResolved = asyncAttributesPromise == null;
-    this._syncAttributes = attributes;
+    this.asyncAttributesPending = asyncAttributesPromise != null;
+    this._syncAttributes = _attributes;
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
       asyncAttributes => {
-        this.attributes = Object.assign({}, this.attributes, asyncAttributes);
-        this.asyncAttributesHaveResolved = true;
+        this._attributes = Object.assign({}, this._attributes, asyncAttributes);
+        this.asyncAttributesPending = false;
         return asyncAttributes;
       },
       err => {
         diag.debug("a resource's async attributes promise rejected: %s", err);
-        this.asyncAttributesHaveResolved = true;
+        this.asyncAttributesPending = false;
         return {};
       }
     );
+  }
+
+  get attributes(): ResourceAttributes {
+    if (this.asyncAttributesPending) {
+      diag.error(
+        'Accessing resource attributes before async attributes settled'
+      );
+    }
+
+    return this._attributes;
   }
 
   /**
@@ -90,7 +100,7 @@ export class Resource {
    * has finished.
    */
   async waitForAsyncAttributes(): Promise<void> {
-    if (!this.asyncAttributesHaveResolved) {
+    if (this.asyncAttributesPending) {
       await this._asyncAttributesPromise;
     }
   }
@@ -109,7 +119,8 @@ export class Resource {
     // SpanAttributes from other resource overwrite attributes from this resource.
     const mergedSyncAttributes = {
       ...this._syncAttributes,
-      ...other._syncAttributes,
+      //Support for old resource implementation where _syncAttributes is not defined
+      ...(other._syncAttributes ?? other.attributes),
     };
 
     if (!this._asyncAttributesPromise && !other._asyncAttributesPromise) {
@@ -123,7 +134,8 @@ export class Resource {
       return {
         ...this._syncAttributes,
         ...thisAsyncAttributes,
-        ...other._syncAttributes,
+        //Support for old resource implementation where _syncAttributes is not defined
+        ...(other._syncAttributes ?? other.attributes),
         ...otherAsyncAttributes,
       };
     });

@@ -55,8 +55,7 @@ export const detectResources = async (
 };
 
 /**
- * Runs all resource detectors synchronously, merging their results. Any asynchronous
- * attributes will be merged together in-order after they resolve.
+ * Runs all resource detectors synchronously, merging their results. In case of attribute collision later resources will take precedence.
  *
  * @param config Configuration for resource detection
  */

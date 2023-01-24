@@ -128,14 +128,14 @@ export class PeriodicExportingMetricReader extends MetricReader {
     };
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
-    if (resourceMetrics.resource.asyncAttributesHaveResolved) {
-      await doExport();
-    } else {
+    if (resourceMetrics.resource.asyncAttributesPending) {
       resourceMetrics.resource
         .waitForAsyncAttributes()
         .then(doExport, err =>
           diag.debug('Error while resolving async portion of resource: ', err)
         );
+    } else {
+      await doExport();
     }
   }
 

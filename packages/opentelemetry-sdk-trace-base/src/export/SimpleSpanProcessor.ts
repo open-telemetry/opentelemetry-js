@@ -35,30 +35,20 @@ import { SpanExporter } from './SpanExporter';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
-  private _unresolvedResources: Set<Promise<void>>;
+  private _unresolvedExports: Set<Promise<void>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
-    this._unresolvedResources = new Set<Promise<void>>();
+    this._unresolvedExports = new Set<Promise<void>>();
   }
 
   async forceFlush(): Promise<void> {
     // await unresolved resources before resolving
-    await Promise.all(Array.from(this._unresolvedResources));
+    await Promise.all(Array.from(this._unresolvedExports));
+    5;
   }
 
-  onStart(_span: Span, _parentContext: Context): void {
-    // store the resource's unresolved promise
-    if (!_span.resource.asyncAttributesHaveResolved) {
-      const resourcePromise = _span.resource.waitForAsyncAttributes();
-
-      this._unresolvedResources.add(resourcePromise);
-
-      void resourcePromise.then(() =>
-        this._unresolvedResources.delete(resourcePromise)
-      );
-    }
-  }
+  onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {
@@ -87,12 +77,19 @@ export class SimpleSpanProcessor implements SpanProcessor {
         });
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
-    if (span.resource.asyncAttributesHaveResolved) {
-      void doExport();
+    if (span.resource.asyncAttributesPending) {
+      const exportPromise = span.resource.waitForAsyncAttributes().then(
+        () => {
+          this._unresolvedExports.delete(exportPromise);
+          return doExport();
+        },
+        err => globalErrorHandler(err)
+      );
+
+      // store the unresolved exports
+      this._unresolvedExports.add(exportPromise);
     } else {
-      span.resource
-        .waitForAsyncAttributes()
-        .then(doExport, err => globalErrorHandler(err));
+      void doExport();
     }
   }
 

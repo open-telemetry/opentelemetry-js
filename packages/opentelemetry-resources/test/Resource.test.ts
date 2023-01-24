@@ -21,6 +21,7 @@ import { Resource, ResourceAttributes } from '../src';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { describeBrowser, describeNode } from './util';
 import { diag } from '@opentelemetry/api';
+import { Resource as Resource190 } from '@opentelemetry/resources_1.9.0';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -102,8 +103,8 @@ describe('Resource', () => {
       assert.strictEqual(Resource.empty(), Resource.empty());
     });
 
-    it('should return true for asyncAttributesHaveResolved immediately', () => {
-      assert.ok(Resource.empty().asyncAttributesHaveResolved);
+    it('should return false for asyncAttributesPending immediately', () => {
+      assert.ok(!Resource.empty().asyncAttributesPending);
     });
   });
 
@@ -112,13 +113,13 @@ describe('Resource', () => {
       sinon.restore();
     });
 
-    it('should return true for asyncAttributesHaveResolved if no promise provided', () => {
-      assert.ok(new Resource({ foo: 'bar' }).asyncAttributesHaveResolved);
-      assert.ok(Resource.empty().asyncAttributesHaveResolved);
-      assert.ok(Resource.default().asyncAttributesHaveResolved);
+    it('should return false for asyncAttributesPending if no promise provided', () => {
+      assert.ok(!new Resource({ foo: 'bar' }).asyncAttributesPending);
+      assert.ok(!Resource.empty().asyncAttributesPending);
+      assert.ok(!Resource.default().asyncAttributesPending);
     });
 
-    it('should return true for asyncAttributesHaveResolved once promise settles', async () => {
+    it('should return false for asyncAttributesPending once promise settles', async () => {
       const clock = sinon.useFakeTimers();
       const resourceResolve = new Resource(
         {},
@@ -134,10 +135,10 @@ describe('Resource', () => {
       );
 
       for (const resource of [resourceResolve, resourceReject]) {
-        assert.ok(!resource.asyncAttributesHaveResolved);
+        assert.ok(resource.asyncAttributesPending);
         await clock.nextAsync();
         await resource.waitForAsyncAttributes();
-        assert.ok(resource.asyncAttributesHaveResolved);
+        assert.ok(!resource.asyncAttributesPending);
       }
     });
 
@@ -292,6 +293,42 @@ describe('Resource', () => {
         resource.attributes[SemanticResourceAttributes.SERVICE_NAME],
         'unknown_service'
       );
+    });
+  });
+
+  describe('compatibility', () => {
+    it('should merge resource with old implementation', () => {
+      const resource = Resource.EMPTY;
+      const oldResource = new Resource190({ fromold: 'fromold' });
+
+      //TODO: find a solution for ts-ignore
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const mergedResource = resource.merge(oldResource);
+
+      assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
+    });
+
+    it('should merge resource containing async attributes with old implementation', async () => {
+      const resource = new Resource(
+        {},
+        Promise.resolve({ fromnew: 'fromnew' })
+      );
+
+      const oldResource = new Resource190({ fromold: 'fromold' });
+
+      //TODO: find a solution for ts-ignore
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const mergedResource = resource.merge(oldResource);
+
+      assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
+
+      await mergedResource.waitForAsyncAttributes();
+
+      assert.strictEqual(mergedResource.attributes['fromnew'], 'fromnew');
     });
   });
 });
