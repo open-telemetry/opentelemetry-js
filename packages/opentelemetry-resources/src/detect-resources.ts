@@ -17,7 +17,6 @@
 import { Resource } from './Resource';
 import { ResourceDetectionConfig } from './config';
 import { diag } from '@opentelemetry/api';
-import * as util from 'util';
 import { isPromiseLike } from './utils';
 import { Detector, DetectorSync } from './types';
 
@@ -111,12 +110,7 @@ const logResources = (resources: Array<Resource>) => {
   resources.forEach(resource => {
     // Print only populated resources
     if (Object.keys(resource.attributes).length > 0) {
-      const resourceDebugString = util.inspect(resource.attributes, {
-        depth: 2,
-        breakLength: Infinity,
-        sorted: true,
-        compact: false,
-      });
+      const resourceDebugString = JSON.stringify(resource.attributes, null, 4);
       diag.verbose(resourceDebugString);
     }
   });
