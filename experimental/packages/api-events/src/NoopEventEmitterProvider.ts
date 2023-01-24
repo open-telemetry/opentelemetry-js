@@ -22,6 +22,7 @@ import { NoopEventEmitter } from './NoopEventEmitter';
 export class NoopEventEmitterProvider implements EventEmitterProvider {
   getEventEmitter(
     _name: string,
+    _domain: string,
     _version?: string | undefined,
     _options?: EventEmitterOptions | undefined
   ): EventEmitter {

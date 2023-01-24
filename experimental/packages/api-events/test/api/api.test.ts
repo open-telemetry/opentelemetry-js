@@ -37,7 +37,7 @@ describe('API', () => {
       events.setGlobalEventEmitterProvider(new TestEventEmitterProvider());
       const eventEmitter = events
         .getEventEmitterProvider()
-        .getEventEmitter('name');
+        .getEventEmitter('name', 'domain');
       assert.deepStrictEqual(eventEmitter, dummyEventEmitter);
     });
 
@@ -58,7 +58,7 @@ describe('API', () => {
 
     it('should return a event emitter instance from global provider', () => {
       events.setGlobalEventEmitterProvider(new TestEventEmitterProvider());
-      const eventEmitter = events.getEventEmitter('myEventEmitter');
+      const eventEmitter = events.getEventEmitter('myEventEmitter', 'domain');
       assert.deepStrictEqual(eventEmitter, dummyEventEmitter);
     });
   });

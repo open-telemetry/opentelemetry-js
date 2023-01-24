@@ -73,11 +73,13 @@ export class EventsAPI {
    */
   public getEventEmitter(
     name: string,
+    domain: string,
     version?: string,
     options?: EventEmitterOptions
   ): EventEmitter {
     return this.getEventEmitterProvider().getEventEmitter(
       name,
+      domain,
       version,
       options
     );

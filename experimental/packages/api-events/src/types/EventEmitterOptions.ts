@@ -24,18 +24,6 @@ export interface EventEmitterOptions {
   schemaUrl?: string;
 
   /**
-   * The default domain for events created by the EventEmitter.
-   *
-   * The combination of event name and event domain uniquely identifies an event.
-   * By supplying an event domain, it is possible to use the same event name across
-   * different domains / use cases.
-   *
-   * The default domain can be overridden when emitting an individual event.
-   * @default ''
-   */
-  eventDomain?: string;
-
-  /**
    * The instrumentation scope attributes to associate with emitted telemetry
    */
   scopeAttributes?: Attributes;

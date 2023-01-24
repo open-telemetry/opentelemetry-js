@@ -28,11 +28,6 @@ export interface Event {
   name: string;
 
   /**
-   * The domain the event belongs to.
-   */
-  domain?: string;
-
-  /**
    * Additional attributes that describe the event.
    */
   attributes?: Attributes;
