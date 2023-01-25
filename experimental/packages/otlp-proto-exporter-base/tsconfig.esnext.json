@@ -1,14 +1,12 @@
 {
   "extends": "../../../tsconfig.base.esnext.json",
   "compilerOptions": {
-    "allowJs": true,
-    "outDir": "build/esnext",
     "rootDir": "src",
+    "outDir": "build/esnext",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
-    "src/**/*.ts",
-    "src/generated/*.js",
+    "src/**/*.ts"
   ],
   "references": [
     {
@@ -16,6 +14,9 @@
     },
     {
       "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../otlp-exporter-base"
     }
   ]
 }
