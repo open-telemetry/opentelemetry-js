@@ -26,9 +26,8 @@ import {
   ExponentialHistogramAggregator,
 } from '../../src/aggregator/ExponentialHistogram';
 import { Buckets } from '../../src/aggregator/exponential-histogram/Buckets';
+import { getMapping } from '../../src/aggregator/exponential-histogram/mapping/getMapping';
 import { Mapping } from '../../src/aggregator/exponential-histogram//mapping/types';
-import { ExponentMapping } from '../../src/aggregator/exponential-histogram//mapping/ExponentMapping';
-import { LogarithmMapping } from '../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
 import * as assert from 'assert';
 import {
   assertInEpsilon,
@@ -534,10 +533,7 @@ describe('ExponentialHistogramAccumulation', () => {
   describe('min max size', () => {
     it('auto-corrects to min max', () => {
       const acc: any = new ExponentialHistogramAccumulation([0, 0], 0);
-      assert.strictEqual(
-        acc['_maxSize'],
-        ExponentialHistogramAccumulation.MIN_MAX_SIZE
-      );
+      assert.strictEqual(acc['_maxSize'], 2);
     });
   });
 });
@@ -781,14 +777,6 @@ function centerValue(mapper: Mapping, x: number): number {
   const lower = mapper.lowerBoundary(x);
   const upper = mapper.lowerBoundary(x + 1);
   return (lower + upper) / 2;
-}
-
-function getMapping(scale: number): Mapping {
-  if (scale <= 0) {
-    return ExponentMapping.get(scale);
-  } else {
-    return LogarithmMapping.get(scale);
-  }
 }
 
 function assertHistogramsEqual(

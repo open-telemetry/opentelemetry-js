@@ -29,9 +29,8 @@ import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Buckets } from './exponential-histogram/Buckets';
+import { getMapping } from './exponential-histogram/mapping/getMapping';
 import { Mapping } from './exponential-histogram/mapping/types';
-import { ExponentMapping } from './exponential-histogram/mapping/ExponentMapping';
-import { LogarithmMapping } from './exponential-histogram/mapping/LogarithmMapping';
 import * as util from './exponential-histogram//util';
 
 /**
@@ -66,13 +65,14 @@ class HighLow {
   constructor(public low: number, public high: number) {}
 }
 
-export class ExponentialHistogramAccumulation implements Accumulation {
-  static DEFAULT_MAX_SIZE = 160;
-  static MIN_MAX_SIZE = 2;
+const MAX_SCALE = 20;
+const DEFAULT_MAX_SIZE = 160;
+const MIN_MAX_SIZE = 2;
 
+export class ExponentialHistogramAccumulation implements Accumulation {
   constructor(
     public startTime: HrTime = startTime,
-    private _maxSize = ExponentialHistogramAccumulation.DEFAULT_MAX_SIZE,
+    private _maxSize = DEFAULT_MAX_SIZE,
     private _recordMinMax = true,
     private _sum = 0,
     private _count = 0,
@@ -81,13 +81,12 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     private _max = Number.NEGATIVE_INFINITY,
     private _positive = new Buckets(),
     private _negative = new Buckets(),
-    private _mapping: Mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE)
+    private _mapping: Mapping = getMapping(MAX_SCALE)
   ) {
-    if (this._maxSize < ExponentialHistogramAccumulation.MIN_MAX_SIZE) {
+    if (this._maxSize < MIN_MAX_SIZE) {
       diag.warn(`Exponential Histogram Max Size set to ${this._maxSize}, \
-                changing to the minimum size of: \
-                ${ExponentialHistogramAccumulation.MIN_MAX_SIZE}`);
-      this._maxSize = ExponentialHistogramAccumulation.MIN_MAX_SIZE;
+                changing to the minimum size of: ${MIN_MAX_SIZE}`);
+      this._maxSize = MIN_MAX_SIZE;
     }
   }
 
@@ -419,11 +418,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     this._positive.downscale(change);
     this._negative.downscale(change);
 
-    if (newScale <= 0) {
-      this._mapping = ExponentMapping.get(newScale);
-    } else {
-      this._mapping = LogarithmMapping.get(newScale);
-    }
+    this._mapping = getMapping(newScale);
   }
 
   /**
