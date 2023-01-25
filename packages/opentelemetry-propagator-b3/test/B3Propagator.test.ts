@@ -106,6 +106,24 @@ describe('B3Propagator', () => {
 
       assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
     });
+
+    it('should not inject if disableInjection is set to true', () => {
+      propagator = new B3Propagator({ disableInjection: true });
+
+      const spanContext: SpanContext = {
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        spanId: 'e457b5a2e4d86bd1',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      propagator.inject(
+        trace.setSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
+    });
   });
 
   describe('.extract()', () => {

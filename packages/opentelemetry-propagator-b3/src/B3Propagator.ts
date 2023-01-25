@@ -45,7 +45,7 @@ export class B3Propagator implements TextMapPropagator {
   ) => void;
   public readonly _fields: string[];
 
-  constructor(config: B3PropagatorConfig = {}) {
+  constructor(private config: B3PropagatorConfig = {}) {
     if (config.injectEncoding === B3InjectEncoding.MULTI_HEADER) {
       this._inject = this._b3MultiPropagator.inject;
       this._fields = this._b3MultiPropagator.fields();
@@ -56,7 +56,7 @@ export class B3Propagator implements TextMapPropagator {
   }
 
   inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
-    if (isTracingSuppressed(context)) {
+    if (this.config.disableInjection || isTracingSuppressed(context)) {
       return;
     }
     this._inject(context, carrier, setter);

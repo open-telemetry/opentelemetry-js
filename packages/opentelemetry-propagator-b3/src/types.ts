@@ -23,4 +23,9 @@ export enum B3InjectEncoding {
 /** Configuration for the B3Propagator */
 export interface B3PropagatorConfig {
   injectEncoding?: B3InjectEncoding;
+  /**
+   * This property, when set to true, disables the injection of context by the propagator and only
+   * enables the extraction functionality. By default, injection is enabled.
+   * */
+  disableInjection?: boolean;
 }
