@@ -75,7 +75,11 @@ export abstract class OTLPProtoExporterBrowserBase<
         sendWithXhr(
           new Blob([body], { type: 'application/x-protobuf' }),
           this.url,
-          { ...this._headers, 'Content-Type': 'application/x-protobuf' },
+          {
+            ...this._headers,
+            'Content-Type': 'application/x-protobuf',
+            Accept: 'application/x-protobuf',
+          },
           this.timeoutMillis,
           onSuccess,
           onError
