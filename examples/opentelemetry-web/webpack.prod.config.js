@@ -12,6 +12,7 @@ const common = {
     'xml-http-request': 'examples/xml-http-request/index.js',
     fetchXhr: 'examples/fetchXhr/index.js',
     fetchXhrB3: 'examples/fetchXhrB3/index.js',
+    "fetch-proto": "examples/fetch-proto/index.js",
     zipkin: 'examples/zipkin/index.js',
   },
   output: {

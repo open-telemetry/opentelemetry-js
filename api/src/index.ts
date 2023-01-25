@@ -58,6 +58,7 @@ export {
   BatchObservableResult,
   ObservableResult,
 } from './metrics/ObservableResult';
+export type { MetricsAPI } from './api/metrics';
 
 // Propagation APIs
 export {
