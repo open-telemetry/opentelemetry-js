@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-export { OTLPExporterBrowserBase } from './OTLPExporterBrowserBase';
-export { sendWithXhr } from './util';
+import { Span } from '@opentelemetry/api';
+import type * as grpcJsTypes from '@grpc/grpc-js';
+import type * as grpcTypes from 'grpc';
+
+export type metadataCaptureType = {
+  client: {
+    captureRequestMetadata: (
+      span: Span,
+      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
+    ) => void;
+    captureResponseMetadata: (
+      span: Span,
+      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
+    ) => void;
+  };
+};

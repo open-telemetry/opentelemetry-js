@@ -27,7 +27,8 @@ import {
   SendUnaryDataCallback,
   GrpcClientFunc,
 } from './types';
-import { GrpcInstrumentationConfig, metadataCaptureType } from '../types';
+import { GrpcInstrumentationConfig } from '../types';
+import { metadataCaptureType } from '../internal-types';
 import {
   context,
   propagation,
