@@ -5,6 +5,6 @@
     "@opentelemetry/instrumentation-agent": "file:./opentelemetry-instrumentation-agent-0.34.0.tgz"
   },
   "scripts": {
-    "clean": "rm -rf node_modules package-lock.json"
+    "clean": "rm -rf node_modules package-lock.json *.tgz"
   }
 }

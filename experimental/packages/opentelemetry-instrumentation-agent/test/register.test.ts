@@ -19,13 +19,14 @@ import * as assert from 'assert';
 
 const exec = promisify(childProcess.exec);
 
-describe('Register', async () => {
+describe('Register', function () {
+  this.timeout(15000);
   before(async () => {
     await exec('cd ./test/test-app ; npm run clean ; cd ../..');
   });
 
   after(async () => {
-    // await exec('cd ./test/test-app ; npm run clean ; cd ../..');
+    await exec('cd ./test/test-app ; npm run clean ; cd ../..');
   });
 
   it('can load the agent from command line', async () => {
@@ -34,5 +35,5 @@ describe('Register', async () => {
       'cd ./test/test-app ; npm install ; env OTEL_LOG_LEVEL=debug node --require @opentelemetry/instrumentation-agent app.js ; cd ../..'
     );
     assert.ok(stdout.includes('Tracing initialized'));
-  }).timeout(15000);
+  });
 });
