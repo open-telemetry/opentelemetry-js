@@ -6,7 +6,8 @@
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/generated/*.js"
   ],
   "references": [
     {
