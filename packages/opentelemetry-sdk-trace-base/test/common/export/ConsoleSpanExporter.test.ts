@@ -15,6 +15,7 @@
  */
 
 import { SpanContext, TraceFlags } from '@opentelemetry/api';
+import { TraceState } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -63,6 +64,7 @@ describe('ConsoleSpanExporter', () => {
         const span = tracer.startSpan('foo', {
           links: [{ context, attributes: { anAttr: 'aValue' } }],
         });
+        span.spanContext().traceState = new TraceState('trace=state');
         span.addEvent('foobar');
         span.end();
 
@@ -85,6 +87,7 @@ describe('ConsoleSpanExporter', () => {
           'status',
           'timestamp',
           'traceId',
+          'traceState',
         ].join(',');
 
         assert.ok(firstSpan.name === 'foo');
