@@ -21,10 +21,11 @@ import {
   HrTime,
   Link,
   SpanContext,
+  SpanDroppedAttributes,
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { TimedEvent } from '../TimedEvent';
+import { TimedEvent, SpanDroppedEvents } from '../TimedEvent';
 
 export interface ReadableSpan {
   readonly name: string;
@@ -41,4 +42,6 @@ export interface ReadableSpan {
   readonly ended: boolean;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly droppedAttributesCount: SpanDroppedAttributes;
+  readonly droppedEventsCount: SpanDroppedEvents;
 }

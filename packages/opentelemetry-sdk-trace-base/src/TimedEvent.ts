@@ -27,3 +27,9 @@ export interface TimedEvent {
   /** The attributes of the event. */
   attributes?: SpanAttributes;
 }
+
+export type SpanDroppedEvents =
+  | {
+      [name: string]: TimedEvent;
+    }
+  | undefined;

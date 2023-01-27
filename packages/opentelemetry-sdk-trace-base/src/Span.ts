@@ -24,6 +24,7 @@ import {
   SpanAttributes,
   SpanAttributeValue,
   SpanContext,
+  SpanDroppedAttributes,
   SpanKind,
   SpanStatus,
   SpanStatusCode,
@@ -47,7 +48,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
 import { SpanProcessor } from './SpanProcessor';
-import { TimedEvent } from './TimedEvent';
+import { SpanDroppedEvents, TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
 import { SpanLimits } from './types';
 
@@ -66,6 +67,10 @@ export class Span implements APISpan, ReadableSpan {
   readonly startTime: HrTime;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
+
+  droppedAttributesCount: SpanDroppedAttributes;
+  droppedEventsCount: SpanDroppedEvents;
+
   name: string;
   status: SpanStatus = {
     code: SpanStatusCode.UNSET,
@@ -141,6 +146,10 @@ export class Span implements APISpan, ReadableSpan {
         this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
+      if (!this.droppedAttributesCount) {
+        this.droppedAttributesCount = {};
+      }
+      this.droppedAttributesCount[key] = this._truncateToSize(value);
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
@@ -167,14 +176,6 @@ export class Span implements APISpan, ReadableSpan {
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
-    if (this._spanLimits.eventCountLimit === 0) {
-      diag.warn('No events allowed.');
-      return this;
-    }
-    if (this.events.length >= this._spanLimits.eventCountLimit!) {
-      diag.warn('Dropping extra events.');
-      this.events.shift();
-    }
 
     if (isTimeInput(attributesOrStartTime)) {
       if (!isTimeInput(timeStamp)) {
@@ -184,6 +185,28 @@ export class Span implements APISpan, ReadableSpan {
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
+
+    if (this._spanLimits.eventCountLimit === 0) {
+      diag.warn('No events allowed.');
+      if (!this.droppedEventsCount) {
+        this.droppedEventsCount = {};
+      }
+      this.droppedEventsCount[name] = {
+        name,
+        attributes,
+        time: this._getTime(timeStamp),
+      };
+      return this;
+    }
+    if (this.events.length >= this._spanLimits.eventCountLimit!) {
+      diag.warn('Dropping extra events.');
+      const dropped = this.events.shift();
+      if (!this.droppedEventsCount) {
+        this.droppedEventsCount = {};
+      }
+      this.droppedEventsCount[dropped!.name] = dropped!;
+    }
+
     this.events.push({
       name,
       attributes,
