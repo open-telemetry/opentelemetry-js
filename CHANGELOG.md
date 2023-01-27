@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-metrics): add exponential histogram mapping functions [#3504](https://github.com/open-telemetry/opentelemetry-js/pull/3504) @mwear
+
 ### :bug: (Bug Fix)
 
 * fix: avoid grpc types dependency [#3551](https://github.com/open-telemetry/opentelemetry-js/pull/3551) @flarna
