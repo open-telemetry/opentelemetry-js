@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix: remove JSON syntax error and regenerate tsconfig files [#3566](https://github.com/open-telemetry/opentelemetry-js/pull/3566) @Flarna
+  * Fixes an error where the generated JS files were not included in the esnext package due to a failure of the tsconfig generation
 * fix(sdk-node): register instrumentations early [#3502](https://github.com/open-telemetry/opentelemetry-js/pull/3502) @flarna
 * fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
 
