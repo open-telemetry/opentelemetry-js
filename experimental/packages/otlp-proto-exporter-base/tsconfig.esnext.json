@@ -8,7 +8,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/generated/*.js",
+    "src/generated/*.js"
   ],
   "references": [
     {
@@ -16,6 +16,9 @@
     },
     {
       "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../otlp-exporter-base"
     }
   ]
 }
