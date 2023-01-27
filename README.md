@@ -140,6 +140,7 @@ The below table describes which versions of each set of packages are expected to
 
 | API   | Stable Packages | Experimental Packages |
 | ----- | --------------- | --------------------- |
+| 1.3.x | 1.9.x           | 0.35.x                |
 | 1.3.x | 1.8.x           | 0.34.x                |
 | 1.2.x | 1.7.x           | 0.33.x                |
 | 1.2.x | 1.6.x           | 0.32.x                |

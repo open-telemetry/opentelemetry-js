@@ -39,6 +39,7 @@ import {
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
+import { getEnv } from '@opentelemetry/core';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -71,10 +72,18 @@ export class NodeSDK {
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
 
+  private _disabled?: boolean;
+
   /**
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
+    if (getEnv().OTEL_SDK_DISABLED) {
+      this._disabled = true;
+      // Functions with possible side-effects are set
+      // to no-op via the _disabled flag
+    }
+
     this._resource = configuration.resource ?? new Resource({});
     this._resourceDetectors = configuration.resourceDetectors ?? [
       envDetector,
@@ -175,6 +184,10 @@ export class NodeSDK {
 
   /** Detect resource attributes */
   public async detectResources(): Promise<void> {
+    if (this._disabled) {
+      return;
+    }
+
     const internalConfig: ResourceDetectionConfig = {
       detectors: this._resourceDetectors,
     };
@@ -191,6 +204,14 @@ export class NodeSDK {
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public async start(): Promise<void> {
+    if (this._disabled) {
+      return;
+    }
+
+    registerInstrumentations({
+      instrumentations: this._instrumentations,
+    });
+
     if (this._autoDetectResources) {
       await this.detectResources();
     }
@@ -238,10 +259,6 @@ export class NodeSDK {
 
       metrics.setGlobalMeterProvider(meterProvider);
     }
-
-    registerInstrumentations({
-      instrumentations: this._instrumentations,
-    });
   }
 
   public shutdown(): Promise<void> {

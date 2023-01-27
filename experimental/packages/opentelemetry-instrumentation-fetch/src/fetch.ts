@@ -276,12 +276,13 @@ export class FetchInstrumentation extends InstrumentationBase<
     spanData: SpanData,
     response: FetchResponse
   ) {
-    const endTime = core.hrTime();
+    const endTime = core.millisToHrTime(Date.now());
+    const performanceEndTime = core.hrTime();
     this._addFinalSpanAttributes(span, response);
 
     setTimeout(() => {
       spanData.observer?.disconnect();
-      this._findResourceAndAddNetworkEvents(span, spanData, endTime);
+      this._findResourceAndAddNetworkEvents(span, spanData, performanceEndTime);
       this._tasksCount--;
       this._clearResources();
       span.end(endTime);

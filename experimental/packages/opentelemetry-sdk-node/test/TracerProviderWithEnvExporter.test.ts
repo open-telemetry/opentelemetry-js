@@ -96,15 +96,29 @@ describe('set up trace exporter with env exporters', () => {
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
-    it('do not use any exporters when empty value is provided for exporter', async () => {
-      env.OTEL_TRACES_EXPORTER = '';
+    it('use default otlp exporter when user does not set exporter via env or config', async () => {
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk['_spanProcessors'];
+      const listOfProcessors = sdk['_spanProcessors']!;
       const listOfExporters = sdk['_configuredExporters'];
 
-      assert(spyGetOtlpProtocol.notCalled);
-      assert(listOfExporters.length === 0);
-      assert(listOfProcessors === undefined);
+      assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
+      assert(listOfExporters.length === 1);
+
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    });
+    it('use default otlp exporter when empty value is provided for exporter via env', async () => {
+      env.OTEL_TRACES_EXPORTER = '';
+      const sdk = new TracerProviderWithEnvExporters();
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
+
+      assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
+      assert(listOfExporters.length === 1);
+
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+
       env.OTEL_TRACES_EXPORTER = '';
     });
     it('do not use any exporters when none value is only provided', async () => {
@@ -124,7 +138,7 @@ describe('set up trace exporter with env exporters', () => {
 
       assert.strictEqual(
         stubLoggerError.args[0][0],
-        'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.'
+        'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
       );
       delete env.OTEL_TRACES_EXPORTER;
     });
@@ -174,6 +188,11 @@ describe('set up trace exporter with env exporters', () => {
 
       assert.strictEqual(
         stubLoggerError.args[0][0],
+        'OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.'
+      );
+
+      assert.strictEqual(
+        stubLoggerError.args[1][0],
         'Unsupported OTLP traces protocol: invalid. Using http/protobuf.'
       );
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
