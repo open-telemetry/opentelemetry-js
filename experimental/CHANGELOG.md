@@ -10,7 +10,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix: include tracestate in export [#FixMe](https://github.com/open-telemetry/opentelemetry-js/pull/FixMe) @flarna
+* fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
 
 ### :books: (Refine Doc)
 
