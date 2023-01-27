@@ -60,6 +60,7 @@ function createExpectedSpanJson(useHex: boolean) {
                 traceId: traceId,
                 spanId: spanId,
                 parentSpanId: parentSpanId,
+                traceState: 'span=bar',
                 name: 'span-name',
                 kind: ESpanKind.SPAN_KIND_CLIENT,
                 links: [
@@ -67,6 +68,7 @@ function createExpectedSpanJson(useHex: boolean) {
                     droppedAttributesCount: 0,
                     spanId: linkSpanId,
                     traceId: linkTraceId,
+                    traceState: 'link=foo',
                     attributes: [
                       {
                         key: 'link-attribute',
@@ -134,7 +136,7 @@ describe('Trace', () => {
           traceFlags: 1,
           traceId: '00000000000000000000000000000001',
           isRemote: false,
-          traceState: new TraceState(''),
+          traceState: new TraceState('span=bar'),
         }),
         parentSpanId: '0000000000000001',
         attributes: { 'string-attribute': 'some attribute value' },
@@ -163,7 +165,7 @@ describe('Trace', () => {
               traceId: '00000000000000000000000000000002',
               traceFlags: 1,
               isRemote: false,
-              traceState: new TraceState(''),
+              traceState: new TraceState('link=foo'),
             },
             attributes: {
               'link-attribute': 'string value',
