@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as assert from 'assert';
 
-import { InstrumentationConfig } from '@opentelemetry/instrumentation';
+export function assertInEpsilon(
+  actual: number,
+  expected: number,
+  epsilon: number
+) {
+  assert.ok(!Number.isNaN(actual), 'unexpected NaN for actual argument');
+  assert.ok(!Number.isNaN(expected), 'unexpected NaN for expected argument');
+  assert.ok(actual !== 0, 'unexpected 0 for actual argument');
 
-export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
+  const relErr = Math.abs(actual - expected) / Math.abs(actual);
 
-export interface GrpcInstrumentationConfig extends InstrumentationConfig {
-  /* Omits tracing on any gRPC methods that match any of
-   * the IgnoreMatchers in the ignoreGrpcMethods list
-   */
-  ignoreGrpcMethods?: IgnoreMatcher[];
-  /** Map the following gRPC metadata to span attributes. */
-  metadataToSpanAttributes?: {
-    client?: {
-      responseMetadata?: string[];
-      requestMetadata?: string[];
-    };
-  };
+  assert.ok(
+    relErr < epsilon,
+    `expected relative error: ${relErr} to be < ${epsilon}`
+  );
 }

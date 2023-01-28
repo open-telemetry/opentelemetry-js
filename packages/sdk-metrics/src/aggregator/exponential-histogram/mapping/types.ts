@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export class MappingError extends Error {}
 
-import { InstrumentationConfig } from '@opentelemetry/instrumentation';
-
-export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
-
-export interface GrpcInstrumentationConfig extends InstrumentationConfig {
-  /* Omits tracing on any gRPC methods that match any of
-   * the IgnoreMatchers in the ignoreGrpcMethods list
-   */
-  ignoreGrpcMethods?: IgnoreMatcher[];
-  /** Map the following gRPC metadata to span attributes. */
-  metadataToSpanAttributes?: {
-    client?: {
-      responseMetadata?: string[];
-      requestMetadata?: string[];
-    };
-  };
+/**
+ * The mapping interface is used by the exponential histogram to determine
+ * where to bucket values. The interface is implemented by ExponentMapping,
+ * used for scales [-10, 0] and LogarithmMapping, used for scales [1, 20].
+ */
+export interface Mapping {
+  mapToIndex(value: number): number;
+  lowerBoundary(index: number): number;
+  scale(): number;
 }
