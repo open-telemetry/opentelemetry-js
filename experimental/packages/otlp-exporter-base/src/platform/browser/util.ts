@@ -130,28 +130,32 @@ export function sendWithFetch(
     signal: controller.signal,
     body,
   })
-    .then(response => {
-      if (response.ok) {
-        response.text().then(
-          t => diag.debug('Request Success', t),
-          () => {}
-        );
-        onSuccess();
-      } else {
-        onError(
-          new OTLPExporterError(
-            `Failed to export with fetch: (${response.status} ${response.statusText})`,
-            response.status
-          )
-        );
+    .then(
+      response => {
+        if (response.ok) {
+          response.text().then(
+            t => diag.debug('Request Success', t),
+            () => {}
+          );
+          onSuccess();
+        } else {
+          onError(
+            new OTLPExporterError(
+              `Failed to export with fetch: (${response.status} ${response.statusText})`,
+              response.status
+            )
+          );
+        }
+      },
+      (e: Error) => {
+        if (e.name === 'AbortError') {
+          onError(new OTLPExporterError('Request Timeout'));
+        } else {
+          onError(
+            new OTLPExporterError(`Request Fail: ${e.name} ${e.message}`)
+          );
+        }
       }
-    })
-    .catch((e: Error) => {
-      if (e.name === 'AbortError') {
-        onError(new OTLPExporterError('Request Timeout'));
-      } else {
-        onError(new OTLPExporterError(`Request Fail: ${e.name} ${e.message}`));
-      }
-    })
+    )
     .finally(() => clearTimeout(timerId));
 }
