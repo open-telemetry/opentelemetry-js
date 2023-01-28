@@ -314,7 +314,6 @@ describe('Span', () => {
         });
 
         it('should store all dropped attributes in droppedAttributesCount', () => {
-          assert.ok(span.droppedAttributesCount);
           assert.strictEqual(
             Object.keys(span.droppedAttributesCount).length,
             50
@@ -822,7 +821,6 @@ describe('Span', () => {
     }
     span.end();
 
-    assert.ok(span.droppedEventsCount);
     assert.strictEqual(Object.keys(span.droppedEventsCount).length, 50);
     assert.strictEqual(span.droppedEventsCount['sent0'].name, 'sent0');
     assert.strictEqual(span.droppedEventsCount['sent42'].name, 'sent42');

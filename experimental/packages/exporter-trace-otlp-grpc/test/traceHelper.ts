@@ -91,6 +91,8 @@ export const mockedReadableSpan: ReadableSpan = {
     })
   ),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  droppedAttributesCount: {},
+  droppedEventsCount: {},
 };
 
 export function ensureExportedEventsAreCorrect(events: IEvent[]) {

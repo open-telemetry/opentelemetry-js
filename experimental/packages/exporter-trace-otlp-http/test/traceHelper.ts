@@ -102,6 +102,8 @@ export const mockedReadableSpan: ReadableSpan = {
     })
   ),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  droppedAttributesCount: {},
+  droppedEventsCount: {},
 };
 
 export const mockedResources: Resource[] = [
@@ -142,6 +144,8 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8885000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: {},
+    droppedEventsCount: {},
   },
   {
     name: 'span2',
@@ -164,6 +168,8 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8775000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: {},
+    droppedEventsCount: {},
   },
   {
     name: 'span3',
@@ -186,6 +192,8 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8775000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: {},
+    droppedEventsCount: {},
   },
 ];
 

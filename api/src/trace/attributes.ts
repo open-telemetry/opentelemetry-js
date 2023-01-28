@@ -30,4 +30,4 @@ export type SpanAttributeValue = AttributeValue;
  * Dropped attributes count is a map of key-value pairs
  * of attributes that were dropped due to collection limits
  */
-export type SpanDroppedAttributes = Attributes | undefined;
+export type SpanDroppedAttributes = Attributes;

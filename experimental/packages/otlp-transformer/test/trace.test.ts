@@ -176,6 +176,8 @@ describe('Trace', () => {
         status: {
           code: SpanStatusCode.OK,
         },
+        droppedAttributesCount: {},
+        droppedEventsCount: {},
       };
     });
 

@@ -68,8 +68,8 @@ export class Span implements APISpan, ReadableSpan {
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
 
-  droppedAttributesCount: SpanDroppedAttributes;
-  droppedEventsCount: SpanDroppedEvents;
+  readonly droppedAttributesCount: SpanDroppedAttributes = {};
+  readonly droppedEventsCount: SpanDroppedEvents = {};
 
   name: string;
   status: SpanStatus = {
@@ -146,10 +146,9 @@ export class Span implements APISpan, ReadableSpan {
         this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
-      if (!this.droppedAttributesCount) {
-        this.droppedAttributesCount = {};
+      if (value) {
+        this.droppedAttributesCount[key] = this._truncateToSize(value);
       }
-      this.droppedAttributesCount[key] = this._truncateToSize(value);
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
@@ -188,9 +187,6 @@ export class Span implements APISpan, ReadableSpan {
 
     if (this._spanLimits.eventCountLimit === 0) {
       diag.warn('No events allowed.');
-      if (!this.droppedEventsCount) {
-        this.droppedEventsCount = {};
-      }
       this.droppedEventsCount[name] = {
         name,
         attributes,
@@ -201,10 +197,9 @@ export class Span implements APISpan, ReadableSpan {
     if (this.events.length >= this._spanLimits.eventCountLimit!) {
       diag.warn('Dropping extra events.');
       const dropped = this.events.shift();
-      if (!this.droppedEventsCount) {
-        this.droppedEventsCount = {};
+      if (dropped) {
+        this.droppedEventsCount[dropped.name] = dropped;
       }
-      this.droppedEventsCount[dropped!.name] = dropped!;
     }
 
     this.events.push({
