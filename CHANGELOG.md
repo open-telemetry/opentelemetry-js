@@ -12,12 +12,14 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat(resource): create sync resource with some attributes that resolve asynchronously [#3460](https://github.com/open-telemetry/opentelemetry-js/pull/3460) @samimusallam
+* feat(sdk-metrics): add exponential histogram mapping functions [#3504](https://github.com/open-telemetry/opentelemetry-js/pull/3504) @mwear
 
 ### :bug: (Bug Fix)
 
 * fix: avoid grpc types dependency [#3551](https://github.com/open-telemetry/opentelemetry-js/pull/3551) @flarna
 * fix(otlp-proto-exporter-base): Match Accept header with Content-Type in the proto exporter
  [#3562](https://github.com/open-telemetry/opentelemetry-js/pull/3562) @scheler
+* fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
 
 ### :books: (Refine Doc)
 

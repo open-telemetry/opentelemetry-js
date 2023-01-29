@@ -209,6 +209,10 @@ export class NodeSDK {
       return;
     }
 
+    registerInstrumentations({
+      instrumentations: this._instrumentations,
+    });
+
     if (this._autoDetectResources) {
       this.detectResources();
     }
@@ -256,10 +260,6 @@ export class NodeSDK {
 
       metrics.setGlobalMeterProvider(meterProvider);
     }
-
-    registerInstrumentations({
-      instrumentations: this._instrumentations,
-    });
   }
 
   public shutdown(): Promise<void> {
