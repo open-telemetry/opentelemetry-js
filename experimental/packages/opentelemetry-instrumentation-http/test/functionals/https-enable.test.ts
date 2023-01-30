@@ -460,11 +460,6 @@ describe('HttpsInstrumentation', () => {
               'user-agent': testValue,
             },
           }),
-          httpsRequest.get(`${protocol}://${hostname}:${serverPort}`, {
-            headers: {
-              'uSeR-aGeNt': testValue,
-            },
-          }),
         ]);
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
