@@ -11,7 +11,13 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-metrics): add exponential histogram mapping functions [#3504](https://github.com/open-telemetry/opentelemetry-js/pull/3504) @mwear
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.9.1
 
 ### :bug: (Bug Fix)
 
@@ -20,11 +26,10 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
  [#3562](https://github.com/open-telemetry/opentelemetry-js/pull/3562) @scheler
 * fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
 
-### :books: (Refine Doc)
-
 ### :house: (Internal)
 
 * chore: fix cross project links and missing implicitly exported types [#3533](https://github.com/open-telemetry/opentelemetry-js/pull/3533) @legendecas
+* feat(sdk-metrics): add exponential histogram mapping functions [#3504](https://github.com/open-telemetry/opentelemetry-js/pull/3504) @mwear
 
 ## 1.9.0
 
