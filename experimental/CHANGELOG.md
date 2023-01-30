@@ -14,6 +14,7 @@ All notable changes to experimental packages in this project will be documented 
   * Fixes an error where the generated JS files were not included in the esnext package due to a failure of the tsconfig generation
 * fix(sdk-node): register instrumentations early [#3502](https://github.com/open-telemetry/opentelemetry-js/pull/3502) @flarna
 * fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
+* fix(http) Remove outgoing headers normalization [#3557](https://github.com/open-telemetry/opentelemetry-js/pull/3557) @marcinjahn
 
 ### :books: (Refine Doc)
 
