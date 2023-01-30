@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -50,7 +50,7 @@
     "codecov": "3.8.3",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "rimraf": "3.0.2",
+    "rimraf": "4.1.2",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
   },

@@ -276,14 +276,6 @@ export const getRequestInfo = (
     origin = `${optionsParsed.protocol || 'http:'}//${hostname}`;
   }
 
-  const headers = optionsParsed.headers ?? {};
-  optionsParsed.headers = Object.keys(headers).reduce(
-    (normalizedHeader, key) => {
-      normalizedHeader[key.toLowerCase()] = headers[key];
-      return normalizedHeader;
-    },
-    {} as OutgoingHttpHeaders
-  );
   // some packages return method in lowercase..
   // ensure upperCase for consistency
   const method = optionsParsed.method
