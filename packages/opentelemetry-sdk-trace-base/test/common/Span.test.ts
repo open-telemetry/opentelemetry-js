@@ -313,14 +313,8 @@ describe('Span', () => {
           assert.strictEqual(span.attributes['foo149'], undefined);
         });
 
-        it('should store all dropped attributes in droppedAttributesCount', () => {
-          assert.strictEqual(
-            Object.keys(span.droppedAttributesCount).length,
-            50
-          );
-          assert.strictEqual(span.droppedAttributesCount['foo100'], 'bar100');
-          assert.strictEqual(span.droppedAttributesCount['foo149'], 'bar149');
-          assert.strictEqual(span.droppedAttributesCount['foo99'], undefined);
+        it('should store the count of dropped attributes in droppedAttributesCount', () => {
+          assert.strictEqual(span.droppedAttributesCount, 50);
         });
       });
 
@@ -801,7 +795,7 @@ describe('Span', () => {
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
   });
 
-  it('should store dropped events in droppedEventsCount', () => {
+  it('should store the count of dropped events in droppedEventsCount', () => {
     const span = new Span(
       tracer,
       ROOT_CONTEXT,
@@ -809,27 +803,12 @@ describe('Span', () => {
       spanContext,
       SpanKind.CLIENT
     );
-    const testAttributes = {
-      attribute_1: 'forty-two',
-    };
     for (let i = 0; i < 150; i++) {
-      if (i === 42) {
-        span.addEvent('sent42', testAttributes);
-      } else {
-        span.addEvent('sent' + i);
-      }
+      span.addEvent('sent' + i);
     }
     span.end();
 
-    assert.strictEqual(Object.keys(span.droppedEventsCount).length, 50);
-    assert.strictEqual(span.droppedEventsCount['sent0'].name, 'sent0');
-    assert.strictEqual(span.droppedEventsCount['sent42'].name, 'sent42');
-    assert.ok(span.droppedEventsCount['sent42'].attributes);
-    assert.strictEqual(
-      span.droppedEventsCount['sent42'].attributes['attribute_1'],
-      'forty-two'
-    );
-    assert.strictEqual(span.droppedEventsCount['sent50'], undefined);
+    assert.strictEqual(span.droppedEventsCount, 50);
   });
 
   it('should add no event', () => {

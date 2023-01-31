@@ -56,8 +56,9 @@ function getReadableSpan() {
     events: [],
     resource: Resource.empty(),
     instrumentationLibrary: { name: 'default', version: '0.0.1' },
-    droppedAttributesCount: {},
-    droppedEventsCount: {},
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   };
   return readableSpan;
 }
@@ -166,8 +167,9 @@ describe('Zipkin Exporter - node', () => {
         ],
         resource: Resource.empty(),
         instrumentationLibrary: { name: 'default', version: '0.0.1' },
-        droppedAttributesCount: {},
-        droppedEventsCount: {},
+        droppedAttributesCount: 0,
+        droppedEventsCount: 0,
+        droppedLinksCount: 0,
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -191,8 +193,9 @@ describe('Zipkin Exporter - node', () => {
         events: [],
         resource: Resource.empty(),
         instrumentationLibrary: { name: 'default', version: '0.0.1' },
-        droppedAttributesCount: {},
-        droppedEventsCount: {},
+        droppedAttributesCount: 0,
+        droppedEventsCount: 0,
+        droppedLinksCount: 0,
       };
 
       const exporter = new ZipkinExporter({
@@ -385,8 +388,9 @@ describe('Zipkin Exporter - node', () => {
         [SemanticResourceAttributes.SERVICE_NAME]: resource_service_name,
       }),
       instrumentationLibrary: { name: 'default', version: '0.0.1' },
-      droppedAttributesCount: {},
-      droppedEventsCount: {},
+      droppedAttributesCount: 0,
+      droppedEventsCount: 0,
+      droppedLinksCount: 0,
     };
     const span2: ReadableSpan = {
       name: 'my-span',
@@ -410,8 +414,9 @@ describe('Zipkin Exporter - node', () => {
         [SemanticResourceAttributes.SERVICE_NAME]: resource_service_name_prime,
       }),
       instrumentationLibrary: { name: 'default', version: '0.0.1' },
-      droppedAttributesCount: {},
-      droppedEventsCount: {},
+      droppedAttributesCount: 0,
+      droppedEventsCount: 0,
+      droppedLinksCount: 0,
     };
 
     const exporter = new ZipkinExporter({});
@@ -477,8 +482,9 @@ describe('Zipkin Exporter - node', () => {
       ],
       resource: Resource.empty(),
       instrumentationLibrary: { name: 'default', version: '0.0.1' },
-      droppedAttributesCount: {},
-      droppedEventsCount: {},
+      droppedAttributesCount: 0,
+      droppedEventsCount: 0,
+      droppedLinksCount: 0,
     };
     const span2: ReadableSpan = {
       name: 'my-span',
@@ -502,8 +508,9 @@ describe('Zipkin Exporter - node', () => {
       events: [],
       resource: Resource.empty(),
       instrumentationLibrary: { name: 'default', version: '0.0.1' },
-      droppedAttributesCount: {},
-      droppedEventsCount: {},
+      droppedAttributesCount: 0,
+      droppedEventsCount: 0,
+      droppedLinksCount: 0,
     };
 
     const exporter = new ZipkinExporter({});

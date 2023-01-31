@@ -24,7 +24,6 @@ import {
   SpanAttributes,
   SpanAttributeValue,
   SpanContext,
-  SpanDroppedAttributes,
   SpanKind,
   SpanStatus,
   SpanStatusCode,
@@ -48,7 +47,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
 import { SpanProcessor } from './SpanProcessor';
-import { SpanDroppedEvents, TimedEvent } from './TimedEvent';
+import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
 import { SpanLimits } from './types';
 
@@ -67,9 +66,9 @@ export class Span implements APISpan, ReadableSpan {
   readonly startTime: HrTime;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
-
-  readonly droppedAttributesCount: SpanDroppedAttributes = {};
-  readonly droppedEventsCount: SpanDroppedEvents = {};
+  droppedAttributesCount: number = 0;
+  droppedEventsCount: number = 0;
+  droppedLinksCount: number = 0;
 
   name: string;
   status: SpanStatus = {
@@ -146,9 +145,7 @@ export class Span implements APISpan, ReadableSpan {
         this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
-      if (value) {
-        this.droppedAttributesCount[key] = this._truncateToSize(value);
-      }
+      this.droppedAttributesCount += 1;
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
@@ -187,19 +184,13 @@ export class Span implements APISpan, ReadableSpan {
 
     if (this._spanLimits.eventCountLimit === 0) {
       diag.warn('No events allowed.');
-      this.droppedEventsCount[name] = {
-        name,
-        attributes,
-        time: this._getTime(timeStamp),
-      };
+      this.droppedEventsCount += 1;
       return this;
     }
     if (this.events.length >= this._spanLimits.eventCountLimit!) {
       diag.warn('Dropping extra events.');
-      const dropped = this.events.shift();
-      if (dropped) {
-        this.droppedEventsCount[dropped.name] = dropped;
-      }
+      this.events.shift();
+      this.droppedEventsCount += 1;
     }
 
     this.events.push({
