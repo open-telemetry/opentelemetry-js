@@ -163,3 +163,30 @@ export function setEquals(lhs: Set<unknown>, rhs: Set<unknown>): boolean {
   }
   return true;
 }
+
+/**
+ * Binary search the sorted array to the find lower bound for the value.
+ * @param arr
+ * @param value
+ * @returns
+ */
+export function binarySearchLB(arr: number[], value: number): number {
+  let lo = 0;
+  let hi = arr.length - 1;
+
+  while (hi - lo > 1) {
+    const mid = Math.trunc((hi + lo) / 2);
+    if (arr[mid] <= value) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
+  }
+
+  if (arr[hi] <= value) {
+    return hi;
+  } else if (arr[lo] <= value) {
+    return lo;
+  }
+  return -1;
+}
