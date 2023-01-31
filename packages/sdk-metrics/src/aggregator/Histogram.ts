@@ -23,7 +23,7 @@ import {
 import { DataPointType, HistogramMetricData } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
-import { Maybe } from '../utils';
+import { binarySearchLB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
 /**
@@ -77,14 +77,8 @@ export class HistogramAccumulation implements Accumulation {
       this._current.hasMinMax = true;
     }
 
-    for (let i = 0; i < this._boundaries.length; i++) {
-      if (value < this._boundaries[i]) {
-        this._current.buckets.counts[i] += 1;
-        return;
-      }
-    }
-    // value is above all observed boundaries
-    this._current.buckets.counts[this._boundaries.length] += 1;
+    const idx = binarySearchLB(this._boundaries, value);
+    this._current.buckets.counts[idx + 1] += 1;
   }
 
   setStartTime(startTime: HrTime): void {
@@ -104,7 +98,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
 
   /**
-   * @param _boundaries upper bounds of recorded values.
+   * @param _boundaries sorted upper bounds of recorded values.
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
   constructor(
