@@ -14,4 +14,5 @@
  * limitations under the License.
  */
 
-export * from './OTLPExporterBrowserBase';
+export { OTLPExporterBrowserBase } from './OTLPExporterBrowserBase';
+export { sendWithXhr } from './util';
