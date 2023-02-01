@@ -16,7 +16,12 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { callWithTimeout, hashAttributes, TimeoutError } from '../src/utils';
+import {
+  binarySearchLB,
+  callWithTimeout,
+  hashAttributes,
+  TimeoutError,
+} from '../src/utils';
 import { assertRejects } from './test-utils';
 import { MetricAttributes } from '@opentelemetry/api';
 
@@ -59,5 +64,29 @@ describe('utils', () => {
         );
       }
     });
+  });
+
+  describe('binarySearchLB', () => {
+    const tests = [
+      /** [ arr, value, expected lb idx ] */
+      [[0, 10, 100, 1000], -1, -1],
+      [[0, 10, 100, 1000], 0, 0],
+      [[0, 10, 100, 1000], 1, 0],
+      [[0, 10, 100, 1000], 10, 1],
+      [[0, 10, 100, 1000], 1000, 3],
+      [[0, 10, 100, 1000], 1001, 3],
+
+      [[0, 10, 100, 1000, 10_000], -1, -1],
+      [[0, 10, 100, 1000, 10_000], 0, 0],
+      [[0, 10, 100, 1000, 10_000], 10, 1],
+      [[0, 10, 100, 1000, 10_000], 1001, 3],
+      [[0, 10, 100, 1000, 10_000], 10_001, 4],
+    ] as [number[], number, number][];
+
+    for (const [idx, test] of tests.entries()) {
+      it(`test idx(${idx}): find lb of ${test[1]} in [${test[0]}]`, () => {
+        assert.strictEqual(binarySearchLB(test[0], test[1]), test[2]);
+      });
+    }
   });
 });
