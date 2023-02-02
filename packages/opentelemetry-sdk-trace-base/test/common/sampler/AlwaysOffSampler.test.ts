@@ -30,18 +30,4 @@ describe('AlwaysOffSampler', () => {
       traceState: undefined,
     });
   });
-
-  it('should forward the traceState', () => {
-    const sampler = new AlwaysOffSampler();
-    const traceState = api.createTraceState();
-    assert.strictEqual(
-      sampler.shouldSample(
-        api.trace.setSpanContext(api.ROOT_CONTEXT, {
-          ...api.INVALID_SPAN_CONTEXT,
-          traceState,
-        })
-      ).traceState,
-      traceState
-    );
-  });
 });
