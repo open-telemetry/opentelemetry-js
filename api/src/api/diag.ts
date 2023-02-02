@@ -22,6 +22,7 @@ import {
   DiagLogger,
   DiagLoggerApi,
   DiagLogLevel,
+  LoggerOptions,
 } from '../diag/types';
 import {
   getGlobal,
@@ -67,8 +68,8 @@ export class DiagAPI implements DiagLogger, DiagLoggerApi {
     // DiagAPI specific functions
 
     const setLogger: DiagLoggerApi['setLogger'] = (
-      logger,
-      optionsOrLogLevel = { logLevel: DiagLogLevel.INFO }
+      logger: DiagLogger,
+      optionsOrLogLevel: LoggerOptions | DiagLogLevel = { logLevel: DiagLogLevel.INFO }
     ) => {
       if (logger === self) {
         // There isn't much we can do here.

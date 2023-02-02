@@ -122,7 +122,7 @@ export class MetricStorageRegistry {
     expectedDescriptor: InstrumentDescriptor,
     existingStorages: MetricStorage[]
   ): T | null {
-    let compatibleStorage = null;
+    let compatibleStorage: T | null = null;
 
     for (const existingStorage of existingStorages) {
       const existingDescriptor = existingStorage.getInstrumentDescriptor();

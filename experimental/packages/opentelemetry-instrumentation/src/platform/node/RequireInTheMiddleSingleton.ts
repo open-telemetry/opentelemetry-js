@@ -37,7 +37,6 @@ const isMocha = [
   'describe',
   'it',
 ].every(fn => {
-  // @ts-expect-error TS7053: Element implicitly has an 'any' type
   return typeof global[fn] === 'function';
 });
 
