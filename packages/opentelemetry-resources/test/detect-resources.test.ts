@@ -35,7 +35,7 @@ describe('detectResourcesSync', () => {
       detectors: [detector],
     });
 
-    await resource.waitForAsyncAttributes();
+    await (resource as Resource).waitForAsyncAttributes();
     assert.deepStrictEqual(resource.attributes, {
       sync: 'fromsync',
     });
@@ -56,7 +56,7 @@ describe('detectResourcesSync', () => {
 
     // before waiting, it should already have the sync resources
     assert.deepStrictEqual(resource.attributes, { sync: 'fromsync' });
-    await resource.waitForAsyncAttributes();
+    await (resource as Resource).waitForAsyncAttributes();
     assert.deepStrictEqual(resource.attributes, {
       sync: 'fromsync',
       async: 'fromasync',
@@ -89,7 +89,7 @@ describe('detectResourcesSync', () => {
         detectors: [new DetectorRejects(), new DetectorOk()],
       });
 
-      await resource.waitForAsyncAttributes();
+      await (resource as Resource).waitForAsyncAttributes();
 
       assert.ok(
         debugStub.calledWithMatch(

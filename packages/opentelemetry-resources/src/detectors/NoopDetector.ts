@@ -16,9 +16,10 @@
 
 import { Resource } from '../Resource';
 import { DetectorSync } from '../types';
+import { IResource } from '../IResource';
 
 export class NoopDetector implements DetectorSync {
-  detect(): Resource {
+  detect(): IResource {
     return new Resource({});
   }
 }

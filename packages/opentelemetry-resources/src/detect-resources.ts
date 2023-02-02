@@ -19,6 +19,7 @@ import { ResourceDetectionConfig } from './config';
 import { diag } from '@opentelemetry/api';
 import { isPromiseLike } from './utils';
 import { Detector, DetectorSync } from './types';
+import { IResource } from './IResource';
 
 /**
  * Runs all resource detectors and returns the results merged into a single Resource. Promise
@@ -30,8 +31,8 @@ import { Detector, DetectorSync } from './types';
  */
 export const detectResources = async (
   config: ResourceDetectionConfig = {}
-): Promise<Resource> => {
-  const resources: Resource[] = await Promise.all(
+): Promise<IResource> => {
+  const resources: IResource[] = await Promise.all(
     (config.detectors || []).map(async d => {
       try {
         const resource = await d.detect(config);
@@ -60,12 +61,12 @@ export const detectResources = async (
  */
 export const detectResourcesSync = (
   config: ResourceDetectionConfig = {}
-): Resource => {
-  const resources: Resource[] = (config.detectors ?? []).map(
+): IResource => {
+  const resources: IResource[] = (config.detectors ?? []).map(
     (d: Detector | DetectorSync) => {
       try {
         const resourceOrPromise = d.detect(config);
-        let resource: Resource;
+        let resource: IResource;
         if (isPromiseLike<Resource>(resourceOrPromise)) {
           const createPromise = async () => {
             const resolvedResource = await resourceOrPromise;
@@ -73,14 +74,18 @@ export const detectResourcesSync = (
           };
           resource = new Resource({}, createPromise());
         } else {
-          resource = resourceOrPromise;
+          resource = resourceOrPromise as IResource;
         }
 
-        void resource
-          .waitForAsyncAttributes()
-          .then(() =>
-            diag.debug(`${d.constructor.name} found resource.`, resource)
-          );
+        if (resource.waitForAsyncAttributes) {
+          void resource
+            .waitForAsyncAttributes()
+            .then(() =>
+              diag.debug(`${d.constructor.name} found resource.`, resource)
+            );
+        } else {
+          diag.debug(`${d.constructor.name} found resource.`, resource);
+        }
 
         return resource;
       } catch (e) {
@@ -94,10 +99,14 @@ export const detectResourcesSync = (
     (acc, resource) => acc.merge(resource),
     Resource.empty()
   );
-  void mergedResources.waitForAsyncAttributes().then(() => {
-    // Future check if verbose logging is enabled issue #1903
-    logResources(resources);
-  });
+
+  if (mergedResources.waitForAsyncAttributes) {
+    void mergedResources.waitForAsyncAttributes().then(() => {
+      // Future check if verbose logging is enabled issue #1903
+      logResources(resources);
+    });
+  }
+
   return mergedResources;
 };
 
@@ -106,7 +115,7 @@ export const detectResourcesSync = (
  *
  * @param resources The array of {@link Resource} that should be logged. Empty entries will be ignored.
  */
-const logResources = (resources: Array<Resource>) => {
+const logResources = (resources: Array<IResource>) => {
   resources.forEach(resource => {
     // Print only populated resources
     if (Object.keys(resource.attributes).length > 0) {

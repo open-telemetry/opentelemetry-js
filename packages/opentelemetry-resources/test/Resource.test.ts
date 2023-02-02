@@ -203,7 +203,9 @@ describe('Resource', () => {
         .merge(resource2)
         .merge(resource3)
         .merge(resource4);
-      await merged.waitForAsyncAttributes();
+
+      await (merged as Resource).waitForAsyncAttributes();
+
       assert.deepStrictEqual(merged.attributes, {
         promise1: 'promise1val',
         promise2: 'promise2val',
@@ -224,7 +226,9 @@ describe('Resource', () => {
       });
 
       const merged = resource1.merge(resource2);
-      await merged.waitForAsyncAttributes();
+
+      await (merged as Resource).waitForAsyncAttributes();
+
       assert.deepStrictEqual(merged.attributes, {
         promise1: 'promise1val',
         promise2: 'promise2val',
@@ -248,7 +252,9 @@ describe('Resource', () => {
       const resource2 = new Resource({}, asyncAttributes);
 
       const merged = resource1.merge(resource2);
-      await merged.waitForAsyncAttributes();
+
+      await (merged as Resource).waitForAsyncAttributes();
+
       assert.deepStrictEqual(merged.attributes, {
         promise1: 'promise1val',
         promise2: 'promise2val',
@@ -344,7 +350,7 @@ describe('Resource', () => {
 
       assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
 
-      await mergedResource.waitForAsyncAttributes();
+      await (mergedResource as Resource).waitForAsyncAttributes();
 
       assert.strictEqual(mergedResource.attributes['fromnew'], 'fromnew');
     });

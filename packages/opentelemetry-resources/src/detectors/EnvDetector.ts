@@ -20,6 +20,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { Resource } from '../Resource';
 import { DetectorSync, ResourceAttributes } from '../types';
 import { ResourceDetectionConfig } from '../config';
+import { IResource } from '../IResource';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -52,7 +53,7 @@ class EnvDetector implements DetectorSync {
    *
    * @param config The resource detection config
    */
-  detect(_config?: ResourceDetectionConfig): Resource {
+  detect(_config?: ResourceDetectionConfig): IResource {
     const attributes: ResourceAttributes = {};
     const env = getEnv();
 

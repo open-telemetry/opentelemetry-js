@@ -19,12 +19,13 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
+import { IResource } from './IResource';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
  * collected.
  */
-export class Resource {
+export class Resource implements IResource {
   static readonly EMPTY = new Resource({});
   private _syncAttributes: ResourceAttributes;
   private _asyncAttributesPromise: Promise<ResourceAttributes> | undefined;
@@ -40,14 +41,14 @@ export class Resource {
   /**
    * Returns an empty Resource
    */
-  static empty(): Resource {
+  static empty(): IResource {
     return Resource.EMPTY;
   }
 
   /**
    * Returns a Resource that identifies the SDK in use.
    */
-  static default(): Resource {
+  static default(): IResource {
     return new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: defaultServiceName(),
       [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
@@ -113,29 +114,32 @@ export class Resource {
    * @param other the Resource that will be merged with this.
    * @returns the newly merged Resource.
    */
-  merge(other: Resource | null): Resource {
+  merge(other: IResource | null): IResource {
     if (!other) return this;
 
     // SpanAttributes from other resource overwrite attributes from this resource.
     const mergedSyncAttributes = {
       ...this._syncAttributes,
       //Support for old resource implementation where _syncAttributes is not defined
-      ...(other._syncAttributes ?? other.attributes),
+      ...((other as Resource)._syncAttributes ?? other.attributes),
     };
 
-    if (!this._asyncAttributesPromise && !other._asyncAttributesPromise) {
+    if (
+      !this._asyncAttributesPromise &&
+      !(other as Resource)._asyncAttributesPromise
+    ) {
       return new Resource(mergedSyncAttributes);
     }
 
     const mergedAttributesPromise = Promise.all([
       this._asyncAttributesPromise,
-      other._asyncAttributesPromise,
+      (other as Resource)._asyncAttributesPromise,
     ]).then(([thisAsyncAttributes, otherAsyncAttributes]) => {
       return {
         ...this._syncAttributes,
         ...thisAsyncAttributes,
         //Support for old resource implementation where _syncAttributes is not defined
-        ...(other._syncAttributes ?? other.attributes),
+        ...((other as Resource)._syncAttributes ?? other.attributes),
         ...otherAsyncAttributes,
       };
     });

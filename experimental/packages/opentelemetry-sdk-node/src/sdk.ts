@@ -24,6 +24,7 @@ import {
   DetectorSync,
   detectResourcesSync,
   envDetector,
+  IResource,
   processDetector,
   Resource,
   ResourceDetectionConfig,
@@ -64,7 +65,7 @@ export class NodeSDK {
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
 
-  private _resource: Resource;
+  private _resource: IResource;
   private _resourceDetectors: Array<Detector | DetectorSync>;
 
   private _autoDetectResources: boolean;
@@ -197,7 +198,7 @@ export class NodeSDK {
   }
 
   /** Manually add a resource */
-  public addResource(resource: Resource): void {
+  public addResource(resource: IResource): void {
     this._resource = this._resource.merge(resource);
   }
 

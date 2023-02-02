@@ -26,6 +26,7 @@ import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -77,13 +78,15 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (span.resource.asyncAttributesPending) {
-      const exportPromise = span.resource.waitForAsyncAttributes().then(
-        () => {
-          this._unresolvedExports.delete(exportPromise);
-          return doExport();
-        },
-        err => globalErrorHandler(err)
-      );
+      const exportPromise = (span.resource as Resource)
+        .waitForAsyncAttributes()
+        .then(
+          () => {
+            this._unresolvedExports.delete(exportPromise);
+            return doExport();
+          },
+          err => globalErrorHandler(err)
+        );
 
       // store the unresolved exports
       this._unresolvedExports.add(exportPromise);

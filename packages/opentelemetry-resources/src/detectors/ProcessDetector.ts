@@ -19,13 +19,14 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { Resource } from '../Resource';
 import { DetectorSync, ResourceAttributes } from '../types';
 import { ResourceDetectionConfig } from '../config';
+import { IResource } from '../IResource';
 
 /**
  * ProcessDetector will be used to detect the resources related current process running
  * and being instrumented from the NodeJS Process module.
  */
 class ProcessDetector implements DetectorSync {
-  detect(config?: ResourceDetectionConfig): Resource {
+  detect(config?: ResourceDetectionConfig): IResource {
     // Skip if not in Node.js environment.
     if (typeof process !== 'object') {
       return Resource.empty();

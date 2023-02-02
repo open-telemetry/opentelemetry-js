@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Resource } from './Resource';
 import { ResourceDetectionConfig } from './config';
 import { SpanAttributes } from '@opentelemetry/api';
+import { IResource } from './IResource';
 
 /**
  * Interface for Resource attributes.
@@ -29,7 +29,7 @@ export type ResourceAttributes = SpanAttributes;
  * @deprecated please use {@link DetectorSync}
  */
 export interface Detector {
-  detect(config?: ResourceDetectionConfig): Promise<Resource>;
+  detect(config?: ResourceDetectionConfig): Promise<IResource>;
 }
 
 /**
@@ -37,5 +37,5 @@ export interface Detector {
  * can pass a Promise as the second parameter to the Resource constructor.
  */
 export interface DetectorSync {
-  detect(config?: ResourceDetectionConfig): Resource;
+  detect(config?: ResourceDetectionConfig): IResource;
 }

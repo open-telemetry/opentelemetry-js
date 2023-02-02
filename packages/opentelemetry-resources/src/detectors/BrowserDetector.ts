@@ -16,14 +16,14 @@
 
 import { diag } from '@opentelemetry/api';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { DetectorSync, Resource, ResourceDetectionConfig } from '..';
+import { DetectorSync, IResource, Resource, ResourceDetectionConfig } from '..';
 import { ResourceAttributes } from '../types';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.
  */
 class BrowserDetector implements DetectorSync {
-  detect(config?: ResourceDetectionConfig): Resource {
+  detect(config?: ResourceDetectionConfig): IResource {
     const isBrowser = typeof navigator !== 'undefined';
     if (!isBrowser) {
       return Resource.empty();
