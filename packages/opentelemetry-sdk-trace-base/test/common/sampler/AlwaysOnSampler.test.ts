@@ -25,9 +25,8 @@ describe('AlwaysOnSampler', () => {
 
   it('should return api.SamplingDecision.RECORD_AND_SAMPLED for AlwaysOnSampler', () => {
     const sampler = new AlwaysOnSampler();
-    assert.deepStrictEqual(sampler.shouldSample(api.ROOT_CONTEXT), {
+    assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-      traceState: undefined,
     });
   });
 });

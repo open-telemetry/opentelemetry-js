@@ -69,7 +69,6 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.NOT_RECORD,
-        traceState: undefined,
       }
     );
   });
@@ -88,7 +87,6 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-        traceState: undefined,
       }
     );
   });
@@ -107,7 +105,6 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-        traceState: undefined,
       }
     );
   });
@@ -131,7 +128,6 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-        traceState: undefined,
       }
     );
   });
@@ -150,7 +146,6 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.NOT_RECORD,
-        traceState: undefined,
       }
     );
   });
@@ -169,7 +164,6 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.NOT_RECORD,
-        traceState: undefined,
       }
     );
   });
