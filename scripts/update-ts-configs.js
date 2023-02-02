@@ -247,12 +247,7 @@ function resolvePackageMeta(pkgDir) {
 }
 
 function readAndMaybeMergeTsConfig(tsconfigPath, updates) {
-  let tsconfig;
-  try {
-    tsconfig = readJSON(tsconfigPath);
-  } catch {
-    return updates;
-  }
+  const tsconfig = readJSON(tsconfigPath);
   updates = mergeTsConfig(tsconfig, updates);
   return updates;
 }
@@ -284,8 +279,11 @@ function hasEsTargets(pjson) {
 
 function readJSON(filepath) {
   const fileContent = fs.readFileSync(filepath, 'utf8');
-  const json = JSON.parse(fileContent);
-  return json;
+  try {
+    return JSON.parse(fileContent);
+  } catch (e) {
+    throw new Error(`Invalid JSON ${filepath}: ${e.message}`);
+  }
 }
 
 function writeJSON(filepath, content, dry) {
