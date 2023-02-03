@@ -22,13 +22,13 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { Stream, PassThrough } from 'stream';
 import * as zlib from 'zlib';
-import { OTLPTraceExporter } from '../src';
+import { OTLPTraceExporter } from '../../src';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureProtoSpanIsCorrect,
   mockedReadableSpan,
   MockedResponse,
-} from './traceHelper';
+} from '../traceHelper';
 import {
   CompressionAlgorithm,
   OTLPExporterNodeConfigBase,
