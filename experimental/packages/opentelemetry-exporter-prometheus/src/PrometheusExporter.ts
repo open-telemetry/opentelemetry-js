@@ -54,7 +54,10 @@ export class PrometheusExporter extends MetricReader {
    * @param config Exporter configuration
    * @param callback Callback to be called after a server was started
    */
-  constructor(config: ExporterConfig = {}, callback?: (error?: Error) => void) {
+  constructor(
+    config: ExporterConfig = {},
+    callback: (error: Error | void) => void = () => {}
+  ) {
     super({
       aggregationSelector: _instrumentType => Aggregation.Default(),
       aggregationTemporalitySelector: _instrumentType =>
@@ -86,13 +89,10 @@ export class PrometheusExporter extends MetricReader {
     ).replace(/^([^/])/, '/$1');
 
     if (config.preventServerStart !== true) {
-      this.startServer().then(
-        () => callback?.(),
-        err => {
-          diag.error(err);
-          callback?.(err);
-        }
-      );
+      this.startServer().then(callback, err => {
+        diag.error(err);
+        callback(err);
+      });
     } else if (callback) {
       callback();
     }
