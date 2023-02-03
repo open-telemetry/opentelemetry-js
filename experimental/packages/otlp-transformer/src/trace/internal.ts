@@ -32,6 +32,7 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, useHex?: boolean): ISpan {
     traceId: useHex ? ctx.traceId : core.hexToBase64(ctx.traceId),
     spanId: useHex ? ctx.spanId : core.hexToBase64(ctx.spanId),
     parentSpanId: parentSpanId,
+    traceState: ctx.traceState?.serialize(),
     name: span.name,
     // Span kind is offset by 1 because the API does not define a value for unset
     kind: span.kind == null ? 0 : span.kind + 1,
@@ -60,6 +61,7 @@ export function toOtlpLink(link: Link, useHex?: boolean): ILink {
     traceId: useHex
       ? link.context.traceId
       : core.hexToBase64(link.context.traceId),
+    traceState: link.context.traceState?.serialize(),
     droppedAttributesCount: 0,
   };
 }
