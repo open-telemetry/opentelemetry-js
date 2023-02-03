@@ -4,6 +4,7 @@
 [![Apache License][license-image]][license-image]
 
 **NOTE: Support for `@opentelemetry/exporter-jaeger` will end July 2023, please use any of the following packages instead:**
+
 - `@opentelemetry/exporter-trace-otlp-proto`
 - `@opentelemetry/exporter-trace-otlp-grpc`
 - `@opentelemetry/exporter-trace-otlp-http`
