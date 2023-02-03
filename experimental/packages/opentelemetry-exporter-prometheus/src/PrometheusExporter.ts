@@ -86,12 +86,13 @@ export class PrometheusExporter extends MetricReader {
     ).replace(/^([^/])/, '/$1');
 
     if (config.preventServerStart !== true) {
-      this.startServer()
-        .then(() => callback?.())
-        .catch(err => {
+      this.startServer().then(
+        () => callback?.(),
+        err => {
           diag.error(err);
           callback?.(err);
-        });
+        }
+      );
     } else if (callback) {
       callback();
     }
@@ -141,7 +142,7 @@ export class PrometheusExporter extends MetricReader {
    */
   startServer(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._server.on('error', reject);
+      this._server.once('error', reject);
       this._server.listen(
         {
           port: this._port,
