@@ -19,6 +19,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* chore(exporter-jaeger): deprecate jaeger exporter [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @pichlermarc
+
 ## 1.9.1
 
 ### :bug: (Bug Fix)
