@@ -29,6 +29,13 @@ import * as jaegerTypes from './types';
 
 /**
  * Format and sends span information to Jaeger Exporter.
+ *
+ * @deprecated Jaeger supports the OpenTelemetry protocol natively
+ * (see https://www.jaegertracing.io/docs/1.41/apis/#opentelemetry-protocol-stable).
+ * Support for this exporter will end July 2023. Please migrate to any of the following packages:
+ * - `@opentelemetry/exporter-trace-otlp-proto`
+ * - `@opentelemetry/exporter-trace-otlp-grpc`
+ * - `@opentelemetry/exporter-trace-otlp-http`
  */
 export class JaegerExporter implements SpanExporter {
   private readonly _onShutdownFlushTimeout: number;
