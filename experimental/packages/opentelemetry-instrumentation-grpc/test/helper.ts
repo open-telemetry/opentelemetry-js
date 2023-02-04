@@ -978,6 +978,10 @@ export const runTests = (
               requestMetadata: ['client_metadata_key'],
               responseMetadata: ['server_metadata_key'],
             },
+            server: {
+              requestMetadata: ['client_metadata_key'],
+              responseMetadata: ['server_metadata_key'],
+            },
           },
         });
 
@@ -1002,6 +1006,11 @@ export const runTests = (
       describe('Capture request/response metadata in client span', () => {
         const attributeValidation = {
           clientAttributes: {
+            'rpc.request.metadata.client_metadata_key': 'client_metadata_value',
+            'rpc.response.metadata.server_metadata_key':
+              'server_metadata_value',
+          },
+          serverAttributes: {
             'rpc.request.metadata.client_metadata_key': 'client_metadata_value',
             'rpc.response.metadata.server_metadata_key':
               'server_metadata_value',
