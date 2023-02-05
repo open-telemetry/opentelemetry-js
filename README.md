@@ -273,7 +273,7 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Upgrade guidelines
 
-### 0.35.0 to 0.36.0
+### 0.35.x to 0.36.0
 
 - `@opentelemetry/sdk-node` changed `await start()` to now be synchronous
 - `@opentelemetry/sdk-node` changed `await detectResources()` to now be synchronous
