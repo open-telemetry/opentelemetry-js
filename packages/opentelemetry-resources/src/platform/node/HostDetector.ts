@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../../Resource';
-import { Detector, ResourceAttributes } from '../../types';
+import { Detector } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
-import { arch, hostname } from 'os';
 import { IResource } from '../../IResource';
-import { normalizeArch } from './utils';
+import { hostDetectorSync } from './HostDetectorSync';
 
 /**
  * HostDetector detects the resources related to the host current process is
@@ -28,11 +25,7 @@ import { normalizeArch } from './utils';
  */
 class HostDetector implements Detector {
   detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    const attributes: ResourceAttributes = {
-      [SemanticResourceAttributes.HOST_NAME]: hostname(),
-      [SemanticResourceAttributes.HOST_ARCH]: normalizeArch(arch()),
-    };
-    return Promise.resolve(new Resource(attributes));
+    return Promise.resolve(hostDetectorSync.detect(_config));
   }
 }
 

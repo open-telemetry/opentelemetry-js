@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../Resource';
-import { Detector, ResourceAttributes } from '../types';
+import { Detector } from '../types';
 import { ResourceDetectionConfig } from '../config';
 import { IResource } from '../IResource';
+import { processDetectorSync } from './ProcessDetectorSync';
 
 /**
  * ProcessDetector will be used to detect the resources related current process running
@@ -27,54 +25,7 @@ import { IResource } from '../IResource';
  */
 class ProcessDetector implements Detector {
   detect(config?: ResourceDetectionConfig): Promise<IResource> {
-    // Skip if not in Node.js environment.
-    if (typeof process !== 'object') {
-      return Promise.resolve(Resource.empty());
-    }
-    const processResource: ResourceAttributes = {
-      [SemanticResourceAttributes.PROCESS_PID]: process.pid,
-      [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title || '',
-      [SemanticResourceAttributes.PROCESS_COMMAND]: process.argv[1] || '',
-      [SemanticResourceAttributes.PROCESS_COMMAND_LINE]:
-        process.argv.join(' ') || '',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]:
-        process.versions.node,
-      [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
-    };
-    return Promise.resolve(
-      this._getResourceAttributes(processResource, config)
-    );
-  }
-  /**
-   * Validates process resource attribute map from process variables
-   *
-   * @param processResource The unsantized resource attributes from process as key/value pairs.
-   * @param config: Config
-   * @returns The sanitized resource attributes.
-   */
-  private _getResourceAttributes(
-    processResource: ResourceAttributes,
-    _config?: ResourceDetectionConfig
-  ) {
-    if (
-      processResource[SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME] ===
-        '' ||
-      processResource[SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH] ===
-        '' ||
-      processResource[SemanticResourceAttributes.PROCESS_COMMAND] === '' ||
-      processResource[SemanticResourceAttributes.PROCESS_COMMAND_LINE] === '' ||
-      processResource[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION] === ''
-    ) {
-      diag.debug(
-        'ProcessDetector failed: Unable to find required process resources. '
-      );
-      return Resource.empty();
-    } else {
-      return new Resource({
-        ...processResource,
-      });
-    }
+    return Promise.resolve(processDetectorSync.detect(config));
   }
 }
 
