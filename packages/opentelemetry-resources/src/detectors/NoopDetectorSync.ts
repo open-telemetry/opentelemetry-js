@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-export * from './BrowserDetector';
-export * from './EnvDetector';
-export * from './ProcessDetector';
-export * from './BrowserDetectorSync';
-export * from './EnvDetectorSync';
-export * from './ProcessDetectorSync';
+import { Resource } from '../Resource';
+import { DetectorSync } from '../types';
+import { IResource } from '../IResource';
+
+export class NoopDetectorSync implements DetectorSync {
+  detect(): IResource {
+    return new Resource({});
+  }
+}
+
+export const noopDetectorSync = new NoopDetectorSync();

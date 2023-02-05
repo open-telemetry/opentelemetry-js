@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-export * from './BrowserDetector';
-export * from './EnvDetector';
-export * from './ProcessDetector';
-export * from './BrowserDetectorSync';
-export * from './EnvDetectorSync';
-export * from './ProcessDetectorSync';
+import { noopDetectorSync } from '../../detectors/NoopDetectorSync';
+
+export const hostDetectorSync = noopDetectorSync;

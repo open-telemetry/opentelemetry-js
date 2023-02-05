@@ -16,34 +16,23 @@
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../Resource';
-import { DetectorSync, ResourceAttributes } from '../../types';
+import { Detector, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
 import { platform, release } from 'os';
+import { IResource } from '../../IResource';
+import { normalizeType } from './utils';
 
 /**
  * OSDetector detects the resources related to the operating system (OS) on
  * which the process represented by this resource is running.
  */
-class OSDetector implements DetectorSync {
-  detect(_config?: ResourceDetectionConfig): Resource {
+class OSDetector implements Detector {
+  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
     const attributes: ResourceAttributes = {
-      [SemanticResourceAttributes.OS_TYPE]: this._normalizeType(platform()),
+      [SemanticResourceAttributes.OS_TYPE]: normalizeType(platform()),
       [SemanticResourceAttributes.OS_VERSION]: release(),
     };
-    return new Resource(attributes);
-  }
-
-  private _normalizeType(nodePlatform: string): string {
-    // Maps from https://nodejs.org/api/os.html#osplatform to arch values in spec:
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/os.md
-    switch (nodePlatform) {
-      case 'sunos':
-        return 'solaris';
-      case 'win32':
-        return 'windows';
-      default:
-        return nodePlatform;
-    }
+    return Promise.resolve(new Resource(attributes));
   }
 }
 

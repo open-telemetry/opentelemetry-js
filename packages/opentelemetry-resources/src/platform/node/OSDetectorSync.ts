@@ -16,24 +16,23 @@
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../Resource';
-import { Detector, ResourceAttributes } from '../../types';
+import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
-import { arch, hostname } from 'os';
-import { IResource } from '../../IResource';
-import { normalizeArch } from './utils';
+import { platform, release } from 'os';
+import { normalizeType } from './utils';
 
 /**
- * HostDetector detects the resources related to the host current process is
- * running on. Currently only non-cloud-based attributes are included.
+ * OSDetectorSync detects the resources related to the operating system (OS) on
+ * which the process represented by this resource is running.
  */
-class HostDetector implements Detector {
-  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
+class OSDetectorSync implements DetectorSync {
+  detect(_config?: ResourceDetectionConfig): Resource {
     const attributes: ResourceAttributes = {
-      [SemanticResourceAttributes.HOST_NAME]: hostname(),
-      [SemanticResourceAttributes.HOST_ARCH]: normalizeArch(arch()),
+      [SemanticResourceAttributes.OS_TYPE]: normalizeType(platform()),
+      [SemanticResourceAttributes.OS_VERSION]: release(),
     };
-    return Promise.resolve(new Resource(attributes));
+    return new Resource(attributes);
   }
 }
 
-export const hostDetector = new HostDetector();
+export const osDetectorSync = new OSDetectorSync();

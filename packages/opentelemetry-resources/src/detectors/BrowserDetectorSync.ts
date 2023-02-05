@@ -15,27 +15,25 @@
  */
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Detector, IResource, Resource, ResourceDetectionConfig } from '..';
+import { DetectorSync, IResource, Resource, ResourceDetectionConfig } from '..';
 import { ResourceAttributes } from '../types';
 import { diag } from '@opentelemetry/api';
 
 /**
- * BrowserDetector will be used to detect the resources related to browser.
+ * BrowserDetectorSync will be used to detect the resources related to browser.
  */
-class BrowserDetector implements Detector {
-  detect(config?: ResourceDetectionConfig): Promise<IResource> {
+class BrowserDetectorSync implements DetectorSync {
+  detect(config?: ResourceDetectionConfig): IResource {
     const isBrowser = typeof navigator !== 'undefined';
     if (!isBrowser) {
-      return Promise.resolve(Resource.empty());
+      return Resource.empty();
     }
     const browserResource: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
       [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
       [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent,
     };
-    return Promise.resolve(
-      this._getResourceAttributes(browserResource, config)
-    );
+    return this._getResourceAttributes(browserResource, config);
   }
   /**
    * Validates process resource attribute map from process variables
@@ -63,4 +61,4 @@ class BrowserDetector implements Detector {
   }
 }
 
-export const browserDetector = new BrowserDetector();
+export const browserDetectorSync = new BrowserDetectorSync();

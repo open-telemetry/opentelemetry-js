@@ -15,12 +15,12 @@
  */
 
 import { Resource } from '../Resource';
-import { DetectorSync } from '../types';
+import { Detector } from '../types';
 import { IResource } from '../IResource';
 
-export class NoopDetector implements DetectorSync {
-  detect(): IResource {
-    return new Resource({});
+export class NoopDetector implements Detector {
+  detect(): Promise<IResource> {
+    return Promise.resolve(new Resource({}));
   }
 }
 

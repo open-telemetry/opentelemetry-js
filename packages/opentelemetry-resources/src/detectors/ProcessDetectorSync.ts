@@ -17,19 +17,19 @@
 import { diag } from '@opentelemetry/api';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../Resource';
-import { Detector, ResourceAttributes } from '../types';
+import { DetectorSync, ResourceAttributes } from '../types';
 import { ResourceDetectionConfig } from '../config';
 import { IResource } from '../IResource';
 
 /**
- * ProcessDetector will be used to detect the resources related current process running
+ * ProcessDetectorSync will be used to detect the resources related current process running
  * and being instrumented from the NodeJS Process module.
  */
-class ProcessDetector implements Detector {
-  detect(config?: ResourceDetectionConfig): Promise<IResource> {
+class ProcessDetectorSync implements DetectorSync {
+  detect(config?: ResourceDetectionConfig): IResource {
     // Skip if not in Node.js environment.
     if (typeof process !== 'object') {
-      return Promise.resolve(Resource.empty());
+      return Resource.empty();
     }
     const processResource: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_PID]: process.pid,
@@ -42,9 +42,7 @@ class ProcessDetector implements Detector {
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',
       [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
     };
-    return Promise.resolve(
-      this._getResourceAttributes(processResource, config)
-    );
+    return this._getResourceAttributes(processResource, config);
   }
   /**
    * Validates process resource attribute map from process variables
@@ -67,7 +65,7 @@ class ProcessDetector implements Detector {
       processResource[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION] === ''
     ) {
       diag.debug(
-        'ProcessDetector failed: Unable to find required process resources. '
+        'ProcessDetectorSync failed: Unable to find required process resources. '
       );
       return Resource.empty();
     } else {
@@ -78,4 +76,4 @@ class ProcessDetector implements Detector {
   }
 }
 
-export const processDetector = new ProcessDetector();
+export const processDetectorSync = new ProcessDetectorSync();
