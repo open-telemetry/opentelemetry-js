@@ -28,7 +28,6 @@ import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
-import { Resource } from '@opentelemetry/resources';
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by
@@ -186,7 +185,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         } else {
           Promise.all(
             pendingResources.map(resource =>
-              (resource as Resource).waitForAsyncAttributes()
+              resource.waitForAsyncAttributes?.()
             )
           ).then(doExport, err => {
             globalErrorHandler(err);

@@ -393,7 +393,7 @@ describe('Node SDK', () => {
         });
         sdk.detectResources();
         const resource = sdk['_resource'];
-        await (resource as Resource).waitForAsyncAttributes();
+        await resource.waitForAsyncAttributes?.();
 
         assert.strictEqual(resource.attributes['customAttr'], 'someValue');
 
@@ -423,7 +423,7 @@ describe('Node SDK', () => {
 
         sdk.detectResources();
         const resource = sdk['_resource'];
-        await (resource as Resource).waitForAsyncAttributes();
+        await resource.waitForAsyncAttributes?.();
 
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -472,7 +472,7 @@ describe('Node SDK', () => {
         );
 
         sdk.detectResources();
-        await (sdk['_resource'] as Resource).waitForAsyncAttributes();
+        await sdk['_resource'].waitForAsyncAttributes?.();
 
         // Test that the Env Detector successfully found its resource and populated it with the right values.
         assert.ok(
@@ -537,7 +537,7 @@ describe('Node SDK', () => {
 
       sdk.start();
       const resource = sdk['_resource'];
-      await (resource as Resource).waitForAsyncAttributes();
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'env-set-name',
@@ -553,7 +553,7 @@ describe('Node SDK', () => {
 
       sdk.start();
       const resource = sdk['_resource'];
-      await (resource as Resource).waitForAsyncAttributes();
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'config-set-name',
@@ -568,7 +568,7 @@ describe('Node SDK', () => {
 
       sdk.start();
       const resource = sdk['_resource'];
-      await (resource as Resource).waitForAsyncAttributes();
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'resource-env-set-name',
@@ -585,7 +585,7 @@ describe('Node SDK', () => {
 
       sdk.start();
       const resource = sdk['_resource'];
-      await (resource as Resource).waitForAsyncAttributes();
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'config-set-name',
@@ -660,7 +660,7 @@ describe('Node SDK', () => {
         });
         sdk.detectResources();
         const resource = sdk['_resource'];
-        await (resource as Resource).waitForAsyncAttributes();
+        await resource.waitForAsyncAttributes?.();
 
         assert.deepStrictEqual(resource, Resource.empty());
       });
