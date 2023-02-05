@@ -66,9 +66,10 @@ export class Span implements APISpan, ReadableSpan {
   readonly startTime: HrTime;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
-  droppedAttributesCount: number = 0;
-  droppedEventsCount: number = 0;
-  droppedLinksCount: number = 0;
+
+  private _droppedAttributesCount: number = 0;
+  private _droppedEventsCount: number = 0;
+  private _droppedLinksCount: number = 0;
 
   name: string;
   status: SpanStatus = {
@@ -145,7 +146,7 @@ export class Span implements APISpan, ReadableSpan {
         this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
-      this.droppedAttributesCount += 1;
+      this._droppedAttributesCount += 1;
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
@@ -172,6 +173,16 @@ export class Span implements APISpan, ReadableSpan {
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
+    if (this._spanLimits.eventCountLimit === 0) {
+      diag.warn('No events allowed.');
+      this._droppedEventsCount += 1;
+      return this;
+    }
+    if (this.events.length >= this._spanLimits.eventCountLimit!) {
+      diag.warn('Dropping extra events.');
+      this.events.shift();
+      this._droppedEventsCount += 1;
+    }
 
     if (isTimeInput(attributesOrStartTime)) {
       if (!isTimeInput(timeStamp)) {
@@ -181,17 +192,6 @@ export class Span implements APISpan, ReadableSpan {
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
-
-    if (this._spanLimits.eventCountLimit === 0) {
-      diag.warn('No events allowed.');
-      this.droppedEventsCount += 1;
-      return this;
-    }
-    if (this.events.length >= this._spanLimits.eventCountLimit!) {
-      diag.warn('Dropping extra events.');
-      this.events.shift();
-      this.droppedEventsCount += 1;
-    }
 
     this.events.push({
       name,
@@ -305,6 +305,18 @@ export class Span implements APISpan, ReadableSpan {
 
   get ended(): boolean {
     return this._ended;
+  }
+
+  get droppedAttributesCount(): number {
+    return this._droppedAttributesCount;
+  }
+
+  get droppedEventsCount(): number {
+    return this._droppedEventsCount;
+  }
+
+  get droppedLinksCount(): number {
+    return this._droppedLinksCount;
   }
 
   private _isSpanEnded(): boolean {

@@ -39,16 +39,16 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, useHex?: boolean): ISpan {
     startTimeUnixNano: hrTimeToNanoseconds(span.startTime),
     endTimeUnixNano: hrTimeToNanoseconds(span.endTime),
     attributes: toAttributes(span.attributes),
-    droppedAttributesCount: 0,
+    droppedAttributesCount: span.droppedAttributesCount,
     events: span.events.map(toOtlpSpanEvent),
-    droppedEventsCount: 0,
+    droppedEventsCount: span.droppedEventsCount,
     status: {
       // API and proto enums share the same values
       code: status.code as unknown as EStatusCode,
       message: status.message,
     },
     links: span.links.map(link => toOtlpLink(link, useHex)),
-    droppedLinksCount: 0,
+    droppedLinksCount: span.droppedLinksCount,
   };
 }
 
