@@ -65,7 +65,7 @@ class EnvDetectorSync implements DetectorSync {
         const parsedAttributes = this._parseResourceAttributes(rawAttributes);
         Object.assign(attributes, parsedAttributes);
       } catch (e) {
-        diag.debug(`EnvDetectorSync failed: ${e.message}`);
+        diag.debug(`EnvDetector failed: ${e.message}`);
       }
     }
 

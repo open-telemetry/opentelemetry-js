@@ -65,7 +65,7 @@ class ProcessDetectorSync implements DetectorSync {
       processResource[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION] === ''
     ) {
       diag.debug(
-        'ProcessDetectorSync failed: Unable to find required process resources. '
+        'ProcessDetector failed: Unable to find required process resources. '
       );
       return Resource.empty();
     } else {
