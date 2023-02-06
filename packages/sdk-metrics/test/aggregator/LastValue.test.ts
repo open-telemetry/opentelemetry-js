@@ -64,10 +64,10 @@ describe('LastValueAggregator', () => {
       const accumulation2 = aggregator.createAccumulation([1, 1]);
 
       accumulation1.record(2);
-      clock.tick(1);
+      clock.tick(100);
       accumulation2.record(3);
       // refresh the accumulation1
-      clock.tick(1);
+      clock.tick(100);
       accumulation1.record(4);
 
       assert.deepStrictEqual(
@@ -111,7 +111,7 @@ describe('LastValueAggregator', () => {
       accumulation1.record(2);
       accumulation2.record(3);
       // refresh the accumulation1
-      clock.tick(1);
+      clock.tick(100);
       accumulation1.record(4);
 
       assert.deepStrictEqual(
