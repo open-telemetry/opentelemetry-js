@@ -327,7 +327,8 @@ describe('Utility', () => {
       const spanAttributes: Attributes = {
         [SemanticAttributes.HTTP_ROUTE]: '/user/:id',
       };
-      const metricAttributes = utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes)
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
 
       assert.deepStrictEqual(
         metricAttributes[SemanticAttributes.HTTP_ROUTE],
@@ -337,8 +338,12 @@ describe('Utility', () => {
 
     it('should skip http_route if span has not it', () => {
       const spanAttributes: Attributes = {};
-      const metricAttributes = utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes)
-      assert.deepEqual(metricAttributes[SemanticAttributes.HTTP_ROUTE], undefined);
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+      assert.deepEqual(
+        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        undefined
+      );
     });
   });
   // Verify the key in the given attributes is set to the given value,
