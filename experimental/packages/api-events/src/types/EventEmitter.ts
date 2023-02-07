@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { SeverityNumber } from '../../src';
-import { NoopLogger } from '../../src/NoopLogger';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import { Event } from './Event';
 
-describe('NoopLogger', () => {
-  it('constructor should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    assert(logger instanceof NoopLogger);
-  });
-
-  it('calling emit should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emit({
-      severityNumber: SeverityNumber.TRACE,
-      body: 'log body',
-    });
-  });
-});
+export interface EventEmitter {
+  /**
+   * Emit an event. This method should only be used by instrumentations emitting events.
+   *
+   * @param event
+   */
+  emit(event: Event): void;
+}
