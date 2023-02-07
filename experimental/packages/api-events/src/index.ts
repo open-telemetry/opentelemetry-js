@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+export * from './types/EventEmitter';
+export * from './types/EventEmitterProvider';
+export * from './types/Event';
+export * from './types/EventEmitterOptions';
 
-export interface LoggerOptions {
-  /**
-   * The schemaUrl of the tracer or instrumentation library
-   * @default ''
-   */
-  schemaUrl?: string;
-
-  /**
-   * The instrumentation scope attributes to associate with emitted telemetry
-   */
-  scopeAttributes?: Attributes;
-}
+import { EventsAPI } from './api/events';
+export const events = EventsAPI.getInstance();

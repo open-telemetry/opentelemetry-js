@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import { EventEmitter } from './types/EventEmitter';
+import { Event } from './types/Event';
 
-export interface LoggerOptions {
-  /**
-   * The schemaUrl of the tracer or instrumentation library
-   * @default ''
-   */
-  schemaUrl?: string;
-
-  /**
-   * The instrumentation scope attributes to associate with emitted telemetry
-   */
-  scopeAttributes?: Attributes;
+export class NoopEventEmitter implements EventEmitter {
+  emit(_event: Event): void {}
 }

@@ -16,7 +16,7 @@
 
 import { Attributes } from '@opentelemetry/api';
 
-export interface LogEvent {
+export interface Event {
   /**
    * The time when the event occurred as UNIX Epoch time in nanoseconds.
    */
@@ -26,11 +26,6 @@ export interface LogEvent {
    * The name of the event.
    */
   name: string;
-
-  /**
-   * The domain the event belongs to.
-   */
-  domain?: string;
 
   /**
    * Additional attributes that describe the event.
