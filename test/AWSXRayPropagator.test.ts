@@ -299,6 +299,24 @@ describe('AWSXRayPropagator', () => {
 
       assert.deepStrictEqual(extractedSpanContext, undefined);
     });
+
+    it('extracts context in a case-insensitive fashion', () => {
+      carrier[AWSXRAY_TRACE_ID_HEADER.toUpperCase()] =
+        'Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad8;Sampled=1;Foo=Bar';
+      const extractedSpanContext = trace
+        .getSpan(
+          xrayPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+        )
+        ?.spanContext();
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        traceId: TRACE_ID,
+        spanId: SPAN_ID,
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
     describe('.fields()', () => {
       it('should return a field with AWS X-Ray Trace ID header', () => {
         const expectedField = xrayPropagator.fields();

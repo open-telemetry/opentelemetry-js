@@ -92,9 +92,18 @@ export class AWSXRayPropagator implements TextMapPropagator {
     carrier: unknown,
     getter: TextMapGetter
   ): SpanContext {
-    const traceHeader = getter.get(carrier, AWSXRAY_TRACE_ID_HEADER);
-    if (!traceHeader || typeof traceHeader !== 'string')
+    const headerKeys = getter.keys(carrier);
+    const relevantHeaderKey = headerKeys.find(e => {
+      return e.toLowerCase() === AWSXRAY_TRACE_ID_HEADER;
+    });
+    if (!relevantHeaderKey) {
       return INVALID_SPAN_CONTEXT;
+    }
+    const traceHeader = getter.get(carrier, relevantHeaderKey);
+
+    if (!traceHeader || typeof traceHeader !== 'string') {
+      return INVALID_SPAN_CONTEXT;
+    }
 
     let pos = 0;
     let trimmedPart: string;
