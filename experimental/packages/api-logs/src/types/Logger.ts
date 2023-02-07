@@ -15,7 +15,6 @@
  */
 
 import { LogRecord } from './LogRecord';
-import { LogEvent } from './LogEvent';
 
 export interface Logger {
   /**
@@ -23,12 +22,5 @@ export interface Logger {
    *
    * @param logRecord
    */
-  emitLogRecord(logRecord: LogRecord): void;
-
-  /**
-   * Emit an event. This method should only be used by instrumentations emitting events.
-   *
-   * @param event
-   */
-  emitEvent(event: LogEvent): void;
+  emit(logRecord: LogRecord): void;
 }
