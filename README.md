@@ -178,6 +178,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
+- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [John Bley](https://github.com/johnbley), Splunk
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Mark Wolff](https://github.com/markwolff), Microsoft
