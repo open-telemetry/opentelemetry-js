@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { SeverityNumber } from '../../src';
-import { NoopLogger } from '../../src/NoopLogger';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import { Attributes } from '@opentelemetry/api';
 
-describe('NoopLogger', () => {
-  it('constructor should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    assert(logger instanceof NoopLogger);
-  });
+export interface EventEmitterOptions {
+  /**
+   * The schemaUrl of the tracer or instrumentation library
+   * @default ''
+   */
+  schemaUrl?: string;
 
-  it('calling emit should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emit({
-      severityNumber: SeverityNumber.TRACE,
-      body: 'log body',
-    });
-  });
-});
+  /**
+   * The instrumentation scope attributes to associate with emitted telemetry
+   */
+  scopeAttributes?: Attributes;
+}

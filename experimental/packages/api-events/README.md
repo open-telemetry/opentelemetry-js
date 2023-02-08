@@ -3,11 +3,11 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This package provides everything needed to interact with the unstable OpenTelemetry Logs API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
+This package provides everything needed to interact with the unstable OpenTelemetry Events API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
 
 ## Beta Software - Use at your own risk
 
-The logs API is considered alpha software and there is no guarantee of stability or long-term support. When the API is stabilized, it will be made available and supported long-term in the `@opentelemetry/api` package and this package will be deprecated.
+The events API is considered alpha software and there is no guarantee of stability or long-term support. When the API is stabilized, it will be made available and supported long-term in the `@opentelemetry/api` package and this package will be deprecated.
 
 ## Quick Start
 
@@ -21,25 +21,25 @@ Because the npm installer and node module resolution algorithm could potentially
 
 ### API Methods
 
-If you are writing an instrumentation library, or prefer to call the API methods directly rather than using the `register` method on the Tracer/Meter/Logger Provider, OpenTelemetry provides direct access to the underlying API methods through the `@opentelemetry/api-logs` package. API entry points are defined as global singleton objects `trace`, `metrics`, `logs`, `propagation`, and `context` which contain methods used to initialize SDK implementations and acquire resources from the API.
+If you are writing an instrumentation library, or prefer to call the API methods directly rather than using the `register` method on the Tracer/Meter/Logger Provider, OpenTelemetry provides direct access to the underlying API methods through the `@opentelemetry/api-events` package. API entry points are defined as global singleton objects `trace`, `metrics`, `logs`, `events`, `propagation`, and `context` which contain methods used to initialize SDK implementations and acquire resources from the API.
 
-- [Logs API Documentation][logs-api-docs]
+- [Events API Documentation][events-api-docs]
 
 ```javascript
-const api = require("@opentelemetry/api-logs");
+const api = require("@opentelemetry/api-events");
 
-/* A specific implementation of LoggerProvider comes from an SDK */
-const loggerProvider = createLoggerProvider();
+/* A specific implementation of EventEmitterProvider comes from an SDK */
+const eventEmitterProvider = createEventEmitterProvider();
 
-/* Initialize LoggerProvider */
-api.logs.setGlobalLoggerProvider(loggerProvider);
-/* returns loggerProvider (no-op if a working provider has not been initialized) */
-api.logs.getLoggerProvider();
-/* returns a logger from the registered global logger provider (no-op if a working provider has not been initialized) */
-const logger = api.logs.getLogger(name, version);
+/* Initialize EventEmitterProvider */
+api.events.setGlobalEventEmitterProvider(eventEmitterProvider);
+/* returns eventEmitterProvider (no-op if a working provider has not been initialized) */
+api.events.getEventEmitterProvider();
+/* returns an event emitter from the registered global event emitter provider (no-op if a working provider has not been initialized) */
+const eventEmitter = api.events.getEventEmitter(name, version);
 
-// logging a log record in a log appender
-logger.emit({ severityNumber: SeverityNumber.TRACE, body: 'log data' });
+// logging an event in an instrumentation library
+eventEmitter.emit({ name: 'event-name', domain: 'event-domain' });
 ```
 
 ## Useful links
