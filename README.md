@@ -195,6 +195,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 - [Amir Blum](https://github.com/blumamir), Aspecto
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Rauno Viskus](https://github.com/Rauno56), Splunk
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
