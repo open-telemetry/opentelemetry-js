@@ -5,6 +5,7 @@
     "entryPointStrategy": "packages",
     "entryPoints": [
       "api",
+      "experimental/packages/api-events",
       "experimental/packages/api-logs",
       "experimental/packages/exporter-trace-otlp-grpc",
       "experimental/packages/exporter-trace-otlp-http",
@@ -53,6 +54,9 @@
   "references": [
     {
       "path": "api"
+    },
+    {
+      "path": "experimental/packages/api-events"
     },
     {
       "path": "experimental/packages/api-logs"
