@@ -180,7 +180,6 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [John Bley](https://github.com/johnbley), Splunk
-- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Matthew Wear](https://github.com/mwear), LightStep
@@ -196,6 +195,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 - [Amir Blum](https://github.com/blumamir), Aspecto
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Rauno Viskus](https://github.com/Rauno56), Splunk
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
