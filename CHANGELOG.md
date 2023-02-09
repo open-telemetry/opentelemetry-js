@@ -7,6 +7,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ## Unreleased
 
+* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
