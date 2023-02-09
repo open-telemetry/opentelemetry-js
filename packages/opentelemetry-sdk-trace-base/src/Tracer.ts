@@ -117,6 +117,8 @@ export class Tracer implements api.Tracer {
       links
     );
 
+    traceState = samplingResult.traceState ?? traceState;
+
     const traceFlags =
       samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
         ? api.TraceFlags.SAMPLED

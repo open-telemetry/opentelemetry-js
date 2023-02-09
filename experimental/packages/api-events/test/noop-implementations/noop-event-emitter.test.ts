@@ -15,21 +15,25 @@
  */
 
 import * as assert from 'assert';
-import { SeverityNumber } from '../../src';
-import { NoopLogger } from '../../src/NoopLogger';
-import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import { NoopEventEmitter } from '../../src/NoopEventEmitter';
+import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
 
-describe('NoopLogger', () => {
+describe('NoopEventEmitter', () => {
   it('constructor should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    assert(logger instanceof NoopLogger);
+    const logger = new NoopEventEmitterProvider().getEventEmitter(
+      'test-noop',
+      'test-domain'
+    );
+    assert(logger instanceof NoopEventEmitter);
   });
 
   it('calling emit should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emit({
-      severityNumber: SeverityNumber.TRACE,
-      body: 'log body',
+    const emitter = new NoopEventEmitterProvider().getEventEmitter(
+      'test-noop',
+      'test-domain'
+    );
+    emitter.emit({
+      name: 'event name',
     });
   });
 });
