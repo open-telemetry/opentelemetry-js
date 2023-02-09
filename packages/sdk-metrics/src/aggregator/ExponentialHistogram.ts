@@ -19,6 +19,7 @@ import {
   AccumulationRecord,
   Aggregator,
   AggregatorKind,
+  ExponentialHistogram,
 } from './types';
 import {
   DataPointType,
@@ -38,22 +39,11 @@ import * as util from './exponential-histogram//util';
  * Differs from the exported type as undefined sum/min/max complicate arithmetic
  * performed by this aggregation, but are required to be undefined in the exported types.
  */
-interface InternalHistogram {
-  positive: {
-    offset: number;
-    bucketCounts: number[];
-  };
-  negative: {
-    offset: number;
-    bucketCounts: number[];
-  };
+interface InternalHistogram extends ExponentialHistogram {
   hasMinMax: boolean;
   min: number;
   max: number;
   sum: number;
-  count: number;
-  scale: number;
-  zeroCount: number;
 }
 
 // HighLow is a utility class used for computing a common scale for
