@@ -81,6 +81,10 @@ export interface SpanLimits {
   linkCountLimit?: number;
   /** eventCountLimit is number of message events per span */
   eventCountLimit?: number;
+  /** attributePerEventCountLimit is the maximum number of attributes allowed per span event */
+  attributePerEventCountLimit?: number;
+  /** attributePerLinkCountLimit is the maximum number of attributes allowed per span link */
+  attributePerLinkCountLimit?: number;
 }
 
 /** Interface configuration for a buffer. */

@@ -62,7 +62,7 @@ export function toOtlpLink(link: Link, useHex?: boolean): ILink {
       ? link.context.traceId
       : core.hexToBase64(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
-    droppedAttributesCount: 0,
+    droppedAttributesCount: link.droppedAttributesCount || 0,
   };
 }
 
@@ -73,6 +73,6 @@ export function toOtlpSpanEvent(timedEvent: TimedEvent): IEvent {
       : [],
     name: timedEvent.name,
     timeUnixNano: hrTimeToNanoseconds(timedEvent.time),
-    droppedAttributesCount: 0,
+    droppedAttributesCount: timedEvent.droppedAttributesCount || 0,
   };
 }
