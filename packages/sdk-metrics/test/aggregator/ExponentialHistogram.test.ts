@@ -50,9 +50,9 @@ describe('ExponentialHistogramAccumulation', () => {
       accumulation.record(4);
       accumulation.record(1);
 
-      assert.strictEqual(accumulation.positive().offset(), -1);
-      assert.strictEqual(accumulation.scale(), 0);
-      assert.deepStrictEqual(getCounts(accumulation.positive()), [1, 1, 1]);
+      assert.strictEqual(accumulation.positive.offset, -1);
+      assert.strictEqual(accumulation.scale, 0);
+      assert.deepStrictEqual(getCounts(accumulation.positive), [1, 1, 1]);
     });
 
     /**
@@ -70,9 +70,9 @@ describe('ExponentialHistogramAccumulation', () => {
       accumulation.record(8);
       accumulation.record(0.5);
 
-      assert.strictEqual(accumulation.positive().offset(), -1);
-      assert.strictEqual(accumulation.scale(), -1);
-      assert.deepStrictEqual(getCounts(accumulation.positive()), [2, 3, 1]);
+      assert.strictEqual(accumulation.positive.offset, -1);
+      assert.strictEqual(accumulation.scale, -1);
+      assert.deepStrictEqual(getCounts(accumulation.positive), [2, 3, 1]);
     });
 
     it('handles permutations of [1/2, 1, 2] with maxSize: 2', () => {
@@ -89,11 +89,11 @@ describe('ExponentialHistogramAccumulation', () => {
           accumulation.record(value);
         });
 
-        assert.strictEqual(accumulation.scale(), -1);
-        assert.strictEqual(accumulation.positive().offset(), -1);
-        assert.strictEqual(accumulation.positive().length(), 2);
-        assert.strictEqual(accumulation.positive().at(0), 2);
-        assert.strictEqual(accumulation.positive().at(1), 1);
+        assert.strictEqual(accumulation.scale, -1);
+        assert.strictEqual(accumulation.positive.offset, -1);
+        assert.strictEqual(accumulation.positive.length, 2);
+        assert.strictEqual(accumulation.positive.at(0), 2);
+        assert.strictEqual(accumulation.positive.at(1), 1);
       });
     });
 
@@ -111,11 +111,11 @@ describe('ExponentialHistogramAccumulation', () => {
           accumulation.record(value);
         });
 
-        assert.strictEqual(accumulation.scale(), -1);
-        assert.strictEqual(accumulation.positive().offset(), -1);
-        assert.strictEqual(accumulation.positive().length(), 2);
-        assert.strictEqual(accumulation.positive().at(0), 1);
-        assert.strictEqual(accumulation.positive().at(1), 2);
+        assert.strictEqual(accumulation.scale, -1);
+        assert.strictEqual(accumulation.positive.offset, -1);
+        assert.strictEqual(accumulation.positive.length, 2);
+        assert.strictEqual(accumulation.positive.at(0), 1);
+        assert.strictEqual(accumulation.positive.at(1), 2);
       });
 
       // Tests that every permutation of {1, 1/2, 1/4} with maxSize=2
@@ -134,11 +134,11 @@ describe('ExponentialHistogramAccumulation', () => {
             accumulation.record(value);
           });
 
-          assert.strictEqual(accumulation.scale(), -1);
-          assert.strictEqual(accumulation.positive().offset(), -2);
-          assert.strictEqual(accumulation.positive().length(), 2);
-          assert.strictEqual(accumulation.positive().at(0), 1);
-          assert.strictEqual(accumulation.positive().at(1), 2);
+          assert.strictEqual(accumulation.scale, -1);
+          assert.strictEqual(accumulation.positive.offset, -2);
+          assert.strictEqual(accumulation.positive.length, 2);
+          assert.strictEqual(accumulation.positive.at(0), 1);
+          assert.strictEqual(accumulation.positive.at(1), 2);
         });
       });
 
@@ -167,14 +167,14 @@ describe('ExponentialHistogramAccumulation', () => {
                   sum += value;
                 }
 
-                assert.strictEqual(accumulation.scale(), initScale);
-                assert.strictEqual(accumulation.positive().offset(), offset);
+                assert.strictEqual(accumulation.scale, initScale);
+                assert.strictEqual(accumulation.positive.offset, offset);
 
                 accumulation.record(maxValue);
                 sum += maxValue;
 
                 // The zeroth bucket is not empty
-                assert.notStrictEqual(accumulation.positive().at(0), 0);
+                assert.notStrictEqual(accumulation.positive.at(0), 0);
 
                 // The maximum-index is at or above the midpoint,
                 // otherwise we downscaled too much.
@@ -182,9 +182,9 @@ describe('ExponentialHistogramAccumulation', () => {
                 let maxFill = 0;
                 let totalCount = 0;
 
-                for (let i = 0; i < accumulation.positive().length(); i++) {
-                  totalCount += accumulation.positive().at(i);
-                  if (accumulation.positive().at(i) !== 0) {
+                for (let i = 0; i < accumulation.positive.length; i++) {
+                  totalCount += accumulation.positive.at(i);
+                  if (accumulation.positive.at(i) !== 0) {
                     maxFill = 0;
                   }
                 }
@@ -192,20 +192,20 @@ describe('ExponentialHistogramAccumulation', () => {
 
                 // count is correct
                 assert.ok(maxSize + 1 >= totalCount);
-                assert.ok(maxSize + 1 >= accumulation.count());
+                assert.ok(maxSize + 1 >= accumulation.count);
                 // sum is correct
-                assert.ok(sum >= accumulation.sum());
+                assert.ok(sum >= accumulation.sum);
 
                 // the offset is correct at the computed scale
-                mapper = getMapping(accumulation.scale());
+                mapper = getMapping(accumulation.scale);
                 let index = mapper.mapToIndex(minValue);
-                assert.strictEqual(accumulation.positive().offset(), index);
+                assert.strictEqual(accumulation.positive.offset, index);
 
                 // the maximum range is correct at the computed scale
                 index = mapper.mapToIndex(maxValue);
                 assert.strictEqual(
-                  accumulation.positive().offset() +
-                    accumulation.positive().length() -
+                  accumulation.positive.offset +
+                    accumulation.positive.length -
                     1,
                   index
                 );
@@ -232,22 +232,22 @@ describe('ExponentialHistogramAccumulation', () => {
         acc2.record(v2);
       }
 
-      assert.strictEqual(acc0.scale(), 0);
-      assert.strictEqual(acc1.scale(), 0);
-      assert.strictEqual(acc2.scale(), -1);
+      assert.strictEqual(acc0.scale, 0);
+      assert.strictEqual(acc1.scale, 0);
+      assert.strictEqual(acc2.scale, -1);
 
-      assert.strictEqual(acc0.positive().offset(), 0);
-      assert.strictEqual(acc1.positive().offset(), -4);
-      assert.strictEqual(acc2.positive().offset(), -2);
+      assert.strictEqual(acc0.positive.offset, 0);
+      assert.strictEqual(acc1.positive.offset, -4);
+      assert.strictEqual(acc2.positive.offset, -2);
 
-      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 1, 1, 1]);
-      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 1, 1, 1]);
-      assert.deepStrictEqual(getCounts(acc2.positive()), [2, 2, 2, 2]);
+      assert.deepStrictEqual(getCounts(acc0.positive), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive), [2, 2, 2, 2]);
 
       acc0.merge(acc1);
 
-      assert.strictEqual(acc0.scale(), -1);
-      assert.strictEqual(acc2.scale(), -1);
+      assert.strictEqual(acc0.scale, -1);
+      assert.strictEqual(acc2.scale, -1);
 
       assertHistogramsEqual(acc0, acc2);
     });
@@ -267,26 +267,26 @@ describe('ExponentialHistogramAccumulation', () => {
         acc2.record(v2);
       }
 
-      assert.strictEqual(acc0.count(), 4);
-      assert.strictEqual(acc1.count(), 4);
-      assert.strictEqual(acc2.count(), 8);
+      assert.strictEqual(acc0.count, 4);
+      assert.strictEqual(acc1.count, 4);
+      assert.strictEqual(acc2.count, 8);
 
-      assert.strictEqual(acc0.scale(), 0);
-      assert.strictEqual(acc1.scale(), 0);
-      assert.strictEqual(acc2.scale(), -1);
+      assert.strictEqual(acc0.scale, 0);
+      assert.strictEqual(acc1.scale, 0);
+      assert.strictEqual(acc2.scale, -1);
 
-      assert.strictEqual(acc0.positive().offset(), 0);
-      assert.strictEqual(acc1.positive().offset(), -3);
-      assert.strictEqual(acc2.positive().offset(), -2);
+      assert.strictEqual(acc0.positive.offset, 0);
+      assert.strictEqual(acc1.positive.offset, -3);
+      assert.strictEqual(acc2.positive.offset, -2);
 
-      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 1, 1, 1]);
-      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 1, 1, 1]);
-      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 2, 3, 2]);
+      assert.deepStrictEqual(getCounts(acc0.positive), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive), [1, 2, 3, 2]);
 
       acc0.merge(acc1);
 
-      assert.strictEqual(acc0.scale(), -1);
-      assert.strictEqual(acc2.scale(), -1);
+      assert.strictEqual(acc0.scale, -1);
+      assert.strictEqual(acc2.scale, -1);
 
       assertHistogramsEqual(acc0, acc2);
     });
@@ -358,14 +358,14 @@ describe('ExponentialHistogramAccumulation', () => {
         acc1.record(v1);
       }
 
-      assert.strictEqual(acc0.scale(), 0);
-      assert.strictEqual(acc1.scale(), 0);
+      assert.strictEqual(acc0.scale, 0);
+      assert.strictEqual(acc1.scale, 0);
 
-      assert.strictEqual(acc0.positive().offset(), 0);
-      assert.strictEqual(acc1.positive().offset(), 0);
+      assert.strictEqual(acc0.positive.offset, 0);
+      assert.strictEqual(acc1.positive.offset, 0);
 
-      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 1, 1, 1]);
-      assert.deepStrictEqual(getCounts(acc1.positive()), [2, 2, 2, 2]);
+      assert.deepStrictEqual(getCounts(acc0.positive), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive), [2, 2, 2, 2]);
 
       acc1.diff(acc0);
 
@@ -391,17 +391,17 @@ describe('ExponentialHistogramAccumulation', () => {
         acc2.record(v1);
       }
 
-      assert.strictEqual(acc0.scale(), 0);
-      assert.strictEqual(acc1.scale(), 0);
-      assert.strictEqual(acc2.scale(), 0);
+      assert.strictEqual(acc0.scale, 0);
+      assert.strictEqual(acc1.scale, 0);
+      assert.strictEqual(acc2.scale, 0);
 
-      assert.strictEqual(acc0.positive().offset(), 0);
-      assert.strictEqual(acc1.positive().offset(), 1);
-      assert.strictEqual(acc2.positive().offset(), 0);
+      assert.strictEqual(acc0.positive.offset, 0);
+      assert.strictEqual(acc1.positive.offset, 1);
+      assert.strictEqual(acc2.positive.offset, 0);
 
-      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 0, 1]);
-      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 0, 1]);
-      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc0.positive), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive), [1, 1, 1, 1]);
 
       acc2.diff(acc1);
 
@@ -427,17 +427,17 @@ describe('ExponentialHistogramAccumulation', () => {
         acc2.record(v1);
       }
 
-      assert.strictEqual(acc0.scale(), 0);
-      assert.strictEqual(acc1.scale(), 0);
-      assert.strictEqual(acc2.scale(), 0);
+      assert.strictEqual(acc0.scale, 0);
+      assert.strictEqual(acc1.scale, 0);
+      assert.strictEqual(acc2.scale, 0);
 
-      assert.strictEqual(acc0.positive().offset(), 1);
-      assert.strictEqual(acc1.positive().offset(), 0);
-      assert.strictEqual(acc2.positive().offset(), 0);
+      assert.strictEqual(acc0.positive.offset, 1);
+      assert.strictEqual(acc1.positive.offset, 0);
+      assert.strictEqual(acc2.positive.offset, 0);
 
-      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 0, 1]);
-      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 0, 1]);
-      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc0.positive), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive), [1, 0, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive), [1, 1, 1, 1]);
 
       acc2.diff(acc1);
       assertHistogramsEqual(acc0, acc2);
@@ -455,17 +455,17 @@ describe('ExponentialHistogramAccumulation', () => {
         acc2.record(v1);
       }
 
-      assert.strictEqual(acc0.scale(), 0);
-      assert.strictEqual(acc1.scale(), 0);
-      assert.strictEqual(acc2.scale(), 0);
+      assert.strictEqual(acc0.scale, 0);
+      assert.strictEqual(acc1.scale, 0);
+      assert.strictEqual(acc2.scale, 0);
 
-      assert.strictEqual(acc0.positive().offset(), 0);
-      assert.strictEqual(acc1.positive().offset(), 0);
-      assert.strictEqual(acc2.positive().offset(), 0);
+      assert.strictEqual(acc0.positive.offset, 0);
+      assert.strictEqual(acc1.positive.offset, 0);
+      assert.strictEqual(acc2.positive.offset, 0);
 
-      assert.deepStrictEqual(getCounts(acc0.positive()), []);
-      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 1, 1, 1]);
-      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc0.positive), []);
+      assert.deepStrictEqual(getCounts(acc1.positive), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive), [1, 1, 1, 1]);
 
       acc2.diff(acc1);
       assertHistogramsEqual(acc0, acc2);
@@ -487,19 +487,19 @@ describe('ExponentialHistogramAccumulation', () => {
       const acc2 = acc0.clone();
 
       assertHistogramsEqual(acc0, acc2);
-      assert.strictEqual(acc0.scale(), acc2.scale());
+      assert.strictEqual(acc0.scale, acc2.scale);
       assert.deepStrictEqual(
-        getCounts(acc0.positive()),
-        getCounts(acc2.positive())
+        getCounts(acc0.positive),
+        getCounts(acc2.positive)
       );
 
       acc2.record(2 << 5);
 
       // no longer equal
-      assert.notStrictEqual(acc0.scale(), acc2.scale());
+      assert.notStrictEqual(acc0.scale, acc2.scale);
       assert.notDeepStrictEqual(
-        getCounts(acc0.positive()),
-        getCounts(acc2.positive())
+        getCounts(acc0.positive),
+        getCounts(acc2.positive)
       );
 
       // ensure acc0 wasn't mutated
@@ -517,16 +517,16 @@ describe('ExponentialHistogramAccumulation', () => {
 
       const pv = acc.toPointValue();
 
-      assert.strictEqual(pv.scale, acc.scale());
-      assert.strictEqual(pv.min, acc.min());
-      assert.strictEqual(pv.max, acc.max());
-      assert.strictEqual(pv.sum, acc.sum());
-      assert.strictEqual(pv.count, acc.count());
-      assert.strictEqual(pv.zeroCount, acc.zeroCount());
-      assert.strictEqual(pv.positive.offset, acc.positive().offset());
-      assert.deepStrictEqual(pv.positive.bucketCounts, acc.positive().counts());
-      assert.strictEqual(pv.negative.offset, acc.negative().offset());
-      assert.deepStrictEqual(pv.negative.bucketCounts, acc.negative().counts());
+      assert.strictEqual(pv.scale, acc.scale);
+      assert.strictEqual(pv.min, acc.min);
+      assert.strictEqual(pv.max, acc.max);
+      assert.strictEqual(pv.sum, acc.sum);
+      assert.strictEqual(pv.count, acc.count);
+      assert.strictEqual(pv.zeroCount, acc.zeroCount);
+      assert.strictEqual(pv.positive.offset, acc.positive.offset);
+      assert.deepStrictEqual(pv.positive.bucketCounts, acc.positive.counts());
+      assert.strictEqual(pv.negative.offset, acc.negative.offset);
+      assert.deepStrictEqual(pv.negative.bucketCounts, acc.negative.counts());
     });
   });
 
@@ -766,8 +766,8 @@ describe('ExponentialHistogramAggregation', () => {
 });
 
 function getCounts(buckets: Buckets): Array<number> {
-  const counts = new Array<number>(buckets.length());
-  for (let i = 0; i < buckets.length(); i++) {
+  const counts = new Array<number>(buckets.length);
+  for (let i = 0; i < buckets.length; i++) {
     counts[i] = buckets.at(i);
   }
   return counts;
@@ -783,8 +783,8 @@ function assertHistogramsEqual(
   actual: ExponentialHistogramAccumulation,
   expected: ExponentialHistogramAccumulation
 ) {
-  const actualSum = actual.sum();
-  const expectedSum = expected.sum();
+  const actualSum = actual.sum;
+  const expectedSum = expected.sum;
 
   if (actualSum === 0 || expectedSum === 0) {
     assertInDelta(actualSum, expectedSum, 1e-6);
@@ -792,24 +792,24 @@ function assertHistogramsEqual(
     assertInEpsilon(actualSum, expectedSum, 1e-6);
   }
 
-  assert.strictEqual(actual.count(), expected.count());
-  assert.strictEqual(actual.zeroCount(), expected.zeroCount());
-  assert.strictEqual(actual.scale(), expected.scale());
+  assert.strictEqual(actual.count, expected.count);
+  assert.strictEqual(actual.zeroCount, expected.zeroCount);
+  assert.strictEqual(actual.scale, expected.scale);
 
   assert.strictEqual(
-    bucketsToString(actual.positive()),
-    bucketsToString(expected.positive())
+    bucketsToString(actual.positive),
+    bucketsToString(expected.positive)
   );
 
   assert.strictEqual(
-    bucketsToString(actual.negative()),
-    bucketsToString(expected.negative())
+    bucketsToString(actual.negative),
+    bucketsToString(expected.negative)
   );
 }
 
 function bucketsToString(buckets: Buckets): string {
-  let str = `[@${buckets.offset()}`;
-  for (let i = 0; i < buckets.length(); i++) {
+  let str = `[@${buckets.offset}`;
+  for (let i = 0; i < buckets.length; i++) {
     str += buckets.at(i).toString();
   }
   str += ']\n';

@@ -42,27 +42,16 @@ export class Buckets {
    * Offset is the bucket index of the smallest entry in the counts array
    * @returns {number}
    */
-  offset(): number {
+  get offset(): number {
     return this.indexStart;
-  }
-
-  /**
-   * An array of counts, where count[i] carries the count
-   * of the bucket at index (offset+i).  count[i] is the count of
-   * values greater than base^(offset+i) and less than or equal to
-   * base^(offset+i+1).
-   * @returns {number} The logical counts based on the backing array
-   */
-  counts(): number[] {
-    return Array.from({ length: this.length() }, (_, i) => this.at(i));
   }
 
   /**
    * Buckets is a view into the backing array.
    * @returns {number}
    */
-  length(): number {
-    if (this.backing.length() === 0) {
+  get length(): number {
+    if (this.backing.length === 0) {
       return 0;
     }
 
@@ -74,6 +63,17 @@ export class Buckets {
   }
 
   /**
+   * An array of counts, where count[i] carries the count
+   * of the bucket at index (offset+i).  count[i] is the count of
+   * values greater than base^(offset+i) and less than or equal to
+   * base^(offset+i+1).
+   * @returns {number} The logical counts based on the backing array
+   */
+  counts(): number[] {
+    return Array.from({ length: this.length }, (_, i) => this.at(i));
+  }
+
+  /**
    * At returns the count of the bucket at a position in the logical
    * array of counts.
    * @param position
@@ -82,7 +82,7 @@ export class Buckets {
   at(position: number): number {
     const bias = this.indexBase - this.indexStart;
     if (position < bias) {
-      position += this.backing.length();
+      position += this.backing.length;
     }
 
     position -= bias;
@@ -114,20 +114,20 @@ export class Buckets {
    * smallest non-zero index is in the 0th position of the backing array
    */
   trim() {
-    for (let i = 0; i < this.length(); i++) {
+    for (let i = 0; i < this.length; i++) {
       if (this.at(i) !== 0) {
         this.indexStart += i;
         break;
-      } else if (i === this.length() - 1) {
+      } else if (i === this.length - 1) {
         //the entire array is zeroed out
         this.indexStart = this.indexEnd = this.indexBase = 0;
         return;
       }
     }
 
-    for (let i = this.length() - 1; i >= 0; i--) {
+    for (let i = this.length - 1; i >= 0; i--) {
       if (this.at(i) !== 0) {
-        this.indexEnd -= this.length() - i - 1;
+        this.indexEnd -= this.length - i - 1;
         break;
       }
     }
@@ -188,13 +188,13 @@ export class Buckets {
     if (bias === 0) {
       return;
     } else if (bias > 0) {
-      this.backing.reverse(0, this.backing.length());
+      this.backing.reverse(0, this.backing.length);
       this.backing.reverse(0, bias);
-      this.backing.reverse(bias, this.backing.length());
+      this.backing.reverse(bias, this.backing.length);
     } else {
       // negative bias, this can happen when diffing two histograms
-      this.backing.reverse(0, this.backing.length());
-      this.backing.reverse(0, this.backing.length() + bias);
+      this.backing.reverse(0, this.backing.length);
+      this.backing.reverse(0, this.backing.length + bias);
     }
     this.indexBase = this.indexStart;
   }
@@ -222,7 +222,7 @@ class BucketsBacking {
    * length returns the physical size of the backing array, which
    * is >= buckets.length()
    */
-  length(): number {
+  get length(): number {
     return this._counts.length;
   }
 
