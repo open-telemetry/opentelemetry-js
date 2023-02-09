@@ -336,7 +336,7 @@ describe('Utility', () => {
       );
     });
 
-    it('should skip http_route if span has not it', () => {
+    it('should skip http_route if span does not have it', () => {
       const spanAttributes: Attributes = {};
       const metricAttributes =
         utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
