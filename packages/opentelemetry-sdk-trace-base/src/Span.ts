@@ -403,10 +403,7 @@ export class Span implements APISpan, ReadableSpan {
       };
     } else {
       return {
-        result: entries.reduce((acc, curr) => {
-          acc[curr[0]] = curr[1];
-          return acc;
-        }, {} as Attributes),
+        result: Object.fromEntries(entries.slice(limit)),
         droppedCount: entries.length - limit,
       };
     }
