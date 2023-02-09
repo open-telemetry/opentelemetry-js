@@ -20,6 +20,12 @@ No changes
 ### `main`
 
 * Uncheck "Restrict who can push to matching branches"
+* Check "Require merge queue"
+  * Build concurrency: 5
+  * Minimum pull requests to merge: 1 or after 5 minutes
+  * Maximum pull requests to merge: 5
+  * Check "Only merge non-failing pull requests"
+  * Status check timeout: 60 minutes
 
 ### `dependabot/**/**`
 
