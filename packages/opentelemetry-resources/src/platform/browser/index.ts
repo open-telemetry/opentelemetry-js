@@ -19,3 +19,6 @@ export * from './HostDetector';
 export * from './OSDetector';
 export * from './HostDetectorSync';
 export * from './OSDetectorSync';
+export * from './ProcessDetector';
+export * from './ProcessDetectorSync';
+
