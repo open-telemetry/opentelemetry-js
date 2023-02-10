@@ -200,22 +200,7 @@ export class NodeSDK {
     this._resource = this._resource.merge(resource);
   }
 
-  /**
-   * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
-   */
-  public async start(): Promise<void> {
-    if (this._disabled) {
-      return;
-    }
-
-    registerInstrumentations({
-      instrumentations: this._instrumentations,
-    });
-
-    if (this._autoDetectResources) {
-      await this.detectResources();
-    }
-
+  private sharedStart(): void {
     this._resource =
       this._serviceName === undefined
         ? this._resource
@@ -259,6 +244,40 @@ export class NodeSDK {
 
       metrics.setGlobalMeterProvider(meterProvider);
     }
+  }
+
+  /**
+   * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
+   * Doesn't support autoDetectResources
+   */
+  public startSync(): void {
+    if (this._disabled) {
+      return;
+    }
+
+    registerInstrumentations({
+      instrumentations: this._instrumentations,
+    });
+
+    this.sharedStart()
+  }
+
+  /**
+   * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
+   */
+  public async start(): Promise<void> {
+    if (this._disabled) {
+      return;
+    }
+
+    registerInstrumentations({
+      instrumentations: this._instrumentations,
+    });
+
+    if (this._autoDetectResources) {
+      await this.detectResources();
+    }
+    this.sharedStart()
   }
 
   public shutdown(): Promise<void> {
