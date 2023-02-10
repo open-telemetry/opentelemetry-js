@@ -32,7 +32,7 @@ import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Buckets } from './exponential-histogram/Buckets';
 import { getMapping } from './exponential-histogram/mapping/getMapping';
 import { Mapping } from './exponential-histogram/mapping/types';
-import * as util from './exponential-histogram//util';
+import { nextGreaterSquare } from './exponential-histogram//util';
 
 /**
  * Internal value type for ExponentialHistogramAggregation.
@@ -369,7 +369,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     const size = buckets.backing.length;
     const bias = buckets.indexBase - buckets.indexStart;
     const oldPositiveLimit = size - bias;
-    let newSize = util.powTwoRoundedUp(needed);
+    let newSize = nextGreaterSquare(needed);
     if (newSize > this._maxSize) {
       newSize = this._maxSize;
     }
