@@ -20,6 +20,7 @@ import { Resource } from '../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
 import { IResource } from '../../IResource';
+import * as os from 'os';
 
 /**
  * ProcessDetectorSync will be used to detect the resources related current process running
@@ -27,23 +28,32 @@ import { IResource } from '../../IResource';
  */
 class ProcessDetectorSync implements DetectorSync {
   detect(config?: ResourceDetectionConfig): IResource {
-    // Skip if not in Node.js environment.
-    if (typeof process !== 'object') {
-      return Resource.empty();
-    }
-    const processResource: ResourceAttributes = {
+    const attributes: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_PID]: process.pid,
-      [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title || '',
-      [SemanticResourceAttributes.PROCESS_COMMAND]: process.argv[1] || '',
-      [SemanticResourceAttributes.PROCESS_COMMAND_LINE]:
-        process.argv.join(' ') || '',
+      [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title,
+      [SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH]: process.execPath,
+      [SemanticResourceAttributes.PROCESS_COMMAND_LINE]: process.argv.join(' '),
+      [SemanticResourceAttributes.PROCESS_COMMAND_ARGS]: process.argv,
       [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]:
         process.versions.node,
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',
       [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
     };
-    return this._getResourceAttributes(processResource, config);
+
+    if (process.argv.length > 1) {
+      attributes[SemanticResourceAttributes.PROCESS_COMMAND] = process.argv[1];
+    }
+
+    try {
+      const userInfo = os.userInfo();
+      attributes[SemanticResourceAttributes.PROCESS_OWNER] = userInfo.username;
+    } catch (e) {
+      diag.debug(`error obtaining process owner: ${e}`);
+    }
+
+    return this._getResourceAttributes(attributes, config);
   }
+
   /**
    * Validates process resource attribute map from process variables
    *

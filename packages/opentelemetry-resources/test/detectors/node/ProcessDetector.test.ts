@@ -20,6 +20,7 @@ import {
   assertEmptyResource,
 } from '../../util/resource-assertions';
 import { describeNode } from '../../util';
+import * as os from 'os';
 
 describeNode('processDetector() on Node.js', () => {
   afterEach(() => {
@@ -27,12 +28,15 @@ describeNode('processDetector() on Node.js', () => {
   });
 
   it('should return resource information from process', async () => {
+    const argv = ['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2'];
     sinon.stub(process, 'pid').value(1234);
     sinon.stub(process, 'title').value('otProcess');
-    sinon
-      .stub(process, 'argv')
-      .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
+    sinon.stub(process, 'argv').value(argv);
+    sinon.stub(process, 'execPath').value(argv[0]);
     sinon.stub(process, 'versions').value({ node: '1.4.1' });
+    sinon
+      .stub(os, 'userInfo')
+      .returns({ username: 'appOwner' } as os.UserInfo<string>);
 
     const resource: IResource = await processDetector.detect();
     assertResource(resource, {
@@ -40,6 +44,9 @@ describeNode('processDetector() on Node.js', () => {
       name: 'otProcess',
       command: '/home/ot/test.js',
       commandLine: '/tmp/node /home/ot/test.js arg1 arg2',
+      commandArgs: argv,
+      executablePath: argv[0],
+      owner: 'appOwner',
       version: '1.4.1',
       runtimeDescription: 'Node.js',
       runtimeName: 'nodejs',
