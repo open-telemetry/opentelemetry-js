@@ -8,7 +8,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat: improve http span name [#FixMe](https://github.com/open-telemetry/opentelemetry-js/pull/FixMe) @Flarna
+* feat: improve http span name [#3603](https://github.com/open-telemetry/opentelemetry-js/pull/3603) @Flarna
 * feat: add HTTP_ROUTE attribute to http incoming metrics if present [#3581](https://github.com/open-telemetry/opentelemetry-js/pull/3581) @hermogenes
 
 ### :bug: (Bug Fix)
