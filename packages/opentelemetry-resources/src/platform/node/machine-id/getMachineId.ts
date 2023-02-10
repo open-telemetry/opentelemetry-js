@@ -28,8 +28,8 @@ switch (process.platform) {
     ({ getMachineId } = require('./getMachineId-bsd'));
     break;
   case 'win32':
-      ({ getMachineId } = require('./getMachineId-win'));
-      break;
+    ({ getMachineId } = require('./getMachineId-win'));
+    break;
   default:
     ({ getMachineId } = require('./getMachineId-unsupported'));
 }
