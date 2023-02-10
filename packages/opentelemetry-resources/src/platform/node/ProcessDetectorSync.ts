@@ -27,7 +27,7 @@ import * as os from 'os';
  * and being instrumented from the NodeJS Process module.
  */
 class ProcessDetectorSync implements DetectorSync {
-  detect(config?: ResourceDetectionConfig): IResource {
+  detect(_config?: ResourceDetectionConfig): IResource {
     const attributes: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_PID]: process.pid,
       [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title,
@@ -51,38 +51,7 @@ class ProcessDetectorSync implements DetectorSync {
       diag.debug(`error obtaining process owner: ${e}`);
     }
 
-    return this._getResourceAttributes(attributes, config);
-  }
-
-  /**
-   * Validates process resource attribute map from process variables
-   *
-   * @param processResource The unsantized resource attributes from process as key/value pairs.
-   * @param config: Config
-   * @returns The sanitized resource attributes.
-   */
-  private _getResourceAttributes(
-    processResource: ResourceAttributes,
-    _config?: ResourceDetectionConfig
-  ) {
-    if (
-      processResource[SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME] ===
-        '' ||
-      processResource[SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH] ===
-        '' ||
-      processResource[SemanticResourceAttributes.PROCESS_COMMAND] === '' ||
-      processResource[SemanticResourceAttributes.PROCESS_COMMAND_LINE] === '' ||
-      processResource[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION] === ''
-    ) {
-      diag.debug(
-        'ProcessDetector failed: Unable to find required process resources. '
-      );
-      return Resource.empty();
-    } else {
-      return new Resource({
-        ...processResource,
-      });
-    }
+    return new Resource(attributes);
   }
 }
 

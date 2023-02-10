@@ -15,10 +15,7 @@
  */
 import * as sinon from 'sinon';
 import { processDetector, IResource } from '../../../src';
-import {
-  assertResource,
-  assertEmptyResource,
-} from '../../util/resource-assertions';
+import { assertResource } from '../../util/resource-assertions';
 import { describeNode } from '../../util';
 import * as os from 'os';
 
@@ -52,11 +49,19 @@ describeNode('processDetector() on Node.js', () => {
       runtimeName: 'nodejs',
     });
   });
-  it('should return empty resources if title, command and commondLine is missing', async () => {
+
+  it('should return a resources if title, command and commondLine are missing', async () => {
     sinon.stub(process, 'pid').value(1234);
-    sinon.stub(process, 'title').value(undefined);
+    sinon.stub(process, 'title').value('');
     sinon.stub(process, 'argv').value([]);
+    sinon.stub(process, 'versions').value({ node: '1.4.1' });
     const resource: IResource = await processDetector.detect();
-    assertEmptyResource(resource);
+    // at a minium we should be able to rely on pid runtime, runtime name, and description
+    assertResource(resource, {
+      pid: 1234,
+      version: '1.4.1',
+      runtimeDescription: 'Node.js',
+      runtimeName: 'nodejs',
+    });
   });
 });
