@@ -16,6 +16,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat(sdk-metrics): apply binary search in histogram recording [#3539](https://github.com/open-telemetry/opentelemetry-js/pull/3539) @legendecas
 * perf(propagator-jaeger): improve deserializeSpanContext performance [#3541](https://github.com/open-telemetry/opentelemetry-js/pull/3541) @doochik
 * feat: support TraceState in SamplingResult [#3530](https://github.com/open-telemetry/opentelemetry-js/pull/3530) @raphael-theriault-swi
+* feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605)
 
 ### :bug: (Bug Fix)
 
