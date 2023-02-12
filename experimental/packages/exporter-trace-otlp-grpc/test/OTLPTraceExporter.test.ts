@@ -41,6 +41,7 @@ import {
   IExportTraceServiceRequest,
   IResourceSpans,
 } from '@opentelemetry/otlp-transformer';
+import { resetEnvCache } from '@opentelemetry/core';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
@@ -315,6 +316,9 @@ describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
 });
 
 describe('when configuring via environment', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
   const envSource = process.env;
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';

@@ -28,6 +28,7 @@ import { OTLPExporterError } from '../../src/types';
 import { PassThrough } from 'stream';
 import * as http from 'http';
 import * as zlib from 'zlib';
+import { resetEnvCache } from '@opentelemetry/core';
 
 // Meant to simulate http.IncomingMessage, at least the parts that sendWithHttp cares about
 // but make it a PassThrough so we can inspect it for the test
@@ -61,6 +62,10 @@ class Exporter extends OTLPExporterNodeBase<object, object> {
 }
 
 describe('configureExporterTimeout', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
+
   const envSource = process.env;
   it('should use timeoutMillis parameter as export timeout value', () => {
     const exporterTimeout = configureExporterTimeout(9000);
@@ -123,6 +128,10 @@ describe('configureExporterTimeout', () => {
 });
 
 describe('invalidTimeout', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
+
   it('should warn user about invalid timeout', () => {
     const spyLoggerWarn = sinon.stub(diag, 'warn');
     invalidTimeout(-9000, 10000);
@@ -144,6 +153,10 @@ describe('invalidTimeout', () => {
 });
 
 describe('configureCompression', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
+
   const envSource = process.env;
   it('should return none for compression', () => {
     const compression = CompressionAlgorithm.NONE;
@@ -209,6 +222,7 @@ describe('sendWithHttp', () => {
   afterEach(function () {
     httpRequestStub.restore();
     setHeaderSpy.restore();
+    resetEnvCache();
   });
 
   it('should send with no compression if configured to do so', () => {

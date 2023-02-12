@@ -22,11 +22,9 @@ import {
 } from '../../utils/environment';
 
 /**
- * Gets the environment variables.
- * Used directly ONLY in test files.
- * Accessing env vars is done by getEnv().
+ * gets the environment variables.
  */
-export function calculateEnv(): Required<ENVIRONMENT> {
+function calculateEnv(): Required<ENVIRONMENT> {
   const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
   const mergedEnv = {
     ...DEFAULT_ENVIRONMENT,
@@ -36,10 +34,17 @@ export function calculateEnv(): Required<ENVIRONMENT> {
   return mergedEnv;
 }
 
-let parsedEnvCache: Required<ENVIRONMENT>;
+let parsedEnvCache: Required<ENVIRONMENT> | undefined;
 
 /**
- * Memoized version of calculateEnv
+ * clears the cached environment
+ */
+export const resetEnvCache = () => {
+  parsedEnvCache = undefined;
+};
+
+/**
+ * memoized version of calculateEnv
  * */
 export function getEnv(): Required<ENVIRONMENT> {
   if (parsedEnvCache) {

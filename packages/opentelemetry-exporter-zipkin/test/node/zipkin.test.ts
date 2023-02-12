@@ -21,6 +21,7 @@ import {
   ExportResult,
   hrTimeToMicroseconds,
   ExportResultCode,
+  resetEnvCache,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
@@ -61,6 +62,10 @@ function getReadableSpan() {
 }
 
 describe('Zipkin Exporter - node', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
+
   describe('constructor', () => {
     it('should construct an exporter', () => {
       const exporter = new ZipkinExporter({ serviceName: 'my-service' });

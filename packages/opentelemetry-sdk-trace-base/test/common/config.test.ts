@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { resetEnvCache } from '@opentelemetry/core';
 import * as assert from 'assert';
 import {
   AlwaysOffSampler,
@@ -30,6 +31,10 @@ describe('config', () => {
   } else {
     envSource = process.env as Record<string, any>;
   }
+
+  afterEach(() => {
+    resetEnvCache();
+  });
 
   describe('buildSamplerFromEnv()', () => {
     afterEach(() => {

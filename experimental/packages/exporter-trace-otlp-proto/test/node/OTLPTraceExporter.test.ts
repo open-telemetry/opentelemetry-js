@@ -15,7 +15,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResultCode } from '@opentelemetry/core';
+import { ExportResultCode, resetEnvCache } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -50,6 +50,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
   afterEach(() => {
     fakeRequest = new Stream.PassThrough();
     sinon.restore();
+    resetEnvCache();
   });
 
   describe('when configuring via environment', () => {

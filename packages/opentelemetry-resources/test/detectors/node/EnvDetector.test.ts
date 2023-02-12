@@ -20,8 +20,13 @@ import {
   assertEmptyResource,
 } from '../../util/resource-assertions';
 import { describeNode } from '../../util';
+import { resetEnvCache } from '@opentelemetry/core';
 
 describeNode('envDetector() on Node.js', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
+
   describe('with valid env', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =

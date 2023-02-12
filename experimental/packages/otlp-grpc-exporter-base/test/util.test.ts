@@ -28,6 +28,7 @@ import {
   DEFAULT_COLLECTOR_URL,
 } from '../src/util';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import { resetEnvCache } from '@opentelemetry/core';
 
 // Tests added to detect breakage released in #2130
 describe('validateAndNormalizeUrl()', () => {
@@ -90,6 +91,9 @@ describe('validateAndNormalizeUrl()', () => {
 });
 
 describe('utils - configureSecurity', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
   const envSource = process.env;
   it('should return insecure channel when using all defaults', () => {
     const credentials = configureSecurity(undefined, DEFAULT_COLLECTOR_URL);
@@ -147,6 +151,9 @@ describe('utils - configureSecurity', () => {
 });
 
 describe('useSecureConnection', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
   const envSource = process.env;
   it('should return secure connection using all credentials', () => {
     envSource.OTEL_EXPORTER_OTLP_CERTIFICATE = './test/certs/ca.crt';
@@ -183,6 +190,9 @@ describe('useSecureConnection', () => {
 });
 
 describe('configureCompression', () => {
+  afterEach(() => {
+    resetEnvCache();
+  });
   const envSource = process.env;
   it('should return none for compression', () => {
     const compression = CompressionAlgorithm.NONE;

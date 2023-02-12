@@ -36,6 +36,7 @@ import {
 import { nextTick } from 'process';
 import { MockedResponse } from './nodeHelpers';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { resetEnvCache } from '@opentelemetry/core';
 
 let fakeRequest: PassThrough;
 
@@ -51,6 +52,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
   afterEach(() => {
     fakeRequest = new Stream.PassThrough();
     sinon.restore();
+    resetEnvCache();
   });
 
   describe('instance', () => {

@@ -16,7 +16,11 @@
 
 import * as assert from 'assert';
 import { JaegerExporter } from '../src';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  resetEnvCache,
+} from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
@@ -54,6 +58,11 @@ describe('JaegerExporter', () => {
       version: '0.0.1',
     },
   };
+
+  afterEach(() => {
+    resetEnvCache();
+  });
+
   describe('constructor', () => {
     afterEach(() => {
       delete process.env.OTEL_EXPORTER_JAEGER_AGENT_HOST;

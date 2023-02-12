@@ -42,6 +42,7 @@ import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
+import { resetEnvCache } from '@opentelemetry/core';
 
 const sleep = (time: number) =>
   new Promise(resolve => {
@@ -60,6 +61,7 @@ describe('NodeTracerProvider', () => {
   afterEach(() => {
     contextManager.disable();
     context.disable();
+    resetEnvCache();
   });
 
   describe('constructor', () => {

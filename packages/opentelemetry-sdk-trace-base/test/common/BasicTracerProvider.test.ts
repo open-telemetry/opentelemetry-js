@@ -27,7 +27,7 @@ import {
   propagation,
   diag,
 } from '@opentelemetry/api';
-import { CompositePropagator } from '@opentelemetry/core';
+import { CompositePropagator, resetEnvCache } from '@opentelemetry/core';
 import { TraceState, W3CTraceContextPropagator } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -77,6 +77,7 @@ describe('BasicTracerProvider', () => {
 
   afterEach(() => {
     sinon.restore();
+    resetEnvCache();
   });
 
   describe('constructor', () => {

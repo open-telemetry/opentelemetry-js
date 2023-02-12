@@ -31,6 +31,7 @@ import {
 import { getSpan } from '@opentelemetry/api/build/src/trace/context-utils';
 import {
   InstrumentationLibrary,
+  resetEnvCache,
   sanitizeAttributes,
   suppressTracing,
 } from '@opentelemetry/core';
@@ -109,6 +110,7 @@ describe('Tracer', () => {
     context.disable();
     delete envSource.OTEL_TRACES_SAMPLER;
     delete envSource.OTEL_TRACES_SAMPLER_ARG;
+    resetEnvCache();
   });
 
   it('should create a Tracer instance', () => {

@@ -18,6 +18,7 @@ import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
   ExportResultCode,
   loggingErrorHandler,
+  resetEnvCache,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 import * as assert from 'assert';
@@ -73,6 +74,7 @@ describe('BatchSpanProcessorBase', () => {
   afterEach(() => {
     exporter.reset();
     sinon.restore();
+    resetEnvCache();
   });
 
   describe('constructor', () => {
