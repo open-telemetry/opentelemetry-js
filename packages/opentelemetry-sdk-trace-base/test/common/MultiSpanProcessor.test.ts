@@ -26,6 +26,7 @@ import {
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
+  resetEnvCache,
 } from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 
@@ -51,6 +52,7 @@ describe('MultiSpanProcessor', () => {
       removeEvent();
       removeEvent = undefined;
     }
+    resetEnvCache();
   });
 
   it('should handle empty span processor', () => {

@@ -122,10 +122,10 @@ const testOTLPMetricExporter = (params: TestParams) =>
 
     after(() => {
       server.forceShutdown();
-      resetEnvCache();
     });
 
     beforeEach(async () => {
+      resetEnvCache();
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -163,6 +163,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
       exportedData = undefined;
       reqMetadata = undefined;
       sinon.restore();
+      resetEnvCache();
     });
 
     describe('instance', () => {
