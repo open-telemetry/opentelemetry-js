@@ -50,6 +50,7 @@ import {
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { resetEnvCache } from '@opentelemetry/core';
 
 let fakeRequest: PassThrough;
 
@@ -70,6 +71,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
     fakeRequest = new Stream.PassThrough();
     await shutdown();
     sinon.restore();
+    resetEnvCache();
   });
 
   describe('instance', () => {

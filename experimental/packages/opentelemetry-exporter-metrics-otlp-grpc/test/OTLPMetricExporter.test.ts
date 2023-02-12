@@ -43,6 +43,7 @@ import {
   IExportMetricsServiceRequest,
   IResourceMetrics,
 } from '@opentelemetry/otlp-transformer';
+import { resetEnvCache } from '@opentelemetry/core';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -121,6 +122,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
 
     after(() => {
       server.forceShutdown();
+      resetEnvCache();
     });
 
     beforeEach(async () => {

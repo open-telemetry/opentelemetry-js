@@ -21,7 +21,7 @@ import {
   Counter,
   Histogram,
 } from '@opentelemetry/api';
-import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { ExportResultCode, hrTimeToNanoseconds, resetEnvCache } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   ResourceMetrics,
@@ -95,6 +95,7 @@ describe('OTLPMetricExporter - web', () => {
     await shutdown();
     sinon.restore();
     diag.disable();
+    resetEnvCache();
   });
 
   describe('export', () => {

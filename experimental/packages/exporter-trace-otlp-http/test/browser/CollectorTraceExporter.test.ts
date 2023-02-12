@@ -33,6 +33,7 @@ import {
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { resetEnvCache } from '@opentelemetry/core';
 
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;
@@ -51,6 +52,7 @@ describe('OTLPTraceExporter - web', () => {
 
   afterEach(() => {
     sinon.restore();
+    resetEnvCache()
   });
 
   describe('constructor', () => {
