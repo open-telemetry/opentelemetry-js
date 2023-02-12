@@ -25,7 +25,7 @@ const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const { MeterProvider }  = require('@opentelemetry/sdk-metrics');
 
 // Add your port and startServer to the Prometheus options
-const options = {port: 9464, startServer: true};
+const options = {port: 9464};
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader

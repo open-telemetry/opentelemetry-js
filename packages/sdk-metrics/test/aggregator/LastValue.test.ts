@@ -16,15 +16,26 @@
 
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { AggregationTemporality } from '../../src';
 import {
   LastValueAccumulation,
   LastValueAggregator,
 } from '../../src/aggregator';
 import { MetricData, DataPointType } from '../../src/export/MetricData';
-import { commonValues, defaultInstrumentDescriptor, sleep } from '../util';
+import { commonValues, defaultInstrumentDescriptor } from '../util';
 
 describe('LastValueAggregator', () => {
+  let clock: sinon.SinonFakeTimers;
+
+  beforeEach(() => {
+    clock = sinon.useFakeTimers();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('createAccumulation', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new LastValueAggregator();
@@ -47,16 +58,16 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(aggregator.merge(prev, delta), expected);
     });
 
-    it('return the newly sampled accumulation', async () => {
+    it('return the newly sampled accumulation', () => {
       const aggregator = new LastValueAggregator();
       const accumulation1 = aggregator.createAccumulation([0, 0]);
       const accumulation2 = aggregator.createAccumulation([1, 1]);
 
       accumulation1.record(2);
-      await sleep(1);
+      clock.tick(100);
       accumulation2.record(3);
       // refresh the accumulation1
-      await sleep(1);
+      clock.tick(100);
       accumulation1.record(4);
 
       assert.deepStrictEqual(
@@ -92,7 +103,7 @@ describe('LastValueAggregator', () => {
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
     });
 
-    it('return the newly sampled accumulation', async () => {
+    it('return the newly sampled accumulation', () => {
       const aggregator = new LastValueAggregator();
       const accumulation1 = aggregator.createAccumulation([0, 0]);
       const accumulation2 = aggregator.createAccumulation([1, 1]);
@@ -100,7 +111,7 @@ describe('LastValueAggregator', () => {
       accumulation1.record(2);
       accumulation2.record(3);
       // refresh the accumulation1
-      await sleep(1);
+      clock.tick(100);
       accumulation1.record(4);
 
       assert.deepStrictEqual(

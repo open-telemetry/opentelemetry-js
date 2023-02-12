@@ -38,11 +38,8 @@ api.logs.getLoggerProvider();
 /* returns a logger from the registered global logger provider (no-op if a working provider has not been initialized) */
 const logger = api.logs.getLogger(name, version);
 
-// logging an event in an instrumentation library
-logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
-
-// logging an event in a log appender
-logger.emitLogRecord({ severityNumber: SeverityNumber.TRACE, body: 'log data' });
+// logging a log record in a log appender
+logger.emit({ severityNumber: SeverityNumber.TRACE, body: 'log data' });
 ```
 
 ## Useful links
