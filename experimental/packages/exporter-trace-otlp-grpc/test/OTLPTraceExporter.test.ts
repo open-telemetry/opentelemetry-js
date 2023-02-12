@@ -142,6 +142,7 @@ const testCollectorExporter = (params: TestParams) =>
       exportedData = undefined;
       reqMetadata = undefined;
       sinon.restore();
+      resetEnvCache();
     });
 
     describe('instance', () => {
@@ -316,9 +317,6 @@ describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
 });
 
 describe('when configuring via environment', () => {
-  afterEach(() => {
-    resetEnvCache();
-  });
   const envSource = process.env;
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';

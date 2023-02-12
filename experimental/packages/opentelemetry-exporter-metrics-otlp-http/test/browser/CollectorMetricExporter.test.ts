@@ -21,7 +21,11 @@ import {
   Counter,
   Histogram,
 } from '@opentelemetry/api';
-import { ExportResultCode, hrTimeToNanoseconds, resetEnvCache } from '@opentelemetry/core';
+import { 
+  ExportResultCode, 
+  hrTimeToNanoseconds, 
+  resetEnvCache,
+} from '@opentelemetry/core';
 import {
   AggregationTemporality,
   ResourceMetrics,

@@ -17,6 +17,7 @@
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
+  resetEnvCache,
 } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -48,6 +49,7 @@ describe('Zipkin Exporter - web', () => {
   afterEach(() => {
     sinon.restore();
     navigator.sendBeacon = sendBeacon;
+    resetEnvCache()
   });
 
   describe('export', () => {
