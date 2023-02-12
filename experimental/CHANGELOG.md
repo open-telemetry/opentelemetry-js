@@ -8,7 +8,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-- feat(opentelemetry-instrumentation-grpc): allow to add attributes from grpc metadata in the patched server #3589 @zombispormedio
+* feat(opentelemetry-instrumentation-grpc): allow to add attributes from grpc metadata in the patched server #3589 @zombispormedio
 
 ### :bug: (Bug Fix)
 

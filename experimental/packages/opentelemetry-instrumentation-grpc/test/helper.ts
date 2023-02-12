@@ -1003,7 +1003,7 @@ export const runTests = (
         });
       });
 
-      describe('Capture request/response metadata in client span', () => {
+      describe('Capture request/response metadata in client and server spans', () => {
         const attributeValidation = {
           clientAttributes: {
             'rpc.request.metadata.client_metadata_key': 'client_metadata_value',
