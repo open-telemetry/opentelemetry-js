@@ -52,7 +52,7 @@ describe('OTLPTraceExporter - web', () => {
 
   afterEach(() => {
     sinon.restore();
-    resetEnvCache()
+    resetEnvCache();
   });
 
   describe('constructor', () => {

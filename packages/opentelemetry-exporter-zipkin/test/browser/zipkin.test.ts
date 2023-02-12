@@ -49,7 +49,7 @@ describe('Zipkin Exporter - web', () => {
   afterEach(() => {
     sinon.restore();
     navigator.sendBeacon = sendBeacon;
-    resetEnvCache()
+    resetEnvCache();
   });
 
   describe('export', () => {
