@@ -26,6 +26,7 @@ import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -35,17 +36,18 @@ import { SpanExporter } from './SpanExporter';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
+  private _unresolvedExports: Set<Promise<void>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+    this._unresolvedExports = new Set<Promise<void>>();
   }
 
-  forceFlush(): Promise<void> {
-    // do nothing as all spans are being exported without waiting
-    return Promise.resolve();
+  async forceFlush(): Promise<void> {
+    // await unresolved resources before resolving
+    await Promise.all(Array.from(this._unresolvedExports));
   }
 
-  // does nothing.
   onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
@@ -57,21 +59,40 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    internal
-      ._export(this._exporter, [span])
-      .then((result: ExportResult) => {
-        if (result.code !== ExportResultCode.SUCCESS) {
-          globalErrorHandler(
-            result.error ??
-              new Error(
-                `SimpleSpanProcessor: span export failed (status ${result})`
-              )
-          );
-        }
-      })
-      .catch(error => {
-        globalErrorHandler(error);
-      });
+    const doExport = () =>
+      internal
+        ._export(this._exporter, [span])
+        .then((result: ExportResult) => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              result.error ??
+                new Error(
+                  `SimpleSpanProcessor: span export failed (status ${result})`
+                )
+            );
+          }
+        })
+        .catch(error => {
+          globalErrorHandler(error);
+        });
+
+    // Avoid scheduling a promise to make the behavior more predictable and easier to test
+    if (span.resource.asyncAttributesPending) {
+      const exportPromise = (span.resource as Resource)
+        .waitForAsyncAttributes()
+        .then(
+          () => {
+            this._unresolvedExports.delete(exportPromise);
+            return doExport();
+          },
+          err => globalErrorHandler(err)
+        );
+
+      // store the unresolved exports
+      this._unresolvedExports.add(exportPromise);
+    } else {
+      void doExport();
+    }
   }
 
   shutdown(): Promise<void> {

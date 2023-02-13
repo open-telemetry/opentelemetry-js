@@ -17,7 +17,7 @@
 import type { ContextManager, SpanAttributes } from '@opentelemetry/api';
 import { TextMapPropagator } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
-import { Detector, Resource } from '@opentelemetry/resources';
+import { Detector, DetectorSync, Resource } from '@opentelemetry/resources';
 import { MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   Sampler,
@@ -35,7 +35,7 @@ export interface NodeSDKConfiguration {
   views: View[];
   instrumentations: InstrumentationOption[];
   resource: Resource;
-  resourceDetectors: Detector[];
+  resourceDetectors: Array<Detector | DetectorSync>;
   sampler: Sampler;
   serviceName?: string;
   spanProcessor: SpanProcessor;
