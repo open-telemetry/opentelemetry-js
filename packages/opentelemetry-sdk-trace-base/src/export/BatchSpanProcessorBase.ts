@@ -44,6 +44,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
+  private _droppedSpansCount: number = 0;
 
   constructor(private readonly _exporter: SpanExporter, config?: T) {
     const env = getEnv();
@@ -117,8 +118,23 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _addToBuffer(span: ReadableSpan) {
     if (this._finishedSpans.length >= this._maxQueueSize) {
       // limit reached, drop span
+
+      if (this._droppedSpansCount === 0) {
+        diag.debug('maxQueueSize reached, dropping spans');
+      }
+      this._droppedSpansCount++;
+
       return;
     }
+
+    if (this._droppedSpansCount > 0) {
+      // some spans were dropped, log once with count of spans dropped
+      diag.warn(
+        `Dropped ${this._droppedSpansCount} spans because maxQueueSize reached`
+      );
+      this._droppedSpansCount = 0;
+    }
+
     this._finishedSpans.push(span);
     this._maybeStartTimer();
   }
