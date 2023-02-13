@@ -23,12 +23,12 @@ import {
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';
-import {AttributeNames} from './enums/AttributeNames';
-import {SemanticAttributes} from '@opentelemetry/semantic-conventions';
-import {FetchError, FetchResponse, SpanData} from './types';
-import {VERSION} from './version';
-import {_globalThis} from '@opentelemetry/core';
-import {Context} from "@opentelemetry/api";
+import { AttributeNames } from './enums/AttributeNames';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { FetchError, FetchResponse, SpanData } from './types';
+import { VERSION } from './version';
+import { _globalThis } from '@opentelemetry/core';
+import { Context } from "@opentelemetry/api";
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -352,7 +352,7 @@ export class FetchInstrumentation extends InstrumentationBase<
               const reader = body.getReader();
               const read = (): void => {
                 reader.read().then(
-                  ({done}) => {
+                  ({ done }) => {
                     if (done) {
                       endSpanOnSuccess(span, resClone4Hook);
                     } else {
@@ -387,46 +387,30 @@ export class FetchInstrumentation extends InstrumentationBase<
         }
 
         return new Promise((resolve, reject) => {
-
+          const apiContextWithSpan = () => api.context.with(
+            api.trace.setSpan(api.context.active(), createdSpan),
+            () => {
+              plugin._addHeaders(options, url);
+              plugin._tasksCount++;
+              // TypeScript complains about arrow function captured a this typed as globalThis
+              // ts(7041)
+              return original
+                .apply(
+                  self,
+                  options instanceof Request ? [options] : [url, options]
+                )
+                .then(
+                  onSuccess.bind(self, createdSpan, resolve),
+                  onError.bind(self, createdSpan, reject)
+                );
+            }
+          );
           if (!baggageContext) {
-            return api.context.with(
-              api.trace.setSpan(api.context.active(), createdSpan),
-              () => {
-                plugin._addHeaders(options, url);
-                plugin._tasksCount++;
-                // TypeScript complains about arrow function captured a this typed as globalThis
-                // ts(7041)
-                return original
-                  .apply(
-                    self,
-                    options instanceof Request ? [options] : [url, options]
-                  )
-                  .then(
-                    onSuccess.bind(self, createdSpan, resolve),
-                    onError.bind(self, createdSpan, reject)
-                  );
-              }
-            );
+            return apiContextWithSpan();
           }
           else {
             return api.context.with(baggageContext, () => {
-              api.context.with(
-                api.trace.setSpan(api.context.active(), createdSpan),
-                () => {
-                  plugin._addHeaders(options, url);
-                  plugin._tasksCount++;
-                  // TypeScript complains about arrow function captured a this typed as globalThis
-                  // ts(7041)
-                  return original
-                    .apply(
-                      self,
-                      options instanceof Request ? [options] : [url, options]
-                    )
-                    .then(
-                      onSuccess.bind(self, createdSpan, resolve),
-                      onError.bind(self, createdSpan, reject)
-                    );
-                });
+              apiContextWithSpan();
             });
           }
         });
@@ -487,7 +471,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
     if (typeof PerformanceObserver !== 'function') {
-      return {entries, startTime, spanUrl};
+      return { entries, startTime, spanUrl };
     }
 
     const observer = new PerformanceObserver(list => {
@@ -501,7 +485,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     observer.observe({
       entryTypes: ['resource'],
     });
-    return {entries, observer, startTime, spanUrl};
+    return { entries, observer, startTime, spanUrl };
   }
 
   /**

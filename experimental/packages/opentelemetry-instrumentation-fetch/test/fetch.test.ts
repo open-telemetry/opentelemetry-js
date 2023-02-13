@@ -759,7 +759,7 @@ describe('fetch', () => {
   describe('when request is NOT successful (wrong url)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = badUrl;
-      await prepareData(badUrl, {propagateTraceHeaderCorsUrls});
+      await prepareData(badUrl, { propagateTraceHeaderCorsUrls });
     });
     afterEach(() => {
       clearData();
@@ -777,7 +777,7 @@ describe('fetch', () => {
   describe('when request is NOT successful (405)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, {propagateTraceHeaderCorsUrls}, 'DELETE');
+      await prepareData(url, { propagateTraceHeaderCorsUrls }, 'DELETE');
     });
     afterEach(() => {
       clearData();
