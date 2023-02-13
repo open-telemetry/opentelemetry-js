@@ -462,7 +462,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   ) {
     const addBaggage = this._getConfig().addBaggage;
     if (addBaggage) {
-      safeExecuteInTheMiddle(
+      return safeExecuteInTheMiddle(
         () => addBaggage(url, request),
         error => {
           if (!error) {

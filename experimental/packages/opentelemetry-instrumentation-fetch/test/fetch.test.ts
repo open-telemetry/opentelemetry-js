@@ -39,9 +39,11 @@ import {
   FetchInstrumentation,
   FetchInstrumentationConfig,
   FetchCustomAttributeFunction,
+  AddBaggageFunction,
 } from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { CompositePropagator, W3CBaggagePropagator } from '@opentelemetry/core';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -296,11 +298,11 @@ describe('fetch', () => {
   });
 
   before(() => {
-    api.propagation.setGlobalPropagator(
-      new B3Propagator({
-        injectEncoding: B3InjectEncoding.MULTI_HEADER,
-      })
-    );
+    const propagator = new CompositePropagator({
+      propagators: [new W3CBaggagePropagator(), new B3Propagator({injectEncoding: B3InjectEncoding.MULTI_HEADER })],
+    });
+
+    api.propagation.setGlobalPropagator(propagator);
   });
 
   describe('when request is successful', () => {
@@ -652,7 +654,7 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('applies attributes when the request is succesful', async () => {
+    it('applies attributes when the request is successful', async () => {
       await prepare(url, span => {
         span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
       });
@@ -757,7 +759,7 @@ describe('fetch', () => {
   describe('when request is NOT successful (wrong url)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = badUrl;
-      await prepareData(badUrl, { propagateTraceHeaderCorsUrls });
+      await prepareData(badUrl, {propagateTraceHeaderCorsUrls});
     });
     afterEach(() => {
       clearData();
@@ -775,7 +777,7 @@ describe('fetch', () => {
   describe('when request is NOT successful (405)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, { propagateTraceHeaderCorsUrls }, 'DELETE');
+      await prepareData(url, {propagateTraceHeaderCorsUrls}, 'DELETE');
     });
     afterEach(() => {
       clearData();
@@ -935,6 +937,33 @@ describe('fetch', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 0, 'number of events is wrong');
+    });
+  });
+
+  describe('addBaggage option', () => {
+    const prepare = async (
+      url: string,
+      addBaggage: AddBaggageFunction,
+    ) => {
+      const propagateTraceHeaderCorsUrls = [url];
+      await prepareData(url, {
+        propagateTraceHeaderCorsUrls,
+        addBaggage,
+      });
+    };
+
+    afterEach(() => {
+      clearData();
+    });
+
+    it('header contains baggage when the request is successful', async () => {
+      await prepare(url, (url, request) => {
+        let currentBaggage = api.propagation.createBaggage();
+        currentBaggage = currentBaggage.setEntry('testKey', {value: 'testValue'});
+        return api.propagation.setBaggage(api.context.active(), currentBaggage)
+      });
+
+      assert.ok(lastResponse.headers.baggage === 'testKey=testValue');
     });
   });
 });
