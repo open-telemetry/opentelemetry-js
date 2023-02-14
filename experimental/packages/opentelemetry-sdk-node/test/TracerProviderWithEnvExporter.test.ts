@@ -32,6 +32,7 @@ import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/expor
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExporter';
+import { resetEnvCache } from '@opentelemetry/core';
 
 describe('set up trace exporter with env exporters', () => {
   let spyGetOtlpProtocol: Sinon.SinonSpy;
@@ -43,10 +44,12 @@ describe('set up trace exporter with env exporters', () => {
       'getOtlpProtocol'
     );
     stubLoggerError = Sinon.stub(diag, 'warn');
+    resetEnvCache();
   });
   afterEach(() => {
     spyGetOtlpProtocol.restore();
     stubLoggerError.restore();
+    resetEnvCache();
   });
   describe('setup otlp exporter from env', () => {
     it('set up default exporter when user does not define otel trace exporter', async () => {

@@ -125,7 +125,6 @@ const testOTLPMetricExporter = (params: TestParams) =>
     });
 
     beforeEach(async () => {
-      resetEnvCache();
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -294,6 +293,12 @@ describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
 
 describe('when configuring via environment', () => {
   const envSource = process.env;
+  beforeEach(() => {
+    // reset the env cache again due to
+    // env cache being set in the beforeEach by
+    // instantiating an OTLPMetricExporter
+    resetEnvCache();
+  })
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     const collectorExporter = new OTLPMetricExporter();

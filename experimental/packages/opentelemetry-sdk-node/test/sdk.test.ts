@@ -27,7 +27,7 @@ import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { CompositePropagator } from '@opentelemetry/core';
+import { CompositePropagator, resetEnvCache } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   ConsoleMetricExporter,
@@ -76,7 +76,12 @@ describe('Node SDK', () => {
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+    resetEnvCache();
   });
+
+  afterEach(() => {
+    resetEnvCache();
+  })
 
   describe('Basic Registration', () => {
     it('should not register any unconfigured SDK components', async () => {
@@ -286,7 +291,9 @@ describe('Node SDK', () => {
 
     await sdk.shutdown();
     delete env.OTEL_TRACES_EXPORTER;
-  });
+
+    // TODO: why this tests throw a timeout issue! 
+  }).timeout(5_000);
 
   it('should throw error when calling configureMeterProvider when views are already configured', () => {
     const exporter = new InMemoryMetricExporter(
@@ -673,6 +680,7 @@ describe('setup exporter from env', () => {
   afterEach(() => {
     spyGetOtlpProtocol.restore();
     stubLoggerError.restore();
+    resetEnvCache();
   });
   it('use default exporter TracerProviderWithEnvExporters when user does not provide span processor or trace exporter to sdk config', async () => {
     const sdk = new NodeSDK();
