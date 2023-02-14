@@ -278,7 +278,7 @@ const testCollectorExporter = (params: TestParams) =>
         // env cache being set in the beforeEach by
         // instantiating an OTLPTraceExporter
         resetEnvCache();
-      })
+      });
       const envSource = process.env;
       it('should return gzip compression algorithm on exporter', () => {
         const credentials = params.useTLS
@@ -325,7 +325,7 @@ describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
 describe('when configuring via environment', () => {
   beforeEach(() => {
     resetEnvCache();
-  })
+  });
   const envSource = process.env;
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';

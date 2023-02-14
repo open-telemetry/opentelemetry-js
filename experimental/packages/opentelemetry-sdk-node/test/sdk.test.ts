@@ -81,7 +81,7 @@ describe('Node SDK', () => {
 
   afterEach(() => {
     resetEnvCache();
-  })
+  });
 
   describe('Basic Registration', () => {
     it('should not register any unconfigured SDK components', async () => {
@@ -292,7 +292,7 @@ describe('Node SDK', () => {
     await sdk.shutdown();
     delete env.OTEL_TRACES_EXPORTER;
 
-    // TODO: why this tests throw a timeout issue! 
+    // TODO: why this tests throw a timeout issue!
   }).timeout(5_000);
 
   it('should throw error when calling configureMeterProvider when views are already configured', () => {

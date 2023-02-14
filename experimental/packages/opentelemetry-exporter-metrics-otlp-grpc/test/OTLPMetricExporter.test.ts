@@ -298,7 +298,7 @@ describe('when configuring via environment', () => {
     // env cache being set in the beforeEach by
     // instantiating an OTLPMetricExporter
     resetEnvCache();
-  })
+  });
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     const collectorExporter = new OTLPMetricExporter();
