@@ -23,7 +23,9 @@ import {
 import { _globalThis } from './globalThis';
 
 /**
- * Gets the environment variables
+ * Used for tests only
+ * Browser tests are running the environment.test.ts 
+ * That imports the resetEnvCache from node
  */
 export function resetEnvCache() {
   return;
