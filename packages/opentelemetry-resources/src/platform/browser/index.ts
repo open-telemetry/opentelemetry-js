@@ -15,6 +15,7 @@
  */
 
 export * from './default-service-name';
-export * from './detect-resources';
 export * from './HostDetector';
 export * from './OSDetector';
+export * from './HostDetectorSync';
+export * from './OSDetectorSync';
