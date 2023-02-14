@@ -87,7 +87,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.strictEqual(
         context['_getContextManager'](),
@@ -114,7 +114,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
@@ -139,7 +139,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
@@ -171,7 +171,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.strictEqual(
         context['_getContextManager'](),
@@ -237,7 +237,7 @@ describe('Node SDK', () => {
       autoDetectResources: false,
     });
 
-    await sdk.start();
+    sdk.start();
 
     assert.strictEqual(
       context['_getContextManager'](),
@@ -391,8 +391,9 @@ describe('Node SDK', () => {
             envDetector,
           ],
         });
-        await sdk.detectResources();
+        sdk.detectResources();
         const resource = sdk['_resource'];
+        await resource.waitForAsyncAttributes?.();
 
         assert.strictEqual(resource.attributes['customAttr'], 'someValue');
 
@@ -420,8 +421,9 @@ describe('Node SDK', () => {
           ],
         });
 
-        await sdk.detectResources();
+        sdk.detectResources();
         const resource = sdk['_resource'];
+        await resource.waitForAsyncAttributes?.();
 
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -460,6 +462,7 @@ describe('Node SDK', () => {
         // This test depends on the env detector to be functioning as intended
         const mockedLoggerMethod = Sinon.fake();
         const mockedVerboseLoggerMethod = Sinon.fake();
+
         diag.setLogger(
           {
             debug: mockedLoggerMethod,
@@ -468,7 +471,8 @@ describe('Node SDK', () => {
           DiagLogLevel.VERBOSE
         );
 
-        await sdk.detectResources();
+        sdk.detectResources();
+        await sdk['_resource'].waitForAsyncAttributes?.();
 
         // Test that the Env Detector successfully found its resource and populated it with the right values.
         assert.ok(
@@ -478,7 +482,7 @@ describe('Node SDK', () => {
         assert.ok(
           callArgsMatches(
             mockedVerboseLoggerMethod,
-            /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/
+            /{\s+"service\.instance\.id":\s+"627cc493",\s+"service\.name":\s+"my-service",\s+"service\.namespace":\s+"default",\s+"service\.version":\s+"0.0.1"\s+}\s*/gm
           )
         );
       });
@@ -500,7 +504,7 @@ describe('Node SDK', () => {
             DiagLogLevel.DEBUG
           );
 
-          await sdk.detectResources();
+          sdk.detectResources();
 
           assert.ok(
             callArgsContains(
@@ -519,7 +523,7 @@ describe('Node SDK', () => {
         serviceName: 'config-set-name',
       });
 
-      await sdk.start();
+      sdk.start();
       const resource = sdk['_resource'];
 
       assertServiceResource(resource, {
@@ -531,8 +535,9 @@ describe('Node SDK', () => {
       process.env.OTEL_SERVICE_NAME = 'env-set-name';
       const sdk = new NodeSDK();
 
-      await sdk.start();
+      sdk.start();
       const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'env-set-name',
@@ -546,8 +551,9 @@ describe('Node SDK', () => {
         serviceName: 'config-set-name',
       });
 
-      await sdk.start();
+      sdk.start();
       const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'config-set-name',
@@ -560,8 +566,9 @@ describe('Node SDK', () => {
         'service.name=resource-env-set-name';
       const sdk = new NodeSDK();
 
-      await sdk.start();
+      sdk.start();
       const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'resource-env-set-name',
@@ -576,8 +583,9 @@ describe('Node SDK', () => {
         serviceName: 'config-set-name',
       });
 
-      await sdk.start();
+      sdk.start();
       const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
 
       assertServiceResource(resource, {
         name: 'config-set-name',
@@ -650,8 +658,9 @@ describe('Node SDK', () => {
             envDetector,
           ],
         });
-        await sdk.detectResources();
+        sdk.detectResources();
         const resource = sdk['_resource'];
+        await resource.waitForAsyncAttributes?.();
 
         assert.deepStrictEqual(resource, Resource.empty());
       });
@@ -676,7 +685,7 @@ describe('setup exporter from env', () => {
   });
   it('use default exporter TracerProviderWithEnvExporters when user does not provide span processor or trace exporter to sdk config', async () => {
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
@@ -689,7 +698,7 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK({
       traceExporter,
     });
-    await sdk.start();
+    sdk.start();
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
@@ -706,7 +715,7 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK({
       spanProcessor,
     });
-    await sdk.start();
+    sdk.start();
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
@@ -723,7 +732,7 @@ describe('setup exporter from env', () => {
     const sdk = new NodeSDK({
       traceExporter,
     });
-    await sdk.start();
+    sdk.start();
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
@@ -739,7 +748,7 @@ describe('setup exporter from env', () => {
     env.OTEL_TRACES_EXPORTER = 'otlp';
     env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
@@ -752,7 +761,7 @@ describe('setup exporter from env', () => {
   it('use noop span processor when user sets env exporter to none', async () => {
     env.OTEL_TRACES_EXPORTER = 'none';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
@@ -765,7 +774,7 @@ describe('setup exporter from env', () => {
   it('log warning that sdk will not be initalized when exporter is set to none', async () => {
     env.OTEL_TRACES_EXPORTER = 'none';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     assert.strictEqual(
       stubLoggerError.args[0][0],
@@ -786,7 +795,7 @@ describe('setup exporter from env', () => {
   it('use default otlp exporter when empty value is provided for exporter via env', async () => {
     env.OTEL_TRACES_EXPORTER = '';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
@@ -799,7 +808,7 @@ describe('setup exporter from env', () => {
   it('use only default exporter when none value is provided with other exporters', async () => {
     env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
@@ -812,7 +821,7 @@ describe('setup exporter from env', () => {
   it('log warning that only default exporter will be used since exporter list contains none with other exports ', async () => {
     env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     assert.strictEqual(
       stubLoggerError.args[0][0],
@@ -823,7 +832,7 @@ describe('setup exporter from env', () => {
   it('should warn that provided exporter value is unrecognized and not able to be set up', async () => {
     env.OTEL_TRACES_EXPORTER = 'invalid';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     assert.strictEqual(
       stubLoggerError.args[0][0],
@@ -841,7 +850,7 @@ describe('setup exporter from env', () => {
     env.OTEL_TRACES_EXPORTER = 'zipkin, otlp, jaeger';
     env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
@@ -857,7 +866,7 @@ describe('setup exporter from env', () => {
   it('use the console exporter', async () => {
     env.OTEL_TRACES_EXPORTER = 'console, otlp';
     const sdk = new NodeSDK();
-    await sdk.start();
+    sdk.start();
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;

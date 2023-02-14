@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { Resource } from '../../../src';
+import { IResource } from '../../../src';
 import { browserDetector } from '../../../src/detectors/BrowserDetector';
 import { describeBrowser } from '../../util';
 import {
@@ -32,7 +32,7 @@ describeBrowser('browserDetector()', () => {
       userAgent: 'dddd',
     });
 
-    const resource: Resource = await browserDetector.detect();
+    const resource: IResource = await browserDetector.detect();
     assertResource(resource, {
       version: 'dddd',
       runtimeDescription: 'Web Browser',
@@ -43,7 +43,7 @@ describeBrowser('browserDetector()', () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
     });
-    const resource: Resource = await browserDetector.detect();
+    const resource: IResource = await browserDetector.detect();
     assertEmptyResource(resource);
   });
 });
