@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-import type { Detector, DetectorSync } from './types';
-
-/**
- * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
- */
-export interface ResourceDetectionConfig {
-  detectors?: Array<Detector | DetectorSync>;
-}
+export const isPromiseLike = <R>(val: any): val is PromiseLike<R> => {
+  return (
+    val !== null && typeof val === 'object' && typeof val.then === 'function'
+  );
+};

@@ -18,7 +18,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { describeNode } from '../../util';
-import { hostDetector, Resource } from '../../../src';
+import { hostDetector, IResource } from '../../../src';
 
 describeNode('hostDetector() on Node.js', () => {
   afterEach(() => {
@@ -31,7 +31,7 @@ describeNode('hostDetector() on Node.js', () => {
     sinon.stub(os, 'arch').returns('x64');
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
 
-    const resource: Resource = await hostDetector.detect();
+    const resource: IResource = await hostDetector.detect();
 
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.HOST_NAME],
@@ -48,7 +48,7 @@ describeNode('hostDetector() on Node.js', () => {
 
     sinon.stub(os, 'arch').returns('some-unknown-arch');
 
-    const resource: Resource = await hostDetector.detect();
+    const resource: IResource = await hostDetector.detect();
 
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.HOST_ARCH],

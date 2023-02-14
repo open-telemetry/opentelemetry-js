@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-import { Detector } from '../../types';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { Resource } from '../../Resource';
+import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
-import { IResource } from '../../IResource';
-import { osDetectorSync } from './OSDetectorSync';
+import { platform, release } from 'os';
+import { normalizeType } from './utils';
 
 /**
- * OSDetector detects the resources related to the operating system (OS) on
+ * OSDetectorSync detects the resources related to the operating system (OS) on
  * which the process represented by this resource is running.
  */
-class OSDetector implements Detector {
-  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(osDetectorSync.detect(_config));
+class OSDetectorSync implements DetectorSync {
+  detect(_config?: ResourceDetectionConfig): Resource {
+    const attributes: ResourceAttributes = {
+      [SemanticResourceAttributes.OS_TYPE]: normalizeType(platform()),
+      [SemanticResourceAttributes.OS_VERSION]: release(),
+    };
+    return new Resource(attributes);
   }
 }
 
-export const osDetector = new OSDetector();
+export const osDetectorSync = new OSDetectorSync();
