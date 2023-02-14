@@ -26,9 +26,8 @@ import { _globalThis } from './globalThis';
  * Gets the environment variables
  */
 export function resetEnvCache() {
-  return 
+  return;
 }
-
 
 /**
  * Gets the environment variables
