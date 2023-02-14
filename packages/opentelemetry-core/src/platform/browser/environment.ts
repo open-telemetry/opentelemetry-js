@@ -25,6 +25,14 @@ import { _globalThis } from './globalThis';
 /**
  * Gets the environment variables
  */
+export function resetEnvCache() {
+  return 
+}
+
+
+/**
+ * Gets the environment variables
+ */
 export function getEnv(): Required<ENVIRONMENT> {
   const globalEnv = parseEnvironment(
     _globalThis as typeof globalThis & RAW_ENVIRONMENT

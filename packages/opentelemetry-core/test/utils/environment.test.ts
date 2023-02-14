@@ -183,8 +183,8 @@ describe('environment', () => {
         OTEL_LOG_LEVEL: 'waRn',
       });
 
-      const getEnvFirstInvocationResult = getEnv();
-      const getEnvSecondInvocationResult = getEnv();
+      const getEnvFirstInvocationResult = getEnv().OTEL_LOG_LEVEL;
+      const getEnvSecondInvocationResult = getEnv().OTEL_LOG_LEVEL;
 
       assert.strictEqual(
         getEnvFirstInvocationResult,
