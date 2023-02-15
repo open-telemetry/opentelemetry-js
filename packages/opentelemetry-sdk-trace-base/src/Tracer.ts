@@ -20,7 +20,7 @@ import {
   sanitizeAttributes,
   isTracingSuppressed,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
 import { Span } from './Span';
 import { GeneralLimits, SpanLimits, TracerConfig } from './types';
@@ -38,7 +38,7 @@ export class Tracer implements api.Tracer {
   private readonly _generalLimits: GeneralLimits;
   private readonly _spanLimits: SpanLimits;
   private readonly _idGenerator: IdGenerator;
-  readonly resource: Resource;
+  readonly resource: IResource;
   readonly instrumentationLibrary: InstrumentationLibrary;
 
   /**
@@ -116,6 +116,8 @@ export class Tracer implements api.Tracer {
       attributes,
       links
     );
+
+    traceState = samplingResult.traceState ?? traceState;
 
     const traceFlags =
       samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED

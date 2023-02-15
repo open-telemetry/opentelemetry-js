@@ -84,9 +84,7 @@ const sdk = new opentelemetry.NodeSDK({
 
 // initialize the SDK and register with the OpenTelemetry API
 // this enables the API to record telemetry
-sdk.start()
-  .then(() => console.log('Tracing initialized'))
-  .catch((error) => console.log('Error initializing tracing', error));
+sdk.start();
 
 // gracefully shut down the SDK on process exit
 process.on('SIGTERM', () => {
@@ -178,9 +176,10 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
+- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [John Bley](https://github.com/johnbley), Splunk
-- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Mark Wolff](https://github.com/markwolff), Microsoft
+- [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
@@ -194,6 +193,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 - [Amir Blum](https://github.com/blumamir), Aspecto
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Rauno Viskus](https://github.com/Rauno56), Splunk
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
@@ -274,6 +274,11 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
+
+### 0.35.x to 0.36.0
+
+- `@opentelemetry/sdk-node` changed `await start()` to now be synchronous
+- `@opentelemetry/sdk-node` changed `await detectResources()` to now be synchronous
 
 ### 0.28.x to 0.29.x
 
