@@ -559,6 +559,10 @@ export const getIncomingRequestMetricAttributesOnResponse = (
     spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
   metricAttributes[SemanticAttributes.NET_HOST_PORT] =
     spanAttributes[SemanticAttributes.NET_HOST_PORT];
+  if (spanAttributes[SemanticAttributes.HTTP_ROUTE] !== undefined) {
+    metricAttributes[SemanticAttributes.HTTP_ROUTE] =
+      spanAttributes[SemanticAttributes.HTTP_ROUTE];
+  }
   return metricAttributes;
 };
 

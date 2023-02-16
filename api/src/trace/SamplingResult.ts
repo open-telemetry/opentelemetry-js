@@ -15,6 +15,7 @@
  */
 
 import { SpanAttributes } from './attributes';
+import { TraceState } from './trace_state';
 
 /**
  * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
@@ -55,4 +56,11 @@ export interface SamplingResult {
    * can safely cache the returned value.
    */
   attributes?: Readonly<SpanAttributes>;
+  /**
+   * A {@link TraceState} that will be associated with the {@link Span} through
+   * the new {@link SpanContext}. Samplers SHOULD return the TraceState from
+   * the passed-in {@link Context} if they do not intend to change it. Leaving
+   * the value undefined will also leave the TraceState unchanged.
+   */
+  traceState?: TraceState;
 }

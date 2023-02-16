@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Resource } from '@opentelemetry/resources';
+import type { IResource } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { toAttributes } from '../common/internal';
 import { sdkSpanToOtlpSpan } from './internal';
@@ -33,7 +33,7 @@ export function createExportTraceServiceRequest(
 }
 
 function createResourceMap(readableSpans: ReadableSpan[]) {
-  const resourceMap: Map<Resource, Map<string, ReadableSpan[]>> = new Map();
+  const resourceMap: Map<IResource, Map<string, ReadableSpan[]>> = new Map();
   for (const record of readableSpans) {
     let ilmMap = resourceMap.get(record.resource);
 
