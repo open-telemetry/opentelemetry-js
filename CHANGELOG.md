@@ -18,6 +18,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat: support TraceState in SamplingResult [#3530](https://github.com/open-telemetry/opentelemetry-js/pull/3530) @raphael-theriault-swi
 
 ### :bug: (Bug Fix)
+* fix(process-usage): added falsy check to make otel core work with browser where webpack config had process as false or null [#3613](https://github.com/open-telemetry/opentelemetry-js/issues/3613) @ravindra-dyte
 
 ### :books: (Refine Doc)
 
