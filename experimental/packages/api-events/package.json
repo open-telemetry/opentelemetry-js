@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/api-logs",
+  "name": "@opentelemetry/api-events",
   "version": "0.35.1",
-  "description": "Public logs API for OpenTelemetry",
+  "description": "Public events API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
@@ -34,7 +34,7 @@
     "nodejs",
     "browser",
     "profiling",
-    "logs",
+    "events",
     "stats",
     "monitoring"
   ],
@@ -82,6 +82,6 @@
     "typescript": "4.4.4",
     "webpack": "4.46.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-logs",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-events",
   "sideEffects": false
 }
