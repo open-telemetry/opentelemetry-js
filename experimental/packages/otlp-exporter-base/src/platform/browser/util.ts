@@ -161,23 +161,19 @@ export function sendWithXhr(
   sendWithRetry();
 }
 
-function retrieveThrottleTime(retryAfter: string): number {
-  // it's a Date object
-  if (typeof retryAfter === 'object') {
-    const currentTime = new Date();
-    const retryAfterDate = new Date(retryAfter);
-    const secondsDiff = Math.ceil(
-      (retryAfterDate.getTime() - currentTime.getTime()) / 1000
-    );
-
-    // if throttle date is set to now, difference in seconds might be less than 0
-    if (secondsDiff <= 0) {
-      return 0;
-    } else {
-      return secondsDiff * 1000;
-    }
-    // it's an integer
-  } else {
-    return Number(retryAfter) * 1000;
+function retrieveThrottleTime(retryAfter?: string | null): number {
+  if (retryAfter == null) {
+    return -1;
   }
+  const seconds = Number.parseInt(retryAfter, 10);
+  if (Number.isInteger(seconds)) {
+    return seconds > 0 ? seconds * 1000 : -1;
+  }
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After#directives
+  const delay = new Date(retryAfter).getTime() - Date.now();
+
+  if (delay >= 0) {
+    return delay;
+  }
+  return 0;
 }
