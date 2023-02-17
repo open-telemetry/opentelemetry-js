@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import { browserDetector } from '../src/BrowserDetector';
 import { describeBrowser, assertResource, assertEmptyResource } from './util';
 
@@ -47,7 +47,7 @@ describeBrowser('browserDetector()', () => {
       },
     });
 
-    const resource: Resource = await browserDetector.detect();
+    const resource: IResource = await browserDetector.detect();
     assertResource(resource, {
       platform: 'platform',
       brands: ['Chromium 106', 'Google Chrome 106', 'Not;A=Brand 99'],
@@ -63,7 +63,7 @@ describeBrowser('browserDetector()', () => {
       userAgentData: undefined,
     });
 
-    const resource: Resource = await browserDetector.detect();
+    const resource: IResource = await browserDetector.detect();
     assertResource(resource, {
       language: 'en-US',
       user_agent: 'dddd',
@@ -74,7 +74,7 @@ describeBrowser('browserDetector()', () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
     });
-    const resource: Resource = await browserDetector.detect();
+    const resource: IResource = await browserDetector.detect();
     assertEmptyResource(resource);
   });
 });

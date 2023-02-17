@@ -25,14 +25,9 @@ describe('NoopLogger', () => {
     assert(logger instanceof NoopLogger);
   });
 
-  it('calling emitEvent should not crash', () => {
+  it('calling emit should not crash', () => {
     const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
-  });
-
-  it('calling emitLogRecord should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitLogRecord({
+    logger.emit({
       severityNumber: SeverityNumber.TRACE,
       body: 'log body',
     });

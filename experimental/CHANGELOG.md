@@ -8,7 +8,11 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat: add HTTP_ROUTE attribute to http incoming metrics if present [#3581](https://github.com/open-telemetry/opentelemetry-js/pull/3581) @hermogenes
+
 ### :bug: (Bug Fix)
+
+* fix(prometheus-exporter): add possibility to respond to errors returned by `server.listen()` [#3552](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @pichlermarc
 
 ### :books: (Refine Doc)
 
