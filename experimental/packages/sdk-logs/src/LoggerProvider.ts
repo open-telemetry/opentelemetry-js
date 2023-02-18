@@ -51,13 +51,12 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     version?: string,
     options?: logsAPI.LoggerOptions
   ): Logger {
-    const { schemaUrl = '', eventDomain } = options || {};
+    const { schemaUrl = '' } = options || {};
     const key = `${name}@${version || ''}:${schemaUrl}`;
     if (!this._loggers.has(key)) {
       this._loggers.set(
         key,
         new Logger({
-          eventDomain,
           resource: this._resource,
           logRecordLimits: this._logRecordLimits,
           activeProcessor: this._activeProcessor,

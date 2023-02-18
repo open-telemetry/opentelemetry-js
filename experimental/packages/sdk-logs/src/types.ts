@@ -41,7 +41,6 @@ export interface LogRecordLimits {
 }
 
 export interface LoggerConfig {
-  eventDomain?: string;
   activeProcessor: LogRecordProcessor;
   resource: Resource;
   logRecordLimits: LogRecordLimits;

@@ -18,23 +18,11 @@ import type * as logsAPI from '@opentelemetry/api-logs';
 
 import type { LoggerConfig } from './types';
 import { LogRecord } from './LogRecord';
-import { EVENT_LOGS_ATTRIBUTES } from './Attributes';
-import { DEFAULT_EVENT_DOMAIN } from './config';
 
 export class Logger implements logsAPI.Logger {
   constructor(private readonly config: LoggerConfig) {}
 
-  public emitEvent(event: logsAPI.LogEvent): void {
-    const logRecord = new LogRecord(this.config, event);
-    logRecord.setAttributes({
-      [EVENT_LOGS_ATTRIBUTES.name]: event.name,
-      [EVENT_LOGS_ATTRIBUTES.domain]:
-        event.domain ?? this.config.eventDomain ?? DEFAULT_EVENT_DOMAIN,
-    });
-    logRecord.emit();
-  }
-
-  public emitLogRecord(logRecord: logsAPI.LogRecord): void {
+  public emit(logRecord: logsAPI.LogRecord): void {
     new LogRecord(this.config, logRecord).emit();
   }
 }
