@@ -20,9 +20,9 @@ import type { LoggerConfig } from './types';
 import { LogRecord } from './LogRecord';
 
 export class Logger implements logsAPI.Logger {
-  constructor(private readonly config: LoggerConfig) {}
+  constructor(private readonly _config: LoggerConfig) {}
 
   public emit(logRecord: logsAPI.LogRecord): void {
-    new LogRecord(this.config, logRecord).emit();
+    new LogRecord(this._config, logRecord).emit();
   }
 }

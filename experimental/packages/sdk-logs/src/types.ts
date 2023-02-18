@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import type { Resource } from '@opentelemetry/resources';
+import type { IResource } from '@opentelemetry/resources';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 
 export interface LoggerProviderConfig {
   /** Resource associated with trace telemetry  */
-  resource?: Resource;
+  resource?: IResource;
 
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
@@ -42,7 +42,7 @@ export interface LogRecordLimits {
 
 export interface LoggerConfig {
   activeProcessor: LogRecordProcessor;
-  resource: Resource;
+  resource: IResource;
   logRecordLimits: LogRecordLimits;
   instrumentationScope: InstrumentationScope;
 }

@@ -24,7 +24,7 @@ import {
   isAttributeValue,
 } from '@opentelemetry/core';
 
-import type { Resource } from '@opentelemetry/resources';
+import type { IResource } from '@opentelemetry/resources';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LoggerConfig } from './types';
 
@@ -36,7 +36,7 @@ export class LogRecord implements ReadableLogRecord {
   readonly severityText?: string;
   readonly severityNumber?: logsAPI.SeverityNumber;
   readonly body?: string;
-  readonly resource: Resource;
+  readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: Attributes = {};
 

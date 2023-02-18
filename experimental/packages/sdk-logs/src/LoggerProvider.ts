@@ -15,7 +15,7 @@
  */
 
 import type * as logsAPI from '@opentelemetry/api-logs';
-import { Resource } from '@opentelemetry/resources';
+import { IResource, Resource } from '@opentelemetry/resources';
 import { merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig, LogRecordLimits } from './types';
@@ -26,7 +26,7 @@ import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 
 export class LoggerProvider implements logsAPI.LoggerProvider {
   private readonly _loggers: Map<string, Logger> = new Map();
-  private readonly _resource: Resource;
+  private readonly _resource: IResource;
   private readonly _logRecordLimits: LogRecordLimits;
   private readonly _activeProcessor: MultiLogRecordProcessor;
 

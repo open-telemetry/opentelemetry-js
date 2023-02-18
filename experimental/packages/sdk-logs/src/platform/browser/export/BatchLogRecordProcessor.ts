@@ -14,46 +14,58 @@
  * limitations under the License.
  */
 
-import type { LogRecordExporter } from "./../../../export/LogRecordExporter";
-import type { BatchLogRecordProcessorBrowserConfig } from "../../../types";
-import { BatchLogRecordProcessorBase } from "../../../export/BatchLogRecordProcessor";
+import type { LogRecordExporter } from './../../../export/LogRecordExporter';
+import type { BatchLogRecordProcessorBrowserConfig } from '../../../types';
+import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessor';
 
 export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorBrowserConfig> {
   private _visibilityChangeListener?: () => void;
   private _pageHideListener?: () => void;
 
-  constructor(exporter: LogRecordExporter, config?: BatchLogRecordProcessorBrowserConfig) {
+  constructor(
+    exporter: LogRecordExporter,
+    config?: BatchLogRecordProcessorBrowserConfig
+  ) {
     super(exporter, config);
     this._onInit(config);
   }
 
   protected onShutdown(): void {
-    if (typeof document === "undefined") {
+    if (typeof document === 'undefined') {
       return;
     }
     if (this._visibilityChangeListener) {
-      document.removeEventListener("visibilitychange", this._visibilityChangeListener);
+      document.removeEventListener(
+        'visibilitychange',
+        this._visibilityChangeListener
+      );
     }
     if (this._pageHideListener) {
-      document.removeEventListener("pagehide", this._pageHideListener);
+      document.removeEventListener('pagehide', this._pageHideListener);
     }
   }
 
   private _onInit(config?: BatchLogRecordProcessorBrowserConfig): void {
-    if (config?.disableAutoFlushOnDocumentHide === true || typeof document === "undefined") {
+    if (
+      config?.disableAutoFlushOnDocumentHide === true ||
+      typeof document === 'undefined'
+    ) {
       return;
     }
     this._visibilityChangeListener = () => {
-      if (document.visibilityState === "hidden") {
+      if (document.visibilityState === 'hidden') {
         this.forceFlush();
       }
     };
     this._pageHideListener = () => {
       this.forceFlush();
     };
-    document.addEventListener("visibilitychange", this._visibilityChangeListener);
+    document.addEventListener(
+      'visibilitychange',
+      this._visibilityChangeListener
+    );
 
     // use 'pagehide' event as a fallback for Safari; see https://bugs.webkit.org/show_bug.cgi?id=116769
-    document.addEventListener("pagehide", this._pageHideListener);
+    document.addEventListener('pagehide', this._pageHideListener);
   }
 }
