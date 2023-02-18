@@ -29,9 +29,8 @@ describe('InMemoryLogRecordExporter', () => {
         logs.push({});
       }
       memoryExporter.export(logs, () => {
-        // @ts-expect-error
         assert.strictEqual(
-          memoryExporter._finishedLogRecords.length,
+          memoryExporter.getFinishedLogRecords().length,
           logs.length
         );
         done();
@@ -48,9 +47,8 @@ describe('InMemoryLogRecordExporter', () => {
         logs.push({});
       }
       memoryExporter.export(logs, () => {
-        // @ts-expect-error
         assert.strictEqual(
-          memoryExporter._finishedLogRecords.length,
+          memoryExporter.getFinishedLogRecords().length,
           logs.length
         );
         memoryExporter.shutdown();
@@ -88,9 +86,8 @@ describe('InMemoryLogRecordExporter', () => {
         logs.push({});
       }
       memoryExporter.export(logs, () => {
-        // @ts-expect-error
         assert.strictEqual(
-          memoryExporter._finishedLogRecords.length,
+          memoryExporter.getFinishedLogRecords().length,
           logs.length
         );
         memoryExporter.reset();
