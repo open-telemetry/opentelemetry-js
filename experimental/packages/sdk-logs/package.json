@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.35.0",
+  "version": "0.35.1",
   "publishConfig": {
     "access": "public"
   },
