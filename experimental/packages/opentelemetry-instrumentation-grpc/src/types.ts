@@ -15,9 +15,6 @@
  */
 
 import { InstrumentationConfig } from '@opentelemetry/instrumentation';
-import { Span } from '@opentelemetry/api';
-import type * as grpcJsTypes from '@grpc/grpc-js';
-import type * as grpcTypes from 'grpc';
 
 export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
 
@@ -34,16 +31,3 @@ export interface GrpcInstrumentationConfig extends InstrumentationConfig {
     };
   };
 }
-
-export type metadataCaptureType = {
-  client: {
-    captureRequestMetadata: (
-      span: Span,
-      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
-    ) => void;
-    captureResponseMetadata: (
-      span: Span,
-      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
-    ) => void;
-  };
-};

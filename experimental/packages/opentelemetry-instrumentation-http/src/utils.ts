@@ -276,14 +276,6 @@ export const getRequestInfo = (
     origin = `${optionsParsed.protocol || 'http:'}//${hostname}`;
   }
 
-  const headers = optionsParsed.headers ?? {};
-  optionsParsed.headers = Object.keys(headers).reduce(
-    (normalizedHeader, key) => {
-      normalizedHeader[key.toLowerCase()] = headers[key];
-      return normalizedHeader;
-    },
-    {} as OutgoingHttpHeaders
-  );
   // some packages return method in lowercase..
   // ensure upperCase for consistency
   const method = optionsParsed.method
@@ -567,6 +559,10 @@ export const getIncomingRequestMetricAttributesOnResponse = (
     spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
   metricAttributes[SemanticAttributes.NET_HOST_PORT] =
     spanAttributes[SemanticAttributes.NET_HOST_PORT];
+  if (spanAttributes[SemanticAttributes.HTTP_ROUTE] !== undefined) {
+    metricAttributes[SemanticAttributes.HTTP_ROUTE] =
+      spanAttributes[SemanticAttributes.HTTP_ROUTE];
+  }
   return metricAttributes;
 };
 

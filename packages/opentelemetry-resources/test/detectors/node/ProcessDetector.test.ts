@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { processDetector, Resource } from '../../../src';
+import { processDetector, IResource } from '../../../src';
 import {
   assertResource,
   assertEmptyResource,
@@ -34,7 +34,7 @@ describeNode('processDetector() on Node.js', () => {
       .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
     sinon.stub(process, 'versions').value({ node: '1.4.1' });
 
-    const resource: Resource = await processDetector.detect();
+    const resource: IResource = await processDetector.detect();
     assertResource(resource, {
       pid: 1234,
       name: 'otProcess',
@@ -49,7 +49,7 @@ describeNode('processDetector() on Node.js', () => {
     sinon.stub(process, 'pid').value(1234);
     sinon.stub(process, 'title').value(undefined);
     sinon.stub(process, 'argv').value([]);
-    const resource: Resource = await processDetector.detect();
+    const resource: IResource = await processDetector.detect();
     assertEmptyResource(resource);
   });
 });

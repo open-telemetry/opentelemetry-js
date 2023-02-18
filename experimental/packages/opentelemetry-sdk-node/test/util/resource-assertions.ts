@@ -16,7 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { Resource } from '@opentelemetry/resources';
+import { IResource, Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
@@ -229,7 +229,7 @@ export const assertTelemetrySDKResource = (
  * @param validations validations for the resource attributes
  */
 export const assertServiceResource = (
-  resource: Resource,
+  resource: IResource,
   validations: {
     name: string;
     instanceId?: string;

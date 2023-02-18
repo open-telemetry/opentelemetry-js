@@ -29,7 +29,7 @@ import {
   Histogram,
 } from '@opentelemetry/sdk-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -340,7 +340,7 @@ export class PrometheusSerializer {
     return results;
   }
 
-  protected _serializeResource(resource: Resource): string {
+  protected _serializeResource(resource: IResource): string {
     const name = 'target_info';
     const help = `# HELP ${name} Target metadata`;
     const type = `# TYPE ${name} gauge`;

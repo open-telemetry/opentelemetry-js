@@ -8,11 +8,25 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat: add HTTP_ROUTE attribute to http incoming metrics if present [#3581](https://github.com/open-telemetry/opentelemetry-js/pull/3581) @hermogenes
+
 ### :bug: (Bug Fix)
+
+* fix(prometheus-exporter): add possibility to respond to errors returned by `server.listen()` [#3552](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @pichlermarc
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.35.1
+
+### :bug: (Bug Fix)
+
+* fix: remove JSON syntax error and regenerate tsconfig files [#3566](https://github.com/open-telemetry/opentelemetry-js/pull/3566) @Flarna
+  * Fixes an error where the generated JS files were not included in the esnext package due to a failure of the tsconfig generation
+* fix(sdk-node): register instrumentations early [#3502](https://github.com/open-telemetry/opentelemetry-js/pull/3502) @flarna
+* fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
+* fix(http) Remove outgoing headers normalization [#3557](https://github.com/open-telemetry/opentelemetry-js/pull/3557) @marcinjahn
 
 ## 0.35.0
 

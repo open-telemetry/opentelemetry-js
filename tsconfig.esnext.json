@@ -6,10 +6,16 @@
       "path": "api/tsconfig.esnext.json"
     },
     {
+      "path": "experimental/packages/api-events/tsconfig.esnext.json"
+    },
+    {
       "path": "experimental/packages/api-logs/tsconfig.esnext.json"
     },
     {
       "path": "experimental/packages/exporter-trace-otlp-http/tsconfig.esnext.json"
+    },
+    {
+      "path": "experimental/packages/exporter-trace-otlp-proto/tsconfig.esnext.json"
     },
     {
       "path": "experimental/packages/opentelemetry-browser-detector/tsconfig.esnext.json"
@@ -28,6 +34,9 @@
     },
     {
       "path": "experimental/packages/otlp-exporter-base/tsconfig.esnext.json"
+    },
+    {
+      "path": "experimental/packages/otlp-proto-exporter-base/tsconfig.esnext.json"
     },
     {
       "path": "experimental/packages/otlp-transformer/tsconfig.esnext.json"

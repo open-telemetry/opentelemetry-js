@@ -134,6 +134,8 @@ export class JaegerPropagator implements TextMapPropagator {
   }
 }
 
+const VALID_HEX_RE = /^[0-9a-f]{1,2}$/i;
+
 /**
  * @param {string} serializedString - a serialized span context.
  * @return {SpanContext} - returns a span context represented by the serializedString.
@@ -148,9 +150,7 @@ function deserializeSpanContext(serializedString: string): SpanContext | null {
 
   const traceId = _traceId.padStart(32, '0');
   const spanId = _spanId.padStart(16, '0');
-  const traceFlags = flags.match(/^[0-9a-f]{1,2}$/i)
-    ? parseInt(flags, 16) & 1
-    : 1;
+  const traceFlags = VALID_HEX_RE.test(flags) ? parseInt(flags, 16) & 1 : 1;
 
   return { traceId, spanId, isRemote: true, traceFlags };
 }

@@ -45,6 +45,7 @@ async function pbjs(files) {
   const outFile = path.join(generatedPath, 'root.js');
   const pbjsOptions = [
     '-t', 'static-module',
+    '-p', protosPath,
     '-w', 'commonjs',
     '--null-defaults',
     '-o', outFile,

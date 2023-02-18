@@ -20,6 +20,7 @@ import {
   SpanKind,
   TraceFlags,
   context,
+  Attributes,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -318,6 +319,31 @@ describe('Utility', () => {
         socket: {},
       } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
+    });
+  });
+
+  describe('getIncomingRequestMetricAttributesOnResponse()', () => {
+    it('should correctly add http_route if span has it', () => {
+      const spanAttributes: Attributes = {
+        [SemanticAttributes.HTTP_ROUTE]: '/user/:id',
+      };
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+
+      assert.deepStrictEqual(
+        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        '/user/:id'
+      );
+    });
+
+    it('should skip http_route if span does not have it', () => {
+      const spanAttributes: Attributes = {};
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+      assert.deepEqual(
+        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        undefined
+      );
     });
   });
   // Verify the key in the given attributes is set to the given value,
