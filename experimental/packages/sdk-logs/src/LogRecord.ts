@@ -43,7 +43,7 @@ export class LogRecord implements ReadableLogRecord {
   private _isEmitted = false;
 
   constructor(
-    private readonly config: LoggerConfig,
+    private readonly _config: LoggerConfig,
     logRecord: logsAPI.LogRecord
   ) {
     const {
@@ -64,8 +64,8 @@ export class LogRecord implements ReadableLogRecord {
     this.severityNumber = severityNumber;
     this.severityText = severityText;
     this.body = body;
-    this.resource = this.config.resource;
-    this.instrumentationScope = this.config.instrumentationScope;
+    this.resource = this._config.resource;
+    this.instrumentationScope = this._config.instrumentationScope;
     this.setAttributes(attributes);
   }
 
@@ -74,7 +74,7 @@ export class LogRecord implements ReadableLogRecord {
       return;
     }
     this._isEmitted = true;
-    this.config.activeProcessor.onEmit(this);
+    this._config.activeProcessor.onEmit(this);
   }
 
   public setAttribute(key: string, value?: AttributeValue) {
@@ -91,7 +91,7 @@ export class LogRecord implements ReadableLogRecord {
     }
     if (
       Object.keys(this.attributes).length >=
-        this.config.logRecordLimits.attributeCountLimit! &&
+        this._config.logRecordLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return;
@@ -113,7 +113,7 @@ export class LogRecord implements ReadableLogRecord {
   }
 
   private _truncateToSize(value: AttributeValue): AttributeValue {
-    const limit = this.config.logRecordLimits.attributeValueLengthLimit || 0;
+    const limit = this._config.logRecordLimits.attributeValueLengthLimit || 0;
     // Check limit
     if (limit <= 0) {
       // Negative values are invalid, so do not truncate

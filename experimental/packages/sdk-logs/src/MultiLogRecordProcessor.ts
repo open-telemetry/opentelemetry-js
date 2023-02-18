@@ -24,28 +24,25 @@ import type { ReadableLogRecord } from './export/ReadableLogRecord';
  * received events to a list of {@link LogRecordProcessor}s.
  */
 export class MultiLogRecordProcessor implements LogRecordProcessor {
-  private readonly _processors: LogRecordProcessor[] = [];
-
-  constructor(private readonly _forceFlushTimeoutMillis: number) {}
-
-  public addLogRecordProcessor(processor: LogRecordProcessor) {
-    this._processors.push(processor);
-  }
+  constructor(
+    public readonly processors: LogRecordProcessor[],
+    public readonly forceFlushTimeoutMillis: number
+  ) {}
 
   public async forceFlush(): Promise<void> {
-    const timeout = this._forceFlushTimeoutMillis;
+    const timeout = this.forceFlushTimeoutMillis;
     await Promise.all(
-      this._processors.map(processor =>
+      this.processors.map(processor =>
         callWithTimeout(processor.forceFlush(), timeout)
       )
     );
   }
 
   public onEmit(logRecord: ReadableLogRecord): void {
-    this._processors.forEach(processors => processors.onEmit(logRecord));
+    this.processors.forEach(processors => processors.onEmit(logRecord));
   }
 
   public async shutdown(): Promise<void> {
-    await Promise.all(this._processors.map(processor => processor.shutdown()));
+    await Promise.all(this.processors.map(processor => processor.shutdown()));
   }
 }

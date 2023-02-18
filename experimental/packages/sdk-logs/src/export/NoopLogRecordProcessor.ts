@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-import type * as logsAPI from '@opentelemetry/api-logs';
+import { LogRecordProcessor } from '../LogRecordProcessor';
+import { ReadableLogRecord } from './ReadableLogRecord';
 
-import type { LoggerConfig, LogRecordLimits } from './types';
-import { LogRecord } from './LogRecord';
-
-export class Logger implements logsAPI.Logger {
-  constructor(private readonly _config: LoggerConfig) {}
-
-  public emit(logRecord: logsAPI.LogRecord): void {
-    new LogRecord(this._config, logRecord).emit();
+export class NoopLogRecordProcessor implements LogRecordProcessor {
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
   }
 
-  public getLogRecordLimits(): LogRecordLimits {
-    return this._config.logRecordLimits;
+  onEmit(_logRecord: ReadableLogRecord): void {}
+
+  shutdown(): Promise<void> {
+    return Promise.resolve();
   }
 }

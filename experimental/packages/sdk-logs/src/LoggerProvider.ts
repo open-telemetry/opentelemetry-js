@@ -13,22 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { IResource, Resource } from '@opentelemetry/resources';
-import { merge } from '@opentelemetry/core';
+import { getEnv, merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig, LogRecordLimits } from './types';
 import type { LogRecordProcessor } from './LogRecordProcessor';
+import type { LogRecordExporter } from './export/LogRecordExporter';
 import { Logger } from './Logger';
 import { loadDefaultConfig } from './config';
 import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
+import { BatchLogRecordProcessor } from './platform/node/export/BatchLogRecordProcessor';
+import { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';
+
+export type EXPORTER_FACTORY = () => LogRecordExporter;
 
 export class LoggerProvider implements logsAPI.LoggerProvider {
+  protected static readonly _registeredExporters = new Map<
+    string,
+    EXPORTER_FACTORY
+  >();
+
+  public readonly resource: IResource;
+
   private readonly _loggers: Map<string, Logger> = new Map();
-  private readonly _resource: IResource;
   private readonly _logRecordLimits: LogRecordLimits;
-  private readonly _activeProcessor: MultiLogRecordProcessor;
+  private _activeProcessor: MultiLogRecordProcessor;
+  private readonly _registeredLogRecordProcessors: LogRecordProcessor[] = [];
+  private readonly _forceFlushTimeoutMillis;
 
   constructor(config: LoggerProviderConfig = {}) {
     const { resource, logRecordLimits, forceFlushTimeoutMillis } = merge(
@@ -36,11 +49,22 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       loadDefaultConfig(),
       config
     );
-    this._resource = Resource.default().merge(resource ?? Resource.empty());
-    this._activeProcessor = new MultiLogRecordProcessor(
-      forceFlushTimeoutMillis
-    );
+    this.resource = Resource.default().merge(resource ?? Resource.empty());
     this._logRecordLimits = logRecordLimits;
+    this._forceFlushTimeoutMillis = forceFlushTimeoutMillis;
+
+    const defaultExporter = this._buildExporterFromEnv();
+    if (defaultExporter !== undefined) {
+      this._activeProcessor = new MultiLogRecordProcessor(
+        [new BatchLogRecordProcessor(defaultExporter)],
+        forceFlushTimeoutMillis
+      );
+    } else {
+      this._activeProcessor = new MultiLogRecordProcessor(
+        [new NoopLogRecordProcessor()],
+        forceFlushTimeoutMillis
+      );
+    }
   }
 
   /**
@@ -57,7 +81,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       this._loggers.set(
         key,
         new Logger({
-          resource: this._resource,
+          resource: this.resource,
           logRecordLimits: this._logRecordLimits,
           activeProcessor: this._activeProcessor,
           instrumentationScope: { name, version, schemaUrl },
@@ -72,7 +96,23 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    * @param processor the new LogRecordProcessor to be added.
    */
   public addLogRecordProcessor(processor: LogRecordProcessor) {
-    this._activeProcessor.addLogRecordProcessor(processor);
+    if (this._registeredLogRecordProcessors.length === 0) {
+      // since we might have enabled by default a batchProcessor, we disable it
+      // before adding the new one
+      this._activeProcessor
+        .shutdown()
+        .catch(err =>
+          diag.error(
+            'Error while trying to shutdown current log record processor',
+            err
+          )
+        );
+    }
+    this._registeredLogRecordProcessors.push(processor);
+    this._activeProcessor = new MultiLogRecordProcessor(
+      this._registeredLogRecordProcessors,
+      this._forceFlushTimeoutMillis
+    );
   }
 
   /**
@@ -92,5 +132,33 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    */
   public shutdown(): Promise<void> {
     return this._activeProcessor.shutdown();
+  }
+
+  public getActiveLogRecordProcessor(): MultiLogRecordProcessor {
+    return this._activeProcessor;
+  }
+
+  public getActiveLoggers(): Map<string, Logger> {
+    return this._loggers;
+  }
+
+  protected _getLogRecordExporter(name: string): LogRecordExporter | undefined {
+    return (this.constructor as typeof LoggerProvider)._registeredExporters.get(
+      name
+    )?.();
+  }
+
+  protected _buildExporterFromEnv(): LogRecordExporter | undefined {
+    const exporterName = getEnv().OTEL_LOGS_EXPORTER;
+    if (exporterName === 'none' || exporterName === '') {
+      return;
+    }
+    const exporter = this._getLogRecordExporter(exporterName);
+    if (!exporter) {
+      diag.error(
+        `Exporter "${exporterName}" requested through environment variable is unavailable.`
+      );
+    }
+    return exporter;
   }
 }
