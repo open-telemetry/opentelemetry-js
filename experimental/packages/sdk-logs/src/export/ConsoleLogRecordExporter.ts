@@ -24,6 +24,8 @@ import type { LogRecordExporter } from './LogRecordExporter';
  * This is implementation of {@link LogRecordExporter} that prints LogRecords to the
  * console. This class can be used for diagnostic purposes.
  */
+
+/* eslint-disable no-console */
 export class ConsoleLogRecordExporter implements LogRecordExporter {
   /**
    * Export logs.
@@ -34,7 +36,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
     logs: ReadableLogRecord[],
     resultCallback: (result: ExportResult) => void
   ) {
-    this._sendLogRecords(logs).then(res => resultCallback(res));
+    this._sendLogRecords(logs, resultCallback);
   }
 
   /**
@@ -67,11 +69,12 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
    * @param done
    */
   private _sendLogRecords(
-    logRecords: ReadableLogRecord[]
-  ): Promise<ExportResult> {
+    logRecords: ReadableLogRecord[],
+    done?: (result: ExportResult) => void
+  ): void {
     for (const logRecord of logRecords) {
       console.dir(this._exportInfo(logRecord), { depth: 3 });
     }
-    return Promise.resolve({ code: ExportResultCode.SUCCESS });
+    done?.({ code: ExportResultCode.SUCCESS });
   }
 }

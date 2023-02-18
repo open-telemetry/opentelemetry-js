@@ -54,11 +54,11 @@ export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLo
     }
     this._visibilityChangeListener = () => {
       if (document.visibilityState === 'hidden') {
-        this.forceFlush();
+        void this.forceFlush();
       }
     };
     this._pageHideListener = () => {
-      this.forceFlush();
+      void this.forceFlush();
     };
     document.addEventListener(
       'visibilitychange',
