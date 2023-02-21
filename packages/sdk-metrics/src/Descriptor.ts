@@ -46,7 +46,8 @@ export interface Descriptor {
 export interface InstrumentDescriptor extends Descriptor {
   /**
    * The original instrument's type.
-   * @deprecated Any necessary information about a metric's properties is available in the data point.
+   * @deprecated Any necessary information about a metric's properties is available in the data point,
+   * see {@link MetricData.dataPointType}
    */
   readonly type: InstrumentType;
 }
