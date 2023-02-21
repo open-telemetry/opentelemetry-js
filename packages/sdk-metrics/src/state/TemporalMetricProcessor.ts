@@ -67,7 +67,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
    * Builds the {@link MetricData} streams to report against a specific MetricCollector.
    * @param collector The information of the MetricCollector.
    * @param collectors The registered collectors.
-   * @param descriptor The instrumentation descriptor that these metrics generated with.
+   * @param descriptor The metric descriptor that these metrics were generated with.
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param collectionTime The current collection timestamp.
    * @returns The {@link MetricData} points or `null`.

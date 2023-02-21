@@ -63,13 +63,7 @@ export interface MetricDescriptor extends Descriptor {
 }
 
 export function toExternal(descriptor: MetricDescriptor): InstrumentDescriptor {
-  return {
-    name: descriptor.name,
-    description: descriptor.description,
-    unit: descriptor.unit,
-    type: descriptor.type,
-    valueType: descriptor.valueType,
-  };
+  return descriptor;
 }
 
 export function createDescriptor(
@@ -79,7 +73,7 @@ export function createDescriptor(
 ): MetricDescriptor {
   return {
     name,
-    type: type,
+    type,
     description: options?.description ?? '',
     unit: options?.unit ?? '',
     valueType: options?.valueType ?? ValueType.DOUBLE,
