@@ -345,8 +345,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
         context.bind(context.active(), response);
         this._diag.debug('outgoingRequest on response()');
-        response.on('end', () => {
-          this._diag.debug('outgoingRequest on end()');
+        response.on('close', () => {
+          this._diag.debug('outgoingRequest on close()');
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
