@@ -18,7 +18,7 @@ import { HrTime } from '@opentelemetry/api';
 import { MetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
-import { createDescriptor, MetricDescriptor } from '../Descriptor';
+import { createMetricDescriptor, MetricDescriptor } from '../Descriptor';
 
 /**
  * Internal interface.
@@ -45,7 +45,7 @@ export abstract class MetricStorage {
   }
 
   updateDescription(description: string): void {
-    this._descriptor = createDescriptor(
+    this._descriptor = createMetricDescriptor(
       this._descriptor.name,
       this._descriptor.type,
       {

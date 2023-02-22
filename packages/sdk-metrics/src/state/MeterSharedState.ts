@@ -18,7 +18,10 @@ import { HrTime } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { MetricCollectOptions } from '../export/MetricProducer';
 import { ScopeMetrics } from '../export/MetricData';
-import { createDescriptorWithView, MetricDescriptor } from '../Descriptor';
+import {
+  createMetricDescriptorWithView,
+  MetricDescriptor,
+} from '../Descriptor';
 import { Meter } from '../Meter';
 import { isNotNullish, Maybe } from '../utils';
 import { AsyncMetricStorage } from './AsyncMetricStorage';
@@ -114,7 +117,7 @@ export class MeterSharedState {
       this._instrumentationScope
     );
     let storages = views.map(view => {
-      const viewDescriptor = createDescriptorWithView(view, descriptor);
+      const viewDescriptor = createMetricDescriptorWithView(view, descriptor);
       const compatibleStorage =
         this.metricStorageRegistry.findOrUpdateCompatibleStorage<R>(
           viewDescriptor

@@ -67,7 +67,7 @@ export function toExternal(descriptor: MetricDescriptor): InstrumentDescriptor {
   return descriptor;
 }
 
-export function createDescriptor(
+export function createMetricDescriptor(
   name: string,
   type: InstrumentType,
   options?: MetricOptions
@@ -81,7 +81,7 @@ export function createDescriptor(
   };
 }
 
-export function createDescriptorWithView(
+export function createMetricDescriptorWithView(
   view: View,
   instrument: MetricDescriptor
 ): MetricDescriptor {
