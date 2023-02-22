@@ -120,3 +120,20 @@ export function isExportRetryable(statusCode: number): boolean {
 
   return retryCodes.includes(statusCode);
 }
+
+export function parseRetryAfterToMills(retryAfter?: string | null): number {
+  if (retryAfter == null) {
+    return -1;
+  }
+  const seconds = Number.parseInt(retryAfter, 10);
+  if (Number.isInteger(seconds)) {
+    return seconds > 0 ? seconds * 1000 : -1;
+  }
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After#directives
+  const delay = new Date(retryAfter).getTime() - Date.now();
+
+  if (delay >= 0) {
+    return delay;
+  }
+  return 0;
+}

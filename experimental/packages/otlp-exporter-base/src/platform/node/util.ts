@@ -30,6 +30,7 @@ import {
   DEFAULT_EXPORT_BACKOFF_MULTIPLIER,
   DEFAULT_EXPORT_MAX_BACKOFF,
   isExportRetryable,
+  parseRetryAfterToMills,
 } from '../../util';
 
 /**
@@ -114,7 +115,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
             // retry after interval specified in Retry-After header
             if (res.headers['retry-after']) {
-              retryTime = retrieveThrottleTime(res.headers['retry-after']!);
+              retryTime = parseRetryAfterToMills(res.headers['retry-after']!);
             } else {
               // exponential backoff with jitter
               retryTime = Math.round(
@@ -223,26 +224,5 @@ export function configureCompression(
     return definedCompression === CompressionAlgorithm.GZIP
       ? CompressionAlgorithm.GZIP
       : CompressionAlgorithm.NONE;
-  }
-}
-
-function retrieveThrottleTime(retryAfter: string): number {
-  // it's a Date object - a string representing a date will return NaN when converted to a number
-  if (isNaN(Number(retryAfter))) {
-    const currentTime = new Date();
-    const retryAfterDate = new Date(retryAfter);
-    const secondsDiff = Math.ceil(
-      (retryAfterDate.getTime() - currentTime.getTime()) / 1000
-    );
-
-    // if throttle date is set to now, difference in seconds might be less than 0
-    if (secondsDiff <= 0) {
-      return 0;
-    } else {
-      return secondsDiff * 1000;
-    }
-    // it's an integer
-  } else {
-    return Number(retryAfter) * 1000;
   }
 }
