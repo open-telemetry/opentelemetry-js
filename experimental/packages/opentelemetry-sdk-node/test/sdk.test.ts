@@ -22,6 +22,7 @@ import {
   diag,
   DiagLogLevel,
   metrics,
+  DiagConsoleLogger,
 } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
@@ -68,6 +69,7 @@ describe('Node SDK', () => {
   let delegate: any;
 
   beforeEach(() => {
+    diag.disable();
     context.disable();
     trace.disable();
     propagation.disable();
@@ -76,6 +78,10 @@ describe('Node SDK', () => {
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+  });
+
+  afterEach(() => {
+    Sinon.restore();
   });
 
   describe('Basic Registration', () => {
@@ -106,6 +112,25 @@ describe('Node SDK', () => {
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should register a diag logger with OTEL_LOG_LEVEL', () => {
+      env.OTEL_LOG_LEVEL = 'ERROR';
+
+      const spy = Sinon.spy(diag, 'setLogger');
+      const sdk = new NodeSDK({
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(spy.callCount, 1);
+      assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
+      assert.deepStrictEqual(spy.args[0][1], {
+        logLevel: DiagLogLevel.ERROR,
+      });
+
+      delete env.OTEL_LOG_LEVEL;
     });
 
     it('should register a tracer provider if an exporter is provided', async () => {
