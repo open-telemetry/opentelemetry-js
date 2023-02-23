@@ -10,6 +10,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat: improve http span name [#3603](https://github.com/open-telemetry/opentelemetry-js/pull/3603) @Flarna
 * feat: add HTTP_ROUTE attribute to http incoming metrics if present [#3581](https://github.com/open-telemetry/opentelemetry-js/pull/3581) @hermogenes
+* feat(sdk-node): install diag logger with OTEL_LOG_LEVEL [#3627](https://github.com/open-telemetry/opentelemetry-js/pull/3627) @legendecas
 
 ### :bug: (Bug Fix)
 

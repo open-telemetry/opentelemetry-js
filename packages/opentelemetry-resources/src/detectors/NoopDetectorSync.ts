@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import type { Detector, DetectorSync } from './types';
+import { Resource } from '../Resource';
+import { DetectorSync } from '../types';
+import { IResource } from '../IResource';
 
-/**
- * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
- */
-export interface ResourceDetectionConfig {
-  detectors?: Array<Detector | DetectorSync>;
+export class NoopDetectorSync implements DetectorSync {
+  detect(): IResource {
+    return new Resource({});
+  }
 }
+
+export const noopDetectorSync = new NoopDetectorSync();

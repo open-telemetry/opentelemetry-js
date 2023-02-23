@@ -17,6 +17,7 @@
 import { diag } from '@opentelemetry/api';
 import {
   Detector,
+  IResource,
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
@@ -27,7 +28,7 @@ import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
  * BrowserDetector will be used to detect the resources related to browser.
  */
 class BrowserDetector implements Detector {
-  async detect(config?: ResourceDetectionConfig): Promise<Resource> {
+  async detect(config?: ResourceDetectionConfig): Promise<IResource> {
     const isBrowser = typeof navigator !== 'undefined';
     if (!isBrowser) {
       return Resource.empty();
