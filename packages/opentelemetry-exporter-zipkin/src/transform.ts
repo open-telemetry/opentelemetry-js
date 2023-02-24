@@ -18,6 +18,7 @@ import * as api from '@opentelemetry/api';
 import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
+import { IResource } from '@opentelemetry/resources';
 
 const ZIPKIN_SPAN_KIND_MAPPING = {
   [api.SpanKind.CLIENT]: zipkinTypes.SpanKind.CLIENT,
@@ -70,7 +71,8 @@ export function _toZipkinTags(
     droppedLinksCount,
   }: ReadableSpan,
   statusCodeTagName: string,
-  statusErrorTagName: string
+  statusErrorTagName: string,
+  resource: IResource
 ): zipkinTypes.Tags {
   const tags: { [key: string]: string } = {};
   for (const key of Object.keys(attributes)) {

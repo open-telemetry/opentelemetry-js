@@ -43,7 +43,7 @@ import {
   otperformance,
   sanitizeAttributes,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
@@ -65,7 +65,7 @@ export class Span implements APISpan, ReadableSpan {
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
-  readonly resource: Resource;
+  readonly resource: IResource;
   readonly instrumentationLibrary: InstrumentationLibrary;
 
   private _droppedAttributesCount: number = 0;
