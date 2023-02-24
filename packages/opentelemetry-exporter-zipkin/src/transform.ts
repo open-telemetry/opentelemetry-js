@@ -72,7 +72,6 @@ export function _toZipkinTags(
   }: ReadableSpan,
   statusCodeTagName: string,
   statusErrorTagName: string,
-  resource: IResource
 ): zipkinTypes.Tags {
   const tags: { [key: string]: string } = {};
   for (const key of Object.keys(attributes)) {
