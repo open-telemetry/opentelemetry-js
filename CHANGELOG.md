@@ -24,7 +24,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
-* fix(sdk-metrics): ix flaky LastValueAggregator test by using fake timer [#3587](https://github.com/open-telemetry/opentelemetry-js/pull/3587) @pichlermarc
+* fix(sdk-metrics): fix flaky LastValueAggregator test by using fake timer [#3587](https://github.com/open-telemetry/opentelemetry-js/pull/3587) @pichlermarc
+* chore: split test script into test/test:coverage [#3633](https://github.com/open-telemetry/opentelemetry-js/pull/3633) @pichlermarc
 
 ## 1.9.1
 
