@@ -70,7 +70,7 @@ export function _toZipkinTags(
     droppedLinksCount,
   }: ReadableSpan,
   statusCodeTagName: string,
-  statusErrorTagName: string,
+  statusErrorTagName: string
 ): zipkinTypes.Tags {
   const tags: { [key: string]: string } = {};
   for (const key of Object.keys(attributes)) {
