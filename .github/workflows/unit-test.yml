@@ -56,7 +56,13 @@ jobs:
           if [ "${{ matrix.node_version }}" = "18" ]; then
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
-          npm run test
+
+          # only collect coverage when needed
+          if [ "${{ matrix.node_version }}" = "14" ]; then
+            npm run test:coverage
+          else
+            npm run test
+          fi
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '14' }}

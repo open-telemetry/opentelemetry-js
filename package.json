@@ -14,6 +14,7 @@
     "protos:copy": "lerna run protos:copy",
     "version:update": "lerna run version:update",
     "test": "lerna run test",
+    "test:coverage": "lerna run test:coverage",
     "test:browser": "lerna run test:browser",
     "test:webworker": "lerna run test:webworker",
     "test:backcompat": "lerna run test:backcompat",
