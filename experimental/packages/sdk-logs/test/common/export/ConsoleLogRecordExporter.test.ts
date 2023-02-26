@@ -55,7 +55,6 @@ describe('ConsoleLogRecordExporter', () => {
         const consoleArgs = spyConsole.args[0];
         const consoleLogRecord = consoleArgs[0];
         const keys = Object.keys(consoleLogRecord).sort().join(',');
-        console.log('11111', keys);
 
         const expectedKeys = [
           'attributes',
