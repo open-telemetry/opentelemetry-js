@@ -105,6 +105,10 @@ export class LogRecord implements ReadableLogRecord {
     }
   }
 
+  get emitted(): boolean {
+    return this._isEmitted;
+  }
+
   private _isLogRecordEmitted(): boolean {
     if (this._isEmitted) {
       api.diag.warn('Can not execute the operation on emitted LogRecord');
