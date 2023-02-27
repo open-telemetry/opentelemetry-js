@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "cross-env NODE_OPTIONS='--max-old-space-size=8192' nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
