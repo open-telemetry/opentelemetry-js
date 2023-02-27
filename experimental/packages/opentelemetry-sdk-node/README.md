@@ -143,7 +143,21 @@ Configure the [service name](https://github.com/open-telemetry/opentelemetry-spe
 
 Disable the SDK by setting the `OTEL_SDK_DISABLED` environment variable to `true`.
 
-## Configure Trace Exporter from  Environment
+## Configure log level from the environment
+
+Set the log level by setting the `OTEL_LOG_LEVEL` environment variable to enums:
+
+- `NONE`,
+- `ERROR`,
+- `WARN`,
+- `INFO`,
+- `DEBUG`,
+- `VERBOSE`,
+- `ALL`.
+
+The default level is `INFO`.
+
+## Configure Trace Exporter from environment
 
 This is an alternative to programmatically configuring an exporter or span processor. This package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor.
 

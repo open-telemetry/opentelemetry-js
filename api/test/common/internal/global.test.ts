@@ -84,23 +84,22 @@ describe('Global Utils', () => {
     assert.notStrictEqual(manager, api1.context['_getContextManager']());
   });
 
-  it('should return the module NoOp implementation if the version is a mismatch', () => {
-    const newContextManager = new NoopContextManager();
-    api1.context.setGlobalContextManager(newContextManager);
+  it('should not register if the version is a mismatch', () => {
+    const logger1 = getMockLogger();
+    const logger2 = getMockLogger();
 
-    // ensure new context manager is returned
-    assert.strictEqual(api1.context['_getContextManager'](), newContextManager);
-
-    const globalInstance = getGlobal('context');
+    api1.diag.setLogger(logger1);
+    const globalInstance = getGlobal('diag');
     assert.ok(globalInstance);
     // @ts-expect-error we are modifying internals for testing purposes here
     _globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)].version = '0.0.1';
 
-    // ensure new context manager is not returned because version above is incompatible
-    assert.notStrictEqual(
-      api1.context['_getContextManager'](),
-      newContextManager
-    );
+    assert.equal(false, api1.diag.setLogger(logger2)); // won't happen
+
+    api1.diag.info('message');
+    sinon.assert.notCalled(logger2.error);
+    sinon.assert.notCalled(logger2.info);
+    sinon.assert.notCalled(logger2.warn);
   });
 
   it('should debug log registrations', () => {
