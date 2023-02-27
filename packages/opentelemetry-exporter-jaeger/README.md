@@ -3,7 +3,7 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**NOTE: Support for `@opentelemetry/exporter-jaeger` will end July 2023, please use any of the following packages instead:**
+**NOTE: Support for `@opentelemetry/exporter-jaeger` will end March 2024, please use any of the following packages instead:**
 
 - `@opentelemetry/exporter-trace-otlp-proto`
 - `@opentelemetry/exporter-trace-otlp-grpc`

@@ -32,7 +32,10 @@ import * as jaegerTypes from './types';
  *
  * @deprecated Jaeger supports the OpenTelemetry protocol natively
  * (see https://www.jaegertracing.io/docs/1.41/apis/#opentelemetry-protocol-stable).
- * Support for this exporter will end July 2023. Please migrate to any of the following packages:
+ * This exporter will not be required by the OpenTelemetry specification starting July 2023, and
+ * will not receive any security fixes past March 2024.
+ *
+ * Please migrate to any of the following packages:
  * - `@opentelemetry/exporter-trace-otlp-proto`
  * - `@opentelemetry/exporter-trace-otlp-grpc`
  * - `@opentelemetry/exporter-trace-otlp-http`
