@@ -64,6 +64,7 @@ jobs:
     runs-on: windows-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
+      NODE_OPTIONS: --max-old-space-size=8192
     steps:
       - name: Checkout
         uses: actions/checkout@v3
