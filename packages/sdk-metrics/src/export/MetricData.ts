@@ -16,7 +16,7 @@
 
 import { HrTime, MetricAttributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
 import { Histogram, ExponentialHistogram } from '../aggregator/types';
@@ -79,7 +79,7 @@ export interface ScopeMetrics {
 }
 
 export interface ResourceMetrics {
-  resource: Resource;
+  resource: IResource;
   scopeMetrics: ScopeMetrics[];
 }
 

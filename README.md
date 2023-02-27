@@ -84,9 +84,7 @@ const sdk = new opentelemetry.NodeSDK({
 
 // initialize the SDK and register with the OpenTelemetry API
 // this enables the API to record telemetry
-sdk.start()
-  .then(() => console.log('Tracing initialized'))
-  .catch((error) => console.log('Error initializing tracing', error));
+sdk.start();
 
 // gracefully shut down the SDK on process exit
 process.on('SIGTERM', () => {
@@ -276,6 +274,11 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
+
+### 0.35.x to 0.36.0
+
+- `@opentelemetry/sdk-node` changed `await start()` to now be synchronous
+- `@opentelemetry/sdk-node` changed `await detectResources()` to now be synchronous
 
 ### 0.28.x to 0.29.x
 
