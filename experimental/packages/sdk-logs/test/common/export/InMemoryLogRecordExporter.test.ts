@@ -1,4 +1,3 @@
-import { SimpleLogRecordProcessor } from './../../../src/export/SimpleLogRecordProcessor';
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -19,7 +18,11 @@ import * as assert from 'assert';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
-import { LoggerProvider, InMemoryLogRecordExporter } from '../../../src';
+import {
+  LoggerProvider,
+  InMemoryLogRecordExporter,
+  SimpleLogRecordProcessor,
+} from '../../../src';
 
 const setup = () => {
   const provider = new LoggerProvider();

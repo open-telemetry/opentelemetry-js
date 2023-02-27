@@ -1,4 +1,3 @@
-import { SimpleLogRecordProcessor } from './../../../src/export/SimpleLogRecordProcessor';
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -19,8 +18,13 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 
-import { LoggerProvider, ConsoleLogRecordExporter } from './../../../src';
+import {
+  LoggerProvider,
+  ConsoleLogRecordExporter,
+  SimpleLogRecordProcessor,
+} from './../../../src';
 
+/* eslint-disable no-console */
 describe('ConsoleLogRecordExporter', () => {
   let previousConsoleDir: typeof console.dir;
 

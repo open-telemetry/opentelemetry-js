@@ -1,4 +1,3 @@
-import { LogRecord } from './../../../src/LogRecord';
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -29,6 +28,7 @@ import {
   LogRecordExporter,
   NoopLogRecordProcessor,
   SimpleLogRecordProcessor,
+  LogRecord,
 } from './../../../src';
 import { MultiLogRecordProcessor } from '../../../src/MultiLogRecordProcessor';
 import { loadDefaultConfig } from '../../../src/config';
