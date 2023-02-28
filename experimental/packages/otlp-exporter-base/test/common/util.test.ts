@@ -21,6 +21,7 @@ import {
   parseHeaders,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
+  parseRetryAfterToMills,
 } from '../../src/util';
 
 describe('utils', () => {
@@ -116,4 +117,31 @@ describe('utils', () => {
       assert.strictEqual(finalUrl, url);
     });
   });
+});
+
+describe('parseRetryAfterToMills', () => {
+  // now: 2023-01-20T00:00:00.000Z
+  const tests = [
+    [null, -1],
+    // duration
+    ['-100', -1],
+    ['1000', 1000 * 1000],
+    // future timestamp
+    ['Fri, 20 Jan 2023 00:00:01 GMT', 1000],
+    // Past timestamp
+    ['Fri, 19 Jan 2023 23:59:59 GMT', 0],
+  ] as [string | null, number][];
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  for (const [value, expect] of tests) {
+    it(`test ${value}`, () => {
+      sinon.useFakeTimers({
+        now: new Date('2023-01-20T00:00:00.000Z'),
+      });
+      assert.strictEqual(parseRetryAfterToMills(value), expect);
+    });
+  }
 });
