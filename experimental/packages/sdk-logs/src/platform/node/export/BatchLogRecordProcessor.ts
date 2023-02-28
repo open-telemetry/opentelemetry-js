@@ -15,7 +15,7 @@
  */
 
 import type { BufferConfig } from '../../../types';
-import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessor';
+import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessorBase';
 
 export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   protected onShutdown(): void {}

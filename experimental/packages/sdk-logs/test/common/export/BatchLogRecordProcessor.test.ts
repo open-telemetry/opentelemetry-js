@@ -28,12 +28,12 @@ import {
   BufferConfig,
   LogRecordLimits,
   NoopLogRecordProcessor,
-  BatchLogRecordProcessorBase,
   LogRecord,
   InMemoryLogRecordExporter,
 } from '../../../src';
 import { loadDefaultConfig } from '../../../src/config';
 import { MultiLogRecordProcessor } from '../../../src/MultiLogRecordProcessor';
+import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onInit() {}

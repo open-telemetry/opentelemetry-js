@@ -16,7 +16,7 @@
 
 import type { LogRecordExporter } from './../../../export/LogRecordExporter';
 import type { BatchLogRecordProcessorBrowserConfig } from '../../../types';
-import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessor';
+import { BatchLogRecordProcessorBase } from '../../../export/BatchLogRecordProcessorBase';
 
 export class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BatchLogRecordProcessorBrowserConfig> {
   private _visibilityChangeListener?: () => void;

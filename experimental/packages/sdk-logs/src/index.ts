@@ -21,7 +21,6 @@ export * from './LogRecord';
 export * from './LogRecordProcessor';
 export * from './export/ReadableLogRecord';
 export * from './export/NoopLogRecordProcessor';
-export * from './export/BatchLogRecordProcessor';
 export * from './export/ConsoleLogRecordExporter';
 export * from './export/LogRecordExporter';
 export * from './export/SimpleLogRecordProcessor';

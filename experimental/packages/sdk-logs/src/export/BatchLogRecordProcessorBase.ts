@@ -28,7 +28,7 @@ import {
 import type { BufferConfig } from '../types';
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
-import type { LogRecordProcessor } from './../LogRecordProcessor';
+import type { LogRecordProcessor } from '../LogRecordProcessor';
 
 export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   implements LogRecordProcessor
