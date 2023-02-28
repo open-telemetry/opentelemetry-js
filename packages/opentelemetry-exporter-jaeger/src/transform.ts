@@ -120,6 +120,12 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
         fields.push({ key: attr, value: toTagValue(attrs[attr]) })
       );
     }
+    if (event.droppedAttributesCount) {
+      fields.push({
+        key: 'otel.event.dropped_attributes_count',
+        value: event.droppedAttributesCount,
+      });
+    }
     return { timestamp: hrTimeToMilliseconds(event.time), fields };
   });
   const spanLogs: ThriftLog[] = ThriftUtils.getThriftLogs(logs);

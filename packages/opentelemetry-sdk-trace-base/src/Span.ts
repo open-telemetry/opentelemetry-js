@@ -193,16 +193,12 @@ export class Span implements APISpan, ReadableSpan {
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
-    const attributeLimit = this._spanLimits.attributePerEventCountLimit;
-
-    const { droppedCount, result: cappedAttributes } =
-      this._truncateAttributesToCount(attributes, attributeLimit);
 
     this.events.push({
       name,
-      attributes: cappedAttributes,
+      attributes,
       time: this._getTime(timeStamp),
-      droppedAttributesCount: droppedCount,
+      droppedAttributesCount: 0,
     });
     return this;
   }
@@ -379,33 +375,5 @@ export class Span implements APISpan, ReadableSpan {
 
     // Other types, no need to apply value length limit
     return value;
-  }
-
-  private _truncateAttributesToCount(
-    value: Attributes,
-    limit?: number
-  ): { result: Attributes; droppedCount: number } {
-    if (limit === undefined)
-      return {
-        result: value,
-        droppedCount: 0,
-      };
-    const entries = Object.entries(value);
-    if (limit === 0) {
-      return {
-        result: {},
-        droppedCount: entries.length,
-      };
-    } else if (limit >= entries.length) {
-      return {
-        result: value,
-        droppedCount: 0,
-      };
-    } else {
-      return {
-        result: Object.fromEntries(entries.slice(limit)),
-        droppedCount: entries.length - limit,
-      };
-    }
   }
 }
