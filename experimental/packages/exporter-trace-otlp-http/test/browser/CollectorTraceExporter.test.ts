@@ -582,3 +582,123 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });
+
+describe('export with retry - real http request destroyed', () => {
+  let server: any;
+  let collectorTraceExporter: OTLPTraceExporter;
+  let collectorExporterConfig: OTLPExporterConfigBase;
+  let spans: ReadableSpan[];
+
+  beforeEach(() => {
+    server = sinon.fakeServer.create({
+      autoRespond: true,
+    });
+    collectorExporterConfig = {
+      timeoutMillis: 1500,
+    };
+  });
+
+  afterEach(() => {
+    server.restore();
+  });
+
+  describe('when "sendBeacon" is NOT available', () => {
+    beforeEach(() => {
+      (window.navigator as any).sendBeacon = false;
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+    });
+    it('should log the timeout request error message when retrying with exponential backoff with jitter', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      let retry = 0;
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          xhr.respond(503);
+        }
+      );
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
+        assert.strictEqual(retry, 1);
+        done();
+      });
+    }).timeout(3000);
+
+    it('should log the timeout request error message when retry-after header is set to 3 seconds', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      let retry = 0;
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          xhr.respond(503, { 'Retry-After': 3 });
+        }
+      );
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
+        assert.strictEqual(retry, 1);
+        done();
+      });
+    }).timeout(3000);
+    it('should log the timeout request error message when retry-after header is a date', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      let retry = 0;
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          const d = new Date();
+          d.setSeconds(d.getSeconds() + 1);
+          xhr.respond(503, { 'Retry-After': d });
+        }
+      );
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
+        assert.strictEqual(retry, 2);
+        done();
+      });
+    }).timeout(3000);
+    it('should log the timeout request error message when retry-after header is a date with long delay', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      let retry = 0;
+      server.respondWith(
+        'http://localhost:4318/v1/traces',
+        function (xhr: any) {
+          retry++;
+          const d = new Date();
+          d.setSeconds(d.getSeconds() + 120);
+          xhr.respond(503, { 'Retry-After': d });
+        }
+      );
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
+        assert.strictEqual(retry, 1);
+        done();
+      });
+    }).timeout(3000);
+  });
+});
