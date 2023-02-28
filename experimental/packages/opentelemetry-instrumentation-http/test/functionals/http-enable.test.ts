@@ -272,6 +272,13 @@ describe('HttpInstrumentation', () => {
           if (request.url?.includes('/ignored')) {
             provider.getTracer('test').startSpan('some-span').end();
           }
+          if (request.url?.includes('/setroute')) {
+            const rpcData = getRPCMetadata(context.active());
+            assert.ok(rpcData != null);
+            assert.strictEqual(rpcData.type, RPCType.HTTP);
+            assert.strictEqual(rpcData.route, undefined);
+            rpcData.route = 'TheRoute';
+          }
           response.end('Test Server Response');
         });
 
@@ -339,6 +346,20 @@ describe('HttpInstrumentation', () => {
         });
       });
 
+      it('should respect HTTP_ROUTE', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/setroute`
+        );
+        const span = memoryExporter.getFinishedSpans()[0];
+
+        assert.strictEqual(span.kind, SpanKind.SERVER);
+        assert.strictEqual(
+          span.attributes[SemanticAttributes.HTTP_ROUTE],
+          'TheRoute'
+        );
+        assert.strictEqual(span.name, 'GET TheRoute');
+      });
+
       const httpErrorCodes = [
         400, 401, 403, 404, 429, 501, 503, 504, 500, 505, 597,
       ];
@@ -404,7 +425,7 @@ describe('HttpInstrumentation', () => {
 
           assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
           assert.strictEqual(spans.length, 2);
-          assert.strictEqual(reqSpan.name, 'HTTP GET');
+          assert.strictEqual(reqSpan.name, 'GET');
           assert.strictEqual(
             localSpan.spanContext().traceId,
             reqSpan.spanContext().traceId
@@ -449,7 +470,7 @@ describe('HttpInstrumentation', () => {
 
               assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
               assert.strictEqual(spans.length, 2);
-              assert.strictEqual(reqSpan.name, 'HTTP GET');
+              assert.strictEqual(reqSpan.name, 'GET');
               assert.strictEqual(
                 localSpan.spanContext().traceId,
                 reqSpan.spanContext().traceId
@@ -474,7 +495,7 @@ describe('HttpInstrumentation', () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();
-            assert.strictEqual(spans[i].name, 'HTTP GET');
+            assert.strictEqual(spans[i].name, 'GET');
             assert.strictEqual(
               span.spanContext().traceId,
               spans[i].spanContext().traceId

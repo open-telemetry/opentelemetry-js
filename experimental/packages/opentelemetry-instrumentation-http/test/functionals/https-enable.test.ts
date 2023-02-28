@@ -356,7 +356,7 @@ describe('HttpsInstrumentation', () => {
 
           assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
           assert.strictEqual(spans.length, 2);
-          assert.strictEqual(reqSpan.name, 'HTTPS GET');
+          assert.strictEqual(reqSpan.name, 'GET');
           assert.strictEqual(
             localSpan.spanContext().traceId,
             reqSpan.spanContext().traceId
@@ -401,7 +401,7 @@ describe('HttpsInstrumentation', () => {
 
               assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
               assert.strictEqual(spans.length, 2);
-              assert.strictEqual(reqSpan.name, 'HTTPS GET');
+              assert.strictEqual(reqSpan.name, 'GET');
               assert.strictEqual(
                 localSpan.spanContext().traceId,
                 reqSpan.spanContext().traceId
@@ -426,7 +426,7 @@ describe('HttpsInstrumentation', () => {
           for (let i = 0; i < num; i++) {
             await httpsRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();
-            assert.strictEqual(spans[i].name, 'HTTPS GET');
+            assert.strictEqual(spans[i].name, 'GET');
             assert.strictEqual(
               span.spanContext().traceId,
               spans[i].spanContext().traceId
