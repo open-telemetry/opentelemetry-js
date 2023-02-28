@@ -47,7 +47,7 @@ describe('LoggerProvider', () => {
         assert.ok(provider instanceof LoggerProvider);
       });
 
-      it('should use noop span processor by default and no diag error', () => {
+      it('should use noop log record processor by default and no diag error', () => {
         const errorStub = sinon.spy(diag, 'error');
         const provider = new LoggerProvider();
         const processors = provider.getActiveLogRecordProcessor().processors;
@@ -136,7 +136,7 @@ describe('LoggerProvider', () => {
       });
 
       describe('when attribute value length limit is defined via env', () => {
-        it('should have span attribute value length limit as deafult of Infinity', () => {
+        it('should have attribute value length limit as default of Infinity', () => {
           envSource.OTEL_LOG_RECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
           const logger = new LoggerProvider().getLogger('default');
           const logRecordLimits = logger.getLogRecordLimits();
@@ -160,14 +160,14 @@ describe('LoggerProvider', () => {
       });
 
       describe('when attribute count limit is defined via env', () => {
-        it('should have span and general attribute count limits as defined in env', () => {
+        it('should have attribute count limits as defined in env', () => {
           envSource.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT = '35';
           const logger = new LoggerProvider().getLogger('default');
           const logRecordLimits = logger.getLogRecordLimits();
           assert.strictEqual(logRecordLimits.attributeCountLimit, 35);
           delete envSource.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT;
         });
-        it('should have span attribute count limit as default of 128', () => {
+        it('should have attribute count limit as default of 128', () => {
           envSource.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT = '128';
           const logger = new LoggerProvider().getLogger('default');
           const logRecordLimits = logger.getLogRecordLimits();
@@ -270,7 +270,7 @@ describe('LoggerProvider', () => {
         });
     });
 
-    it('should throw error when calling forceFlush on all registered span processors fails', done => {
+    it('should throw error when calling forceFlush on all registered processors fails', done => {
       sinon.restore();
 
       const forceFlushStub = sinon.stub(

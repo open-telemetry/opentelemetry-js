@@ -28,8 +28,8 @@ import { MultiLogRecordProcessor } from './../../src/MultiLogRecordProcessor';
 
 class TestProcessor implements LogRecordProcessor {
   logRecords: ReadableLogRecord[] = [];
-  onEmit(span: ReadableLogRecord): void {
-    this.logRecords.push(span);
+  onEmit(logRecord: ReadableLogRecord): void {
+    this.logRecords.push(logRecord);
   }
   shutdown(): Promise<void> {
     this.logRecords = [];

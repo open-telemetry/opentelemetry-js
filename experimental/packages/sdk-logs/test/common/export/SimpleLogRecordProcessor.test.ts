@@ -21,17 +21,15 @@ import {
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 
 import {
   InMemoryLogRecordExporter,
   LogRecordExporter,
-  NoopLogRecordProcessor,
   SimpleLogRecordProcessor,
   LogRecord,
+  LoggerProvider,
+  Logger,
 } from './../../../src';
-import { MultiLogRecordProcessor } from '../../../src/MultiLogRecordProcessor';
-import { loadDefaultConfig } from '../../../src/config';
 
 const setup = (exporter: LogRecordExporter) => {
   const processor = new SimpleLogRecordProcessor(exporter);
@@ -54,25 +52,18 @@ describe('SimpleLogRecordProcessor', () => {
       const { processor } = setup(exporter);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
 
-      const { forceFlushTimeoutMillis, logRecordLimits } = loadDefaultConfig();
-      const logRecord = new LogRecord(
+      const logger = new Logger(
         {
-          activeProcessor: new MultiLogRecordProcessor(
-            [new NoopLogRecordProcessor()],
-            forceFlushTimeoutMillis
-          ),
-          resource: Resource.default(),
-          logRecordLimits,
-          instrumentationScope: {
-            name: 'test name',
-            version: 'test version',
-            schemaUrl: 'test schema url',
-          },
+          name: 'test name',
+          version: 'test version',
+          schemaUrl: 'test schema url',
         },
-        {
-          body: 'body',
-        }
+        {},
+        new LoggerProvider()
       );
+      const logRecord = new LogRecord(logger, {
+        body: 'body',
+      });
       processor.onEmit(logRecord);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 1);
 
@@ -93,25 +84,18 @@ describe('SimpleLogRecordProcessor', () => {
       };
       const { processor } = setup(exporter);
 
-      const { forceFlushTimeoutMillis, logRecordLimits } = loadDefaultConfig();
-      const logRecord = new LogRecord(
+      const logger = new Logger(
         {
-          activeProcessor: new MultiLogRecordProcessor(
-            [new NoopLogRecordProcessor()],
-            forceFlushTimeoutMillis
-          ),
-          resource: Resource.default(),
-          logRecordLimits,
-          instrumentationScope: {
-            name: 'test name',
-            version: 'test version',
-            schemaUrl: 'test schema url',
-          },
+          name: 'test name',
+          version: 'test version',
+          schemaUrl: 'test schema url',
         },
-        {
-          body: 'body',
-        }
+        {},
+        new LoggerProvider()
       );
+      const logRecord = new LogRecord(logger, {
+        body: 'body',
+      });
       const errorHandlerSpy = sinon.spy();
       setGlobalErrorHandler(errorHandlerSpy);
       processor.onEmit(logRecord);

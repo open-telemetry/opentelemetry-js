@@ -18,46 +18,37 @@ import type { Attributes, AttributeValue } from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { Resource } from '@opentelemetry/resources';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 
 import {
   LogRecordLimits,
   LogRecordProcessor,
-  NoopLogRecordProcessor,
   LogRecord,
+  Logger,
   LoggerProvider,
 } from './../../src';
-import { loadDefaultConfig } from '../../src/config';
-import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 import { invalidAttributes, validAttributes } from './utils';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
 const setup = (limits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
-  const { forceFlushTimeoutMillis, logRecordLimits } = loadDefaultConfig();
-  const config = {
-    activeProcessor: new MultiLogRecordProcessor(
-      [new NoopLogRecordProcessor()],
-      forceFlushTimeoutMillis
-    ),
-    resource: Resource.default(),
-    logRecordLimits: {
-      attributeValueLengthLimit:
-        limits?.attributeValueLengthLimit ??
-        logRecordLimits.attributeValueLengthLimit,
-      attributeCountLimit:
-        limits?.attributeCountLimit ?? logRecordLimits.attributeCountLimit,
-    },
-    instrumentationScope: {
-      name: 'test name',
-      version: 'test version',
-      schemaUrl: 'test schema url',
-    },
+  const instrumentationScope = {
+    name: 'test name',
+    version: 'test version',
+    schemaUrl: 'test schema url',
   };
-  const logRecord = new LogRecord(config, data || {});
-  return { logRecord, config };
+  const resource = Resource.default();
+  const loggerProvider = new LoggerProvider({ resource });
+  const logger = new Logger(
+    instrumentationScope,
+    {
+      logRecordLimits: limits,
+    },
+    loggerProvider
+  );
+  const logRecord = new LogRecord(logger, data || {});
+  return { logger, logRecord, instrumentationScope, resource };
 };
 
 describe('LogRecord', () => {
@@ -85,7 +76,7 @@ describe('LogRecord', () => {
       );
     });
 
-    it('should return ReadableLogRecord', () => {
+    it('should return LogRecord', () => {
       const logRecordData: logsAPI.LogRecord = {
         timestamp: new Date().getTime(),
         severityNumber: logsAPI.SeverityNumber.DEBUG,
@@ -98,7 +89,10 @@ describe('LogRecord', () => {
         spanId: 'span id',
         traceFlags: 1,
       };
-      const { logRecord, config } = setup(undefined, logRecordData);
+      const { logRecord, resource, instrumentationScope } = setup(
+        undefined,
+        logRecordData
+      );
       assert.deepStrictEqual(
         logRecord.time,
         timeInputToHrTime(logRecordData.timestamp!)
@@ -113,14 +107,14 @@ describe('LogRecord', () => {
       assert.deepStrictEqual(logRecord.traceId, logRecordData.traceId);
       assert.deepStrictEqual(logRecord.spanId, logRecordData.spanId);
       assert.deepStrictEqual(logRecord.traceFlags, logRecordData.traceFlags);
-      assert.deepStrictEqual(logRecord.resource, config.resource);
+      assert.deepStrictEqual(logRecord.resource, resource);
       assert.deepStrictEqual(
         logRecord.instrumentationScope,
-        config.instrumentationScope
+        instrumentationScope
       );
     });
 
-    it('should return ReadableLogRecord with attributes', () => {
+    it('should return LogRecord with attributes', () => {
       const logRecordData: logsAPI.LogRecord = {
         timestamp: new Date().getTime(),
         severityNumber: logsAPI.SeverityNumber.DEBUG,
@@ -144,15 +138,6 @@ describe('LogRecord', () => {
       });
 
       logRecord.setAttributes({ attr2: 123, attr1: false });
-      assert.deepStrictEqual(logRecord.attributes, {
-        name: 'test name',
-        attr1: false,
-        attr2: 123,
-      });
-
-      logRecord.emit();
-      // shouldn't add new attribute
-      logRecord.setAttribute('attr3', 'value3');
       assert.deepStrictEqual(logRecord.attributes, {
         name: 'test name',
         attr1: false,
@@ -268,30 +253,6 @@ describe('LogRecord', () => {
       logRecord.setAttributes(validAttributes);
       logRecord.setAttributes(invalidAttributes as unknown as Attributes);
       assert.deepStrictEqual(logRecord.attributes, validAttributes);
-    });
-  });
-
-  describe('emit', () => {
-    it('should be emit', () => {
-      const { logRecord, config } = setup();
-      const callSpy = sinon.spy(config.activeProcessor, 'onEmit');
-      logRecord.emit();
-      assert.ok(callSpy.called);
-    });
-
-    it('should have emitted', () => {
-      const { logRecord } = setup();
-      assert.strictEqual(logRecord.emitted, false);
-      logRecord.emit();
-      assert.strictEqual(logRecord.emitted, true);
-    });
-
-    it('should be allow emit only once', () => {
-      const { logRecord, config } = setup();
-      const callSpy = sinon.spy(config.activeProcessor, 'onEmit');
-      logRecord.emit();
-      logRecord.emit();
-      assert.ok(callSpy.callCount === 1);
     });
   });
 

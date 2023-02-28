@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Resource } from '@opentelemetry/resources';
 import {
   ExportResultCode,
   getEnv,
@@ -27,12 +26,11 @@ import {
 import {
   BufferConfig,
   LogRecordLimits,
-  NoopLogRecordProcessor,
   LogRecord,
   InMemoryLogRecordExporter,
+  LoggerProvider,
+  Logger,
 } from '../../../src';
-import { loadDefaultConfig } from '../../../src/config';
-import { MultiLogRecordProcessor } from '../../../src/MultiLogRecordProcessor';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
@@ -41,30 +39,18 @@ class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> 
 }
 
 const createLogRecord = (limits?: LogRecordLimits): LogRecord => {
-  const { forceFlushTimeoutMillis, logRecordLimits } = loadDefaultConfig();
-
-  const logRecord = new LogRecord(
+  const logger = new Logger(
     {
-      activeProcessor: new MultiLogRecordProcessor(
-        [new NoopLogRecordProcessor()],
-        forceFlushTimeoutMillis
-      ),
-      resource: Resource.default(),
-      logRecordLimits: {
-        attributeValueLengthLimit:
-          limits?.attributeValueLengthLimit ??
-          logRecordLimits.attributeValueLengthLimit,
-        attributeCountLimit:
-          limits?.attributeCountLimit ?? logRecordLimits.attributeCountLimit,
-      },
-      instrumentationScope: {
-        name: 'test name',
-        version: 'test version',
-        schemaUrl: 'test schema url',
-      },
+      name: 'test name',
+      version: 'test version',
+      schemaUrl: 'test schema url',
     },
-    {}
+    {
+      logRecordLimits: limits,
+    },
+    new LoggerProvider()
   );
+  const logRecord = new LogRecord(logger, { body: 'body' });
   return logRecord;
 };
 

@@ -48,7 +48,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
 
   /**
    * converts logRecord info into more readable format
-   * @param span
+   * @param logRecord
    */
   private _exportInfo(logRecord: ReadableLogRecord) {
     return {

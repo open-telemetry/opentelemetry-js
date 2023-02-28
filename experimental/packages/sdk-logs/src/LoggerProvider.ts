@@ -18,11 +18,11 @@ import type * as logsAPI from '@opentelemetry/api-logs';
 import { IResource, Resource } from '@opentelemetry/resources';
 import { getEnv, merge } from '@opentelemetry/core';
 
-import type { LoggerProviderConfig, LogRecordLimits } from './types';
+import type { LoggerConfig } from './types';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { LogRecordExporter } from './export/LogRecordExporter';
 import { Logger } from './Logger';
-import { loadDefaultConfig } from './config';
+import { loadDefaultConfig, reconfigureLimits } from './config';
 import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 import { BatchLogRecordProcessor } from './platform/node/export/BatchLogRecordProcessor';
 import { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';
@@ -38,20 +38,22 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   public readonly resource: IResource;
 
   private readonly _loggers: Map<string, Logger> = new Map();
-  private readonly _logRecordLimits: LogRecordLimits;
   private _activeProcessor: MultiLogRecordProcessor;
   private readonly _registeredLogRecordProcessors: LogRecordProcessor[] = [];
-  private readonly _forceFlushTimeoutMillis;
+  private readonly _config: LoggerConfig;
 
-  constructor(config: LoggerProviderConfig = {}) {
-    const { resource, logRecordLimits, forceFlushTimeoutMillis } = merge(
-      {},
-      loadDefaultConfig(),
-      config
-    );
-    this.resource = Resource.default().merge(resource ?? Resource.empty());
-    this._logRecordLimits = logRecordLimits;
-    this._forceFlushTimeoutMillis = forceFlushTimeoutMillis;
+  constructor(config: LoggerConfig = {}) {
+    const {
+      resource = Resource.empty(),
+      logRecordLimits,
+      forceFlushTimeoutMillis,
+    } = merge({}, loadDefaultConfig(), reconfigureLimits(config));
+    this.resource = Resource.default().merge(resource);
+    this._config = {
+      logRecordLimits,
+      resource: this.resource,
+      forceFlushTimeoutMillis,
+    };
 
     const defaultExporter = this._buildExporterFromEnv();
     if (defaultExporter !== undefined) {
@@ -80,12 +82,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     if (!this._loggers.has(key)) {
       this._loggers.set(
         key,
-        new Logger({
-          resource: this.resource,
-          logRecordLimits: this._logRecordLimits,
-          activeProcessor: this._activeProcessor,
-          instrumentationScope: { name, version, schemaUrl },
-        })
+        new Logger({ name, version, schemaUrl }, this._config, this)
       );
     }
     return this._loggers.get(key)!;
@@ -111,7 +108,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     this._registeredLogRecordProcessors.push(processor);
     this._activeProcessor = new MultiLogRecordProcessor(
       this._registeredLogRecordProcessors,
-      this._forceFlushTimeoutMillis
+      this._config.forceFlushTimeoutMillis!
     );
   }
 

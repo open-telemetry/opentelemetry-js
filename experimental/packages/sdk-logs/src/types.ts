@@ -15,15 +15,13 @@
  */
 
 import type { IResource } from '@opentelemetry/resources';
-import type { InstrumentationScope } from '@opentelemetry/core';
-import type { LogRecordProcessor } from './LogRecordProcessor';
 
-export interface LoggerProviderConfig {
-  /** Resource associated with trace telemetry  */
-  resource?: IResource;
-
+export interface LoggerConfig {
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
+
+  /** Resource associated with trace telemetry  */
+  resource?: IResource;
 
   /**
    * How long the forceFlush can run before it is cancelled.
@@ -38,13 +36,6 @@ export interface LogRecordLimits {
 
   /** attributeCountLimit is number of attributes per LogRecord */
   attributeCountLimit?: number;
-}
-
-export interface LoggerConfig {
-  activeProcessor: LogRecordProcessor;
-  resource: IResource;
-  logRecordLimits: LogRecordLimits;
-  instrumentationScope: InstrumentationScope;
 }
 
 /** Interface configuration for a buffer. */

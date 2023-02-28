@@ -15,18 +15,39 @@
  */
 
 import type * as logsAPI from '@opentelemetry/api-logs';
+import type { IResource } from '@opentelemetry/resources';
+import type { InstrumentationScope } from '@opentelemetry/core';
 
 import type { LoggerConfig, LogRecordLimits } from './types';
 import { LogRecord } from './LogRecord';
+import { LoggerProvider } from './LoggerProvider';
+import { mergeConfig } from './config';
+import { LogRecordProcessor } from './LogRecordProcessor';
 
 export class Logger implements logsAPI.Logger {
-  constructor(private readonly _config: LoggerConfig) {}
+  public readonly resource: IResource;
+  private readonly _logRecordLimits: LogRecordLimits;
+
+  constructor(
+    public readonly instrumentationScope: InstrumentationScope,
+    config: LoggerConfig,
+    private _loggerProvider: LoggerProvider
+  ) {
+    const localConfig = mergeConfig(config);
+    this.resource = _loggerProvider.resource;
+    this._logRecordLimits = localConfig.logRecordLimits!;
+  }
 
   public emit(logRecord: logsAPI.LogRecord): void {
-    new LogRecord(this._config, logRecord).emit();
+    const logRecordInstance = new LogRecord(this, logRecord);
+    this.getActiveLogRecordProcessor().onEmit(logRecordInstance);
   }
 
   public getLogRecordLimits(): LogRecordLimits {
-    return this._config.logRecordLimits;
+    return this._logRecordLimits;
+  }
+
+  public getActiveLogRecordProcessor(): LogRecordProcessor {
+    return this._loggerProvider.getActiveLogRecordProcessor();
   }
 }

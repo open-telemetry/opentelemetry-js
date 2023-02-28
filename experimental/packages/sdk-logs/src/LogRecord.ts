@@ -23,10 +23,11 @@ import {
   timeInputToHrTime,
   isAttributeValue,
 } from '@opentelemetry/core';
-
 import type { IResource } from '@opentelemetry/resources';
+
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
-import type { LoggerConfig } from './types';
+import type { LogRecordLimits } from './types';
+import { Logger } from './Logger';
 
 export class LogRecord implements ReadableLogRecord {
   readonly time: api.HrTime;
@@ -39,13 +40,9 @@ export class LogRecord implements ReadableLogRecord {
   readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: Attributes = {};
+  private readonly _logRecordLimits: LogRecordLimits;
 
-  private _isEmitted = false;
-
-  constructor(
-    private readonly _config: LoggerConfig,
-    logRecord: logsAPI.LogRecord
-  ) {
+  constructor(logger: Logger, logRecord: logsAPI.LogRecord) {
     const {
       timestamp = hrTime(),
       severityNumber,
@@ -64,26 +61,14 @@ export class LogRecord implements ReadableLogRecord {
     this.severityNumber = severityNumber;
     this.severityText = severityText;
     this.body = body;
-    this.resource = this._config.resource;
-    this.instrumentationScope = this._config.instrumentationScope;
+    this.resource = logger.resource;
+    this.instrumentationScope = logger.instrumentationScope;
+    this._logRecordLimits = logger.getLogRecordLimits();
     this.setAttributes(attributes);
-  }
-
-  public emit(): void {
-    if (this._isEmitted) {
-      api.diag.warn('Can not emit an emitted LogRecord');
-      return;
-    }
-    this._isEmitted = true;
-    this._config.activeProcessor.onEmit(this);
   }
 
   public setAttribute(key: string, value?: AttributeValue) {
     if (value === null) {
-      return;
-    }
-    if (this._isEmitted) {
-      api.diag.warn('Can not setAttribute on emitted LogRecord');
       return;
     }
     if (key.length === 0) {
@@ -96,7 +81,7 @@ export class LogRecord implements ReadableLogRecord {
     }
     if (
       Object.keys(this.attributes).length >=
-        this._config.logRecordLimits.attributeCountLimit! &&
+        this._logRecordLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return;
@@ -110,12 +95,8 @@ export class LogRecord implements ReadableLogRecord {
     }
   }
 
-  get emitted(): boolean {
-    return this._isEmitted;
-  }
-
   private _truncateToSize(value: AttributeValue): AttributeValue {
-    const limit = this._config.logRecordLimits.attributeValueLengthLimit || 0;
+    const limit = this._logRecordLimits.attributeValueLengthLimit || 0;
     // Check limit
     if (limit <= 0) {
       // Negative values are invalid, so do not truncate

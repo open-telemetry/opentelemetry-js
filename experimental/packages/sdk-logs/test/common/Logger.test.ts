@@ -16,27 +16,21 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Resource } from '@opentelemetry/resources';
 
-import { Logger, LogRecord, NoopLogRecordProcessor } from '../../src';
+import { Logger, LoggerProvider } from '../../src';
 import { loadDefaultConfig } from '../../src/config';
-import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 
 const setup = () => {
   const { forceFlushTimeoutMillis, logRecordLimits } = loadDefaultConfig();
-  const logger = new Logger({
-    activeProcessor: new MultiLogRecordProcessor(
-      [new NoopLogRecordProcessor()],
-      forceFlushTimeoutMillis
-    ),
-    resource: Resource.default(),
-    logRecordLimits,
-    instrumentationScope: {
+  const logger = new Logger(
+    {
       name: 'test name',
       version: 'test version',
       schemaUrl: 'test schema url',
     },
-  });
+    { logRecordLimits },
+    new LoggerProvider({ forceFlushTimeoutMillis })
+  );
   return { logger };
 };
 
@@ -51,7 +45,7 @@ describe('Logger', () => {
   describe('emit', () => {
     it('should emit a logRecord instance', () => {
       const { logger } = setup();
-      const callSpy = sinon.spy(LogRecord.prototype, 'emit');
+      const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
       logger.emit({
         body: 'test log body',
       });
