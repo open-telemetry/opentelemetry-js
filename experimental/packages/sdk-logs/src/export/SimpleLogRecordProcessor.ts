@@ -23,7 +23,7 @@ import {
 
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
-import type { ReadableLogRecord } from './ReadableLogRecord';
+import type { LogRecord } from './../LogRecord';
 
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
@@ -32,7 +32,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
 
-  public onEmit(logRecord: ReadableLogRecord): void {
+  public onEmit(logRecord: LogRecord): void {
     if (this._shutdownOnce.isCalled) {
       return;
     }

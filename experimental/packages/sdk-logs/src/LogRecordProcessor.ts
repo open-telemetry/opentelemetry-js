@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ReadableLogRecord } from './export/ReadableLogRecord';
+import { LogRecord } from './LogRecord';
 
 export interface LogRecordProcessor {
   /**
@@ -23,10 +23,10 @@ export interface LogRecordProcessor {
   forceFlush(): Promise<void>;
 
   /**
-   * Called when a {@link ReadableLogRecord} is emit
+   * Called when a {@link LogRecord} is emit
    * @param logRecord the ReadableLogRecord that just emitted.
    */
-  onEmit(logRecord: ReadableLogRecord): void;
+  onEmit(logRecord: LogRecord): void;
 
   /**
    * Shuts down the processor. Called when SDK is shut down. This is an

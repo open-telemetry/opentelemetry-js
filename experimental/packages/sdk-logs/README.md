@@ -44,15 +44,8 @@ const logger = loggerProvider.getLogger('default');
 logsAPI.logs.setGlobalLoggerProvider(loggerProvider);
 const logger = logsAPI.logs.getLogger('default');
 
-// logging an event in an instrumentation library
-logger.emitEvent({
-  name: 'event-name',
-  body: 'this is a log event body',
-  attributes: { 'log.type': 'LogEvent' },
-});
-
-// logging an event in a log appender
-logger.emitLogRecord({
+// emit a log record
+logger.emit({
   severityNumber: SeverityNumber.INFO,
   severityText: 'INFO',
   body: 'this is a log record body',

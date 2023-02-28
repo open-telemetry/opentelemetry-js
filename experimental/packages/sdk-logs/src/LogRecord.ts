@@ -70,7 +70,8 @@ export class LogRecord implements ReadableLogRecord {
   }
 
   public emit(): void {
-    if (this._isLogRecordEmitted()) {
+    if (this._isEmitted) {
+      api.diag.warn('Can not emit an emitted LogRecord');
       return;
     }
     this._isEmitted = true;
@@ -78,7 +79,11 @@ export class LogRecord implements ReadableLogRecord {
   }
 
   public setAttribute(key: string, value?: AttributeValue) {
-    if (value === null || this._isLogRecordEmitted()) {
+    if (value === null) {
+      return;
+    }
+    if (this._isEmitted) {
+      api.diag.warn('Can not setAttribute on emitted LogRecord');
       return;
     }
     if (key.length === 0) {
@@ -106,13 +111,6 @@ export class LogRecord implements ReadableLogRecord {
   }
 
   get emitted(): boolean {
-    return this._isEmitted;
-  }
-
-  private _isLogRecordEmitted(): boolean {
-    if (this._isEmitted) {
-      api.diag.warn('Can not execute the operation on emitted LogRecord');
-    }
     return this._isEmitted;
   }
 
