@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator, metrics } from '@opentelemetry/api';
+import {
+  ContextManager,
+  TextMapPropagator,
+  metrics,
+  diag,
+  DiagConsoleLogger,
+} from '@opentelemetry/api';
 import {
   InstrumentationOption,
   registerInstrumentations,
@@ -80,10 +86,16 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    if (getEnv().OTEL_SDK_DISABLED) {
+    const env = getEnv();
+    if (env.OTEL_SDK_DISABLED) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
+    }
+    if (env.OTEL_LOG_LEVEL) {
+      diag.setLogger(new DiagConsoleLogger(), {
+        logLevel: env.OTEL_LOG_LEVEL,
+      });
     }
 
     this._resource = configuration.resource ?? new Resource({});

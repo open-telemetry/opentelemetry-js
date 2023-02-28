@@ -300,14 +300,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
    * Attach event listeners to a client request to end span and add span attributes.
    *
    * @param request The original request object.
-   * @param options The arguments to the original function.
    * @param span representing the current operation
    * @param startTime representing the start time of the request to calculate duration in Metric
    * @param metricAttributes metric attributes
    */
   private _traceClientRequest(
     request: http.ClientRequest,
-    hostname: string,
     span: Span,
     startTime: HrTime,
     metricAttributes: MetricAttributes
@@ -687,7 +685,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
           request,
-          hostname,
           span,
           startTime,
           metricAttributes

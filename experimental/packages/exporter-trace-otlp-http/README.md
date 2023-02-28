@@ -143,6 +143,21 @@ To override the default timeout duration, use the following options:
 
   > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
 
+## OTLP Exporter Retry
+
+OTLP requires that transient errors be handled with a [retry strategy](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#retry).
+
+This retry policy has the following configuration, which there is currently no way to customize.
+
++ `DEFAULT_EXPORT_MAX_ATTEMPTS`: The maximum number of attempts, including the original request. Defaults to 5.
++ `DEFAULT_EXPORT_INITIAL_BACKOFF`: The initial backoff duration. Defaults to 1 second.
++ `DEFAULT_EXPORT_MAX_BACKOFF`: The maximum backoff duration. Defaults to 5 seconds.
++ `DEFAULT_EXPORT_BACKOFF_MULTIPLIER`: The backoff multiplier. Defaults to 1.5.
+
+This retry policy first checks if the response has a `'Retry-After'` header. If there is a `'Retry-After'` header, the exporter will wait the amount specified in the `'Retry-After'` header before retrying. If there is no `'Retry-After'` header, the exporter will use an exponential backoff with jitter retry strategy.
+
+  > The exporter will retry exporting within the [exporter timeout configuration](#Exporter-Timeout-Configuration) time.
+
 ## Running opentelemetry-collector locally to see the traces
 
 1. Go to `examples/otlp-exporter-node`
