@@ -225,6 +225,9 @@ describe('sendWithHttp', () => {
       assert.strictEqual(requestData, data);
     });
 
+    // use fake timers to replace setTimeout in sendWithHttp function
+    const clock = sinon.useFakeTimers();
+
     sendWithHttp(
       exporter,
       data,
@@ -237,6 +240,8 @@ describe('sendWithHttp', () => {
         assert.fail(err);
       }
     );
+
+    clock.restore();
   });
 
   it('should send with gzip compression if configured to do so', () => {
@@ -255,6 +260,9 @@ describe('sendWithHttp', () => {
       assert(Buffer.concat(buffers).equals(compressedData));
     });
 
+    // use fake timers to replace setTimeout in sendWithHttp function
+    const clock = sinon.useFakeTimers();
+
     sendWithHttp(
       exporter,
       data,
@@ -267,6 +275,8 @@ describe('sendWithHttp', () => {
         assert.fail(err);
       }
     );
+
+    clock.restore();
   });
 
   it('should work with gzip compression enabled even after multiple requests', () => {
@@ -297,6 +307,9 @@ describe('sendWithHttp', () => {
         assert(Buffer.concat(buffers).equals(compressedData));
       });
 
+      // use fake timers to replace setTimeout in sendWithHttp function
+      const clock = sinon.useFakeTimers();
+
       sendWithHttp(
         exporter,
         data,
@@ -309,6 +322,8 @@ describe('sendWithHttp', () => {
           assert.fail(err);
         }
       );
+
+      clock.restore();
     }
   });
 });
