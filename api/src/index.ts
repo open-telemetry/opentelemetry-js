@@ -32,7 +32,7 @@ export {
   DiagLogger,
   DiagLogLevel,
   ComponentLoggerOptions,
-  LoggerOptions,
+  DiagLoggerOptions,
 } from './diag/types';
 export type { DiagAPI } from './api/diag';
 
