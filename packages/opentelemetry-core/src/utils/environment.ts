@@ -333,7 +333,7 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
  * populating default values.
  */
 export function getEnvWithoutDefaults(): ENVIRONMENT {
-  return typeof process !== 'undefined'
+  return typeof process !== 'undefined' && process && process.env
     ? parseEnvironment(process.env as RAW_ENVIRONMENT)
     : parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
 }
