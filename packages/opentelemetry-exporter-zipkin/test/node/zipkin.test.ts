@@ -163,6 +163,7 @@ describe('Zipkin Exporter - node', () => {
             name: 'my-event',
             time: [startTime + 10, 0],
             attributes: { key3: 'value3' },
+            droppedAttributesCount: 0,
           },
         ],
         resource: Resource.empty(),
@@ -382,6 +383,7 @@ describe('Zipkin Exporter - node', () => {
           name: 'my-event',
           time: [startTime + 10, 0],
           attributes: { key3: 'value3' },
+          droppedAttributesCount: 0,
         },
       ],
       resource: new Resource({
@@ -478,6 +480,7 @@ describe('Zipkin Exporter - node', () => {
           name: 'my-event',
           time: [startTime + 10, 0],
           attributes: { key3: 'value3' },
+          droppedAttributesCount: 0,
         },
       ],
       resource: Resource.empty(),

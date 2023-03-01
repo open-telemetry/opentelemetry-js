@@ -61,25 +61,45 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   events: [
-    { name: 'fetchStart', time: [1574120165, 429803070] },
+    {
+      name: 'fetchStart',
+      time: [1574120165, 429803070],
+      droppedAttributesCount: 0,
+    },
     {
       name: 'domainLookupStart',
       time: [1574120165, 429803070],
+      droppedAttributesCount: 0,
     },
-    { name: 'domainLookupEnd', time: [1574120165, 429803070] },
+    {
+      name: 'domainLookupEnd',
+      time: [1574120165, 429803070],
+      droppedAttributesCount: 0,
+    },
     {
       name: 'connectStart',
       time: [1574120165, 429803070],
+      droppedAttributesCount: 0,
     },
-    { name: 'connectEnd', time: [1574120165, 429803070] },
+    {
+      name: 'connectEnd',
+      time: [1574120165, 429803070],
+      droppedAttributesCount: 0,
+    },
     {
       name: 'requestStart',
       time: [1574120165, 435513070],
+      droppedAttributesCount: 0,
     },
-    { name: 'responseStart', time: [1574120165, 436923070] },
+    {
+      name: 'responseStart',
+      time: [1574120165, 436923070],
+      droppedAttributesCount: 0,
+    },
     {
       name: 'responseEnd',
       time: [1574120165, 438688070],
+      droppedAttributesCount: 0,
     },
   ],
   duration: [0, 8885000],
