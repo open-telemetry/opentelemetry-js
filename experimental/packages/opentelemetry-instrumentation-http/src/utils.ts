@@ -484,7 +484,7 @@ export const getIncomingRequestAttributes = (
   }
 
   if (requestUrl) {
-    attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.pathname || '/';
+    attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.path || '/';
   }
 
   if (userAgent !== undefined) {
