@@ -503,6 +503,23 @@ describe('Utility', () => {
       });
       assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
     });
+
+    it('should set http.target as path in http span attributes', () => {
+      const request = {
+        url: 'http://hostname/user/?q=val',
+        method: 'GET',
+      } as IncomingMessage;
+      request.headers = {
+        'user-agent': 'chrome',
+      };
+      const attributes = utils.getIncomingRequestAttributes(request, {
+        component: 'http',
+      });
+      assert.strictEqual(
+        attributes[SemanticAttributes.HTTP_TARGET],
+        '/user/?q=val'
+      );
+    });
   });
 
   describe('headers to span attributes capture', () => {
