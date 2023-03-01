@@ -58,6 +58,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { errorMonitor } from 'events';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
@@ -489,11 +490,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.getIncomingRequestMetricAttributes(spanAttributes);
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
-      const span = instrumentation._startHttpSpan(
-        `${component.toLocaleUpperCase()} ${method}`,
-        spanOptions,
-        ctx
-      );
+      const span = instrumentation._startHttpSpan(method, spanOptions, ctx);
       const rpcMetadata: RPCMetadata = {
         type: RPCType.HTTP,
         span,
@@ -622,7 +619,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         return original.apply(this, [optionsParsed, ...args]);
       }
 
-      const operationName = `${component.toUpperCase()} ${method}`;
       const { hostname, port } = utils.extractHostnameAndPort(optionsParsed);
 
       const attributes = utils.getOutgoingRequestAttributes(optionsParsed, {
@@ -643,7 +639,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         kind: SpanKind.CLIENT,
         attributes,
       };
-      const span = instrumentation._startHttpSpan(operationName, spanOptions);
+      const span = instrumentation._startHttpSpan(method, spanOptions);
 
       const parentContext = context.active();
       const requestContext = trace.setSpan(parentContext, span);
@@ -716,6 +712,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     span.setAttributes(attributes).setStatus({
       code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
+
+    const route = attributes[SemanticAttributes.HTTP_ROUTE];
+    if (route) {
+      span.updateName(`${request.method || 'GET'} ${route}`);
+    }
 
     if (this._getConfig().applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(

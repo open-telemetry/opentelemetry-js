@@ -180,7 +180,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTPS GET');
+      assert.strictEqual(span.name, 'GET');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
@@ -207,7 +207,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTPS GET');
+      assert.strictEqual(span.name, 'GET');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
@@ -237,7 +237,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTPS GET');
+      assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
       assert.strictEqual(
         span.attributes[SemanticAttributes.HTTP_FLAVOR],
@@ -268,7 +268,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTPS GET');
+      assert.strictEqual(span.name, 'GET');
       assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -296,7 +296,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTPS GET');
+      assert.strictEqual(span.name, 'GET');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
     for (const headers of [
@@ -351,7 +351,7 @@ describe('HttpsInstrumentation Integration tests', () => {
           const span = spans.find(s => s.kind === SpanKind.CLIENT);
           assert.ok(span);
           assert.strictEqual(spans.length, 2);
-          assert.strictEqual(span.name, 'HTTPS GET');
+          assert.strictEqual(span.name, 'GET');
           assert.ok(data);
           assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
           assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);

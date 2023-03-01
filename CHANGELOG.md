@@ -7,6 +7,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ## Unreleased
 
+* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
@@ -19,6 +21,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat(sdk-trace-base): add diagnostic logging when spans are dropped [#3610](https://github.com/open-telemetry/opentelemetry-js/pull/3610) @neoeinstein
 
 ### :bug: (Bug Fix)
+
+* fix(core): added falsy check to make otel core work with browser where webpack config had process as false or null [#3613](https://github.com/open-telemetry/opentelemetry-js/issues/3613) @ravindra-dyte
 
 ### :books: (Refine Doc)
 
