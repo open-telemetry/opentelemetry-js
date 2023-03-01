@@ -147,7 +147,7 @@ export class Span implements APISpan, ReadableSpan {
         this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
-      this._droppedAttributesCount += 1;
+      this._droppedAttributesCount++;
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
