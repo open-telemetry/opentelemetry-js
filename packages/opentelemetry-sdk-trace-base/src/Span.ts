@@ -68,7 +68,7 @@ export class Span implements APISpan, ReadableSpan {
   readonly resource: IResource;
   readonly instrumentationLibrary: InstrumentationLibrary;
 
-  private _droppedAttributesCount: number = 0;
+  private _droppedAttributesCount = 0;
   private _droppedEventsCount: number = 0;
   private _droppedLinksCount: number = 0;
 
