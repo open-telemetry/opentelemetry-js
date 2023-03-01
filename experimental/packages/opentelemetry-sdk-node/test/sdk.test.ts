@@ -695,7 +695,6 @@ describe('Node SDK', () => {
   });
 
   describe('configure IdGenerator', async () => {
-
     class CustomIdGenerator implements IdGenerator {
       generateTraceId(): string {
         return 'constant-test-trace-id';
@@ -710,7 +709,7 @@ describe('Node SDK', () => {
       const spanProcessor = new SimpleSpanProcessor(new ConsoleSpanExporter());
       const sdk = new NodeSDK({
         idGenerator,
-        spanProcessor
+        spanProcessor,
       });
       sdk.start();
 
@@ -719,8 +718,8 @@ describe('Node SDK', () => {
       });
       span.end();
 
-      assert.strictEqual(span.spanContext().spanId, 'constant-test-span-id')
-      assert.strictEqual(span.spanContext().traceId, 'constant-test-trace-id')
+      assert.strictEqual(span.spanContext().spanId, 'constant-test-span-id');
+      assert.strictEqual(span.spanContext().traceId, 'constant-test-trace-id');
     });
   });
 });

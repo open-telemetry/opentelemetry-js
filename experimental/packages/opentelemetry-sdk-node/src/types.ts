@@ -24,7 +24,7 @@ import {
   SpanExporter,
   SpanLimits,
   SpanProcessor,
-  IdGenerator
+  IdGenerator,
 } from '@opentelemetry/sdk-trace-base';
 
 export interface NodeSDKConfiguration {
@@ -42,5 +42,5 @@ export interface NodeSDKConfiguration {
   spanProcessor: SpanProcessor;
   traceExporter: SpanExporter;
   spanLimits: SpanLimits;
-  idGenerator: IdGenerator
+  idGenerator: IdGenerator;
 }
