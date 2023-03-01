@@ -25,6 +25,7 @@ import {
 } from './../../src';
 import { loadDefaultConfig } from '../../src/config';
 import { MultiLogRecordProcessor } from './../../src/MultiLogRecordProcessor';
+import { assertRejects } from '../test-utils';
 
 class TestProcessor implements LogRecordProcessor {
   logRecords: ReadableLogRecord[] = [];
@@ -176,7 +177,7 @@ describe('MultiLogRecordProcessor', () => {
       const res = multiProcessor.forceFlush();
       clock.tick(forceFlushTimeoutMillis + 1000);
       clock.restore();
-      await assert.rejects(res, /Operation timed out/);
+      await assertRejects(res, /Operation timed out/);
     });
   });
 
