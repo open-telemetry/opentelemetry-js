@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### :bug: (Bug Fix)
 
 * fix(metrics): export `MetricsAPI` type [#3535](https://github.com/open-telemetry/opentelemetry-js/pull/3535)
+* fix(api): rename `LoggerOptions` to `DiagLoggerOptions` [#3641](https://github.com/open-telemetry/opentelemetry-js/pull/3641)
 
 ## 1.4.0
 
