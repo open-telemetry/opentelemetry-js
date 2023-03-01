@@ -15,7 +15,6 @@
  */
 
 import {
-  Attributes,
   Context,
   diag,
   Exception,
@@ -176,13 +175,13 @@ export class Span implements APISpan, ReadableSpan {
     if (this._isSpanEnded()) return this;
     if (this._spanLimits.eventCountLimit === 0) {
       diag.warn('No events allowed.');
-      this._droppedEventsCount += 1;
+      this._droppedEventsCount++;
       return this;
     }
     if (this.events.length >= this._spanLimits.eventCountLimit!) {
       diag.warn('Dropping extra events.');
       this.events.shift();
-      this._droppedEventsCount += 1;
+      this._droppedEventsCount++;
     }
 
     if (isTimeInput(attributesOrStartTime)) {

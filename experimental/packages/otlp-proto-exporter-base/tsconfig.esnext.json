@@ -6,7 +6,10 @@
     "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
-  "include": ["src/**/*.ts", "src/generated/*.js"],
+  "include": [
+    "src/**/*.ts",
+    "src/generated/*.js"
+  ],
   "references": [
     {
       "path": "../../../api"
