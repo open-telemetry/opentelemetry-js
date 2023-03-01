@@ -504,7 +504,7 @@ describe('Utility', () => {
       assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
     });
 
-    it('should set http.target as full path in http span attributes', () => {
+    it('should set http.target as path in http span attributes', () => {
       const request = {
         url: 'http://hostname/user/?q=val',
         method: 'GET',
