@@ -27,11 +27,16 @@ describeNode('hostDetector() on Node.js', () => {
 
   it('should return resource information about the host', async () => {
     const os = require('os');
+    const mid = require('../../../src/platform/node/machine-id/getMachineId');
+
+    const expectedHostId = 'f2c668b579780554f70f72a063dc0864';
 
     sinon.stub(os, 'arch').returns('x64');
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
+    sinon.stub(mid, 'getMachineId').returns(Promise.resolve(expectedHostId));
 
     const resource: IResource = await hostDetector.detect();
+    await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.HOST_NAME],
@@ -40,6 +45,10 @@ describeNode('hostDetector() on Node.js', () => {
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.HOST_ARCH],
       'amd64'
+    );
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.HOST_ID],
+      expectedHostId
     );
   });
 
@@ -53,6 +62,31 @@ describeNode('hostDetector() on Node.js', () => {
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.HOST_ARCH],
       'some-unknown-arch'
+    );
+  });
+
+  it('should handle missing machine id', async () => {
+    const os = require('os');
+    const mid = require('../../../src/platform/node/machine-id/getMachineId');
+
+    sinon.stub(os, 'arch').returns('x64');
+    sinon.stub(os, 'hostname').returns('opentelemetry-test');
+    sinon.stub(mid, 'getMachineId').returns(Promise.resolve(''));
+
+    const resource: IResource = await hostDetector.detect();
+    await resource.waitForAsyncAttributes?.();
+
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.HOST_NAME],
+      'opentelemetry-test'
+    );
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.HOST_ARCH],
+      'amd64'
+    );
+    assert.strictEqual(
+      false,
+      SemanticResourceAttributes.HOST_ID in resource.attributes
     );
   });
 });
