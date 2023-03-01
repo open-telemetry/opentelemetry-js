@@ -462,6 +462,40 @@ describe('BatchSpanProcessorBase', () => {
         }
         assert.equal(processor['_finishedSpans'].length, 6);
       });
+      it('should count and report dropped spans', done => {
+        const debugStub = sinon.spy(diag, 'debug');
+        const warnStub = sinon.spy(diag, 'warn');
+        const span = createSampledSpan('test');
+        for (let i = 0, j = 6; i < j; i++) {
+          processor.onStart(span, ROOT_CONTEXT);
+          processor.onEnd(span);
+        }
+        assert.equal(processor['_finishedSpans'].length, 6);
+        assert.equal(processor['_droppedSpansCount'], 0);
+        sinon.assert.notCalled(debugStub);
+
+        processor.onStart(span, ROOT_CONTEXT);
+        processor.onEnd(span);
+
+        assert.equal(processor['_finishedSpans'].length, 6);
+        assert.equal(processor['_droppedSpansCount'], 1);
+        sinon.assert.calledOnce(debugStub);
+
+        processor.forceFlush().then(() => {
+          processor.onStart(span, ROOT_CONTEXT);
+          processor.onEnd(span);
+
+          assert.equal(processor['_finishedSpans'].length, 1);
+          assert.equal(processor['_droppedSpansCount'], 0);
+
+          sinon.assert.calledOnceWithExactly(
+            warnStub,
+            'Dropped 1 spans because maxQueueSize reached'
+          );
+
+          done();
+        });
+      });
     });
   });
 
