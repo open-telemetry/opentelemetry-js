@@ -20,6 +20,7 @@ import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
 import { arch, hostname } from 'os';
 import { normalizeArch } from './utils';
+import { getMachineId } from './machine-id/getMachineId';
 
 /**
  * HostDetectorSync detects the resources related to the host current process is
@@ -31,7 +32,18 @@ class HostDetectorSync implements DetectorSync {
       [SemanticResourceAttributes.HOST_NAME]: hostname(),
       [SemanticResourceAttributes.HOST_ARCH]: normalizeArch(arch()),
     };
-    return new Resource(attributes);
+
+    return new Resource(attributes, this._getAsyncAttributes());
+  }
+
+  private _getAsyncAttributes(): Promise<ResourceAttributes> {
+    return getMachineId().then(machineId => {
+      const attributes: ResourceAttributes = {};
+      if (machineId) {
+        attributes[SemanticResourceAttributes.HOST_ID] = machineId;
+      }
+      return attributes;
+    });
   }
 }
 
