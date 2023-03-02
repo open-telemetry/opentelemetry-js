@@ -20,11 +20,17 @@ import { SpanExporter } from '../../../src';
 import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
 import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExporter';
 
+/**
+ * VisibilityState has been removed from TypeScript 4.6.0+
+ * So just defining a simple replacement
+ */
+type WebVisibilityState = 'visible' | 'hidden';
+
 const describeDocument =
   typeof document === 'object' ? describe : describe.skip;
 
 describeDocument('BatchSpanProcessor - web main context', () => {
-  let visibilityState: VisibilityState = 'visible';
+  let visibilityState: WebVisibilityState = 'visible';
   let exporter: SpanExporter;
   let processor: BatchSpanProcessor;
   let forceFlushSpy: sinon.SinonStub;

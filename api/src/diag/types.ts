@@ -97,7 +97,7 @@ export interface ComponentLoggerOptions {
   namespace: string;
 }
 
-export interface LoggerOptions {
+export interface DiagLoggerOptions {
   /**
    * The {@link DiagLogLevel} used to filter logs sent to the logger.
    *
@@ -117,10 +117,10 @@ export interface DiagLoggerApi {
    * If a global diag logger is already set, this will override it.
    *
    * @param logger - The {@link DiagLogger} instance to set as the default logger.
-   * @param options - A {@link LoggerOptions} object. If not provided, default values will be set.
+   * @param options - A {@link DiagLoggerOptions} object. If not provided, default values will be set.
    * @returns `true` if the logger was successfully registered, else `false`
    */
-  setLogger(logger: DiagLogger, options?: LoggerOptions): boolean;
+  setLogger(logger: DiagLogger, options?: DiagLoggerOptions): boolean;
 
   /**
    *
