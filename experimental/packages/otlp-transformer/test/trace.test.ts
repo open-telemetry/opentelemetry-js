@@ -150,7 +150,6 @@ describe('Trace', () => {
             attributes: {
               'event-attribute': 'some string value',
             },
-            droppedAttributesCount: 0,
           },
         ],
         instrumentationLibrary: {

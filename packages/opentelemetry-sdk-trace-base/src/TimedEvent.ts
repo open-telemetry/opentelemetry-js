@@ -27,5 +27,5 @@ export interface TimedEvent {
   /** The attributes of the event. */
   attributes?: SpanAttributes;
   /** Count of attributes of the event that were dropped due to collection limits */
-  droppedAttributesCount: number;
+  droppedAttributesCount?: number;
 }
