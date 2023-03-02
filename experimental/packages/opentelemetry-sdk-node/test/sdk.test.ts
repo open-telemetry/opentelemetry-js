@@ -23,7 +23,6 @@ import {
   DiagLogLevel,
   metrics,
   DiagConsoleLogger,
-  SpanKind,
 } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
