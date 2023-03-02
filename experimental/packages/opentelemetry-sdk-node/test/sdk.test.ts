@@ -713,9 +713,7 @@ describe('Node SDK', () => {
       });
       sdk.start();
 
-      const span = trace.getTracer('test').startSpan('testName', {
-        kind: SpanKind.INTERNAL,
-      });
+      const span = trace.getTracer('test').startSpan('testName');
       span.end();
 
       assert.strictEqual(span.spanContext().spanId, 'constant-test-span-id');
