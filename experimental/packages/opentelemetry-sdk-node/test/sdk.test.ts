@@ -45,6 +45,7 @@ import {
   SimpleSpanProcessor,
   BatchSpanProcessor,
   NoopSpanProcessor,
+  IdGenerator,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as semver from 'semver';
@@ -689,6 +690,33 @@ describe('Node SDK', () => {
 
         assert.deepStrictEqual(resource, Resource.empty());
       });
+    });
+  });
+
+  describe('configure IdGenerator', async () => {
+    class CustomIdGenerator implements IdGenerator {
+      generateTraceId(): string {
+        return 'constant-test-trace-id';
+      }
+      generateSpanId(): string {
+        return 'constant-test-span-id';
+      }
+    }
+
+    it('should configure IdGenerator via config', async () => {
+      const idGenerator = new CustomIdGenerator();
+      const spanProcessor = new SimpleSpanProcessor(new ConsoleSpanExporter());
+      const sdk = new NodeSDK({
+        idGenerator,
+        spanProcessor,
+      });
+      sdk.start();
+
+      const span = trace.getTracer('test').startSpan('testName');
+      span.end();
+
+      assert.strictEqual(span.spanContext().spanId, 'constant-test-span-id');
+      assert.strictEqual(span.spanContext().traceId, 'constant-test-trace-id');
     });
   });
 });
