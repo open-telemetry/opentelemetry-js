@@ -19,6 +19,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(prometheus-exporter): add possibility to respond to errors returned by `server.listen()` [#3552](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @pichlermarc
+  fix(sdk-node): update instrumentations once MeterProvider is initialized [#3624](https://github.com/open-telemetry/opentelemetry-js/pull/3624) @pichlermarc
 
 ### :books: (Refine Doc)
 

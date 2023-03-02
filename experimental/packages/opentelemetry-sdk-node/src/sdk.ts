@@ -48,6 +48,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv } from '@opentelemetry/core';
+import { parseInstrumentationOptions } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -61,6 +62,7 @@ export type MeterProviderConfig = {
    */
   views?: View[];
 };
+
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -275,6 +277,15 @@ export class NodeSDK {
       this._meterProvider = meterProvider;
 
       metrics.setGlobalMeterProvider(meterProvider);
+
+      // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
+      // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
+      // This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
+      for (const instrumentation of parseInstrumentationOptions(
+        this._instrumentations
+      )) {
+        instrumentation.setMeterProvider(metrics.getMeterProvider());
+      }
     }
   }
 
