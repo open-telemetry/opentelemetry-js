@@ -463,6 +463,69 @@ describe('MeterProvider', () => {
         }
       );
     });
+
+    it('with instrument unit should apply view to only the selected instrument unit', async () => {
+      // Add view that renames 'test-counter-ms' and 'test-counter-s' to 'renamed-instrument' on 'meter1'
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        views: [
+          new View({
+            name: 'renamed-instrument',
+            instrumentName: 'test-counter-ms',
+            meterName: 'meter1',
+          }),
+          new View({
+            name: 'renamed-instrument',
+            instrumentName: 'test-counter-s',
+            meterName: 'meter1',
+          }),
+        ],
+      });
+
+      const reader = new TestMetricReader();
+      meterProvider.addMetricReader(reader);
+
+      // Create meter and counters, with different units.
+      const meter = meterProvider.getMeter('meter1', 'v1.0.0');
+      meter.createCounter('test-counter-ms', { unit: 'ms' });
+      meter.createCounter('test-counter-s', { unit: 's' });
+
+      // Perform collection.
+      const { resourceMetrics, errors } = await reader.collect();
+
+      assert.strictEqual(errors.length, 0);
+      // Results came only from one Meter
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+
+      // InstrumentationScope matches the only created Meter.
+      assertScopeMetrics(resourceMetrics.scopeMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0',
+      });
+
+      // Two metrics are collected ('renamed-instrument'-ms and 'renamed-instrument'-s)
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
+
+      // Both 'renamed-instrument' are still exported with their units.
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[0],
+        DataPointType.SUM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.COUNTER,
+          unit: 'ms',
+        }
+      );
+      assertMetricData(
+        resourceMetrics.scopeMetrics[0].metrics[1],
+        DataPointType.SUM,
+        {
+          name: 'renamed-instrument',
+          type: InstrumentType.COUNTER,
+          unit: 's',
+        }
+      );
+    });
   });
 
   describe('shutdown', () => {
