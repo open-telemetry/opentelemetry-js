@@ -9,8 +9,7 @@ function makeRequest() {
   // span corresponds to outgoing requests. Here, we have manually created
   // the span, which is created to track work that happens outside of the
   // request lifecycle entirely.
-  const span = tracer.startSpan('makeRequest');
-  api.context.with(api.trace.setSpan(api.context.active(), span), () => {
+  tracer.startActiveSpan('makeRequest', (span) => {
     http.get({
       host: 'localhost',
       port: 8080,
