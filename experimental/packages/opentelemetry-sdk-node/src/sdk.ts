@@ -117,6 +117,9 @@ export class NodeSDK {
       if (configuration.spanLimits) {
         tracerProviderConfig.spanLimits = configuration.spanLimits;
       }
+      if (configuration.idGenerator) {
+        tracerProviderConfig.idGenerator = configuration.idGenerator;
+      }
 
       const spanProcessor =
         configuration.spanProcessor ??
