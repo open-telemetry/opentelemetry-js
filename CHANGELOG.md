@@ -27,6 +27,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :books: (Refine Doc)
 
+* chore: update http example [#3651](https://github.com/open-telemetry/opentelemetry-js/pull/3651) @JamieDanielson
+
 ### :house: (Internal)
 
 * fix(sdk-metrics): fix flaky LastValueAggregator test by using fake timer [#3587](https://github.com/open-telemetry/opentelemetry-js/pull/3587) @pichlermarc
