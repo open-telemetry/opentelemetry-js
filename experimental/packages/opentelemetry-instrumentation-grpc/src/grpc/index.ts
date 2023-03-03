@@ -223,6 +223,24 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                       [SemanticAttributes.RPC_SERVICE]: service,
                     });
 
+                  instrumentation._metadataCapture.server.captureRequestMetadata(
+                    span,
+                    call.metadata
+                  );
+
+                  instrumentation._wrap(
+                    call as any,
+                    'sendMetadata',
+                    originalSendMetadata =>
+                      (responseMetadata: grpcTypes.Metadata) => {
+                        instrumentation._metadataCapture.server.captureResponseMetadata(
+                          span,
+                          responseMetadata
+                        );
+                        originalSendMetadata.call(call, responseMetadata);
+                      }
+                  );
+
                   context.with(trace.setSpan(context.active(), span), () => {
                     switch (type) {
                       case 'unary':
@@ -368,6 +386,16 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         captureResponseMetadata: metadataCapture(
           'response',
           config.metadataToSpanAttributes?.client?.responseMetadata ?? []
+        ),
+      },
+      server: {
+        captureRequestMetadata: metadataCapture(
+          'request',
+          config.metadataToSpanAttributes?.server?.requestMetadata ?? []
+        ),
+        captureResponseMetadata: metadataCapture(
+          'response',
+          config.metadataToSpanAttributes?.server?.responseMetadata ?? []
         ),
       },
     };
