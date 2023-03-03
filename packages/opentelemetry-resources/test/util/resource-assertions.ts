@@ -269,7 +269,6 @@ export const assertResource = (
     pid?: number;
     name?: string;
     command?: string;
-    commandLine?: string;
     commandArgs?: string[];
     executablePath?: string;
     owner?: string;
@@ -292,12 +291,6 @@ export const assertResource = (
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND],
       validations.command
-    );
-  }
-  if (validations.commandLine) {
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND_LINE],
-      validations.commandLine
     );
   }
   if (validations.commandArgs) {

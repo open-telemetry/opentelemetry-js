@@ -32,7 +32,6 @@ class ProcessDetectorSync implements DetectorSync {
       [SemanticResourceAttributes.PROCESS_PID]: process.pid,
       [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title,
       [SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH]: process.execPath,
-      [SemanticResourceAttributes.PROCESS_COMMAND_LINE]: process.argv.join(' '),
       [SemanticResourceAttributes.PROCESS_COMMAND_ARGS]: [
         process.argv[0],
         ...process.execArgv,

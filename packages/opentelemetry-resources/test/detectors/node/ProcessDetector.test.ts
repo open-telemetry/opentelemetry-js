@@ -41,7 +41,6 @@ describeNode('processDetector() on Node.js', () => {
       pid: 1234,
       name: 'otProcess',
       command: '/home/ot/test.js',
-      commandLine: '/tmp/node /home/ot/test.js arg1 arg2',
       commandArgs: [
         '/tmp/node',
         '--trace-warnings',
