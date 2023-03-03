@@ -30,6 +30,7 @@ describeNode('processDetector() on Node.js', () => {
     sinon.stub(process, 'title').value('otProcess');
     sinon.stub(process, 'argv').value(argv);
     sinon.stub(process, 'execPath').value(argv[0]);
+    sinon.stub(process, 'execArgv').value(['--trace-warnings']);
     sinon.stub(process, 'versions').value({ node: '1.4.1' });
     sinon
       .stub(os, 'userInfo')
@@ -41,7 +42,13 @@ describeNode('processDetector() on Node.js', () => {
       name: 'otProcess',
       command: '/home/ot/test.js',
       commandLine: '/tmp/node /home/ot/test.js arg1 arg2',
-      commandArgs: argv,
+      commandArgs: [
+        '/tmp/node',
+        '--trace-warnings',
+        '/home/ot/test.js',
+        'arg1',
+        'arg2',
+      ],
       executablePath: argv[0],
       owner: 'appOwner',
       version: '1.4.1',
@@ -50,7 +57,7 @@ describeNode('processDetector() on Node.js', () => {
     });
   });
 
-  it('should return a resources if title, command and commondLine are missing', async () => {
+  it('should return a resources if title, command and commandLine are missing', async () => {
     sinon.stub(process, 'pid').value(1234);
     sinon.stub(process, 'title').value('');
     sinon.stub(process, 'argv').value([]);

@@ -33,7 +33,11 @@ class ProcessDetectorSync implements DetectorSync {
       [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title,
       [SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH]: process.execPath,
       [SemanticResourceAttributes.PROCESS_COMMAND_LINE]: process.argv.join(' '),
-      [SemanticResourceAttributes.PROCESS_COMMAND_ARGS]: process.argv,
+      [SemanticResourceAttributes.PROCESS_COMMAND_ARGS]: [
+        process.argv[0],
+        ...process.execArgv,
+        ...process.argv.slice(1),
+      ],
       [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]:
         process.versions.node,
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',

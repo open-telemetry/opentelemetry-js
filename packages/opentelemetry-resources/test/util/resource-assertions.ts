@@ -301,7 +301,7 @@ export const assertResource = (
     );
   }
   if (validations.commandArgs) {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND_ARGS],
       validations.commandArgs
     );
