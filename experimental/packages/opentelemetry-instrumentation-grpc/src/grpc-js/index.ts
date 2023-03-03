@@ -212,6 +212,24 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                       [SemanticAttributes.RPC_SERVICE]: service,
                     });
 
+                  instrumentation._metadataCapture.server.captureRequestMetadata(
+                    span,
+                    call.metadata
+                  );
+
+                  instrumentation._wrap(
+                    call,
+                    'sendMetadata',
+                    originalSendMetadata =>
+                      (responseMetadata: grpcJs.Metadata) => {
+                        instrumentation._metadataCapture.server.captureResponseMetadata(
+                          span,
+                          responseMetadata
+                        );
+                        originalSendMetadata.call(call, responseMetadata);
+                      }
+                  );
+
                   context.with(trace.setSpan(context.active(), span), () => {
                     handleServerFunction.call(
                       self,
@@ -383,6 +401,16 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         captureResponseMetadata: metadataCapture(
           'response',
           config.metadataToSpanAttributes?.client?.responseMetadata ?? []
+        ),
+      },
+      server: {
+        captureRequestMetadata: metadataCapture(
+          'request',
+          config.metadataToSpanAttributes?.server?.requestMetadata ?? []
+        ),
+        captureResponseMetadata: metadataCapture(
+          'response',
+          config.metadataToSpanAttributes?.server?.responseMetadata ?? []
         ),
       },
     };
