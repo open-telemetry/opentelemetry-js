@@ -65,7 +65,7 @@ describe('ExponentialHistogramAccumulation', () => {
       const accumulation = new ExponentialHistogramAccumulation([0, 0], 4);
       accumulation.record(2);
       accumulation.record(2);
-      accumulation.record(2);
+      accumulation.record(4);
       accumulation.record(1);
       accumulation.record(8);
       accumulation.record(0.5);
