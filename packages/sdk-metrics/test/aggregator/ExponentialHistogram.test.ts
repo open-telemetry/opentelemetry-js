@@ -27,7 +27,7 @@ import {
 } from '../../src/aggregator/ExponentialHistogram';
 import { Buckets } from '../../src/aggregator/exponential-histogram/Buckets';
 import { getMapping } from '../../src/aggregator/exponential-histogram/mapping/getMapping';
-import { Mapping } from '../../src/aggregator/exponential-histogram//mapping/types';
+import { Mapping } from '../../src/aggregator/exponential-histogram/mapping/types';
 import * as assert from 'assert';
 import {
   assertInEpsilon,

@@ -32,7 +32,7 @@ import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Buckets } from './exponential-histogram/Buckets';
 import { getMapping } from './exponential-histogram/mapping/getMapping';
 import { Mapping } from './exponential-histogram/mapping/types';
-import { nextGreaterSquare } from './exponential-histogram//util';
+import { nextGreaterSquare } from './exponential-histogram/util';
 
 /**
  * Internal value type for ExponentialHistogramAggregation.

@@ -102,7 +102,7 @@ export class Buckets {
    * decrementBucket decrements the backing array index by `decrement`
    * if decrement is greater than the current value, it's set to 0.
    * @param bucketIndex
-   * @param increment
+   * @param decrement
    */
   decrementBucket(bucketIndex: number, decrement: number) {
     this.backing.decrement(bucketIndex, decrement);

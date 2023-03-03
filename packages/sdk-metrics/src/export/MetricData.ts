@@ -57,7 +57,7 @@ export interface HistogramMetricData extends BaseMetricData {
 }
 
 /**
- * Represents a metric data aggregated by a HistogramAggregation.
+ * Represents a metric data aggregated by a ExponentialHistogramAggregation.
  */
 export interface ExponentialHistogramMetricData extends BaseMetricData {
   readonly dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM;
