@@ -42,7 +42,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "1.4.1",
+    "@opentelemetry/api": ">=1.0.0 <1.5.0",
     "@opentelemetry/propagator-b3": "1.10.0",
     "@opentelemetry/propagator-jaeger": "1.10.0",
     "@opentelemetry/sdk-trace-base": "1.10.0",
