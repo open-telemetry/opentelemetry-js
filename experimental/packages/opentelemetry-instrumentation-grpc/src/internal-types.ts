@@ -29,4 +29,14 @@ export type metadataCaptureType = {
       metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
     ) => void;
   };
+  server: {
+    captureRequestMetadata: (
+      span: Span,
+      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
+    ) => void;
+    captureResponseMetadata: (
+      span: Span,
+      metadata: grpcJsTypes.Metadata | grpcTypes.Metadata
+    ) => void;
+  };
 };
