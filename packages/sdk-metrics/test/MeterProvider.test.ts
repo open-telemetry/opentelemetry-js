@@ -15,7 +15,13 @@
  */
 
 import * as assert from 'assert';
-import { MeterProvider, InstrumentType, DataPointType } from '../src';
+import {
+  MeterProvider,
+  InstrumentType,
+  DataPointType,
+  ExplicitBucketHistogramAggregation,
+  HistogramMetricData,
+} from '../src';
 import {
   assertScopeMetrics,
   assertMetricData,
@@ -465,19 +471,20 @@ describe('MeterProvider', () => {
     });
 
     it('with instrument unit should apply view to only the selected instrument unit', async () => {
-      // Add view that renames 'test-counter-ms' and 'test-counter-s' to 'renamed-instrument' on 'meter1'
+      // Add views with different boundaries for each unit.
+      const msBoundaries = [0, 1, 2, 3, 4, 5];
+      const sBoundaries = [10, 50, 250, 1000];
+
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
           new View({
-            name: 'renamed-instrument',
-            instrumentName: 'test-counter-ms',
-            meterName: 'meter1',
+            instrumentUnit: 'ms',
+            aggregation: new ExplicitBucketHistogramAggregation(msBoundaries),
           }),
           new View({
-            name: 'renamed-instrument',
-            instrumentName: 'test-counter-s',
-            meterName: 'meter1',
+            instrumentUnit: 's',
+            aggregation: new ExplicitBucketHistogramAggregation(sBoundaries),
           }),
         ],
       });
@@ -485,10 +492,18 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
 
-      // Create meter and counters, with different units.
+      // Create meter and histograms, with different units.
       const meter = meterProvider.getMeter('meter1', 'v1.0.0');
-      meter.createCounter('test-counter-ms', { unit: 'ms' });
-      meter.createCounter('test-counter-s', { unit: 's' });
+      const histogram1 = meter.createHistogram('test-histogram-ms', {
+        unit: 'ms',
+      });
+      const histogram2 = meter.createHistogram('test-histogram-s', {
+        unit: 's',
+      });
+
+      // Record values for both.
+      histogram1.record(1);
+      histogram2.record(1);
 
       // Perform collection.
       const { resourceMetrics, errors } = await reader.collect();
@@ -503,27 +518,19 @@ describe('MeterProvider', () => {
         version: 'v1.0.0',
       });
 
-      // Two metrics are collected ('renamed-instrument'-ms and 'renamed-instrument'-s)
+      // Two metrics are collected ('test-histogram-ms' and 'test-histogram-s')
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
 
-      // Both 'renamed-instrument' are still exported with their units.
-      assertMetricData(
-        resourceMetrics.scopeMetrics[0].metrics[0],
-        DataPointType.SUM,
-        {
-          name: 'renamed-instrument',
-          type: InstrumentType.COUNTER,
-          unit: 'ms',
-        }
+      // Check if the boundaries are applied to the correct instrument.
+      assert.deepStrictEqual(
+        (resourceMetrics.scopeMetrics[0].metrics[0] as HistogramMetricData)
+          .dataPoints[0].value.buckets.boundaries,
+        msBoundaries
       );
-      assertMetricData(
-        resourceMetrics.scopeMetrics[0].metrics[1],
-        DataPointType.SUM,
-        {
-          name: 'renamed-instrument',
-          type: InstrumentType.COUNTER,
-          unit: 's',
-        }
+      assert.deepStrictEqual(
+        (resourceMetrics.scopeMetrics[0].metrics[1] as HistogramMetricData)
+          .dataPoints[0].value.buckets.boundaries,
+        sBoundaries
       );
     });
   });
