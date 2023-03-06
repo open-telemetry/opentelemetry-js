@@ -101,6 +101,50 @@ describe('ViewRegistry', () => {
           assert.strictEqual(views[0].name, 'histogram');
         }
       });
+
+      it('should match view with instrument unit', () => {
+        const registry = new ViewRegistry();
+        registry.addView(
+          new View({
+            name: 'ms_view',
+            instrumentName: 'default_metric',
+            instrumentUnit: 'ms',
+          })
+        );
+        registry.addView(
+          new View({
+            name: 's_view',
+            instrumentName: 'default_metric',
+            instrumentUnit: 's',
+          })
+        );
+
+        {
+          const views = registry.findViews(
+            {
+              ...defaultInstrumentDescriptor,
+              unit: 'ms',
+            },
+            defaultInstrumentationScope
+          );
+
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 'ms_view');
+        }
+
+        {
+          const views = registry.findViews(
+            {
+              ...defaultInstrumentDescriptor,
+              unit: 's',
+            },
+            defaultInstrumentationScope
+          );
+
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 's_view');
+        }
+      });
     });
 
     describe('MeterSelector', () => {
