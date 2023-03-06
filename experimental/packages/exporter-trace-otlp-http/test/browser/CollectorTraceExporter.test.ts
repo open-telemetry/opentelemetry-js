@@ -909,7 +909,7 @@ describe('export with retry - real http request destroyed', () => {
     afterEach(() => {
       clock?.restore();
       fetchMock.reset();
-    })
+    });
     it('should log the timeout request error message when retrying with exponential backoff with jitter', done => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
@@ -919,7 +919,7 @@ describe('export with retry - real http request destroyed', () => {
       fetchMock.mock(url, () => {
         tries++;
         return 503;
-      })
+      });
 
       collectorTraceExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
@@ -940,7 +940,7 @@ describe('export with retry - real http request destroyed', () => {
       let retry = 0;
       fetchMock.mock(url, () => {
         retry++;
-        return {status: 503, headers: { 'Retry-After': 3 }}
+        return { status: 503, headers: { 'Retry-After': 3 } };
       });
 
       collectorTraceExporter.export(spans, result => {
@@ -963,10 +963,10 @@ describe('export with retry - real http request destroyed', () => {
         tries++;
         const d = new Date();
         d.setSeconds(d.getSeconds() + 1);
-        return {status: 503, headers: { 'Retry-After': d.toUTCString() }}
+        return { status: 503, headers: { 'Retry-After': d.toUTCString() } };
       });
 
-      await new Promise(r => setTimeout(r, 1000 - Date.now() % 1000)) // wait to start export exactly in seconds
+      await new Promise(r => setTimeout(r, 1000 - (Date.now() % 1000))); // wait to start export exactly in seconds
       return new Promise(resolve => {
         collectorTraceExporter.export(spans, result => {
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
@@ -988,7 +988,7 @@ describe('export with retry - real http request destroyed', () => {
         tries++;
         const d = new Date();
         d.setSeconds(d.getSeconds() + 120);
-      return {status: 503, headers: { 'Retry-After': d.toUTCString() }}
+        return { status: 503, headers: { 'Retry-After': d.toUTCString() } };
       });
 
       collectorTraceExporter.export(spans, result => {
