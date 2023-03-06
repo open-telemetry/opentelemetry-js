@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { RAW_ENVIRONMENT } from '@opentelemetry/core';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { envDetector, Resource } from '../../../src';
+import { envDetector, IResource } from '../../../src';
 import {
   assertEmptyResource,
   assertWebEngineResource,
@@ -39,7 +39,7 @@ describeBrowser('envDetector() on web browser', () => {
     });
 
     it('should return resource information from environment variable', async () => {
-      const resource: Resource = await envDetector.detect();
+      const resource: IResource = await envDetector.detect();
       assertWebEngineResource(resource, {
         [SemanticResourceAttributes.WEBENGINE_NAME]: 'chromium',
         [SemanticResourceAttributes.WEBENGINE_VERSION]: '99',
@@ -66,7 +66,7 @@ describeBrowser('envDetector() on web browser', () => {
         });
 
         it('should return empty resource', async () => {
-          const resource: Resource = await envDetector.detect();
+          const resource: IResource = await envDetector.detect();
           assertEmptyResource(resource);
         });
       });
@@ -75,14 +75,14 @@ describeBrowser('envDetector() on web browser', () => {
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: Resource = await envDetector.detect();
+      const resource: IResource = await envDetector.detect();
       assertEmptyResource(resource);
     });
   });
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: Resource = await envDetector.detect();
+      const resource: IResource = await envDetector.detect();
       assertEmptyResource(resource);
     });
   });

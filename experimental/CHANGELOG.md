@@ -6,9 +6,28 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat: remove HTTP/HTTPS prefix from span name [#3603](https://github.com/open-telemetry/opentelemetry-js/pull/3603) @Flarna
+
 ### :rocket: (Enhancement)
 
-* feat(otlp-exporter-base): Add fetch sender for ServiceWorker environment. [#3542](https://github.com/open-telemetry/opentelemetry-js/pull/3542) @sugi
+* feat: use HTTP_ROUTE in span name [#3603](https://github.com/open-telemetry/opentelemetry-js/pull/3603) @Flarna
+* feat: add HTTP_ROUTE attribute to http incoming metrics if present [#3581](https://github.com/open-telemetry/opentelemetry-js/pull/3581) @hermogenes
+* feat(opentelemetry-instrumentation-grpc): allow to add attributes from grpc metadata in the patched server [#3589](https://github.com/open-telemetry/opentelemetry-js/pull/3589) @zombispormedio
+* feat(sdk-node): install diag logger with OTEL_LOG_LEVEL [#3627](https://github.com/open-telemetry/opentelemetry-js/pull/3627) @legendecas
+* feat(otlp-exporter-base): add retries [#3207](https://github.com/open-telemetry/opentelemetry-js/pull/3207) @svetlanabrennan
+* feat(sdk-node): override IdGenerator when using NodeSDK [#3645](https://github.com/open-telemetry/opentelemetry-js/pull/3645) @haddasbronfman
+* feat(otlp-exporter-base): Add fetch sender for WebWorker and ServiceWorker environment. [#3542](https://github.com/open-telemetry/opentelemetry-js/pull/3542) @sugi
+
+### :bug: (Bug Fix)
+
+* fix(prometheus-exporter): add possibility to respond to errors returned by `server.listen()` [#3552](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @pichlermarc
+  fix(sdk-node): update instrumentations once MeterProvider is initialized [#3624](https://github.com/open-telemetry/opentelemetry-js/pull/3624) @pichlermarc
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.35.1
 
 ### :bug: (Bug Fix)
 
@@ -16,10 +35,7 @@ All notable changes to experimental packages in this project will be documented 
   * Fixes an error where the generated JS files were not included in the esnext package due to a failure of the tsconfig generation
 * fix(sdk-node): register instrumentations early [#3502](https://github.com/open-telemetry/opentelemetry-js/pull/3502) @flarna
 * fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(http) Remove outgoing headers normalization [#3557](https://github.com/open-telemetry/opentelemetry-js/pull/3557) @marcinjahn
 
 ## 0.35.0
 

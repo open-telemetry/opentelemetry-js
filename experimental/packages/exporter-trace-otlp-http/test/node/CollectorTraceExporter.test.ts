@@ -551,38 +551,3 @@ describe('export - real http request destroyed before response received', () => 
     }, 0);
   });
 });
-
-describe('export - real http request destroyed after response received', () => {
-  let collectorExporter: OTLPTraceExporter;
-  let collectorExporterConfig: OTLPExporterNodeConfigBase;
-  let spans: ReadableSpan[];
-
-  const server = http.createServer((_, res) => {
-    res.write('writing something');
-  });
-  before(done => {
-    server.listen(8081, done);
-  });
-  after(done => {
-    server.close(done);
-  });
-  it('should log the timeout request error message', done => {
-    collectorExporterConfig = {
-      url: 'http://localhost:8081',
-      timeoutMillis: 300,
-    };
-    collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
-    spans = [];
-    spans.push(Object.assign({}, mockedReadableSpan));
-
-    setTimeout(() => {
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        done();
-      });
-    }, 0);
-  });
-});

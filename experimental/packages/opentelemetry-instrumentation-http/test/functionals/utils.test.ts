@@ -20,6 +20,7 @@ import {
   SpanKind,
   TraceFlags,
   context,
+  Attributes,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -320,6 +321,31 @@ describe('Utility', () => {
       assert.deepEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
     });
   });
+
+  describe('getIncomingRequestMetricAttributesOnResponse()', () => {
+    it('should correctly add http_route if span has it', () => {
+      const spanAttributes: Attributes = {
+        [SemanticAttributes.HTTP_ROUTE]: '/user/:id',
+      };
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+
+      assert.deepStrictEqual(
+        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        '/user/:id'
+      );
+    });
+
+    it('should skip http_route if span does not have it', () => {
+      const spanAttributes: Attributes = {};
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+      assert.deepEqual(
+        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        undefined
+      );
+    });
+  });
   // Verify the key in the given attributes is set to the given value,
   // and that no other HTTP Content Length attributes are set.
   function verifyValueInAttributes(
@@ -476,6 +502,23 @@ describe('Utility', () => {
         component: 'http',
       });
       assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
+    });
+
+    it('should set http.target as path in http span attributes', () => {
+      const request = {
+        url: 'http://hostname/user/?q=val',
+        method: 'GET',
+      } as IncomingMessage;
+      request.headers = {
+        'user-agent': 'chrome',
+      };
+      const attributes = utils.getIncomingRequestAttributes(request, {
+        component: 'http',
+      });
+      assert.strictEqual(
+        attributes[SemanticAttributes.HTTP_TARGET],
+        '/user/?q=val'
+      );
     });
   });
 

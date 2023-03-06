@@ -18,6 +18,7 @@ import {
   Context,
   context,
   createContextKey,
+  createTraceState,
   INVALID_TRACEID,
   Link,
   ROOT_CONTEXT,
@@ -25,6 +26,7 @@ import {
   SpanKind,
   trace,
   TraceFlags,
+  TraceState,
 } from '@opentelemetry/api';
 import { getSpan } from '@opentelemetry/api/build/src/trace/context-utils';
 import {
@@ -57,6 +59,8 @@ describe('Tracer', () => {
   }
 
   class TestSampler implements Sampler {
+    constructor(private readonly traceState?: TraceState) {}
+
     shouldSample(
       _context: Context,
       _traceId: string,
@@ -80,6 +84,7 @@ describe('Tracer', () => {
           // invalid attributes should be sanitized.
           ...invalidAttributes,
         } as unknown as SpanAttributes,
+        traceState: this.traceState,
       };
     }
   }
@@ -160,6 +165,17 @@ describe('Tracer', () => {
     span.end();
   });
 
+  it('should start a span with traceState in sampling result', () => {
+    const traceState = createTraceState();
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler(traceState) },
+      tracerProvider
+    );
+    const span = tracer.startSpan('stateSpan');
+    assert.strictEqual(span.spanContext().traceState, traceState);
+  });
+
   it('should have an instrumentationLibrary', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
@@ -192,11 +208,13 @@ describe('Tracer', () => {
     });
   });
 
-  it('should use traceId and spanId from parent', () => {
+  it('should use traceId, spanId and traceState from parent', () => {
+    const traceState = createTraceState();
     const parent: SpanContext = {
       traceId: '00112233445566778899001122334455',
       spanId: '0011223344556677',
       traceFlags: TraceFlags.SAMPLED,
+      traceState,
     };
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
@@ -210,6 +228,7 @@ describe('Tracer', () => {
     );
     assert.strictEqual((span as Span).parentSpanId, parent.spanId);
     assert.strictEqual(span.spanContext().traceId, parent.traceId);
+    assert.strictEqual(span.spanContext().traceState, traceState);
   });
 
   it('should not use spanId from invalid parent', () => {

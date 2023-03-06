@@ -22,7 +22,7 @@ import {
   Link,
   SpanContext,
 } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { TimedEvent } from '../TimedEvent';
 
@@ -39,6 +39,6 @@ export interface ReadableSpan {
   readonly events: TimedEvent[];
   readonly duration: HrTime;
   readonly ended: boolean;
-  readonly resource: Resource;
+  readonly resource: IResource;
   readonly instrumentationLibrary: InstrumentationLibrary;
 }

@@ -24,6 +24,14 @@ import { diag } from '@opentelemetry/api';
 import { CompressionAlgorithm } from './types';
 import { getEnv } from '@opentelemetry/core';
 import { OTLPExporterError } from '../../types';
+import {
+  DEFAULT_EXPORT_MAX_ATTEMPTS,
+  DEFAULT_EXPORT_INITIAL_BACKOFF,
+  DEFAULT_EXPORT_BACKOFF_MULTIPLIER,
+  DEFAULT_EXPORT_MAX_BACKOFF,
+  isExportRetryable,
+  parseRetryAfterToMills,
+} from '../../util';
 
 /**
  * Sends data using http
@@ -42,16 +50,21 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 ): void {
   const exporterTimeout = collector.timeoutMillis;
   const parsedUrl = new url.URL(collector.url);
-  let reqIsDestroyed: boolean;
   const nodeVersion = Number(process.versions.node.split('.')[0]);
+  let retryTimer: ReturnType<typeof setTimeout>;
+  let req: http.ClientRequest;
+  let reqIsDestroyed = false;
 
   const exporterTimer = setTimeout(() => {
+    clearTimeout(retryTimer);
     reqIsDestroyed = true;
-    // req.abort() was deprecated since v14
-    if (nodeVersion >= 14) {
-      req.destroy();
+
+    if (req.destroyed) {
+      const err = new OTLPExporterError('Request Timeout');
+      onError(err);
     } else {
-      req.abort();
+      // req.abort() was deprecated since v14
+      nodeVersion >= 14 ? req.destroy() : req.abort();
     }
   }, exporterTimeout);
 
@@ -69,61 +82,104 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
-  const req = request(options, (res: http.IncomingMessage) => {
-    let responseData = '';
-    res.on('data', chunk => (responseData += chunk));
+  const sendWithRetry = (
+    retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
+    minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
+  ) => {
+    req = request(options, (res: http.IncomingMessage) => {
+      let responseData = '';
+      res.on('data', chunk => (responseData += chunk));
 
-    res.on('aborted', () => {
+      res.on('aborted', () => {
+        if (reqIsDestroyed) {
+          const err = new OTLPExporterError('Request Timeout');
+          onError(err);
+        }
+      });
+
+      res.on('end', () => {
+        if (reqIsDestroyed === false) {
+          if (res.statusCode && res.statusCode < 299) {
+            diag.debug(`statusCode: ${res.statusCode}`, responseData);
+            onSuccess();
+            // clear all timers since request was completed and promise was resolved
+            clearTimeout(exporterTimer);
+            clearTimeout(retryTimer);
+          } else if (
+            res.statusCode &&
+            isExportRetryable(res.statusCode) &&
+            retries > 0
+          ) {
+            let retryTime: number;
+            minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
+
+            // retry after interval specified in Retry-After header
+            if (res.headers['retry-after']) {
+              retryTime = parseRetryAfterToMills(res.headers['retry-after']!);
+            } else {
+              // exponential backoff with jitter
+              retryTime = Math.round(
+                Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) +
+                  minDelay
+              );
+            }
+
+            retryTimer = setTimeout(() => {
+              sendWithRetry(retries - 1, minDelay);
+            }, retryTime);
+          } else {
+            const error = new OTLPExporterError(
+              res.statusMessage,
+              res.statusCode,
+              responseData
+            );
+            onError(error);
+            // clear all timers since request was completed and promise was resolved
+            clearTimeout(exporterTimer);
+            clearTimeout(retryTimer);
+          }
+        }
+      });
+    });
+
+    req.on('error', (error: Error | any) => {
+      if (reqIsDestroyed) {
+        const err = new OTLPExporterError('Request Timeout', error.code);
+        onError(err);
+      } else {
+        onError(error);
+      }
+      clearTimeout(exporterTimer);
+      clearTimeout(retryTimer);
+    });
+
+    req.on('abort', () => {
       if (reqIsDestroyed) {
         const err = new OTLPExporterError('Request Timeout');
         onError(err);
       }
-    });
-
-    res.on('end', () => {
-      if (!reqIsDestroyed) {
-        if (res.statusCode && res.statusCode < 299) {
-          diag.debug(`statusCode: ${res.statusCode}`, responseData);
-          onSuccess();
-        } else {
-          const error = new OTLPExporterError(
-            res.statusMessage,
-            res.statusCode,
-            responseData
-          );
-          onError(error);
-        }
-        clearTimeout(exporterTimer);
-      }
-    });
-  });
-
-  req.on('error', (error: Error | any) => {
-    if (reqIsDestroyed) {
-      const err = new OTLPExporterError('Request Timeout', error.code);
-      onError(err);
-    } else {
       clearTimeout(exporterTimer);
-      onError(error);
-    }
-  });
+      clearTimeout(retryTimer);
+    });
 
-  switch (collector.compression) {
-    case CompressionAlgorithm.GZIP: {
-      req.setHeader('Content-Encoding', 'gzip');
-      const dataStream = readableFromBuffer(data);
-      dataStream
-        .on('error', onError)
-        .pipe(zlib.createGzip())
-        .on('error', onError)
-        .pipe(req);
+    switch (collector.compression) {
+      case CompressionAlgorithm.GZIP: {
+        req.setHeader('Content-Encoding', 'gzip');
+        const dataStream = readableFromBuffer(data);
+        dataStream
+          .on('error', onError)
+          .pipe(zlib.createGzip())
+          .on('error', onError)
+          .pipe(req);
 
-      break;
+        break;
+      }
+      default:
+        req.end(data);
+        break;
     }
-    default:
-      req.end(data);
-      break;
-  }
+  };
+  sendWithRetry();
 }
 
 function readableFromBuffer(buff: string | Buffer): Readable {

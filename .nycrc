@@ -1,4 +1,5 @@
 {
+  "produceSourceMap": false,
   "extension": [
     ".ts"
   ],

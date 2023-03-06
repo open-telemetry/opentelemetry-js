@@ -125,7 +125,7 @@ describe('Packages', () => {
         };
 
         assert.strictEqual(spans.length, 1);
-        assert.strictEqual(span.name, 'HTTPS GET');
+        assert.strictEqual(span.name, 'GET');
 
         switch (name) {
           case 'axios':

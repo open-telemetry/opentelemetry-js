@@ -7,11 +7,35 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ## Unreleased
 
+* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-metrics): add exponential histogram mapping functions [#3504](https://github.com/open-telemetry/opentelemetry-js/pull/3504) @mwear
+* feat(resource): create sync resource with some attributes that resolve asynchronously [#3460](https://github.com/open-telemetry/opentelemetry-js/pull/3460) @samimusallam
+* feat (api-logs): separate Events API into its own package [3550](https://github.com/open-telemetry/opentelemetry-js/pull/3550) @martinkuba
+* feat(sdk-metrics): apply binary search in histogram recording [#3539](https://github.com/open-telemetry/opentelemetry-js/pull/3539) @legendecas
+* perf(propagator-jaeger): improve deserializeSpanContext performance [#3541](https://github.com/open-telemetry/opentelemetry-js/pull/3541) @doochik
+* feat: support TraceState in SamplingResult [#3530](https://github.com/open-telemetry/opentelemetry-js/pull/3530) @raphael-theriault-swi
+* feat(sdk-trace-base): add diagnostic logging when spans are dropped [#3610](https://github.com/open-telemetry/opentelemetry-js/pull/3610) @neoeinstein
+
+### :bug: (Bug Fix)
+
+* fix(core): added falsy check to make otel core work with browser where webpack config had process as false or null [#3613](https://github.com/open-telemetry/opentelemetry-js/issues/3613) @ravindra-dyte
+* fix(instrumentation-http): include query params in http.target [#3646](https://github.com/open-telemetry/opentelemetry-js/pull/3646) @kobi-co
+
+### :books: (Refine Doc)
+
+* chore: update http example [#3651](https://github.com/open-telemetry/opentelemetry-js/pull/3651) @JamieDanielson
+
+### :house: (Internal)
+
+* chore(exporter-jaeger): deprecate jaeger exporter [#3585](https://github.com/open-telemetry/opentelemetry-js/pull/3585) @pichlermarc
+* fix(sdk-metrics): fix flaky LastValueAggregator test by using fake timer [#3587](https://github.com/open-telemetry/opentelemetry-js/pull/3587) @pichlermarc
+* fix(test): fix failing tests by preventing source-map generation [#3642](https://github.com/open-telemetry/opentelemetry-js/pull/3642) @pichlermarc
+
+## 1.9.1
 
 ### :bug: (Bug Fix)
 
@@ -20,11 +44,10 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
  [#3562](https://github.com/open-telemetry/opentelemetry-js/pull/3562) @scheler
 * fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
 
-### :books: (Refine Doc)
-
 ### :house: (Internal)
 
 * chore: fix cross project links and missing implicitly exported types [#3533](https://github.com/open-telemetry/opentelemetry-js/pull/3533) @legendecas
+* feat(sdk-metrics): add exponential histogram mapping functions [#3504](https://github.com/open-telemetry/opentelemetry-js/pull/3504) @mwear
 
 ## 1.9.0
 

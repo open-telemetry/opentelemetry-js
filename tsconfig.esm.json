@@ -6,6 +6,9 @@
       "path": "api/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/api-events/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/api-logs/tsconfig.esm.json"
     },
     {
