@@ -162,7 +162,6 @@ export function sendWithXhr(
   sendWithRetry();
 }
 
-
 /**
  * function to send metrics/spans using browser fetch
  *     used when navigator.sendBeacon and XMLHttpRequest are not available
@@ -181,26 +180,60 @@ export function sendWithFetch(
   onError: (error: OTLPExporterError) => void
 ): void {
   const controller = new AbortController();
-  const timerId = setTimeout(() => controller.abort(), exporterTimeout);
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      ...defaultHeaders,
-      ...headers,
-    },
-    signal: controller.signal,
-    body,
-  })
-    .then(
+  let cancelRetry: ((e: OTLPExporterError) => void) | undefined;
+  const exporterTimer = setTimeout(() => {
+    controller.abort();
+    cancelRetry?.(new OTLPExporterError('Request Timeout'));
+  }, exporterTimeout);
+
+  const fetchWithRetry = (
+    retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
+    minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
+  ) => {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        ...defaultHeaders,
+        ...headers,
+      },
+      signal: controller.signal,
+      body,
+    }).then(
       response => {
         if (response.ok) {
           response.text().then(
             t => diag.debug('Request Success', t),
             () => {}
           );
-          onSuccess();
+          return;
+        } else if (isExportRetryable(response.status) && retries > 0) {
+          let retryTime: number;
+          minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
+
+          // retry after interval specified in Retry-After header
+          if (response.headers.has('Retry-After')) {
+            retryTime = parseRetryAfterToMills(
+              response.headers.get('Retry-After')
+            );
+          } else {
+            // exponential backoff with jitter
+            retryTime = Math.round(
+              Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay
+            );
+          }
+
+          return new Promise((resolve, reject) => {
+            const retryTimer = setTimeout(() => {
+              cancelRetry = undefined;
+              fetchWithRetry(retries - 1, minDelay).then(resolve, reject);
+            }, retryTime);
+            cancelRetry = e => {
+              clearTimeout(retryTimer);
+              reject(e);
+            };
+          });
         } else {
-          onError(
+          return Promise.reject(
             new OTLPExporterError(
               `Failed to export with fetch: (${response.status} ${response.statusText})`,
               response.status
@@ -210,13 +243,19 @@ export function sendWithFetch(
       },
       (e: Error) => {
         if (e.name === 'AbortError') {
-          onError(new OTLPExporterError('Request Timeout'));
+          return Promise.reject(new OTLPExporterError('Request Timeout'));
         } else {
-          onError(
+          return Promise.reject(
             new OTLPExporterError(`Request Fail: ${e.name} ${e.message}`)
           );
         }
       }
+    );
+  };
+  fetchWithRetry()
+    .then(
+      () => onSuccess(),
+      e => onError(e)
     )
-    .finally(() => clearTimeout(timerId));
+    .finally(() => clearTimeout(exporterTimer));
 }

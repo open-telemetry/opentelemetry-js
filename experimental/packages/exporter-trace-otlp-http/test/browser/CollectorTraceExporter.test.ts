@@ -897,4 +897,108 @@ describe('export with retry - real http request destroyed', () => {
       });
     }).timeout(3000);
   });
+
+  describe('when both "sendBeacon" and "XMLHttpRequest" are NOT available', () => {
+    const url = 'http://localhost:4318/v1/traces';
+    let clock: sinon.SinonFakeTimers | undefined;
+    beforeEach(() => {
+      (window.navigator as any).sendBeacon = false;
+      sinon.stub(globalThis, 'XMLHttpRequest').value(undefined);
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+    });
+    afterEach(() => {
+      clock?.restore();
+      fetchMock.reset();
+    })
+    it('should log the timeout request error message when retrying with exponential backoff with jitter', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+      clock = sinon.useFakeTimers();
+
+      let tries = 0;
+      fetchMock.mock(url, () => {
+        tries++;
+        return 503;
+      })
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
+        assert.strictEqual(tries, 1);
+        done();
+      });
+      clock.tick(2000);
+    }).timeout(3000);
+
+    it('should log the timeout request error message when retry-after header is set to 3 seconds', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+      clock = sinon.useFakeTimers();
+
+      let retry = 0;
+      fetchMock.mock(url, () => {
+        retry++;
+        return {status: 503, headers: { 'Retry-After': 3 }}
+      });
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
+        assert.strictEqual(retry, 1);
+        done();
+      });
+      clock.tick(2000);
+    }).timeout(3000);
+
+    it('should log the timeout request error message when retry-after header is a date', async () => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      let tries = 0;
+      fetchMock.mock(url, () => {
+        tries++;
+        const d = new Date();
+        d.setSeconds(d.getSeconds() + 1);
+        return {status: 503, headers: { 'Retry-After': d.toUTCString() }}
+      });
+
+      await new Promise(r => setTimeout(r, 1000 - Date.now() % 1000)) // wait to start export exactly in seconds
+      return new Promise(resolve => {
+        collectorTraceExporter.export(spans, result => {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
+          assert.strictEqual(tries, 2);
+          resolve();
+        });
+      });
+    }).timeout(3000);
+
+    it('should log the timeout request error message when retry-after header is a date with long delay', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      let tries = 0;
+      fetchMock.mock(url, () => {
+        tries++;
+        const d = new Date();
+        d.setSeconds(d.getSeconds() + 120);
+      return {status: 503, headers: { 'Retry-After': d.toUTCString() }}
+      });
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
+        assert.strictEqual(tries, 1);
+        done();
+      });
+    }).timeout(3000);
+  });
 });
