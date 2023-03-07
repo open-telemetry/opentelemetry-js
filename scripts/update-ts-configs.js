@@ -51,6 +51,7 @@ const ignoredLernaProjects = [
   'examples/otlp-exporter-node',
   'examples/opentelemetry-web',
   'examples/https',
+  'examples/http',
 ];
 
 let dryRun = false;
