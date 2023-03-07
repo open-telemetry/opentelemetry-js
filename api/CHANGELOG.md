@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ### :rocket: (Enhancement)
 
 * feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
+* feat(api): add optional `droppedAttributesCount` property in the `Link` interface [#3576](https://github.com/open-telemetry/opentelemetry-js/pull/3576) @mohitk05
 
 ### :bug: (Bug Fix)
 
