@@ -141,7 +141,7 @@ jobs:
 
       - name: Unit tests
         run: npm run test:browser
-      - name: Report Coverage
+      - name: Generate Report
         run: npm run codecov:browser
       - name: Report Coverage
         uses: codecov/codecov-action@v3
