@@ -58,8 +58,12 @@ jobs:
           fi
           npm run test
       - name: Report Coverage
-        run: npm run codecov
-        if: ${{ matrix.node_version == '14' }}
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./**/coverage/*.json
+          fail_ci_if_error: true
+          verbose: true
+        if: ${{ matrix.node_version == '18' }}
   node-windows-tests:
     runs-on: windows-latest
     env:
