@@ -48,7 +48,8 @@ export class ViewRegistry {
     return (
       (selector.getType() === undefined ||
         instrument.type === selector.getType()) &&
-      selector.getNameFilter().match(instrument.name)
+      selector.getNameFilter().match(instrument.name) &&
+      selector.getUnitFilter().match(instrument.unit)
     );
   }
 
