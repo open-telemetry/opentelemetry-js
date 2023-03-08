@@ -57,6 +57,9 @@ jobs:
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
           npm run test
+      - name: Generate Report
+        run: npm run codecov
+        if: ${{ matrix.node_version == '18' }}
       - name: Report Coverage
         uses: codecov/codecov-action@v3
         with:
