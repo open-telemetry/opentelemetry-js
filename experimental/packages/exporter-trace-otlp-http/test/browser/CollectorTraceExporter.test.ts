@@ -374,18 +374,31 @@ describe('OTLPTraceExporter - web', () => {
 
         collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
-      it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
 
-        queueMicrotask(() => {
-          const [{ requestHeaders }] = server.requests;
+      const tests = [{ withStaticHeaders: true }, { withStaticHeaders: false }];
+      tests.forEach(({ withStaticHeaders }) => {
+        it(`should successfully send custom ${
+          withStaticHeaders ? '' : 'dynamic '
+        } headers using XMLHTTPRequest`, done => {
+          const collectorExporterConfigWithHeaders = {
+            headers: withStaticHeaders ? customHeaders : () => customHeaders,
+          };
+          const collectorTraceExporterWithHeaders = new OTLPTraceExporter(
+            collectorExporterConfigWithHeaders
+          );
 
-          ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(stubBeacon.callCount, 0);
-          assert.strictEqual(stubOpen.callCount, 0);
+          collectorTraceExporterWithHeaders.export(spans, () => {});
 
-          clock.restore();
-          done();
+          queueMicrotask(() => {
+            const [{ requestHeaders }] = server.requests;
+
+            ensureHeadersContain(requestHeaders, customHeaders);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubOpen.callCount, 0);
+
+            clock.restore();
+            done();
+          });
         });
       });
     });
@@ -401,18 +414,30 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
 
-      it('should successfully send spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+      const tests = [{ withStaticHeaders: true }, { withStaticHeaders: false }];
+      tests.forEach(({ withStaticHeaders }) => {
+        it(`should successfully send spans using XMLHttpRequest with custom ${
+          withStaticHeaders ? '' : 'dynamic '
+        } headers`, done => {
+          const collectorExporterConfigWithHeaders = {
+            headers: withStaticHeaders ? customHeaders : () => customHeaders,
+          };
+          const collectorTraceExporterWithHeaders = new OTLPTraceExporter(
+            collectorExporterConfigWithHeaders
+          );
 
-        queueMicrotask(() => {
-          const [{ requestHeaders }] = server.requests;
+          collectorTraceExporterWithHeaders.export(spans, () => {});
 
-          ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(stubBeacon.callCount, 0);
-          assert.strictEqual(stubOpen.callCount, 0);
+          queueMicrotask(() => {
+            const [{ requestHeaders }] = server.requests;
 
-          clock.restore();
-          done();
+            ensureHeadersContain(requestHeaders, customHeaders);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubOpen.callCount, 0);
+
+            clock.restore();
+            done();
+          });
         });
       });
       it('should log the timeout request error message', done => {

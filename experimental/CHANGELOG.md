@@ -153,6 +153,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(otlp-exporter-base): add retries [#3207](https://github.com/open-telemetry/opentelemetry-js/pull/3207) @svetlanabrennan
 * feat(sdk-node): override IdGenerator when using NodeSDK [#3645](https://github.com/open-telemetry/opentelemetry-js/pull/3645) @haddasbronfman
 * feat(otlp-transformer): expose dropped attributes, events and links counts on the transformed otlp span [#3576](https://github.com/open-telemetry/opentelemetry-js/pull/3576) @mohitk05
+* feat(exporter-trace-otlp-http): allow dynamic headers in HTTP exporter [#2903](https://github.com/open-telemetry/opentelemetry-js/issues/2903)
 
 ### :bug: (Bug Fix)
 

@@ -244,6 +244,35 @@ describe('OTLPTraceExporter - node with json over http', () => {
       });
     });
 
+    it('should set dynamic custom headers', done => {
+      const customHeaders = {
+        foo: 'dynamic',
+      };
+      const collectorExporterConfigWithDynamicHeaders = {
+        headers: () => customHeaders,
+        hostname: 'foo',
+        url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
+      };
+      const collectorExporterWithDynamicHeaders = new OTLPTraceExporter(
+        collectorExporterConfigWithDynamicHeaders
+      );
+      collectorExporterWithDynamicHeaders.export(spans, () => {});
+
+      setTimeout(() => {
+        const mockRes = new MockedResponse(200);
+        const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
+
+        const options = args[0];
+        assert.strictEqual(options.headers['foo'], 'dynamic');
+        done();
+      });
+    });
+
     it('should not have Content-Encoding header', done => {
       collectorExporter.export(spans, () => {});
 

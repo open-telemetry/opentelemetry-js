@@ -38,6 +38,7 @@ export abstract class OTLPExporterNodeBase<
 > {
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
+  getHeaders?: () => Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
   compression: CompressionAlgorithm;
 
@@ -47,6 +48,10 @@ export abstract class OTLPExporterNodeBase<
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
+    if (config.headers && config.headers instanceof Function) {
+      this.getHeaders = config.headers as () => Record<string, string>;
+    }
+
     this.headers = Object.assign(
       this.DEFAULT_HEADERS,
       parseHeaders(config.headers),
