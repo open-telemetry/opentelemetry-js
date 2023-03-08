@@ -63,7 +63,6 @@ jobs:
       - name: Report Coverage
         uses: codecov/codecov-action@v3
         with:
-          files: ./**/coverage/coverage-final.json
           fail_ci_if_error: true
           verbose: true
         if: ${{ matrix.node_version == '18' }}
