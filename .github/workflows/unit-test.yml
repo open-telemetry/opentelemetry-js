@@ -178,8 +178,13 @@ jobs:
 
       - name: Unit tests
         run: npm run test:webworker
-      - name: Report Coverage
+      - name: Generate Report
         run: npm run codecov:webworker
+      - name: Report Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          verbose: true
   api-eol-node-test:
     strategy:
       fail-fast: false
