@@ -143,6 +143,11 @@ jobs:
         run: npm run test:browser
       - name: Report Coverage
         run: npm run codecov:browser
+      - name: Report Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          verbose: true
   webworker-tests:
     runs-on: ubuntu-latest
     env:
