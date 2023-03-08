@@ -312,6 +312,10 @@ describe('Span', () => {
           assert.strictEqual(span.attributes['foo99'], 'bar99');
           assert.strictEqual(span.attributes['foo149'], undefined);
         });
+
+        it('should store the count of dropped attributes in droppedAttributesCount', () => {
+          assert.strictEqual(span.droppedAttributesCount, 50);
+        });
       });
 
       describe('when "attributeValueLengthLimit" option defined', () => {
@@ -789,6 +793,22 @@ describe('Span', () => {
 
     assert.strictEqual(span.events.length, 100);
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
+  });
+
+  it('should store the count of dropped events in droppedEventsCount', () => {
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
+    for (let i = 0; i < 150; i++) {
+      span.addEvent('sent' + i);
+    }
+    span.end();
+
+    assert.strictEqual(span.droppedEventsCount, 50);
   });
 
   it('should add no event', () => {

@@ -86,6 +86,30 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     });
   }
 
+  /* Add droppedAttributesCount as a tag */
+  if (span.droppedAttributesCount) {
+    tags.push({
+      key: 'otel.dropped_attributes_count',
+      value: toTagValue(span.droppedAttributesCount),
+    });
+  }
+
+  /* Add droppedEventsCount as a tag */
+  if (span.droppedEventsCount) {
+    tags.push({
+      key: 'otel.dropped_events_count',
+      value: toTagValue(span.droppedEventsCount),
+    });
+  }
+
+  /* Add droppedLinksCount as a tag */
+  if (span.droppedLinksCount) {
+    tags.push({
+      key: 'otel.dropped_links_count',
+      value: toTagValue(span.droppedLinksCount),
+    });
+  }
+
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
 
   const logs = span.events.map((event): Log => {
@@ -95,6 +119,12 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
       Object.keys(attrs).forEach(attr =>
         fields.push({ key: attr, value: toTagValue(attrs[attr]) })
       );
+    }
+    if (event.droppedAttributesCount) {
+      fields.push({
+        key: 'otel.event.dropped_attributes_count',
+        value: event.droppedAttributesCount,
+      });
     }
     return { timestamp: hrTimeToMilliseconds(event.time), fields };
   });
