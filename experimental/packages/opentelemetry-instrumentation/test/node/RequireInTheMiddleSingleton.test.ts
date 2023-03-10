@@ -20,8 +20,6 @@ import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import { RequireInTheMiddleSingleton } from '../../src/platform/node/RequireInTheMiddleSingleton';
 
-const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
-
 type AugmentedExports = {
   __ritmOnRequires?: string[];
 };
@@ -34,15 +32,25 @@ const makeOnRequiresStub = (label: string): sinon.SinonStub =>
   }) as RequireInTheMiddle.OnRequireFn);
 
 describe('RequireInTheMiddleSingleton', () => {
-  describe('register', () => {
-    const onRequireFsStub = makeOnRequiresStub('fs');
-    const onRequireFsPromisesStub = makeOnRequiresStub('fs-promises');
-    const onRequireCodecovStub = makeOnRequiresStub('codecov');
-    const onRequireCodecovLibStub = makeOnRequiresStub('codecov-lib');
-    const onRequireCpxStub = makeOnRequiresStub('cpx');
-    const onRequireCpxLibStub = makeOnRequiresStub('cpx-lib');
+  describe('default', () => {
+    let requireInTheMiddleSingleton: RequireInTheMiddleSingleton;
+    let onRequireFsStub: sinon.SinonStub;
+    let onRequireFsPromisesStub: sinon.SinonStub;
+    let onRequireCodecovStub: sinon.SinonStub;
+    let onRequireCodecovLibStub: sinon.SinonStub;
+    let onRequireCpxStub: sinon.SinonStub;
+    let onRequireCpxLibStub: sinon.SinonStub;
 
     before(() => {
+      onRequireFsStub = makeOnRequiresStub('fs');
+      onRequireFsPromisesStub = makeOnRequiresStub('fs-promises');
+      onRequireCodecovStub = makeOnRequiresStub('codecov');
+      onRequireCodecovLibStub = makeOnRequiresStub('codecov-lib');
+      onRequireCpxStub = makeOnRequiresStub('cpx');
+      onRequireCpxLibStub = makeOnRequiresStub('cpx-lib');
+
+      requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
+
       requireInTheMiddleSingleton.register('fs', onRequireFsStub);
       requireInTheMiddleSingleton.register(
         'fs/promises',
@@ -67,6 +75,10 @@ describe('RequireInTheMiddleSingleton', () => {
       onRequireCodecovLibStub.resetHistory();
       onRequireCpxStub.resetHistory();
       onRequireCpxLibStub.resetHistory();
+    });
+
+    after(() => {
+      requireInTheMiddleSingleton.unhook();
     });
 
     it('should return a hooked object', () => {
@@ -176,6 +188,73 @@ describe('RequireInTheMiddleSingleton', () => {
             baseDir
           );
         });
+      });
+    });
+  });
+
+  describe('with OTEL_REQUIRE_ONLY set', () => {
+    let requireInTheMiddleSingleton: RequireInTheMiddleSingleton;
+    let onRequireFsStub: sinon.SinonStub;
+    let onRequireCodecovStub: sinon.SinonStub;
+
+    describe('single module', function () {
+      before(() => {
+        onRequireFsStub = makeOnRequiresStub('fs');
+        onRequireCodecovStub = makeOnRequiresStub('codecov');
+
+        process.env.OTEL_REQUIRE_ONLY = 'fs';
+        requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
+
+        requireInTheMiddleSingleton.register('fs', onRequireFsStub);
+        requireInTheMiddleSingleton.register('codecov', onRequireCodecovStub);
+      });
+
+      beforeEach(() => {
+        onRequireFsStub.resetHistory();
+        onRequireCodecovStub.resetHistory();
+      });
+
+      after(() => {
+        delete process.env.OTEL_REQUIRE_ONLY;
+        requireInTheMiddleSingleton.unhook();
+      });
+
+      it('should call `onRequire` for fs', () => {
+        require('fs');
+        require('codecov');
+
+        assert.equal(onRequireFsStub.called, true);
+        assert.equal(onRequireCodecovStub.called, false);
+      });
+    });
+
+    describe('multiple modules', function () {
+      before(() => {
+        onRequireFsStub = makeOnRequiresStub('fs');
+        onRequireCodecovStub = makeOnRequiresStub('codecov');
+
+        process.env.OTEL_REQUIRE_ONLY = 'fs,codecov';
+        requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
+
+        requireInTheMiddleSingleton.register('fs', onRequireFsStub);
+        requireInTheMiddleSingleton.register('codecov', onRequireCodecovStub);
+      });
+
+      beforeEach(() => {
+        onRequireFsStub.resetHistory();
+        onRequireCodecovStub.resetHistory();
+      });
+
+      after(() => {
+        delete process.env.OTEL_REQUIRE_ONLY;
+      });
+
+      it('should call `onRequire` for codecov & fs', () => {
+        require('fs');
+        require('codecov');
+
+        assert.equal(onRequireFsStub.called, true);
+        assert.equal(onRequireCodecovStub.called, true);
       });
     });
   });

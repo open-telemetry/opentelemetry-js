@@ -51,6 +51,7 @@ const isMocha = [
  * on the performance of instrumentation hooks being applied.
  */
 export class RequireInTheMiddleSingleton {
+  private hook?: RequireInTheMiddle.Hooked;
   private _moduleNameTrie: ModuleNameTrie = new ModuleNameTrie();
   private static _instance?: RequireInTheMiddleSingleton;
 
@@ -59,9 +60,15 @@ export class RequireInTheMiddleSingleton {
   }
 
   private _initialize() {
-    RequireInTheMiddle(
-      // Intercept all `require` calls; we will filter the matching ones below
-      null,
+    // A list of strings separated by comma e.g. fastify,fs
+    const modules = process.env.OTEL_REQUIRE_ONLY
+      ? process.env.OTEL_REQUIRE_ONLY.split(',').map(i => i.trim())
+      : null;
+
+    this.hook = RequireInTheMiddle(
+      // Intercept all `require` calls; we will filter the matching ones below.
+      // Alternatively you can set an env variable to only listen for specific libs.
+      modules,
       { internals: true },
       (exports, name, basedir) => {
         // For internal files on Windows, `name` will use backslash as the path separator
@@ -82,6 +89,15 @@ export class RequireInTheMiddleSingleton {
         return exports;
       }
     );
+  }
+
+  /**
+   * Deregister require-in-the-middle hook.
+   * @returns
+   */
+  unhook() {
+    if (!this.hook) return;
+    this.hook.unhook();
   }
 
   /**

@@ -8,6 +8,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ## Unreleased
 
 * feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
+* feat: added env variable to require only specific libraries [#3666](https://github.com/open-telemetry/opentelemetry-js/pull/3666) @kirrg001
 
 ### :boom: Breaking Change
 
