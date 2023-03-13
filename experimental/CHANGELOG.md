@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.36.0
+
+### :boom: Breaking Change
+
 * feat: remove HTTP/HTTPS prefix from span name [#3603](https://github.com/open-telemetry/opentelemetry-js/pull/3603) @Flarna
 
 ### :rocket: (Enhancement)
@@ -21,11 +33,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(prometheus-exporter): add possibility to respond to errors returned by `server.listen()` [#3552](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @pichlermarc
-  fix(sdk-node): update instrumentations once MeterProvider is initialized [#3624](https://github.com/open-telemetry/opentelemetry-js/pull/3624) @pichlermarc
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(sdk-node): update instrumentations once MeterProvider is initialized [#3624](https://github.com/open-telemetry/opentelemetry-js/pull/3624) @pichlermarc
 
 ## 0.35.1
 
