@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix: remove HTTP/HTTPS prefix from span name in instrumentation-xml-http-request
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
