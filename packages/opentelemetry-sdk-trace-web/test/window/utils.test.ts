@@ -186,8 +186,6 @@ describe('utils', () => {
       assert.strictEqual(url, 'https://opentelemetry.io/%E4%BD%A0%E5%A5%BD');
     });
   });
-
-  
 });
 
 function getElementByXpath(path: string) {
