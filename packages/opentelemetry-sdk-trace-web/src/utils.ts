@@ -305,7 +305,7 @@ export interface URLLike {
  */
 export function parseUrl(url: string): URLLike {
   if (typeof URL === 'function') {
-    return new URL(url, location.href);
+    return new URL(url, document.baseURI);
   }
   const element = getUrlNormalizingAnchor();
   element.href = url;
