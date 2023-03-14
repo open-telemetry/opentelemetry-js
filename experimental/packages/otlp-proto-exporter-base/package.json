@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-proto-exporter-base",
-  "version": "0.35.1",
+  "version": "0.36.0",
   "description": "OpenTelemetry OTLP-HTTP-protobuf Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
-    "@opentelemetry/api": "^1.0.0",
+    "@opentelemetry/api": "1.4.1",
     "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "@types/sinon": "10.0.13",
@@ -77,8 +77,8 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.9.1",
-    "@opentelemetry/otlp-exporter-base": "0.35.1",
+    "@opentelemetry/core": "1.10.0",
+    "@opentelemetry/otlp-exporter-base": "0.36.0",
     "protobufjs": "^7.1.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-proto-exporter-base",

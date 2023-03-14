@@ -94,7 +94,7 @@ export class LogarithmMapping implements Mapping {
    * The scale used by this mapping
    * @returns {number}
    */
-  scale(): number {
+  get scale(): number {
     return this._scale;
   }
 
