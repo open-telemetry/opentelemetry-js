@@ -31,3 +31,11 @@ export function assertInEpsilon(
     `expected relative error: ${relErr} to be < ${epsilon}`
   );
 }
+
+export function assertInDelta(actual: number, expected: number, delta: number) {
+  const actualDelta = Math.abs(expected - actual);
+  assert.ok(
+    actualDelta < delta,
+    `expected delta: ${delta} to be < ${actualDelta}`
+  );
+}
