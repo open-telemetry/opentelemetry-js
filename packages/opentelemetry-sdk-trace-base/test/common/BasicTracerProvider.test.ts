@@ -179,6 +179,8 @@ describe('BasicTracerProvider', () => {
             attributeCountLimit: 128,
             eventCountLimit: 128,
             linkCountLimit: 128,
+            attributePerEventCountLimit: 128,
+            attributePerLinkCountLimit: 128,
           });
         });
       });

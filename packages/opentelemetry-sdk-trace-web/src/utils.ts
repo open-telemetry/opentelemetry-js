@@ -44,7 +44,10 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * @param key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+export function hasKey<O extends object>(
+  obj: O,
+  key: keyof any
+): key is keyof O {
   return key in obj;
 }
 
