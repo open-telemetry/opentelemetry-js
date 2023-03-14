@@ -13,6 +13,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-web): make `parseUrl()` respect document.baseURI [#3670](https://github.com/open-telemetry/opentelemetry-js/pull/3670) @domasx2
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
