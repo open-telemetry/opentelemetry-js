@@ -155,7 +155,7 @@ describe('Resource', () => {
       for (const resource of [resourceResolve, resourceReject]) {
         assert.ok(resource.asyncAttributesPending);
         await clock.nextAsync();
-        await resource.waitForAsyncAttributes();
+        await resource.waitForAsyncAttributes?.();
         assert.ok(!resource.asyncAttributesPending);
       }
     });
@@ -174,7 +174,7 @@ describe('Resource', () => {
         asyncAttributes
       );
 
-      await resource.waitForAsyncAttributes();
+      await resource.waitForAsyncAttributes?.();
       assert.deepStrictEqual(resource.attributes, {
         sync: 'fromsync',
         // async takes precedence
@@ -266,7 +266,7 @@ describe('Resource', () => {
       const debugStub = sinon.spy(diag, 'debug');
 
       const resource = new Resource({}, Promise.reject(new Error('rejected')));
-      await resource.waitForAsyncAttributes();
+      await resource.waitForAsyncAttributes?.();
 
       assert.ok(
         debugStub.calledWithMatch(
