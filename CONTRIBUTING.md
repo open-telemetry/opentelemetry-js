@@ -57,7 +57,7 @@ If a PR has not been interacted with by a reviewer within one week, please ping 
 - No “changes requested” reviews by approvers, maintainers, technical committee members, or subject matter experts
 - No unresolved conversations
 - Approved by at least one maintainer OR by at least one approver who is not the approver merging the pull request
-    - A pull request for small (simple typo, URL, update docs, or grammatical fix) changes may be approved and merged by the same approver
+  - A pull request for small (simple typo, URL, update docs, or grammatical fix) changes may be approved and merged by the same approver
 - For plugins, exporters, and propagators approval of the original code module author, or a contributor who has done extensive work on the module, is preferred but not required
 - New or changed functionality is tested by unit tests
 - New or changed functionality is documented if appropriate
