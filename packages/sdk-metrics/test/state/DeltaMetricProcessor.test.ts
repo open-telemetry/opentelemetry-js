@@ -100,6 +100,26 @@ describe('DeltaMetricProcessor', () => {
         assert.strictEqual(accumulation?.toPointValue(), 11);
       }
     });
+
+    it('should merge with active delta of accumulations', () => {
+      const metricProcessor = new DeltaMetricProcessor(new SumAggregator(true));
+
+      {
+        const measurements = new AttributeHashMap<number>();
+        measurements.set({}, 10);
+        metricProcessor.batchCumulate(measurements, [0, 0]);
+      }
+
+      {
+        const measurements = new AttributeHashMap<number>();
+        measurements.set({}, 20);
+        metricProcessor.batchCumulate(measurements, [1, 1]);
+      }
+
+      const accumulations = metricProcessor.collect();
+      const accumulation = accumulations.get({});
+      assert.strictEqual(accumulation?.toPointValue(), 20);
+    });
   });
 
   describe('collect', () => {
