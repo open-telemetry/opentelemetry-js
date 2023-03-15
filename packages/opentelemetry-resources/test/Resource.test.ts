@@ -325,10 +325,6 @@ describe('Resource', () => {
       const resource = Resource.EMPTY;
       const oldResource = new Resource190({ fromold: 'fromold' });
 
-      //TODO: find a solution for ts-ignore
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const mergedResource = resource.merge(oldResource);
 
       assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
@@ -339,19 +335,12 @@ describe('Resource', () => {
         {},
         Promise.resolve({ fromnew: 'fromnew' })
       );
-
       const oldResource = new Resource190({ fromold: 'fromold' });
 
-      //TODO: find a solution for ts-ignore
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const mergedResource = resource.merge(oldResource);
-
       assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
 
       await mergedResource.waitForAsyncAttributes?.();
-
       assert.strictEqual(mergedResource.attributes['fromnew'], 'fromnew');
     });
   });
