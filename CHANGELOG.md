@@ -16,6 +16,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :bug: (Bug Fix)
 
 * fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
+* fix(resources): change fs/promises import to be node 12 compatible [#3681](https://github.com/open-telemetry/opentelemetry-js/pull/3681) @pichlermarc
 
 ### :books: (Refine Doc)
 
