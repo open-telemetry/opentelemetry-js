@@ -315,6 +315,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
+    let requestHasResponse = false;
+
     /*
      * User 'response' event listeners can be added before our listener,
      * force our listener to be the first, so response emitter is bound
@@ -323,6 +325,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
+        requestHasResponse = true;
         const responseAttributes =
           utils.getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
@@ -345,8 +348,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
         context.bind(context.active(), response);
         this._diag.debug('outgoingRequest on response()');
-        response.on('close', () => {
-          this._diag.debug('outgoingRequest on close()');
+        response.on('end', () => {
+          this._diag.debug('outgoingRequest on end()');
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -401,7 +404,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     );
     request.on('close', () => {
       this._diag.debug('outgoingRequest on request close()');
-      if (!request.aborted) {
+      if (!request.aborted && !requestHasResponse) {
         this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
       }
     });
