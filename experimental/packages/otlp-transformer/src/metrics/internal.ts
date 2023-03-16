@@ -19,6 +19,7 @@ import {
   AggregationTemporality,
   DataPoint,
   DataPointType,
+  ExponentialHistogram,
   Histogram,
   MetricData,
   ResourceMetrics,
@@ -96,7 +97,10 @@ export function toMetric(metricData: MetricData): IMetric {
 }
 
 function toSingularDataPoint(
-  dataPoint: DataPoint<number> | DataPoint<Histogram>,
+  dataPoint:
+    | DataPoint<number>
+    | DataPoint<Histogram>
+    | DataPoint<ExponentialHistogram>,
   valueType: ValueType
 ) {
   const out: INumberDataPoint = {

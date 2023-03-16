@@ -7,13 +7,26 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ## Unreleased
 
-* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
-
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-metrics): add exponential histogram accumulation / aggregator [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505) @mwear
+
+### :bug: (Bug Fix)
+
+* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.10.0
+
+### :rocket: (Enhancement)
+
 * feat(resource): create sync resource with some attributes that resolve asynchronously [#3460](https://github.com/open-telemetry/opentelemetry-js/pull/3460) @samimusallam
+* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
 * feat (api-logs): separate Events API into its own package [3550](https://github.com/open-telemetry/opentelemetry-js/pull/3550) @martinkuba
 * feat(sdk-metrics): apply binary search in histogram recording [#3539](https://github.com/open-telemetry/opentelemetry-js/pull/3539) @legendecas
 * perf(propagator-jaeger): improve deserializeSpanContext performance [#3541](https://github.com/open-telemetry/opentelemetry-js/pull/3541) @doochik
@@ -26,6 +39,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * fix(core): added falsy check to make otel core work with browser where webpack config had process as false or null [#3613](https://github.com/open-telemetry/opentelemetry-js/issues/3613) @ravindra-dyte
 * fix(instrumentation-http): include query params in http.target [#3646](https://github.com/open-telemetry/opentelemetry-js/pull/3646) @kobi-co
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 
 ### :books: (Refine Doc)
 

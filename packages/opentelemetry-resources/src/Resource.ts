@@ -27,8 +27,9 @@ import { IResource } from './IResource';
  */
 export class Resource implements IResource {
   static readonly EMPTY = new Resource({});
-  private _syncAttributes: ResourceAttributes;
-  private _asyncAttributesPromise: Promise<ResourceAttributes> | undefined;
+  private _syncAttributes?: ResourceAttributes;
+  private _asyncAttributesPromise?: Promise<ResourceAttributes>;
+  private _attributes?: ResourceAttributes;
 
   /**
    * Check if async attributes have resolved. This is useful to avoid awaiting
@@ -36,7 +37,7 @@ export class Resource implements IResource {
    *
    * @returns true if the resource "attributes" property is not yet settled to its final value
    */
-  public asyncAttributesPending: boolean;
+  public asyncAttributesPending?: boolean;
 
   /**
    * Returns an empty Resource
@@ -66,11 +67,12 @@ export class Resource implements IResource {
      * information about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on attributes.
      */
-    private _attributes: ResourceAttributes,
+    attributes: ResourceAttributes,
     asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
+    this._attributes = attributes;
     this.asyncAttributesPending = asyncAttributesPromise != null;
-    this._syncAttributes = _attributes;
+    this._syncAttributes = this._attributes ?? {};
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
       asyncAttributes => {
         this._attributes = Object.assign({}, this._attributes, asyncAttributes);
@@ -92,7 +94,7 @@ export class Resource implements IResource {
       );
     }
 
-    return this._attributes;
+    return this._attributes ?? {};
   }
 
   /**
@@ -100,7 +102,7 @@ export class Resource implements IResource {
    * this Resource's attributes. This is useful in exporters to block until resource detection
    * has finished.
    */
-  async waitForAsyncAttributes(): Promise<void> {
+  async waitForAsyncAttributes?(): Promise<void> {
     if (this.asyncAttributesPending) {
       await this._asyncAttributesPromise;
     }
