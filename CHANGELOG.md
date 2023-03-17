@@ -12,6 +12,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat(sdk-metrics): add exponential histogram accumulation / aggregator [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505) @mwear
+* feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
 
 ### :bug: (Bug Fix)
 
