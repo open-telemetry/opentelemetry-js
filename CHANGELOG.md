@@ -12,6 +12,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat(sdk-metrics): add exponential histogram accumulation / aggregator [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505) @mwear
+* feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
 
 ### :bug: (Bug Fix)
 
@@ -30,7 +31,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * perf(propagator-jaeger): improve deserializeSpanContext performance [#3541](https://github.com/open-telemetry/opentelemetry-js/pull/3541) @doochik
 * feat: support TraceState in SamplingResult [#3530](https://github.com/open-telemetry/opentelemetry-js/pull/3530) @raphael-theriault-swi
 * feat(sdk-trace-base): add diagnostic logging when spans are dropped [#3610](https://github.com/open-telemetry/opentelemetry-js/pull/3610) @neoeinstein
-* feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
 * feat: add unit to view instrument selection criteria [#3647](https://github.com/open-telemetry/opentelemetry-js/pull/3647) @jlabatut
 * feat(tracing): expose dropped counts for attributes, events and links on span [#3576](https://github.com/open-telemetry/opentelemetry-js/pull/3576) @mohitk05
 
