@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import { execAsync } from './execAsync';
 import { diag } from '@opentelemetry/api';
 
