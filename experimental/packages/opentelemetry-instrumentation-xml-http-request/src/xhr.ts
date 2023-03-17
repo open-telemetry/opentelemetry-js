@@ -329,7 +329,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
-    const spanName = `HTTP ${method.toUpperCase()}`;
+    const spanName = method.toUpperCase();
 
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
