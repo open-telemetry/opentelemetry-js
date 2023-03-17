@@ -66,6 +66,11 @@ export class Span implements APISpan, ReadableSpan {
   readonly startTime: HrTime;
   readonly resource: IResource;
   readonly instrumentationLibrary: InstrumentationLibrary;
+
+  private _droppedAttributesCount = 0;
+  private _droppedEventsCount: number = 0;
+  private _droppedLinksCount: number = 0;
+
   name: string;
   status: SpanStatus = {
     code: SpanStatusCode.UNSET,
@@ -141,6 +146,7 @@ export class Span implements APISpan, ReadableSpan {
         this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
+      this._droppedAttributesCount++;
       return this;
     }
     this.attributes[key] = this._truncateToSize(value);
@@ -169,11 +175,13 @@ export class Span implements APISpan, ReadableSpan {
     if (this._isSpanEnded()) return this;
     if (this._spanLimits.eventCountLimit === 0) {
       diag.warn('No events allowed.');
+      this._droppedEventsCount++;
       return this;
     }
     if (this.events.length >= this._spanLimits.eventCountLimit!) {
       diag.warn('Dropping extra events.');
       this.events.shift();
+      this._droppedEventsCount++;
     }
 
     if (isTimeInput(attributesOrStartTime)) {
@@ -184,10 +192,12 @@ export class Span implements APISpan, ReadableSpan {
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
+
     this.events.push({
       name,
       attributes,
       time: this._getTime(timeStamp),
+      droppedAttributesCount: 0,
     });
     return this;
   }
@@ -296,6 +306,18 @@ export class Span implements APISpan, ReadableSpan {
 
   get ended(): boolean {
     return this._ended;
+  }
+
+  get droppedAttributesCount(): number {
+    return this._droppedAttributesCount;
+  }
+
+  get droppedEventsCount(): number {
+    return this._droppedEventsCount;
+  }
+
+  get droppedLinksCount(): number {
+    return this._droppedLinksCount;
   }
 
   private _isSpanEnded(): boolean {

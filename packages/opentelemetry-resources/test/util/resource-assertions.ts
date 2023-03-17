@@ -269,7 +269,9 @@ export const assertResource = (
     pid?: number;
     name?: string;
     command?: string;
-    commandLine?: string;
+    commandArgs?: string[];
+    executablePath?: string;
+    owner?: string;
     version?: string;
     runtimeName?: string;
     runtimeDescription?: string;
@@ -291,10 +293,22 @@ export const assertResource = (
       validations.command
     );
   }
-  if (validations.commandLine) {
+  if (validations.commandArgs) {
+    assert.deepStrictEqual(
+      resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND_ARGS],
+      validations.commandArgs
+    );
+  }
+  if (validations.executablePath) {
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND_LINE],
-      validations.commandLine
+      resource.attributes[SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH],
+      validations.executablePath
+    );
+  }
+  if (validations.owner) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.PROCESS_OWNER],
+      validations.owner
     );
   }
   if (validations.version) {

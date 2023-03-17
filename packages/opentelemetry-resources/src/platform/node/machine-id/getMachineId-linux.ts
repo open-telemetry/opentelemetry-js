@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import { diag } from '@opentelemetry/api';
 
 export async function getMachineId(): Promise<string> {

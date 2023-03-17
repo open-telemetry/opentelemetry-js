@@ -82,6 +82,9 @@ describe('transform', () => {
           name: 'default',
           version: '0.0.1',
         },
+        droppedAttributesCount: 0,
+        droppedEventsCount: 0,
+        droppedLinksCount: 0,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -179,6 +182,9 @@ describe('transform', () => {
           name: 'default',
           version: '0.0.1',
         },
+        droppedAttributesCount: 0,
+        droppedEventsCount: 0,
+        droppedLinksCount: 0,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -246,6 +252,9 @@ describe('transform', () => {
           name: 'default',
           version: '0.0.1',
         },
+        droppedAttributesCount: 0,
+        droppedEventsCount: 0,
+        droppedLinksCount: 0,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -291,6 +300,9 @@ describe('transform', () => {
           name: 'default',
           version: '0.0.1',
         },
+        droppedAttributesCount: 0,
+        droppedEventsCount: 0,
+        droppedLinksCount: 0,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -353,6 +365,9 @@ describe('transform', () => {
           name: 'default',
           version: '0.0.1',
         },
+        droppedAttributesCount: 0,
+        droppedEventsCount: 0,
+        droppedLinksCount: 0,
       };
       let thriftSpan = spanToThrift(readableSpan);
       assert.strictEqual(

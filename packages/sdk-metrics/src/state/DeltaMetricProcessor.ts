@@ -57,6 +57,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
           this._aggregator.createAccumulation(collectionTime);
         accumulation?.record(value);
         let delta = accumulation;
+        // Diff with recorded cumulative memo.
         if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
           // has() returned true, previous is present.
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -65,6 +66,16 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
             hashCode
           )!;
           delta = this._aggregator.diff(previous, accumulation);
+        }
+        // Merge with uncollected active delta.
+        if (this._activeCollectionStorage.has(attributes, hashCode)) {
+          // has() returned true, previous is present.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const active = this._activeCollectionStorage.get(
+            attributes,
+            hashCode
+          )!;
+          delta = this._aggregator.merge(active, delta);
         }
 
         // Save the current record and the delta record.

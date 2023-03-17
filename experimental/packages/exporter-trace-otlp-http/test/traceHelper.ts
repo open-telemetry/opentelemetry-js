@@ -72,22 +72,34 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   events: [
-    { name: 'fetchStart', time: [1574120165, 429803070] },
+    {
+      name: 'fetchStart',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'domainLookupStart',
       time: [1574120165, 429803070],
     },
-    { name: 'domainLookupEnd', time: [1574120165, 429803070] },
+    {
+      name: 'domainLookupEnd',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'connectStart',
       time: [1574120165, 429803070],
     },
-    { name: 'connectEnd', time: [1574120165, 429803070] },
+    {
+      name: 'connectEnd',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'requestStart',
       time: [1574120165, 435513070],
     },
-    { name: 'responseStart', time: [1574120165, 436923070] },
+    {
+      name: 'responseStart',
+      time: [1574120165, 436923070],
+    },
     {
       name: 'responseEnd',
       time: [1574120165, 438688070],
@@ -102,6 +114,9 @@ export const mockedReadableSpan: ReadableSpan = {
     })
   ),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  droppedAttributesCount: 0,
+  droppedEventsCount: 0,
+  droppedLinksCount: 0,
 };
 
 export const mockedResources: Resource[] = [
@@ -142,6 +157,9 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8885000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   },
   {
     name: 'span2',
@@ -164,6 +182,9 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8775000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   },
   {
     name: 'span3',
@@ -186,6 +207,9 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8775000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   },
 ];
 
