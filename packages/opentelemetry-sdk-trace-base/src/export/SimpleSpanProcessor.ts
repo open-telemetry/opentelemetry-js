@@ -79,17 +79,21 @@ export class SimpleSpanProcessor implements SpanProcessor {
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (span.resource.asyncAttributesPending) {
       const exportPromise = (span.resource as Resource)
-        .waitForAsyncAttributes()
+        .waitForAsyncAttributes?.()
         .then(
           () => {
-            this._unresolvedExports.delete(exportPromise);
+            if (exportPromise != null) {
+              this._unresolvedExports.delete(exportPromise);
+            }
             return doExport();
           },
           err => globalErrorHandler(err)
         );
 
       // store the unresolved exports
-      this._unresolvedExports.add(exportPromise);
+      if (exportPromise != null) {
+        this._unresolvedExports.add(exportPromise);
+      }
     } else {
       void doExport();
     }
