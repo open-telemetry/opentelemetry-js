@@ -62,7 +62,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       const err = new OTLPExporterError('Request Timeout');
       onError(err);
     } else {
-       req.destroy();
+      req.destroy();
     }
   }, exporterTimeout);
 
