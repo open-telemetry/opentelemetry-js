@@ -325,7 +325,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
-        requestHasResponse = true;
+        // if there are no other response listeners, we don't wanna set this as there won't ever be any response
+        if (request.listenerCount('response') > 1) {
+          requestHasResponse = true;
+        }
+
         const responseAttributes =
           utils.getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
