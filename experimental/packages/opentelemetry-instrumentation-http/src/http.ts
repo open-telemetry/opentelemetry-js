@@ -38,7 +38,6 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
-import * as semver from 'semver';
 import * as url from 'url';
 import {
   Err,
@@ -580,18 +579,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         options,
         extraOptions
       );
-      /**
-       * Node 8's https module directly call the http one so to avoid creating
-       * 2 span for the same request we need to check that the protocol is correct
-       * See: https://github.com/nodejs/node/blob/v8.17.0/lib/https.js#L245
-       */
-      if (
-        component === 'http' &&
-        semver.lt(process.version, '9.0.0') &&
-        optionsParsed.protocol === 'https:'
-      ) {
-        return original.apply(this, [optionsParsed, ...args]);
-      }
 
       if (
         utils.isIgnored(
