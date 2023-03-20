@@ -59,6 +59,7 @@ export function getTypeConflictResolutionRecipe(
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
     type: otherDescriptor.type,
+    unit: otherDescriptor.unit,
   };
 
   const selectorString = JSON.stringify(selector);
@@ -73,6 +74,7 @@ export function getDescriptionResolutionRecipe(
   const selector: InstrumentSelectorCriteria = {
     name: otherDescriptor.name,
     type: otherDescriptor.type,
+    unit: otherDescriptor.unit,
   };
 
   const selectorString = JSON.stringify(selector);

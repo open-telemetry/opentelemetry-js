@@ -85,6 +85,14 @@ export type ViewOptions = {
   instrumentName?: string;
   /**
    * Instrument selection criteria:
+   * The unit of the Instrument(s).
+   *
+   * @example <caption>select all instruments with unit 'ms'</caption>
+   * instrumentUnit: 'ms'
+   */
+  instrumentUnit?: string;
+  /**
+   * Instrument selection criteria:
    * The name of the Meter. No wildcard support, name must match the meter exactly.
    *
    * @example <caption>select all meters named 'example.component.app' exactly</caption>
@@ -113,6 +121,7 @@ function isSelectorNotProvided(options: ViewOptions): boolean {
   return (
     options.instrumentName == null &&
     options.instrumentType == null &&
+    options.instrumentUnit == null &&
     options.meterName == null &&
     options.meterVersion == null &&
     options.meterSchemaUrl == null
@@ -161,6 +170,9 @@ export class View {
    * @param viewOptions.instrumentType
    * Instrument selection criteria:
    *  The original type of the Instrument(s).
+   * @param viewOptions.instrumentUnit
+   * Instrument selection criteria:
+   *  The unit of the Instrument(s).
    * @param viewOptions.meterName
    * Instrument selection criteria:
    *  The name of the Meter. No wildcard support, name must match the meter exactly.
@@ -213,6 +225,7 @@ export class View {
     this.instrumentSelector = new InstrumentSelector({
       name: viewOptions.instrumentName,
       type: viewOptions.instrumentType,
+      unit: viewOptions.instrumentUnit,
     });
     this.meterSelector = new MeterSelector({
       name: viewOptions.meterName,

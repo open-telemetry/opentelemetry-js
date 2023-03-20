@@ -49,6 +49,10 @@ export function loadDefaultConfig() {
       attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
       linkCountLimit: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
       eventCountLimit: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
+      attributePerEventCountLimit:
+        getEnv().OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT,
+      attributePerLinkCountLimit:
+        getEnv().OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
     },
   };
 }

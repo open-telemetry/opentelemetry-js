@@ -30,7 +30,7 @@ describe('getMapping', () => {
       } else {
         assert.ok(mapping instanceof ExponentMapping);
       }
-      assert.strictEqual(mapping.scale(), scale);
+      assert.strictEqual(mapping.scale, scale);
     }
   });
 

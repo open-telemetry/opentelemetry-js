@@ -53,6 +53,9 @@ describe('JaegerExporter', () => {
       name: 'default',
       version: '0.0.1',
     },
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   };
   describe('constructor', () => {
     afterEach(() => {

@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-export { Sum, LastValue, Histogram } from './aggregator/types';
+export {
+  Sum,
+  LastValue,
+  Histogram,
+  ExponentialHistogram,
+} from './aggregator/types';
 
 export {
   AggregationSelector,
