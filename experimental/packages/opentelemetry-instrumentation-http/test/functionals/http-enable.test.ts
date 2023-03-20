@@ -16,11 +16,13 @@
 import {
   SpanStatusCode,
   context,
+  diag,
   propagation,
   Span as ISpan,
   SpanKind,
   trace,
   SpanAttributes,
+  DiagConsoleLogger,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -267,6 +269,14 @@ describe('HttpInstrumentation', () => {
             // write response headers.
             response.write('');
             // hang the request.
+            return;
+          }
+          if (request.url?.includes('/destroy-request')) {
+            // force flush http response header to trigger client response callback
+            response.write('');
+            setTimeout(() => {
+              request.socket.destroy();
+            }, 100);
             return;
           }
           if (request.url?.includes('/ignored')) {
@@ -919,6 +929,37 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
         assert.strictEqual(clientSpan.status.code, SpanStatusCode.ERROR);
         assert.ok(Object.keys(clientSpan.attributes).length >= 6);
+      });
+
+      it('should not end span multiple times if request socket destroyed before response completes', async () => {
+        const warnMessages: string[] = [];
+        diag.setLogger({
+          ...new DiagConsoleLogger(),
+          warn: message => {
+            warnMessages.push(message);
+          },
+        });
+        const promise = new Promise<void>(resolve => {
+          const req = http.get(
+            `${protocol}://${hostname}:${serverPort}/destroy-request`,
+            res => {
+              res.on('end', () => {});
+              res.on('close', () => {});
+              res.on('error', () => {
+                resolve();
+              });
+            }
+          );
+          // force flush http request header to trigger client response callback
+          req.write('');
+          req.on('error', () => {});
+        });
+
+        await promise;
+
+        diag.disable();
+
+        assert.strictEqual(warnMessages, []);
       });
     });
 
