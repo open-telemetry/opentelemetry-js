@@ -33,7 +33,7 @@ import {
   assertInEpsilon,
   assertInDelta,
 } from './exponential-histogram/helpers';
-import { defaultInstrumentDescriptor } from '../util';
+import { defaultMetricDescriptor } from '../util';
 
 describe('ExponentialHistogramAccumulation', () => {
   describe('record', () => {
@@ -627,14 +627,14 @@ describe('ExponentialHistogramAggregation', () => {
       acc.record(-4);
 
       const result = agg.toMetricData(
-        defaultInstrumentDescriptor,
+        defaultMetricDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
         endTime
       );
 
       const expected: MetricData = {
-        descriptor: defaultInstrumentDescriptor,
+        descriptor: defaultMetricDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM,
         dataPoints: [
@@ -678,14 +678,14 @@ describe('ExponentialHistogramAggregation', () => {
       acc.record(-4);
 
       const result = agg.toMetricData(
-        defaultInstrumentDescriptor,
+        defaultMetricDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
         endTime
       );
 
       const expected: MetricData = {
-        descriptor: defaultInstrumentDescriptor,
+        descriptor: defaultMetricDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM,
         dataPoints: [

@@ -119,7 +119,7 @@ describe('ViewRegistry', () => {
         {
           const views = registry.findViews(
             {
-              ...defaultInstrumentDescriptor,
+              ...defaultMetricDescriptor,
               unit: 'ms',
             },
             defaultInstrumentationScope
@@ -132,7 +132,7 @@ describe('ViewRegistry', () => {
         {
           const views = registry.findViews(
             {
-              ...defaultInstrumentDescriptor,
+              ...defaultMetricDescriptor,
               unit: 's',
             },
             defaultInstrumentationScope
