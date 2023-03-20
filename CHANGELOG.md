@@ -12,6 +12,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat(sdk-metrics): add exponential histogram accumulation / aggregator [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505) @mwear
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 * feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
 
 ### :bug: (Bug Fix)
@@ -44,7 +45,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * fix(core): added falsy check to make otel core work with browser where webpack config had process as false or null [#3613](https://github.com/open-telemetry/opentelemetry-js/issues/3613) @ravindra-dyte
 * fix(instrumentation-http): include query params in http.target [#3646](https://github.com/open-telemetry/opentelemetry-js/pull/3646) @kobi-co
-* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 
 ### :books: (Refine Doc)
 
