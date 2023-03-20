@@ -352,8 +352,21 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
         context.bind(context.active(), response);
         this._diag.debug('outgoingRequest on response()');
+
+        // See https://github.com/open-telemetry/opentelemetry-js/pull/3625#issuecomment-1475673533
+        let endEmitted = false;
+        if (semver.lt(process.version, '16.0.0')) {
+          response.on('close', () => {
+            this._diag.debug('outgoingRequest on close()');
+            if (!endEmitted) {
+              response.emit('end');
+            }
+          });
+        }
+
         response.on('end', () => {
           this._diag.debug('outgoingRequest on end()');
+          endEmitted = true;
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {

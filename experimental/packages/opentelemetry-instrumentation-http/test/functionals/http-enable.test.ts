@@ -866,7 +866,7 @@ describe('HttpInstrumentation', () => {
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
               res.on('close', () => {});
-              res.on('error', () => {});
+              res.on('error', reject);
             }
           );
           // close the socket.
