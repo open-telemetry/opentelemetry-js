@@ -325,7 +325,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
-        // if there are no other response listeners, we don't wanna set this as there won't ever be any response
+        // if there are no other response listeners, we don't wanna set this as the data of the response is not consumed and no 'end' event is emitted.
         if (request.listenerCount('response') > 1) {
           requestHasResponse = true;
         }
