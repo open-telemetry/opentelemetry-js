@@ -27,8 +27,8 @@ export function loadDefaultConfig() {
     forceFlushTimeoutMillis: 30000,
     logRecordLimits: {
       attributeValueLengthLimit:
-        getEnv().OTEL_LOG_RECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: getEnv().OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT,
+        getEnv().OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeCountLimit: getEnv().OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT,
     },
   };
 }
@@ -48,7 +48,7 @@ export function reconfigureLimits(userConfig: LoggerConfig): LoggerConfig {
    */
   logRecordLimits.attributeCountLimit =
     userConfig.logRecordLimits?.attributeCountLimit ??
-    parsedEnvConfig.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT ??
+    parsedEnvConfig.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT ??
     parsedEnvConfig.OTEL_ATTRIBUTE_COUNT_LIMIT ??
     DEFAULT_ATTRIBUTE_COUNT_LIMIT;
 
@@ -57,7 +57,7 @@ export function reconfigureLimits(userConfig: LoggerConfig): LoggerConfig {
    */
   logRecordLimits.attributeValueLengthLimit =
     userConfig.logRecordLimits?.attributeValueLengthLimit ??
-    parsedEnvConfig.OTEL_LOG_RECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
+    parsedEnvConfig.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
     parsedEnvConfig.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
     DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT;
 

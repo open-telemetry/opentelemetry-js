@@ -137,14 +137,14 @@ describe('LoggerProvider', () => {
 
       describe('when attribute value length limit is defined via env', () => {
         it('should have attribute value length limit as default of Infinity', () => {
-          envSource.OTEL_LOG_RECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
+          envSource.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
           const logger = new LoggerProvider().getLogger('default');
           const logRecordLimits = logger.getLogRecordLimits();
           assert.strictEqual(
             logRecordLimits.attributeValueLengthLimit,
             Infinity
           );
-          delete envSource.OTEL_LOG_RECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT;
         });
       });
 
@@ -161,18 +161,18 @@ describe('LoggerProvider', () => {
 
       describe('when attribute count limit is defined via env', () => {
         it('should have attribute count limits as defined in env', () => {
-          envSource.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT = '35';
+          envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '35';
           const logger = new LoggerProvider().getLogger('default');
           const logRecordLimits = logger.getLogRecordLimits();
           assert.strictEqual(logRecordLimits.attributeCountLimit, 35);
-          delete envSource.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT;
+          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
         });
         it('should have attribute count limit as default of 128', () => {
-          envSource.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT = '128';
+          envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '128';
           const logger = new LoggerProvider().getLogger('default');
           const logRecordLimits = logger.getLogRecordLimits();
           assert.strictEqual(logRecordLimits.attributeCountLimit, 128);
-          delete envSource.OTEL_LOG_RECORD_ATTRIBUTE_COUNT_LIMIT;
+          delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
         });
       });
 

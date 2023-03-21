@@ -45,12 +45,12 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   constructor(private readonly _exporter: LogRecordExporter, config?: T) {
     const env = getEnv();
     this._maxExportBatchSize =
-      config?.maxExportBatchSize ?? env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
-    this._maxQueueSize = config?.maxQueueSize ?? env.OTEL_BSP_MAX_QUEUE_SIZE;
+      config?.maxExportBatchSize ?? env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;
+    this._maxQueueSize = config?.maxQueueSize ?? env.OTEL_BLRP_MAX_QUEUE_SIZE;
     this._scheduledDelayMillis =
-      config?.scheduledDelayMillis ?? env.OTEL_BSP_SCHEDULE_DELAY;
+      config?.scheduledDelayMillis ?? env.OTEL_BLRP_SCHEDULE_DELAY;
     this._exportTimeoutMillis =
-      config?.exportTimeoutMillis ?? env.OTEL_BSP_EXPORT_TIMEOUT;
+      config?.exportTimeoutMillis ?? env.OTEL_BLRP_EXPORT_TIMEOUT;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
