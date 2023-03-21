@@ -66,7 +66,6 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
-  private readonly _version = process.versions.node;
   private _headerCapture;
   private _httpServerDurationHistogram!: Histogram;
   private _httpClientDurationHistogram!: Histogram;
@@ -116,7 +115,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'http',
       ['*'],
       moduleExports => {
-        this._diag.debug(`Applying patch for http@${this._version}`);
+        this._diag.debug(
+          `Applying patch for http@${this.instrumentationVersion}`
+        );
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -145,7 +146,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for http@${this._version}`);
+        this._diag.debug(
+          `Removing patch for http@${this.instrumentationVersion}`
+        );
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -159,7 +162,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'https',
       ['*'],
       moduleExports => {
-        this._diag.debug(`Applying patch for https@${this._version}`);
+        this._diag.debug(
+          `Applying patch for https@${this.instrumentationVersion}`
+        );
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -188,7 +193,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for https@${this._version}`);
+        this._diag.debug(
+          `Removing patch for https@${this.instrumentationVersion}`
+        );
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
