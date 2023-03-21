@@ -230,18 +230,15 @@ jobs:
       - uses: actions/download-artifact@v3
         name: Download node reports
         with:
-          name:
-            - node-coverage
+          name: node-coverage
       - uses: actions/download-artifact@v3
         name: Download webworker reports
         with:
-          name:
-            - browser-coverage
+          name: browser-coverage
       - uses: actions/download-artifact@v3
         name: Download browser reports
         with:
-          name:
-            - browser-coverage
+          name: browser-coverage
       - name: Move reports
         run: |
           find ./node-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-node.json' sh {} \;
