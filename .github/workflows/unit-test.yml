@@ -60,12 +60,12 @@ jobs:
       - name: Generate Report
         run: npm run coverage:report
         if: ${{ matrix.node_version == '18' }}
-      - name: Report Coverage
-        uses: codecov/codecov-action@v3
+      - name: Store coverage
+        uses: actions/upload-artifact@v3
         with:
-          fail_ci_if_error: true
-          verbose: true
-        if: ${{ matrix.node_version == '18' }}
+          name: node-coverage
+          path: ./**/coverage-final.json
+          retention-days: 1
   node-windows-tests:
     runs-on: windows-latest
     env:
@@ -143,11 +143,12 @@ jobs:
         run: npm run test:browser
       - name: Generate Report
         run: npm run coverage:report:browser
-      - name: Report Coverage
-        uses: codecov/codecov-action@v3
+      - name: Store coverage
+        uses: actions/upload-artifact@v3
         with:
-          fail_ci_if_error: true
-          verbose: true
+          name: browser-coverage
+          path: ./**/coverage-final.json
+          retention-days: 1
   webworker-tests:
     runs-on: ubuntu-latest
     env:
@@ -185,11 +186,12 @@ jobs:
         run: npm run test:webworker
       - name: Generate Report
         run: npm run coverage:report:webworker
-      - name: Report Coverage
-        uses: codecov/codecov-action@v3
+      - name: Store coverage
+        uses: actions/upload-artifact@v3
         with:
-          fail_ci_if_error: true
-          verbose: true
+          name: browser-coverage
+          path: ./**/coverage-final.json
+          retention-days: 1
   api-eol-node-test:
     strategy:
       fail-fast: false
@@ -218,3 +220,30 @@ jobs:
       - name: Test
         working-directory: ./api
         run: npm test
+  report-coverage:
+    steps:
+      - uses: actions/download-artifact@v3
+        name: Download reports
+        with:
+          name:
+            - node-coverage
+            - webworker-coverage
+            - browser-coverage
+        needs:
+          - node-tests
+          - webworker-tests
+          - browser-tests
+      - name: Move reports
+        run: |
+          find ./node-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-node.json' sh {} \;
+          find ./webworker-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-webworker.json' sh {} \;
+          find ./browser-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-browser.json' sh {} \;
+          rsync -av node-coverage/ .
+          rsync -av webworker-coverage/ .
+          rsync -av browser-coverage/ .
+      - name: Report Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          verbose: true
+          files: coverage-final-node.json,coverage-final-browser.json,coverage-final-webworker.json
