@@ -25,6 +25,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* chore: update codecov to use the codecov action [#3661](https://github.com/open-telemetry/opentelemetry-js/pull/3661) @pichlermarc
+
 ## 1.10.1
 
 ### :bug: (Bug Fix)
