@@ -10,6 +10,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-logs): logs sdk implementation. [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
+* feat(core): add logs environment variables; add timeout utils method. [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
