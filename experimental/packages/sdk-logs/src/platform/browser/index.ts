@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export * from './export/BatchLogRecordProcessor';
+export { BatchLogRecordProcessor } from './export/BatchLogRecordProcessor';
