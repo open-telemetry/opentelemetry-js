@@ -22,7 +22,7 @@
     "test:browser": "nyc karma start --single-run",
     "watch": "tsc --build -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "codecov": "nyc report --reporter=json"
+    "coverage:report": "nyc report --reporter=json"
   },
   "keywords": [
     "opentelemetry",

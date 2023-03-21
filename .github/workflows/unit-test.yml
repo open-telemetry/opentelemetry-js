@@ -58,7 +58,7 @@ jobs:
           fi
           npm run test
       - name: Generate Report
-        run: npm run codecov
+        run: npm run coverage:report
         if: ${{ matrix.node_version == '18' }}
       - name: Report Coverage
         uses: codecov/codecov-action@v3
@@ -142,7 +142,7 @@ jobs:
       - name: Unit tests
         run: npm run test:browser
       - name: Generate Report
-        run: npm run codecov:browser
+        run: npm run coverage:report:browser
       - name: Report Coverage
         uses: codecov/codecov-action@v3
         with:
@@ -184,7 +184,7 @@ jobs:
       - name: Unit tests
         run: npm run test:webworker
       - name: Generate Report
-        run: npm run codecov:webworker
+        run: npm run coverage:report:webworker
       - name: Report Coverage
         uses: codecov/codecov-action@v3
         with:

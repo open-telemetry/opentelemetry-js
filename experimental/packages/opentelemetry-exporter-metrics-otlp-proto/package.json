@@ -18,7 +18,7 @@
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "codecov": "nyc report --reporter=json"
+    "coverage:report": "nyc report --reporter=json"
   },
   "keywords": [
     "opentelemetry",
