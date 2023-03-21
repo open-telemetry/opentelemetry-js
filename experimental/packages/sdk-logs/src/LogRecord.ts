@@ -16,12 +16,12 @@
 
 import type { Attributes, AttributeValue } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
-import type { InstrumentationScope } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import {
-  hrTime,
   timeInputToHrTime,
   isAttributeValue,
+  InstrumentationScope,
+  millisToHrTime,
 } from '@opentelemetry/core';
 import type { IResource } from '@opentelemetry/resources';
 
@@ -44,7 +44,7 @@ export class LogRecord implements ReadableLogRecord {
 
   constructor(logger: Logger, logRecord: logsAPI.LogRecord) {
     const {
-      timestamp = hrTime(),
+      timestamp = Date.now(),
       severityNumber,
       severityText,
       body,
