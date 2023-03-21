@@ -23,5 +23,5 @@ export class MappingError extends Error {}
 export interface Mapping {
   mapToIndex(value: number): number;
   lowerBoundary(index: number): number;
-  scale(): number;
+  get scale(): number;
 }

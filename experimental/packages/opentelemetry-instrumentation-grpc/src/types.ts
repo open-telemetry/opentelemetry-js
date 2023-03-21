@@ -29,5 +29,9 @@ export interface GrpcInstrumentationConfig extends InstrumentationConfig {
       responseMetadata?: string[];
       requestMetadata?: string[];
     };
+    server?: {
+      responseMetadata?: string[];
+      requestMetadata?: string[];
+    };
   };
 }

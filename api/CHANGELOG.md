@@ -4,15 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.4.1
+
 ### :bug: (Bug Fix)
 
 * fix(metrics): export `MetricsAPI` type [#3535](https://github.com/open-telemetry/opentelemetry-js/pull/3535)
+* fix(api): rename `LoggerOptions` to `DiagLoggerOptions` [#3641](https://github.com/open-telemetry/opentelemetry-js/pull/3641)
+* fix(api): export `DiagLoggerOptions` type [#3639](https://github.com/open-telemetry/opentelemetry-js/pull/3639)
 
 ## 1.4.0
 
 ### :rocket: (Enhancement)
 
 * feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
+* feat(api): add optional `droppedAttributesCount` property in the `Link` interface [#3576](https://github.com/open-telemetry/opentelemetry-js/pull/3576) @mohitk05
 
 ### :bug: (Bug Fix)
 
