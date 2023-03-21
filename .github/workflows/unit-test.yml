@@ -221,6 +221,7 @@ jobs:
         working-directory: ./api
         run: npm test
   report-coverage:
+    runs-on: ubuntu-latest
     needs:
       - node-tests
       - webworker-tests
