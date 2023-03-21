@@ -221,6 +221,10 @@ jobs:
         working-directory: ./api
         run: npm test
   report-coverage:
+    needs:
+      - node-tests
+      - webworker-tests
+      - browser-tests
     steps:
       - uses: actions/download-artifact@v3
         name: Download reports
@@ -229,10 +233,6 @@ jobs:
             - node-coverage
             - webworker-coverage
             - browser-coverage
-        needs:
-          - node-tests
-          - webworker-tests
-          - browser-tests
       - name: Move reports
         run: |
           find ./node-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-node.json' sh {} \;
