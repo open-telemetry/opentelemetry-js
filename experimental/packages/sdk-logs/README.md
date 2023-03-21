@@ -55,7 +55,7 @@ logger.emit({
 
 ## Config
 
-Logs configuration is a merge of user supplied configuration with both the default
+Logs configuration is a merge of both the user supplied configuration and the default
 configuration as specified in [config.ts](./src/config.ts)
 
 ## Example
@@ -76,4 +76,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-logs
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk%2Dlogs.svg
