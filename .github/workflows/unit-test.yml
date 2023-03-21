@@ -228,11 +228,19 @@ jobs:
       - browser-tests
     steps:
       - uses: actions/download-artifact@v3
-        name: Download reports
+        name: Download node reports
         with:
           name:
             - node-coverage
-            - webworker-coverage
+      - uses: actions/download-artifact@v3
+        name: Download webworker reports
+        with:
+          name:
+            - browser-coverage
+      - uses: actions/download-artifact@v3
+        name: Download browser reports
+        with:
+          name:
             - browser-coverage
       - name: Move reports
         run: |
