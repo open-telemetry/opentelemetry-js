@@ -73,20 +73,11 @@ describe('LoggerProvider', () => {
     });
 
     describe('when user sets unavailable exporter', () => {
-      it('should use noop log record processor by default and show diag error', () => {
-        const errorStub = sinon.spy(diag, 'error');
-        envSource.OTEL_LOGS_EXPORTER = 'someExporter';
-
+      it('should use noop log record processor by default', () => {
         const provider = new LoggerProvider();
         const processors = provider.getActiveLogRecordProcessor().processors;
         assert.ok(processors.length === 1);
         assert.ok(processors[0] instanceof NoopLogRecordProcessor);
-
-        sinon.assert.calledWith(
-          errorStub,
-          'Exporter "someExporter" requested through environment variable is unavailable.'
-        );
-        delete envSource.OTEL_LOGS_EXPORTER;
       });
     });
 

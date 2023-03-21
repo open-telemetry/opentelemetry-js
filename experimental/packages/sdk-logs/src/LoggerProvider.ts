@@ -16,25 +16,16 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { IResource, Resource } from '@opentelemetry/resources';
-import { getEnv, merge } from '@opentelemetry/core';
+import { merge } from '@opentelemetry/core';
 
 import type { LoggerConfig } from './types';
 import type { LogRecordProcessor } from './LogRecordProcessor';
-import type { LogRecordExporter } from './export/LogRecordExporter';
 import { Logger } from './Logger';
 import { loadDefaultConfig, reconfigureLimits } from './config';
 import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
-import { BatchLogRecordProcessor } from './platform/node/export/BatchLogRecordProcessor';
 import { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';
 
-export type EXPORTER_FACTORY = () => LogRecordExporter;
-
 export class LoggerProvider implements logsAPI.LoggerProvider {
-  protected static readonly _registeredExporters = new Map<
-    string,
-    EXPORTER_FACTORY
-  >();
-
   public readonly resource: IResource;
 
   private readonly _loggers: Map<string, Logger> = new Map();
@@ -55,18 +46,11 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       forceFlushTimeoutMillis,
     };
 
-    const defaultExporter = this._buildExporterFromEnv();
-    if (defaultExporter !== undefined) {
-      this._activeProcessor = new MultiLogRecordProcessor(
-        [new BatchLogRecordProcessor(defaultExporter)],
-        forceFlushTimeoutMillis
-      );
-    } else {
-      this._activeProcessor = new MultiLogRecordProcessor(
-        [new NoopLogRecordProcessor()],
-        forceFlushTimeoutMillis
-      );
-    }
+    // add a default processor: NoopLogRecordProcessor
+    this._activeProcessor = new MultiLogRecordProcessor(
+      [new NoopLogRecordProcessor()],
+      forceFlushTimeoutMillis
+    );
   }
 
   /**
@@ -137,25 +121,5 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
 
   public getActiveLoggers(): Map<string, Logger> {
     return this._loggers;
-  }
-
-  protected _getLogRecordExporter(name: string): LogRecordExporter | undefined {
-    return (this.constructor as typeof LoggerProvider)._registeredExporters.get(
-      name
-    )?.();
-  }
-
-  protected _buildExporterFromEnv(): LogRecordExporter | undefined {
-    const exporterName = getEnv().OTEL_LOGS_EXPORTER;
-    if (exporterName === 'none' || exporterName === '') {
-      return;
-    }
-    const exporter = this._getLogRecordExporter(exporterName);
-    if (!exporter) {
-      diag.error(
-        `Exporter "${exporterName}" requested through environment variable is unavailable.`
-      );
-    }
-    return exporter;
   }
 }
