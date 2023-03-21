@@ -61,12 +61,15 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     version?: string,
     options?: logsAPI.LoggerOptions
   ): Logger {
-    const { schemaUrl = '' } = options || {};
-    const key = `${name}@${version || ''}:${schemaUrl}`;
+    const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._loggers.has(key)) {
       this._loggers.set(
         key,
-        new Logger({ name, version, schemaUrl }, this._config, this)
+        new Logger(
+          { name, version, schemaUrl: options?.schemaUrl },
+          this._config,
+          this
+        )
       );
     }
     return this._loggers.get(key)!;
