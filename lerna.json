@@ -2,7 +2,6 @@
   "version": "independent",
   "npmClient": "npm",
   "packages": [
-    "api",
     "packages/*",
     "experimental/packages/*",
     "experimental/examples/*",
