@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
+import * as ImportInTheMiddle from 'import-in-the-middle';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import { RequireInTheMiddleSingleton } from '../../src/platform/node/RequireInTheMiddleSingleton';
 
@@ -24,6 +25,7 @@ const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
 
 type AugmentedExports = {
   __ritmOnRequires?: string[];
+  __iitmHookFn?: string[];
 };
 
 const makeOnRequiresStub = (label: string): sinon.SinonStub =>
@@ -33,6 +35,13 @@ const makeOnRequiresStub = (label: string): sinon.SinonStub =>
     return exports;
   }) as RequireInTheMiddle.OnRequireFn);
 
+const makeHookFnStub = (label: string): sinon.SinonStub =>
+  sinon.stub().callsFake(((exports: AugmentedExports) => {
+    exports.__iitmHookFn ??= [];
+    exports.__iitmHookFn.push(label);
+    return exports;
+  }) as ImportInTheMiddle.HookFn);
+
 describe('RequireInTheMiddleSingleton', () => {
   describe('register', () => {
     const onRequireFsStub = makeOnRequiresStub('fs');
@@ -41,22 +50,38 @@ describe('RequireInTheMiddleSingleton', () => {
     const onRequireCodecovLibStub = makeOnRequiresStub('codecov-lib');
     const onRequireCpxStub = makeOnRequiresStub('cpx');
     const onRequireCpxLibStub = makeOnRequiresStub('cpx-lib');
+    const hookFnBasicStub = makeHookFnStub('fs');
 
     before(() => {
-      requireInTheMiddleSingleton.register('fs', onRequireFsStub);
+      requireInTheMiddleSingleton.register(
+        'fs',
+        onRequireFsStub,
+        hookFnBasicStub
+      );
       requireInTheMiddleSingleton.register(
         'fs/promises',
-        onRequireFsPromisesStub
+        onRequireFsPromisesStub,
+        hookFnBasicStub
       );
-      requireInTheMiddleSingleton.register('codecov', onRequireCodecovStub);
+      requireInTheMiddleSingleton.register(
+        'codecov',
+        onRequireCodecovStub,
+        hookFnBasicStub
+      );
       requireInTheMiddleSingleton.register(
         'codecov/lib/codecov.js',
-        onRequireCodecovLibStub
+        onRequireCodecovLibStub,
+        hookFnBasicStub
       );
-      requireInTheMiddleSingleton.register('cpx', onRequireCpxStub);
+      requireInTheMiddleSingleton.register(
+        'cpx',
+        onRequireCpxStub,
+        hookFnBasicStub
+      );
       requireInTheMiddleSingleton.register(
         'cpx/lib/copy-sync.js',
-        onRequireCpxLibStub
+        onRequireCpxLibStub,
+        hookFnBasicStub
       );
     });
 
@@ -72,11 +97,13 @@ describe('RequireInTheMiddleSingleton', () => {
     it('should return a hooked object', () => {
       const moduleName = 'm';
       const onRequire = makeOnRequiresStub('m');
+      const hookFn = makeHookFnStub('n');
       const hooked = requireInTheMiddleSingleton.register(
         moduleName,
-        onRequire
+        onRequire,
+        hookFn
       );
-      assert.deepStrictEqual(hooked, { moduleName, onRequire });
+      assert.deepStrictEqual(hooked, { moduleName, onRequire, hookFn });
     });
 
     describe('core module', () => {

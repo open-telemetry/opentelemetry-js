@@ -24,6 +24,7 @@ import {
 } from './RequireInTheMiddleSingleton';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
+import * as ImportInTheMiddle from 'import-in-the-middle';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 
 /**
@@ -100,7 +101,7 @@ export abstract class InstrumentationBase<T = any>
     module: InstrumentationModuleDefinition<T>,
     exports: T,
     name: string,
-    baseDir?: string
+    baseDir?: string | void
   ): T {
     if (!baseDir) {
       if (typeof module.patch === 'function') {
@@ -167,6 +168,14 @@ export abstract class InstrumentationBase<T = any>
 
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
+      const hookFn: ImportInTheMiddle.HookFn = (exports, name, baseDir) => {
+        return this._onRequire<typeof exports>(
+          module as unknown as InstrumentationModuleDefinition<typeof exports>,
+          Object.assign({}, exports),
+          name,
+          baseDir
+        );
+      };
       const onRequire: RequireInTheMiddle.OnRequireFn = (
         exports,
         name,
@@ -184,8 +193,11 @@ export abstract class InstrumentationBase<T = any>
       // For an absolute paths, we must create a separate instance of `RequireInTheMiddle`.
       const hook = path.isAbsolute(module.name)
         ? RequireInTheMiddle([module.name], { internals: true }, onRequire)
-        : this._requireInTheMiddleSingleton.register(module.name, onRequire);
-
+        : this._requireInTheMiddleSingleton.register(
+            module.name,
+            onRequire,
+            hookFn
+          );
       this._hooks.push(hook);
     }
   }
