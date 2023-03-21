@@ -18,7 +18,11 @@ import type { Attributes, AttributeValue } from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
+import {
+  hrTimeToMilliseconds,
+  millisToHrTime,
+  timeInputToHrTime,
+} from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
 import {
@@ -56,15 +60,6 @@ describe('LogRecord', () => {
     it('should create an instance', () => {
       const { logRecord } = setup();
       assert.ok(logRecord instanceof LogRecord);
-    });
-
-    it('should have a default timestamp', () => {
-      const { logRecord } = setup();
-      assert.ok(logRecord.time !== undefined);
-      assert.ok(
-        hrTimeToMilliseconds(logRecord.time) >
-          hrTimeToMilliseconds(performanceTimeOrigin)
-      );
     });
 
     it('should have a default timestamp', () => {
@@ -253,6 +248,55 @@ describe('LogRecord', () => {
       logRecord.setAttributes(validAttributes);
       logRecord.setAttributes(invalidAttributes as unknown as Attributes);
       assert.deepStrictEqual(logRecord.attributes, validAttributes);
+    });
+  });
+
+  describe('should rewrite time/body/severityNumber/severityText', () => {
+    const currentTime = new Date().getTime();
+    const logRecordData: logsAPI.LogRecord = {
+      timestamp: currentTime,
+      severityNumber: logsAPI.SeverityNumber.DEBUG,
+      severityText: 'DEBUG',
+      body: 'this is a body',
+      attributes: {
+        name: 'test name',
+      },
+      traceId: 'trance id',
+      spanId: 'span id',
+      traceFlags: 1,
+    };
+
+    const newTime = millisToHrTime(currentTime + 1000);
+    const newBody = 'this is a new body';
+    const newSeverityNumber = logsAPI.SeverityNumber.INFO;
+    const newSeverityText = 'INFO';
+
+    it('should rewrite directly through the property method', () => {
+      const { logRecord } = setup(undefined, logRecordData);
+
+      logRecord.time = newTime;
+      logRecord.body = newBody;
+      logRecord.severityNumber = newSeverityNumber;
+      logRecord.severityText = newSeverityText;
+
+      assert.deepStrictEqual(logRecord.time, newTime);
+      assert.deepStrictEqual(logRecord.body, newBody);
+      assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
+      assert.deepStrictEqual(logRecord.severityText, newSeverityText);
+    });
+
+    it('should rewrite using the update method', () => {
+      const { logRecord } = setup(undefined, logRecordData);
+
+      logRecord.updateTime(newTime);
+      logRecord.updateBody(newBody);
+      logRecord.updateSeverityNumber(newSeverityNumber);
+      logRecord.updateSeverityText(newSeverityText);
+
+      assert.deepStrictEqual(logRecord.time, newTime);
+      assert.deepStrictEqual(logRecord.body, newBody);
+      assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
+      assert.deepStrictEqual(logRecord.severityText, newSeverityText);
     });
   });
 

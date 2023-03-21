@@ -24,7 +24,7 @@ export interface LogRecordProcessor {
 
   /**
    * Called when a {@link LogRecord} is emit
-   * @param logRecord the ReadableLogRecord that just emitted.
+   * @param logRecord the ReadWriteLogRecord that just emitted.
    */
   onEmit(logRecord: LogRecord): void;
 

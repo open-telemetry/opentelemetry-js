@@ -21,7 +21,6 @@ import {
   timeInputToHrTime,
   isAttributeValue,
   InstrumentationScope,
-  millisToHrTime,
 } from '@opentelemetry/core';
 import type { IResource } from '@opentelemetry/resources';
 
@@ -29,14 +28,14 @@ import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { Logger } from './Logger';
 
-export class LogRecord implements ReadableLogRecord {
-  readonly time: api.HrTime;
+export class LogRecord implements logsAPI.LogRecord, ReadableLogRecord {
+  time: api.HrTime;
+  severityText?: string;
+  severityNumber?: logsAPI.SeverityNumber;
+  body?: string;
   readonly traceId?: string;
   readonly spanId?: string;
   readonly traceFlags?: number;
-  readonly severityText?: string;
-  readonly severityNumber?: logsAPI.SeverityNumber;
-  readonly body?: string;
   readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: Attributes = {};
@@ -95,6 +94,22 @@ export class LogRecord implements ReadableLogRecord {
     }
   }
 
+  public updateTime(time: api.TimeInput) {
+    this.time = timeInputToHrTime(time);
+  }
+
+  public updateBody(body: string) {
+    this.body = body;
+  }
+
+  public updateSeverityNumber(severityNumber: logsAPI.SeverityNumber) {
+    this.severityNumber = severityNumber;
+  }
+
+  public updateSeverityText(severityText: string) {
+    this.severityText = severityText;
+  }
+
   private _truncateToSize(value: AttributeValue): AttributeValue {
     const limit = this._logRecordLimits.attributeValueLengthLimit || 0;
     // Check limit
@@ -124,6 +139,6 @@ export class LogRecord implements ReadableLogRecord {
     if (value.length <= limit) {
       return value;
     }
-    return value.substr(0, limit);
+    return value.substring(0, limit);
   }
 }
