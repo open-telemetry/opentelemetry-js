@@ -36,6 +36,9 @@ const tracer = new BasicTracerProvider({
   resource: Resource.default().merge(
     new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+      cost: '112.12',
+      service: 'ui',
+      version: '1',
     })
   ),
 }).getTracer('default');
@@ -49,13 +52,6 @@ const spanContext: api.SpanContext = {
   spanId: '6e0c63257de34c92',
   traceFlags: api.TraceFlags.SAMPLED,
 };
-
-const DUMMY_RESOURCE = new Resource({
-  service: 'ui',
-  version: 1,
-  cost: 112.12,
-  [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
-});
 
 describe('transform', () => {
   describe('toZipkinSpan', () => {
@@ -102,6 +98,9 @@ describe('transform', () => {
           key1: 'value1',
           key2: 'value2',
           [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          cost: '112.12',
+          service: 'ui',
+          version: '1',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
@@ -140,6 +139,9 @@ describe('transform', () => {
         parentId: undefined,
         tags: {
           [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          cost: '112.12',
+          service: 'ui',
+          version: '1',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
@@ -188,6 +190,9 @@ describe('transform', () => {
           parentId: undefined,
           tags: {
             [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+            cost: '112.12',
+            service: 'ui',
+            version: '1',
             'telemetry.sdk.language': language,
             'telemetry.sdk.name': 'opentelemetry',
             'telemetry.sdk.version': VERSION,
@@ -214,20 +219,21 @@ describe('transform', () => {
         key2: 'value2',
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
-        span.attributes,
-        span.status,
+        span,
         defaultStatusCodeTagName,
-        defaultStatusErrorTagName,
-        DUMMY_RESOURCE
+        defaultStatusErrorTagName
       );
 
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
+        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        'telemetry.sdk.language': language,
+        'telemetry.sdk.name': 'opentelemetry',
+        'telemetry.sdk.version': VERSION,
         cost: '112.12',
         service: 'ui',
         version: '1',
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
       });
     });
     it('should map OpenTelemetry SpanStatus.code to a Zipkin tag', () => {
@@ -248,15 +254,9 @@ describe('transform', () => {
         key2: 'value2',
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
-        span.attributes,
-        span.status,
+        span,
         defaultStatusCodeTagName,
-        defaultStatusErrorTagName,
-        Resource.empty().merge(
-          new Resource({
-            [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
-          })
-        )
+        defaultStatusErrorTagName
       );
 
       assert.deepStrictEqual(tags, {
@@ -264,6 +264,12 @@ describe('transform', () => {
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
         [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        'telemetry.sdk.language': language,
+        'telemetry.sdk.name': 'opentelemetry',
+        'telemetry.sdk.version': VERSION,
+        cost: '112.12',
+        service: 'ui',
+        version: '1',
       });
     });
     it('should map OpenTelemetry SpanStatus.message to a Zipkin tag', () => {
@@ -285,15 +291,9 @@ describe('transform', () => {
         key2: 'value2',
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
-        span.attributes,
-        span.status,
+        span,
         defaultStatusCodeTagName,
-        defaultStatusErrorTagName,
-        Resource.empty().merge(
-          new Resource({
-            [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
-          })
-        )
+        defaultStatusErrorTagName
       );
 
       assert.deepStrictEqual(tags, {
@@ -302,6 +302,12 @@ describe('transform', () => {
         [defaultStatusCodeTagName]: 'ERROR',
         [defaultStatusErrorTagName]: status.message,
         [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        'telemetry.sdk.language': language,
+        'telemetry.sdk.name': 'opentelemetry',
+        'telemetry.sdk.version': VERSION,
+        cost: '112.12',
+        service: 'ui',
+        version: '1',
       });
     });
   });

@@ -23,7 +23,7 @@ const MAX_SCALE = 0;
 describe('ExponentMapping', () => {
   it('maps expected values for scale 0', () => {
     const mapping = new ExponentMapping(0);
-    assert.strictEqual(mapping.scale(), 0);
+    assert.strictEqual(mapping.scale, 0);
 
     const expectedMappings = [
       // near +inf
@@ -71,7 +71,7 @@ describe('ExponentMapping', () => {
 
   it('maps expected values for min scale', () => {
     const mapping = new ExponentMapping(MIN_SCALE);
-    assert.strictEqual(mapping.scale(), MIN_SCALE);
+    assert.strictEqual(mapping.scale, MIN_SCALE);
 
     const expectedMappings = [
       [1.000001, 0],
@@ -94,7 +94,7 @@ describe('ExponentMapping', () => {
 
   it('maps expected values for scale -1', () => {
     const mapping = new ExponentMapping(-1);
-    assert.strictEqual(mapping.scale(), -1);
+    assert.strictEqual(mapping.scale, -1);
 
     const expectedMappings = [
       [17, 2],
@@ -131,7 +131,7 @@ describe('ExponentMapping', () => {
 
   it('maps expected values for scale -4', () => {
     const mapping = new ExponentMapping(-4);
-    assert.strictEqual(mapping.scale(), -4);
+    assert.strictEqual(mapping.scale, -4);
 
     const expectedMappings = [
       [0x1, -1],

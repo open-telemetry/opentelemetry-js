@@ -37,4 +37,6 @@ export interface Link {
   context: SpanContext;
   /** A set of {@link SpanAttributes} on the link. */
   attributes?: SpanAttributes;
+  /** Count of attributes of the link that were dropped due to collection limits */
+  droppedAttributesCount?: number;
 }

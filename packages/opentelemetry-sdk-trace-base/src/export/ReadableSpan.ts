@@ -41,4 +41,7 @@ export interface ReadableSpan {
   readonly ended: boolean;
   readonly resource: IResource;
   readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly droppedAttributesCount: number;
+  readonly droppedEventsCount: number;
+  readonly droppedLinksCount: number;
 }

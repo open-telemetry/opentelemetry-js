@@ -171,6 +171,12 @@ describe('utils', () => {
         assert.strictEqual(typeof url[field], 'string');
       });
     });
+
+    it('should correctly parse relative url in presence of base tag', () => {
+      sinon.stub(globalThis.document, 'baseURI').value('http://foobar.com');
+      const url = parseUrl('foo/bar');
+      assert.strictEqual(url.href, 'http://foobar.com/foo/bar');
+    });
   });
 
   describe('normalizeUrl', () => {

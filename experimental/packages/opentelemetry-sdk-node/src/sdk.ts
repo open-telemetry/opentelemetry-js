@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator, metrics } from '@opentelemetry/api';
+import {
+  ContextManager,
+  TextMapPropagator,
+  metrics,
+  diag,
+  DiagConsoleLogger,
+} from '@opentelemetry/api';
 import {
   InstrumentationOption,
   registerInstrumentations,
@@ -42,6 +48,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv } from '@opentelemetry/core';
+import { parseInstrumentationOptions } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -55,6 +62,7 @@ export type MeterProviderConfig = {
    */
   views?: View[];
 };
+
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -80,10 +88,16 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    if (getEnv().OTEL_SDK_DISABLED) {
+    const env = getEnv();
+    if (env.OTEL_SDK_DISABLED) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
+    }
+    if (env.OTEL_LOG_LEVEL) {
+      diag.setLogger(new DiagConsoleLogger(), {
+        logLevel: env.OTEL_LOG_LEVEL,
+      });
     }
 
     this._resource = configuration.resource ?? new Resource({});
@@ -104,6 +118,9 @@ export class NodeSDK {
       }
       if (configuration.spanLimits) {
         tracerProviderConfig.spanLimits = configuration.spanLimits;
+      }
+      if (configuration.idGenerator) {
+        tracerProviderConfig.idGenerator = configuration.idGenerator;
       }
 
       const spanProcessor =
@@ -260,6 +277,15 @@ export class NodeSDK {
       this._meterProvider = meterProvider;
 
       metrics.setGlobalMeterProvider(meterProvider);
+
+      // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
+      // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
+      // This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
+      for (const instrumentation of parseInstrumentationOptions(
+        this._instrumentations
+      )) {
+        instrumentation.setMeterProvider(metrics.getMeterProvider());
+      }
     }
   }
 

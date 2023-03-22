@@ -22,6 +22,7 @@ import {
   diag,
   DiagLogLevel,
   metrics,
+  DiagConsoleLogger,
 } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
@@ -44,6 +45,7 @@ import {
   SimpleSpanProcessor,
   BatchSpanProcessor,
   NoopSpanProcessor,
+  IdGenerator,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as semver from 'semver';
@@ -68,6 +70,7 @@ describe('Node SDK', () => {
   let delegate: any;
 
   beforeEach(() => {
+    diag.disable();
     context.disable();
     trace.disable();
     propagation.disable();
@@ -76,6 +79,10 @@ describe('Node SDK', () => {
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+  });
+
+  afterEach(() => {
+    Sinon.restore();
   });
 
   describe('Basic Registration', () => {
@@ -106,6 +113,25 @@ describe('Node SDK', () => {
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should register a diag logger with OTEL_LOG_LEVEL', () => {
+      env.OTEL_LOG_LEVEL = 'ERROR';
+
+      const spy = Sinon.spy(diag, 'setLogger');
+      const sdk = new NodeSDK({
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(spy.callCount, 1);
+      assert.ok(spy.args[0][0] instanceof DiagConsoleLogger);
+      assert.deepStrictEqual(spy.args[0][1], {
+        logLevel: DiagLogLevel.ERROR,
+      });
+
+      delete env.OTEL_LOG_LEVEL;
     });
 
     it('should register a tracer provider if an exporter is provided', async () => {
@@ -664,6 +690,33 @@ describe('Node SDK', () => {
 
         assert.deepStrictEqual(resource, Resource.empty());
       });
+    });
+  });
+
+  describe('configure IdGenerator', async () => {
+    class CustomIdGenerator implements IdGenerator {
+      generateTraceId(): string {
+        return 'constant-test-trace-id';
+      }
+      generateSpanId(): string {
+        return 'constant-test-span-id';
+      }
+    }
+
+    it('should configure IdGenerator via config', async () => {
+      const idGenerator = new CustomIdGenerator();
+      const spanProcessor = new SimpleSpanProcessor(new ConsoleSpanExporter());
+      const sdk = new NodeSDK({
+        idGenerator,
+        spanProcessor,
+      });
+      sdk.start();
+
+      const span = trace.getTracer('test').startSpan('testName');
+      span.end();
+
+      assert.strictEqual(span.spanContext().spanId, 'constant-test-span-id');
+      assert.strictEqual(span.spanContext().traceId, 'constant-test-trace-id');
     });
   });
 });
