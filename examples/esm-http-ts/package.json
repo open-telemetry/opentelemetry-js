@@ -3,11 +3,11 @@
   "private": true,
   "version": "0.36.1",
   "description": "Example of HTTP integration with OpenTelemetry using ESM and TypeScript",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "start": "node --experimental-loader=import-in-the-middle/hook.mjs ./dist/index.js"
+    "start": "node --experimental-loader=import-in-the-middle/hook.mjs ./build/index.js"
   },
   "repository": {
     "type": "git",
