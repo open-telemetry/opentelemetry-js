@@ -240,14 +240,17 @@ jobs:
         name: Download node reports
         with:
           name: node-coverage
+          path: node-coverage
       - uses: actions/download-artifact@v3
         name: Download webworker reports
         with:
-          name: browser-coverage
+          name: webworker-coverage
+          path: webworker-coverage
       - uses: actions/download-artifact@v3
         name: Download browser reports
         with:
           name: browser-coverage
+          path: browser-coverage
       - name: Move reports
         run: |
           ls -al
