@@ -60,14 +60,14 @@ jobs:
       - name: Generate Report
         run: npm run coverage:report
         if: ${{ matrix.node_version == '18' }}
+      - name: List coverage files
+        run: find . -name 'coverage-final.json'
       - name: Store coverage
         uses: actions/upload-artifact@v3
         with:
           name: node-coverage
           path: |
-            api/**/coverage-final.json
-            packages/**/coverage-final.json
-            experimental/**/coverage-final.json
+            **/coverage-final.json
           retention-days: 1
         if: ${{ matrix.node_version == '18' }}
   node-windows-tests:
