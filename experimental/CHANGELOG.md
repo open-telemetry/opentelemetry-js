@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat: add ECMAScript Module (ESM) support for instrumentation [#3698](https://github.com/open-telemetry/opentelemetry-js/pull/3698) @JamieDanielson
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
