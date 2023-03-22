@@ -83,9 +83,8 @@ export class RequireInTheMiddleSingleton {
         // `basedir` is always `undefined` for core modules.
         fullOnly: basedir === undefined,
       });
-      for (const { onRequire, hookFn } of matches) {
+      for (const { onRequire } of matches) {
         exports = onRequire(exports, name, basedir ? basedir : undefined);
-        exports = hookFn(exports, name, basedir);
       }
       return exports;
     };
