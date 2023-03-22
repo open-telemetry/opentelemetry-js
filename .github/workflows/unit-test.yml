@@ -196,7 +196,7 @@ jobs:
       - name: Store coverage
         uses: actions/upload-artifact@v3
         with:
-          name: browser-coverage
+          name: webworker-coverage
           path: |
             **/coverage-final.json
             !**/node_modules/**/coverage-final.json
@@ -250,6 +250,7 @@ jobs:
           name: browser-coverage
       - name: Move reports
         run: |
+          ls -al
           find ./node-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-node.json' sh {} \;
           find ./webworker-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-webworker.json' sh {} \;
           find ./browser-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-browser.json' sh {} \;
