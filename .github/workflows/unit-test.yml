@@ -67,7 +67,7 @@ jobs:
         with:
           name: node-coverage
           path: |
-            **/coverage-final.json
+            {,!(node_modules)/**/}coverage-final.json
           retention-days: 1
         if: ${{ matrix.node_version == '18' }}
   node-windows-tests:
@@ -152,9 +152,7 @@ jobs:
         with:
           name: browser-coverage
           path: |
-            api/**/coverage-final.json
-            packages/**/coverage-final.json
-            experimental/**/coverage-final.json
+            {,!(node_modules)/**/}coverage-final.json
           retention-days: 1
   webworker-tests:
     runs-on: ubuntu-latest
@@ -198,9 +196,7 @@ jobs:
         with:
           name: browser-coverage
           path: |
-            api/**/coverage-final.json
-            packages/**/coverage-final.json
-            experimental/**/coverage-final.json
+            {,!(node_modules)/**/}coverage-final.json
           retention-days: 1
   api-eol-node-test:
     strategy:
