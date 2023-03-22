@@ -2,6 +2,25 @@
 
 We'd love your help!
 
+- [Development Quick Start](#development-quick-start)
+- [Pull Request Merge Guidelines](#pull-request-merge-guidelines)
+  - [General Merge Requirements](#general-merge-requirements)
+- [Report a bug or requesting feature](#report-a-bug-or-requesting-feature)
+- [How to contribute](#how-to-contribute)
+  - [Before you start](#before-you-start)
+    - [Conventional commit](#conventional-commit)
+  - [Changelog](#changelog)
+  - [Fork](#fork)
+- [Development](#development)
+  - [Tools used](#tools-used)
+  - [Install dependencies](#install-dependencies)
+  - [Compile modules](#compile-modules)
+  - [Running tests](#running-tests)
+  - [Linting](#linting)
+  - [Generating docs](#generating-docs)
+  - [Adding a package](#adding-a-package)
+  - [Platform conditional exports](#platform-conditional-exports)
+
 ## Development Quick Start
 
 To get the project started quickly, you can follow these steps. For more
@@ -14,6 +33,37 @@ npm install
 npm run compile
 npm test
 ```
+
+## Pull Request Merge Guidelines
+
+Most pull requests MAY be merged by an approver OR a maintainer provided they meet the following [General Merge Requirements](#general-merge-requirements).
+All requirements are at the discretion of the maintainers.
+Maintainers MAY merge pull requests which have not strictly met these requirements.
+Maintainers MAY close, block, or put on hold pull requests even if they have strictly met these requirements.
+
+It is generally expected that a maintainer ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)) should review and merge major changes.
+Some examples include, but are not limited to:
+
+- API changes
+- Breaking changes
+- New modules
+- Changes which affect runtime support
+- New features which are not required by the specification
+
+If a PR has not been interacted with by a reviewer within one week, please ping the approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)).
+
+### General Merge Requirements
+
+- No “changes requested” reviews by approvers, maintainers, technical committee members, or subject matter experts
+- No unresolved conversations
+- Approved by at least one maintainer OR by at least one approver who is not the approver merging the pull request
+  - A pull request for small (simple typo, URL, update docs, or grammatical fix) changes may be approved and merged by the same approver
+- For plugins, exporters, and propagators approval of the original code module author, or a contributor who has done extensive work on the module, is preferred but not required
+- New or changed functionality is tested by unit tests
+- New or changed functionality is documented if appropriate
+- Substantial changes should not be merged within 24 hours of opening in order to allow reviewers from all time zones to have a chance to review
+
+If all of the above requirements are met and there are no unresolved discussions, a pull request may be merged by either a maintainer or an approver.
 
 ## Report a bug or requesting feature
 
@@ -215,40 +265,6 @@ The document will be available under `docs` path.
 To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf` and `tsconifg.esm.json` files may be deleted. If the package will support es5 targets, the reference to `tsconfig.base.json` in `tsconfig.json` should be changed to `tsconfig.es5.json`.
 
 After adding the package, run `npm install` from the root of the project. This will update the `tsconfig.json` project references automatically and install all dependencies in your new package. For packages supporting browser, file `tsconfig.esm.json` needs to be manually updated to include reference to ES modules build.
-
-### Guidelines for Pull Requests
-
-- Typically we try to turn around reviews within one to two business days.
-- It is generally expected that a maintainer ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)) should review and merge every PR.
-  - If a change has met the requirements listed below, an approver may also merge the pull request.
-- Most PRs should be merged in one to two weeks.
-- If a PR is taking longer than 30 days, please ping the approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)) as it may have been lost
-- Dependency upgrades and Security fixes: This PR is small and/or low-risk and can be merged with only maintainer reviews.
-- If your patch is not getting reviewed or you need a specific person to review it, you can @username or @open-telemetry/javascript-approvers a reviewer asking for a review in the pull request.
-- API changes, breaking changes, or large changes will be subject to more scrutiny and may require more reviewers. These PRs should only be merged by maintainers.
-- Changes to existing plugins and exporters will typically require the approval of the original plugin/exporter author.
-
-### General Merge Requirements
-
-- All requirements are at the discretion of the maintainers.
-  - Maintainers may merge pull requests which have not strictly met these requirements.
-  - Maintainers may close, block, or put on hold pull requests even if they have strictly met these requirements.
-- No “changes requested” reviews.
-- No unresolved conversations.
-- 3 approvals, including the approvals of at least 2 maintainers
-  - A pull request opened by an approver may be merged with only the 2 maintainer reviews.
-  - Small (simple typo, URL, update docs, or grammatical fix) or high-priority changes may be merged more quickly or with fewer reviewers at the discretion of the maintainers. This is typically indicated with the express label.
-- For plugins, exporters, and propagators approval of the original code module author is preferred but not required.
-- New or changed functionality is tested by unit tests.
-- New or changed functionality is documented.
-- Substantial changes should not be merged within 24 hours of opening in order to allow reviewers from all time zones to have a chance to review.
-
-If all of the above requirements are met and there are no unresolved discussions, a pull request may be merged by either a maintainer or an approver.
-
-### Generating CHANGELOG documentation
-
-- Generate and export your [Github access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token): `export GITHUB_AUTH=<your_token>`
-- `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).
 
 ### Platform conditional exports
 

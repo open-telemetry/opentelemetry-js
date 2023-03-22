@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { promises as fs } from 'fs';
-import { diag } from '@opentelemetry/api';
+import { Resource, Detector, ResourceDetectionConfig } from '../../src';
+import * as assert from 'assert';
 
-export async function getMachineId(): Promise<string> {
-  const paths = ['/etc/machine-id', '/var/lib/dbus/machine-id'];
-
-  for (const path of paths) {
-    try {
-      const result = await fs.readFile(path, { encoding: 'utf8' });
-      return result.trim();
-    } catch (e) {
-      diag.debug(`error reading machine id: ${e}`);
-    }
+// DO NOT MODIFY THIS DETECTOR: Previous detectors used Resource as IResource did not yet exist.
+// If compilation fails at this point then the changes made are breaking.
+class RegressionTestResourceDetector_1_9_1 implements Detector {
+  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
+    return Resource.empty();
   }
-
-  return '';
 }
+
+describe('Regression Test @opentelemetry/resources@1.9.1', () => {
+  it('constructor', () => {
+    assert.ok(new RegressionTestResourceDetector_1_9_1());
+  });
+});

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Detector } from '../types';
-import { ResourceDetectionConfig } from '../config';
-import { IResource } from '../IResource';
+import { Detector } from '../../types';
+import { ResourceDetectionConfig } from '../../config';
+import { IResource } from '../../IResource';
 import { processDetectorSync } from './ProcessDetectorSync';
 
 /**
