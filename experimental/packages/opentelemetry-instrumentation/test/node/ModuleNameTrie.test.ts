@@ -22,11 +22,11 @@ describe('ModuleNameTrie', () => {
   describe('search', () => {
     const trie = new ModuleNameTrie();
     const inserts = [
-      { moduleName: 'a', onRequire: () => {}, hookFn: () => {} },
-      { moduleName: 'a/b', onRequire: () => {}, hookFn: () => {} },
-      { moduleName: 'a', onRequire: () => {}, hookFn: () => {} },
-      { moduleName: 'a/c', onRequire: () => {}, hookFn: () => {} },
-      { moduleName: 'd', onRequire: () => {}, hookFn: () => {} },
+      { moduleName: 'a', onRequire: () => {} },
+      { moduleName: 'a/b', onRequire: () => {} },
+      { moduleName: 'a', onRequire: () => {} },
+      { moduleName: 'a/c', onRequire: () => {} },
+      { moduleName: 'd', onRequire: () => {} },
     ] as Hooked[];
     inserts.forEach(trie.insert.bind(trie));
 

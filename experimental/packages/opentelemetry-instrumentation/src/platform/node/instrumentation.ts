@@ -22,9 +22,10 @@ import {
   RequireInTheMiddleSingleton,
   Hooked,
 } from './RequireInTheMiddleSingleton';
+import { HookFn } from 'import-in-the-middle';
+import * as ImportInTheMiddle from 'import-in-the-middle';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
-import * as ImportInTheMiddle from 'import-in-the-middle';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 
 /**
@@ -193,12 +194,10 @@ export abstract class InstrumentationBase<T = any>
       // For an absolute paths, we must create a separate instance of `RequireInTheMiddle`.
       const hook = path.isAbsolute(module.name)
         ? RequireInTheMiddle([module.name], { internals: true }, onRequire)
-        : this._requireInTheMiddleSingleton.register(
-            module.name,
-            onRequire,
-            hookFn
-          );
+        : this._requireInTheMiddleSingleton.register(module.name, onRequire);
+
       this._hooks.push(hook);
+      ImportInTheMiddle([module.name], { internals: true }, <HookFn>hookFn);
     }
   }
 

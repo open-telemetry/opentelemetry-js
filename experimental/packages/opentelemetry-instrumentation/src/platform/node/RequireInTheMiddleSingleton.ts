@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import * as ImportInTheMiddle from 'import-in-the-middle';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import * as path from 'path';
 import { ModuleNameTrie, ModuleNameSeparator } from './ModuleNameTrie';
@@ -22,18 +21,7 @@ import { ModuleNameTrie, ModuleNameSeparator } from './ModuleNameTrie';
 export type Hooked = {
   moduleName: string;
   onRequire: RequireInTheMiddle.OnRequireFn;
-  hookFn: ImportInTheMiddle.HookFn;
 };
-
-/**
- * We are forced to re-type here because ImportInTheMiddle is exported as normal CJS
- * in the JS files but transpiled ESM (with a default export) in its typing.
- */
-const ESMHook = ImportInTheMiddle as unknown as (
-  module: any,
-  options: any,
-  hookfn: any
-) => void;
 
 /**
  * Whether Mocha is running in this process
@@ -54,14 +42,13 @@ const isMocha = [
 });
 
 /**
- * Singleton class for `require-in-the-middle` and `import-in-the-middle`
+ * Singleton class for `require-in-the-middle`
  * Allows instrumentation plugins to patch modules with only a single `require` patch
- * WARNING: Because this class will create its own `require-in-the-middle` (RITM) instance
- * and `import-in-the-middle` (IITM) instance,
+ * WARNING: Because this class will create its own `require-in-the-middle` (RITM) instance,
  * we should minimize the number of new instances of this class.
  * Multiple instances of `@opentelemetry/instrumentation` (e.g. multiple versions) in a single process
- * will result in multiple instances of RITM/IITM, which will have an impact
- * on the performance of instrumentation hooks being applied for Common JS.
+ * will result in multiple instances of RITM, which will have an impact
+ * on the performance of instrumentation hooks being applied.
  */
 export class RequireInTheMiddleSingleton {
   private _moduleNameTrie: ModuleNameTrie = new ModuleNameTrie();
@@ -72,24 +59,29 @@ export class RequireInTheMiddleSingleton {
   }
 
   private _initialize() {
-    const onHook = (exports: any, name: string, basedir: string | void) => {
-      // For internal files on Windows, `name` will use backslash as the path separator
-      const normalizedModuleName = normalizePathSeparators(name);
+    RequireInTheMiddle(
+      // Intercept all `require` calls; we will filter the matching ones below
+      null,
+      { internals: true },
+      (exports, name, basedir) => {
+        // For internal files on Windows, `name` will use backslash as the path separator
+        const normalizedModuleName = normalizePathSeparators(name);
 
-      const matches = this._moduleNameTrie.search(normalizedModuleName, {
-        maintainInsertionOrder: true,
-        // For core modules (e.g. `fs`), do not match on sub-paths (e.g. `fs/promises').
-        // This matches the behavior of `require-in-the-middle`.
-        // `basedir` is always `undefined` for core modules.
-        fullOnly: basedir === undefined,
-      });
-      for (const { onRequire } of matches) {
-        exports = onRequire(exports, name, basedir ? basedir : undefined);
+        const matches = this._moduleNameTrie.search(normalizedModuleName, {
+          maintainInsertionOrder: true,
+          // For core modules (e.g. `fs`), do not match on sub-paths (e.g. `fs/promises').
+          // This matches the behavior of `require-in-the-middle`.
+          // `basedir` is always `undefined` for core modules.
+          fullOnly: basedir === undefined,
+        });
+
+        for (const { onRequire } of matches) {
+          exports = onRequire(exports, name, basedir);
+        }
+
+        return exports;
       }
-      return exports;
-    };
-    // Intercept all `require` calls; we will filter the matching ones below
-    RequireInTheMiddle(null, { internals: true }, onHook);
+    );
   }
 
   /**
@@ -101,12 +93,10 @@ export class RequireInTheMiddleSingleton {
    */
   register(
     moduleName: string,
-    onRequire: RequireInTheMiddle.OnRequireFn,
-    hookFn: ImportInTheMiddle.HookFn
+    onRequire: RequireInTheMiddle.OnRequireFn
   ): Hooked {
-    const hooked = { moduleName, onRequire, hookFn };
+    const hooked = { moduleName, onRequire };
     this._moduleNameTrie.insert(hooked);
-    ESMHook([normalizePathSeparators(moduleName)], { internals: true }, hookFn);
     return hooked;
   }
 
