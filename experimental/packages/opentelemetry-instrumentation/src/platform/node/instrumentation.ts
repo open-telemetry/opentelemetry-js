@@ -197,7 +197,11 @@ export abstract class InstrumentationBase<T = any>
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      ImportInTheMiddle([module.name], { internals: true }, <HookFn>hookFn);
+      new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
+        [module.name],
+        { internals: true },
+        <HookFn>hookFn
+      );
     }
   }
 
