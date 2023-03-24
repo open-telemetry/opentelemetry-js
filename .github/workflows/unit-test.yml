@@ -226,7 +226,8 @@ jobs:
           node ../scripts/version-update.js
           which tsc
           tsc --version
-          tsc --build tsconfig.json tsconfig.esm.json
+          npx tsc --version
+          npx tsc --build tsconfig.json tsconfig.esm.json
 
       - name: Test
         working-directory: ./api
