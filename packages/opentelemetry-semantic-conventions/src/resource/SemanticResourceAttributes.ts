@@ -244,7 +244,7 @@ As an alternative, consider setting `faas.id` as a span attribute instead.
   HOST_IMAGE_ID: 'host.image.id',
 
   /**
-   * The version string of the VM image as defined in [Version SpanAttributes](README.md#version-attributes).
+   * The version string of the VM image as defined in [Version Attributes](README.md#version-attributes).
    */
   HOST_IMAGE_VERSION: 'host.image.version',
 
@@ -359,7 +359,7 @@ As an alternative, consider setting `faas.id` as a span attribute instead.
   OS_NAME: 'os.name',
 
   /**
-   * The version string of the operating system as defined in [Version SpanAttributes](../../resource/semantic_conventions/README.md#version-attributes).
+   * The version string of the operating system as defined in [Version Attributes](../../resource/semantic_conventions/README.md#version-attributes).
    */
   OS_VERSION: 'os.version',
 
