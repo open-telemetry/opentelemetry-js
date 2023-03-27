@@ -1,7 +1,7 @@
 {
   "name": "http-example",
   "private": true,
-  "version": "0.35.1",
+  "version": "0.35.2",
   "description": "Example of HTTP integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
@@ -34,9 +34,9 @@
     "@opentelemetry/instrumentation": "0.35.1",
     "@opentelemetry/instrumentation-http": "0.35.1",
     "@opentelemetry/resources": "1.9.1",
-    "@opentelemetry/semantic-conventions": "1.9.1",
+    "@opentelemetry/sdk-trace-base": "1.9.1",
     "@opentelemetry/sdk-trace-node": "1.9.1",
-    "@opentelemetry/sdk-trace-base": "1.9.1"
+    "@opentelemetry/semantic-conventions": "1.9.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http",
   "devDependencies": {
