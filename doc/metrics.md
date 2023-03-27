@@ -294,6 +294,12 @@ The description of a metric instrument can expose up in the metrics backend, the
 can be used to information about the record measurement itself.
 
 ```typescript
+import {
+  HTTP_METHOD,
+  HTTP_SCHEME,
+  HTTP_STATUS_CODE,
+} from '@opentelemetry/semantic-conventions';
+
 async function myTask() {
   const httpServerDuration = meter.createHistogram("http.server.duration", {
     description: 'A http server duration',
@@ -396,6 +402,12 @@ should be used to define the bucket sizes for the Histogram instrument.
 Below an example is given how you can define explicit buckets for a histogram.
 
 ```typescript
+import {
+  HTTP_METHOD,
+  HTTP_SCHEME,
+  HTTP_STATUS_CODE,
+} from '@opentelemetry/semantic-conventions';
+
 // Define view for the histogram metric
 const histogramView = new View({
   aggregation: new ExplicitBucketHistogramAggregation([0, 1, 5, 10, 15, 20, 25, 30]),
