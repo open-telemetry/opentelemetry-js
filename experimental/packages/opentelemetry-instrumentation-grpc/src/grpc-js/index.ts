@@ -52,7 +52,13 @@ import {
 import { EventEmitter } from 'events';
 import { _extractMethodAndService, metadataCapture, URI_REGEX } from '../utils';
 import { AttributeValues } from '../enums/AttributeValues';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  NET_PEER_NAME,
+  NET_PEER_PORT,
+  RPC_METHOD,
+  RPC_SERVICE,
+  RPC_SYSTEM,
+} from '@opentelemetry/semantic-conventions';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
   private _metadataCapture: metadataCaptureType;
@@ -206,10 +212,10 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [SemanticAttributes.RPC_SYSTEM]:
+                      [RPC_SYSTEM]:
                         AttributeValues.RPC_SYSTEM,
-                      [SemanticAttributes.RPC_METHOD]: method,
-                      [SemanticAttributes.RPC_SERVICE]: service,
+                      [RPC_METHOD]: method,
+                      [RPC_SERVICE]: service,
                     });
 
                   instrumentation._metadataCapture.server.captureRequestMetadata(
@@ -324,19 +330,19 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         const span = instrumentation.tracer
           .startSpan(name, { kind: SpanKind.CLIENT })
           .setAttributes({
-            [SemanticAttributes.RPC_SYSTEM]: 'grpc',
-            [SemanticAttributes.RPC_METHOD]: method,
-            [SemanticAttributes.RPC_SERVICE]: service,
+            [RPC_SYSTEM]: 'grpc',
+            [RPC_METHOD]: method,
+            [RPC_SERVICE]: service,
           });
         // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
         const parsedUri = URI_REGEX.exec(this.getChannel().getTarget());
         if (parsedUri != null && parsedUri.groups != null) {
           span.setAttribute(
-            SemanticAttributes.NET_PEER_NAME,
+            NET_PEER_NAME,
             parsedUri.groups['name']
           );
           span.setAttribute(
-            SemanticAttributes.NET_PEER_PORT,
+            NET_PEER_PORT,
             parseInt(parsedUri.groups['port'])
           );
         }

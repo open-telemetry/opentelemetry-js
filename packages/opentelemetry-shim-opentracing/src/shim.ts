@@ -22,7 +22,11 @@ import {
   TextMapPropagator,
 } from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  EXCEPTION_MESSAGE,
+  EXCEPTION_STACKTRACE,
+  EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -325,15 +329,15 @@ export class SpanShim extends opentracing.Span {
       for (const [k, v] of entries) {
         switch (k) {
           case 'error.kind': {
-            mappedAttributes[SemanticAttributes.EXCEPTION_TYPE] = v;
+            mappedAttributes[EXCEPTION_TYPE] = v;
             break;
           }
           case 'message': {
-            mappedAttributes[SemanticAttributes.EXCEPTION_MESSAGE] = v;
+            mappedAttributes[EXCEPTION_MESSAGE] = v;
             break;
           }
           case 'stack': {
-            mappedAttributes[SemanticAttributes.EXCEPTION_STACKTRACE] = v;
+            mappedAttributes[EXCEPTION_STACKTRACE] = v;
             break;
           }
           default: {

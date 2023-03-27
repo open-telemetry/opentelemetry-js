@@ -24,7 +24,14 @@ import {
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/sdk-trace-web';
 import { AttributeNames } from './enums/AttributeNames';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  HTTP_SCHEME,
+  HTTP_METHOD,
+  HTTP_STATUS_CODE,
+  HTTP_HOST,
+  HTTP_URL,
+  HTTP_USER_AGENT,
+} from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
@@ -123,16 +130,13 @@ export class FetchInstrumentation extends InstrumentationBase<
     response: FetchResponse
   ): void {
     const parsedUrl = web.parseUrl(response.url);
-    span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.status);
+    span.setAttribute(HTTP_STATUS_CODE, response.status);
     if (response.statusText != null) {
       span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
     }
-    span.setAttribute(SemanticAttributes.HTTP_HOST, parsedUrl.host);
-    span.setAttribute(
-      SemanticAttributes.HTTP_SCHEME,
-      parsedUrl.protocol.replace(':', '')
-    );
-    span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, navigator.userAgent);
+    span.setAttribute(HTTP_HOST, parsedUrl.host);
+    span.setAttribute(HTTP_SCHEME, parsedUrl.protocol.replace(':', ''));
+    span.setAttribute(HTTP_USER_AGENT, navigator.userAgent);
   }
 
   /**
@@ -202,8 +206,8 @@ export class FetchInstrumentation extends InstrumentationBase<
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
-        [SemanticAttributes.HTTP_METHOD]: method,
-        [SemanticAttributes.HTTP_URL]: url,
+        [HTTP_METHOD]: method,
+        [HTTP_URL]: url,
       },
     });
   }

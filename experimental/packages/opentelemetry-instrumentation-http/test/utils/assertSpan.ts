@@ -21,7 +21,24 @@ import {
 } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  HTTP_METHOD,
+  HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  HTTP_REQUEST_CONTENT_LENGTH,
+  HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+  HTTP_RESPONSE_CONTENT_LENGTH,
+  HTTP_SCHEME,
+  HTTP_SERVER_NAME,
+  HTTP_STATUS_CODE,
+  HTTP_TARGET,
+  HTTP_URL,
+  HTTP_USER_AGENT,
+  NET_HOST_IP,
+  NET_HOST_PORT,
+  NET_PEER_IP,
+  NET_PEER_NAME,
+  NET_PEER_PORT,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as utils from '../../src/utils';
@@ -55,15 +72,15 @@ export const assertSpan = (
     span.status.message
   );
   assert.strictEqual(
-    span.attributes[SemanticAttributes.HTTP_METHOD],
+    span.attributes[HTTP_METHOD],
     validations.httpMethod
   );
   assert.strictEqual(
-    span.attributes[SemanticAttributes.HTTP_TARGET],
+    span.attributes[HTTP_TARGET],
     validations.path || validations.pathname
   );
   assert.strictEqual(
-    span.attributes[SemanticAttributes.HTTP_STATUS_CODE],
+    span.attributes[HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
 
@@ -98,7 +115,7 @@ export const assertSpan = (
     const userAgent = validations.reqHeaders['user-agent'];
     if (userAgent) {
       assert.strictEqual(
-        span.attributes[SemanticAttributes.HTTP_USER_AGENT],
+        span.attributes[HTTP_USER_AGENT],
         userAgent
       );
     }
@@ -112,36 +129,36 @@ export const assertSpan = (
         validations.resHeaders['content-encoding'] !== 'identity'
       ) {
         assert.strictEqual(
-          span.attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH],
+          span.attributes[HTTP_RESPONSE_CONTENT_LENGTH],
           contentLength
         );
       } else {
         assert.strictEqual(
           span.attributes[
-            SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+            HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
           ],
           contentLength
         );
       }
     }
     assert.strictEqual(
-      span.attributes[SemanticAttributes.NET_PEER_NAME],
+      span.attributes[NET_PEER_NAME],
       validations.hostname,
       'must be consistent (PEER_NAME and hostname)'
     );
     if (!validations.noNetPeer) {
       assert.ok(
-        span.attributes[SemanticAttributes.NET_PEER_IP],
+        span.attributes[NET_PEER_IP],
         'must have PEER_IP'
       );
       assert.ok(
-        span.attributes[SemanticAttributes.NET_PEER_PORT],
+        span.attributes[NET_PEER_PORT],
         'must have PEER_PORT'
       );
     }
     assert.ok(
-      (span.attributes[SemanticAttributes.HTTP_URL] as string).indexOf(
-        span.attributes[SemanticAttributes.NET_PEER_NAME] as string
+      (span.attributes[HTTP_URL] as string).indexOf(
+        span.attributes[NET_PEER_NAME] as string
       ) > -1,
       'must be consistent'
     );
@@ -155,13 +172,13 @@ export const assertSpan = (
         validations.reqHeaders['content-encoding'] !== 'identity'
       ) {
         assert.strictEqual(
-          span.attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH],
+          span.attributes[HTTP_REQUEST_CONTENT_LENGTH],
           contentLength
         );
       } else {
         assert.strictEqual(
           span.attributes[
-            SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+            HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
           ],
           contentLength
         );
@@ -169,21 +186,21 @@ export const assertSpan = (
     }
     if (validations.serverName) {
       assert.strictEqual(
-        span.attributes[SemanticAttributes.HTTP_SERVER_NAME],
+        span.attributes[HTTP_SERVER_NAME],
         validations.serverName,
         ' must have serverName attribute'
       );
       assert.ok(
-        span.attributes[SemanticAttributes.NET_HOST_PORT],
+        span.attributes[NET_HOST_PORT],
         'must have HOST_PORT'
       );
       assert.ok(
-        span.attributes[SemanticAttributes.NET_HOST_IP],
+        span.attributes[NET_HOST_IP],
         'must have HOST_IP'
       );
     }
     assert.strictEqual(
-      span.attributes[SemanticAttributes.HTTP_SCHEME],
+      span.attributes[HTTP_SCHEME],
       validations.component,
       ' must have http.scheme attribute'
     );

@@ -17,7 +17,7 @@
 import type * as grpcTypes from 'grpc';
 import type * as events from 'events';
 import { SendUnaryDataCallback, GrpcClientFunc } from './types';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { RPC_GRPC_STATUS_CODE } from '@opentelemetry/semantic-conventions';
 import { context, Span, SpanStatusCode, propagation } from '@opentelemetry/api';
 import {
   _grpcStatusCodeToSpanStatus,
@@ -51,7 +51,7 @@ export const makeGrpcClientRemoteCall = function (
       if (err) {
         if (err.code) {
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
-          span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
+          span.setAttribute(RPC_GRPC_STATUS_CODE, err.code);
         }
         span.setAttributes({
           [AttributeNames.GRPC_ERROR_NAME]: err.name,
@@ -60,7 +60,7 @@ export const makeGrpcClientRemoteCall = function (
       } else {
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
-          SemanticAttributes.RPC_GRPC_STATUS_CODE,
+          RPC_GRPC_STATUS_CODE,
           GRPC_STATUS_CODE_OK
         );
       }
@@ -127,7 +127,7 @@ export const makeGrpcClientRemoteCall = function (
           });
           if (err.code != null) {
             span.setAttribute(
-              SemanticAttributes.RPC_GRPC_STATUS_CODE,
+              RPC_GRPC_STATUS_CODE,
               err.code
             );
           }
@@ -140,7 +140,7 @@ export const makeGrpcClientRemoteCall = function (
         (status: grpcTypes.StatusObject) => {
           span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
-            SemanticAttributes.RPC_GRPC_STATUS_CODE,
+            RPC_GRPC_STATUS_CODE,
             status.code
           );
           endSpan();

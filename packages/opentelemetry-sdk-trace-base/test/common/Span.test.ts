@@ -33,7 +33,11 @@ import {
   hrTimeToNanoseconds,
   otperformance as performance,
 } from '@opentelemetry/core';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  EXCEPTION_TYPE,
+  EXCEPTION_MESSAGE,
+  EXCEPTION_STACKTRACE,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
@@ -1174,11 +1178,11 @@ describe('Span', () => {
 
           assert.ok(event.attributes);
 
-          const type = event.attributes[SemanticAttributes.EXCEPTION_TYPE];
+          const type = event.attributes[EXCEPTION_TYPE];
           const message =
-            event.attributes[SemanticAttributes.EXCEPTION_MESSAGE];
+            event.attributes[EXCEPTION_MESSAGE];
           const stacktrace = String(
-            event.attributes[SemanticAttributes.EXCEPTION_STACKTRACE]
+            event.attributes[EXCEPTION_STACKTRACE]
           );
           assert.strictEqual(type, 'Error');
           assert.strictEqual(message, 'boom');
@@ -1218,7 +1222,7 @@ describe('Span', () => {
         span.recordException({ code: 12 });
         const event = span.events[0];
         assert.deepStrictEqual(event.attributes, {
-          [SemanticAttributes.EXCEPTION_TYPE]: '12',
+          [EXCEPTION_TYPE]: '12',
         });
       });
     });
