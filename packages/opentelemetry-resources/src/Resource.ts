@@ -15,7 +15,12 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SERVICE_NAME,
+  TELEMETRY_SDK_LANGUAGE,
+  TELEMETRY_SDK_NAME,
+  TELEMETRY_SDK_VERSION,
+} from '@opentelemetry/semantic-conventions';
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
@@ -51,13 +56,13 @@ export class Resource implements IResource {
    */
   static default(): IResource {
     return new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: defaultServiceName(),
-      [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
-        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
-      [SemanticResourceAttributes.TELEMETRY_SDK_NAME]:
-        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_NAME],
-      [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]:
-        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_VERSION],
+      [SERVICE_NAME]: defaultServiceName(),
+      [TELEMETRY_SDK_LANGUAGE]:
+        SDK_INFO[TELEMETRY_SDK_LANGUAGE],
+      [TELEMETRY_SDK_NAME]:
+        SDK_INFO[TELEMETRY_SDK_NAME],
+      [TELEMETRY_SDK_VERSION]:
+        SDK_INFO[TELEMETRY_SDK_VERSION],
     });
   }
 

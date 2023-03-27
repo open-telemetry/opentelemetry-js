@@ -16,7 +16,12 @@
 
 import * as sinon from 'sinon';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SERVICE_NAME,
+  TELEMETRY_SDK_LANGUAGE,
+  TELEMETRY_SDK_NAME,
+  TELEMETRY_SDK_VERSION,
+} from '@opentelemetry/semantic-conventions';
 
 export const mockedHrTimeMs = 1586347902211;
 
@@ -25,18 +30,18 @@ export function mockHrTime() {
 }
 
 export const serviceName = Resource.default()
-  .attributes[SemanticResourceAttributes.SERVICE_NAME]?.toString()
+  .attributes[SERVICE_NAME]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
 export const sdkLanguage = Resource.default()
-  .attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]?.toString()
+  .attributes[TELEMETRY_SDK_LANGUAGE]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
 export const sdkName = Resource.default()
-  .attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME]?.toString()
+  .attributes[TELEMETRY_SDK_NAME]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');
 export const sdkVersion = Resource.default()
-  .attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]?.toString()
+  .attributes[TELEMETRY_SDK_VERSION]?.toString()
   .replace(/\\/g, '\\\\')
   .replace(/\n/g, '\\n');

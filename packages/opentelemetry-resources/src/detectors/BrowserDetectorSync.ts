@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  PROCESS_RUNTIME_DESCRIPTION,
+  PROCESS_RUNTIME_NAME,
+  PROCESS_RUNTIME_VERSION,
+} from '@opentelemetry/semantic-conventions';
 import { DetectorSync, IResource, Resource, ResourceDetectionConfig } from '..';
 import { ResourceAttributes } from '../types';
 import { diag } from '@opentelemetry/api';
@@ -29,9 +33,9 @@ class BrowserDetectorSync implements DetectorSync {
       return Resource.empty();
     }
     const browserResource: ResourceAttributes = {
-      [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent,
+      [PROCESS_RUNTIME_NAME]: 'browser',
+      [PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
+      [PROCESS_RUNTIME_VERSION]: navigator.userAgent,
     };
     return this._getResourceAttributes(browserResource, config);
   }
@@ -47,7 +51,7 @@ class BrowserDetectorSync implements DetectorSync {
     _config?: ResourceDetectionConfig
   ) {
     if (
-      browserResource[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION] === ''
+      browserResource[PROCESS_RUNTIME_VERSION] === ''
     ) {
       diag.debug(
         'BrowserDetector failed: Unable to find required browser resources. '

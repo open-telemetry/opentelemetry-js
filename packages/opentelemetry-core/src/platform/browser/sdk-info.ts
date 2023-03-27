@@ -17,14 +17,16 @@
 import { VERSION } from '../../version';
 import {
   TelemetrySdkLanguageValues,
-  SemanticResourceAttributes,
+  PROCESS_RUNTIME_NAME,
+  TELEMETRY_SDK_LANGUAGE,
+  TELEMETRY_SDK_NAME,
+  TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
 
 /** Constants describing the SDK in use */
 export const SDK_INFO = {
-  [SemanticResourceAttributes.TELEMETRY_SDK_NAME]: 'opentelemetry',
-  [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
-  [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
-    TelemetrySdkLanguageValues.WEBJS,
-  [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]: VERSION,
+  [TELEMETRY_SDK_NAME]: 'opentelemetry',
+  [PROCESS_RUNTIME_NAME]: 'browser',
+  [TELEMETRY_SDK_LANGUAGE]: TelemetrySdkLanguageValues.WEBJS,
+  [TELEMETRY_SDK_VERSION]: VERSION,
 };

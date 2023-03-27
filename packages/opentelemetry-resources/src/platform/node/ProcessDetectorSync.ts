@@ -15,7 +15,17 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  PROCESS_COMMAND_ARGS,
+  PROCESS_COMMAND,
+  PROCESS_EXECUTABLE_NAME,
+  PROCESS_EXECUTABLE_PATH,
+  PROCESS_OWNER,
+  PROCESS_PID,
+  PROCESS_RUNTIME_DESCRIPTION,
+  PROCESS_RUNTIME_NAME,
+  PROCESS_RUNTIME_VERSION,
+} from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
@@ -29,27 +39,27 @@ import * as os from 'os';
 class ProcessDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): IResource {
     const attributes: ResourceAttributes = {
-      [SemanticResourceAttributes.PROCESS_PID]: process.pid,
-      [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title,
-      [SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH]: process.execPath,
-      [SemanticResourceAttributes.PROCESS_COMMAND_ARGS]: [
+      [PROCESS_PID]: process.pid,
+      [PROCESS_EXECUTABLE_NAME]: process.title,
+      [PROCESS_EXECUTABLE_PATH]: process.execPath,
+      [PROCESS_COMMAND_ARGS]: [
         process.argv[0],
         ...process.execArgv,
         ...process.argv.slice(1),
       ],
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]:
+      [PROCESS_RUNTIME_VERSION]:
         process.versions.node,
-      [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
+      [PROCESS_RUNTIME_NAME]: 'nodejs',
+      [PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
     };
 
     if (process.argv.length > 1) {
-      attributes[SemanticResourceAttributes.PROCESS_COMMAND] = process.argv[1];
+      attributes[PROCESS_COMMAND] = process.argv[1];
     }
 
     try {
       const userInfo = os.userInfo();
-      attributes[SemanticResourceAttributes.PROCESS_OWNER] = userInfo.username;
+      attributes[PROCESS_OWNER] = userInfo.username;
     } catch (e) {
       diag.debug(`error obtaining process owner: ${e}`);
     }

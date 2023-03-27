@@ -6,7 +6,7 @@ const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-htt
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
 const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { Resource } = require('@opentelemetry/resources');
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
@@ -15,7 +15,7 @@ const metricExporter = new OTLPMetricExporter({});
 
 const meterProvider = new MeterProvider({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'basic-metric-service',
+    [SERVICE_NAME]: 'basic-metric-service',
   }),
 });
 

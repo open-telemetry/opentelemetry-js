@@ -16,7 +16,11 @@
 
 import * as assert from 'assert';
 import { RAW_ENVIRONMENT } from '@opentelemetry/core';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  WEBENGINE_DESCRIPTION,
+  WEBENGINE_NAME,
+  WEBENGINE_VERSION,
+} from '@opentelemetry/semantic-conventions';
 import { envDetector, IResource } from '../../../src';
 import {
   assertEmptyResource,
@@ -41,9 +45,9 @@ describeBrowser('envDetector() on web browser', () => {
     it('should return resource information from environment variable', async () => {
       const resource: IResource = await envDetector.detect();
       assertWebEngineResource(resource, {
-        [SemanticResourceAttributes.WEBENGINE_NAME]: 'chromium',
-        [SemanticResourceAttributes.WEBENGINE_VERSION]: '99',
-        [SemanticResourceAttributes.WEBENGINE_DESCRIPTION]: 'Chromium',
+        [WEBENGINE_NAME]: 'chromium',
+        [WEBENGINE_VERSION]: '99',
+        [WEBENGINE_DESCRIPTION]: 'Chromium',
       });
       assert.strictEqual(resource.attributes['custom.key'], 'custom value');
     });

@@ -23,7 +23,7 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import {
   defaultStatusCodeTagName,
   defaultStatusErrorTagName,
@@ -35,7 +35,7 @@ import * as zipkinTypes from '../../src/types';
 const tracer = new BasicTracerProvider({
   resource: Resource.default().merge(
     new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+      [SERVICE_NAME]: 'zipkin-test',
       cost: '112.12',
       service: 'ui',
       version: '1',
@@ -44,7 +44,7 @@ const tracer = new BasicTracerProvider({
 }).getTracer('default');
 
 const language =
-  tracer.resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE];
+  tracer.resource.attributes[TELEMETRY_SDK_LANGUAGE];
 
 const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {
@@ -97,7 +97,7 @@ describe('transform', () => {
         tags: {
           key1: 'value1',
           key2: 'value2',
-          [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          [SERVICE_NAME]: 'zipkin-test',
           cost: '112.12',
           service: 'ui',
           version: '1',
@@ -138,7 +138,7 @@ describe('transform', () => {
         name: span.name,
         parentId: undefined,
         tags: {
-          [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          [SERVICE_NAME]: 'zipkin-test',
           cost: '112.12',
           service: 'ui',
           version: '1',
@@ -189,7 +189,7 @@ describe('transform', () => {
           name: span.name,
           parentId: undefined,
           tags: {
-            [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+            [SERVICE_NAME]: 'zipkin-test',
             cost: '112.12',
             service: 'ui',
             version: '1',
@@ -227,7 +227,7 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        [SERVICE_NAME]: 'zipkin-test',
         'telemetry.sdk.language': language,
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -263,7 +263,7 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        [SERVICE_NAME]: 'zipkin-test',
         'telemetry.sdk.language': language,
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -301,7 +301,7 @@ describe('transform', () => {
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
         [defaultStatusErrorTagName]: status.message,
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        [SERVICE_NAME]: 'zipkin-test',
         'telemetry.sdk.language': language,
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
