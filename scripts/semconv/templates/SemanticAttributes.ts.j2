@@ -26,6 +26,23 @@
 {%- endmacro %}
 
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/{{template}}
+{%- for attribute in attributes if attribute.is_local and not attribute.ref %}
+
+/**
+* {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
+  {%- if attribute.note %}
+*
+* Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
+  {%- endif %}
+  {%- if attribute.deprecated %}
+*
+* @deprecated {{attribute.deprecated | to_doc_brief}}.
+  {%- endif %}
+*/
+export const {{attribute.fqn | to_const_name}} = '{{attribute.fqn}}' as const;
+
+{%- endfor %}
+
 export const {{class}} = {
   {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
 
@@ -40,7 +57,7 @@ export const {{class}} = {
   * @deprecated {{attribute.deprecated | to_doc_brief}}.
     {%- endif %}
   */
-  {{attribute.fqn | to_const_name}}: '{{attribute.fqn}}',
+  {{attribute.fqn | to_const_name}},
   {%- endfor %}
 }
 
