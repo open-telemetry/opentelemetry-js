@@ -310,9 +310,9 @@ async function myTask() {
     const executionTime = endTime - startTime
 
     httpServerDuration.record(executionTime, {
-      [SemanticAttributes.HTTP_METHOD]: 'POST',
-      [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-      [SemanticAttributes.HTTP_SCHEME]: 'https',
+      [HTTP_METHOD]: 'POST',
+      [HTTP_STATUS_CODE]: '200',
+      [HTTP_SCHEME]: 'https',
     })
   }
 }
@@ -422,9 +422,9 @@ const httpServerDuration = meter.createHistogram("http.server.duration", {
 
 // Record measurement for histogram
 httpServerDuration.record(50, {
-  [SemanticAttributes.HTTP_METHOD]: 'POST',
-  [SemanticAttributes.HTTP_STATUS_CODE]: '200',
-  [SemanticAttributes.HTTP_SCHEME]: 'https',
+  [HTTP_METHOD]: 'POST',
+  [HTTP_STATUS_CODE]: '200',
+  [HTTP_SCHEME]: 'https',
 });
 ```
 
