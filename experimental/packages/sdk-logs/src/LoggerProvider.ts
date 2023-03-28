@@ -15,8 +15,9 @@
  */
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
+import { NOOP_LOGGER } from '@opentelemetry/api-logs';
 import { IResource, Resource } from '@opentelemetry/resources';
-import { merge } from '@opentelemetry/core';
+import { BindOnceFuture, merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig } from './types';
 import type { LogRecordProcessor } from './LogRecordProcessor';
@@ -34,6 +35,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   private _activeProcessor: MultiLogRecordProcessor;
   private readonly _registeredLogRecordProcessors: LogRecordProcessor[] = [];
   private readonly _config: LoggerProviderConfig;
+  private _shutdownOnce: BindOnceFuture<void>;
 
   constructor(config: LoggerProviderConfig = {}) {
     const {
@@ -47,6 +49,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       resource: this.resource,
       forceFlushTimeoutMillis,
     };
+
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
     // add a default processor: NoopLogRecordProcessor
     this._activeProcessor = new MultiLogRecordProcessor(
@@ -62,7 +66,12 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     name: string,
     version?: string,
     options?: logsAPI.LoggerOptions
-  ): Logger {
+  ): logsAPI.Logger {
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('A shutdown LoggerProvider cannot provide a Meter');
+      return NOOP_LOGGER;
+    }
+
     if (!name) {
       diag.warn('Logger requested without instrumentation scope name.');
     }
@@ -111,6 +120,11 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    * Returns a promise which is resolved when all flushes are complete.
    */
   public forceFlush(): Promise<void> {
+    // do not flush after shutdown
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('invalid attempt to force flush after LoggerProvider shutdown');
+      return this._shutdownOnce.promise;
+    }
     return this._activeProcessor.forceFlush();
   }
 
@@ -121,7 +135,11 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    * Returns a promise which is resolved when all flushes are complete.
    */
   public shutdown(): Promise<void> {
-    return this._activeProcessor.shutdown();
+    if (this._shutdownOnce.isCalled) {
+      diag.warn('shutdown may only be called once per LoggerProvider');
+      return this._shutdownOnce.promise;
+    }
+    return this._shutdownOnce.call();
   }
 
   public getActiveLogRecordProcessor(): MultiLogRecordProcessor {
@@ -130,5 +148,9 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
 
   public getActiveLoggers(): Map<string, Logger> {
     return this._loggers;
+  }
+
+  private _shutdown(): Promise<void> {
+    return this._activeProcessor.shutdown();
   }
 }
