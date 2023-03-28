@@ -21,6 +21,7 @@ import * as sinon from 'sinon';
 
 import { Logger, LoggerProvider, NoopLogRecordProcessor } from '../../src';
 import { loadDefaultConfig } from '../../src/config';
+import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 
 describe('LoggerProvider', () => {
   let envSource: Record<string, any>;
@@ -181,6 +182,12 @@ describe('LoggerProvider', () => {
     const testName = 'test name';
     const testVersion = 'test version';
     const testSchemaURL = 'test schema url';
+
+    it('should create a logger instance with default name if the name is invalid ', () => {
+      const provider = new LoggerProvider();
+      const logger = provider.getLogger('');
+      assert.ok(logger.instrumentationScope.name === DEFAULT_LOGGER_NAME);
+    });
 
     it("should create a logger instance if the name doesn't exist", () => {
       const provider = new LoggerProvider();

@@ -25,6 +25,8 @@ import { loadDefaultConfig, reconfigureLimits } from './config';
 import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 import { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';
 
+export const DEFAULT_LOGGER_NAME = 'unknown';
+
 export class LoggerProvider implements logsAPI.LoggerProvider {
   public readonly resource: IResource;
 
@@ -61,12 +63,16 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     version?: string,
     options?: logsAPI.LoggerOptions
   ): Logger {
-    const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
+    if (!name) {
+      diag.warn('Logger requested without instrumentation scope name.');
+    }
+    const loggerName = name || DEFAULT_LOGGER_NAME;
+    const key = `${loggerName}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._loggers.has(key)) {
       this._loggers.set(
         key,
         new Logger(
-          { name, version, schemaUrl: options?.schemaUrl },
+          { name: loggerName, version, schemaUrl: options?.schemaUrl },
           this._config,
           this
         )
