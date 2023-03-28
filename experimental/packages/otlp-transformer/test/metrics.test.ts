@@ -265,6 +265,47 @@ describe('Metrics', () => {
       };
     }
 
+    function createExponentialHistogramMetrics(
+      count: number,
+      sum: number,
+      scale: number,
+      zeroCount: number,
+      positive: { offset: number; bucketCounts: number[] },
+      negative: { offset: number; bucketCounts: number[] },
+      aggregationTemporality: AggregationTemporality,
+      min?: number,
+      max?: number
+    ): MetricData {
+      return {
+        descriptor: {
+          description: 'this is a description',
+          type: InstrumentType.HISTOGRAM,
+          name: 'xhist',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        aggregationTemporality,
+        dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM,
+        dataPoints: [
+          {
+            value: {
+              sum: sum,
+              count: count,
+              min: min,
+              max: max,
+              zeroCount: zeroCount,
+              scale: scale,
+              positive: positive,
+              negative: negative,
+            },
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+          },
+        ],
+      };
+    }
+
     function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
       const resource = new Resource({
         'resource-attribute': 'resource attribute value',
@@ -594,6 +635,134 @@ describe('Metrics', () => {
                             sum: 9,
                             min: undefined,
                             max: undefined,
+                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+      });
+    });
+
+    describe('serializes an exponential histogram metric record', () => {
+      it('with min/max', () => {
+        const exportRequest = createExportMetricsServiceRequest([
+          createResourceMetrics([
+            createExponentialHistogramMetrics(
+              3,
+              10,
+              1,
+              0,
+              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+              { offset: 0, bucketCounts: [0] },
+              AggregationTemporality.CUMULATIVE,
+              1,
+              8
+            ),
+          ]),
+        ]);
+
+        assert.ok(exportRequest);
+
+        assert.deepStrictEqual(exportRequest, {
+          resourceMetrics: [
+            {
+              resource: expectedResource,
+              schemaUrl: undefined,
+              scopeMetrics: [
+                {
+                  scope: expectedScope,
+                  schemaUrl: expectedSchemaUrl,
+                  metrics: [
+                    {
+                      name: 'xhist',
+                      description: 'this is a description',
+                      unit: '1',
+                      exponentialHistogram: {
+                        aggregationTemporality:
+                          EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        dataPoints: [
+                          {
+                            attributes: expectedAttributes,
+                            count: 3,
+                            sum: 10,
+                            min: 1,
+                            max: 8,
+                            zeroCount: 0,
+                            scale: 1,
+                            positive: {
+                              offset: 0,
+                              bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0],
+                            },
+                            negative: { offset: 0, bucketCounts: [0] },
+                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+      });
+
+      it('without min/max', () => {
+        const exportRequest = createExportMetricsServiceRequest([
+          createResourceMetrics([
+            createExponentialHistogramMetrics(
+              3,
+              10,
+              1,
+              0,
+              { offset: 0, bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0] },
+              { offset: 0, bucketCounts: [0] },
+              AggregationTemporality.CUMULATIVE
+            ),
+          ]),
+        ]);
+
+        assert.ok(exportRequest);
+
+        assert.deepStrictEqual(exportRequest, {
+          resourceMetrics: [
+            {
+              resource: expectedResource,
+              schemaUrl: undefined,
+              scopeMetrics: [
+                {
+                  scope: expectedScope,
+                  schemaUrl: expectedSchemaUrl,
+                  metrics: [
+                    {
+                      name: 'xhist',
+                      description: 'this is a description',
+                      unit: '1',
+                      exponentialHistogram: {
+                        aggregationTemporality:
+                          EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        dataPoints: [
+                          {
+                            attributes: expectedAttributes,
+                            count: 3,
+                            sum: 10,
+                            min: undefined,
+                            max: undefined,
+                            zeroCount: 0,
+                            scale: 1,
+                            positive: {
+                              offset: 0,
+                              bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0],
+                            },
+                            negative: { offset: 0, bucketCounts: [0] },
                             startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                             timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           },
