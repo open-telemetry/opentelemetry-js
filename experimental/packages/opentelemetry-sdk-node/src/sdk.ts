@@ -47,7 +47,7 @@ import {
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
-import { getEnv } from '@opentelemetry/core';
+import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 import { parseInstrumentationOptions } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -89,14 +89,19 @@ export class NodeSDK {
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     const env = getEnv();
+    const envWithoutDefaults = getEnvWithoutDefaults();
+
     if (env.OTEL_SDK_DISABLED) {
       this._disabled = true;
       // Functions with possible side-effects are set
       // to no-op via the _disabled flag
     }
-    if (env.OTEL_LOG_LEVEL) {
+
+    // Default is INFO, use environment without defaults to check
+    // if the user originally set the environment variable.
+    if (envWithoutDefaults.OTEL_LOG_LEVEL) {
       diag.setLogger(new DiagConsoleLogger(), {
-        logLevel: env.OTEL_LOG_LEVEL,
+        logLevel: envWithoutDefaults.OTEL_LOG_LEVEL,
       });
     }
 
