@@ -35,16 +35,6 @@ for (const contextManagerClass of [
       | AsyncHooksContextManager
       | AsyncLocalStorageContextManager;
 
-    before(function () {
-      if (
-        contextManagerClass.name === 'AsyncLocalStorageContextManager' &&
-        (process.version.startsWith('v8.') ||
-          process.version.startsWith('v10.'))
-      ) {
-        this.skip();
-      }
-    });
-
     beforeEach(() => {
       contextManager = new contextManagerClass();
       contextManager.enable();
