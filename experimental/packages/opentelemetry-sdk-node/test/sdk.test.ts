@@ -134,6 +134,19 @@ describe('Node SDK', () => {
       delete env.OTEL_LOG_LEVEL;
     });
 
+    it('should not register a diag logger with OTEL_LOG_LEVEL unset', () => {
+      delete env.OTEL_LOG_LEVEL;
+
+      const spy = Sinon.spy(diag, 'setLogger');
+      const sdk = new NodeSDK({
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(spy.callCount, 0);
+    });
+
     it('should register a tracer provider if an exporter is provided', async () => {
       const sdk = new NodeSDK({
         traceExporter: new ConsoleSpanExporter(),

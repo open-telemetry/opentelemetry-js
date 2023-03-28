@@ -21,6 +21,7 @@ import {
   DropAggregator,
   LastValueAggregator,
   HistogramAggregator,
+  ExponentialHistogramAggregator,
 } from '../aggregator';
 import { Accumulation } from '../aggregator/types';
 import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
@@ -50,6 +51,10 @@ export abstract class Aggregation {
 
   static Histogram(): Aggregation {
     return HISTOGRAM_AGGREGATION;
+  }
+
+  static ExponentialHistogram(): Aggregation {
+    return EXPONENTIAL_HISTOGRAM_AGGREGATION;
   }
 
   static Default(): Aggregation {
@@ -144,6 +149,21 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
   }
 }
 
+export class ExponentialHistogramAggregation extends Aggregation {
+  constructor(
+    private readonly _maxSize: number = 160,
+    private readonly _recordMinMax = true
+  ) {
+    super();
+  }
+  createAggregator(_instrument: InstrumentDescriptor) {
+    return new ExponentialHistogramAggregator(
+      this._maxSize,
+      this._recordMinMax
+    );
+  }
+}
+
 /**
  * The default aggregation.
  */
@@ -179,4 +199,5 @@ const DROP_AGGREGATION = new DropAggregation();
 const SUM_AGGREGATION = new SumAggregation();
 const LAST_VALUE_AGGREGATION = new LastValueAggregation();
 const HISTOGRAM_AGGREGATION = new HistogramAggregation();
+const EXPONENTIAL_HISTOGRAM_AGGREGATION = new ExponentialHistogramAggregation();
 const DEFAULT_AGGREGATION = new DefaultAggregation();
