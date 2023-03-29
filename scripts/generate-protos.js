@@ -3,8 +3,10 @@
 const cp = require('child_process');
 const path = require('path');
 
-const generatedPath = path.resolve(__dirname, '../src/generated');
-const protosPath = path.resolve(__dirname, '../protos');
+const appRoot = process.cwd();
+
+const generatedPath = path.resolve(appRoot, './src/generated');
+const protosPath = path.resolve(appRoot, './protos');
 const protos = [
   'opentelemetry/proto/common/v1/common.proto',
   'opentelemetry/proto/resource/v1/resource.proto',
@@ -33,7 +35,7 @@ function exec(command, argv) {
 }
 
 function pbts(pbjsOutFile) {
-  const pbtsPath = path.resolve(__dirname, '../node_modules/.bin/pbts');
+  const pbtsPath = path.resolve(appRoot, './node_modules/.bin/pbts');
   const pbtsOptions = [
     '-o', path.join(generatedPath, 'root.d.ts'),
   ];
@@ -41,7 +43,7 @@ function pbts(pbjsOutFile) {
 }
 
 async function pbjs(files) {
-  const pbjsPath = path.resolve(__dirname, '../node_modules/.bin/pbjs');
+  const pbjsPath = path.resolve(appRoot, './node_modules/.bin/pbjs');
   const outFile = path.join(generatedPath, 'root.js');
   const pbjsOptions = [
     '-t', 'static-module',

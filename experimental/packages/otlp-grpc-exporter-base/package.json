@@ -14,7 +14,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "postcompile": "npm run submodule && npm run protos:copy",
     "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
-    "protos": "npm run submodule && node scripts/protos.js",
+    "protos": "npm run submodule && node ../../../scripts/generate-protos.js",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
