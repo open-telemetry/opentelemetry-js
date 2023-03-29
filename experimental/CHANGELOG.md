@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(otlp-grpc-exporter-base): use statically generated protobuf code [#3705](https://github.com/open-telemetry/opentelemetry-js/pull/3705) @pichlermarc
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @pichlermarc
