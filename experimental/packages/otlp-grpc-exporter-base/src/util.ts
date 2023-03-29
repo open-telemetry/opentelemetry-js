@@ -31,22 +31,11 @@ import {
   OTLPExporterError,
   CompressionAlgorithm,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportMetricsServiceRequest,
-  IExportTraceServiceRequest,
-} from '@opentelemetry/otlp-transformer';
-import * as root from './generated/root';
-import { opentelemetry } from './generated/root';
-import IExportMetricsServiceResponse = opentelemetry.proto.collector.metrics.v1.IExportMetricsServiceResponse;
-import IExportTraceServiceResponse = opentelemetry.proto.collector.trace.v1.IExportTraceServiceResponse;
+
+import { MetricExportServiceClient } from './MetricsExportServiceClient';
+import { TraceExportServiceClient } from './TraceExportServiceClient';
 
 export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
-
-interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
-  create(properties?: T): R;
-  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
-  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
-}
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: OTLPGRPCExporterNodeBase<ExportItem, ServiceRequest>,
@@ -61,45 +50,7 @@ export function onInit<ExportItem, ServiceRequest>(
 
   try {
     if (collector.getServiceClientType() === ServiceClientType.SPANS) {
-      const service = {
-        export: {
-          path: '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
-          requestStream: false,
-          responseStream: false,
-          requestSerialize: (arg: IExportTraceServiceRequest) => {
-            const requestType = root.opentelemetry.proto.collector.trace.v1
-              .ExportTraceServiceRequest as ExportRequestType<IExportTraceServiceRequest>;
-
-            const buffer = requestType.encode(arg).finish();
-            return Buffer.from(buffer);
-          },
-          requestDeserialize: (arg: Buffer) => {
-            const requestType = root.opentelemetry.proto.collector.trace.v1
-              .ExportTraceServiceRequest as ExportRequestType<IExportTraceServiceRequest>;
-
-            return requestType.decode(arg);
-          },
-          responseSerialize: (arg: IExportMetricsServiceResponse) => {
-            const requestType = root.opentelemetry.proto.collector.trace.v1
-              .ExportTraceServiceResponse as ExportRequestType<IExportTraceServiceResponse>;
-
-            const buffer = requestType.encode(arg).finish();
-            return Buffer.from(buffer);
-          },
-          responseDeserialize: (arg: Buffer) => {
-            const requestType = root.opentelemetry.proto.collector.trace.v1
-              .ExportTraceServiceResponse as ExportRequestType<IExportTraceServiceResponse>;
-
-            return requestType.decode(arg);
-          },
-        },
-      };
-
-      const clientConstructor = grpc.makeGenericClientConstructor(
-        service,
-        'TraceExportService'
-      );
-      const client = new clientConstructor(collector.url, credentials, {
+      const client = new TraceExportServiceClient(collector.url, credentials, {
         'grpc.default_compression_algorithm': collector.compression.valueOf(),
       });
 
@@ -107,45 +58,7 @@ export function onInit<ExportItem, ServiceRequest>(
       // @ts-ignore
       collector.serviceClient = client;
     } else if (collector.getServiceClientType() === ServiceClientType.METRICS) {
-      const service = {
-        export: {
-          path: '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
-          requestStream: false,
-          responseStream: false,
-          requestSerialize: (arg: IExportMetricsServiceRequest) => {
-            const requestType = root.opentelemetry.proto.collector.metrics.v1
-              .ExportMetricsServiceRequest as ExportRequestType<IExportMetricsServiceRequest>;
-
-            const buffer = requestType.encode(arg).finish();
-            return Buffer.from(buffer);
-          },
-          requestDeserialize: (arg: Buffer) => {
-            const requestType = root.opentelemetry.proto.collector.metrics.v1
-              .ExportMetricsServiceRequest as ExportRequestType<IExportMetricsServiceRequest>;
-
-            return requestType.decode(arg);
-          },
-          responseSerialize: (arg: IExportMetricsServiceResponse) => {
-            const requestType = root.opentelemetry.proto.collector.metrics.v1
-              .ExportMetricsServiceResponse as ExportRequestType<IExportMetricsServiceResponse>;
-
-            const buffer = requestType.encode(arg).finish();
-            return Buffer.from(buffer);
-          },
-          responseDeserialize: (arg: Buffer) => {
-            const requestType = root.opentelemetry.proto.collector.metrics.v1
-              .ExportMetricsServiceResponse as ExportRequestType<IExportMetricsServiceResponse>;
-
-            return requestType.decode(arg);
-          },
-        },
-      };
-
-      const clientConstructor = grpc.makeGenericClientConstructor(
-        service,
-        'MetricsExportService'
-      );
-      const client = new clientConstructor(collector.url, credentials, {
+      const client = new MetricExportServiceClient(collector.url, credentials, {
         'grpc.default_compression_algorithm': collector.compression.valueOf(),
       });
 
