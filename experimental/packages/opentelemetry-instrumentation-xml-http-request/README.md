@@ -35,7 +35,7 @@ providerWithZone.register({
 registerInstrumentations({
   instrumentations: [
     new XMLHttpRequestInstrumentation({
-      propagateTraceHeaderCorsUrls: ['http://localhost:8090']
+      propagateTraceHeaderCorsUrls: ['http://localhost:8090'],
     }),
   ],
 });
@@ -61,6 +61,20 @@ xmlHttpRequestInstrumentation.setTracerProvider(providerWithZone);
 const req = new XMLHttpRequest();
 req.open('GET', 'http://localhost:8090/xml-http-request.js', true);
 req.send();
+
+//////////////////////////////////////////
+// plugin can be initialised to disable network and/or client events
+const xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
+  // disable network events - defaults to false
+  // (`connectStart`, `secureConnectionStart`, `fetchStart`, 
+  // `connectEnd, `domainLookupStart`, `domainLookupEnd`, `requestStart`, 
+  // `responseStart`, `responseEnd`)
+  disableNetworkEvents: true,
+  
+  // disable client events - defaults to false
+  // (`open`, `send`, `loaded`)
+  disableClientEvents: true,
+});
 
 ```
 
