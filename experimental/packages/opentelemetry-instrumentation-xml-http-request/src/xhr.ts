@@ -74,6 +74,10 @@ export interface XMLHttpRequestInstrumentationConfig
   ignoreUrls?: Array<string | RegExp>;
   /** Function for adding custom attributes on the span */
   applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
+  /** Ignore network events */
+  ignoreNetworkEvents?: boolean;
+  /** Ignore client events (`open`, `method` and `loaded`) */
+  ignoreClientEvents?: boolean;
 }
 
 /**
@@ -140,7 +144,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      if (!this._getConfig().ignoreNetworkEvents) {
+        addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      }
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -292,7 +298,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      addSpanNetworkEvents(span, mainRequest);
+      if (!this._getConfig().ignoreNetworkEvents) {
+        addSpanNetworkEvents(span, mainRequest);
+      }
     }
   }
 
@@ -339,7 +347,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       },
     });
 
-    currentSpan.addEvent(EventNames.METHOD_OPEN);
+    if (!this._getConfig().ignoreClientEvents) {
+      currentSpan.addEvent(EventNames.METHOD_OPEN);
+    }
 
     this._cleanPreviousSpanInformation(xhr);
 
@@ -408,7 +418,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
           sendStartTime,
           performanceEndTime
         );
-        span.addEvent(eventName, endTime);
+        if (!plugin._getConfig().ignoreClientEvents) {
+          span.addEvent(eventName, endTime);
+        }
         plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
         span.end(endTime);
         plugin._tasksCount--;
@@ -485,7 +497,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             () => {
               plugin._tasksCount++;
               xhrMem.sendStartTime = hrTime();
-              currentSpan.addEvent(EventNames.METHOD_SEND);
+              if (!plugin._getConfig().ignoreClientEvents) {
+                currentSpan.addEvent(EventNames.METHOD_SEND);
+              }
 
               this.addEventListener('abort', onAbort);
               this.addEventListener('error', onError);

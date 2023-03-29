@@ -53,7 +53,7 @@ const XHR_TIMEOUT = 2000;
 const getData = (
   req: XMLHttpRequest,
   url: string,
-  callbackAfterSend: Function,
+  callbackAfterSend: () => void,
   async?: boolean
 ) => {
   // eslint-disable-next-line no-async-promise-executor
@@ -164,7 +164,11 @@ describe('xhr', () => {
     const testAsync = test.async;
     describe(`when async='${testAsync}'`, () => {
       let requests: any[] = [];
-      let prepareData: any;
+      let prepareData: (
+        done: () => void,
+        fileUrl: string,
+        config?: XMLHttpRequestInstrumentationConfig
+      ) => void;
       let clearData: any;
       let contextManager: ZoneContextManager;
 
@@ -800,6 +804,103 @@ describe('xhr', () => {
               attributes[SemanticAttributes.HTTP_URL],
               location.origin + '/get',
               `attributes ${SemanticAttributes.HTTP_URL} is wrong`
+            );
+          });
+        });
+
+        describe('when ignoreNetworkEvents is set', () => {
+          beforeEach(done => {
+            clearData();
+            prepareData(done, url, {
+              ignoreNetworkEvents: true,
+            });
+          });
+
+          it('should not add network events to the pre-flight span nor main span', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const events = span.events;
+            const parentSpanEvents = parentSpan.events;
+
+            assert.strictEqual(
+              exportSpy.args.length,
+              2,
+              `Wrong number of spans: ${exportSpy.args.length}`
+            );
+
+            assert.strictEqual(
+              events.length,
+              0,
+              `number of events is wrong: ${events.length}`
+            );
+
+            // We still expect open, send and loaded events
+            assert.strictEqual(
+              parentSpanEvents.length,
+              3,
+              `number of parent span events is wrong: ${parentSpanEvents.length}`
+            );
+          });
+        });
+
+        describe('when ignoreClientEvents is set', () => {
+          beforeEach(done => {
+            clearData();
+            prepareData(done, url, {
+              ignoreClientEvents: true,
+            });
+          });
+
+          it('should not add client events to the main span', () => {
+            const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const parentSpanEvents = parentSpan.events;
+
+            assert.strictEqual(
+              exportSpy.args.length,
+              2,
+              `Wrong number of spans: ${exportSpy.args.length}`
+            );
+
+            // We expect the network events only
+            assert.strictEqual(
+              parentSpanEvents.length,
+              9,
+              `number of main span events is wrong: ${parentSpanEvents.length}`
+            );
+          });
+        });
+        
+        describe('when ignoreNetworkEvents and ignoreClientEvents is set', () => {
+          beforeEach(done => {
+            clearData();
+            prepareData(done, url, {
+              ignoreNetworkEvents: true,
+              ignoreClientEvents: true,
+            });
+          });
+
+          it('should not add any events to the pre-flight span nor main span', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const events = span.events;
+            const parentSpanEvents = parentSpan.events;
+
+            assert.strictEqual(
+              exportSpy.args.length,
+              2,
+              `Wrong number of spans: ${exportSpy.args.length}`
+            );
+
+            assert.strictEqual(
+              events.length,
+              0,
+              `number of events is wrong: ${events.length}`
+            );
+
+            assert.strictEqual(
+              parentSpanEvents.length,
+              0,
+              `number of parent span events is wrong: ${parentSpanEvents.length}`
             );
           });
         });
