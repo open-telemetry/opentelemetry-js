@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+
 import * as root from './generated/root';
-import { ExportRequestType } from './internal';
-import { opentelemetry } from './generated/root';
-import IExportMetricsServiceResponse = opentelemetry.proto.collector.metrics.v1.IExportMetricsServiceResponse;
 import * as grpc from '@grpc/grpc-js';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { ExportRequestType } from './internal-types';
+import IExportMetricsServiceResponse = root.opentelemetry.proto.collector.metrics.v1.IExportMetricsServiceResponse;
 
 const responseType = root.opentelemetry.proto.collector.metrics.v1
   .ExportMetricsServiceResponse as ExportRequestType<IExportMetricsServiceResponse>;

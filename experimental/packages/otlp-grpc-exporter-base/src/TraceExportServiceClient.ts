@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+
 import * as root from './generated/root';
-import { ExportRequestType } from './internal';
-import { opentelemetry } from './generated/root';
 import * as grpc from '@grpc/grpc-js';
-import IExportTraceServiceResponse = opentelemetry.proto.collector.trace.v1.IExportTraceServiceResponse;
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { ExportRequestType } from './internal-types';
+import IExportTraceServiceResponse = root.opentelemetry.proto.collector.trace.v1.IExportTraceServiceResponse;
 
 const responseType = root.opentelemetry.proto.collector.trace.v1
   .ExportTraceServiceResponse as ExportRequestType<IExportTraceServiceResponse>;
@@ -48,7 +48,7 @@ const traceServiceDefinition = {
   },
 };
 
-// Creates a new instance of a gRPC service client for OTLP traces
+// Creates a new instance of a gRPC service client for exporting OTLP traces
 export const TraceExportServiceClient: grpc.ServiceClientConstructor =
   grpc.makeGenericClientConstructor(
     traceServiceDefinition,
