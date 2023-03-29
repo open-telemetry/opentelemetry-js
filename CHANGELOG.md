@@ -37,6 +37,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 * fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
 * fix(resource): change fs/promises import to be node 12 compatible [#3681](https://github.com/open-telemetry/opentelemetry-js/pull/3681) @pichlermarc
 
