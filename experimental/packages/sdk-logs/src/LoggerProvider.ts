@@ -68,7 +68,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     options?: logsAPI.LoggerOptions
   ): logsAPI.Logger {
     if (this._shutdownOnce.isCalled) {
-      diag.warn('A shutdown LoggerProvider cannot provide a Meter');
+      diag.warn('A shutdown LoggerProvider cannot provide a Logger');
       return NOOP_LOGGER;
     }
 
