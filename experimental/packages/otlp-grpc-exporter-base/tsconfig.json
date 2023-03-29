@@ -7,9 +7,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/clients/**/*.js",
     "src/generated/**/*.js",
-    "src/clients/**/*.ts",
     "src/generated/**/*.ts",
     "test/**/*.ts"
   ],
