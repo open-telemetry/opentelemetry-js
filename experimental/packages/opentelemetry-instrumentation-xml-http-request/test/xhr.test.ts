@@ -869,7 +869,7 @@ describe('xhr', () => {
             );
           });
         });
-        
+
         describe('when ignoreNetworkEvents and ignoreClientEvents is set', () => {
           beforeEach(done => {
             clearData();
