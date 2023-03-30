@@ -11,19 +11,27 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.11.0
+
+### :rocket: (Enhancement)
+
 * feat(sdk-metrics): add exponential histogram support [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505), [#3506](https://github.com/open-telemetry/opentelemetry-js/pull/3506) @mwear
 * feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 * fix(sdk-trace-web): make `parseUrl()` respect document.baseURI [#3670](https://github.com/open-telemetry/opentelemetry-js/pull/3670) @domasx2
-* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
 
 ### :books: (Refine Doc)
 
 * doc(sdk): update NodeSDK example [#3684](https://github.com/open-telemetry/opentelemetry-js/pull/3684) @martinkuba
-
-### :house: (Internal)
 
 ## 1.10.1
 
