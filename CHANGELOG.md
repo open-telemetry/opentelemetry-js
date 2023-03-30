@@ -32,6 +32,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :books: (Refine Doc)
 
 * doc(sdk): update NodeSDK example [#3684](https://github.com/open-telemetry/opentelemetry-js/pull/3684) @martinkuba
+* docs: change rauno56 status from maintainer to emeritus [#3706](https://github.com/open-telemetry/opentelemetry-js/pull/3706) @rauno56
 
 ## 1.10.1
 
