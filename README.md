@@ -173,7 +173,19 @@ instructions to build and make changes to this project, see the
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
-Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
+### Community members
+
+#### Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
+
+- [Amir Blum](https://github.com/blumamir), Aspecto
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
+- [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
+- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
+
+*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
+
+#### Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
@@ -188,30 +200,22 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
-Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
-
-- [Amir Blum](https://github.com/blumamir), Aspecto
-- [Chengzhong Wu](https://github.com/legendecas), Alibaba
-- [Daniel Dyla](https://github.com/dyladan), Dynatrace
-- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
-- [Rauno Viskus](https://github.com/Rauno56), Splunk
-- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
-
-*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
-
-### Thanks to all the people who already contributed
-
-<a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
-</a>
-
-### Thanks to all previous approvers and maintainers
+#### Emeriti
 
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep, Maintainer
 - [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
 - [Mayur Kale](https://github.com/mayurkale22), Google, Maintainer
+- [Rauno Viskus](https://github.com/rauno56), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
 - [Roch Devost](https://github.com/rochdev), DataDog, Approver
+
+*Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
+
+#### Thanks to all the people who already contributed
+
+<a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
+</a>
 
 ## Packages
 
