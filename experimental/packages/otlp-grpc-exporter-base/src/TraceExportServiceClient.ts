@@ -17,14 +17,14 @@
 import * as root from './generated/root';
 import * as grpc from '@grpc/grpc-js';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
-import { ExportRequestType } from './internal-types';
+import { ExportType } from './internal-types';
 import IExportTraceServiceResponse = root.opentelemetry.proto.collector.trace.v1.IExportTraceServiceResponse;
 
 const responseType = root.opentelemetry.proto.collector.trace.v1
-  .ExportTraceServiceResponse as ExportRequestType<IExportTraceServiceResponse>;
+  .ExportTraceServiceResponse as ExportType<IExportTraceServiceResponse>;
 
 const requestType = root.opentelemetry.proto.collector.trace.v1
-  .ExportTraceServiceRequest as ExportRequestType<IExportTraceServiceRequest>;
+  .ExportTraceServiceRequest as ExportType<IExportTraceServiceRequest>;
 
 const traceServiceDefinition = {
   export: {
