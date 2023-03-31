@@ -32,15 +32,13 @@ const metricsServiceDefinition = {
     requestStream: false,
     responseStream: false,
     requestSerialize: (arg: IExportMetricsServiceRequest) => {
-      const buffer = requestType.encode(arg).finish();
-      return Buffer.from(buffer);
+      return Buffer.from(requestType.encode(arg).finish());
     },
     requestDeserialize: (arg: Buffer) => {
       return requestType.decode(arg);
     },
     responseSerialize: (arg: IExportMetricsServiceResponse) => {
-      const buffer = responseType.encode(arg).finish();
-      return Buffer.from(buffer);
+      return Buffer.from(responseType.encode(arg).finish());
     },
     responseDeserialize: (arg: Buffer) => {
       return responseType.decode(arg);

@@ -32,15 +32,13 @@ const traceServiceDefinition = {
     requestStream: false,
     responseStream: false,
     requestSerialize: (arg: IExportTraceServiceRequest) => {
-      const buffer = requestType.encode(arg).finish();
-      return Buffer.from(buffer);
+      return Buffer.from(requestType.encode(arg).finish());
     },
     requestDeserialize: (arg: Buffer) => {
       return requestType.decode(arg);
     },
     responseSerialize: (arg: IExportTraceServiceResponse) => {
-      const buffer = responseType.encode(arg).finish();
-      return Buffer.from(buffer);
+      return Buffer.from(responseType.encode(arg).finish());
     },
     responseDeserialize: (arg: Buffer) => {
       return responseType.decode(arg);
