@@ -62,14 +62,13 @@ jobs:
         if: ${{ matrix.node_version == '18' }}
       - name: List coverage files
         run: find . -name 'coverage-final.json'
-      - name: Store coverage
-        uses: actions/upload-artifact@v3
+      - name: Cache coverage
+        uses: actions/cache@v3
         with:
-          name: node-coverage
           path: |
             **/coverage-final.json
             !**/node_modules/**/coverage-final.json
-          retention-days: 1
+          key: cache-${{ github.run_id }}-${{ github.run_attempt }}-node
         if: ${{ matrix.node_version == '18' }}
   node-windows-tests:
     runs-on: windows-latest
@@ -148,14 +147,13 @@ jobs:
         run: npm run test:browser
       - name: Generate Report
         run: npm run coverage:report:browser
-      - name: Store coverage
-        uses: actions/upload-artifact@v3
+      - name: Cache coverage
+        uses: actions/cache@v3
         with:
-          name: browser-coverage
           path: |
             **/coverage-final.json
             !**/node_modules/**/coverage-final.json
-          retention-days: 1
+          key: cache-${{ github.run_id }}-${{ github.run_attempt }}-browser
   webworker-tests:
     runs-on: ubuntu-latest
     env:
@@ -193,14 +191,13 @@ jobs:
         run: npm run test:webworker
       - name: Generate Report
         run: npm run coverage:report:webworker
-      - name: Store coverage
-        uses: actions/upload-artifact@v3
+      - name: Cache coverage
+        uses: actions/cache@v3
         with:
-          name: webworker-coverage
           path: |
             **/coverage-final.json
             !**/node_modules/**/coverage-final.json
-          retention-days: 1
+          key: cache-${{ github.run_id }}-${{ github.run_attempt }}-webworker
   api-eol-node-test:
     strategy:
       fail-fast: false
@@ -236,30 +233,36 @@ jobs:
       - webworker-tests
       - browser-tests
     steps:
-      - uses: actions/download-artifact@v3
-        name: Download node reports
+      - name: Restore node coverage
+        uses: actions/cache/restore@v3
         with:
-          name: node-coverage
-          path: node-coverage
-      - uses: actions/download-artifact@v3
-        name: Download webworker reports
-        with:
-          name: webworker-coverage
-          path: webworker-coverage
-      - uses: actions/download-artifact@v3
-        name: Download browser reports
-        with:
-          name: browser-coverage
-          path: browser-coverage
-      - name: Move reports
+          path: |
+            **/coverage-final.json
+            !**/node_modules/**/coverage-final.json
+          key: cache-${{ github.run_id }}-${{ github.run_attempt }}-node
+      - name: Move node reports
         run: |
-          ls -al
-          find ./node-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-node.json' sh {} \;
-          find ./webworker-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-webworker.json' sh {} \;
-          find ./browser-coverage/ -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-browser.json' sh {} \;
-          rsync -av node-coverage/ .
-          rsync -av webworker-coverage/ .
-          rsync -av browser-coverage/ .
+          find . -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-node.json' sh {} \;
+      - name: Restore browser coverage
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            **/coverage-final.json
+            !**/node_modules/**/coverage-final.json
+          key: cache-${{ github.run_id }}-${{ github.run_attempt }}-browser
+      - name: Move browser reports
+        run: |
+          find . -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-browser.json' sh {} \;
+      - name: Restore webworker coverage
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            **/coverage-final.json
+            !**/node_modules/**/coverage-final.json
+          key: cache-${{ github.run_id }}-${{ github.run_attempt }}-webworker
+      - name: Move webworker reports
+        run: |
+          find . -name "coverage-final.json" -exec sh -c 'mv $1 $(dirname $1)/coverage-final-webworker.json' sh {} \;
       - name: Report Coverage
         uses: codecov/codecov-action@v3
         with:
