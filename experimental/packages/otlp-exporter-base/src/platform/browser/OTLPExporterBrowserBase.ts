@@ -41,7 +41,7 @@ export abstract class OTLPExporterBrowserBase<
     super(config);
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (config.headers && config.headers instanceof Function) {
+    if (config.headers && typeof config.headers === 'function') {
       this._hasDynamicHeaders = true;
       this._getHeaders = config.headers as () => Record<string, string>;
     }
