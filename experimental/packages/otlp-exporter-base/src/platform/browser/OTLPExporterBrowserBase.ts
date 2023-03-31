@@ -30,9 +30,8 @@ export abstract class OTLPExporterBrowserBase<
   ServiceRequest
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
-  private _getHeaders: () => Record<string, string> = () => ({});
+  private _getHeaders?: () => Record<string, string>;
   private _useXHR: boolean = false;
-  private _hasDynamicHeaders: boolean = false;
 
   /**
    * @param config
@@ -42,7 +41,6 @@ export abstract class OTLPExporterBrowserBase<
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
     if (config.headers && typeof config.headers === 'function') {
-      this._hasDynamicHeaders = true;
       this._getHeaders = config.headers as () => Record<string, string>;
     }
     if (this._useXHR) {
@@ -83,7 +81,7 @@ export abstract class OTLPExporterBrowserBase<
         sendWithXhr(
           body,
           this.url,
-          this._hasDynamicHeaders
+          this._getHeaders
             ? { ...this._headers, ...parseHeaders(this._getHeaders()) }
             : this._headers,
           this.timeoutMillis,
