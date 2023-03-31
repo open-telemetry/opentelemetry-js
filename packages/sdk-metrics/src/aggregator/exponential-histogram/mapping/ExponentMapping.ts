@@ -79,7 +79,7 @@ export class ExponentMapping implements Mapping {
    * The scale used by this mapping
    * @returns {number}
    */
-  scale(): number {
+  get scale(): number {
     if (this._shift === 0) {
       return 0;
     }

@@ -35,7 +35,6 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as fs from 'fs';
-import * as semver from 'semver';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
@@ -548,15 +547,7 @@ describe('HttpsInstrumentation', () => {
           assert.fail();
         } catch (error) {
           const spans = memoryExporter.getFinishedSpans();
-          /**
-           * There is an edge case with node 8 because the https module
-           * just call the http one, resulting in 2 span. The fix only works
-           * if the protocol is 'https:' resulting in 2 span only for this test.
-           */
-          assert.strictEqual(
-            spans.length,
-            semver.gt(process.version, '9.0.0') ? 1 : 2
-          );
+          assert.strictEqual(spans.length, 1);
         }
       });
 

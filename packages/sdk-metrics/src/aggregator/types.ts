@@ -26,6 +26,7 @@ export enum AggregatorKind {
   SUM,
   LAST_VALUE,
   HISTOGRAM,
+  EXPONENTIAL_HISTOGRAM,
 }
 
 /** DataPoint value type for SumAggregation. */
@@ -58,6 +59,24 @@ export interface Histogram {
   };
   sum?: number;
   count: number;
+  min?: number;
+  max?: number;
+}
+
+/** DataPoint value type for ExponentialHistogramAggregation. */
+export interface ExponentialHistogram {
+  count: number;
+  sum?: number;
+  scale: number;
+  zeroCount: number;
+  positive: {
+    offset: number;
+    bucketCounts: number[];
+  };
+  negative: {
+    offset: number;
+    bucketCounts: number[];
+  };
   min?: number;
   max?: number;
 }

@@ -7,13 +7,46 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ## Unreleased
 
-* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
-
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.11.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): add exponential histogram support [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505), [#3506](https://github.com/open-telemetry/opentelemetry-js/pull/3506) @mwear
+* feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
+* fix(sdk-trace-web): make `parseUrl()` respect document.baseURI [#3670](https://github.com/open-telemetry/opentelemetry-js/pull/3670) @domasx2
+
+### :books: (Refine Doc)
+
+* doc(sdk): update NodeSDK example [#3684](https://github.com/open-telemetry/opentelemetry-js/pull/3684) @martinkuba
+* docs: change rauno56 status from maintainer to emeritus [#3706](https://github.com/open-telemetry/opentelemetry-js/pull/3706) @rauno56
+
+## 1.10.1
+
+### :bug: (Bug Fix)
+
+* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
+* fix(resource): change fs/promises import to be node 12 compatible [#3681](https://github.com/open-telemetry/opentelemetry-js/pull/3681) @pichlermarc
+
+## 1.10.0
+
+### :rocket: (Enhancement)
+
 * feat(resource): create sync resource with some attributes that resolve asynchronously [#3460](https://github.com/open-telemetry/opentelemetry-js/pull/3460) @samimusallam
+* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
 * feat (api-logs): separate Events API into its own package [3550](https://github.com/open-telemetry/opentelemetry-js/pull/3550) @martinkuba
 * feat(sdk-metrics): apply binary search in histogram recording [#3539](https://github.com/open-telemetry/opentelemetry-js/pull/3539) @legendecas
 * perf(propagator-jaeger): improve deserializeSpanContext performance [#3541](https://github.com/open-telemetry/opentelemetry-js/pull/3541) @doochik
