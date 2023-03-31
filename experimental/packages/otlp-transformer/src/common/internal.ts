@@ -49,17 +49,3 @@ export function toAnyValue(value: unknown): IAnyValue {
 
   return {};
 }
-
-export function hexToBuf(hex: string): Uint8Array | undefined {
-  const ints = hex.match(/[\da-f]{2}/gi)?.map(h => parseInt(h, 16));
-  return ints && new Uint8Array(ints);
-}
-
-function i2hex(i: number): string {
-  return ('0' + i.toString(16)).slice(-2);
-}
-
-export function bufToHex(buf?: Uint8Array | null): string | undefined {
-  if (buf == null || buf.length === 0) return undefined;
-  return Array.from(buf).map(i2hex).join('');
-}
