@@ -12,14 +12,12 @@
     "clean": "tsc --build --clean",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "postcompile": "npm run submodule && npm run protos:copy",
-    "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
     "protos": "npm run submodule && node ../../../scripts/generate-protos.js",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "npm run protos && npm run protos:copy && tsc -w",
+    "watch": "npm run protos && tsc -w",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
@@ -41,7 +39,6 @@
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
-    "build/protos/**/*.proto",
     "doc",
     "LICENSE",
     "README.md"
