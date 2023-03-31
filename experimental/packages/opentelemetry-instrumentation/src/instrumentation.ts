@@ -61,7 +61,24 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /* Api to wrap instrumented method */
-  protected _wrap = shimmer.wrap;
+  protected _wrap = (
+    moduleExports: any,
+    name: string,
+    wrapper: (originalFn: any) => any
+  ) => {
+    try {
+      return shimmer.wrap(moduleExports, name, wrapper);
+    } catch (e) {
+      const wrapped: any = shimmer.wrap(
+        Object.assign({}, moduleExports),
+        name,
+        wrapper
+      );
+      Object.defineProperty(moduleExports, name, {
+        value: wrapped,
+      });
+    }
+  };
   /* Api to unwrap instrumented methods */
   protected _unwrap = shimmer.unwrap;
   /* Api to mass wrap instrumented method */
