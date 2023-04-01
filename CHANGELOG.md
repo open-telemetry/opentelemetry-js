@@ -12,6 +12,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
+
 * fix(instrumentation-http): fixed description for http.server.duration metric [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710)
 
 ### :books: (Refine Doc)
