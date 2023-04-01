@@ -88,7 +88,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     this._httpClientDurationHistogram = this.meter.createHistogram(
       'http.client.duration',
       {
-        description: 'Measures the duration of inbound HTTP requests.',
+        description: 'Measures the duration of outbound HTTP requests.',
         unit: 'ms',
         valueType: ValueType.DOUBLE,
       }
