@@ -57,6 +57,7 @@ import {
   envDetector,
   processDetector,
   Resource,
+  IResource
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
@@ -731,6 +732,23 @@ describe('Node SDK', () => {
       assert.strictEqual(span.spanContext().spanId, 'constant-test-span-id');
       assert.strictEqual(span.spanContext().traceId, 'constant-test-trace-id');
     });
+  });
+
+  it('should register a tracer provider from factory if provided', async () => {
+    let instance: NodeTracerProvider | undefined;
+    const tracerProviderFactory = (resource: IResource) => {
+      instance = new NodeTracerProvider({resource});
+      return instance;
+    }
+
+    const sdk = new NodeSDK({
+      tracerProviderFactory
+    });
+    sdk.start();
+
+    const apiTracerProvider =
+      trace.getTracerProvider() as ProxyTracerProvider;
+    assert.strictEqual(apiTracerProvider.getDelegate(), instance);
   });
 });
 

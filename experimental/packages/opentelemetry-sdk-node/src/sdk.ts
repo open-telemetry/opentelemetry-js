@@ -71,8 +71,12 @@ type TracerProviderConfig = {
   textMapPropagator?: TextMapPropagator;
 };
 
+export type TracerProviderFactory = (resource: IResource) => BasicTracerProvider;
+
 export class NodeSDK {
   private _tracerProviderConfig?: TracerProviderConfig;
+  private _tracerProviderFactory: TracerProviderFactory;
+
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
 
@@ -80,7 +84,7 @@ export class NodeSDK {
   private _resourceDetectors: Array<Detector | DetectorSync>;
 
   private _autoDetectResources: boolean;
-
+  
   private _tracerProvider?: BasicTracerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
@@ -142,6 +146,9 @@ export class NodeSDK {
         configuration.textMapPropagator
       );
     }
+
+    const defaultTracerProviderFactory = (resource: IResource) => new TracerProviderWithEnvExporters({resource});
+    this._tracerProviderFactory = configuration.tracerProviderFactory ?? defaultTracerProviderFactory;
 
     if (configuration.metricReader || configuration.views) {
       const meterProviderConfig: MeterProviderConfig = {};
@@ -295,7 +302,7 @@ export class NodeSDK {
       return tracerProvider
     }
 
-    const tracerProvider = new TracerProviderWithEnvExporters({resource: this._resource});
+    const tracerProvider = this._tracerProviderFactory(this._resource);
     tracerProvider.register();
 
     return tracerProvider

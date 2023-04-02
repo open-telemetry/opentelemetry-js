@@ -26,6 +26,7 @@ import {
   SpanProcessor,
   IdGenerator,
 } from '@opentelemetry/sdk-trace-base';
+import { TracerProviderFactory } from './sdk';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
@@ -39,6 +40,7 @@ export interface NodeSDKConfiguration {
   resourceDetectors: Array<Detector | DetectorSync>;
   sampler: Sampler;
   serviceName?: string;
+  tracerProviderFactory?: TracerProviderFactory;
   spanProcessor: SpanProcessor;
   traceExporter: SpanExporter;
   spanLimits: SpanLimits;
