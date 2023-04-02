@@ -37,6 +37,7 @@ import {
 } from '@opentelemetry/resources';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
+  BasicTracerProvider,
   BatchSpanProcessor,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
@@ -63,13 +64,15 @@ export type MeterProviderConfig = {
   views?: View[];
 };
 
+type TracerProviderConfig = {
+  tracerConfig: NodeTracerConfig;
+  spanProcessor: SpanProcessor;
+  contextManager?: ContextManager;
+  textMapPropagator?: TextMapPropagator;
+};
+
 export class NodeSDK {
-  private _tracerProviderConfig?: {
-    tracerConfig: NodeTracerConfig;
-    spanProcessor: SpanProcessor;
-    contextManager?: ContextManager;
-    textMapPropagator?: TextMapPropagator;
-  };
+  private _tracerProviderConfig?: TracerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
 
@@ -78,7 +81,7 @@ export class NodeSDK {
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
+  private _tracerProvider?: BasicTracerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
 
@@ -116,16 +119,16 @@ export class NodeSDK {
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     if (configuration.spanProcessor || configuration.traceExporter) {
-      const tracerProviderConfig: NodeTracerConfig = {};
+      const tracerConfig: NodeTracerConfig = {};
 
       if (configuration.sampler) {
-        tracerProviderConfig.sampler = configuration.sampler;
+        tracerConfig.sampler = configuration.sampler;
       }
       if (configuration.spanLimits) {
-        tracerProviderConfig.spanLimits = configuration.spanLimits;
+        tracerConfig.spanLimits = configuration.spanLimits;
       }
       if (configuration.idGenerator) {
-        tracerProviderConfig.idGenerator = configuration.idGenerator;
+        tracerConfig.idGenerator = configuration.idGenerator;
       }
 
       const spanProcessor =
@@ -133,7 +136,7 @@ export class NodeSDK {
         new BatchSpanProcessor(configuration.traceExporter!);
 
       this.configureTracerProvider(
-        tracerProviderConfig,
+        tracerConfig,
         spanProcessor,
         configuration.contextManager,
         configuration.textMapPropagator
@@ -249,48 +252,16 @@ export class NodeSDK {
             })
           );
 
-    const Provider = this._tracerProviderConfig
-      ? NodeTracerProvider
-      : TracerProviderWithEnvExporters;
+    this._tracerProvider = this.createAndRegisterTraceProvider(this._tracerProviderConfig);
+    this._meterProvider = this.createAndRegisterMeterProvider(this._meterProviderConfig);
 
-    const tracerProvider = new Provider({
-      ...this._tracerProviderConfig?.tracerConfig,
-      resource: this._resource,
-    });
-
-    this._tracerProvider = tracerProvider;
-
-    if (this._tracerProviderConfig) {
-      tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
-    }
-
-    tracerProvider.register({
-      contextManager: this._tracerProviderConfig?.contextManager,
-      propagator: this._tracerProviderConfig?.textMapPropagator,
-    });
-
-    if (this._meterProviderConfig) {
-      const meterProvider = new MeterProvider({
-        resource: this._resource,
-        views: this._meterProviderConfig?.views ?? [],
-      });
-
-      if (this._meterProviderConfig.reader) {
-        meterProvider.addMetricReader(this._meterProviderConfig.reader);
-      }
-
-      this._meterProvider = meterProvider;
-
-      metrics.setGlobalMeterProvider(meterProvider);
-
-      // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
-      // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
-      // This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
-      for (const instrumentation of parseInstrumentationOptions(
-        this._instrumentations
-      )) {
-        instrumentation.setMeterProvider(metrics.getMeterProvider());
-      }
+    // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
+    // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
+    // This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
+    for (const instrumentation of parseInstrumentationOptions(
+      this._instrumentations
+    )) {
+      instrumentation.setMeterProvider(metrics.getMeterProvider());
     }
   }
 
@@ -308,5 +279,44 @@ export class NodeSDK {
         // return void instead of the array from Promise.all
         .then(() => {})
     );
+  }
+
+  private createAndRegisterTraceProvider(tracerProviderConfig?: TracerProviderConfig): BasicTracerProvider {
+    if (tracerProviderConfig) {
+      const tracerProvider = new NodeTracerProvider({
+        ...tracerProviderConfig.tracerConfig,
+        resource: this._resource,
+      });
+      tracerProvider.addSpanProcessor(tracerProviderConfig.spanProcessor);
+      tracerProvider.register({
+        contextManager: tracerProviderConfig.contextManager,
+        propagator: tracerProviderConfig.textMapPropagator,
+      });
+      return tracerProvider
+    }
+
+    const tracerProvider = new TracerProviderWithEnvExporters({resource: this._resource});
+    tracerProvider.register();
+
+    return tracerProvider
+  }
+
+  private createAndRegisterMeterProvider(meterProviderConfig?: MeterProviderConfig): MeterProvider | undefined {
+    if (meterProviderConfig) {
+      const meterProvider = new MeterProvider({
+        resource: this._resource,
+        views: meterProviderConfig.views ?? [],
+      });
+
+      if (meterProviderConfig.reader) {
+        meterProvider.addMetricReader(meterProviderConfig.reader);
+      }
+
+      metrics.setGlobalMeterProvider(meterProvider);
+
+      return meterProvider;
+    }
+
+    return;
   }
 }
