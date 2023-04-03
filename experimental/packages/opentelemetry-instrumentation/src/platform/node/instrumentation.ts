@@ -98,66 +98,6 @@ export abstract class InstrumentationBase<T = any>
     return undefined;
   }
 
-  private _onHook<T extends object>(
-    module: InstrumentationModuleDefinition<T>,
-    exports: T,
-    name: string,
-    baseDir?: string | void
-  ): T {
-    if (!baseDir) {
-      if (typeof module.patch === 'function') {
-        module.moduleExports = exports;
-        if (this._enabled) {
-          // const patchedExports = module.patch(Object.assign({}, exports));
-          // return new Proxy(patchedExports, {});
-          return module.patch(exports);
-        }
-      }
-      return exports;
-    }
-
-    if (module.name === name) {
-      // main module
-      if (
-        isSupported(
-          module.supportedVersions,
-          module.moduleVersion,
-          module.includePrerelease
-        )
-      ) {
-        if (typeof module.patch === 'function') {
-          module.moduleExports = exports;
-          if (this._enabled) {
-            return module.patch(exports, module.moduleVersion);
-          }
-        }
-      }
-      return exports;
-    }
-
-    return exports;
-    // const files = module.files ?? [];
-    // const supportedFileInstrumentations = files
-    //   .filter(f => f.name === name)
-    //   .filter(f =>
-    //     isSupported(
-    //       f.supportedVersions,
-    //       module.moduleVersion,
-    //       module.includePrerelease
-    //     )
-    //   );
-    // return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
-    //   file.moduleExports = patchedExports;
-    //   if (this._enabled) {
-    //     return file.patch(
-    //       Object.assign({}, patchedExports),
-    //       module.moduleVersion
-    //     );
-    //   }
-    //   return new Proxy(patchedExports, {});
-    // }, exports);
-  }
-
   private _onRequire<T>(
     module: InstrumentationModuleDefinition<T>,
     exports: T,
@@ -230,7 +170,7 @@ export abstract class InstrumentationBase<T = any>
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       const hookFn: ImportInTheMiddle.HookFn = (exports, name, baseDir) => {
-        return this._onHook<typeof exports>(
+        return this._onRequire<typeof exports>(
           module as unknown as InstrumentationModuleDefinition<typeof exports>,
           exports,
           name,
@@ -257,11 +197,13 @@ export abstract class InstrumentationBase<T = any>
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
-        [module.name],
-        { internals: false },
-        <HookFn>hookFn
-      );
+      const esmHook =
+        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
+          [module.name],
+          { internals: false },
+          <HookFn>hookFn
+        );
+      this._hooks.push(esmHook);
     }
   }
 
