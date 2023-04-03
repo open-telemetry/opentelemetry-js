@@ -181,7 +181,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
-- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
 
@@ -206,6 +205,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
 - [Mayur Kale](https://github.com/mayurkale22), Google, Maintainer
 - [Rauno Viskus](https://github.com/rauno56), Maintainer
+- [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
 - [Roch Devost](https://github.com/rochdev), DataDog, Approver
 
