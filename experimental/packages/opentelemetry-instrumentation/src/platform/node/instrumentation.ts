@@ -172,7 +172,7 @@ export abstract class InstrumentationBase<T = any>
       const hookFn: ImportInTheMiddle.HookFn = (exports, name, baseDir) => {
         return this._onRequire<typeof exports>(
           module as unknown as InstrumentationModuleDefinition<typeof exports>,
-          Object.assign({}, exports),
+          exports,
           name,
           baseDir
         );
@@ -197,11 +197,13 @@ export abstract class InstrumentationBase<T = any>
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
-        [module.name],
-        { internals: true },
-        <HookFn>hookFn
-      );
+      const esmHook =
+        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
+          [module.name],
+          { internals: false },
+          <HookFn>hookFn
+        );
+      this._hooks.push(esmHook);
     }
   }
 

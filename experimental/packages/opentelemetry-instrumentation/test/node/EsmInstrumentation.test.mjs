@@ -18,32 +18,73 @@ import * as assert from 'assert';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
+  isWrapped,
 } from '../../build/src/index.js';
+import * as exported from 'test-esm-module';
 
+class TestInstrumentationWrapFn extends InstrumentationBase {
+  constructor(config) {
+    super('test-esm-instrumentation', '0.0.1', config);
+  }
+  init() {
+    console.log('test-esm-instrumentation initialized!');
+    return new InstrumentationNodeModuleDefinition(
+      'test-esm-module',
+      ['*'],
+      moduleExports => {
+        this._wrap(moduleExports, 'testFunction', () => {
+          return () => 'a different result';
+        });
+        return moduleExports;
+      },
+      moduleExports => {
+        this._unwrap(moduleExports, 'testFunction');
+        console.log('second');
+        return moduleExports;
+      }
+    );
+  }
+}
+
+class TestInstrumentationSimple extends InstrumentationBase {
+  constructor(config) {
+    super('test-esm-instrumentation', '0.0.1', config);
+  }
+  init() {
+    console.log('test-esm-instrumentation initialized!');
+    return new InstrumentationNodeModuleDefinition(
+      'test-esm-module',
+      ['*'],
+      moduleExports => {
+        moduleExports.testConstant = 43;
+        return moduleExports;
+      }
+    );
+  }
+}
 describe('when loading esm module', () => {
-  it('should patch module file', async () => {
-    class TestInstrumentation extends InstrumentationBase {
-      constructor() {
-        super('test-esm-instrumentation', '0.0.1');
-      }
-      init() {
-        console.log('test-esm-instrumentation initialized!');
-        return new InstrumentationNodeModuleDefinition(
-          'test-esm-module',
-          ['*'],
-          moduleExports => {
-            console.log('patch');
-            moduleExports.testConstant = 43;
-          }
-        );
-      }
-    }
-    const instrumentation = new TestInstrumentation();
-    instrumentation.enable();
-    // const exported = await import('test-esm-module');
-    // assert.deepEqual(exported.testConstant, 43);
-
-    // error from import-in-the-middle register
-    // TypeError: setters.get(...)[name] is not a function
+  const instrumentationWrap = new TestInstrumentationWrapFn({
+    enabled: false,
   });
+
+  it('should patch module file directly', async () => {
+    const instrumentation = new TestInstrumentationSimple({
+      enabled: false,
+    });
+    instrumentation.enable();
+    assert.deepEqual(exported.testConstant, 43);
+  });
+
+  it('should patch a module with the wrap function', async () => {
+    instrumentationWrap.enable();
+    assert.deepEqual(exported.testFunction(), 'a different result');
+  });
+
+  // it('should be able to unwrap a patched function', async () => {
+  //   // disable to trigger unwrap
+  //   const exported = await import('test-esm-module');
+  //   instrumentationWrap.enable();
+  //   instrumentationWrap.disable();
+  //   assert.deepEqual(exported.testFunction(), 'test');
+  // });
 });

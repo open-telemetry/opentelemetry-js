@@ -1,5 +1,5 @@
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { trace } from '@opentelemetry/api';
+import { trace, DiagConsoleLogger, DiagLogLevel, diag } from '@opentelemetry/api';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -10,6 +10,7 @@ import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import http from 'http';
 
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 const tracerProvider = new NodeTracerProvider({
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: 'esm-http-ts-example',
