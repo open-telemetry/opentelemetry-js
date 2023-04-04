@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
-  isWrapped,
 } from '../../build/src/index.js';
 import * as exported from 'test-esm-module';
 
@@ -33,13 +32,12 @@ class TestInstrumentationWrapFn extends InstrumentationBase {
       ['*'],
       moduleExports => {
         this._wrap(moduleExports, 'testFunction', () => {
-          return () => 'a different result';
+          return () => 'patched';
         });
         return moduleExports;
       },
       moduleExports => {
         this._unwrap(moduleExports, 'testFunction');
-        console.log('second');
         return moduleExports;
       }
     );
@@ -77,14 +75,14 @@ describe('when loading esm module', () => {
 
   it('should patch a module with the wrap function', async () => {
     instrumentationWrap.enable();
-    assert.deepEqual(exported.testFunction(), 'a different result');
+    assert.deepEqual(exported.testFunction(), 'patched');
   });
 
-  // it('should be able to unwrap a patched function', async () => {
+  // it('should unwrap a patched function', async () => {
   //   // disable to trigger unwrap
   //   const exported = await import('test-esm-module');
   //   instrumentationWrap.enable();
   //   instrumentationWrap.disable();
-  //   assert.deepEqual(exported.testFunction(), 'test');
+  //   assert.deepEqual(exported.testFunction(), 'original');
   // });
 });
