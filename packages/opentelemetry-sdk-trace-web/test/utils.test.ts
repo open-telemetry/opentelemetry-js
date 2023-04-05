@@ -499,8 +499,8 @@ describe('utils', () => {
     // Deno is an example of this
     it('should parse url in runtimes where global location is not defined', () => {
       const actualLocationObj = globalThis.location;
-      globalThis.location = undefined as any;
-      
+      globalThis.location = undefined as any; // undefined is not allowed as a value normally, hence the any
+
       try {
         const url = parseUrl('https://opentelemetry.io/foo');
         urlFields.forEach(field => {
