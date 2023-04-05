@@ -495,6 +495,21 @@ describe('utils', () => {
         assert.strictEqual(typeof url[field], 'string');
       });
     });
+
+    // Deno is an example of this
+    it('should parse url in runtimes where global location is not defined', () => {
+      const actualLocationObj = globalThis.location;
+      globalThis.location = undefined as any;
+      
+      try {
+        const url = parseUrl('https://opentelemetry.io/foo');
+        urlFields.forEach(field => {
+          assert.strictEqual(typeof url[field], 'string');
+        });
+      } finally {
+        globalThis.location = actualLocationObj;
+      }
+    });
   });
 
   describe('normalizeUrl', () => {
