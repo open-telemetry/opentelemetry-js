@@ -27,6 +27,7 @@ import {
 import * as shimmer from 'shimmer';
 import { InstrumentationModuleDefinition } from './platform/node';
 import * as types from './types';
+import * as util from 'util';
 
 /**
  * Base abstract internal class for instrumenting node and web plugins
@@ -63,32 +64,48 @@ export abstract class InstrumentationAbstract<T = any>
   /* Api to wrap instrumented method */
   protected _wrap = (
     moduleExports: any,
-    name: string,
+    name: any,
     wrapper: (originalFn: any) => any
   ) => {
-    try {
+    if (!util.types.isProxy(moduleExports)) {
       return shimmer.wrap(moduleExports, name, wrapper);
-    } catch (e) {
-      // shimmer doesn't handle Proxy objects well
-      // if there is an error from import in the middle providing
-      // a Proxy of a Module we have to pass it to shimmer as a regular object
-      const wrapped: any = shimmer.wrap(
-        Object.assign({}, moduleExports),
-        name,
-        wrapper
-      );
-      Object.defineProperty(moduleExports, name, {
-        value: wrapped,
-      });
-      return moduleExports;
+    } else {
+      return this._wrapEsm(moduleExports, name, wrapper);
     }
   };
   /* Api to unwrap instrumented methods */
-  protected _unwrap = shimmer.unwrap;
+  protected _unwrap = (moduleExports: any, name: any) => {
+    if (!util.types.isProxy(moduleExports)) {
+      return shimmer.unwrap(moduleExports, name);
+    } else {
+      return this._unwrapEsm(moduleExports, name);
+    }
+  };
   /* Api to mass wrap instrumented method */
   protected _massWrap = shimmer.massWrap;
   /* Api to mass unwrap instrumented methods */
   protected _massUnwrap = shimmer.massUnwrap;
+
+  private _wrapEsm = (
+    moduleExports: T,
+    name: keyof T,
+    wrapper: (original: ({} & T)[keyof T]) => ({} & T)[keyof T]
+  ): void => {
+    const wrapped = shimmer.wrap(
+      Object.assign({}, moduleExports),
+      name,
+      wrapper
+    );
+    Object.defineProperty(moduleExports, name, {
+      value: wrapped,
+    });
+  };
+
+  private _unwrapEsm = (moduleExports: T, name: keyof T): void => {
+    Object.defineProperty(moduleExports, name, {
+      value: moduleExports[name],
+    });
+  };
 
   /* Returns meter */
   protected get meter(): Meter {

@@ -78,11 +78,11 @@ describe('when loading esm module', () => {
     assert.deepEqual(exported.testFunction(), 'patched');
   });
 
-  // it('should unwrap a patched function', async () => {
-  //   // disable to trigger unwrap
-  //   const exported = await import('test-esm-module');
-  //   instrumentationWrap.enable();
-  //   instrumentationWrap.disable();
-  //   assert.deepEqual(exported.testFunction(), 'original');
-  // });
+  it('should unwrap a patched function', async () => {
+    // disable to trigger unwrap
+    const exported = await import('test-esm-module');
+    instrumentationWrap.enable();
+    instrumentationWrap.disable();
+    assert.deepEqual(exported.testFunction(), 'original');
+  });
 });
