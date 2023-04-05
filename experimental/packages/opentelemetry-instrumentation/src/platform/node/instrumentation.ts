@@ -27,6 +27,8 @@ import * as ImportInTheMiddle from 'import-in-the-middle';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
 import * as RequireInTheMiddle from 'require-in-the-middle';
+import * as util from 'util';
+import * as shimmer from 'shimmer';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -68,6 +70,47 @@ export abstract class InstrumentationBase<T = any>
       this.enable();
     }
   }
+
+  protected override _wrap = (
+    moduleExports: any,
+    name: any,
+    wrapper: (originalFn: any) => any
+  ) => {
+    if (!util.types.isProxy(moduleExports)) {
+      return shimmer.wrap(moduleExports, name, wrapper);
+    } else {
+      return this._wrapEsm(moduleExports, name, wrapper);
+    }
+  };
+
+  protected override _unwrap = (moduleExports: any, name: any) => {
+    if (!util.types.isProxy(moduleExports)) {
+      return shimmer.unwrap(moduleExports, name);
+    } else {
+      return this._unwrapEsm(moduleExports, name);
+    }
+  };
+
+  private _wrapEsm = (
+    moduleExports: T,
+    name: keyof T,
+    wrapper: (original: ({} & T)[keyof T]) => ({} & T)[keyof T]
+  ): void => {
+    const wrapped = shimmer.wrap(
+      Object.assign({}, moduleExports),
+      name,
+      wrapper
+    );
+    Object.defineProperty(moduleExports, name, {
+      value: wrapped,
+    });
+  };
+
+  private _unwrapEsm = (moduleExports: T, name: keyof T): void => {
+    Object.defineProperty(moduleExports, name, {
+      value: moduleExports[name],
+    });
+  };
 
   private _warnOnPreloadedModules(): void {
     this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
