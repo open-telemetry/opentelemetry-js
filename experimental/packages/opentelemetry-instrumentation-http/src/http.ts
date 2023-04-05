@@ -111,12 +111,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   private _getHttpInstrumentation() {
+    const version = process.version;
     return new InstrumentationNodeModuleDefinition<Http>(
       'http',
       ['*'],
       moduleExports => {
         this._diag.debug(
-          `Applying patch for http@${this.instrumentationVersion}`
+          `Applying patch for http@${version}`
         );
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
@@ -147,7 +148,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       moduleExports => {
         if (moduleExports === undefined) return;
         this._diag.debug(
-          `Removing patch for http@${this.instrumentationVersion}`
+          `Removing patch for http@${version}`
         );
 
         this._unwrap(moduleExports, 'request');
@@ -158,12 +159,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   private _getHttpsInstrumentation() {
+    const version = process.version;
     return new InstrumentationNodeModuleDefinition<Https>(
       'https',
       ['*'],
       moduleExports => {
         this._diag.debug(
-          `Applying patch for https@${this.instrumentationVersion}`
+          `Applying patch for https@${version}`
         );
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
@@ -194,7 +196,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       moduleExports => {
         if (moduleExports === undefined) return;
         this._diag.debug(
-          `Removing patch for https@${this.instrumentationVersion}`
+          `Removing patch for https@${version}`
         );
 
         this._unwrap(moduleExports, 'request');
