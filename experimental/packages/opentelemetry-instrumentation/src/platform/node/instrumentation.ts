@@ -113,6 +113,18 @@ export abstract class InstrumentationBase<T = any>
     names,
     wrapper
   ) => {
+    if (!moduleExportsArray) {
+      diag.error('must provide one or more modules to patch');
+      return;
+    } else if (!Array.isArray(moduleExportsArray)) {
+      moduleExportsArray = [moduleExportsArray];
+    }
+
+    if (!(names && Array.isArray(names))) {
+      diag.error('must provide one or more functions to wrap on modules');
+      return;
+    }
+
     moduleExportsArray.forEach(moduleExports => {
       names.forEach(name => {
         this._wrap(moduleExports, name, wrapper);
@@ -124,6 +136,18 @@ export abstract class InstrumentationBase<T = any>
     moduleExportsArray,
     names
   ) => {
+    if (!moduleExportsArray) {
+      diag.error('must provide one or more modules to patch');
+      return;
+    } else if (!Array.isArray(moduleExportsArray)) {
+      moduleExportsArray = [moduleExportsArray];
+    }
+
+    if (!(names && Array.isArray(names))) {
+      diag.error('must provide one or more functions to wrap on modules');
+      return;
+    }
+
     moduleExportsArray.forEach(moduleExports => {
       names.forEach(name => {
         this._unwrap(moduleExports, name);
