@@ -44,6 +44,36 @@ class TestInstrumentationWrapFn extends InstrumentationBase {
   }
 }
 
+class TestInstrumentationMasswrapFn extends InstrumentationBase {
+  constructor(config) {
+    super('test-esm-instrumentation', '0.0.1', config);
+  }
+  init() {
+    console.log('test-esm-instrumentation initialized!');
+    return new InstrumentationNodeModuleDefinition(
+      'test-esm-module',
+      ['*'],
+      moduleExports => {
+        this._massWrap(
+          [moduleExports],
+          ['testFunction', 'secondTestFunction'],
+          () => {
+            return () => 'patched';
+          }
+        );
+        return moduleExports;
+      },
+      moduleExports => {
+        this._massUnwrap(
+          [moduleExports],
+          ['testFunction', 'secondTestFunction']
+        );
+        return moduleExports;
+      }
+    );
+  }
+}
+
 class TestInstrumentationSimple extends InstrumentationBase {
   constructor(config) {
     super('test-esm-instrumentation', '0.0.1', config);
@@ -79,10 +109,30 @@ describe('when loading esm module', () => {
   });
 
   it('should unwrap a patched function', async () => {
-    // disable to trigger unwrap
-    const exported = await import('test-esm-module');
     instrumentationWrap.enable();
+    // disable to trigger unwrap
     instrumentationWrap.disable();
     assert.deepEqual(exported.testFunction(), 'original');
+  });
+
+  it('should wrap multiple functions with masswrap', () => {
+    const instrumentation = new TestInstrumentationMasswrapFn({
+      enabled: false,
+    });
+
+    instrumentation.enable();
+    assert.deepEqual(exported.testFunction(), 'patched');
+    assert.deepEqual(exported.secondTestFunction(), 'patched');
+  });
+
+  it('should unwrap multiple functions with massunwrap', () => {
+    const instrumentation = new TestInstrumentationMasswrapFn({
+      enabled: false,
+    });
+
+    instrumentation.enable();
+    instrumentation.disable();
+    assert.deepEqual(exported.testFunction(), 'original');
+    assert.deepEqual(exported.secondTestFunction(), 'original');
   });
 });

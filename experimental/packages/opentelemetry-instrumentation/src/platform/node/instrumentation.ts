@@ -108,6 +108,29 @@ export abstract class InstrumentationBase<T = any>
     });
   };
 
+  protected override _massWrap: typeof shimmer.massWrap = (
+    moduleExportsArray,
+    names,
+    wrapper
+  ) => {
+    moduleExportsArray.forEach(moduleExports => {
+      names.forEach(name => {
+        this._wrap(moduleExports, name, wrapper);
+      });
+    });
+  };
+
+  protected override _massUnwrap: typeof shimmer.massUnwrap = (
+    moduleExportsArray,
+    names
+  ) => {
+    moduleExportsArray.forEach(moduleExports => {
+      names.forEach(name => {
+        this._unwrap(moduleExports, name);
+      });
+    });
+  };
+
   private _warnOnPreloadedModules(): void {
     this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
       const { name } = module;
