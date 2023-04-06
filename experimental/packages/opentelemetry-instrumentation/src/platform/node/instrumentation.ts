@@ -16,7 +16,9 @@
 
 import * as types from '../../types';
 import * as path from 'path';
+import * as util from 'util';
 import { satisfies } from 'semver';
+import * as shimmer from 'shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
   RequireInTheMiddleSingleton,
@@ -27,8 +29,6 @@ import * as ImportInTheMiddle from 'import-in-the-middle';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
 import * as RequireInTheMiddle from 'require-in-the-middle';
-import * as util from 'util';
-import * as shimmer from 'shimmer';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -71,10 +71,10 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
-  protected override _wrap = (
-    moduleExports: any,
-    name: any,
-    wrapper: (originalFn: any) => any
+  protected override _wrap: typeof shimmer.wrap = (
+    moduleExports,
+    name,
+    wrapper
   ) => {
     if (!util.types.isProxy(moduleExports)) {
       return shimmer.wrap(moduleExports, name, wrapper);
@@ -83,7 +83,7 @@ export abstract class InstrumentationBase<T = any>
     }
   };
 
-  protected override _unwrap = (moduleExports: any, name: any) => {
+  protected override _unwrap: typeof shimmer.unwrap = (moduleExports, name) => {
     if (!util.types.isProxy(moduleExports)) {
       return shimmer.unwrap(moduleExports, name);
     } else {
@@ -91,11 +91,7 @@ export abstract class InstrumentationBase<T = any>
     }
   };
 
-  private _wrapEsm = (
-    moduleExports: T,
-    name: keyof T,
-    wrapper: (original: ({} & T)[keyof T]) => ({} & T)[keyof T]
-  ): void => {
+  private _wrapEsm: typeof shimmer.wrap = (moduleExports, name, wrapper) => {
     const wrapped = shimmer.wrap(
       Object.assign({}, moduleExports),
       name,
@@ -106,7 +102,7 @@ export abstract class InstrumentationBase<T = any>
     });
   };
 
-  private _unwrapEsm = (moduleExports: T, name: keyof T): void => {
+  private _unwrapEsm: typeof shimmer.unwrap = (moduleExports, name) => {
     Object.defineProperty(moduleExports, name, {
       value: moduleExports[name],
     });
