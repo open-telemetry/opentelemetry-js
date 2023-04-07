@@ -16,7 +16,9 @@
 
 import * as types from '../../types';
 import * as path from 'path';
+import * as util from 'util';
 import { satisfies } from 'semver';
+import * as shimmer from 'shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
   RequireInTheMiddleSingleton,
@@ -68,6 +70,90 @@ export abstract class InstrumentationBase<T = any>
       this.enable();
     }
   }
+
+  protected override _wrap: typeof shimmer.wrap = (
+    moduleExports,
+    name,
+    wrapper
+  ) => {
+    if (!util.types.isProxy(moduleExports)) {
+      return shimmer.wrap(moduleExports, name, wrapper);
+    } else {
+      return this._wrapEsm(moduleExports, name, wrapper);
+    }
+  };
+
+  protected override _unwrap: typeof shimmer.unwrap = (moduleExports, name) => {
+    if (!util.types.isProxy(moduleExports)) {
+      return shimmer.unwrap(moduleExports, name);
+    } else {
+      return this._unwrapEsm(moduleExports, name);
+    }
+  };
+
+  private _wrapEsm: typeof shimmer.wrap = (moduleExports, name, wrapper) => {
+    const wrapped = shimmer.wrap(
+      Object.assign({}, moduleExports),
+      name,
+      wrapper
+    );
+    Object.defineProperty(moduleExports, name, {
+      value: wrapped,
+    });
+  };
+
+  private _unwrapEsm: typeof shimmer.unwrap = (moduleExports, name) => {
+    Object.defineProperty(moduleExports, name, {
+      value: moduleExports[name],
+    });
+  };
+
+  protected override _massWrap: typeof shimmer.massWrap = (
+    moduleExportsArray,
+    names,
+    wrapper
+  ) => {
+    if (!moduleExportsArray) {
+      diag.error('must provide one or more modules to patch');
+      return;
+    } else if (!Array.isArray(moduleExportsArray)) {
+      moduleExportsArray = [moduleExportsArray];
+    }
+
+    if (!(names && Array.isArray(names))) {
+      diag.error('must provide one or more functions to wrap on modules');
+      return;
+    }
+
+    moduleExportsArray.forEach(moduleExports => {
+      names.forEach(name => {
+        this._wrap(moduleExports, name, wrapper);
+      });
+    });
+  };
+
+  protected override _massUnwrap: typeof shimmer.massUnwrap = (
+    moduleExportsArray,
+    names
+  ) => {
+    if (!moduleExportsArray) {
+      diag.error('must provide one or more modules to patch');
+      return;
+    } else if (!Array.isArray(moduleExportsArray)) {
+      moduleExportsArray = [moduleExportsArray];
+    }
+
+    if (!(names && Array.isArray(names))) {
+      diag.error('must provide one or more functions to wrap on modules');
+      return;
+    }
+
+    moduleExportsArray.forEach(moduleExports => {
+      names.forEach(name => {
+        this._unwrap(moduleExports, name);
+      });
+    });
+  };
 
   private _warnOnPreloadedModules(): void {
     this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {

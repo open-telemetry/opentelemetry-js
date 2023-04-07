@@ -61,28 +61,7 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /* Api to wrap instrumented method */
-  protected _wrap = (
-    moduleExports: any,
-    name: string,
-    wrapper: (originalFn: any) => any
-  ) => {
-    try {
-      return shimmer.wrap(moduleExports, name, wrapper);
-    } catch (e) {
-      // shimmer doesn't handle Proxy objects well
-      // if there is an error from import in the middle providing
-      // a Proxy of a Module we have to pass it to shimmer as a regular object
-      const wrapped: any = shimmer.wrap(
-        Object.assign({}, moduleExports),
-        name,
-        wrapper
-      );
-      Object.defineProperty(moduleExports, name, {
-        value: wrapped,
-      });
-      return moduleExports;
-    }
-  };
+  protected _wrap = shimmer.wrap;
   /* Api to unwrap instrumented methods */
   protected _unwrap = shimmer.unwrap;
   /* Api to mass wrap instrumented method */
