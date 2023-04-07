@@ -82,7 +82,7 @@ describe('metrics', () => {
     assert.strictEqual(metrics[0].dataPointType, DataPointType.HISTOGRAM);
     assert.strictEqual(
       metrics[0].descriptor.description,
-      'measures the duration of the inbound HTTP requests'
+      'Measures the duration of inbound HTTP requests.'
     );
     assert.strictEqual(metrics[0].descriptor.name, 'http.server.duration');
     assert.strictEqual(metrics[0].descriptor.unit, 'ms');
@@ -119,7 +119,7 @@ describe('metrics', () => {
     assert.strictEqual(metrics[1].dataPointType, DataPointType.HISTOGRAM);
     assert.strictEqual(
       metrics[1].descriptor.description,
-      'measures the duration of the outbound HTTP requests'
+      'Measures the duration of outbound HTTP requests.'
     );
     assert.strictEqual(metrics[1].descriptor.name, 'http.client.duration');
     assert.strictEqual(metrics[1].descriptor.unit, 'ms');

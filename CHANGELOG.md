@@ -11,20 +11,40 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-metrics): add exponential histogram accumulation / aggregator [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505) @mwear
+* feat(tracing): log span name and IDs when span end is called multiple times [#3716](https://github.com/open-telemetry/opentelemetry-js/pull/3716)
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): fixed description for http.server.duration metric [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.11.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): add exponential histogram support [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505), [#3506](https://github.com/open-telemetry/opentelemetry-js/pull/3506) @mwear
 * feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 * fix(sdk-trace-web): make `parseUrl()` respect document.baseURI [#3670](https://github.com/open-telemetry/opentelemetry-js/pull/3670) @domasx2
-* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
-* fix(resources): change fs/promises import to be node 12 compatible [#3681](https://github.com/open-telemetry/opentelemetry-js/pull/3681) @pichlermarc
 
 ### :books: (Refine Doc)
 
 * doc(sdk): update NodeSDK example [#3684](https://github.com/open-telemetry/opentelemetry-js/pull/3684) @martinkuba
+* docs: change vmarchaud status from maintainer to emeritus [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710) @vmarchaud
+* docs: change rauno56 status from maintainer to emeritus [#3706](https://github.com/open-telemetry/opentelemetry-js/pull/3706) @rauno56
 
-### :house: (Internal)
+## 1.10.1
+
+### :bug: (Bug Fix)
+
+* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
+* fix(resource): change fs/promises import to be node 12 compatible [#3681](https://github.com/open-telemetry/opentelemetry-js/pull/3681) @pichlermarc
 
 ## 1.10.0
 
@@ -44,7 +64,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * fix(core): added falsy check to make otel core work with browser where webpack config had process as false or null [#3613](https://github.com/open-telemetry/opentelemetry-js/issues/3613) @ravindra-dyte
 * fix(instrumentation-http): include query params in http.target [#3646](https://github.com/open-telemetry/opentelemetry-js/pull/3646) @kobi-co
-* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 
 ### :books: (Refine Doc)
 

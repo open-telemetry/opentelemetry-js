@@ -184,7 +184,7 @@ export interface IExponentialHistogramDataPoint {
   startTimeUnixNano?: number;
 
   /** ExponentialHistogramDataPoint timeUnixNano */
-  timeUnixNano?: string;
+  timeUnixNano?: number;
 
   /** ExponentialHistogramDataPoint count */
   count?: number;
@@ -209,6 +209,12 @@ export interface IExponentialHistogramDataPoint {
 
   /** ExponentialHistogramDataPoint exemplars */
   exemplars?: IExemplar[];
+
+  /** ExponentialHistogramDataPoint min */
+  min?: number;
+
+  /** ExponentialHistogramDataPoint max */
+  max?: number;
 }
 
 /** Properties of a SummaryDataPoint. */
