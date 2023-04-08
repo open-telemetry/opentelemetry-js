@@ -1,7 +1,7 @@
 {
   "name": "http-example",
   "private": true,
-  "version": "0.35.2",
+  "version": "0.36.0",
   "description": "Example of HTTP integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {

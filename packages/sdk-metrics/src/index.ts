@@ -34,6 +34,7 @@ export {
   SumMetricData,
   GaugeMetricData,
   HistogramMetricData,
+  ExponentialHistogramMetricData,
   ResourceMetrics,
   ScopeMetrics,
   MetricData,
@@ -60,6 +61,7 @@ export { MeterProvider, MeterProviderOptions } from './MeterProvider';
 export {
   DefaultAggregation,
   ExplicitBucketHistogramAggregation,
+  ExponentialHistogramAggregation,
   DropAggregation,
   HistogramAggregation,
   LastValueAggregation,
