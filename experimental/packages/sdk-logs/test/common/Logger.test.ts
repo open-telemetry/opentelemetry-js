@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { Logger, LoggerProvider } from '../../src';
+import { LogRecord, Logger, LoggerProvider } from '../../src';
 import { loadDefaultConfig } from '../../src/config';
 
 const setup = () => {
@@ -50,6 +50,15 @@ describe('Logger', () => {
         body: 'test log body',
       });
       assert.ok(callSpy.called);
+    });
+
+    it('should make log record instance readonly after emit it', () => {
+      const { logger } = setup();
+      const makeOnlySpy = sinon.spy(LogRecord.prototype, 'makeReadonly');
+      logger.emit({
+        body: 'test log body',
+      });
+      assert.ok(makeOnlySpy.called);
     });
   });
 });

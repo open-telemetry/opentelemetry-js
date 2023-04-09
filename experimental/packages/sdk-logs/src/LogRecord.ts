@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import {
@@ -29,17 +29,48 @@ import type { LogRecordLimits } from './types';
 import { Logger } from './Logger';
 
 export class LogRecord implements logsAPI.LogRecord, ReadableLogRecord {
-  time: api.HrTime;
-  severityText?: string;
-  severityNumber?: logsAPI.SeverityNumber;
-  body?: string;
+  readonly time: api.HrTime;
   readonly traceId?: string;
   readonly spanId?: string;
   readonly traceFlags?: number;
   readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: Attributes = {};
+  private _severityText?: string;
+  private _severityNumber?: logsAPI.SeverityNumber;
+  private _body?: string;
+  private _isReadonly: boolean = false;
   private readonly _logRecordLimits: LogRecordLimits;
+
+  set severityText(severityText: string | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._severityText = severityText;
+  }
+  get severityText(): string | undefined {
+    return this._severityText;
+  }
+
+  set severityNumber(severityNumber: logsAPI.SeverityNumber | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._severityNumber = severityNumber;
+  }
+  get severityNumber(): logsAPI.SeverityNumber | undefined {
+    return this._severityNumber;
+  }
+
+  set body(body: string | undefined) {
+    if (this._isLogRecordReadonly()) {
+      return;
+    }
+    this._body = body;
+  }
+  get body(): string | undefined {
+    return this._body;
+  }
 
   constructor(logger: Logger, logRecord: logsAPI.LogRecord) {
     const {
@@ -67,47 +98,59 @@ export class LogRecord implements logsAPI.LogRecord, ReadableLogRecord {
   }
 
   public setAttribute(key: string, value?: AttributeValue) {
+    if (this._isLogRecordReadonly()) {
+      return this;
+    }
     if (value === null) {
-      return;
+      return this;
     }
     if (key.length === 0) {
       api.diag.warn(`Invalid attribute key: ${key}`);
-      return;
+      return this;
     }
     if (!isAttributeValue(value)) {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
-      return;
+      return this;
     }
     if (
       Object.keys(this.attributes).length >=
         this._logRecordLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
-      return;
+      return this;
     }
     this.attributes[key] = this._truncateToSize(value);
+    return this;
   }
 
   public setAttributes(attributes: Attributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
+    return this;
   }
 
-  public updateTime(time: api.TimeInput) {
-    this.time = timeInputToHrTime(time);
-  }
-
-  public updateBody(body: string) {
+  public setBody(body: string) {
     this.body = body;
+    return this;
   }
 
-  public updateSeverityNumber(severityNumber: logsAPI.SeverityNumber) {
+  public setSeverityNumber(severityNumber: logsAPI.SeverityNumber) {
     this.severityNumber = severityNumber;
+    return this;
   }
 
-  public updateSeverityText(severityText: string) {
+  public setSeverityText(severityText: string) {
     this.severityText = severityText;
+    return this;
+  }
+
+  /**
+   * A LogRecordProcessor may freely modify logRecord for the duration of the OnEmit call.
+   * If logRecord is needed after OnEmit returns (i.e. for asynchronous processing) only reads are permitted.
+   */
+  public makeReadonly() {
+    this._isReadonly = true;
   }
 
   private _truncateToSize(value: AttributeValue): AttributeValue {
@@ -140,5 +183,12 @@ export class LogRecord implements logsAPI.LogRecord, ReadableLogRecord {
       return value;
     }
     return value.substring(0, limit);
+  }
+
+  private _isLogRecordReadonly(): boolean {
+    if (this._isReadonly) {
+      diag.warn('Can not execute the operation on emitted log record');
+    }
+    return this._isReadonly;
   }
 }

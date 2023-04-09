@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-import type { Attributes, AttributeValue } from '@opentelemetry/api';
+import * as sinon from 'sinon';
+import * as assert from 'assert';
+import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
-import * as assert from 'assert';
-import {
-  hrTimeToMilliseconds,
-  millisToHrTime,
-  timeInputToHrTime,
-} from '@opentelemetry/core';
+import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
 import {
@@ -251,7 +248,7 @@ describe('LogRecord', () => {
     });
   });
 
-  describe('should rewrite time/body/severityNumber/severityText', () => {
+  describe('should rewrite body/severityNumber/severityText', () => {
     const currentTime = new Date().getTime();
     const logRecordData: logsAPI.LogRecord = {
       timestamp: currentTime,
@@ -266,7 +263,6 @@ describe('LogRecord', () => {
       traceFlags: 1,
     };
 
-    const newTime = millisToHrTime(currentTime + 1000);
     const newBody = 'this is a new body';
     const newSeverityNumber = logsAPI.SeverityNumber.INFO;
     const newSeverityText = 'INFO';
@@ -274,29 +270,97 @@ describe('LogRecord', () => {
     it('should rewrite directly through the property method', () => {
       const { logRecord } = setup(undefined, logRecordData);
 
-      logRecord.time = newTime;
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
       logRecord.severityText = newSeverityText;
 
-      assert.deepStrictEqual(logRecord.time, newTime);
       assert.deepStrictEqual(logRecord.body, newBody);
       assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
       assert.deepStrictEqual(logRecord.severityText, newSeverityText);
     });
 
-    it('should rewrite using the update method', () => {
+    it('should rewrite using the set method', () => {
       const { logRecord } = setup(undefined, logRecordData);
 
-      logRecord.updateTime(newTime);
-      logRecord.updateBody(newBody);
-      logRecord.updateSeverityNumber(newSeverityNumber);
-      logRecord.updateSeverityText(newSeverityText);
+      logRecord.setBody(newBody);
+      logRecord.setSeverityNumber(newSeverityNumber);
+      logRecord.setSeverityText(newSeverityText);
 
-      assert.deepStrictEqual(logRecord.time, newTime);
       assert.deepStrictEqual(logRecord.body, newBody);
       assert.deepStrictEqual(logRecord.severityNumber, newSeverityNumber);
       assert.deepStrictEqual(logRecord.severityText, newSeverityText);
+    });
+  });
+
+  describe('should be read-only(body/severityNumber/severityText) if makeReadonly has been called', () => {
+    const currentTime = new Date().getTime();
+    const logRecordData: logsAPI.LogRecord = {
+      timestamp: currentTime,
+      severityNumber: logsAPI.SeverityNumber.DEBUG,
+      severityText: 'DEBUG',
+      body: 'this is a body',
+      attributes: {
+        name: 'test name',
+      },
+      traceId: 'trance id',
+      spanId: 'span id',
+      traceFlags: 1,
+    };
+
+    const newBody = 'this is a new body';
+    const newSeverityNumber = logsAPI.SeverityNumber.INFO;
+    const newSeverityText = 'INFO';
+
+    it('should not rewrite directly through the property method', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup(undefined, logRecordData);
+      logRecord.makeReadonly();
+
+      logRecord.body = newBody;
+      logRecord.severityNumber = newSeverityNumber;
+      logRecord.severityText = newSeverityText;
+
+      assert.deepStrictEqual(logRecord.body, logRecordData.body);
+      assert.deepStrictEqual(
+        logRecord.severityNumber,
+        logRecordData.severityNumber
+      );
+      assert.deepStrictEqual(
+        logRecord.severityText,
+        logRecordData.severityText
+      );
+      sinon.assert.callCount(warnStub, 3);
+      sinon.assert.alwaysCalledWith(
+        warnStub,
+        'Can not execute the operation on emitted log record'
+      );
+      warnStub.restore();
+    });
+
+    it('should not rewrite using the set method', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      const { logRecord } = setup(undefined, logRecordData);
+      logRecord.makeReadonly();
+
+      logRecord.setBody(newBody);
+      logRecord.setSeverityNumber(newSeverityNumber);
+      logRecord.setSeverityText(newSeverityText);
+
+      assert.deepStrictEqual(logRecord.body, logRecordData.body);
+      assert.deepStrictEqual(
+        logRecord.severityNumber,
+        logRecordData.severityNumber
+      );
+      assert.deepStrictEqual(
+        logRecord.severityText,
+        logRecordData.severityText
+      );
+      sinon.assert.callCount(warnStub, 3);
+      sinon.assert.alwaysCalledWith(
+        warnStub,
+        'Can not execute the operation on emitted log record'
+      );
+      warnStub.restore();
     });
   });
 

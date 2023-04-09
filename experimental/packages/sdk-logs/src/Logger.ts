@@ -41,6 +41,11 @@ export class Logger implements logsAPI.Logger {
   public emit(logRecord: logsAPI.LogRecord): void {
     const logRecordInstance = new LogRecord(this, logRecord);
     this.getActiveLogRecordProcessor().onEmit(logRecordInstance);
+    /**
+     * A LogRecordProcessor may freely modify logRecord for the duration of the OnEmit call.
+     * If logRecord is needed after OnEmit returns (i.e. for asynchronous processing) only reads are permitted.
+     */
+    logRecordInstance.makeReadonly();
   }
 
   public getLogRecordLimits(): LogRecordLimits {
