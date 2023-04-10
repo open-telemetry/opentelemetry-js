@@ -309,7 +309,7 @@ export function parseUrl(url: string): URLLike {
       url,
       typeof document !== 'undefined'
         ? document.baseURI
-        : typeof location !== 'undefined'
+        : typeof location !== 'undefined' // Some JS runtimes (e.g. Deno) don't define this
         ? location.href
         : undefined
     );
