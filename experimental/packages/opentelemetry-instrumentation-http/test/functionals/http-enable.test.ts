@@ -871,12 +871,12 @@ describe('HttpInstrumentation', () => {
       });
 
       it('should have 2 ended span when client prematurely close', async () => {
-        const promise = new Promise<void>((resolve, reject) => {
+        const promise = new Promise<void>((resolve) => {
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
               res.on('close', () => {});
-              res.on('error', reject);
+              res.on('error', () => {});
             }
           );
           // close the socket.
@@ -884,7 +884,7 @@ describe('HttpInstrumentation', () => {
             req.destroy();
           }, 10);
 
-          req.on('error', reject);
+          req.on('error', () => {});
 
           req.on('close', () => {
             // yield to server to end the span.
@@ -940,8 +940,12 @@ describe('HttpInstrumentation', () => {
           },
         });
         const promise = new Promise<void>(resolve => {
-          const req = http.get(
+          const req = http.request(
             `${protocol}://${hostname}:${serverPort}/destroy-request`,
+            {
+              // Allow `req.write()`.
+              method: 'POST',
+            },
             res => {
               res.on('end', () => {});
               res.on('close', () => {});
@@ -959,7 +963,7 @@ describe('HttpInstrumentation', () => {
 
         diag.disable();
 
-        assert.strictEqual(warnMessages, []);
+        assert.deepStrictEqual(warnMessages, []);
       });
     });
 
