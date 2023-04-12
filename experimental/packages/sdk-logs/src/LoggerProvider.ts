@@ -82,7 +82,10 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
         key,
         new Logger(
           { name: loggerName, version, schemaUrl: options?.schemaUrl },
-          this._config,
+          {
+            logRecordLimits: this._config.logRecordLimits,
+            includeTraceContext: options?.includeTraceContext,
+          },
           this
         )
       );

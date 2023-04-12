@@ -28,17 +28,16 @@ import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { Logger } from './Logger';
 
-export class LogRecord implements logsAPI.LogRecord, ReadableLogRecord {
-  readonly time: api.HrTime;
-  readonly traceId?: string;
-  readonly spanId?: string;
-  readonly traceFlags?: number;
+export class LogRecord implements ReadableLogRecord {
+  readonly hrTime: api.HrTime;
+  readonly spanContext?: api.SpanContext;
   readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: Attributes = {};
   private _severityText?: string;
   private _severityNumber?: logsAPI.SeverityNumber;
   private _body?: string;
+
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: LogRecordLimits;
 
@@ -79,15 +78,16 @@ export class LogRecord implements logsAPI.LogRecord, ReadableLogRecord {
       severityText,
       body,
       attributes = {},
-      spanId,
-      traceFlags,
-      traceId,
+      context,
     } = logRecord;
 
-    this.time = timeInputToHrTime(timestamp);
-    this.spanId = spanId;
-    this.traceId = traceId;
-    this.traceFlags = traceFlags;
+    this.hrTime = timeInputToHrTime(timestamp);
+    if (context) {
+      const spanContext = api.trace.getSpanContext(context);
+      if (spanContext && api.isSpanContextValid(spanContext)) {
+        this.spanContext = spanContext;
+      }
+    }
     this.severityNumber = severityNumber;
     this.severityText = severityText;
     this.body = body;

@@ -15,15 +15,13 @@
  */
 
 import type { IResource } from '@opentelemetry/resources';
-import type { Attributes, HrTime } from '@opentelemetry/api';
+import type { Attributes, HrTime, SpanContext } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
 import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 export interface ReadableLogRecord {
-  readonly time: HrTime;
-  readonly traceId?: string;
-  readonly spanId?: string;
-  readonly traceFlags?: number;
+  readonly hrTime: HrTime;
+  readonly spanContext?: SpanContext;
   readonly severityText?: string;
   readonly severityNumber?: SeverityNumber;
   readonly body?: string;

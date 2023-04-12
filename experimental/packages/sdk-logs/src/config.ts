@@ -20,7 +20,7 @@ import {
   getEnv,
   getEnvWithoutDefaults,
 } from '@opentelemetry/core';
-import { LoggerConfig, LogRecordLimits } from './types';
+import { LoggerConfig } from './types';
 
 export function loadDefaultConfig() {
   return {
@@ -30,6 +30,7 @@ export function loadDefaultConfig() {
         getEnv().OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT,
       attributeCountLimit: getEnv().OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT,
     },
+    includeTraceContext: true,
   };
 }
 
@@ -68,9 +69,7 @@ export function reconfigureLimits(userConfig: LoggerConfig): LoggerConfig {
  * Function to merge Default configuration (as specified in './config') with
  * user provided configurations.
  */
-export function mergeConfig(userConfig: LoggerConfig): LoggerConfig & {
-  logRecordLimits: LogRecordLimits;
-} {
+export function mergeConfig(userConfig: LoggerConfig): Required<LoggerConfig> {
   const DEFAULT_CONFIG = loadDefaultConfig();
 
   const target = Object.assign({}, DEFAULT_CONFIG, userConfig);

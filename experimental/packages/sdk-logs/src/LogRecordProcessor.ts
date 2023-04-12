@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/api';
+
 import { LogRecord } from './LogRecord';
 
 export interface LogRecordProcessor {
@@ -25,8 +27,9 @@ export interface LogRecordProcessor {
   /**
    * Called when a {@link LogRecord} is emit
    * @param logRecord the ReadWriteLogRecord that just emitted.
+   * @param context the current Context, or an empty Context if the Logger was obtained with include_trace_context=false
    */
-  onEmit(logRecord: LogRecord): void;
+  onEmit(logRecord: LogRecord, context?: Context): void;
 
   /**
    * Shuts down the processor. Called when SDK is shut down. This is an

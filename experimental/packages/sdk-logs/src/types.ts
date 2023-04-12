@@ -16,7 +16,7 @@
 
 import type { IResource } from '@opentelemetry/resources';
 
-export interface LoggerProviderConfig extends LoggerConfig {
+export interface LoggerProviderConfig {
   /** Resource associated with trace telemetry  */
   resource?: IResource;
 
@@ -25,11 +25,17 @@ export interface LoggerProviderConfig extends LoggerConfig {
    * The default value is 30000ms
    */
   forceFlushTimeoutMillis?: number;
+
+  /** Log Record Limits*/
+  logRecordLimits?: LogRecordLimits;
 }
 
 export interface LoggerConfig {
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
+
+  /** include Trace Context */
+  includeTraceContext?: boolean;
 }
 
 export interface LogRecordLimits {

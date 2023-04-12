@@ -17,19 +17,19 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LogRecord, Logger, LoggerProvider } from '../../src';
+import { LogRecord, Logger, LoggerConfig, LoggerProvider } from '../../src';
 import { loadDefaultConfig } from '../../src/config';
+import { context } from '@opentelemetry/api';
 
-const setup = () => {
-  const { forceFlushTimeoutMillis, logRecordLimits } = loadDefaultConfig();
+const setup = (loggerConfig: LoggerConfig = {}) => {
   const logger = new Logger(
     {
       name: 'test name',
       version: 'test version',
       schemaUrl: 'test schema url',
     },
-    { logRecordLimits },
-    new LoggerProvider({ forceFlushTimeoutMillis })
+    loggerConfig,
+    new LoggerProvider()
   );
   return { logger };
 };
@@ -39,6 +39,14 @@ describe('Logger', () => {
     it('should create an instance', () => {
       const { logger } = setup();
       assert.ok(logger instanceof Logger);
+    });
+
+    it('should a default value with config.includeTraceContext', () => {
+      const { logger } = setup();
+      assert.ok(
+        logger['_loggerConfig'].includeTraceContext ===
+          loadDefaultConfig().includeTraceContext
+      );
     });
   });
 
@@ -59,6 +67,24 @@ describe('Logger', () => {
         body: 'test log body',
       });
       assert.ok(makeOnlySpy.called);
+    });
+
+    it('should emit with current Context when includeTraceContext is true', () => {
+      const { logger } = setup({ includeTraceContext: true });
+      const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
+      logger.emit({
+        body: 'test log body',
+      });
+      assert.ok(callSpy.calledWith(sinon.match.any, context.active()));
+    });
+
+    it('should emit with empty Context when includeTraceContext is false', () => {
+      const { logger } = setup({ includeTraceContext: false });
+      const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
+      logger.emit({
+        body: 'test log body',
+      });
+      assert.ok(callSpy.calledWith(sinon.match.any, undefined));
     });
   });
 });

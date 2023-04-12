@@ -16,7 +16,14 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
+import {
+  Attributes,
+  AttributeValue,
+  diag,
+  ROOT_CONTEXT,
+  trace,
+  TraceFlags,
+} from '@opentelemetry/api';
 import * as logsAPI from '@opentelemetry/api-logs';
 import type { HrTime } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, timeInputToHrTime } from '@opentelemetry/core';
@@ -61,14 +68,21 @@ describe('LogRecord', () => {
 
     it('should have a default timestamp', () => {
       const { logRecord } = setup();
-      assert.ok(logRecord.time !== undefined);
+      assert.ok(logRecord.hrTime !== undefined);
       assert.ok(
-        hrTimeToMilliseconds(logRecord.time) >
+        hrTimeToMilliseconds(logRecord.hrTime) >
           hrTimeToMilliseconds(performanceTimeOrigin)
       );
     });
 
     it('should return LogRecord', () => {
+      const spanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+
       const logRecordData: logsAPI.LogRecord = {
         timestamp: new Date().getTime(),
         severityNumber: logsAPI.SeverityNumber.DEBUG,
@@ -77,16 +91,14 @@ describe('LogRecord', () => {
         attributes: {
           name: 'test name',
         },
-        traceId: 'trance id',
-        spanId: 'span id',
-        traceFlags: 1,
+        context: activeContext,
       };
       const { logRecord, resource, instrumentationScope } = setup(
         undefined,
         logRecordData
       );
       assert.deepStrictEqual(
-        logRecord.time,
+        logRecord.hrTime,
         timeInputToHrTime(logRecordData.timestamp!)
       );
       assert.strictEqual(
@@ -96,9 +108,12 @@ describe('LogRecord', () => {
       assert.strictEqual(logRecord.severityText, logRecordData.severityText);
       assert.strictEqual(logRecord.body, logRecordData.body);
       assert.deepStrictEqual(logRecord.attributes, logRecordData.attributes);
-      assert.deepStrictEqual(logRecord.traceId, logRecordData.traceId);
-      assert.deepStrictEqual(logRecord.spanId, logRecordData.spanId);
-      assert.deepStrictEqual(logRecord.traceFlags, logRecordData.traceFlags);
+      assert.strictEqual(logRecord.spanContext?.traceId, spanContext.traceId);
+      assert.strictEqual(logRecord.spanContext?.spanId, spanContext.spanId);
+      assert.strictEqual(
+        logRecord.spanContext?.traceFlags,
+        spanContext.traceFlags
+      );
       assert.deepStrictEqual(logRecord.resource, resource);
       assert.deepStrictEqual(
         logRecord.instrumentationScope,
@@ -115,9 +130,6 @@ describe('LogRecord', () => {
         attributes: {
           name: 'test name',
         },
-        traceId: 'trance id',
-        spanId: 'span id',
-        traceFlags: 1,
       };
       const { logRecord } = setup(undefined, logRecordData);
 
@@ -258,9 +270,6 @@ describe('LogRecord', () => {
       attributes: {
         name: 'test name',
       },
-      traceId: 'trance id',
-      spanId: 'span id',
-      traceFlags: 1,
     };
 
     const newBody = 'this is a new body';
@@ -302,9 +311,6 @@ describe('LogRecord', () => {
       attributes: {
         name: 'test name',
       },
-      traceId: 'trance id',
-      spanId: 'span id',
-      traceFlags: 1,
     };
 
     const newBody = 'this is a new body';

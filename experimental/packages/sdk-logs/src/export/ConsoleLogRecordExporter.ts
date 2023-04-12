@@ -52,10 +52,10 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
    */
   private _exportInfo(logRecord: ReadableLogRecord) {
     return {
-      timestamp: hrTimeToMicroseconds(logRecord.time),
-      traceId: logRecord.traceId,
-      spanId: logRecord.spanId,
-      traceFlags: logRecord.traceFlags,
+      timestamp: hrTimeToMicroseconds(logRecord.hrTime),
+      traceId: logRecord.spanContext?.traceId,
+      spanId: logRecord.spanContext?.spanId,
+      traceFlags: logRecord.spanContext?.traceFlags,
       severityText: logRecord.severityText,
       severityNumber: logRecord.severityNumber,
       body: logRecord.body,
