@@ -12,6 +12,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat(tracing): log span name and IDs when span end is called multiple times [#3716](https://github.com/open-telemetry/opentelemetry-js/pull/3716)
+* feat(core): add logs environment variables; add timeout utils method. [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
 
 ### :bug: (Bug Fix)
 
