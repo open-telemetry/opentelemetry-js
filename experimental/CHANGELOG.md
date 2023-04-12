@@ -6,15 +6,21 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* fix: remove HTTP/HTTPS prefix from span name in instrumentation-xml-http-request [#3672](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @jufab
-
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @pichlermarc
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.37.0
+
+### :boom: Breaking Change
+
+* fix: remove HTTP/HTTPS prefix from span name in instrumentation-xml-http-request [#3672](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @jufab
 
 ## 0.36.0
 
