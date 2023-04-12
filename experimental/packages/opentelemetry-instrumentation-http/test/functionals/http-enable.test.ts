@@ -871,7 +871,7 @@ describe('HttpInstrumentation', () => {
       });
 
       it('should have 2 ended span when client prematurely close', async () => {
-        const promise = new Promise<void>((resolve) => {
+        const promise = new Promise<void>(resolve => {
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
@@ -948,10 +948,10 @@ describe('HttpInstrumentation', () => {
             },
             res => {
               res.on('end', () => {});
-              res.on('close', () => {});
-              res.on('error', () => {
+              res.on('close', () => {
                 resolve();
               });
+              res.on('error', () => {});
             }
           );
           // force flush http request header to trigger client response callback

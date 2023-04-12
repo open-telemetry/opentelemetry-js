@@ -405,7 +405,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
           responseFinished = true;
           utils.setSpanWithError(span, error);
-          span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: error.message,
+          });
           this._closeHttpSpan(
             span,
             SpanKind.CLIENT,
