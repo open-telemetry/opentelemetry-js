@@ -11,15 +11,21 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.12.0
+
+### :rocket: (Enhancement)
+
 * feat(tracing): log span name and IDs when span end is called multiple times [#3716](https://github.com/open-telemetry/opentelemetry-js/pull/3716)
 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): fixed description for http.server.duration metric [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710)
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 1.11.0
 
