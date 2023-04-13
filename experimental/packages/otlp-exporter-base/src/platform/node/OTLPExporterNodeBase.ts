@@ -49,12 +49,14 @@ export abstract class OTLPExporterNodeBase<
       diag.warn('Metadata cannot be set when using http');
     }
     if (config.headers && typeof config.headers === 'function') {
-      this.getHeaders = config.headers as () => Record<string, string>;
+      this.getHeaders = config.headers;
     }
 
     this.headers = Object.assign(
       this.DEFAULT_HEADERS,
-      parseHeaders(config.headers),
+      parseHeaders(
+        typeof config.headers === 'function' ? config.headers() : config.headers
+      ),
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
     );
     this.agent = createHttpAgent(config);
