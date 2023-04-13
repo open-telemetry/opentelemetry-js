@@ -41,12 +41,16 @@ export abstract class OTLPExporterBrowserBase<
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
     if (config.headers && typeof config.headers === 'function') {
-      this._getHeaders = config.headers as () => Record<string, string>;
+      this._getHeaders = config.headers;
     }
     if (this._useXHR) {
       this._headers = Object.assign(
         {},
-        parseHeaders(config.headers),
+        parseHeaders(
+          typeof config.headers === 'function'
+            ? config.headers()
+            : config.headers
+        ),
         baggageUtils.parseKeyPairsIntoRecord(
           getEnv().OTEL_EXPORTER_OTLP_HEADERS
         )
