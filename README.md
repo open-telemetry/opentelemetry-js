@@ -279,6 +279,11 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Upgrade guidelines
 
+### 0.37.x to 0.38.0
+
+- `@opentelemetry/sdk-node` `NodeSDKConfiguration.defaultAttributes` has been unused and was removed as the concept does not exist in OpenTelemetry anymore
+  - Please use `NodeSDKConfiguration.resource` instead.
+
 ### 0.35.x to 0.36.0
 
 - `@opentelemetry/sdk-node` changed `await start()` to now be synchronous

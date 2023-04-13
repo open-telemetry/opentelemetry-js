@@ -6,6 +6,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(sdk-node)!: remove unused defaultAttributes option [#3724](https://github.com/open-telemetry/opentelemetry-js/pull/3724) @pichlermarc
+  * Please use `NodeSDKConfiguration.resource` instead
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
