@@ -1,0 +1,17 @@
+{
+  "name": "logs-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.4.1",
+    "@opentelemetry/api-logs": "^0.37.0",
+    "@opentelemetry/sdk-logs": "^0.37.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "@types/node": "18.6.5"
+  }
+}

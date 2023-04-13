@@ -11,6 +11,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(api-logs): 1.`LogRecord` fields update: `traceFlags`/`traceId`/`spanId` -> `context`; 2.`Logger` supports configuring `includeTraceContext`; 3.The `onEmit` method of `LogRecordProcessor` supports the `context` field.  [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
+* feat(sdk-logs): logs sdk implementation. [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @pichlermarc

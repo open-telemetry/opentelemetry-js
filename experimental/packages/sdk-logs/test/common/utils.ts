@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/LoggerOptions';
-export * from './NoopLogger';
-export * from './NoopLoggerProvider';
+export const validAttributes = {
+  string: 'string',
+  number: 0,
+  bool: true,
+  'array<string>': ['str1', 'str2'],
+  'array<number>': [1, 2],
+  'array<bool>': [true, false],
+};
 
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+export const invalidAttributes = {
+  // invalid attribute type object
+  object: { foo: 'bar' },
+  // invalid attribute inhomogeneous array
+  'non-homogeneous-array': [0, ''],
+  // This empty length attribute should not be set
+  '': 'empty-key',
+};
