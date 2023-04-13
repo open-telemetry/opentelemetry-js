@@ -216,7 +216,9 @@ export class Span implements APISpan, ReadableSpan {
 
   end(endTime?: TimeInput): void {
     if (this._isSpanEnded()) {
-      diag.error('You can only call end() on a span once.');
+      diag.error(
+        `${this.name} ${this._spanContext.traceId}-${this._spanContext.spanId} - You can only call end() on a span once.`
+      );
       return;
     }
     this._ended = true;
