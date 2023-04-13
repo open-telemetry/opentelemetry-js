@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/LoggerOptions';
-export * from './NoopLogger';
-export * from './NoopLoggerProvider';
+import { LogRecordProcessor } from '../LogRecordProcessor';
+import { ReadableLogRecord } from './ReadableLogRecord';
 
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+export class NoopLogRecordProcessor implements LogRecordProcessor {
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  onEmit(_logRecord: ReadableLogRecord): void {}
+
+  shutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+}

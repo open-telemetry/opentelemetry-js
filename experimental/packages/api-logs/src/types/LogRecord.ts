@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import { Attributes, Context } from '@opentelemetry/api';
 
 export enum SeverityNumber {
   UNSPECIFIED = 0,
@@ -71,17 +71,7 @@ export interface LogRecord {
   attributes?: Attributes;
 
   /**
-   * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
+   * The Context associated with the LogRecord.
    */
-  traceFlags?: number;
-
-  /**
-   * A unique identifier for a trace.
-   */
-  traceId?: string;
-
-  /**
-   * A unique identifier for a span within a trace.
-   */
-  spanId?: string;
+  context?: Context;
 }
