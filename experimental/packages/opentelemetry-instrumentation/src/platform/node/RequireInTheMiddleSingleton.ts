@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import * as RequireInTheMiddle from 'require-in-the-middle';
+import type { OnRequireFn } from 'require-in-the-middle';
+import { Hook } from 'require-in-the-middle';
 import * as path from 'path';
 import { ModuleNameTrie, ModuleNameSeparator } from './ModuleNameTrie';
 
 export type Hooked = {
   moduleName: string;
-  onRequire: RequireInTheMiddle.OnRequireFn;
+  onRequire: OnRequireFn;
 };
 
 /**
@@ -59,7 +60,7 @@ export class RequireInTheMiddleSingleton {
   }
 
   private _initialize() {
-    RequireInTheMiddle(
+    new Hook(
       // Intercept all `require` calls; we will filter the matching ones below
       null,
       { internals: true },
