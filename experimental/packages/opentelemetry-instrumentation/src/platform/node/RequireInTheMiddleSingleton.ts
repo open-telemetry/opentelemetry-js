@@ -92,10 +92,7 @@ export class RequireInTheMiddleSingleton {
    * @param {OnRequireFn} onRequire Hook function
    * @returns {Hooked} Registered hook
    */
-  register(
-    moduleName: string,
-    onRequire: OnRequireFn
-  ): Hooked {
+  register(moduleName: string, onRequire: OnRequireFn): Hooked {
     const hooked = { moduleName, onRequire };
     this._moduleNameTrie.insert(hooked);
     return hooked;
