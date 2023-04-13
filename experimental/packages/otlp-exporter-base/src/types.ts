@@ -45,7 +45,7 @@ export interface ExportServiceError {
  * Collector Exporter base config
  */
 export interface OTLPExporterConfigBase {
-  headers?: Record<string, unknown> | () => Record<string, string>;
+  headers?: Partial<Record<string, unknown> | (() => Record<string, string>)>;
   hostname?: string;
   url?: string;
   concurrencyLimit?: number;
