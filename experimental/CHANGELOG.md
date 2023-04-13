@@ -22,6 +22,10 @@ All notable changes to experimental packages in this project will be documented 
 * fix(sdk-node)!: remove unused defaultAttributes option [#3724](https://github.com/open-telemetry/opentelemetry-js/pull/3724) @pichlermarc
   * Please use `NodeSDKConfiguration.resource` instead
 
+### :rocket: (Enhancement)
+
+* feat(sdk-logs): use logs API 0.38
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @pichlermarc
