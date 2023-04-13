@@ -30,6 +30,7 @@ export abstract class OTLPExporterBrowserBase<
   ServiceRequest
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
+  private _getHeaders?: () => Record<string, string>;
   private _useXHR: boolean = false;
 
   /**
@@ -39,10 +40,17 @@ export abstract class OTLPExporterBrowserBase<
     super(config);
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
+    if (config.headers && typeof config.headers === 'function') {
+      this._getHeaders = config.headers;
+    }
     if (this._useXHR) {
       this._headers = Object.assign(
         {},
-        parseHeaders(config.headers),
+        parseHeaders(
+          typeof config.headers === 'function'
+            ? config.headers()
+            : config.headers
+        ),
         baggageUtils.parseKeyPairsIntoRecord(
           getEnv().OTEL_EXPORTER_OTLP_HEADERS
         )
@@ -77,7 +85,9 @@ export abstract class OTLPExporterBrowserBase<
         sendWithXhr(
           body,
           this.url,
-          this._headers,
+          this._getHeaders
+            ? { ...this._headers, ...parseHeaders(this._getHeaders()) }
+            : this._headers,
           this.timeoutMillis,
           resolve,
           reject
