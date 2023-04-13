@@ -307,7 +307,11 @@ export function parseUrl(url: string): URLLike {
   if (typeof URL === 'function') {
     return new URL(
       url,
-      typeof document !== 'undefined' ? document.baseURI : location.href
+      typeof document !== 'undefined'
+        ? document.baseURI
+        : typeof location !== 'undefined' // Some JS runtimes (e.g. Deno) don't define this
+        ? location.href
+        : undefined
     );
   }
   const element = getUrlNormalizingAnchor();

@@ -16,6 +16,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): fixed description for http.server.duration metric [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710)
+* fix(opentelemetry-sdk-trace-web): don't crash in runtimes where location isn't defined [#3715](https://github.com/open-telemetry/opentelemetry-js/pull/3715)
 
 ### :books: (Refine Doc)
 
