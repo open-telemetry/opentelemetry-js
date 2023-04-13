@@ -14,156 +14,172 @@
  * limitations under the License.
  */
 
-import { Link, SpanStatusCode, SpanKind } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import { Link, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 import {
-  hrTimeToMilliseconds,
   hrTimeToMicroseconds,
+  hrTimeToMilliseconds,
 } from '@opentelemetry/core';
 import {
-  ThriftSpan,
-  Tag,
   Log,
-  ThriftTag,
-  ThriftLog,
-  ThriftUtils,
-  Utils,
-  ThriftReference,
+  Tag,
   TagValue,
+  ThriftLog,
+  ThriftReference,
   ThriftReferenceType,
+  ThriftSpan,
+  ThriftTag,
 } from './types';
 
 const DEFAULT_FLAGS = 0x1;
 
-/**
- * Translate OpenTelemetry ReadableSpan to Jaeger Thrift Span
- * @param span Span to be translated
- */
-export function spanToThrift(span: ReadableSpan): ThriftSpan {
-  const traceId = span.spanContext().traceId.padStart(32, '0');
-  const traceIdHigh = traceId.slice(0, 16);
-  const traceIdLow = traceId.slice(16);
-  const parentSpan = span.parentSpanId
-    ? Utils.encodeInt64(span.parentSpanId)
-    : ThriftUtils.emptyBuffer;
+export class JaegerTransformer {
+  private _utils: any;
+  private _thriftUtils: any;
 
-  const tags = Object.keys(span.attributes).map(
-    (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
-  );
-  if (span.status.code !== SpanStatusCode.UNSET) {
-    tags.push({
-      key: 'otel.status_code',
-      value: SpanStatusCode[span.status.code],
-    });
-    if (span.status.message) {
-      tags.push({ key: 'otel.status_description', value: span.status.message });
+  constructor() {
+    /* eslint-disable @typescript-eslint/no-var-requires */
+    this._utils = require('jaeger-client/dist/src/util').default;
+    this._thriftUtils = require('jaeger-client/dist/src/thrift').default;
+    /* eslint-enable @typescript-eslint/no-var-requires */
+  }
+
+  public spanToThrift(span: ReadableSpan): ThriftSpan {
+    const traceId = span.spanContext().traceId.padStart(32, '0');
+    const traceIdHigh = traceId.slice(0, 16);
+    const traceIdLow = traceId.slice(16);
+    const parentSpan = span.parentSpanId
+      ? this._utils.encodeInt64(span.parentSpanId)
+      : this._thriftUtils.emptyBuffer;
+
+    const tags = Object.keys(span.attributes).map(
+      (name): Tag => ({
+        key: name,
+        value: this.toTagValue(span.attributes[name]),
+      })
+    );
+    if (span.status.code !== SpanStatusCode.UNSET) {
+      tags.push({
+        key: 'otel.status_code',
+        value: SpanStatusCode[span.status.code],
+      });
+      if (span.status.message) {
+        tags.push({
+          key: 'otel.status_description',
+          value: span.status.message,
+        });
+      }
     }
-  }
-  // Ensure that if SpanStatus.Code is ERROR, that we set the "error" tag on the
-  // Jaeger span.
-  if (span.status.code === SpanStatusCode.ERROR) {
-    tags.push({ key: 'error', value: true });
-  }
-
-  if (span.kind !== undefined && span.kind !== SpanKind.INTERNAL) {
-    tags.push({ key: 'span.kind', value: SpanKind[span.kind].toLowerCase() });
-  }
-  Object.keys(span.resource.attributes).forEach(name =>
-    tags.push({
-      key: name,
-      value: toTagValue(span.resource.attributes[name]),
-    })
-  );
-
-  if (span.instrumentationLibrary) {
-    tags.push({
-      key: 'otel.library.name',
-      value: toTagValue(span.instrumentationLibrary.name),
-    });
-    tags.push({
-      key: 'otel.library.version',
-      value: toTagValue(span.instrumentationLibrary.version),
-    });
-  }
-
-  /* Add droppedAttributesCount as a tag */
-  if (span.droppedAttributesCount) {
-    tags.push({
-      key: 'otel.dropped_attributes_count',
-      value: toTagValue(span.droppedAttributesCount),
-    });
-  }
-
-  /* Add droppedEventsCount as a tag */
-  if (span.droppedEventsCount) {
-    tags.push({
-      key: 'otel.dropped_events_count',
-      value: toTagValue(span.droppedEventsCount),
-    });
-  }
-
-  /* Add droppedLinksCount as a tag */
-  if (span.droppedLinksCount) {
-    tags.push({
-      key: 'otel.dropped_links_count',
-      value: toTagValue(span.droppedLinksCount),
-    });
-  }
-
-  const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
-
-  const logs = span.events.map((event): Log => {
-    const fields: Tag[] = [{ key: 'event', value: event.name }];
-    const attrs = event.attributes;
-    if (attrs) {
-      Object.keys(attrs).forEach(attr =>
-        fields.push({ key: attr, value: toTagValue(attrs[attr]) })
-      );
+    // Ensure that if SpanStatus.Code is ERROR, that we set the "error" tag on the
+    // Jaeger span.
+    if (span.status.code === SpanStatusCode.ERROR) {
+      tags.push({ key: 'error', value: true });
     }
-    if (event.droppedAttributesCount) {
-      fields.push({
-        key: 'otel.event.dropped_attributes_count',
-        value: event.droppedAttributesCount,
+
+    if (span.kind !== undefined && span.kind !== SpanKind.INTERNAL) {
+      tags.push({ key: 'span.kind', value: SpanKind[span.kind].toLowerCase() });
+    }
+    Object.keys(span.resource.attributes).forEach(name =>
+      tags.push({
+        key: name,
+        value: this.toTagValue(span.resource.attributes[name]),
+      })
+    );
+
+    if (span.instrumentationLibrary) {
+      tags.push({
+        key: 'otel.library.name',
+        value: this.toTagValue(span.instrumentationLibrary.name),
+      });
+      tags.push({
+        key: 'otel.library.version',
+        value: this.toTagValue(span.instrumentationLibrary.version),
       });
     }
-    return { timestamp: hrTimeToMilliseconds(event.time), fields };
-  });
-  const spanLogs: ThriftLog[] = ThriftUtils.getThriftLogs(logs);
 
-  return {
-    traceIdLow: Utils.encodeInt64(traceIdLow),
-    traceIdHigh: Utils.encodeInt64(traceIdHigh),
-    spanId: Utils.encodeInt64(span.spanContext().spanId),
-    parentSpanId: parentSpan,
-    operationName: span.name,
-    references: spanLinksToThriftRefs(span.links),
-    flags: span.spanContext().traceFlags || DEFAULT_FLAGS,
-    startTime: Utils.encodeInt64(hrTimeToMicroseconds(span.startTime)),
-    duration: Utils.encodeInt64(hrTimeToMicroseconds(span.duration)),
-    tags: spanTags,
-    logs: spanLogs,
-  };
-}
+    /* Add droppedAttributesCount as a tag */
+    if (span.droppedAttributesCount) {
+      tags.push({
+        key: 'otel.dropped_attributes_count',
+        value: this.toTagValue(span.droppedAttributesCount),
+      });
+    }
 
-/** Translate OpenTelemetry {@link Link}s to Jaeger ThriftReference. */
-function spanLinksToThriftRefs(links: Link[]): ThriftReference[] {
-  return links.map((link): ThriftReference => {
-    const refType = ThriftReferenceType.FOLLOWS_FROM;
-    const traceId = link.context.traceId;
-    const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
-    const traceIdLow = Utils.encodeInt64(traceId.slice(16));
-    const spanId = Utils.encodeInt64(link.context.spanId);
-    return { traceIdLow, traceIdHigh, spanId, refType };
-  });
-}
+    /* Add droppedEventsCount as a tag */
+    if (span.droppedEventsCount) {
+      tags.push({
+        key: 'otel.dropped_events_count',
+        value: this.toTagValue(span.droppedEventsCount),
+      });
+    }
 
-/** Translate OpenTelemetry attribute value to Jaeger TagValue. */
-function toTagValue(value: unknown): TagValue {
-  const valueType = typeof value;
-  if (valueType === 'boolean') {
-    return value as boolean;
-  } else if (valueType === 'number') {
-    return value as number;
+    /* Add droppedLinksCount as a tag */
+    if (span.droppedLinksCount) {
+      tags.push({
+        key: 'otel.dropped_links_count',
+        value: this.toTagValue(span.droppedLinksCount),
+      });
+    }
+
+    const spanTags: ThriftTag[] = this._thriftUtils.getThriftTags(tags);
+
+    const logs = span.events.map((event): Log => {
+      const fields: Tag[] = [{ key: 'event', value: event.name }];
+      const attrs = event.attributes;
+      if (attrs) {
+        Object.keys(attrs).forEach(attr =>
+          fields.push({ key: attr, value: this.toTagValue(attrs[attr]) })
+        );
+      }
+      if (event.droppedAttributesCount) {
+        fields.push({
+          key: 'otel.event.dropped_attributes_count',
+          value: event.droppedAttributesCount,
+        });
+      }
+      return { timestamp: hrTimeToMilliseconds(event.time), fields };
+    });
+    const spanLogs: ThriftLog[] = this._thriftUtils.getThriftLogs(logs);
+
+    return {
+      traceIdLow: this._utils.encodeInt64(traceIdLow),
+      traceIdHigh: this._utils.encodeInt64(traceIdHigh),
+      spanId: this._utils.encodeInt64(span.spanContext().spanId),
+      parentSpanId: parentSpan,
+      operationName: span.name,
+      references: this.spanLinksToThriftRefs(span.links),
+      flags: span.spanContext().traceFlags || DEFAULT_FLAGS,
+      startTime: this._utils.encodeInt64(hrTimeToMicroseconds(span.startTime)),
+      duration: this._utils.encodeInt64(hrTimeToMicroseconds(span.duration)),
+      tags: spanTags,
+      logs: spanLogs,
+    };
   }
-  return String(value);
+
+  /** Translate OpenTelemetry {@link Link}s to Jaeger ThriftReference. */
+  private spanLinksToThriftRefs(links: Link[]): ThriftReference[] {
+    return links.map((link): ThriftReference => {
+      const refType = ThriftReferenceType.FOLLOWS_FROM;
+      const traceId = link.context.traceId;
+      const traceIdHigh = this._utils.encodeInt64(traceId.slice(0, 16));
+      const traceIdLow = this._utils.encodeInt64(traceId.slice(16));
+      const spanId = this._utils.encodeInt64(link.context.spanId);
+      return { traceIdLow, traceIdHigh, spanId, refType };
+    });
+  }
+
+  /** Translate OpenTelemetry attribute value to Jaeger TagValue. */
+  private toTagValue(value: unknown): TagValue {
+    const valueType = typeof value;
+    if (valueType === 'boolean') {
+      return value as boolean;
+    } else if (valueType === 'number') {
+      return value as number;
+    }
+    return String(value);
+  }
+
+  public getThriftTag(tags: Tag[]): any {
+    return this._thriftUtils.getThriftTags(tags);
+  }
 }

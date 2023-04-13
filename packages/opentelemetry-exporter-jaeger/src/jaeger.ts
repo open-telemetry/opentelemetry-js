@@ -24,7 +24,7 @@ import {
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { spanToThrift } from './transform';
+import { JaegerTransformer } from './transform';
 import * as jaegerTypes from './types';
 
 /**
@@ -43,16 +43,15 @@ import * as jaegerTypes from './types';
 export class JaegerExporter implements SpanExporter {
   private readonly _onShutdownFlushTimeout: number;
   private readonly _localConfig: jaegerTypes.ExporterConfig;
+  private readonly _transformer: JaegerTransformer;
   private _shutdownOnce: BindOnceFuture<void>;
+  private readonly _httpSender: any;
+  private readonly _udpSender: any;
 
-  private _sender?: typeof jaegerTypes.UDPSender;
+  private _sender?: any;
 
   constructor(config?: jaegerTypes.ExporterConfig) {
     const localConfig = Object.assign({}, config);
-    this._onShutdownFlushTimeout =
-      typeof localConfig.flushTimeout === 'number'
-        ? localConfig.flushTimeout
-        : 2000;
 
     // https://github.com/jaegertracing/jaeger-client-node#environment-variables
     // By default, the client sends traces via UDP to the agent at localhost:6832. Use OTEL_EXPORTER_JAEGER_AGENT_HOST and
@@ -73,6 +72,21 @@ export class JaegerExporter implements SpanExporter {
     this._localConfig = localConfig;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+
+    // Transformer lazy requires jaeger-client so that it throws on runtime when used with esbuild.
+    this._transformer = new JaegerTransformer();
+
+    // Below requires are needed as jaeger-client does not expose udp_sender, and http_sender modules
+    /* eslint-disable @typescript-eslint/no-var-requires */
+    this._udpSender =
+      require('jaeger-client/dist/src/reporters/udp_sender').default;
+    this._httpSender =
+      require('jaeger-client/dist/src/reporters/http_sender').default;
+    /* eslint-enable @typescript-eslint/no-var-requires */
+    this._onShutdownFlushTimeout =
+      typeof localConfig.flushTimeout === 'number'
+        ? localConfig.flushTimeout
+        : 2000;
   }
 
   /** Exports a list of spans to Jaeger. */
@@ -116,7 +130,7 @@ export class JaegerExporter implements SpanExporter {
     spans: ReadableSpan[],
     done?: (result: ExportResult) => void
   ) {
-    const thriftSpan = spans.map(span => spanToThrift(span));
+    const thriftSpan = spans.map(span => this._transformer.spanToThrift(span));
     for (const span of thriftSpan) {
       try {
         await this._append(span);
@@ -144,16 +158,14 @@ export class JaegerExporter implements SpanExporter {
     });
   }
 
-  private _getSender(
-    span: jaegerTypes.ThriftSpan
-  ): typeof jaegerTypes.UDPSender {
+  private _getSender(span: jaegerTypes.ThriftSpan): any {
     if (this._sender) {
       return this._sender;
     }
 
     const sender = this._localConfig.endpoint
-      ? new jaegerTypes.HTTPSender(this._localConfig)
-      : new jaegerTypes.UDPSender(this._localConfig);
+      ? new this._httpSender(this._localConfig)
+      : new this._udpSender(this._localConfig);
 
     if (sender._client instanceof Socket) {
       // unref socket to prevent it from keeping the process running
@@ -167,7 +179,7 @@ export class JaegerExporter implements SpanExporter {
 
     sender.setProcess({
       serviceName,
-      tags: jaegerTypes.ThriftUtils.getThriftTags(this._localConfig.tags || []),
+      tags: this._transformer.getThriftTag(this._localConfig.tags || []),
     });
 
     this._sender = sender;

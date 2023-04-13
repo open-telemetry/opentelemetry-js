@@ -15,15 +15,20 @@
  */
 
 import * as assert from 'assert';
-import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { Resource } from '@opentelemetry/resources';
 import * as api from '@opentelemetry/api';
-import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
+import { ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import { JaegerTransformer } from '../src/transform';
+
+const Utils = require('jaeger-client/dist/src/util').default;
+const ThriftUtils = require('jaeger-client/dist/src/thrift').default;
 
 describe('transform', () => {
+  const transformer = new JaegerTransformer();
+
   const spanContext = () => {
     return {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -87,7 +92,7 @@ describe('transform', () => {
         droppedLinksCount: 0,
       };
 
-      const thriftSpan = spanToThrift(readableSpan);
+      const thriftSpan = transformer.spanToThrift(readableSpan);
       const result = ThriftUtils._thrift.Span.rw.toBuffer(thriftSpan);
       assert.strictEqual(result.err, null);
       assert.deepStrictEqual(thriftSpan.operationName, 'my-span');
@@ -187,7 +192,7 @@ describe('transform', () => {
         droppedLinksCount: 0,
       };
 
-      const thriftSpan = spanToThrift(readableSpan);
+      const thriftSpan = transformer.spanToThrift(readableSpan);
       const result = ThriftUtils._thrift.Span.rw.toBuffer(thriftSpan);
       assert.strictEqual(result.err, null);
       assert.deepStrictEqual(thriftSpan.operationName, 'my-span1');
@@ -257,7 +262,7 @@ describe('transform', () => {
         droppedLinksCount: 0,
       };
 
-      const thriftSpan = spanToThrift(readableSpan);
+      const thriftSpan = transformer.spanToThrift(readableSpan);
       const result = ThriftUtils._thrift.Span.rw.toBuffer(thriftSpan);
       assert.strictEqual(result.err, null);
       assert.deepStrictEqual(thriftSpan.operationName, 'my-span');
@@ -305,7 +310,7 @@ describe('transform', () => {
         droppedLinksCount: 0,
       };
 
-      const thriftSpan = spanToThrift(readableSpan);
+      const thriftSpan = transformer.spanToThrift(readableSpan);
 
       assert.strictEqual(
         thriftSpan.traceIdLow.toString('hex'),
@@ -369,7 +374,7 @@ describe('transform', () => {
         droppedEventsCount: 0,
         droppedLinksCount: 0,
       };
-      let thriftSpan = spanToThrift(readableSpan);
+      let thriftSpan = transformer.spanToThrift(readableSpan);
       assert.strictEqual(
         thriftSpan.tags.find(tag => tag.key === 'error'),
         undefined,
@@ -377,7 +382,7 @@ describe('transform', () => {
       );
 
       readableSpan.status.code = SpanStatusCode.UNSET;
-      thriftSpan = spanToThrift(readableSpan);
+      thriftSpan = transformer.spanToThrift(readableSpan);
       assert.strictEqual(
         thriftSpan.tags.find(tag => tag.key === 'error'),
         undefined,
@@ -385,7 +390,7 @@ describe('transform', () => {
       );
 
       readableSpan.status.code = SpanStatusCode.ERROR;
-      thriftSpan = spanToThrift(readableSpan);
+      thriftSpan = transformer.spanToThrift(readableSpan);
       const errorTag = thriftSpan.tags.find(tag => tag.key === 'error');
 
       assert.strictEqual(
