@@ -48,7 +48,7 @@ export abstract class OTLPExporterNodeBase<
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    if (config.headers && config.headers instanceof Function) {
+    if (config.headers && typeof config.headers === 'function') {
       this.getHeaders = config.headers as () => Record<string, string>;
     }
 
