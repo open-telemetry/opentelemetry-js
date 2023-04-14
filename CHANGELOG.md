@@ -11,19 +11,41 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.12.0
+
+### :rocket: (Enhancement)
+
+* feat(tracing): log span name and IDs when span end is called multiple times [#3716](https://github.com/open-telemetry/opentelemetry-js/pull/3716)
+* feat(core): add logs environment variables; add timeout utils method. [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): fixed description for http.server.duration metric [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710)
+* fix(opentelemetry-sdk-trace-web): don't crash in runtimes where location isn't defined [#3715](https://github.com/open-telemetry/opentelemetry-js/pull/3715)
+
+## 1.11.0
+
+### :rocket: (Enhancement)
+
 * feat(sdk-metrics): add exponential histogram support [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505), [#3506](https://github.com/open-telemetry/opentelemetry-js/pull/3506) @mwear
 * feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
 * fix(sdk-trace-web): make `parseUrl()` respect document.baseURI [#3670](https://github.com/open-telemetry/opentelemetry-js/pull/3670) @domasx2
-* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
 
 ### :books: (Refine Doc)
 
 * doc(sdk): update NodeSDK example [#3684](https://github.com/open-telemetry/opentelemetry-js/pull/3684) @martinkuba
-
-### :house: (Internal)
+* docs: change vmarchaud status from maintainer to emeritus [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710) @vmarchaud
+* docs: change rauno56 status from maintainer to emeritus [#3706](https://github.com/open-telemetry/opentelemetry-js/pull/3706) @rauno56
 
 ## 1.10.1
 
