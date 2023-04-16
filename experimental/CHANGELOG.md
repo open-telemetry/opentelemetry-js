@@ -10,17 +10,36 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @pichlermarc
-
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.38.0
+
+### :boom: Breaking Change
+
+* fix: remove HTTP/HTTPS prefix from span name in instrumentation-xml-http-request [#3672](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @jufab
+* fix(sdk-node)!: remove unused defaultAttributes option [#3724](https://github.com/open-telemetry/opentelemetry-js/pull/3724) @pichlermarc
+  * Please use `NodeSDKConfiguration.resource` instead
+
+### :rocket: (Enhancement)
+
+* feat(sdk-logs): use logs API 0.38
+
+### :bug: (Bug Fix)
+
+* fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @pichlermarc
 
 ## 0.37.0
 
 ### :boom: Breaking Change
 
 * fix: remove HTTP/HTTPS prefix from span name in instrumentation-xml-http-request [#3672](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @jufab
+
+### :rocket: (Enhancement)
+
+* feat(api-logs): 1.`LogRecord` fields update: `traceFlags`/`traceId`/`spanId` -> `context`; 2.`Logger` supports configuring `includeTraceContext`; 3.The `onEmit` method of `LogRecordProcessor` supports the `context` field.  [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
+* feat(sdk-logs): logs sdk implementation. [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
 
 ## 0.36.0
 

@@ -27,4 +27,10 @@ export interface LoggerOptions {
    * The instrumentation scope attributes to associate with emitted telemetry
    */
   scopeAttributes?: Attributes;
+
+  /**
+   * Specifies whether the Trace Context should automatically be passed on to the LogRecords emitted by the Logger.
+   * @default true
+   */
+  includeTraceContext?: boolean;
 }
