@@ -13,6 +13,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(exporter-jaeger): lazy require jaeger-client #3728
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
