@@ -8,6 +8,8 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Filter Logs singal files
+!experimental/examples/logs
 
 # Runtime data
 pids
