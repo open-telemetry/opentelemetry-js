@@ -6,7 +6,7 @@
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
 This module provides exporter for node to be used with OTLP (`grpc`) compatible receivers.
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.16 <=0.53`.
+Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.75.0`.
 
 ## Installation
 
@@ -74,11 +74,6 @@ logger.emit({ body: 'example-log' });
 | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
 
 > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
-
-## Running opentelemetry-collector locally to see the logs
-
-1. Go to `examples/otlp-exporter-node`
-2. Follow the instructions there to view logs.
 
 ## Useful links
 
