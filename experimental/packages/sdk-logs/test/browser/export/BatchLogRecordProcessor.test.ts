@@ -30,6 +30,7 @@ const describeDocument =
 type WebVisibilityState = 'visible' | 'hidden';
 
 describeDocument('BatchLogRecordProcessor - web main context', () => {
+  // TODO: change to DocumentVisibilityState when TypeScript is upgraded to 4.6+
   let visibilityState: WebVisibilityState = 'visible';
   let exporter: LogRecordExporter;
   let processor: BatchLogRecordProcessor;
