@@ -21,6 +21,7 @@
       "experimental/packages/opentelemetry-instrumentation-http",
       "experimental/packages/opentelemetry-instrumentation-xml-http-request",
       "experimental/packages/opentelemetry-sdk-node",
+      "experimental/packages/opentelemetry-shim-opencensus",
       "experimental/packages/otlp-exporter-base",
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-proto-exporter-base",
@@ -103,6 +104,9 @@
     },
     {
       "path": "experimental/packages/opentelemetry-sdk-node"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-shim-opencensus"
     },
     {
       "path": "experimental/packages/otlp-exporter-base"
