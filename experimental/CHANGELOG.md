@@ -30,7 +30,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3672) @pichlermarc
+* fix(sdk-node): only set DiagConsoleLogger when OTEL_LOG_LEVEL is set [#3693](https://github.com/open-telemetry/opentelemetry-js/pull/3693) @pichlermarc
 
 ## 0.37.0
 
