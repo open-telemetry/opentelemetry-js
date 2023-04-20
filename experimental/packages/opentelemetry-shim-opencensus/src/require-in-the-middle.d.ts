@@ -14,4 +14,23 @@
  * limitations under the License.
  */
 
-export { installShim, uninstallShim } from './shim';
+declare module 'require-in-the-middle' {
+  namespace hook {
+    type Options = {
+      internals?: boolean;
+    };
+    type OnRequireFn<T> = (exports: T, name: string, basedir?: string) => T;
+    type Hooked = { unhook(): void };
+  }
+  function hook<T>(
+    modules: string[] | null,
+    options: hook.Options | null,
+    onRequire: hook.OnRequireFn<T>
+  ): hook.Hooked;
+  function hook<T>(
+    modules: string[] | null,
+    onRequire: hook.OnRequireFn<T>
+  ): hook.Hooked;
+  function hook<T>(onRequire: hook.OnRequireFn<T>): hook.Hooked;
+  export = hook;
+}
