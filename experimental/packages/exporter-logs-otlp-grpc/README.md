@@ -29,7 +29,7 @@ options that work with trace also work with logs.
 ```js
 import {
   LoggerProvider,
-  SimpleLogRecordProcessor,
+  BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogsExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 
@@ -42,7 +42,7 @@ const loggerExpoter = new OTLPLogsExporter(collectorOptions);
 const loggerProvider = new LoggerProvider();
 
 loggerProvider.addLogRecordProcessor(
-  new SimpleLogRecordProcessor(loggerExpoter)
+  new BatchLogRecordProcessor(loggerExpoter)
 );
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
