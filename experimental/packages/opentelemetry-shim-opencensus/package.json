@@ -10,6 +10,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
+    "tdd": "npm run test -- --extension ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "lint": "eslint . --ext .ts",
@@ -44,21 +45,23 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/core": "1.11.0",
-    "@opentelemetry/context-async-hooks": "1.11.0",
+    "@opentelemetry/core": "1.12.0",
+    "@opentelemetry/context-async-hooks": "1.12.0",
     "@opencensus/core": "0.1.0",
-    "@opentelemetry/api": ">=1.0.0 <1.5.0",
+    "@opentelemetry/api": "1.4.1",
     "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "codecov": "3.8.3",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
+    "sinon": "15.0.0",
+    "@types/sinon": "10.0.13",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
   },
   "peerDependencies": {
     "@opencensus/core": "^0.1.0",
-    "@opentelemetry/api": ">=1.0.0 <1.5.0"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/core": "^1.0.0",
