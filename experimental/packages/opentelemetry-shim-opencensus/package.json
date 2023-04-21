@@ -1,7 +1,8 @@
 {
   "name": "@opentelemetry/shim-opencensus",
   "version": "0.38.0",
-  "description": "OpenTracing to OpenTelemetry shim",
+  "description": "OpenCensus to OpenTelemetry shim",
+  "private": true,
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
