@@ -9,7 +9,7 @@
 
 OpenCensus shim allows existing OpenCensus instrumentation to report to OpenTelemetry. This
 allows you to incrementally migrate your existing OpenCensus instrumentation to OpenTelemetry.
-More details are available in the [OpenCensus Compatibility Specification][https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/compatibility/opencensus.md].
+More details are available in the [OpenCensus Compatibility Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/compatibility/opencensus.md).
 
 ## Installation
 
