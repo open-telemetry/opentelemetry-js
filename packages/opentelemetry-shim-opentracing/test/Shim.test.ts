@@ -22,7 +22,7 @@ import {
   CompositePropagator,
   W3CBaggagePropagator,
   W3CTraceContextPropagator,
-  timeInputToHrTime,
+  hrTimeToMilliseconds,
 } from '@opentelemetry/core';
 import {
   defaultTextMapGetter,
@@ -40,10 +40,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
-    propagators: [
-      new W3CTraceContextPropagator(),
-      new W3CBaggagePropagator(),
-    ],
+    propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()],
   });
 
   propagation.setGlobalPropagator(compositePropagator);
@@ -259,8 +256,13 @@ describe('OpenTracing Shim', () => {
 
         const otSpan = (span as SpanShim).getSpan() as Span;
 
+        const adjustment = otSpan['_performanceOffset'];
+
         assert.strictEqual(otSpan.links.length, 1);
-        assert.deepStrictEqual(otSpan.startTime, timeInputToHrTime(now));
+        assert.deepStrictEqual(
+          hrTimeToMilliseconds(otSpan.startTime),
+          Math.round(now + adjustment + performance.timeOrigin)
+        );
         assert.deepStrictEqual(otSpan.attributes, opentracingOptions.tags);
       });
     });
@@ -268,7 +270,10 @@ describe('OpenTracing Shim', () => {
 
   describe('SpanContextShim', () => {
     it('returns the correct context', () => {
-      const shim = new SpanContextShim(INVALID_SPAN_CONTEXT, propagation.createBaggage());
+      const shim = new SpanContextShim(
+        INVALID_SPAN_CONTEXT,
+        propagation.createBaggage()
+      );
       assert.strictEqual(shim.getSpanContext(), INVALID_SPAN_CONTEXT);
       assert.strictEqual(shim.toTraceId(), INVALID_SPAN_CONTEXT.traceId);
       assert.strictEqual(shim.toSpanId(), INVALID_SPAN_CONTEXT.spanId);
@@ -367,19 +372,26 @@ describe('OpenTracing Shim', () => {
 
         it('records an exception', () => {
           const payload = {
-            'error.object': 'boom', fault: 'meow'
+            'error.object': 'boom',
+            fault: 'meow',
           };
           span.logEvent('error', payload);
           assert.strictEqual(otSpan.events[0].name, 'exception');
           const expectedAttributes = {
             [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
           };
-          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+          assert.deepStrictEqual(
+            otSpan.events[0].attributes,
+            expectedAttributes
+          );
         });
 
         it('maps to exception semantic conventions', () => {
           const payload = {
-            fault: 'meow', 'error.kind': 'boom', message: 'oh no!', stack: 'pancakes'
+            fault: 'meow',
+            'error.kind': 'boom',
+            message: 'oh no!',
+            stack: 'pancakes',
           };
           span.logEvent('error', payload);
           assert.strictEqual(otSpan.events[0].name, 'exception');
@@ -387,9 +399,12 @@ describe('OpenTracing Shim', () => {
             fault: 'meow',
             [SemanticAttributes.EXCEPTION_TYPE]: 'boom',
             [SemanticAttributes.EXCEPTION_MESSAGE]: 'oh no!',
-            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes'
+            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes',
           };
-          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+          assert.deepStrictEqual(
+            otSpan.events[0].attributes,
+            expectedAttributes
+          );
         });
       });
 
@@ -400,7 +415,10 @@ describe('OpenTracing Shim', () => {
           const kvLogs = { event: 'fun-time', user: 'meow', value: 123 };
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'fun-time');
-          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          assert.strictEqual(
+            otSpan.events[0].time[0],
+            Math.trunc(tomorrow / 1000)
+          );
           assert.deepStrictEqual(otSpan.events[0].attributes, kvLogs);
         });
 
@@ -408,38 +426,59 @@ describe('OpenTracing Shim', () => {
           const kvLogs = { user: 'meow', value: 123 };
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'log');
-          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          assert.strictEqual(
+            otSpan.events[0].time[0],
+            Math.trunc(tomorrow / 1000)
+          );
           assert.deepStrictEqual(otSpan.events[0].attributes, kvLogs);
         });
 
         it('records an exception', () => {
           const kvLogs = {
-            event: 'error', 'error.object': 'boom', fault: 'meow'
+            event: 'error',
+            'error.object': 'boom',
+            fault: 'meow',
           };
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'exception');
-          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          assert.strictEqual(
+            otSpan.events[0].time[0],
+            Math.trunc(tomorrow / 1000)
+          );
           const expectedAttributes = {
             [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
           };
-          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+          assert.deepStrictEqual(
+            otSpan.events[0].attributes,
+            expectedAttributes
+          );
         });
 
         it('maps to exception semantic conventions', () => {
           const kvLogs = {
-            event: 'error', fault: 'meow', 'error.kind': 'boom', message: 'oh no!', stack: 'pancakes'
+            event: 'error',
+            fault: 'meow',
+            'error.kind': 'boom',
+            message: 'oh no!',
+            stack: 'pancakes',
           };
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'exception');
-          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          assert.strictEqual(
+            otSpan.events[0].time[0],
+            Math.trunc(tomorrow / 1000)
+          );
           const expectedAttributes = {
             event: 'error',
             fault: 'meow',
             [SemanticAttributes.EXCEPTION_TYPE]: 'boom',
             [SemanticAttributes.EXCEPTION_MESSAGE]: 'oh no!',
-            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes'
+            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes',
           };
-          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+          assert.deepStrictEqual(
+            otSpan.events[0].attributes,
+            expectedAttributes
+          );
         });
       });
     });
@@ -453,7 +492,11 @@ describe('OpenTracing Shim', () => {
     it('sets explicit end timestamp', () => {
       const now = performance.now();
       span.finish(now);
-      assert.deepStrictEqual(otSpan.endTime, timeInputToHrTime(now));
+      const adjustment = otSpan['_performanceOffset'];
+      assert.deepStrictEqual(
+        hrTimeToMilliseconds(otSpan.endTime),
+        Math.round(now + adjustment + performance.timeOrigin)
+      );
     });
 
     it('can set and retrieve baggage', () => {

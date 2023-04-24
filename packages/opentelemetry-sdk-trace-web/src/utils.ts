@@ -44,7 +44,10 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * @param key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+export function hasKey<O extends object>(
+  obj: O,
+  key: keyof any
+): key is keyof O {
   return key in obj;
 }
 
@@ -108,7 +111,9 @@ export function addSpanNetworkEvents(
  * sort resources by startTime
  * @param filteredResources
  */
-export function sortResources(filteredResources: PerformanceResourceTiming[]): PerformanceResourceTiming[] {
+export function sortResources(
+  filteredResources: PerformanceResourceTiming[]
+): PerformanceResourceTiming[] {
   return filteredResources.slice().sort((a, b) => {
     const valueA = a[PTN.FETCH_START];
     const valueB = b[PTN.FETCH_START];
@@ -300,7 +305,10 @@ export interface URLLike {
  */
 export function parseUrl(url: string): URLLike {
   if (typeof URL === 'function') {
-    return new URL(url, location.href);
+    return new URL(
+      url,
+      typeof document !== 'undefined' ? document.baseURI : location.href
+    );
   }
   const element = getUrlNormalizingAnchor();
   element.href = url;

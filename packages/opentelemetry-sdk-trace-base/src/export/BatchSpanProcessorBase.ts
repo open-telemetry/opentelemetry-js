@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, Context, TraceFlags } from '@opentelemetry/api';
+import { context, Context, diag, TraceFlags } from '@opentelemetry/api';
 import {
   BindOnceFuture,
   ExportResultCode,
@@ -33,7 +33,9 @@ import { SpanExporter } from './SpanExporter';
  * Implementation of the {@link SpanProcessor} that batches spans exported by
  * the SDK then pushes them to the exporter pipeline.
  */
-export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements SpanProcessor {
+export abstract class BatchSpanProcessorBase<T extends BufferConfig>
+  implements SpanProcessor
+{
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
@@ -42,6 +44,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
+  private _droppedSpansCount: number = 0;
 
   constructor(private readonly _exporter: SpanExporter, config?: T) {
     const env = getEnv();
@@ -63,6 +66,13 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
         : env.OTEL_BSP_EXPORT_TIMEOUT;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+
+    if (this._maxExportBatchSize > this._maxQueueSize) {
+      diag.warn(
+        'BatchSpanProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, setting maxExportBatchSize to match maxQueueSize'
+      );
+      this._maxExportBatchSize = this._maxQueueSize;
+    }
   }
 
   forceFlush(): Promise<void> {
@@ -108,8 +118,23 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
   private _addToBuffer(span: ReadableSpan) {
     if (this._finishedSpans.length >= this._maxQueueSize) {
       // limit reached, drop span
+
+      if (this._droppedSpansCount === 0) {
+        diag.debug('maxQueueSize reached, dropping spans');
+      }
+      this._droppedSpansCount++;
+
       return;
     }
+
+    if (this._droppedSpansCount > 0) {
+      // some spans were dropped, log once with count of spans dropped
+      diag.warn(
+        `Dropped ${this._droppedSpansCount} spans because maxQueueSize reached`
+      );
+      this._droppedSpansCount = 0;
+    }
+
     this._finishedSpans.push(span);
     this._maybeStartTimer();
   }
@@ -151,10 +176,11 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       context.with(suppressTracing(context.active()), () => {
         // Reset the finished spans buffer here because the next invocations of the _flush method
         // could pass the same finished spans to the exporter if the buffer is cleared
-        // outside of the execution of this callback.
-        this._exporter.export(
-          this._finishedSpans.splice(0, this._maxExportBatchSize),
-          result => {
+        // outside the execution of this callback.
+        const spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
+
+        const doExport = () =>
+          this._exporter.export(spans, result => {
             clearTimeout(timer);
             if (result.code === ExportResultCode.SUCCESS) {
               resolve();
@@ -164,8 +190,24 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
                   new Error('BatchSpanProcessor: span export failed')
               );
             }
-          }
-        );
+          });
+        const pendingResources = spans
+          .map(span => span.resource)
+          .filter(resource => resource.asyncAttributesPending);
+
+        // Avoid scheduling a promise to make the behavior more predictable and easier to test
+        if (pendingResources.length === 0) {
+          doExport();
+        } else {
+          Promise.all(
+            pendingResources.map(resource =>
+              resource.waitForAsyncAttributes?.()
+            )
+          ).then(doExport, err => {
+            globalErrorHandler(err);
+            reject(err);
+          });
+        }
       });
     });
   }

@@ -45,7 +45,8 @@ export class ZipkinExporter implements SpanExporter {
     this._urlStr = config.url || getEnv().OTEL_EXPORTER_ZIPKIN_ENDPOINT;
     this._send = prepareSend(this._urlStr, config.headers);
     this._serviceName = config.serviceName;
-    this._statusCodeTagName = config.statusCodeTagName || defaultStatusCodeTagName;
+    this._statusCodeTagName =
+      config.statusCodeTagName || defaultStatusCodeTagName;
     this._statusDescriptionTagName =
       config.statusDescriptionTagName || defaultStatusErrorTagName;
     this._isShutdown = false;
@@ -86,7 +87,6 @@ export class ZipkinExporter implements SpanExporter {
         resultCallback(result);
       });
     });
-
 
     this._sendingPromises.push(promise);
     const popPromise = () => {

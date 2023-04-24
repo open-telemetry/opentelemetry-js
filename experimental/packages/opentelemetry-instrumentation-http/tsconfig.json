@@ -1,14 +1,17 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "rootDir": "."
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
   ],
   "references": [
+    {
+      "path": "../../../api"
+    },
     {
       "path": "../../../packages/opentelemetry-context-async-hooks"
     },
@@ -23,6 +26,9 @@
     },
     {
       "path": "../../../packages/opentelemetry-semantic-conventions"
+    },
+    {
+      "path": "../../../packages/sdk-metrics"
     },
     {
       "path": "../opentelemetry-instrumentation"

@@ -14,17 +14,29 @@
  * limitations under the License.
  */
 
-import { Meter, ObservableResult } from '@opentelemetry/api-metrics';
-import {
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
+import { Counter, Meter, ObservableResult } from '@opentelemetry/api';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
-import { mockedHrTimeMs, mockHrTime } from './util';
+import {
+  mockedHrTimeMs,
+  mockHrTime,
+  sdkLanguage,
+  sdkName,
+  sdkVersion,
+  serviceName,
+} from './util';
 import { SinonStubbedInstance } from 'sinon';
-import { Counter } from '@opentelemetry/api-metrics';
+
+const infoLine = `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1`;
+
+const serializedDefaultResourceLines = [
+  '# HELP target_info Target metadata',
+  '# TYPE target_info gauge',
+  infoLine,
+];
 
 describe('PrometheusExporter', () => {
   beforeEach(() => {
@@ -59,6 +71,27 @@ describe('PrometheusExporter', () => {
             return done();
           });
         });
+      });
+    });
+
+    it('should pass server error to callback when port is already in use', done => {
+      const firstExporter = new PrometheusExporter({}, error => {
+        if (error) {
+          // This should not happen as the port should not be already in use when the test starts.
+          done(error);
+        }
+      });
+      const secondExporter = new PrometheusExporter({}, error => {
+        firstExporter
+          .shutdown()
+          .then(() => secondExporter.shutdown())
+          .then(() =>
+            done(
+              error
+                ? undefined
+                : 'Second exporter should respond with EADDRINUSE but did not pass it to callback'
+            )
+          );
       });
     });
 
@@ -119,7 +152,7 @@ describe('PrometheusExporter', () => {
     it('should unref the server to allow graceful termination', () => {
       const mockServer = sinon.createStubInstance(http.Server);
       const createStub = sinon.stub(http, 'createServer');
-      createStub.returns((mockServer as any) as http.Server);
+      createStub.returns(mockServer as any as http.Server);
       const exporter = new PrometheusExporter({}, async () => {
         await exporter.shutdown();
       });
@@ -201,20 +234,18 @@ describe('PrometheusExporter', () => {
 
     it('should able to call getMetricsRequestHandler function to generate response with metrics', async () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
-      const mockRequest: SinonStubbedInstance<http.IncomingMessage> = sinon.createStubInstance(
-        http.IncomingMessage
-      );
-      const mockResponse: SinonStubbedInstance<http.ServerResponse> = sinon.createStubInstance(
-        http.ServerResponse
-      );
+      const mockRequest: SinonStubbedInstance<http.IncomingMessage> =
+        sinon.createStubInstance(http.IncomingMessage);
+      const mockResponse: SinonStubbedInstance<http.ServerResponse> =
+        sinon.createStubInstance(http.ServerResponse);
       let resolve: () => void;
       const deferred = new Promise<void>(res => {
         resolve = res;
       });
       mockResponse.end.callsFake(() => resolve() as any);
       exporter.getMetricsRequestHandler(
-        (mockRequest as unknown) as http.IncomingMessage,
-        (mockResponse as unknown) as http.ServerResponse
+        mockRequest as unknown as http.IncomingMessage,
+        mockResponse as unknown as http.ServerResponse
       );
       await deferred;
       sinon.assert.calledOnce(mockResponse.setHeader);
@@ -251,11 +282,12 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.strictEqual(
-        lines[0],
+        lines[serializedDefaultResourceLines.length],
         '# HELP counter_total a test description'
       );
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
         `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -272,7 +304,7 @@ describe('PrometheusExporter', () => {
         'metric_observable_gauge',
         {
           description: 'a test description',
-        },
+        }
       );
       observableGauge.addCallback((observableResult: ObservableResult) => {
         observableResult.observe(getCpuUsage(), {
@@ -285,6 +317,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP metric_observable_gauge a test description',
         '# TYPE metric_observable_gauge gauge',
         `metric_observable_gauge{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
@@ -304,6 +337,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
         `counter_total{counterKey1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -333,11 +367,14 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a comment if no metrics are registered', async () => {
+    it('should export resource even if no metrics are registered', async () => {
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
-      assert.deepStrictEqual(lines, ['# no registered metrics']);
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# no registered metrics',
+      ]);
     });
 
     it('should add a description if missing', async () => {
@@ -349,6 +386,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
         `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -357,7 +395,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should sanitize names', async () => {
-      const counter = meter.createCounter('counter.bad-name');
+      const counter = meter.createCounter('counter..bad-name');
 
       counter.add(10, { key1: 'attributeValue1' });
 
@@ -365,6 +403,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP counter_bad_name_total description missing',
         '# TYPE counter_bad_name_total counter',
         `counter_bad_name_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -382,6 +421,7 @@ describe('PrometheusExporter', () => {
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP counter a test description',
         '# TYPE counter gauge',
         `counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
@@ -389,7 +429,7 @@ describe('PrometheusExporter', () => {
       ]);
     });
 
-    it('should export an ObservableCounter as a counter', async() => {
+    it('should export an ObservableCounter as a counter', async () => {
       function getValue() {
         return 20;
       }
@@ -398,7 +438,7 @@ describe('PrometheusExporter', () => {
         'metric_observable_counter',
         {
           description: 'a test description',
-        },
+        }
       );
       observableCounter.addCallback((observableResult: ObservableResult) => {
         observableResult.observe(getValue(), {
@@ -410,6 +450,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP metric_observable_counter a test description',
         '# TYPE metric_observable_counter counter',
         `metric_observable_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
@@ -426,18 +467,21 @@ describe('PrometheusExporter', () => {
         'metric_observable_up_down_counter',
         {
           description: 'a test description',
-        },
+        }
       );
-      observableUpDownCounter.addCallback((observableResult: ObservableResult) => {
-        observableResult.observe(getValue(), {
-          key1: 'attributeValue1',
-        });
-      });
+      observableUpDownCounter.addCallback(
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getValue(), {
+            key1: 'attributeValue1',
+          });
+        }
+      );
 
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP metric_observable_up_down_counter a test description',
         '# TYPE metric_observable_up_down_counter gauge',
         `metric_observable_up_down_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
@@ -445,7 +489,7 @@ describe('PrometheusExporter', () => {
       ]);
     });
 
-    it('should export a Histogram as a summary', async() => {
+    it('should export a Histogram as a summary', async () => {
       const histogram = meter.createHistogram('test_histogram', {
         description: 'a test description',
       });
@@ -456,6 +500,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
         '# HELP test_histogram a test description',
         '# TYPE test_histogram histogram',
         `test_histogram_count{key1="attributeValue1"} 1 ${mockedHrTimeMs}`,
@@ -480,22 +525,19 @@ describe('PrometheusExporter', () => {
     let meter: Meter;
     let meterProvider: MeterProvider;
     let counter: Counter;
-    let exporter: PrometheusExporter | undefined;
+    let exporter: PrometheusExporter;
 
-    beforeEach(() => {
+    function setup(reader: PrometheusExporter) {
       meterProvider = new MeterProvider();
+      meterProvider.addMetricReader(reader);
+
       meter = meterProvider.getMeter('test-prometheus');
       counter = meter.createCounter('counter');
       counter.add(10, { key1: 'attributeValue1' });
-    });
+    }
 
-    afterEach(done => {
-      if (exporter) {
-        exporter.shutdown().then(done);
-        exporter = undefined;
-      } else {
-        done();
-      }
+    afterEach(async () => {
+      await exporter.shutdown();
     });
 
     it('should use a configured name prefix', done => {
@@ -504,7 +546,7 @@ describe('PrometheusExporter', () => {
           prefix: 'test_prefix',
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -512,6 +554,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
+                  ...serializedDefaultResourceLines,
                   '# HELP test_prefix_counter_total description missing',
                   '# TYPE test_prefix_counter_total counter',
                   `test_prefix_counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -532,7 +575,7 @@ describe('PrometheusExporter', () => {
           port: 8080,
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:8080/metrics', res => {
               res.on('data', chunk => {
@@ -540,6 +583,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
+                  ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
                   `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -560,7 +604,7 @@ describe('PrometheusExporter', () => {
           endpoint: '/test',
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:9464/test', res => {
               res.on('data', chunk => {
@@ -568,6 +612,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
+                  ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
                   `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -588,7 +633,7 @@ describe('PrometheusExporter', () => {
           appendTimestamp: false,
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -596,6 +641,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
+                  ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
                   'counter_total{key1="attributeValue1"} 10',

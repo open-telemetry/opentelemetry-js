@@ -26,7 +26,7 @@ import { buildSamplerFromEnv } from '../../src/config';
 describe('config', () => {
   let envSource: Record<string, any>;
   if (typeof process === 'undefined') {
-    envSource = (globalThis as unknown) as Record<string, any>;
+    envSource = globalThis as unknown as Record<string, any>;
   } else {
     envSource = process.env as Record<string, any>;
   }

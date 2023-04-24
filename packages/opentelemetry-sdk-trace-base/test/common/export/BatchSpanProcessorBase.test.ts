@@ -22,12 +22,19 @@ import {
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { AlwaysOnSampler, BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
+import {
+  AlwaysOnSampler,
+  BasicTracerProvider,
+  BufferConfig,
+  InMemorySpanExporter,
+  Span,
+} from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
+import { Resource, ResourceAttributes } from '@opentelemetry/resources';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -96,7 +103,7 @@ describe('BatchSpanProcessorBase', () => {
 
       let env: Record<string, any>;
       if (typeof process === 'undefined') {
-        env = (globalThis as unknown) as Record<string, any>;
+        env = globalThis as unknown as Record<string, any>;
       } else {
         env = process.env as Record<string, any>;
       }
@@ -384,6 +391,27 @@ describe('BatchSpanProcessorBase', () => {
           done();
         });
       });
+
+      it('should wait for pending resource on flush', async () => {
+        const tracer = new BasicTracerProvider({
+          resource: new Resource(
+            {},
+            new Promise<ResourceAttributes>(resolve => {
+              setTimeout(() => resolve({ async: 'fromasync' }), 1);
+            })
+          ),
+        }).getTracer('default');
+
+        const span = tracer.startSpan('test') as Span;
+        span.end();
+
+        processor.onStart(span, ROOT_CONTEXT);
+        processor.onEnd(span);
+
+        await processor.forceFlush();
+
+        assert.strictEqual(exporter.getFinishedSpans().length, 1);
+      });
     });
 
     describe('flushing spans with exporter triggering instrumentation', () => {
@@ -405,7 +433,8 @@ describe('BatchSpanProcessorBase', () => {
         processor.onEnd(span);
 
         processor.forceFlush().then(() => {
-          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+          const exporterCreatedSpans =
+            testTracingExporter.getExporterCreatedSpans();
           assert.equal(exporterCreatedSpans.length, 0);
 
           done();
@@ -432,6 +461,59 @@ describe('BatchSpanProcessorBase', () => {
           processor.onEnd(span);
         }
         assert.equal(processor['_finishedSpans'].length, 6);
+      });
+      it('should count and report dropped spans', done => {
+        const debugStub = sinon.spy(diag, 'debug');
+        const warnStub = sinon.spy(diag, 'warn');
+        const span = createSampledSpan('test');
+        for (let i = 0, j = 6; i < j; i++) {
+          processor.onStart(span, ROOT_CONTEXT);
+          processor.onEnd(span);
+        }
+        assert.equal(processor['_finishedSpans'].length, 6);
+        assert.equal(processor['_droppedSpansCount'], 0);
+        sinon.assert.notCalled(debugStub);
+
+        processor.onStart(span, ROOT_CONTEXT);
+        processor.onEnd(span);
+
+        assert.equal(processor['_finishedSpans'].length, 6);
+        assert.equal(processor['_droppedSpansCount'], 1);
+        sinon.assert.calledOnce(debugStub);
+
+        processor.forceFlush().then(() => {
+          processor.onStart(span, ROOT_CONTEXT);
+          processor.onEnd(span);
+
+          assert.equal(processor['_finishedSpans'].length, 1);
+          assert.equal(processor['_droppedSpansCount'], 0);
+
+          sinon.assert.calledOnceWithExactly(
+            warnStub,
+            'Dropped 1 spans because maxQueueSize reached'
+          );
+
+          done();
+        });
+      });
+    });
+  });
+
+  describe('maxExportBatchSize', () => {
+    let processor: BatchSpanProcessor;
+
+    describe('when "maxExportBatchSize" is greater than "maxQueueSize"', () => {
+      beforeEach(() => {
+        processor = new BatchSpanProcessor(exporter, {
+          maxExportBatchSize: 7,
+          maxQueueSize: 6,
+        });
+      });
+      it('should match maxQueueSize', () => {
+        assert.equal(
+          processor['_maxExportBatchSize'],
+          processor['_maxQueueSize']
+        );
       });
     });
   });

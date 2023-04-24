@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
+For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
+
 ## Unreleased
 
 ### :boom: Breaking Change
@@ -9,8 +12,177 @@ All notable changes to this project will be documented in this file.
 ### :rocket: (Enhancement)
 
 * feat(SpanExpoter): Add optional forceFlush to SpanExporter interface [#3067] @sgracias1
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.11.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): add exponential histogram support [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505), [#3506](https://github.com/open-telemetry/opentelemetry-js/pull/3506) @mwear
+* feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
+* fix(sdk-trace-web): make `parseUrl()` respect document.baseURI [#3670](https://github.com/open-telemetry/opentelemetry-js/pull/3670) @domasx2
+
+### :books: (Refine Doc)
+
+* doc(sdk): update NodeSDK example [#3684](https://github.com/open-telemetry/opentelemetry-js/pull/3684) @martinkuba
+* docs: change rauno56 status from maintainer to emeritus [#3706](https://github.com/open-telemetry/opentelemetry-js/pull/3706) @rauno56
+
+## 1.10.1
+
+### :bug: (Bug Fix)
+
+* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
+* fix(resource): change fs/promises import to be node 12 compatible [#3681](https://github.com/open-telemetry/opentelemetry-js/pull/3681) @pichlermarc
+
+## 1.10.0
+
+### :rocket: (Enhancement)
+
+* feat(resource): create sync resource with some attributes that resolve asynchronously [#3460](https://github.com/open-telemetry/opentelemetry-js/pull/3460) @samimusallam
+* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
+* feat (api-logs): separate Events API into its own package [3550](https://github.com/open-telemetry/opentelemetry-js/pull/3550) @martinkuba
+* feat(sdk-metrics): apply binary search in histogram recording [#3539](https://github.com/open-telemetry/opentelemetry-js/pull/3539) @legendecas
+* perf(propagator-jaeger): improve deserializeSpanContext performance [#3541](https://github.com/open-telemetry/opentelemetry-js/pull/3541) @doochik
+* feat: support TraceState in SamplingResult [#3530](https://github.com/open-telemetry/opentelemetry-js/pull/3530) @raphael-theriault-swi
+* feat(sdk-trace-base): add diagnostic logging when spans are dropped [#3610](https://github.com/open-telemetry/opentelemetry-js/pull/3610) @neoeinstein
+* feat: add unit to view instrument selection criteria [#3647](https://github.com/open-telemetry/opentelemetry-js/pull/3647) @jlabatut
+* feat(tracing): expose dropped counts for attributes, events and links on span [#3576](https://github.com/open-telemetry/opentelemetry-js/pull/3576) @mohitk05
+
+### :bug: (Bug Fix)
+
+* fix(core): added falsy check to make otel core work with browser where webpack config had process as false or null [#3613](https://github.com/open-telemetry/opentelemetry-js/issues/3613) @ravindra-dyte
+* fix(instrumentation-http): include query params in http.target [#3646](https://github.com/open-telemetry/opentelemetry-js/pull/3646) @kobi-co
+
+### :books: (Refine Doc)
+
+* chore: update http example [#3651](https://github.com/open-telemetry/opentelemetry-js/pull/3651) @JamieDanielson
+
+### :house: (Internal)
+
+* chore(exporter-jaeger): deprecate jaeger exporter [#3585](https://github.com/open-telemetry/opentelemetry-js/pull/3585) @pichlermarc
+* fix(sdk-metrics): fix flaky LastValueAggregator test by using fake timer [#3587](https://github.com/open-telemetry/opentelemetry-js/pull/3587) @pichlermarc
+* fix(test): fix failing tests by preventing source-map generation [#3642](https://github.com/open-telemetry/opentelemetry-js/pull/3642) @pichlermarc
+
+## 1.9.1
+
+### :bug: (Bug Fix)
+
+* fix: avoid grpc types dependency [#3551](https://github.com/open-telemetry/opentelemetry-js/pull/3551) @flarna
+* fix(otlp-proto-exporter-base): Match Accept header with Content-Type in the proto exporter
+ [#3562](https://github.com/open-telemetry/opentelemetry-js/pull/3562) @scheler
+* fix: include tracestate in export [#3569](https://github.com/open-telemetry/opentelemetry-js/pull/3569) @flarna
+
+### :house: (Internal)
+
+* chore: fix cross project links and missing implicitly exported types [#3533](https://github.com/open-telemetry/opentelemetry-js/pull/3533) @legendecas
+* feat(sdk-metrics): add exponential histogram mapping functions [#3504](https://github.com/open-telemetry/opentelemetry-js/pull/3504) @mwear
+
+## 1.9.0
+
+### :rocket: (Enhancement)
+
+* feat(instrumentation-grpc): set net.peer.name and net.peer.port on client spans [#3430](https://github.com/open-telemetry/opentelemetry-js/pull/3430)
+* feat(exporter-trace-otlp-proto): Add protobuf otlp trace exporter support for browser [#3208](https://github.com/open-telemetry/opentelemetry-js/pull/3208) @pkanal
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): use default Resource to comply with semantic conventions [#3411](https://github.com/open-telemetry/opentelemetry-js/pull/3411) @pichlermarc
+  * Metrics exported by the SDK now contain the following resource attributes by default:
+    * `service.name`
+    * `telemetry.sdk.name`
+    * `telemetry.sdk.language`
+    * `telemetry.sdk.version`
+* fix(sdk-metrics): use Date.now() for instrument recording timestamps [#3514](https://github.com/open-telemetry/opentelemetry-js/pull/3514) @MisterSquishy
+* fix(sdk-trace): make spans resilient to clock drift [#3434](https://github.com/open-telemetry/opentelemetry-js/pull/3434) @dyladan
+* fix(selenium-tests): updated webpack version for selenium test issue [#3456](https://github.com/open-telemetry/opentelemetry-js/issues/3456) @SaumyaBhushan
+* fix(sdk-metrics): collect metrics when periodic exporting metric reader flushes [#3517](https://github.com/open-telemetry/opentelemetry-js/pull/3517) @legendecas
+* fix(sdk-metrics): fix duplicated registration of metrics for collectors [#3488](https://github.com/open-telemetry/opentelemetry-js/pull/3488) @legendecas
+* fix(core): fix precision loss in numberToHrtime [#3480](https://github.com/open-telemetry/opentelemetry-js/pull/3480) @legendecas
+
+### :house: (Internal)
+
+* chore: automatically generate tsconfigs [#3432](https://github.com/open-telemetry/opentelemetry-js/pull/3432) @legendecas
+* chore: enforce format with prettier [#3444](https://github.com/open-telemetry/opentelemetry-js/pull/3444) @legendecas
+
+## 1.8.0
+
+* `@opentelemetry/sdk-metrics` has been promoted to stable
+* `@opentelemetry/api-metrics` has been merged into `@opentelemetry/api` and deprecated
+
+### :boom: Breaking Change
+
+* feat(api): merge api-metrics into api [#3374](https://github.com/open-telemetry/opentelemetry-js/pull/3374) @legendecas
+
+### :rocket: (Enhancement)
+
+* feat(sdk-trace): re-export sdk-trace-base in sdk-trace-node and web [#3319](https://github.com/open-telemetry/opentelemetry-js/pull/3319) @legendecas
+* feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace): enforce consistent span durations
+  [#3327](https://github.com/open-telemetry/opentelemetry-js/pull/3327) @dyladan
+* fix(resources): fix EnvDetector throwing errors when attribute values contain spaces
+  [#3295](https://github.com/open-telemetry/opentelemetry-js/issues/3295)
+* fix(trace): fix an issue which caused negative span durations in web based spans
+  [#3359](https://github.com/open-telemetry/opentelemetry-js/pull/3359) @dyladan
+* fix(resources): strict OTEL_RESOURCE_ATTRIBUTES baggage octet decoding
+  [#3341](https://github.com/open-telemetry/opentelemetry-js/pull/3341) @legendecas
+
+### :books: (Refine Doc)
+
+* doc: Added Metrics documentation [#3360](https://github.com/open-telemetry/opentelemetry-js/pull/3360) @weyert
+* docs(api): fix counter negative value wording [#3396](https://github.com/open-telemetry/opentelemetry-js/pull/3396) @legendecas
+
+### :house: (Internal)
+
+* ci: run browser tests without circle [#3328](https://github.com/open-telemetry/opentelemetry-js/pull/3328) @dyladan
+
+## Metrics API 1.0.0
+
+Metrics API is now stable and generally available.
+There are no changes between 1.0.0 and the previous 0.33.0 version.
+
+### :boom: Breaking Change
+
+* Add semver check to metrics API [#3357](https://github.com/open-telemetry/opentelemetry-js/pull/3357) @dyladan
+  * Previously API versions were only considered compatible if the API was exactly the same
+
+## 1.7.0
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): make span start times resistant to hrtime clock drift
+  [#3129](https://github.com/open-telemetry/opentelemetry-js/issues/3129)
+
+* fix(sdk-trace-base): validate maxExportBatchSize in BatchSpanProcessorBase
+  [#3232](https://github.com/open-telemetry/opentelemetry-js/issues/3232)
+
+### :books: (Refine Doc)
+
+* docs(metrics): add missing metrics packages to SDK reference documentation [#3239](https://github.com/open-telemetry/opentelemetry-js/pull/3239) @dyladan
+
+### :house: (Internal)
+
+* deps: update markdownlint-cli to 0.32.2 [#3253](https://github.com/open-telemetry/opentelemetry-js/pull/3253) @pichlermarc
+
+## 1.6.0
+
+### :rocket: (Enhancement)
+
+* perf(opentelemetry-core): improve hexToBase64 performance [#3178](https://github.com/open-telemetry/opentelemetry-js/pull/3178) @seemk
 * feat(sdk-trace-base): move Sampler declaration into sdk-trace-base [#3088](https://github.com/open-telemetry/opentelemetry-js/pull/3088) @legendecas
 * fix(grpc-instrumentation): added grpc attributes in instrumentation [#3127](https://github.com/open-telemetry/opentelemetry-js/pull/3127) @andrewzenkov
+* feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
 
 ### :bug: (Bug Fix)
 
@@ -21,8 +193,6 @@ All notable changes to this project will be documented in this file.
 
 * chore: update trace-web example and rename it to opentelemetry-web [#3145](https://github.com/open-telemetry/opentelemetry-js/pull/3145) @pichlermarc
 * chore: update https example [#3152](https://github.com/open-telemetry/opentelemetry-js/pull/3152) @pichlermarc
-
-### :house: (Internal)
 
 ## 1.5.0
 

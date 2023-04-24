@@ -2,8 +2,8 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "allowJs": true,
-    "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "rootDir": "."
   },
   "include": [
     "src/**/*.ts",
@@ -11,6 +11,9 @@
     "test/**/*.ts"
   ],
   "references": [
+    {
+      "path": "../../../api"
+    },
     {
       "path": "../../../packages/opentelemetry-core"
     },

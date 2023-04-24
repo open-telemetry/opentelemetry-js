@@ -40,11 +40,10 @@ export class BindOnceFuture<
     if (!this._isCalled) {
       this._isCalled = true;
       try {
-        Promise.resolve(this._callback.call(this._that, ...args))
-          .then(
-            val => this._deferred.resolve(val),
-            err => this._deferred.reject(err)
-          );
+        Promise.resolve(this._callback.call(this._that, ...args)).then(
+          val => this._deferred.resolve(val),
+          err => this._deferred.reject(err)
+        );
       } catch (err) {
         this._deferred.reject(err);
       }

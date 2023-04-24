@@ -20,52 +20,59 @@ import { toAttributes } from '../common/internal';
 import { EStatusCode, IEvent, ILink, ISpan } from './types';
 import * as core from '@opentelemetry/core';
 
-export function sdkSpanToOtlpSpan(
-  span: ReadableSpan,
-  useHex?: boolean
-): ISpan {
+export function sdkSpanToOtlpSpan(span: ReadableSpan, useHex?: boolean): ISpan {
   const ctx = span.spanContext();
   const status = span.status;
-  const parentSpanId = useHex? span.parentSpanId : span.parentSpanId != null? core.hexToBase64(span.parentSpanId): undefined;
+  const parentSpanId = useHex
+    ? span.parentSpanId
+    : span.parentSpanId != null
+    ? core.hexToBase64(span.parentSpanId)
+    : undefined;
   return {
-    traceId: useHex? ctx.traceId : core.hexToBase64(ctx.traceId),
-    spanId: useHex? ctx.spanId : core.hexToBase64(ctx.spanId),
+    traceId: useHex ? ctx.traceId : core.hexToBase64(ctx.traceId),
+    spanId: useHex ? ctx.spanId : core.hexToBase64(ctx.spanId),
     parentSpanId: parentSpanId,
+    traceState: ctx.traceState?.serialize(),
     name: span.name,
     // Span kind is offset by 1 because the API does not define a value for unset
     kind: span.kind == null ? 0 : span.kind + 1,
     startTimeUnixNano: hrTimeToNanoseconds(span.startTime),
     endTimeUnixNano: hrTimeToNanoseconds(span.endTime),
     attributes: toAttributes(span.attributes),
-    droppedAttributesCount: 0,
+    droppedAttributesCount: span.droppedAttributesCount,
     events: span.events.map(toOtlpSpanEvent),
-    droppedEventsCount: 0,
+    droppedEventsCount: span.droppedEventsCount,
     status: {
       // API and proto enums share the same values
       code: status.code as unknown as EStatusCode,
       message: status.message,
     },
     links: span.links.map(link => toOtlpLink(link, useHex)),
-    droppedLinksCount: 0,
+    droppedLinksCount: span.droppedLinksCount,
   };
 }
 
 export function toOtlpLink(link: Link, useHex?: boolean): ILink {
   return {
     attributes: link.attributes ? toAttributes(link.attributes) : [],
-    spanId: useHex? link.context.spanId : core.hexToBase64(link.context.spanId),
-    traceId: useHex? link.context.traceId : core.hexToBase64(link.context.traceId),
-    droppedAttributesCount: 0,
+    spanId: useHex
+      ? link.context.spanId
+      : core.hexToBase64(link.context.spanId),
+    traceId: useHex
+      ? link.context.traceId
+      : core.hexToBase64(link.context.traceId),
+    traceState: link.context.traceState?.serialize(),
+    droppedAttributesCount: link.droppedAttributesCount || 0,
   };
 }
 
-export function toOtlpSpanEvent(
-  timedEvent: TimedEvent
-): IEvent {
+export function toOtlpSpanEvent(timedEvent: TimedEvent): IEvent {
   return {
-    attributes: timedEvent.attributes ? toAttributes(timedEvent.attributes) : [],
+    attributes: timedEvent.attributes
+      ? toAttributes(timedEvent.attributes)
+      : [],
     name: timedEvent.name,
     timeUnixNano: hrTimeToNanoseconds(timedEvent.time),
-    droppedAttributesCount: 0,
+    droppedAttributesCount: timedEvent.droppedAttributesCount || 0,
   };
 }

@@ -15,7 +15,11 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, BindOnceFuture } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  BindOnceFuture,
+} from '@opentelemetry/core';
 import {
   OTLPExporterError,
   OTLPExporterConfigBase,
@@ -30,7 +34,7 @@ export abstract class OTLPExporterBase<
   T extends OTLPExporterConfigBase,
   ExportItem,
   ServiceRequest
-  > {
+> {
   public readonly url: string;
   public readonly hostname: string | undefined;
   public readonly timeoutMillis: number;
@@ -66,7 +70,10 @@ export abstract class OTLPExporterBase<
    * @param items
    * @param resultCallback
    */
-  export(items: ExportItem[], resultCallback: (result: ExportResult) => void): void {
+  export(
+    items: ExportItem[],
+    resultCallback: (result: ExportResult) => void
+  ): void {
     if (this._shutdownOnce.isCalled) {
       resultCallback({
         code: ExportResultCode.FAILED,

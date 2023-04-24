@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import { Tracer, TracerProvider } from '@opentelemetry/api';
-import { NOOP_METER_PROVIDER } from '@opentelemetry/api-metrics';
+import {
+  Tracer,
+  TracerProvider,
+  Meter,
+  MeterOptions,
+  MeterProvider,
+} from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
@@ -25,6 +30,13 @@ class DummyTracerProvider implements TracerProvider {
     throw new Error('not implemented');
   }
 }
+
+class DummyMeterProvider implements MeterProvider {
+  getMeter(name: string, version?: string, options?: MeterOptions): Meter {
+    throw new Error('not implemented');
+  }
+}
+
 class FooInstrumentation extends InstrumentationBase {
   init() {
     return [];
@@ -50,14 +62,14 @@ describe('autoLoader', () => {
       let instrumentation: InstrumentationBase;
       let enableSpy: sinon.SinonSpy;
       let setTracerProviderSpy: sinon.SinonSpy;
-      let setsetMeterProvider: sinon.SinonSpy;
+      let setMeterProviderSpy: sinon.SinonSpy;
       const tracerProvider = new DummyTracerProvider();
-      const meterProvider = NOOP_METER_PROVIDER;
+      const meterProvider = new DummyMeterProvider();
       beforeEach(() => {
         instrumentation = new FooInstrumentation('foo', '1', {});
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
-        setsetMeterProvider = sinon.stub(instrumentation, 'setMeterProvider');
+        setMeterProviderSpy = sinon.stub(instrumentation, 'setMeterProvider');
         unload = registerInstrumentations({
           instrumentations: [instrumentation],
           tracerProvider,
@@ -78,13 +90,12 @@ describe('autoLoader', () => {
           unload();
           unload = undefined;
         }
-        instrumentation = new FooInstrumentation(
-          'foo',
-          '1',
-          { enabled: false }
-        );
+        instrumentation = new FooInstrumentation('foo', '1', {
+          enabled: false,
+        });
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
+        setMeterProviderSpy = sinon.stub(instrumentation, 'setMeterProvider');
         unload = registerInstrumentations({
           instrumentations: [instrumentation],
           tracerProvider,
@@ -104,9 +115,9 @@ describe('autoLoader', () => {
       });
 
       it('should set MeterProvider', () => {
-        assert.strictEqual(setsetMeterProvider.callCount, 1);
-        assert.ok(setsetMeterProvider.lastCall.args[0] === meterProvider);
-        assert.strictEqual(setsetMeterProvider.lastCall.args.length, 1);
+        assert.strictEqual(setMeterProviderSpy.callCount, 1);
+        assert.ok(setMeterProviderSpy.lastCall.args[0] === meterProvider);
+        assert.strictEqual(setMeterProviderSpy.lastCall.args.length, 1);
       });
     });
   });

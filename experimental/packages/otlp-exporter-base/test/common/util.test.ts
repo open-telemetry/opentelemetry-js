@@ -20,7 +20,8 @@ import { diag } from '@opentelemetry/api';
 import {
   parseHeaders,
   appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded
+  appendRootPathToUrlIfNeeded,
+  parseRetryAfterToMills,
 } from '../../src/util';
 
 describe('utils', () => {
@@ -84,24 +85,63 @@ describe('utils', () => {
   describe('appendRootPathToUrlIfNeeded - specifc signal http endpoint', () => {
     it('should append root path when missing', () => {
       const url = 'http://foo.bar';
-      const resourcePath = 'v1/traces';
 
-      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+      const finalUrl = appendRootPathToUrlIfNeeded(url);
       assert.strictEqual(finalUrl, url + '/');
     });
     it('should not append root path and return same url', () => {
       const url = 'http://foo.bar/';
-      const resourcePath = 'v1/traces';
 
-      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+      const finalUrl = appendRootPathToUrlIfNeeded(url);
       assert.strictEqual(finalUrl, url);
     });
-    it('should append root path when url contains resource path', () => {
-      const url = 'http://foo.bar/v1/traces';
-      const resourcePath = 'v1/traces';
+    it('should not append root path when url contains resource path', () => {
+      {
+        const url = 'http://foo.bar/v1/traces';
 
-      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+        const finalUrl = appendRootPathToUrlIfNeeded(url);
+        assert.strictEqual(finalUrl, url);
+      }
+      {
+        const url = 'https://endpoint/something';
+
+        const finalUrl = appendRootPathToUrlIfNeeded(url);
+        assert.strictEqual(finalUrl, url);
+      }
+    });
+
+    it('should not change string when url is not parseable', () => {
+      const url = 'this is not a URL';
+
+      const finalUrl = appendRootPathToUrlIfNeeded(url);
       assert.strictEqual(finalUrl, url);
     });
   });
+});
+
+describe('parseRetryAfterToMills', () => {
+  // now: 2023-01-20T00:00:00.000Z
+  const tests = [
+    [null, -1],
+    // duration
+    ['-100', -1],
+    ['1000', 1000 * 1000],
+    // future timestamp
+    ['Fri, 20 Jan 2023 00:00:01 GMT', 1000],
+    // Past timestamp
+    ['Fri, 19 Jan 2023 23:59:59 GMT', 0],
+  ] as [string | null, number][];
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  for (const [value, expect] of tests) {
+    it(`test ${value}`, () => {
+      sinon.useFakeTimers({
+        now: new Date('2023-01-20T00:00:00.000Z'),
+      });
+      assert.strictEqual(parseRetryAfterToMills(value), expect);
+    });
+  }
 });

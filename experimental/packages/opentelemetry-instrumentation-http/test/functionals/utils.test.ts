@@ -20,6 +20,7 @@ import {
   SpanKind,
   TraceFlags,
   context,
+  Attributes,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -28,12 +29,12 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import {IgnoreMatcher, ParsedRequestOptions} from '../../src/types';
+import { IgnoreMatcher, ParsedRequestOptions } from '../../src/types';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import {extractHostnameAndPort} from '../../src/utils';
+import { extractHostnameAndPort } from '../../src/utils';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -119,7 +120,7 @@ describe('Utility', () => {
 
     it('should throw if type is unknown', () => {
       try {
-        utils.satisfiesPattern('/TeSt/1', (true as unknown) as IgnoreMatcher);
+        utils.satisfiesPattern('/TeSt/1', true as unknown as IgnoreMatcher);
         assert.fail();
       } catch (error) {
         assert.strictEqual(error instanceof TypeError, true);
@@ -293,7 +294,7 @@ describe('Utility', () => {
         setRPCMetadata(context.active(), {
           type: RPCType.HTTP,
           route: '/user/:id',
-          span: (null as unknown) as Span,
+          span: null as unknown as Span,
         }),
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
@@ -318,6 +319,31 @@ describe('Utility', () => {
         socket: {},
       } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
+    });
+  });
+
+  describe('getIncomingRequestMetricAttributesOnResponse()', () => {
+    it('should correctly add http_route if span has it', () => {
+      const spanAttributes: Attributes = {
+        [SemanticAttributes.HTTP_ROUTE]: '/user/:id',
+      };
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+
+      assert.deepStrictEqual(
+        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        '/user/:id'
+      );
+    });
+
+    it('should skip http_route if span does not have it', () => {
+      const spanAttributes: Attributes = {};
+      const metricAttributes =
+        utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
+      assert.deepEqual(
+        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        undefined
+      );
     });
   });
   // Verify the key in the given attributes is set to the given value,
@@ -466,14 +492,33 @@ describe('Utility', () => {
     it('should not set http.route in http span attributes', () => {
       const request = {
         url: 'http://hostname/user/:id',
-        method: 'GET'
+        method: 'GET',
       } as IncomingMessage;
       request.headers = {
         'user-agent': 'chrome',
-        'x-forwarded-for': '<client>, <proxy1>, <proxy2>'
+        'x-forwarded-for': '<client>, <proxy1>, <proxy2>',
       };
-      const attributes = utils.getIncomingRequestAttributes(request, { component: 'http'});
+      const attributes = utils.getIncomingRequestAttributes(request, {
+        component: 'http',
+      });
       assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
+    });
+
+    it('should set http.target as path in http span attributes', () => {
+      const request = {
+        url: 'http://hostname/user/?q=val',
+        method: 'GET',
+      } as IncomingMessage;
+      request.headers = {
+        'user-agent': 'chrome',
+      };
+      const attributes = utils.getIncomingRequestAttributes(request, {
+        component: 'http',
+      });
+      assert.strictEqual(
+        attributes[SemanticAttributes.HTTP_TARGET],
+        '/user/?q=val'
+      );
     });
   });
 
@@ -493,13 +538,23 @@ describe('Utility', () => {
     it('should set attributes for request and response keys', () => {
       utils.headerCapture('request', ['Origin'])(span, () => 'localhost');
       utils.headerCapture('response', ['Cookie'])(span, () => 'token=123');
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
-      assert.deepStrictEqual(span.attributes['http.response.header.cookie'], ['token=123']);
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
+        'localhost',
+      ]);
+      assert.deepStrictEqual(span.attributes['http.response.header.cookie'], [
+        'token=123',
+      ]);
     });
 
     it('should set attributes for multiple values', () => {
-      utils.headerCapture('request', ['Origin'])(span, () => ['localhost', 'www.example.com']);
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost', 'www.example.com']);
+      utils.headerCapture('request', ['Origin'])(span, () => [
+        'localhost',
+        'www.example.com',
+      ]);
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
+        'localhost',
+        'www.example.com',
+      ]);
     });
 
     it('sets attributes for multiple headers', () => {
@@ -515,13 +570,18 @@ describe('Utility', () => {
         return undefined;
       });
 
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
+        'localhost',
+      ]);
       assert.deepStrictEqual(span.attributes['http.request.header.foo'], [42]);
     });
 
     it('should normalize header names', () => {
       utils.headerCapture('request', ['X-Forwarded-For'])(span, () => 'foo');
-      assert.deepStrictEqual(span.attributes['http.request.header.x_forwarded_for'], ['foo']);
+      assert.deepStrictEqual(
+        span.attributes['http.request.header.x_forwarded_for'],
+        ['foo']
+      );
     });
 
     it('ignores non-existent headers', () => {
@@ -533,60 +593,77 @@ describe('Utility', () => {
         return undefined;
       });
 
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
-      assert.deepStrictEqual(span.attributes['http.request.header.accept'], undefined);
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
+        'localhost',
+      ]);
+      assert.deepStrictEqual(
+        span.attributes['http.request.header.accept'],
+        undefined
+      );
     });
   });
 
   describe('extractHostnameAndPort', () => {
     it('should return the hostname and port defined in the parsedOptions', () => {
-      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      type tmpParsedOption = Pick<
+        ParsedRequestOptions,
+        'hostname' | 'host' | 'port' | 'protocol'
+      >;
       const parsedOption: tmpParsedOption = {
         hostname: 'www.google.com',
         port: '80',
         host: 'www.google.com',
-        protocol: 'http:'
+        protocol: 'http:',
       };
-      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, parsedOption.hostname);
       assert.strictEqual(port, parsedOption.port);
     });
 
     it('should return the hostname and port based on host field defined in the parsedOptions when hostname and port are missing', () => {
-      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      type tmpParsedOption = Pick<
+        ParsedRequestOptions,
+        'hostname' | 'host' | 'port' | 'protocol'
+      >;
       const parsedOption: tmpParsedOption = {
         hostname: null,
         port: null,
         host: 'www.google.com:8181',
-        protocol: 'http:'
+        protocol: 'http:',
       };
-      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '8181');
     });
 
     it('should infer the port number based on protocol https when can not extract it from host field', () => {
-      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      type tmpParsedOption = Pick<
+        ParsedRequestOptions,
+        'hostname' | 'host' | 'port' | 'protocol'
+      >;
       const parsedOption: tmpParsedOption = {
         hostname: null,
         port: null,
         host: 'www.google.com',
-        protocol: 'https:'
+        protocol: 'https:',
       };
-      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '443');
     });
 
     it('should infer the port number based on protocol http when can not extract it from host field', () => {
-      type tmpParsedOption = Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>;
+      type tmpParsedOption = Pick<
+        ParsedRequestOptions,
+        'hostname' | 'host' | 'port' | 'protocol'
+      >;
       const parsedOption: tmpParsedOption = {
         hostname: null,
         port: null,
         host: 'www.google.com',
-        protocol: 'http:'
+        protocol: 'http:',
       };
-      const {hostname, port} = extractHostnameAndPort(parsedOption);
+      const { hostname, port } = extractHostnameAndPort(parsedOption);
       assert.strictEqual(hostname, 'www.google.com');
       assert.strictEqual(port, '80');
     });

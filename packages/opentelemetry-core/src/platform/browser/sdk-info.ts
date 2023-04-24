@@ -24,6 +24,7 @@ import {
 export const SDK_INFO = {
   [SemanticResourceAttributes.TELEMETRY_SDK_NAME]: 'opentelemetry',
   [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
-  [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]: TelemetrySdkLanguageValues.WEBJS,
+  [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
+    TelemetrySdkLanguageValues.WEBJS,
   [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]: VERSION,
 };

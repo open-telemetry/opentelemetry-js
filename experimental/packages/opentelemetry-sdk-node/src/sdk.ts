@@ -14,27 +14,41 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
-import { metrics } from '@opentelemetry/api-metrics';
+import {
+  ContextManager,
+  TextMapPropagator,
+  metrics,
+  diag,
+  DiagConsoleLogger,
+} from '@opentelemetry/api';
 import {
   InstrumentationOption,
-  registerInstrumentations
+  registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
-  detectResources,
+  Detector,
+  DetectorSync,
+  detectResourcesSync,
   envDetector,
+  IResource,
   processDetector,
   Resource,
-  ResourceDetectionConfig
+  ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
-  SpanProcessor
+  SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import {
+  NodeTracerConfig,
+  NodeTracerProvider,
+} from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
+import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
+import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import { parseInstrumentationOptions } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -42,15 +56,13 @@ export type MeterProviderConfig = {
   /**
    * Reference to the MetricReader instance by the NodeSDK
    */
-  reader?: MetricReader
+  reader?: MetricReader;
   /**
-   * Lists the views that should be passed when meterProvider
-   *
-   * Note: This is only getting used when NodeSDK is responsible for
-   * instantiated an instance of MeterProvider
+   * List of {@link View}s that should be passed to the MeterProvider
    */
-  views?: View[]
+  views?: View[];
 };
+
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -61,19 +73,43 @@ export class NodeSDK {
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
 
-  private _resource: Resource;
+  private _resource: IResource;
+  private _resourceDetectors: Array<Detector | DetectorSync>;
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider;
+  private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
+
+  private _disabled?: boolean;
 
   /**
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
+    const env = getEnv();
+    const envWithoutDefaults = getEnvWithoutDefaults();
+
+    if (env.OTEL_SDK_DISABLED) {
+      this._disabled = true;
+      // Functions with possible side-effects are set
+      // to no-op via the _disabled flag
+    }
+
+    // Default is INFO, use environment without defaults to check
+    // if the user originally set the environment variable.
+    if (envWithoutDefaults.OTEL_LOG_LEVEL) {
+      diag.setLogger(new DiagConsoleLogger(), {
+        logLevel: envWithoutDefaults.OTEL_LOG_LEVEL,
+      });
+    }
+
     this._resource = configuration.resource ?? new Resource({});
+    this._resourceDetectors = configuration.resourceDetectors ?? [
+      envDetector,
+      processDetector,
+    ];
 
     this._serviceName = configuration.serviceName;
 
@@ -87,6 +123,9 @@ export class NodeSDK {
       }
       if (configuration.spanLimits) {
         tracerProviderConfig.spanLimits = configuration.spanLimits;
+      }
+      if (configuration.idGenerator) {
+        tracerProviderConfig.idGenerator = configuration.idGenerator;
       }
 
       const spanProcessor =
@@ -156,7 +195,9 @@ export class NodeSDK {
 
     // make sure we do not override existing reader with another reader.
     if (this._meterProviderConfig.reader != null && config.reader != null) {
-      throw new Error('MetricReader passed but MetricReader has already been configured.');
+      throw new Error(
+        'MetricReader passed but MetricReader has already been configured.'
+      );
     }
 
     // set reader, but make sure we do not override existing reader with null/undefined.
@@ -166,50 +207,67 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources(
-    config?: ResourceDetectionConfig
-  ): Promise<void> {
+  public detectResources(): void {
+    if (this._disabled) {
+      return;
+    }
+
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [envDetector, processDetector],
-      ...config,
+      detectors: this._resourceDetectors,
     };
 
-    this.addResource(await detectResources(internalConfig));
+    this.addResource(detectResourcesSync(internalConfig));
   }
 
   /** Manually add a resource */
-  public addResource(resource: Resource): void {
+  public addResource(resource: IResource): void {
     this._resource = this._resource.merge(resource);
   }
 
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public async start(): Promise<void> {
-    if (this._autoDetectResources) {
-      await this.detectResources();
+  public start(): void {
+    if (this._disabled) {
+      return;
     }
 
-    this._resource = this._serviceName === undefined
-      ? this._resource
-      : this._resource.merge(new Resource(
-        { [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName }
-      ));
+    registerInstrumentations({
+      instrumentations: this._instrumentations,
+    });
+
+    if (this._autoDetectResources) {
+      this.detectResources();
+    }
+
+    this._resource =
+      this._serviceName === undefined
+        ? this._resource
+        : this._resource.merge(
+            new Resource({
+              [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName,
+            })
+          );
+
+    const Provider = this._tracerProviderConfig
+      ? NodeTracerProvider
+      : TracerProviderWithEnvExporters;
+
+    const tracerProvider = new Provider({
+      ...this._tracerProviderConfig?.tracerConfig,
+      resource: this._resource,
+    });
+
+    this._tracerProvider = tracerProvider;
 
     if (this._tracerProviderConfig) {
-      const tracerProvider = new NodeTracerProvider({
-        ...this._tracerProviderConfig.tracerConfig,
-        resource: this._resource,
-      });
-
-      this._tracerProvider = tracerProvider;
-
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
-      tracerProvider.register({
-        contextManager: this._tracerProviderConfig.contextManager,
-        propagator: this._tracerProviderConfig.textMapPropagator,
-      });
     }
+
+    tracerProvider.register({
+      contextManager: this._tracerProviderConfig?.contextManager,
+      propagator: this._tracerProviderConfig?.textMapPropagator,
+    });
 
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
@@ -224,11 +282,16 @@ export class NodeSDK {
       this._meterProvider = meterProvider;
 
       metrics.setGlobalMeterProvider(meterProvider);
-    }
 
-    registerInstrumentations({
-      instrumentations: this._instrumentations,
-    });
+      // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
+      // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
+      // This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
+      for (const instrumentation of parseInstrumentationOptions(
+        this._instrumentations
+      )) {
+        instrumentation.setMeterProvider(metrics.getMeterProvider());
+      }
+    }
   }
 
   public shutdown(): Promise<void> {
@@ -243,8 +306,7 @@ export class NodeSDK {
     return (
       Promise.all(promises)
         // return void instead of the array from Promise.all
-        .then(() => {
-        })
+        .then(() => {})
     );
   }
 }

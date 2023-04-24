@@ -3,6 +3,10 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This package is intended for internal use only.**
+
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides a base exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
 
 ## Installation
@@ -37,6 +41,3 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/otlp-proto-exporter-base
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fotlp-exporter-base.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
-[opentelemetry-spec-protocol-exporter]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
-[semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
-[metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http

@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-import { Counter, Histogram, ObservableGauge, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
+import {
+  Counter,
+  Histogram,
+  ObservableGauge,
+  ObservableResult,
+  ValueType,
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
 import {
-  AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader,
@@ -29,10 +34,6 @@ import {
 import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
 
 class TestMetricReader extends MetricReader {
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
-  }
-
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
   }
@@ -42,11 +43,11 @@ class TestMetricReader extends MetricReader {
   }
 }
 
-const testResource = Resource.default().merge(new Resource({
+const testResource = new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
-}));
+});
 
 let meterProvider = new MeterProvider({ resource: testResource });
 
@@ -66,13 +67,11 @@ export function setUp() {
       new View({
         aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
         instrumentName: 'int-histogram',
-      })
-    ]
+      }),
+    ],
   });
   reader = new TestMetricReader();
-  meterProvider.addMetricReader(
-    reader
-  );
+  meterProvider.addMetricReader(reader);
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 
@@ -92,13 +91,10 @@ export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void
 ): ObservableGauge {
   const name = 'double-observable-gauge';
-  const observableGauge = meter.createObservableGauge(
-    name,
-    {
-      description: 'sample observable gauge description',
-      valueType: ValueType.DOUBLE,
-    },
-  );
+  const observableGauge = meter.createObservableGauge(name, {
+    description: 'sample observable gauge description',
+    valueType: ValueType.DOUBLE,
+  });
   observableGauge.addCallback(callback);
 
   return observableGauge;
@@ -111,9 +107,7 @@ export function mockHistogram(): Histogram {
   });
 }
 
-export function ensureExportedAttributesAreCorrect(
-  attributes: IKeyValue[]
-) {
+export function ensureExportedAttributesAreCorrect(attributes: IKeyValue[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -219,38 +213,36 @@ export function ensureExportedHistogramIsCorrect(
   });
 }
 
-export function ensureResourceIsCorrect(
-  resource: IResource
-) {
+export function ensureResourceIsCorrect(resource: IResource) {
   assert.deepStrictEqual(resource, {
     attributes: [
       {
-        'key': 'service.name',
-        'value': {
-          'stringValue': `unknown_service:${process.argv0}`,
-          'value': 'stringValue'
-        }
+        key: 'service.name',
+        value: {
+          stringValue: `unknown_service:${process.argv0}`,
+          value: 'stringValue',
+        },
       },
       {
-        'key': 'telemetry.sdk.language',
-        'value': {
-          'stringValue': 'nodejs',
-          'value': 'stringValue'
-        }
+        key: 'telemetry.sdk.language',
+        value: {
+          stringValue: 'nodejs',
+          value: 'stringValue',
+        },
       },
       {
-        'key': 'telemetry.sdk.name',
-        'value': {
-          'stringValue': 'opentelemetry',
-          'value': 'stringValue'
-        }
+        key: 'telemetry.sdk.name',
+        value: {
+          stringValue: 'opentelemetry',
+          value: 'stringValue',
+        },
       },
       {
-        'key': 'telemetry.sdk.version',
-        'value': {
-          'stringValue': VERSION,
-          'value': 'stringValue'
-        }
+        key: 'telemetry.sdk.version',
+        value: {
+          stringValue: VERSION,
+          value: 'stringValue',
+        },
       },
       {
         key: 'service',

@@ -4,6 +4,7 @@ on:
     branches:
       - main
   pull_request:
+  merge_group:
 
 jobs:
   node-tests:
@@ -50,13 +51,16 @@ jobs:
           npm run compile
 
       - name: Unit tests
-        run: npm run test
+        run: |
+          # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
+          if [ "${{ matrix.node_version }}" = "18" ]; then
+            export NODE_OPTIONS=--openssl-legacy-provider
+          fi
+          npm run test
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '14' }}
   node-windows-tests:
-    strategy:
-      fail-fast: false
     runs-on: windows-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -90,21 +94,22 @@ jobs:
 
       - name: Build 🔧
         run: |
+          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
           npm run compile
 
       - name: Unit tests
         run: npm run test
   browser-tests:
     runs-on: ubuntu-latest
-    container:
-      image: circleci/node:16-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
-      - name: Permission Setup
-        run: sudo chmod -R 777 /github /__w
       - name: Checkout
         uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
       - name: restore lerna
         id: cache
@@ -127,8 +132,6 @@ jobs:
       - name: Build 🔧
         run: |
           npm run compile
-          # run additional compilation variants
-          npx lerna run compile
 
       - name: Unit tests
         run: npm run test:browser
@@ -136,15 +139,14 @@ jobs:
         run: npm run codecov:browser
   webworker-tests:
     runs-on: ubuntu-latest
-    container:
-      image: circleci/node:16-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
-      - name: Permission Setup
-        run: sudo chmod -R 777 /github /__w
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.0.2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
       - name: restore lerna
         id: cache
@@ -167,10 +169,36 @@ jobs:
       - name: Build 🔧
         run: |
           npm run compile
-          # run additional compilation variants
-          npx lerna run compile
 
       - name: Unit tests
         run: npm run test:webworker
       - name: Report Coverage
         run: npm run codecov:webworker
+  api-eol-node-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version:
+          - "8"
+          - "10"
+          - "12"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: Build
+        working-directory: ./api
+        run: |
+          npm install --ignore-scripts
+          npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
+          node ../scripts/version-update.js
+          npx tsc --build tsconfig.json tsconfig.esm.json
+
+      - name: Test
+        working-directory: ./api
+        run: npm test

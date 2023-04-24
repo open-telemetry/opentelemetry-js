@@ -23,4 +23,15 @@ export interface GrpcInstrumentationConfig extends InstrumentationConfig {
    * the IgnoreMatchers in the ignoreGrpcMethods list
    */
   ignoreGrpcMethods?: IgnoreMatcher[];
+  /** Map the following gRPC metadata to span attributes. */
+  metadataToSpanAttributes?: {
+    client?: {
+      responseMetadata?: string[];
+      requestMetadata?: string[];
+    };
+    server?: {
+      responseMetadata?: string[];
+      requestMetadata?: string[];
+    };
+  };
 }

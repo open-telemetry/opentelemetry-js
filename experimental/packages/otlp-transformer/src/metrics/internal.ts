@@ -13,50 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ValueType } from '@opentelemetry/api-metrics';
+import { ValueType } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   DataPoint,
   DataPointType,
+  ExponentialHistogram,
   Histogram,
   MetricData,
   ResourceMetrics,
-  ScopeMetrics
+  ScopeMetrics,
 } from '@opentelemetry/sdk-metrics';
 import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
+  IExponentialHistogramDataPoint,
   IHistogramDataPoint,
   IMetric,
   INumberDataPoint,
   IResourceMetrics,
-  IScopeMetrics
+  IScopeMetrics,
 } from './types';
 
-export function toResourceMetrics(resourceMetrics: ResourceMetrics): IResourceMetrics {
+export function toResourceMetrics(
+  resourceMetrics: ResourceMetrics
+): IResourceMetrics {
   return {
     resource: {
       attributes: toAttributes(resourceMetrics.resource.attributes),
-      droppedAttributesCount: 0
+      droppedAttributesCount: 0,
     },
     schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
-    scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics)
+    scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics),
   };
 }
 
 export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[] {
-  return Array.from(scopeMetrics.map(metrics => {
-    const scopeMetrics: IScopeMetrics = {
-      scope: {
-        name: metrics.scope.name,
-        version: metrics.scope.version,
-      },
-      metrics: metrics.metrics.map(metricData => toMetric(metricData)),
-      schemaUrl: metrics.scope.schemaUrl
-    };
-    return scopeMetrics;
-  }));
+  return Array.from(
+    scopeMetrics.map(metrics => {
+      const scopeMetrics: IScopeMetrics = {
+        scope: {
+          name: metrics.scope.name,
+          version: metrics.scope.version,
+        },
+        metrics: metrics.metrics.map(metricData => toMetric(metricData)),
+        schemaUrl: metrics.scope.schemaUrl,
+      };
+      return scopeMetrics;
+    })
+  );
 }
 
 export function toMetric(metricData: MetricData): IMetric {
@@ -66,38 +72,47 @@ export function toMetric(metricData: MetricData): IMetric {
     unit: metricData.descriptor.unit,
   };
 
-  const aggregationTemporality = toAggregationTemporality(metricData.aggregationTemporality);
+  const aggregationTemporality = toAggregationTemporality(
+    metricData.aggregationTemporality
+  );
 
   if (metricData.dataPointType === DataPointType.SUM) {
     out.sum = {
       aggregationTemporality,
       isMonotonic: metricData.isMonotonic,
-      dataPoints: toSingularDataPoints(metricData)
+      dataPoints: toSingularDataPoints(metricData),
     };
   } else if (metricData.dataPointType === DataPointType.GAUGE) {
     // Instrument is a gauge.
     out.gauge = {
-      dataPoints: toSingularDataPoints(metricData)
+      dataPoints: toSingularDataPoints(metricData),
     };
   } else if (metricData.dataPointType === DataPointType.HISTOGRAM) {
     out.histogram = {
       aggregationTemporality,
-      dataPoints: toHistogramDataPoints(metricData)
+      dataPoints: toHistogramDataPoints(metricData),
+    };
+  } else if (metricData.dataPointType === DataPointType.EXPONENTIAL_HISTOGRAM) {
+    out.exponentialHistogram = {
+      aggregationTemporality,
+      dataPoints: toExponentialHistogramDataPoints(metricData),
     };
   }
 
   return out;
 }
 
-function toSingularDataPoint(dataPoint: DataPoint<number> | DataPoint<Histogram>, valueType: ValueType) {
+function toSingularDataPoint(
+  dataPoint:
+    | DataPoint<number>
+    | DataPoint<Histogram>
+    | DataPoint<ExponentialHistogram>,
+  valueType: ValueType
+) {
   const out: INumberDataPoint = {
     attributes: toAttributes(dataPoint.attributes),
-    startTimeUnixNano: hrTimeToNanoseconds(
-      dataPoint.startTime
-    ),
-    timeUnixNano: hrTimeToNanoseconds(
-      dataPoint.endTime
-    ),
+    startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
+    timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
   };
 
   if (valueType === ValueType.INT) {
@@ -109,17 +124,13 @@ function toSingularDataPoint(dataPoint: DataPoint<number> | DataPoint<Histogram>
   return out;
 }
 
-function toSingularDataPoints(
-  metricData: MetricData
-): INumberDataPoint[] {
+function toSingularDataPoints(metricData: MetricData): INumberDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     return toSingularDataPoint(dataPoint, metricData.descriptor.valueType);
   });
 }
 
-function toHistogramDataPoints(
-  metricData: MetricData
-): IHistogramDataPoint[] {
+function toHistogramDataPoints(metricData: MetricData): IHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
     return {
@@ -131,15 +142,40 @@ function toHistogramDataPoints(
       min: histogram.min,
       max: histogram.max,
       startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-      timeUnixNano: hrTimeToNanoseconds(
-        dataPoint.endTime
-      ),
+      timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
+    };
+  });
+}
+
+function toExponentialHistogramDataPoints(
+  metricData: MetricData
+): IExponentialHistogramDataPoint[] {
+  return metricData.dataPoints.map(dataPoint => {
+    const histogram = dataPoint.value as ExponentialHistogram;
+    return {
+      attributes: toAttributes(dataPoint.attributes),
+      count: histogram.count,
+      min: histogram.min,
+      max: histogram.max,
+      sum: histogram.sum,
+      positive: {
+        offset: histogram.positive.offset,
+        bucketCounts: histogram.positive.bucketCounts,
+      },
+      negative: {
+        offset: histogram.negative.offset,
+        bucketCounts: histogram.negative.bucketCounts,
+      },
+      scale: histogram.scale,
+      zeroCount: histogram.zeroCount,
+      startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
+      timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
     };
   });
 }
 
 function toAggregationTemporality(
-  temporality: AggregationTemporality,
+  temporality: AggregationTemporality
 ): EAggregationTemporality {
   if (temporality === AggregationTemporality.DELTA) {
     return EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA;

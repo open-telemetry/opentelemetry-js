@@ -20,25 +20,16 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
-import { IEvent, IKeyValue, ILink, IResource, ISpan } from '@opentelemetry/otlp-transformer';
+import {
+  IEvent,
+  IKeyValue,
+  ILink,
+  IResource,
+  ISpan,
+} from '@opentelemetry/otlp-transformer';
 
 const traceIdArr = [
-  31,
-  16,
-  8,
-  220,
-  142,
-  39,
-  14,
-  133,
-  196,
-  10,
-  13,
-  124,
-  57,
-  57,
-  178,
-  120,
+  31, 16, 8, 220, 142, 39, 14, 133, 196, 10, 13, 124, 57, 57, 178, 120,
 ];
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
@@ -70,34 +61,51 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   events: [
-    { name: 'fetchStart', time: [1574120165, 429803070] },
+    {
+      name: 'fetchStart',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'domainLookupStart',
       time: [1574120165, 429803070],
     },
-    { name: 'domainLookupEnd', time: [1574120165, 429803070] },
+    {
+      name: 'domainLookupEnd',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'connectStart',
       time: [1574120165, 429803070],
     },
-    { name: 'connectEnd', time: [1574120165, 429803070] },
+    {
+      name: 'connectEnd',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'requestStart',
       time: [1574120165, 435513070],
     },
-    { name: 'responseStart', time: [1574120165, 436923070] },
+    {
+      name: 'responseStart',
+      time: [1574120165, 436923070],
+    },
     {
       name: 'responseEnd',
       time: [1574120165, 438688070],
     },
   ],
   duration: [0, 8885000],
-  resource: Resource.default().merge(new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  })),
+  resource: Resource.default().merge(
+    new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    })
+  ),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  droppedAttributesCount: 0,
+  droppedEventsCount: 0,
+  droppedLinksCount: 0,
 };
 
 export function ensureExportedEventsAreCorrect(events: IEvent[]) {
@@ -257,32 +265,32 @@ export function ensureResourceIsCorrect(resource: IResource) {
   assert.deepStrictEqual(resource, {
     attributes: [
       {
-        'key': 'service.name',
-        'value': {
-          'stringValue': `unknown_service:${process.argv0}`,
-          'value': 'stringValue'
-        }
+        key: 'service.name',
+        value: {
+          stringValue: `unknown_service:${process.argv0}`,
+          value: 'stringValue',
+        },
       },
       {
-        'key': 'telemetry.sdk.language',
-        'value': {
-          'stringValue': 'nodejs',
-          'value': 'stringValue'
-        }
+        key: 'telemetry.sdk.language',
+        value: {
+          stringValue: 'nodejs',
+          value: 'stringValue',
+        },
       },
       {
-        'key': 'telemetry.sdk.name',
-        'value': {
-          'stringValue': 'opentelemetry',
-          'value': 'stringValue'
-        }
+        key: 'telemetry.sdk.name',
+        value: {
+          stringValue: 'opentelemetry',
+          value: 'stringValue',
+        },
       },
       {
-        'key': 'telemetry.sdk.version',
-        'value': {
-          'stringValue': VERSION,
-          'value': 'stringValue'
-        }
+        key: 'telemetry.sdk.version',
+        value: {
+          stringValue: VERSION,
+          value: 'stringValue',
+        },
       },
       {
         key: 'service',

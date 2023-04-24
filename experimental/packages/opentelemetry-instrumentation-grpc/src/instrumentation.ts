@@ -19,7 +19,6 @@ import { VERSION } from './version';
 import { GrpcNativeInstrumentation } from './grpc';
 import { GrpcJsInstrumentation } from './grpc-js';
 import * as api from '@opentelemetry/api';
-import { MeterProvider } from '@opentelemetry/api-metrics';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
@@ -32,9 +31,7 @@ export class GrpcInstrumentation {
     '@opentelemetry/instrumentation-grpc';
   public readonly instrumentationVersion: string = VERSION;
 
-  constructor(
-    config?: GrpcInstrumentationConfig
-  ) {
+  constructor(config?: GrpcInstrumentationConfig) {
     this._grpcJsInstrumentation = new GrpcJsInstrumentation(
       this.instrumentationName,
       this.instrumentationVersion,
@@ -81,7 +78,7 @@ export class GrpcInstrumentation {
    * Sets MeterProvider to this plugin
    * @param meterProvider
    */
-  public setMeterProvider(meterProvider: MeterProvider) {
+  public setMeterProvider(meterProvider: api.MeterProvider) {
     this._grpcJsInstrumentation.setMeterProvider(meterProvider);
     this._grpcNativeInstrumentation.setMeterProvider(meterProvider);
   }

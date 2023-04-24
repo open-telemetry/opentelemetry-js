@@ -21,14 +21,16 @@ import {
   isValidTraceId,
   TextMapGetter,
   TextMapPropagator,
-  TextMapSetter, trace,
+  TextMapSetter,
+  trace,
   TraceFlags,
 } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
 import { B3_DEBUG_FLAG_KEY } from './common';
 import { B3_CONTEXT_HEADER } from './constants';
 
-const B3_CONTEXT_REGEX = /((?:[0-9a-f]{16}){1,2})-([0-9a-f]{16})(?:-([01d](?![0-9a-f])))?(?:-([0-9a-f]{16}))?/;
+const B3_CONTEXT_REGEX =
+  /((?:[0-9a-f]{16}){1,2})-([0-9a-f]{16})(?:-([01d](?![0-9a-f])))?(?:-([0-9a-f]{16}))?/;
 const PADDING = '0'.repeat(16);
 const SAMPLED_VALUES = new Set(['d', '1']);
 const DEBUG_STATE = 'd';

@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides exporter for node to be used with OTLP (`http/protobuf`) compatible receivers.
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.32 <=0.53`.
 
@@ -26,7 +28,7 @@ const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-pr
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
 };
-const exporter = new OTLPMetricExporter(collectorOptions);
+const metricExporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({});
 
 meterProvider.addMetricReader(new PeriodicExportingMetricReader({
@@ -40,6 +42,19 @@ const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
 
 ```
+
+## Environment Variable Configuration
+
+In addition to settings passed to the constructor, the exporter also supports configuration via environment variables:
+
+| Environment variable                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                |
+|---------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| OTEL_EXPORTER_OTLP_ENDPOINT                       | The endpoint to send metrics to. This will also be used for the traces exporter if `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is not configured. By default `http://localhost:4318` will be used. `/v1/metrics` will be automatically appended to configured values.                                                                                                                                                             |
+| OTEL_EXPORTER_OTLP_METRICS_ENDPOINT               | The endpoint to send metrics to. By default `https://localhost:4318/v1/metrics` will be used. `v1/metrics` will not be appended automatically and has to be added explicitly.                                                                                                                                                                                                                                              |
+| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE | The exporters aggregation temporality preference. Valid values are `cumulative`, and `delta`. `cumulative` selects cumulative temporality for all instrument kinds. `delta` selects delta aggregation temporality for Counter, Asynchronous Counter and Histogram instrument kinds, and selects cumulative aggregation for UpDownCounter and Asynchronous UpDownCounter instrument kinds. By default `cumulative` is used. |
+
+> Settings configured programmatically take precedence over environment variables. Per-signal environment variables take
+> precedence over non-per-signal environment variables.
 
 ## Running opentelemetry-collector locally to see the metrics
 

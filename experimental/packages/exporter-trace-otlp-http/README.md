@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides exporter for web and node to be used with OTLP (`http/json`) compatible receivers.
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.48 <=0.50`.
 
@@ -23,8 +25,10 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Web expects the endpoint to end in `/v1/traces`.
 
 ```js
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import {
+  BatchSpanProcessor,
+  WebTracerProvider,
+} from '@opentelemetry/sdk-trace-web';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const collectorOptions = {
@@ -138,6 +142,21 @@ To override the default timeout duration, use the following options:
   ```
 
   > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
+
+## OTLP Exporter Retry
+
+OTLP requires that transient errors be handled with a [retry strategy](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#retry).
+
+This retry policy has the following configuration, which there is currently no way to customize.
+
++ `DEFAULT_EXPORT_MAX_ATTEMPTS`: The maximum number of attempts, including the original request. Defaults to 5.
++ `DEFAULT_EXPORT_INITIAL_BACKOFF`: The initial backoff duration. Defaults to 1 second.
++ `DEFAULT_EXPORT_MAX_BACKOFF`: The maximum backoff duration. Defaults to 5 seconds.
++ `DEFAULT_EXPORT_BACKOFF_MULTIPLIER`: The backoff multiplier. Defaults to 1.5.
+
+This retry policy first checks if the response has a `'Retry-After'` header. If there is a `'Retry-After'` header, the exporter will wait the amount specified in the `'Retry-After'` header before retrying. If there is no `'Retry-After'` header, the exporter will use an exponential backoff with jitter retry strategy.
+
+  > The exporter will retry exporting within the [exporter timeout configuration](#Exporter-Timeout-Configuration) time.
 
 ## Running opentelemetry-collector locally to see the traces
 

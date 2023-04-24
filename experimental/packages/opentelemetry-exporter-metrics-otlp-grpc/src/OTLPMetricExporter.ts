@@ -15,9 +15,8 @@
  */
 
 import {
-  defaultOptions,
   OTLPMetricExporterBase,
-  OTLPMetricExporterOptions
+  OTLPMetricExporterOptions,
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
@@ -25,17 +24,24 @@ import {
   OTLPGRPCExporterNodeBase,
   ServiceClientType,
   validateAndNormalizeUrl,
-  DEFAULT_COLLECTOR_URL
+  DEFAULT_COLLECTOR_URL,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
-import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  createExportMetricsServiceRequest,
+  IExportMetricsServiceRequest,
+} from '@opentelemetry/otlp-transformer';
 
-class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics, IExportMetricsServiceRequest> {
-
-  constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions= defaultOptions) {
+class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
+  ResourceMetrics,
+  IExportMetricsServiceRequest
+> {
+  constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
     super(config);
-    const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
+    const headers = baggageUtils.parseKeyPairsIntoRecord(
+      getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+    );
     this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
@@ -63,17 +69,19 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics, 
       return config.url;
     }
 
-    return getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT ||
+    return (
+      getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT ||
       getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
-      DEFAULT_COLLECTOR_URL;
+      DEFAULT_COLLECTOR_URL
+    );
   }
 }
 
 /**
  * OTLP-gRPC metric exporter
  */
-export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterProxy>{
-  constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions = defaultOptions) {
+export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterProxy> {
+  constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
     super(new OTLPMetricExporterProxy(config), config);
   }
 }

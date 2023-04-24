@@ -35,7 +35,8 @@ instrumentation.disable();
 import * as http from 'http';
 import * as request from 'request-promise-native';
 import * as superagent from 'superagent';
-import * as got from 'got';
+// Temporarily removed. See https://github.com/open-telemetry/opentelemetry-js/issues/3344
+// import * as got from 'got';
 import * as nock from 'nock';
 import axios, { AxiosResponse } from 'axios';
 
@@ -80,7 +81,7 @@ describe('Packages', () => {
     [
       { name: 'axios', httpPackage: axios }, //keep first
       { name: 'superagent', httpPackage: superagent },
-      { name: 'got', httpPackage: { get: (url: string) => got(url) } },
+      // { name: 'got', httpPackage: { get: (url: string) => got(url) } },
       {
         name: 'request',
         httpPackage: { get: (url: string) => request(url) },
@@ -100,10 +101,10 @@ describe('Packages', () => {
         const urlparsed = url.parse(
           name === 'got' && process.versions.node.startsWith('12')
             ? // there is an issue with got 9.6 version and node 12 when redirecting so url above will not work
-          // https://github.com/nock/nock/pull/1551
-          // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
-          // TODO: check if this is still the case when new version
-            'https://www.google.com'
+              // https://github.com/nock/nock/pull/1551
+              // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
+              // TODO: check if this is still the case when new version
+              'https://www.google.com'
             : 'https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8'
         );
         const result = await httpPackage.get(urlparsed.href!);
@@ -124,7 +125,7 @@ describe('Packages', () => {
         };
 
         assert.strictEqual(spans.length, 1);
-        assert.strictEqual(span.name, 'HTTPS GET');
+        assert.strictEqual(span.name, 'GET');
 
         switch (name) {
           case 'axios':

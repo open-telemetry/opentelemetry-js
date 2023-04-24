@@ -1,5 +1,4 @@
-const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-const { metrics } = require('@opentelemetry/api-metrics');
+const { DiagConsoleLogger, DiagLogLevel, diag, metrics } = require('@opentelemetry/api');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 

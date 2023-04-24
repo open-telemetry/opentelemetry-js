@@ -15,7 +15,12 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { BindOnceFuture, ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import {
+  BindOnceFuture,
+  ExportResult,
+  ExportResultCode,
+  getEnv,
+} from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
@@ -24,6 +29,16 @@ import * as jaegerTypes from './types';
 
 /**
  * Format and sends span information to Jaeger Exporter.
+ *
+ * @deprecated Jaeger supports the OpenTelemetry protocol natively
+ * (see https://www.jaegertracing.io/docs/1.41/apis/#opentelemetry-protocol-stable).
+ * This exporter will not be required by the OpenTelemetry specification starting July 2023, and
+ * will not receive any security fixes past March 2024.
+ *
+ * Please migrate to any of the following packages:
+ * - `@opentelemetry/exporter-trace-otlp-proto`
+ * - `@opentelemetry/exporter-trace-otlp-grpc`
+ * - `@opentelemetry/exporter-trace-otlp-http`
  */
 export class JaegerExporter implements SpanExporter {
   private readonly _onShutdownFlushTimeout: number;
@@ -92,7 +107,10 @@ export class JaegerExporter implements SpanExporter {
   private _shutdown(): Promise<void> {
     return Promise.race([
       new Promise<void>((_resolve, reject) => {
-        setTimeout(() => reject(new Error('Flush timeout')), this._onShutdownFlushTimeout);
+        setTimeout(
+          () => reject(new Error('Flush timeout')),
+          this._onShutdownFlushTimeout
+        );
       }),
       this._flush(),
     ]).finally(() => {
@@ -133,19 +151,25 @@ export class JaegerExporter implements SpanExporter {
     });
   }
 
-  private _getSender(span: jaegerTypes.ThriftSpan): typeof jaegerTypes.UDPSender {
+  private _getSender(
+    span: jaegerTypes.ThriftSpan
+  ): typeof jaegerTypes.UDPSender {
     if (this._sender) {
       return this._sender;
     }
 
-    const sender = this._localConfig.endpoint ? new jaegerTypes.HTTPSender(this._localConfig) : new jaegerTypes.UDPSender(this._localConfig);
+    const sender = this._localConfig.endpoint
+      ? new jaegerTypes.HTTPSender(this._localConfig)
+      : new jaegerTypes.UDPSender(this._localConfig);
 
     if (sender._client instanceof Socket) {
       // unref socket to prevent it from keeping the process running
       sender._client.unref();
     }
 
-    const serviceNameTag = span.tags.find(t => t.key === SemanticResourceAttributes.SERVICE_NAME);
+    const serviceNameTag = span.tags.find(
+      t => t.key === SemanticResourceAttributes.SERVICE_NAME
+    );
     const serviceName = serviceNameTag?.vStr || 'unknown_service';
 
     sender.setProcess({

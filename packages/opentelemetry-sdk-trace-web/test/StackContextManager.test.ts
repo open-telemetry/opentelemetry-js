@@ -182,13 +182,19 @@ describe('StackContextManager', () => {
 
     it('should return the same target (when enabled)', () => {
       const test = ROOT_CONTEXT.setValue(key1, 1);
-      assert.deepStrictEqual(contextManager.bind(contextManager.active(), test), test);
+      assert.deepStrictEqual(
+        contextManager.bind(contextManager.active(), test),
+        test
+      );
     });
 
     it('should return the same target (when disabled)', () => {
       contextManager.disable();
       const test = ROOT_CONTEXT.setValue(key1, 1);
-      assert.deepStrictEqual(contextManager.bind(contextManager.active(), test), test);
+      assert.deepStrictEqual(
+        contextManager.bind(contextManager.active(), test),
+        test
+      );
       contextManager.enable();
     });
 

@@ -86,20 +86,48 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     });
   }
 
+  /* Add droppedAttributesCount as a tag */
+  if (span.droppedAttributesCount) {
+    tags.push({
+      key: 'otel.dropped_attributes_count',
+      value: toTagValue(span.droppedAttributesCount),
+    });
+  }
+
+  /* Add droppedEventsCount as a tag */
+  if (span.droppedEventsCount) {
+    tags.push({
+      key: 'otel.dropped_events_count',
+      value: toTagValue(span.droppedEventsCount),
+    });
+  }
+
+  /* Add droppedLinksCount as a tag */
+  if (span.droppedLinksCount) {
+    tags.push({
+      key: 'otel.dropped_links_count',
+      value: toTagValue(span.droppedLinksCount),
+    });
+  }
+
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
 
-  const logs = span.events.map(
-    (event): Log => {
-      const fields: Tag[] = [{ key: 'event', value: event.name }];
-      const attrs = event.attributes;
-      if (attrs) {
-        Object.keys(attrs).forEach(attr =>
-          fields.push({ key: attr, value: toTagValue(attrs[attr]) })
-        );
-      }
-      return { timestamp: hrTimeToMilliseconds(event.time), fields };
+  const logs = span.events.map((event): Log => {
+    const fields: Tag[] = [{ key: 'event', value: event.name }];
+    const attrs = event.attributes;
+    if (attrs) {
+      Object.keys(attrs).forEach(attr =>
+        fields.push({ key: attr, value: toTagValue(attrs[attr]) })
+      );
     }
-  );
+    if (event.droppedAttributesCount) {
+      fields.push({
+        key: 'otel.event.dropped_attributes_count',
+        value: event.droppedAttributesCount,
+      });
+    }
+    return { timestamp: hrTimeToMilliseconds(event.time), fields };
+  });
   const spanLogs: ThriftLog[] = ThriftUtils.getThriftLogs(logs);
 
   return {
@@ -118,18 +146,15 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
 }
 
 /** Translate OpenTelemetry {@link Link}s to Jaeger ThriftReference. */
-function spanLinksToThriftRefs(
-  links: Link[],
-): ThriftReference[] {
-  return links
-    .map((link): ThriftReference => {
-      const refType = ThriftReferenceType.FOLLOWS_FROM;
-      const traceId = link.context.traceId;
-      const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
-      const traceIdLow = Utils.encodeInt64(traceId.slice(16));
-      const spanId = Utils.encodeInt64(link.context.spanId);
-      return { traceIdLow, traceIdHigh, spanId, refType };
-    });
+function spanLinksToThriftRefs(links: Link[]): ThriftReference[] {
+  return links.map((link): ThriftReference => {
+    const refType = ThriftReferenceType.FOLLOWS_FROM;
+    const traceId = link.context.traceId;
+    const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
+    const traceIdLow = Utils.encodeInt64(traceId.slice(16));
+    const spanId = Utils.encodeInt64(link.context.spanId);
+    return { traceIdLow, traceIdHigh, spanId, refType };
+  });
 }
 
 /** Translate OpenTelemetry attribute value to Jaeger TagValue. */

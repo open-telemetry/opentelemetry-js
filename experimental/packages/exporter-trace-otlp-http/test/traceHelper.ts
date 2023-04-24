@@ -15,7 +15,11 @@
  */
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import { hexToBase64, InstrumentationLibrary, VERSION } from '@opentelemetry/core';
+import {
+  hexToBase64,
+  InstrumentationLibrary,
+  VERSION,
+} from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -26,7 +30,7 @@ import {
   IKeyValue,
   ILink,
   IResource,
-  ISpan
+  ISpan,
 } from '@opentelemetry/otlp-transformer';
 
 if (typeof Buffer === 'undefined') {
@@ -44,7 +48,7 @@ const parentIdHex = '78a8915098864388';
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
-  spanContext: ()=> {
+  spanContext: () => {
     return {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '5e107261f64fa53e',
@@ -68,35 +72,51 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   events: [
-    { name: 'fetchStart', time: [1574120165, 429803070] },
+    {
+      name: 'fetchStart',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'domainLookupStart',
       time: [1574120165, 429803070],
     },
-    { name: 'domainLookupEnd', time: [1574120165, 429803070] },
+    {
+      name: 'domainLookupEnd',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'connectStart',
       time: [1574120165, 429803070],
     },
-    { name: 'connectEnd', time: [1574120165, 429803070] },
+    {
+      name: 'connectEnd',
+      time: [1574120165, 429803070],
+    },
     {
       name: 'requestStart',
       time: [1574120165, 435513070],
     },
-    { name: 'responseStart', time: [1574120165, 436923070] },
+    {
+      name: 'responseStart',
+      time: [1574120165, 436923070],
+    },
     {
       name: 'responseEnd',
       time: [1574120165, 438688070],
     },
   ],
   duration: [0, 8885000],
-  resource: Resource.default()
-    .merge(new Resource({
+  resource: Resource.default().merge(
+    new Resource({
       service: 'ui',
       version: 1,
       cost: 112.12,
-    })),
+    })
+  ),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  droppedAttributesCount: 0,
+  droppedEventsCount: 0,
+  droppedLinksCount: 0,
 };
 
 export const mockedResources: Resource[] = [
@@ -137,6 +157,9 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8885000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   },
   {
     name: 'span2',
@@ -159,6 +182,9 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8775000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   },
   {
     name: 'span3',
@@ -181,6 +207,9 @@ export const basicTrace: ReadableSpan[] = [
     duration: [0, 8775000],
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
   },
 ];
 
@@ -214,9 +243,7 @@ export const multiInstrumentationLibraryTrace: ReadableSpan[] = [
   },
 ];
 
-export function ensureEventsAreCorrect(
-  events: IEvent[]
-) {
+export function ensureEventsAreCorrect(events: IEvent[]) {
   assert.deepStrictEqual(
     events,
     [
@@ -273,9 +300,7 @@ export function ensureEventsAreCorrect(
   );
 }
 
-export function ensureAttributesAreCorrect(
-  attributes: IKeyValue[]
-) {
+export function ensureAttributesAreCorrect(attributes: IKeyValue[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -290,10 +315,7 @@ export function ensureAttributesAreCorrect(
   );
 }
 
-export function ensureLinksAreCorrect(
-  attributes: ILink[],
-  useHex?: boolean
-) {
+export function ensureLinksAreCorrect(attributes: ILink[], useHex?: boolean) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -315,10 +337,7 @@ export function ensureLinksAreCorrect(
   );
 }
 
-export function ensureSpanIsCorrect(
-  span: ISpan,
-  useHex = true
-) {
+export function ensureSpanIsCorrect(span: ISpan, useHex = true) {
   if (span.attributes) {
     ensureAttributesAreCorrect(span.attributes);
   }
@@ -344,11 +363,7 @@ export function ensureSpanIsCorrect(
     'parentIdArr is wrong'
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
-  assert.strictEqual(
-    span.kind,
-    ESpanKind.SPAN_KIND_INTERNAL,
-    'kind is wrong'
-  );
+  assert.strictEqual(span.kind, ESpanKind.SPAN_KIND_INTERNAL, 'kind is wrong');
   assert.strictEqual(
     span.startTimeUnixNano,
     1574120165429803008,
@@ -373,12 +388,13 @@ export function ensureSpanIsCorrect(
   );
 }
 
-export function ensureWebResourceIsCorrect(
-  resource: IResource
-) {
+export function ensureWebResourceIsCorrect(resource: IResource) {
   assert.strictEqual(resource.attributes.length, 7);
   assert.strictEqual(resource.attributes[0].key, 'service.name');
-  assert.strictEqual(resource.attributes[0].value.stringValue, 'unknown_service');
+  assert.strictEqual(
+    resource.attributes[0].value.stringValue,
+    'unknown_service'
+  );
   assert.strictEqual(resource.attributes[1].key, 'telemetry.sdk.language');
   assert.strictEqual(resource.attributes[1].value.stringValue, 'webjs');
   assert.strictEqual(resource.attributes[2].key, 'telemetry.sdk.name');

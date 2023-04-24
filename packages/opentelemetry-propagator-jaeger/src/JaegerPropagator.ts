@@ -49,15 +49,17 @@ export class JaegerPropagator implements TextMapPropagator {
   private readonly _jaegerTraceHeader: string;
   private readonly _jaegerBaggageHeaderPrefix: string;
 
-  constructor(customTraceHeader?: string)
-  constructor(config?: JaegerPropagatorConfig)
+  constructor(customTraceHeader?: string);
+  constructor(config?: JaegerPropagatorConfig);
   constructor(config?: JaegerPropagatorConfig | string) {
     if (typeof config === 'string') {
       this._jaegerTraceHeader = config;
       this._jaegerBaggageHeaderPrefix = UBER_BAGGAGE_HEADER_PREFIX;
     } else {
-      this._jaegerTraceHeader = config?.customTraceHeader || UBER_TRACE_ID_HEADER;
-      this._jaegerBaggageHeaderPrefix = config?.customBaggageHeaderPrefix || UBER_BAGGAGE_HEADER_PREFIX;
+      this._jaegerTraceHeader =
+        config?.customTraceHeader || UBER_TRACE_ID_HEADER;
+      this._jaegerBaggageHeaderPrefix =
+        config?.customBaggageHeaderPrefix || UBER_BAGGAGE_HEADER_PREFIX;
     }
   }
 
@@ -114,7 +116,8 @@ export class JaegerPropagator implements TextMapPropagator {
     if (baggageValues.length === 0) return newContext;
 
     // if baggage values are present, inject it into the current baggage
-    let currentBaggage = propagation.getBaggage(context) ?? propagation.createBaggage();
+    let currentBaggage =
+      propagation.getBaggage(context) ?? propagation.createBaggage();
     for (const baggageEntry of baggageValues) {
       if (baggageEntry.value === undefined) continue;
       currentBaggage = currentBaggage.setEntry(baggageEntry.key, {
@@ -131,6 +134,8 @@ export class JaegerPropagator implements TextMapPropagator {
   }
 }
 
+const VALID_HEX_RE = /^[0-9a-f]{1,2}$/i;
+
 /**
  * @param {string} serializedString - a serialized span context.
  * @return {SpanContext} - returns a span context represented by the serializedString.
@@ -145,7 +150,7 @@ function deserializeSpanContext(serializedString: string): SpanContext | null {
 
   const traceId = _traceId.padStart(32, '0');
   const spanId = _spanId.padStart(16, '0');
-  const traceFlags = flags.match(/^[0-9a-f]{1,2}$/i) ? parseInt(flags, 16) & 1 : 1;
+  const traceFlags = VALID_HEX_RE.test(flags) ? parseInt(flags, 16) & 1 : 1;
 
   return { traceId, spanId, isRemote: true, traceFlags };
 }

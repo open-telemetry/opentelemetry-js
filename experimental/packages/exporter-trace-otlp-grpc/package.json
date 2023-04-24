@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-grpc",
-  "version": "0.31.0",
+  "version": "0.37.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -14,7 +14,7 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc -w",
+    "watch": "tsc --watch --build",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
@@ -48,17 +48,18 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
-    "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/otlp-exporter-base": "0.31.0",
-    "@types/mocha": "9.1.1",
+    "@grpc/proto-loader": "^0.7.3",
+    "@opentelemetry/api": "1.4.1",
+    "@opentelemetry/otlp-exporter-base": "0.37.0",
+    "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "@types/sinon": "10.0.13",
     "codecov": "3.8.3",
     "cpx": "1.5.0",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "rimraf": "3.0.2",
-    "sinon": "14.0.0",
+    "rimraf": "4.1.2",
+    "sinon": "15.0.0",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
@@ -67,13 +68,13 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.5.9",
-    "@grpc/proto-loader": "^0.6.9",
-    "@opentelemetry/core": "1.5.0",
-    "@opentelemetry/otlp-grpc-exporter-base": "0.31.0",
-    "@opentelemetry/otlp-transformer": "0.31.0",
-    "@opentelemetry/resources": "1.5.0",
-    "@opentelemetry/sdk-trace-base": "1.5.0"
+    "@grpc/grpc-js": "^1.7.1",
+    "@opentelemetry/core": "1.11.0",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.37.0",
+    "@opentelemetry/otlp-transformer": "0.37.0",
+    "@opentelemetry/resources": "1.11.0",
+    "@opentelemetry/sdk-trace-base": "1.11.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-grpc",
+  "sideEffects": false
 }

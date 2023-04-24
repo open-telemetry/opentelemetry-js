@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { isValidSpanId, SpanKind, SpanStatus, Exception } from '@opentelemetry/api';
+import {
+  isValidSpanId,
+  SpanKind,
+  SpanStatus,
+  Exception,
+} from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -44,10 +49,7 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
   assert.strictEqual(span.kind, kind);
-  assert.strictEqual(
-    span.name,
-    `${validations.component.toUpperCase()} ${validations.httpMethod}`
-  );
+  assert.strictEqual(span.name, validations.httpMethod);
   assert.strictEqual(
     span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],
     span.status.message
@@ -73,18 +75,20 @@ export const assertSpan = (
 
     const eventAttributes = span.events[0].attributes;
     assert.ok(eventAttributes != null);
-    assert.deepStrictEqual(
-      Object.keys(eventAttributes),
-      ['exception.type', 'exception.message', 'exception.stacktrace']
-    );
+    assert.deepStrictEqual(Object.keys(eventAttributes), [
+      'exception.type',
+      'exception.message',
+      'exception.stacktrace',
+    ]);
   } else {
     assert.strictEqual(span.events.length, 0);
   }
 
   assert.deepStrictEqual(
     span.status,
-    validations.forceStatus ||
-    { code: utils.parseResponseStatus(span.kind, validations.httpStatusCode) }
+    validations.forceStatus || {
+      code: utils.parseResponseStatus(span.kind, validations.httpStatusCode),
+    }
   );
 
   assert.ok(span.endTime, 'must be finished');
@@ -125,7 +129,7 @@ export const assertSpan = (
       validations.hostname,
       'must be consistent (PEER_NAME and hostname)'
     );
-    if(!validations.noNetPeer) {
+    if (!validations.noNetPeer) {
       assert.ok(
         span.attributes[SemanticAttributes.NET_PEER_IP],
         'must have PEER_IP'
@@ -178,6 +182,11 @@ export const assertSpan = (
         'must have HOST_IP'
       );
     }
+    assert.strictEqual(
+      span.attributes[SemanticAttributes.HTTP_SCHEME],
+      validations.component,
+      ' must have http.scheme attribute'
+    );
     assert.ok(typeof span.parentSpanId === 'string');
     assert.ok(isValidSpanId(span.parentSpanId));
   } else if (validations.reqHeaders) {

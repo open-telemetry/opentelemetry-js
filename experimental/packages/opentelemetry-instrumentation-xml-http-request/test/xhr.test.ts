@@ -41,8 +41,7 @@ import {
 import { AttributeNames } from '../src/enums/AttributeNames';
 
 class DummySpanExporter implements tracing.SpanExporter {
-  export(spans: any) {
-  }
+  export(spans: any) {}
 
   shutdown() {
     return Promise.resolve();
@@ -132,8 +131,7 @@ function createMainResource(resource = {}): PerformanceResourceTiming {
 
 function createFakePerformanceObs(url: string) {
   class FakePerfObs implements PerformanceObserver {
-    constructor(private readonly cb: PerformanceObserverCallback) {
-    }
+    constructor(private readonly cb: PerformanceObserverCallback) {}
 
     observe() {
       const absoluteUrl = url.startsWith('http') ? url : location.origin + url;
@@ -154,8 +152,7 @@ function createFakePerformanceObs(url: string) {
       this.cb(resources, this);
     }
 
-    disconnect() {
-    }
+    disconnect() {}
 
     takeRecords(): PerformanceEntryList {
       return [];
@@ -236,7 +233,7 @@ describe('xhr', () => {
           );
 
           spyEntries = sinon.stub(
-            (performance as unknown) as Performance,
+            performance as unknown as Performance,
             'getEntriesByType'
           );
           spyEntries.withArgs('resource').returns(resources);
@@ -257,7 +254,7 @@ describe('xhr', () => {
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
           clearResourceTimingsSpy = sinon.stub(
-            (performance as unknown) as Performance,
+            performance as unknown as Performance,
             'clearResourceTimings'
           );
           webTracerProviderWithZone.addSpanProcessor(
@@ -265,27 +262,30 @@ describe('xhr', () => {
           );
 
           rootSpan = webTracerWithZone.startSpan('root');
-          api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            void getData(
-              new XMLHttpRequest(),
-              fileUrl,
-              () => {
-                fakeNow = 100;
-              },
-              testAsync
-            ).then(() => {
-              fakeNow = 0;
-              sinon.clock.tick(1000);
-              done();
-            });
-            assert.strictEqual(requests.length, 1, 'request not called');
+          api.context.with(
+            api.trace.setSpan(api.context.active(), rootSpan),
+            () => {
+              void getData(
+                new XMLHttpRequest(),
+                fileUrl,
+                () => {
+                  fakeNow = 100;
+                },
+                testAsync
+              ).then(() => {
+                fakeNow = 0;
+                sinon.clock.tick(1000);
+                done();
+              });
+              assert.strictEqual(requests.length, 1, 'request not called');
 
-            requests[0].respond(
-              200,
-              { 'Content-Type': 'application/json' },
-              '{"foo":"bar"}'
-            );
-          });
+              requests[0].respond(
+                200,
+                { 'Content-Type': 'application/json' },
+                '{"foo":"bar"}'
+              );
+            }
+          );
         };
 
         beforeEach(done => {
@@ -322,7 +322,7 @@ describe('xhr', () => {
 
         it('span should have correct name', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+          assert.strictEqual(span.name, 'GET', 'span has wrong name');
         });
 
         it('span should have correct kind', () => {
@@ -567,7 +567,7 @@ describe('xhr', () => {
 
         describe(
           'AND origin does NOT match window.location but match with' +
-          ' propagateTraceHeaderCorsUrls',
+            ' propagateTraceHeaderCorsUrls',
           () => {
             beforeEach(done => {
               clearData();
@@ -600,7 +600,7 @@ describe('xhr', () => {
         );
         describe(
           'AND origin does NOT match window.location And does NOT match' +
-          ' with propagateTraceHeaderCorsUrls',
+            ' with propagateTraceHeaderCorsUrls',
           () => {
             let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
@@ -784,15 +784,29 @@ describe('xhr', () => {
               `Wrong number of spans: ${exportSpy.args.length}`
             );
 
-            assert.strictEqual(events.length, 12, `number of events is wrong: ${events.length}`);
+            assert.strictEqual(
+              events.length,
+              12,
+              `number of events is wrong: ${events.length}`
+            );
             assert.strictEqual(
               events[8].name,
               PTN.REQUEST_START,
               `event ${PTN.REQUEST_START} is not defined`
             );
           });
-        });
 
+          it('should have an absolute http.url attribute', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const attributes = span.attributes;
+
+            assert.strictEqual(
+              attributes[SemanticAttributes.HTTP_URL],
+              location.origin + '/get',
+              `attributes ${SemanticAttributes.HTTP_URL} is wrong`
+            );
+          });
+        });
       });
 
       describe('when request is NOT successful', () => {
@@ -827,7 +841,7 @@ describe('xhr', () => {
           );
 
           spyEntries = sinon.stub(
-            (performance as unknown) as Performance,
+            performance as unknown as Performance,
             'getEntriesByType'
           );
           spyEntries.withArgs('resource').returns(resources);
@@ -858,75 +872,85 @@ describe('xhr', () => {
         });
 
         function timedOutRequest(done: any) {
-          api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            void getData(
-              new XMLHttpRequest(),
-              url,
-              () => {
-                sinon.clock.tick(XHR_TIMEOUT);
-              },
-              testAsync
-            ).then(() => {
-              fakeNow = 0;
-              sinon.clock.tick(1000);
-              done();
-            });
-          });
+          api.context.with(
+            api.trace.setSpan(api.context.active(), rootSpan),
+            () => {
+              void getData(
+                new XMLHttpRequest(),
+                url,
+                () => {
+                  sinon.clock.tick(XHR_TIMEOUT);
+                },
+                testAsync
+              ).then(() => {
+                fakeNow = 0;
+                sinon.clock.tick(1000);
+                done();
+              });
+            }
+          );
         }
 
         function abortedRequest(done: any) {
-          api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            void getData(new XMLHttpRequest(), url, () => {
-            }, testAsync).then(
-              () => {
-                fakeNow = 0;
-                sinon.clock.tick(1000);
-                done();
-              }
-            );
+          api.context.with(
+            api.trace.setSpan(api.context.active(), rootSpan),
+            () => {
+              void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+                () => {
+                  fakeNow = 0;
+                  sinon.clock.tick(1000);
+                  done();
+                }
+              );
 
-            assert.strictEqual(requests.length, 1, 'request not called');
-            requests[0].abort();
-          });
+              assert.strictEqual(requests.length, 1, 'request not called');
+              requests[0].abort();
+            }
+          );
         }
 
         function erroredRequest(done: any) {
-          api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            void getData(
-              new XMLHttpRequest(),
-              url,
-              () => {
-                fakeNow = 100;
-              },
-              testAsync
-            ).then(() => {
-              fakeNow = 0;
-              sinon.clock.tick(1000);
-              done();
-            });
-            assert.strictEqual(requests.length, 1, 'request not called');
-            requests[0].respond(
-              400,
-              { 'Content-Type': 'text/plain' },
-              'Bad Request'
-            );
-          });
-        }
-
-        function networkErrorRequest(done: any) {
-          api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            void getData(new XMLHttpRequest(), url, () => {
-            }, testAsync).then(
-              () => {
+          api.context.with(
+            api.trace.setSpan(api.context.active(), rootSpan),
+            () => {
+              void getData(
+                new XMLHttpRequest(),
+                url,
+                () => {
+                  fakeNow = 100;
+                },
+                testAsync
+              ).then(() => {
                 fakeNow = 0;
                 sinon.clock.tick(1000);
                 done();
-              }
-            );
+              });
+              assert.strictEqual(requests.length, 1, 'request not called');
+              requests[0].respond(
+                400,
+                { 'Content-Type': 'text/plain' },
+                'Bad Request'
+              );
+            }
+          );
+        }
 
-            assert.strictEqual(requests.length, 1, 'request not called');
-            requests[0].error();
-          });
+        function networkErrorRequest(done: any) {
+          api.context.with(
+            api.trace.setSpan(api.context.active(), rootSpan),
+            () => {
+              void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+                () => {
+                  fakeNow = 0;
+                  sinon.clock.tick(1000);
+                  done();
+                }
+              );
+
+              assert.strictEqual(requests.length, 1, 'request not called');
+              requests[0].error();
+            }
+          );
         }
 
         describe('when request loads and receives an error code', () => {

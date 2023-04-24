@@ -1,9 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
     "outDir": "build",
-    "skipLibCheck": true
+    "rootDir": "."
   },
   "files": [
     "node_modules/zone.js/dist/zone.js.d.ts"
@@ -11,5 +10,10 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../api"
+    }
   ]
 }

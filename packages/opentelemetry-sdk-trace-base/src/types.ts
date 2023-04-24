@@ -15,7 +15,7 @@
  */
 
 import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import { IdGenerator } from './IdGenerator';
 import { Sampler } from './Sampler';
 
@@ -35,7 +35,7 @@ export interface TracerConfig {
   spanLimits?: SpanLimits;
 
   /** Resource associated with trace telemetry  */
-  resource?: Resource;
+  resource?: IResource;
 
   /**
    * Generator of trace and span IDs
@@ -81,6 +81,10 @@ export interface SpanLimits {
   linkCountLimit?: number;
   /** eventCountLimit is number of message events per span */
   eventCountLimit?: number;
+  /** attributePerEventCountLimit is the maximum number of attributes allowed per span event */
+  attributePerEventCountLimit?: number;
+  /** attributePerLinkCountLimit is the maximum number of attributes allowed per span link */
+  attributePerLinkCountLimit?: number;
 }
 
 /** Interface configuration for a buffer. */
