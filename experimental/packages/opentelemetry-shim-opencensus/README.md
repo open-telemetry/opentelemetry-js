@@ -4,7 +4,7 @@
 [![Apache License][license-image]][license-image]
 
 > **Note**
-> This package is in active developemnt and has not yet been released. You cannot install this
+> This package is in active development and has not yet been released. You cannot install this
 > package from NPM yet.
 
 OpenCensus shim allows existing OpenCensus instrumentation to report to OpenTelemetry. This
