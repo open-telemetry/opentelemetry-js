@@ -68,7 +68,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "require-in-the-middle": "^6.0.0",
+    "require-in-the-middle": "^7.0.1",
     "semver": "^7.3.2",
     "shimmer": "^1.2.1"
   },
@@ -97,7 +97,6 @@
     "karma-webpack": "4.0.2",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "rimraf": "4.1.2",
     "sinon": "15.0.0",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
