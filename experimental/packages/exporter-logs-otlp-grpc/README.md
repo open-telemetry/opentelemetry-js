@@ -6,7 +6,7 @@
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
 This module provides exporter for node to be used with OTLP (`grpc`) compatible receivers.
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.75.0`.
+Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.54.0`.
 
 ## Installation
 
