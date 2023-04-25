@@ -105,6 +105,9 @@
       "path": "experimental/packages/opentelemetry-sdk-node"
     },
     {
+      "path": "experimental/packages/opentelemetry-shim-opencensus"
+    },
+    {
       "path": "experimental/packages/otlp-exporter-base"
     },
     {
