@@ -155,8 +155,9 @@ describe('SimpleSpanProcessor', () => {
     it('should call forceflush on exporter', () => {
       const spyflush = sinon.spy(exporter, 'forceFlush');
       const processor = new SimpleSpanProcessor(exporter);
-      processor.forceFlush().then(() => {});
-      assert.ok(spyflush.calledOnce);
+      processor.forceFlush().then(() => {
+        assert.ok(spyflush.calledOnce);
+      });
     });
 
     it('should await unresolved resources', async () => {
