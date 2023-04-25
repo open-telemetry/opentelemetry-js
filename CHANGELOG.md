@@ -11,7 +11,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(SpanExpoter): Add optional forceFlush to SpanExporter interface [#3067] @sgracias1
+* feat(SpanExpoter): Add mandatory forceFlush to SpanExporter interface [#3753] @sgracias1 @JacksonWeber
 
 ### :bug: (Bug Fix)
 
