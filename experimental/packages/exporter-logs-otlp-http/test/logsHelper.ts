@@ -45,16 +45,6 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-class TestLogsReader extends LogReader {
-  protected onForceFlush(): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-
-  protected onShutdown(): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-}
-
 const defaultResource = Resource.default().merge(
   new Resource({
     service: 'ui',
@@ -64,17 +54,13 @@ const defaultResource = Resource.default().merge(
 );
 
 let loggerProvider = new LoggerProvider({ resource: defaultResource });
-// let reader = new TestLogsReader();
-loggerProvider.addLogRecordProcessor(reader);
+loggerProvider.addLogRecordProcessor(
+  new SimpleLogRecordProcessor(new OTLPLogsExporter())
+);
 let logger = loggerProvider.getLogger('default', '0.0.1');
-
-export async function collect() {
-  return (await reader.collect())!;
-}
 
 export function setUp() {
   loggerProvider = new LoggerProvider({ resource: defaultResource });
-  // reader = new TestLogsReader();
   loggerProvider.addLogRecordProcessor(
     new SimpleLogRecordProcessor(new OTLPLogsExporter())
   );

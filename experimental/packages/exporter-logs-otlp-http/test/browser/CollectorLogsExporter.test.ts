@@ -19,7 +19,7 @@ import { ExportResultCode } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPLogsExporter } from '../../src/platform/browser';
-import { collect, ensureHeadersContain, setUp, shutdown } from '../logsHelper';
+import { ensureHeadersContain, setUp, shutdown } from '../logsHelper';
 import { OTLPLogsExporterOptions } from '../../src';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
@@ -38,10 +38,6 @@ describe('OTLPLogsExporter - web', () => {
     stubOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     sinon.stub(XMLHttpRequest.prototype, 'send');
     stubBeacon = sinon.stub(navigator, 'sendBeacon');
-
-    const { resourceMetrics, errors } = await collect();
-    assert.strictEqual(errors.length, 0);
-    logs = resourceMetrics;
 
     // Need to stub/spy on the underlying logger as the "diag" instance is global
     debugStub = sinon.stub();

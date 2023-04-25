@@ -22,7 +22,7 @@ import * as sinon from 'sinon';
 import { OTLPLogsExporterOptions } from '../../src';
 
 import { OTLPLogsExporter } from '../../src/platform/node';
-import { collect, setUp, shutdown } from '../logsHelper';
+import { setUp, shutdown } from '../logsHelper';
 import { MockedResponse } from './nodeHelpers';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { PassThrough, Stream } from 'stream';
@@ -192,10 +192,6 @@ describe('OTLPLogsExporter - node with json over http', () => {
       };
 
       collectorExporter = new OTLPLogsExporter(collectorExporterConfig);
-
-      const { resourceMetrics, errors } = await collect();
-      assert.strictEqual(errors.length, 0);
-      logs = resourceMetrics;
     });
 
     it('should open the connection', done => {

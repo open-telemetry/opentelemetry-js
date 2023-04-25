@@ -17,7 +17,7 @@
 import { ExportResultCode } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { collect, setUp, shutdown } from '../logsHelper';
+import { setUp, shutdown } from '../logsHelper';
 import {
   OTLPExporterBase,
   OTLPExporterConfigBase,
@@ -71,10 +71,6 @@ describe('OTLPLogsExporter - common', () => {
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPLogsExporter(collectorExporterConfig);
-
-      const { resourceMetrics, errors } = await collect();
-      assert.strictEqual(errors.length, 0);
-      logs = resourceMetrics;
     });
 
     it('should create an instance', () => {
