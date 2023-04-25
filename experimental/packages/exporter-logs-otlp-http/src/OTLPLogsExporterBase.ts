@@ -18,7 +18,7 @@ import { ExportResult } from '@opentelemetry/core';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 
-import { IExportLogsServiceRequest } from 'otlp-transformer';
+import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 import { OTLPLogsExporterOptions } from './OTLPLogsExporterOptions';
 
