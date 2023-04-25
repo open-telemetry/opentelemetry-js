@@ -38,11 +38,11 @@ const collectorOptions = {
   url: 'http://<collector-hostname>:<port>',
 };
 
-const loggerExpoter = new OTLPLogsExporter(collectorOptions);
+const loggerExporter = new OTLPLogsExporter(collectorOptions);
 const loggerProvider = new LoggerProvider();
 
 loggerProvider.addLogRecordProcessor(
-  new BatchLogRecordProcessor(loggerExpoter)
+  new BatchLogRecordProcessor(loggerExporter)
 );
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
