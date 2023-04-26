@@ -11,7 +11,12 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(core): add environment variables for OTLP log exporters. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+
 ### :bug: (Bug Fix)
+
+* fix(http-instrumentation): stop listening to `request`'s `close` event once it has emitted `response` [#3625](https://github.com/open-telemetry/opentelemetry-js/pull/3625) @SimenB
+* fix(sdk-node): fix initialization in bundled environments by not loading @opentelemetry/exporter-jaeger [#3739](https://github.com/open-telemetry/opentelemetry-js/pull/3739) @pichlermarc
 
 ### :books: (Refine Doc)
 

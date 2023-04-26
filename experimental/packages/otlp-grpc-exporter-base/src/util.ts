@@ -64,20 +64,31 @@ export function onInit<ExportItem, ServiceRequest>(
         'grpc.default_compression_algorithm': collector.compression,
       };
 
-      if (collector.getServiceClientType() === ServiceClientType.SPANS) {
-        collector.serviceClient =
-          new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-            collector.url,
-            credentials,
-            options
-          );
-      } else {
-        collector.serviceClient =
-          new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
-            collector.url,
-            credentials,
-            options
-          );
+      switch (collector.getServiceClientType()) {
+        case ServiceClientType.SPANS:
+          collector.serviceClient =
+            new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
+              collector.url,
+              credentials,
+              options
+            );
+          break;
+        case ServiceClientType.METRICS:
+          collector.serviceClient =
+            new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
+              collector.url,
+              credentials,
+              options
+            );
+          break;
+        case ServiceClientType.LOGS:
+          collector.serviceClient =
+            new packageObject.opentelemetry.proto.collector.logs.v1.LogsService(
+              collector.url,
+              credentials,
+              options
+            );
+          break;
       }
 
       if (collector.grpcQueue.length > 0) {
