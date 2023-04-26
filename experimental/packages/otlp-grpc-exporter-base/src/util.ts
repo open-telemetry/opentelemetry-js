@@ -34,6 +34,7 @@ import {
 
 import { MetricExportServiceClient } from './MetricsExportServiceClient';
 import { TraceExportServiceClient } from './TraceExportServiceClient';
+import { LogsExportServiceClient } from './LogsExportServiceClient';
 
 export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
@@ -59,6 +60,14 @@ export function onInit<ExportItem, ServiceRequest>(
       collector.serviceClient = client;
     } else if (collector.getServiceClientType() === ServiceClientType.METRICS) {
       const client = new MetricExportServiceClient(collector.url, credentials, {
+        'grpc.default_compression_algorithm': collector.compression.valueOf(),
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      collector.serviceClient = client;
+    } else if (collector.getServiceClientType() === ServiceClientType.LOGS) {
+      const client = new LogsExportServiceClient(collector.url, credentials, {
         'grpc.default_compression_algorithm': collector.compression.valueOf(),
       });
 
