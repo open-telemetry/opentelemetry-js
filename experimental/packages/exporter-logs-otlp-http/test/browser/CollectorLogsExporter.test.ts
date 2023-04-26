@@ -19,7 +19,13 @@ import { ExportResultCode } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPLogsExporter } from '../../src/platform/browser';
-import { ensureHeadersContain, setUp, shutdown } from '../logsHelper';
+import {
+  setUp,
+  shutdown,
+  ensureHeadersContain,
+  ensureExportLogsServiceRequestIsSet,
+  ensureWebResourceIsCorrect,
+} from '../logsHelper';
 import { OTLPLogsExporterOptions } from '../../src';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
@@ -78,6 +84,16 @@ describe('OTLPLogsExporter - web', () => {
           const json = JSON.parse(body) as IExportLogsServiceRequest;
 
           // The order of the logs is not guaranteed.
+          const resource = json.resourceLogs?.at(0)?.resource;
+          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+          ensureWebResourceIsCorrect(resource);
+
+          assert.strictEqual(url, 'http://foo.bar.com');
+
+          assert.strictEqual(stubBeacon.callCount, 0);
+          assert.strictEqual(stubOpen.callCount, 0);
+
+          ensureExportLogsServiceRequestIsSet(json);
 
           done();
         });
@@ -134,6 +150,14 @@ describe('OTLPLogsExporter - web', () => {
           assert.strictEqual(request.url, 'http://foo.bar.com');
 
           const body = request.requestBody;
+          const json = JSON.parse(body) as IExportLogsServiceRequest;
+
+          const resource = json.resourceLogs?.at(0)?.resource;
+          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+          ensureWebResourceIsCorrect(resource);
+
+          assert.strictEqual(stubBeacon.callCount, 0);
+          ensureExportLogsServiceRequestIsSet(json);
 
           done();
         });

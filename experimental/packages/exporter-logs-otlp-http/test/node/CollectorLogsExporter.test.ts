@@ -22,7 +22,11 @@ import * as sinon from 'sinon';
 import { OTLPLogsExporterOptions } from '../../src';
 
 import { OTLPLogsExporter } from '../../src/platform/node';
-import { setUp, shutdown } from '../logsHelper';
+import {
+  ensureExportLogsServiceRequestIsSet,
+  setUp,
+  shutdown,
+} from '../logsHelper';
 import { MockedResponse } from './nodeHelpers';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { PassThrough, Stream } from 'stream';
@@ -255,6 +259,8 @@ describe('OTLPLogsExporter - node with json over http', () => {
         const json = JSON.parse(responseBody) as IExportLogsServiceRequest;
         // The order of the logs is not guaranteed.
 
+        ensureExportLogsServiceRequestIsSet(json);
+
         done();
       });
 
@@ -325,7 +331,7 @@ describe('OTLPLogsExporter - node with json over http', () => {
       setTimeout(() => {
         assert.strictEqual(
           collectorExporter._otlpExporter.url,
-          'http://localhost:4317/v1/logs'
+          'http://localhost:4318/v1/logs'
         );
         done();
       });

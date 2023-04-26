@@ -31,6 +31,7 @@ import {
 } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { OTLPLogsExporter } from '../src';
+import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const traceIdArr = [
   31, 16, 8, 220, 142, 39, 14, 133, 196, 10, 13, 124, 57, 57, 178, 120,
@@ -65,6 +66,7 @@ export function setUp() {
     new SimpleLogRecordProcessor(new OTLPLogsExporter())
   );
   logger = loggerProvider.getLogger('default', '0.0.1');
+  return logger;
 }
 
 export async function shutdown() {
@@ -211,4 +213,50 @@ export function ensureHeadersContain(
       `Expected ${actual} to contain ${k}: ${v}`
     );
   });
+}
+
+export function ensureWebResourceIsCorrect(resource: IResource) {
+  assert.strictEqual(resource.attributes.length, 7);
+  assert.strictEqual(resource.attributes[0].key, 'service.name');
+  assert.strictEqual(
+    resource.attributes[0].value.stringValue,
+    'unknown_service'
+  );
+  assert.strictEqual(resource.attributes[1].key, 'telemetry.sdk.language');
+  assert.strictEqual(resource.attributes[1].value.stringValue, 'webjs');
+  assert.strictEqual(resource.attributes[2].key, 'telemetry.sdk.name');
+  assert.strictEqual(resource.attributes[2].value.stringValue, 'opentelemetry');
+  assert.strictEqual(resource.attributes[3].key, 'telemetry.sdk.version');
+  assert.strictEqual(resource.attributes[3].value.stringValue, VERSION);
+  assert.strictEqual(resource.attributes[4].key, 'service');
+  assert.strictEqual(resource.attributes[4].value.stringValue, 'ui');
+  assert.strictEqual(resource.attributes[5].key, 'version');
+  assert.strictEqual(resource.attributes[5].value.intValue, 1);
+  assert.strictEqual(resource.attributes[6].key, 'cost');
+  assert.strictEqual(resource.attributes[6].value.doubleValue, 112.12);
+  assert.strictEqual(resource.droppedAttributesCount, 0);
+}
+
+export function ensureExportLogsServiceRequestIsSet(
+  json: IExportLogsServiceRequest
+) {
+  const resourceLogs = json.resourceLogs;
+
+  assert.strictEqual(
+    resourceLogs?.length,
+    1,
+    'resourceMetrics has incorrect length'
+  );
+
+  const resource = resourceLogs[0].resource;
+  assert.ok(resource, 'resource is missing');
+
+  const scopeLogs = resourceLogs[0].scopeLogs;
+  assert.strictEqual(scopeLogs?.length, 1, 'scopeLogs is missing');
+
+  const scope = scopeLogs[0].scope;
+  assert.ok(scope, 'scope is missing');
+
+  const logRecords = resourceLogs[0].scopeLogs[0].logRecords;
+  assert.strictEqual(logRecords?.length, 3, 'logRecords are missing');
 }

@@ -32,7 +32,7 @@ import { OTLPLogsExporterOptions } from '../../OTLPLogsExporterOptions';
 import { OTLPLogsExporterBase } from '../../OTLPLogsExporterBase';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/logs';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4317/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
   ReadableLogRecord,
@@ -43,7 +43,7 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
     this.headers = Object.assign(
       this.headers,
       baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
       )
     );
   }
@@ -55,10 +55,8 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
     return typeof config.url === 'string'
       ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(
-          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-        )
+      : getEnv().OTEL_EXPORTER_OTLP_LOGS_ENDPOINT.length > 0
+      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_LOGS_ENDPOINT)
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
       ? appendResourcePathToUrl(
           getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
