@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-export * from './common/types';
-export * from './metrics/types';
-export * from './resource/types';
-export * from './trace/types';
-export * from './logs/types';
+import * as assert from 'assert';
 
-export { createExportTraceServiceRequest } from './trace';
-export { createExportMetricsServiceRequest } from './metrics';
-export { createExportLogsServiceRequest } from './logs';
+describe('ShimTracer', () => {
+  it('asserts true', () => {
+    assert.ok(true);
+  });
+});
