@@ -22,7 +22,7 @@ import {
 } from '@opentelemetry/otlp-exporter-base';
 
 /**
- * Queue item to be used to save temporary spans/metrics in case the GRPC service
+ * Queue item to be used to save temporary spans/metrics/logs in case the GRPC service
  * hasn't been fully initialized yet
  */
 export interface GRPCQueueItem<ExportedItem> {
@@ -32,7 +32,7 @@ export interface GRPCQueueItem<ExportedItem> {
 }
 
 /**
- * Service Client for sending spans or metrics
+ * Service Client for sending spans/metrics/logs
  */
 export interface ServiceClient extends grpc.Client {
   export: (
@@ -55,4 +55,5 @@ export interface OTLPGRPCExporterConfigNode extends OTLPExporterConfigBase {
 export enum ServiceClientType {
   SPANS,
   METRICS,
+  LOGS,
 }
