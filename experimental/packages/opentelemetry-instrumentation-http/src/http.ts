@@ -315,6 +315,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
+    /**
+     * Determines if the request has errored or the response has ended/errored.
+     */
+    let responseFinished = false;
+
     /*
      * User 'response' event listeners can be added before our listener,
      * force our listener to be the first, so response emitter is bound
@@ -323,6 +328,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
+        this._diag.debug('outgoingRequest on response()');
         const responseAttributes =
           utils.getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
@@ -344,9 +350,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
 
         context.bind(context.active(), response);
-        this._diag.debug('outgoingRequest on response()');
-        response.on('end', () => {
+
+        const endHandler = () => {
           this._diag.debug('outgoingRequest on end()');
+          if (responseFinished) {
+            return;
+          }
+          responseFinished = true;
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -381,15 +391,24 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             startTime,
             metricAttributes
           );
-        });
+        };
+
+        response.on('end', endHandler);
+        // See https://github.com/open-telemetry/opentelemetry-js/pull/3625#issuecomment-1475673533
+        if (semver.lt(process.version, '16.0.0')) {
+          response.on('close', endHandler);
+        }
         response.on(errorMonitor, (error: Err) => {
           this._diag.debug('outgoingRequest on error()', error);
+          if (responseFinished) {
+            return;
+          }
+          responseFinished = true;
           utils.setSpanWithError(span, error);
-          const code = utils.parseResponseStatus(
-            SpanKind.CLIENT,
-            response.statusCode
-          );
-          span.setStatus({ code, message: error.message });
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: error.message,
+          });
           this._closeHttpSpan(
             span,
             SpanKind.CLIENT,
@@ -401,12 +420,18 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     );
     request.on('close', () => {
       this._diag.debug('outgoingRequest on request close()');
-      if (!request.aborted) {
-        this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
+      if (request.aborted || responseFinished) {
+        return;
       }
+      responseFinished = true;
+      this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
     request.on(errorMonitor, (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
+      if (responseFinished) {
+        return;
+      }
+      responseFinished = true;
       utils.setSpanWithError(span, error);
       this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
