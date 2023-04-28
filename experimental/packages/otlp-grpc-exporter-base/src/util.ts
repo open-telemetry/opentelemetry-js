@@ -180,9 +180,7 @@ export function configureSecurity(
 }
 
 function getSecurityFromEnv(): boolean {
-  const definedInsecure =
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
-    getEnv().OTEL_EXPORTER_OTLP_INSECURE;
+  const definedInsecure = getEnv().OTEL_EXPORTER_OTLP_INSECURE;
 
   if (definedInsecure) {
     return definedInsecure.toLowerCase() === 'true';
@@ -204,9 +202,7 @@ export function useSecureConnection(): grpc.ChannelCredentials {
 }
 
 function retrieveRootCert(): Buffer | undefined {
-  const rootCertificate =
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE ||
-    getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE;
+  const rootCertificate = getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE;
 
   if (rootCertificate) {
     try {
@@ -221,9 +217,7 @@ function retrieveRootCert(): Buffer | undefined {
 }
 
 function retrievePrivateKey(): Buffer | undefined {
-  const clientKey =
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY ||
-    getEnv().OTEL_EXPORTER_OTLP_CLIENT_KEY;
+  const clientKey = getEnv().OTEL_EXPORTER_OTLP_CLIENT_KEY;
 
   if (clientKey) {
     try {
@@ -238,9 +232,7 @@ function retrievePrivateKey(): Buffer | undefined {
 }
 
 function retrieveCertChain(): Buffer | undefined {
-  const clientChain =
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE ||
-    getEnv().OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+  const clientChain = getEnv().OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
 
   if (clientChain) {
     try {
@@ -278,9 +270,7 @@ export function configureCompression(
   if (compression) {
     return toGrpcCompression(compression);
   } else {
-    const definedCompression =
-      getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
-      getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+    const definedCompression = getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
 
     return definedCompression === 'gzip'
       ? GrpcCompressionAlgorithm.GZIP
