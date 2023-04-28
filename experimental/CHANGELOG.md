@@ -11,6 +11,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(otlp-transformer): support log records. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
 * feat(otlp-grpc-exporter-base): support log records. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
 * feat(exporter-logs-otlp-grpc): otlp-grpc exporter for logs. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+* refactor(otlp-transformer): refine metric transformers. [#3770](https://github.com/open-telemetry/opentelemetry-js/pull/3770/) @llc1123
 
 ### :bug: (Bug Fix)
 
