@@ -218,9 +218,7 @@ export function configureCompression(
   if (compression) {
     return compression;
   } else {
-    const definedCompression =
-      getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
-      getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+    const definedCompression = getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
     return definedCompression === CompressionAlgorithm.GZIP
       ? CompressionAlgorithm.GZIP
       : CompressionAlgorithm.NONE;

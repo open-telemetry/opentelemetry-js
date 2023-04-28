@@ -66,50 +66,30 @@ describe('configureExporterTimeout', () => {
     const exporterTimeout = configureExporterTimeout(9000);
     assert.strictEqual(exporterTimeout, 9000);
   });
-  it('should use default trace export timeout env variable value when timeoutMillis parameter is undefined', () => {
+  it('should use env value when timeoutMillis parameter is undefined', () => {
+    envSource.OTEL_EXPORTER_OTLP_TIMEOUT = '9000';
+    const exporterTimeout = configureExporterTimeout(undefined);
+    assert.strictEqual(exporterTimeout, 9000);
+    delete envSource.OTEL_EXPORTER_OTLP_TIMEOUT;
+  });
+  it('should use default trace export timeout env variable value when both timeoutMillis parameter and env value are undefined', () => {
     const exporterTimeout = configureExporterTimeout(undefined);
     assert.strictEqual(exporterTimeout, 10000);
-  });
-  it('should use default trace export timeout env variable value when timeoutMillis parameter is negative', () => {
-    const exporterTimeout = configureExporterTimeout(-18000);
-    assert.strictEqual(exporterTimeout, 10000);
-  });
-  it('should use trace export timeout value defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '15000';
-    const exporterTimeout = configureExporterTimeout(undefined);
-    assert.strictEqual(exporterTimeout, 15000);
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
-  });
-  it('should use default trace export timeout env variable value when trace export timeout value defined in env is negative', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '-15000';
-    const exporterTimeout = configureExporterTimeout(undefined);
-    assert.strictEqual(exporterTimeout, 10000);
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
   });
   it('should use default trace export timeout when timeoutMillis parameter is negative', () => {
     const exporterTimeout = configureExporterTimeout(-15000);
     assert.strictEqual(exporterTimeout, 10000);
   });
-  it('should use timeoutMillis parameter over trace export timeout value defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '11000';
-    const exporterTimeout = configureExporterTimeout(9000);
-    assert.strictEqual(exporterTimeout, 9000);
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
-  });
   it('should use default value when both timeoutMillis parameter and export timeout values defined in env are negative', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '-11000';
     envSource.OTEL_EXPORTER_OTLP_TIMEOUT = '-9000';
     const exporterTimeout = configureExporterTimeout(-5000);
     assert.strictEqual(exporterTimeout, 10000);
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
     delete envSource.OTEL_EXPORTER_OTLP_TIMEOUT;
   });
   it('should use default value export timeout value defined in env are negative', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '-11000';
     envSource.OTEL_EXPORTER_OTLP_TIMEOUT = '-9000';
     const exporterTimeout = configureExporterTimeout(undefined);
     assert.strictEqual(exporterTimeout, 10000);
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
     delete envSource.OTEL_EXPORTER_OTLP_TIMEOUT;
   });
   it('should warn user about invalid timeout', () => {
@@ -153,20 +133,20 @@ describe('configureCompression', () => {
     );
   });
   it('should return gzip compression defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
+    envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
     assert.strictEqual(
       configureCompression(undefined),
       CompressionAlgorithm.GZIP
     );
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
+    delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
   });
   it('should return none for compression defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'none';
+    envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'none';
     assert.strictEqual(
       configureCompression(undefined),
       CompressionAlgorithm.NONE
     );
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
+    delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
   });
   it('should return none for compression when no compression is set', () => {
     assert.strictEqual(

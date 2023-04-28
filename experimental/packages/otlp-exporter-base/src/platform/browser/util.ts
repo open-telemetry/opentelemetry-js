@@ -114,10 +114,9 @@ export function sendWithXhr(
           minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
 
           // retry after interval specified in Retry-After header
-          if (xhr.getResponseHeader('Retry-After')) {
-            retryTime = parseRetryAfterToMills(
-              xhr.getResponseHeader('Retry-After')!
-            );
+          const retryAfter = xhr.getResponseHeader('Retry-After');
+          if (retryAfter) {
+            retryTime = parseRetryAfterToMills(retryAfter);
           } else {
             // exponential backoff with jitter
             retryTime = Math.round(
