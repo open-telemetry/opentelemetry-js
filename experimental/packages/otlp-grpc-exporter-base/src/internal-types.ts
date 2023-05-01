@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-export * from './common/types';
-export * from './metrics/types';
-export * from './resource/types';
-export * from './trace/types';
-export * from './logs/types';
+import type * as protobuf from 'protobufjs';
 
-export { createExportTraceServiceRequest } from './trace';
-export { createExportMetricsServiceRequest } from './metrics';
-export { createExportLogsServiceRequest } from './logs';
+export interface ExportType<T, R = T & { toJSON: () => unknown }> {
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
+}

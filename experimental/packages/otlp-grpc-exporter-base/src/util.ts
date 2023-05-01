@@ -15,7 +15,6 @@
  */
 
 import * as grpc from '@grpc/grpc-js';
-import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
 import { getEnv, globalErrorHandler } from '@opentelemetry/core';
 import * as path from 'path';
@@ -28,10 +27,14 @@ import {
   ServiceClientType,
 } from './types';
 import {
-  CompressionAlgorithm,
   ExportServiceError,
   OTLPExporterError,
+  CompressionAlgorithm,
 } from '@opentelemetry/otlp-exporter-base';
+
+import { MetricExportServiceClient } from './MetricsExportServiceClient';
+import { TraceExportServiceClient } from './TraceExportServiceClient';
+import { LogsExportServiceClient } from './LogsExportServiceClient';
 
 export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
@@ -46,50 +49,41 @@ export function onInit<ExportItem, ServiceRequest>(
     collector.getUrlFromConfig(config)
   );
 
-  const includeDirs = [path.resolve(__dirname, '..', 'protos')];
+  try {
+    if (collector.getServiceClientType() === ServiceClientType.SPANS) {
+      const client = new TraceExportServiceClient(collector.url, credentials, {
+        'grpc.default_compression_algorithm': collector.compression.valueOf(),
+      });
 
-  protoLoader
-    .load(collector.getServiceProtoPath(), {
-      keepCase: false,
-      longs: String,
-      enums: String,
-      defaults: true,
-      oneofs: true,
-      includeDirs,
-    })
-    .then(packageDefinition => {
-      const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      collector.serviceClient = client;
+    } else if (collector.getServiceClientType() === ServiceClientType.METRICS) {
+      const client = new MetricExportServiceClient(collector.url, credentials, {
+        'grpc.default_compression_algorithm': collector.compression.valueOf(),
+      });
 
-      const options = {
-        'grpc.default_compression_algorithm': collector.compression,
-      };
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      collector.serviceClient = client;
+    } else if (collector.getServiceClientType() === ServiceClientType.LOGS) {
+      const client = new LogsExportServiceClient(collector.url, credentials, {
+        'grpc.default_compression_algorithm': collector.compression.valueOf(),
+      });
 
-      if (collector.getServiceClientType() === ServiceClientType.SPANS) {
-        collector.serviceClient =
-          new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-            collector.url,
-            credentials,
-            options
-          );
-      } else {
-        collector.serviceClient =
-          new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
-            collector.url,
-            credentials,
-            options
-          );
-      }
-
-      if (collector.grpcQueue.length > 0) {
-        const queue = collector.grpcQueue.splice(0);
-        queue.forEach((item: GRPCQueueItem<ExportItem>) => {
-          collector.send(item.objects, item.onSuccess, item.onError);
-        });
-      }
-    })
-    .catch(err => {
-      globalErrorHandler(err);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      collector.serviceClient = client;
+    }
+  } catch (err) {
+    globalErrorHandler(err);
+  }
+  if (collector.grpcQueue.length > 0) {
+    const queue = collector.grpcQueue.splice(0);
+    queue.forEach((item: GRPCQueueItem<ExportItem>) => {
+      collector.send(item.objects, item.onSuccess, item.onError);
     });
+  }
 }
 
 export function send<ExportItem, ServiceRequest>(
