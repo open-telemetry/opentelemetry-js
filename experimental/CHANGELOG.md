@@ -16,6 +16,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation): update `require-in-the-middle` to v7.1.0 [#3727](https://github.com/open-telemetry/opentelemetry-js/pull/3727) @trentm
 * fix(instrumentation): update `require-in-the-middle` to v7.0.1 [#3743](https://github.com/open-telemetry/opentelemetry-js/pull/3743) @trentm
 
 ### :books: (Refine Doc)
