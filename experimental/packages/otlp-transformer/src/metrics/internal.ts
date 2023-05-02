@@ -44,24 +44,21 @@ export function toResourceMetrics(
       attributes: toAttributes(resourceMetrics.resource.attributes),
       droppedAttributesCount: 0,
     },
-    schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
+    schemaUrl: undefined,
     scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics),
   };
 }
 
 export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[] {
   return Array.from(
-    scopeMetrics.map(metrics => {
-      const scopeMetrics: IScopeMetrics = {
-        scope: {
-          name: metrics.scope.name,
-          version: metrics.scope.version,
-        },
-        metrics: metrics.metrics.map(metricData => toMetric(metricData)),
-        schemaUrl: metrics.scope.schemaUrl,
-      };
-      return scopeMetrics;
-    })
+    scopeMetrics.map(metrics => ({
+      scope: {
+        name: metrics.scope.name,
+        version: metrics.scope.version,
+      },
+      metrics: metrics.metrics.map(metricData => toMetric(metricData)),
+      schemaUrl: metrics.scope.schemaUrl,
+    }))
   );
 }
 
@@ -76,27 +73,31 @@ export function toMetric(metricData: MetricData): IMetric {
     metricData.aggregationTemporality
   );
 
-  if (metricData.dataPointType === DataPointType.SUM) {
-    out.sum = {
-      aggregationTemporality,
-      isMonotonic: metricData.isMonotonic,
-      dataPoints: toSingularDataPoints(metricData),
-    };
-  } else if (metricData.dataPointType === DataPointType.GAUGE) {
-    // Instrument is a gauge.
-    out.gauge = {
-      dataPoints: toSingularDataPoints(metricData),
-    };
-  } else if (metricData.dataPointType === DataPointType.HISTOGRAM) {
-    out.histogram = {
-      aggregationTemporality,
-      dataPoints: toHistogramDataPoints(metricData),
-    };
-  } else if (metricData.dataPointType === DataPointType.EXPONENTIAL_HISTOGRAM) {
-    out.exponentialHistogram = {
-      aggregationTemporality,
-      dataPoints: toExponentialHistogramDataPoints(metricData),
-    };
+  switch (metricData.dataPointType) {
+    case DataPointType.SUM:
+      out.sum = {
+        aggregationTemporality,
+        isMonotonic: metricData.isMonotonic,
+        dataPoints: toSingularDataPoints(metricData),
+      };
+      break;
+    case DataPointType.GAUGE:
+      out.gauge = {
+        dataPoints: toSingularDataPoints(metricData),
+      };
+      break;
+    case DataPointType.HISTOGRAM:
+      out.histogram = {
+        aggregationTemporality,
+        dataPoints: toHistogramDataPoints(metricData),
+      };
+      break;
+    case DataPointType.EXPONENTIAL_HISTOGRAM:
+      out.exponentialHistogram = {
+        aggregationTemporality,
+        dataPoints: toExponentialHistogramDataPoints(metricData),
+      };
+      break;
   }
 
   return out;
@@ -115,10 +116,13 @@ function toSingularDataPoint(
     timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
   };
 
-  if (valueType === ValueType.INT) {
-    out.asInt = dataPoint.value as number;
-  } else if (valueType === ValueType.DOUBLE) {
-    out.asDouble = dataPoint.value as number;
+  switch (valueType) {
+    case ValueType.INT:
+      out.asInt = dataPoint.value as number;
+      break;
+    case ValueType.DOUBLE:
+      out.asDouble = dataPoint.value as number;
+      break;
   }
 
   return out;
@@ -177,13 +181,10 @@ function toExponentialHistogramDataPoints(
 function toAggregationTemporality(
   temporality: AggregationTemporality
 ): EAggregationTemporality {
-  if (temporality === AggregationTemporality.DELTA) {
-    return EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA;
+  switch (temporality) {
+    case AggregationTemporality.DELTA:
+      return EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA;
+    case AggregationTemporality.CUMULATIVE:
+      return EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE;
   }
-
-  if (temporality === AggregationTemporality.CUMULATIVE) {
-    return EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE;
-  }
-
-  return EAggregationTemporality.AGGREGATION_TEMPORALITY_UNSPECIFIED;
 }
