@@ -16,15 +16,15 @@
 
 import * as types from '../../types';
 import * as path from 'path';
-import * as util from 'util';
+import { types as utilTypes } from 'util';
 import { satisfies } from 'semver';
-import * as shimmer from 'shimmer';
+import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
   RequireInTheMiddleSingleton,
   Hooked,
 } from './RequireInTheMiddleSingleton';
-import { HookFn } from 'import-in-the-middle';
+import type { HookFn } from 'import-in-the-middle';
 import * as ImportInTheMiddle from 'import-in-the-middle';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
@@ -72,44 +72,29 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
-  protected override _wrap: typeof shimmer.wrap = (
-    moduleExports,
-    name,
-    wrapper
-  ) => {
-    if (!util.types.isProxy(moduleExports)) {
-      return shimmer.wrap(moduleExports, name, wrapper);
+  protected override _wrap: typeof wrap = (moduleExports, name, wrapper) => {
+    if (!utilTypes.isProxy(moduleExports)) {
+      return wrap(moduleExports, name, wrapper);
     } else {
-      return this._wrapEsm(moduleExports, name, wrapper);
+      const wrapped = wrap(Object.assign({}, moduleExports), name, wrapper);
+
+      return Object.defineProperty(moduleExports, name, {
+        value: wrapped,
+      });
     }
   };
 
-  protected override _unwrap: typeof shimmer.unwrap = (moduleExports, name) => {
-    if (!util.types.isProxy(moduleExports)) {
-      return shimmer.unwrap(moduleExports, name);
+  protected override _unwrap: typeof unwrap = (moduleExports, name) => {
+    if (!utilTypes.isProxy(moduleExports)) {
+      return unwrap(moduleExports, name);
     } else {
-      return this._unwrapEsm(moduleExports, name);
+      return Object.defineProperty(moduleExports, name, {
+        value: moduleExports[name],
+      });
     }
   };
 
-  private _wrapEsm: typeof shimmer.wrap = (moduleExports, name, wrapper) => {
-    const wrapped = shimmer.wrap(
-      Object.assign({}, moduleExports),
-      name,
-      wrapper
-    );
-    Object.defineProperty(moduleExports, name, {
-      value: wrapped,
-    });
-  };
-
-  private _unwrapEsm: typeof shimmer.unwrap = (moduleExports, name) => {
-    Object.defineProperty(moduleExports, name, {
-      value: moduleExports[name],
-    });
-  };
-
-  protected override _massWrap: typeof shimmer.massWrap = (
+  protected override _massWrap: typeof massWrap = (
     moduleExportsArray,
     names,
     wrapper
@@ -133,7 +118,7 @@ export abstract class InstrumentationBase<T = any>
     });
   };
 
-  protected override _massUnwrap: typeof shimmer.massUnwrap = (
+  protected override _massUnwrap: typeof massUnwrap = (
     moduleExportsArray,
     names
   ) => {
@@ -256,7 +241,7 @@ export abstract class InstrumentationBase<T = any>
 
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
-      const hookFn: ImportInTheMiddle.HookFn = (exports, name, baseDir) => {
+      const hookFn: HookFn = (exports, name, baseDir) => {
         return this._onRequire<typeof exports>(
           module as unknown as InstrumentationModuleDefinition<typeof exports>,
           exports,
