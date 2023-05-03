@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-node",
-  "version": "0.38.0",
+  "version": "0.39.0",
   "description": "OpenTelemetry SDK for Node.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -44,25 +44,25 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.12.0",
-    "@opentelemetry/exporter-jaeger": "1.12.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "0.38.0",
-    "@opentelemetry/exporter-trace-otlp-http": "0.38.0",
-    "@opentelemetry/exporter-trace-otlp-proto": "0.38.0",
-    "@opentelemetry/exporter-zipkin": "1.12.0",
-    "@opentelemetry/instrumentation": "0.38.0",
-    "@opentelemetry/resources": "1.12.0",
-    "@opentelemetry/sdk-metrics": "1.12.0",
-    "@opentelemetry/sdk-trace-base": "1.12.0",
-    "@opentelemetry/sdk-trace-node": "1.12.0",
-    "@opentelemetry/semantic-conventions": "1.12.0"
+    "@opentelemetry/core": "1.13.0",
+    "@opentelemetry/exporter-jaeger": "1.13.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "0.39.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.39.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.39.0",
+    "@opentelemetry/exporter-zipkin": "1.13.0",
+    "@opentelemetry/instrumentation": "0.39.0",
+    "@opentelemetry/resources": "1.13.0",
+    "@opentelemetry/sdk-metrics": "1.13.0",
+    "@opentelemetry/sdk-trace-base": "1.13.0",
+    "@opentelemetry/sdk-trace-node": "1.13.0",
+    "@opentelemetry/semantic-conventions": "1.13.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.3.0 <1.5.0"
   },
   "devDependencies": {
     "@opentelemetry/api": "1.4.1",
-    "@opentelemetry/context-async-hooks": "1.12.0",
+    "@opentelemetry/context-async-hooks": "1.13.0",
     "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "@types/semver": "7.3.9",
