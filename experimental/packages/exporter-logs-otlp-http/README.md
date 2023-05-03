@@ -33,6 +33,7 @@ import {
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 
+// exporter options. see all options in OTLPExporterConfigBase
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/logs
   headers: {}, // an optional object containing custom headers to be sent with each request
@@ -62,6 +63,7 @@ import {
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogsExporter } from '@opentelemetry/exporter-logs-otlp-http';
 
+// exporter options. see all options in OTLPExporterNodeConfigBase
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/logs
   concurrencyLimit: 1, // an optional limit on pending requests
