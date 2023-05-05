@@ -111,7 +111,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   private _getHttpInstrumentation() {
-    const version = process.version;
+    const version = process.versions.node;
     return new InstrumentationNodeModuleDefinition<Http>(
       'http',
       ['*'],
@@ -155,7 +155,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   private _getHttpsInstrumentation() {
-    const version = process.version;
+    const version = process.versions.node;
     return new InstrumentationNodeModuleDefinition<Https>(
       'https',
       ['*'],
