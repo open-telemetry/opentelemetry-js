@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { TargetWithEvents } from './types';
-
 /**
- * check if an object has addEventListener and removeEventListener functions then it will return true
- * @param obj
+ * check if an object has addEventListener and removeEventListener functions then it will return true.
+ * Generally only called with a `TargetWithEvents` but may be called with an unknown / any.
+ * @param obj - The object to check.
  */
-export function isListenerObject(obj: TargetWithEvents = {}): boolean {
+export function isListenerObject(obj: any = {}): boolean {
   return (
     typeof obj.addEventListener === 'function' &&
     typeof obj.removeEventListener === 'function'

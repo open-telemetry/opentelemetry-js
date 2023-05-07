@@ -19,6 +19,7 @@ import {
   AggregationTemporality,
   DataPoint,
   DataPointType,
+  ExponentialHistogram,
   Histogram,
   MetricData,
   ResourceMetrics,
@@ -27,6 +28,7 @@ import {
 import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
+  IExponentialHistogramDataPoint,
   IHistogramDataPoint,
   IMetric,
   INumberDataPoint,
@@ -42,24 +44,21 @@ export function toResourceMetrics(
       attributes: toAttributes(resourceMetrics.resource.attributes),
       droppedAttributesCount: 0,
     },
-    schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
+    schemaUrl: undefined,
     scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics),
   };
 }
 
 export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[] {
   return Array.from(
-    scopeMetrics.map(metrics => {
-      const scopeMetrics: IScopeMetrics = {
-        scope: {
-          name: metrics.scope.name,
-          version: metrics.scope.version,
-        },
-        metrics: metrics.metrics.map(metricData => toMetric(metricData)),
-        schemaUrl: metrics.scope.schemaUrl,
-      };
-      return scopeMetrics;
-    })
+    scopeMetrics.map(metrics => ({
+      scope: {
+        name: metrics.scope.name,
+        version: metrics.scope.version,
+      },
+      metrics: metrics.metrics.map(metricData => toMetric(metricData)),
+      schemaUrl: metrics.scope.schemaUrl,
+    }))
   );
 }
 
@@ -74,29 +73,41 @@ export function toMetric(metricData: MetricData): IMetric {
     metricData.aggregationTemporality
   );
 
-  if (metricData.dataPointType === DataPointType.SUM) {
-    out.sum = {
-      aggregationTemporality,
-      isMonotonic: metricData.isMonotonic,
-      dataPoints: toSingularDataPoints(metricData),
-    };
-  } else if (metricData.dataPointType === DataPointType.GAUGE) {
-    // Instrument is a gauge.
-    out.gauge = {
-      dataPoints: toSingularDataPoints(metricData),
-    };
-  } else if (metricData.dataPointType === DataPointType.HISTOGRAM) {
-    out.histogram = {
-      aggregationTemporality,
-      dataPoints: toHistogramDataPoints(metricData),
-    };
+  switch (metricData.dataPointType) {
+    case DataPointType.SUM:
+      out.sum = {
+        aggregationTemporality,
+        isMonotonic: metricData.isMonotonic,
+        dataPoints: toSingularDataPoints(metricData),
+      };
+      break;
+    case DataPointType.GAUGE:
+      out.gauge = {
+        dataPoints: toSingularDataPoints(metricData),
+      };
+      break;
+    case DataPointType.HISTOGRAM:
+      out.histogram = {
+        aggregationTemporality,
+        dataPoints: toHistogramDataPoints(metricData),
+      };
+      break;
+    case DataPointType.EXPONENTIAL_HISTOGRAM:
+      out.exponentialHistogram = {
+        aggregationTemporality,
+        dataPoints: toExponentialHistogramDataPoints(metricData),
+      };
+      break;
   }
 
   return out;
 }
 
 function toSingularDataPoint(
-  dataPoint: DataPoint<number> | DataPoint<Histogram>,
+  dataPoint:
+    | DataPoint<number>
+    | DataPoint<Histogram>
+    | DataPoint<ExponentialHistogram>,
   valueType: ValueType
 ) {
   const out: INumberDataPoint = {
@@ -105,10 +116,13 @@ function toSingularDataPoint(
     timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
   };
 
-  if (valueType === ValueType.INT) {
-    out.asInt = dataPoint.value as number;
-  } else if (valueType === ValueType.DOUBLE) {
-    out.asDouble = dataPoint.value as number;
+  switch (valueType) {
+    case ValueType.INT:
+      out.asInt = dataPoint.value as number;
+      break;
+    case ValueType.DOUBLE:
+      out.asDouble = dataPoint.value as number;
+      break;
   }
 
   return out;
@@ -137,16 +151,40 @@ function toHistogramDataPoints(metricData: MetricData): IHistogramDataPoint[] {
   });
 }
 
+function toExponentialHistogramDataPoints(
+  metricData: MetricData
+): IExponentialHistogramDataPoint[] {
+  return metricData.dataPoints.map(dataPoint => {
+    const histogram = dataPoint.value as ExponentialHistogram;
+    return {
+      attributes: toAttributes(dataPoint.attributes),
+      count: histogram.count,
+      min: histogram.min,
+      max: histogram.max,
+      sum: histogram.sum,
+      positive: {
+        offset: histogram.positive.offset,
+        bucketCounts: histogram.positive.bucketCounts,
+      },
+      negative: {
+        offset: histogram.negative.offset,
+        bucketCounts: histogram.negative.bucketCounts,
+      },
+      scale: histogram.scale,
+      zeroCount: histogram.zeroCount,
+      startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
+      timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
+    };
+  });
+}
+
 function toAggregationTemporality(
   temporality: AggregationTemporality
 ): EAggregationTemporality {
-  if (temporality === AggregationTemporality.DELTA) {
-    return EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA;
+  switch (temporality) {
+    case AggregationTemporality.DELTA:
+      return EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA;
+    case AggregationTemporality.CUMULATIVE:
+      return EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE;
   }
-
-  if (temporality === AggregationTemporality.CUMULATIVE) {
-    return EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE;
-  }
-
-  return EAggregationTemporality.AGGREGATION_TEMPORALITY_UNSPECIFIED;
 }

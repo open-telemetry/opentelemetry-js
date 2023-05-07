@@ -301,7 +301,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       ): Promise<Response> {
         const self = this;
         const url = web.parseUrl(
-          args[0] instanceof Request ? args[0].url : args[0]
+          args[0] instanceof Request ? args[0].url : String(args[0])
         ).href;
 
         const options = args[0] instanceof Request ? args[0] : args[1] || {};

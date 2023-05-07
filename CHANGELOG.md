@@ -7,18 +7,71 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ## Unreleased
 
-* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
-
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
 
+* feat(core): add environment variables for OTLP log exporters. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+
+### :bug: (Bug Fix)
+
+* fix(http-instrumentation): stop listening to `request`'s `close` event once it has emitted `response` [#3625](https://github.com/open-telemetry/opentelemetry-js/pull/3625) @SimenB
+* fix(sdk-node): fix initialization in bundled environments by not loading @opentelemetry/exporter-jaeger [#3739](https://github.com/open-telemetry/opentelemetry-js/pull/3739) @pichlermarc
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.12.0
+
+### :rocket: (Enhancement)
+
+* feat(tracing): log span name and IDs when span end is called multiple times [#3716](https://github.com/open-telemetry/opentelemetry-js/pull/3716)
+* feat(core): add logs environment variables; add timeout utils method. [#3549](https://github.com/open-telemetry/opentelemetry-js/pull/3549/) @fuaiyi
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): fixed description for http.server.duration metric [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710)
+* fix(opentelemetry-sdk-trace-web): don't crash in runtimes where location isn't defined [#3715](https://github.com/open-telemetry/opentelemetry-js/pull/3715)
+
+## 1.11.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): add exponential histogram support [#3505](https://github.com/open-telemetry/opentelemetry-js/pull/3505), [#3506](https://github.com/open-telemetry/opentelemetry-js/pull/3506) @mwear
+* feat(resources): collect additional process attributes [#3605](https://github.com/open-telemetry/opentelemetry-js/pull/3605) @mwear
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): merge uncollected delta accumulations [#3667](https://github.com/open-telemetry/opentelemetry-js/pull/3667) @legendecas
+* fix(sdk-trace-web): make `parseUrl()` respect document.baseURI [#3670](https://github.com/open-telemetry/opentelemetry-js/pull/3670) @domasx2
+
+### :books: (Refine Doc)
+
+* doc(sdk): update NodeSDK example [#3684](https://github.com/open-telemetry/opentelemetry-js/pull/3684) @martinkuba
+* docs: change vmarchaud status from maintainer to emeritus [#3710](https://github.com/open-telemetry/opentelemetry-js/pull/3710) @vmarchaud
+* docs: change rauno56 status from maintainer to emeritus [#3706](https://github.com/open-telemetry/opentelemetry-js/pull/3706) @rauno56
+
+## 1.10.1
+
+### :bug: (Bug Fix)
+
+* fix(resource): make properties for async resource resolution optional [#3677](https://github.com/open-telemetry/opentelemetry-js/pull/3677) @pichlermarc
+* fix(resource): change fs/promises import to be node 12 compatible [#3681](https://github.com/open-telemetry/opentelemetry-js/pull/3681) @pichlermarc
+
+## 1.10.0
+
+### :rocket: (Enhancement)
+
 * feat(resource): create sync resource with some attributes that resolve asynchronously [#3460](https://github.com/open-telemetry/opentelemetry-js/pull/3460) @samimusallam
+* feat: collect host id for non-cloud environments [#3575](https://github.com/open-telemetry/opentelemetry-js/pull/3575) @mwear
 * feat (api-logs): separate Events API into its own package [3550](https://github.com/open-telemetry/opentelemetry-js/pull/3550) @martinkuba
 * feat(sdk-metrics): apply binary search in histogram recording [#3539](https://github.com/open-telemetry/opentelemetry-js/pull/3539) @legendecas
 * perf(propagator-jaeger): improve deserializeSpanContext performance [#3541](https://github.com/open-telemetry/opentelemetry-js/pull/3541) @doochik
 * feat: support TraceState in SamplingResult [#3530](https://github.com/open-telemetry/opentelemetry-js/pull/3530) @raphael-theriault-swi
 * feat(sdk-trace-base): add diagnostic logging when spans are dropped [#3610](https://github.com/open-telemetry/opentelemetry-js/pull/3610) @neoeinstein
+* feat: add unit to view instrument selection criteria [#3647](https://github.com/open-telemetry/opentelemetry-js/pull/3647) @jlabatut
+* feat(tracing): expose dropped counts for attributes, events and links on span [#3576](https://github.com/open-telemetry/opentelemetry-js/pull/3576) @mohitk05
 
 ### :bug: (Bug Fix)
 

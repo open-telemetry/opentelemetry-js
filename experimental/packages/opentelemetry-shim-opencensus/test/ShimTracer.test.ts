@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-import { Detector } from '../types';
-import { ResourceDetectionConfig } from '../config';
-import { IResource } from '../IResource';
-import { processDetectorSync } from './ProcessDetectorSync';
+import * as assert from 'assert';
 
-/**
- * ProcessDetector will be used to detect the resources related current process running
- * and being instrumented from the NodeJS Process module.
- */
-class ProcessDetector implements Detector {
-  detect(config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(processDetectorSync.detect(config));
-  }
-}
-
-export const processDetector = new ProcessDetector();
+describe('ShimTracer', () => {
+  it('asserts true', () => {
+    assert.ok(true);
+  });
+});

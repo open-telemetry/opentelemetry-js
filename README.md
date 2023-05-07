@@ -173,7 +173,18 @@ instructions to build and make changes to this project, see the
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
-Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
+### Community members
+
+#### Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
+
+- [Amir Blum](https://github.com/blumamir), Aspecto
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
+- [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
+
+*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
+
+#### Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
@@ -188,30 +199,23 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
-Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
-
-- [Amir Blum](https://github.com/blumamir), Aspecto
-- [Chengzhong Wu](https://github.com/legendecas), Alibaba
-- [Daniel Dyla](https://github.com/dyladan), Dynatrace
-- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
-- [Rauno Viskus](https://github.com/Rauno56), Splunk
-- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
-
-*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
-
-### Thanks to all the people who already contributed
-
-<a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
-</a>
-
-### Thanks to all previous approvers and maintainers
+#### Emeriti
 
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep, Maintainer
 - [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
 - [Mayur Kale](https://github.com/mayurkale22), Google, Maintainer
+- [Rauno Viskus](https://github.com/rauno56), Maintainer
+- [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
 - [Roch Devost](https://github.com/rochdev), DataDog, Approver
+
+*Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
+
+#### Thanks to all the people who already contributed
+
+<a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
+</a>
 
 ## Packages
 
@@ -274,6 +278,11 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
+
+### 0.37.x to 0.38.0
+
+- `@opentelemetry/sdk-node` `NodeSDKConfiguration.defaultAttributes` has been unused and was removed as the concept does not exist in OpenTelemetry anymore
+  - Please use `NodeSDKConfiguration.resource` instead.
 
 ### 0.35.x to 0.36.0
 
@@ -544,7 +553,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [compliance-matrix]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md
 [CONTRIBUTING]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md
 
-[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-metrics
+[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node
 
 [otel-instrumentation-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch

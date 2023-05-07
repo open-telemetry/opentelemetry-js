@@ -44,7 +44,10 @@ function getUrlNormalizingAnchor(): HTMLAnchorElement {
  * @param key
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+export function hasKey<O extends object>(
+  obj: O,
+  key: keyof any
+): key is keyof O {
   return key in obj;
 }
 
@@ -302,7 +305,14 @@ export interface URLLike {
  */
 export function parseUrl(url: string): URLLike {
   if (typeof URL === 'function') {
-    return new URL(url, location.href);
+    return new URL(
+      url,
+      typeof document !== 'undefined'
+        ? document.baseURI
+        : typeof location !== 'undefined' // Some JS runtimes (e.g. Deno) don't define this
+        ? location.href
+        : undefined
+    );
   }
   const element = getUrlNormalizingAnchor();
   element.href = url;

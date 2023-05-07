@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-export { Sum, LastValue, Histogram } from './aggregator/types';
+export {
+  Sum,
+  LastValue,
+  Histogram,
+  ExponentialHistogram,
+} from './aggregator/types';
 
 export {
   AggregationSelector,
@@ -29,6 +34,7 @@ export {
   SumMetricData,
   GaugeMetricData,
   HistogramMetricData,
+  ExponentialHistogramMetricData,
   ResourceMetrics,
   ScopeMetrics,
   MetricData,
@@ -55,6 +61,7 @@ export { MeterProvider, MeterProviderOptions } from './MeterProvider';
 export {
   DefaultAggregation,
   ExplicitBucketHistogramAggregation,
+  ExponentialHistogramAggregation,
   DropAggregation,
   HistogramAggregation,
   LastValueAggregation,

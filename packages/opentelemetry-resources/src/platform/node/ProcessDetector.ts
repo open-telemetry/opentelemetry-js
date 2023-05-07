@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-declare module 'require-in-the-middle' {
-  namespace hook {
-    type Options = {
-      internals?: boolean;
-    };
-    type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
-    type Hooked = { unhook(): void };
+import { Detector } from '../../types';
+import { ResourceDetectionConfig } from '../../config';
+import { IResource } from '../../IResource';
+import { processDetectorSync } from './ProcessDetectorSync';
+
+/**
+ * ProcessDetector will be used to detect the resources related current process running
+ * and being instrumented from the NodeJS Process module.
+ */
+class ProcessDetector implements Detector {
+  detect(config?: ResourceDetectionConfig): Promise<IResource> {
+    return Promise.resolve(processDetectorSync.detect(config));
   }
-  function hook(
-    modules: string[] | null,
-    options: hook.Options | null,
-    onRequire: hook.OnRequireFn
-  ): hook.Hooked;
-  function hook(
-    modules: string[] | null,
-    onRequire: hook.OnRequireFn
-  ): hook.Hooked;
-  function hook(onRequire: hook.OnRequireFn): hook.Hooked;
-  export = hook;
 }
+
+export const processDetector = new ProcessDetector();

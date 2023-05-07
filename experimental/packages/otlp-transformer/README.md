@@ -7,7 +7,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This package provides everything needed to serialize [OpenTelemetry SDK][sdk] traces and metrics into the [OpenTelemetry Protocol][otlp] format.
+This package provides everything needed to serialize [OpenTelemetry SDK][sdk] traces, metrics and logs into the [OpenTelemetry Protocol][otlp] format.
 
 ## Quick Start
 
@@ -19,15 +19,20 @@ To get started you will need to install a compatible OpenTelemetry API.
 npm install @opentelemetry/api
 ```
 
-### Serialize Traces and Metrics
+### Serialize Traces/Metrics/Logs
 
-This module exports functions to serialize traces and metrics from the OpenTelemetry SDK into protocol buffers which can be sent over HTTP to the OpenTelemetry collector or a compatible receiver.
+This module exports functions to serialize traces, metrics and logs from the OpenTelemetry SDK into protocol buffers which can be sent over HTTP to the OpenTelemetry collector or a compatible receiver.
 
 ```typescript
-import { createExportTraceServiceRequest, createExportMetricsServiceRequest } from "@opentelemetry/otlp-transformer";
+import {
+  createExportTraceServiceRequest,
+  createExportMetricsServiceRequest,
+  createExportLogsServiceRequest,
+} from '@opentelemetry/otlp-transformer';
 
 const serializedSpans = createExportTraceServiceRequest(readableSpans);
 const serializedMetrics = createExportMetricsServiceRequest(readableMetrics);
+const serializedLogs = createExportLogsServiceRequest(readableLogRecords);
 ```
 
 ## Useful links
