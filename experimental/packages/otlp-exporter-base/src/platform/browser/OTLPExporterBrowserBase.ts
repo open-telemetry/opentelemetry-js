@@ -20,8 +20,7 @@ import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithFetch, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { _globalThis } from '@opentelemetry/core';
+import { getEnv, baggageUtils, _globalThis } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class
