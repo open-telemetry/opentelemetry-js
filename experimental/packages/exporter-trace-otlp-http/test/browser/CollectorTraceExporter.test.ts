@@ -599,7 +599,7 @@ describe('OTLPTraceExporter - web', () => {
         );
       };
 
-      it('should successfully send spans using XMLHttpRequest', done => {
+      it('should successfully send spans using fetch', done => {
         collectorTraceExporter.export(spans, () => {
           try {
             assert.ok(fetchMock.called('*'));
