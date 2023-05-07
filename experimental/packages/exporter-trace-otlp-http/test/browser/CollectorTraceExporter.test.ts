@@ -586,7 +586,7 @@ describe('OTLPTraceExporter - web', () => {
         fetchMock.restore();
       });
 
-      const assertRequesetHeaders = (
+      const assertRequestHeaders = (
         call: MockCall | undefined,
         expected: Record<string, string>
       ) => {
@@ -603,7 +603,7 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
           try {
             assert.ok(fetchMock.called('*'));
-            assertRequesetHeaders(fetchMock.lastCall('*'), customHeaders);
+            assertRequestHeaders(fetchMock.lastCall('*'), customHeaders);
             assert.strictEqual(stubBeacon.callCount, 0);
             assert.strictEqual(stubOpen.callCount, 0);
             assert.strictEqual(stubXhr.callCount, 0);
