@@ -650,7 +650,7 @@ describe('OTLPMetricExporter - web', () => {
         );
       };
 
-      it('should successfully send metrics using XMLHttpRequest', done => {
+      it('should successfully send metrics using fetch', done => {
         collectorExporter.export(metrics, () => {
           try {
             assert.ok(fetchMock.called('*'));
