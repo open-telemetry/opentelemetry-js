@@ -4,6 +4,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
+### :rocket: (Enhancement)
+
+* feat(otlp-exporters): Add User-Agent header to OTLP exporters [#3790](https://github.com/open-telemetry/opentelemetry-js/pull/3790) @JamieDanielson
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
