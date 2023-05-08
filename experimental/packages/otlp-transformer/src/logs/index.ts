@@ -93,7 +93,7 @@ function logRecordsToResourceLogs(
 function toLogRecord(log: ReadableLogRecord, useHex?: boolean): ILogRecord {
   return {
     timeUnixNano: hrTimeToNanoseconds(log.hrTime),
-    observedTimeUnixNano: hrTimeToNanoseconds(log.hrTime),
+    observedTimeUnixNano: hrTimeToNanoseconds(log.hrTimeObserved),
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),

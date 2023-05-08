@@ -21,6 +21,7 @@ import type { SeverityNumber } from '@opentelemetry/api-logs';
 
 export interface ReadableLogRecord {
   readonly hrTime: HrTime;
+  readonly hrTimeObserved: HrTime;
   readonly spanContext?: SpanContext;
   readonly severityText?: string;
   readonly severityNumber?: SeverityNumber;
