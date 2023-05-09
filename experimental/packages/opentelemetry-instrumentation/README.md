@@ -221,7 +221,7 @@ to avoid leaking information from one provider to the other because there are a 
 
 ## Limitations
 
-Instrumentations for external modules (e.g. express, mongodb,...) hook the `require` call. Therefore following conditions need to be met that this mechanism can work:
+Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call. Therefore following conditions need to be met that this mechanism can work:
 
 * `require` is used. ECMA script modules (using `import`) is not supported as of now
 * Instrumentations are registered **before** the module to instrument is `require`ed
