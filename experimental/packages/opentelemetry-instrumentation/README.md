@@ -269,6 +269,8 @@ As the module loading mechanism for ESM is different than CJS, you need to selec
 To avoid using the `--experimental-import-meta-resolve` flag, the hook file can be referenced directly from the `import-in-the-middle` library as `--experimental-loader=import-in-the-middle/hook.mjs`.
 As the ESM module loader from NodeJS is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
 
+**Note**: ESM is not yet supported for Node 20.
+
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
