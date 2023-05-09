@@ -69,6 +69,6 @@
     "semver": "^7.3.5",
     "require-in-the-middle": "^6.0.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opencensus",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/shim-opencensus",
   "sideEffects": false
 }
