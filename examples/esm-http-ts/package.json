@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "start": "node --experimental-import-meta-resolve --experimental-loader=@opentelemetry/instrumentation/hook.mjs ./build/index.js"
+    "start": "node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ./build/index.js"
   },
   "repository": {
     "type": "git",

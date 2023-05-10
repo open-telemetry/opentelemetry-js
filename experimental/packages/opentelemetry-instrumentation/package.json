@@ -49,7 +49,7 @@
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test:cjs": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
-    "test:esm": "nyc node --experimental-import-meta-resolve --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs' test/node/*.test.mjs",
+    "test:esm": "nyc node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs' test/node/*.test.mjs",
     "test": "npm run test:cjs && npm run test:esm",
     "test:browser": "nyc karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
