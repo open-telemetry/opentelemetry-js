@@ -21,6 +21,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
+* doc(instrumentation): add limitiations section to readme [#3786](https://github.com/open-telemetry/opentelemetry-js/pull/3786) @flarna
+
 ### :house: (Internal)
 
 ## 0.38.0
