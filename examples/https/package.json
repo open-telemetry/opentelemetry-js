@@ -1,7 +1,7 @@
 {
   "name": "https-example",
   "private": true,
-  "version": "0.38.0",
+  "version": "0.39.0",
   "description": "Example of HTTPs integration with OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -33,14 +33,14 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/exporter-jaeger": "1.12.0",
-    "@opentelemetry/exporter-zipkin": "1.12.0",
-    "@opentelemetry/instrumentation": "0.38.0",
-    "@opentelemetry/instrumentation-http": "0.38.0",
-    "@opentelemetry/resources": "1.12.0",
-    "@opentelemetry/sdk-trace-base": "1.12.0",
-    "@opentelemetry/sdk-trace-node": "1.12.0",
-    "@opentelemetry/semantic-conventions": "1.12.0"
+    "@opentelemetry/exporter-jaeger": "1.13.0",
+    "@opentelemetry/exporter-zipkin": "1.13.0",
+    "@opentelemetry/instrumentation": "0.39.0",
+    "@opentelemetry/instrumentation-http": "0.39.0",
+    "@opentelemetry/resources": "1.13.0",
+    "@opentelemetry/sdk-trace-base": "1.13.0",
+    "@opentelemetry/sdk-trace-node": "1.13.0",
+    "@opentelemetry/semantic-conventions": "1.13.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/https",
   "devDependencies": {
