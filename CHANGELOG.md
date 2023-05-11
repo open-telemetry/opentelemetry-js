@@ -11,7 +11,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(SpanExpoter): Add mandatory forceFlush to SpanExporter interface [#3753](https://github.com/open-telemetry/opentelemetry-js/pull/3753/) @sgracias1 @JacksonWeber
+* feat(SpanExpoter): Add optional forceFlush to SpanExporter interface [#3753](https://github.com/open-telemetry/opentelemetry-js/pull/3753/) @sgracias1 @JacksonWeber
 * feat(core): add environment variables for OTLP log exporters. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
 
 ### :bug: (Bug Fix)
