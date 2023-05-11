@@ -8,17 +8,17 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
-    "compile": "tsc --build",
+    "compile": "npm run protos && tsc --build",
     "clean": "tsc --build --clean",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "postcompile": "npm run submodule && npm run protos:copy",
-    "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
+    "protos": "npm run submodule && npm run protos:generate",
+    "protos:generate": "node ../../../scripts/generate-protos.js",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "npm run protos:copy && tsc -w",
+    "watch": "npm run protos && tsc -w",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
@@ -40,7 +40,6 @@
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
-    "build/protos/**/*.proto",
     "doc",
     "LICENSE",
     "README.md"
@@ -64,16 +63,17 @@
     "sinon": "15.0.0",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
-    "typescript": "4.4.4"
+    "typescript": "4.4.4",
+    "protobufjs-cli": "1.0.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
-    "@grpc/proto-loader": "^0.7.3",
     "@opentelemetry/core": "1.12.0",
-    "@opentelemetry/otlp-exporter-base": "0.38.0"
+    "@opentelemetry/otlp-exporter-base": "0.38.0",
+    "protobufjs": "^7.2.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base",
   "sideEffects": false

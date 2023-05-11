@@ -34,13 +34,15 @@ export interface GRPCQueueItem<ExportedItem> {
 /**
  * Service Client for sending spans/metrics/logs
  */
-export interface ServiceClient extends grpc.Client {
+export interface ServiceClient {
   export: (
     request: any,
     metadata: grpc.Metadata,
     options: grpc.CallOptions,
     callback: Function
   ) => {};
+
+  close(): void;
 }
 
 /**
