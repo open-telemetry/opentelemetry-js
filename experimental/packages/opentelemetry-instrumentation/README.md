@@ -23,9 +23,9 @@ import {
 
 import type * as module_name_to_be_patched from 'module_name_to_be_patched';
 
-export class MyPlugin extends InstrumentationBase {
+export class MyInstrumentation extends InstrumentationBase {
   constructor(config: InstrumentationConfig = {}) {
-    super('MyPlugin', VERSION, config);
+    super('MyInstrumentation', VERSION, config);
   }
 
   /**
@@ -106,12 +106,12 @@ export class MyPlugin extends InstrumentationBase {
   }
 }
 
-// Later
+// Later, but before the module to instrument is required
 
-const myPLugin = new MyPlugin();
-myPLugin.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
-myPLugin.setMeterProvider(meterProvider); // this is optional
-myPLugin.enable();
+const myInstrumentationn = new MyInstrumentation();
+myInstrumentation.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
+myInstrumentation.setMeterProvider(meterProvider); // this is optional
+myInstrumentation.enable();
 // or use Auto Loader
 ```
 
@@ -125,9 +125,9 @@ import {
 
 import { Instrumentation } from '@opentelemetry/instrumentation';
 
-export class MyPlugin extends InstrumentationBase {
+export class MyInstrumentation extends InstrumentationBase {
   constructor(config: InstrumentationConfig = {}) {
-    super('MyPlugin', VERSION, config);
+    super('MyInstrumentation', VERSION, config);
   }
 
   private _patchOpen() {
@@ -150,58 +150,14 @@ export class MyPlugin extends InstrumentationBase {
 
 // Later
 
-const myPLugin = new MyPlugin();
-myPLugin.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
-myPLugin.setMeterProvider(meterProvider); // this is optional, only if global MeterProvider shouldn't be used
-myPLugin.enable();
+const myInstrumentation = new MyInstrumentation();
+myInstrumentation.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
+myInstrumentation.setMeterProvider(meterProvider); // this is optional, only if global MeterProvider shouldn't be used
+myInstrumentation.enable();
 // or use Auto Loader
 ```
 
 ## AutoLoader
-
-Successor of loading plugins through TracerProvider "plugins" option.
-It also supersedes PluginLoader for node. The old configurations usually looks like
-
-### NODE - old way using TracerProvider - not available anymore
-
-```javascript
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
-const { B3Propagator } = require('@opentelemetry/propagator-b3');
-const provider = new NodeTracerProvider({
-  plugins: {
-    http: { enabled: false },
-  },
-});
-provider.register({
-  propagator: new B3Propagator(),
-});
-```
-
-### WEB - old way using TracerProvider - not available anymore
-
-```javascript
-const { WebTracerProvider } = require('@opentelemetry/sdk-trace-web');
-const { UserInteractionPlugin } = require('@opentelemetry/plugin-user-interaction');
-const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
-const { B3Propagator } = require('@opentelemetry/propagator-b3');
-const provider = new WebTracerProvider({
-  plugins: [
-    new UserInteractionPlugin(),
-    new XMLHttpRequestInstrumentation({
-      ignoreUrls: [/localhost/],
-      propagateTraceHeaderCorsUrls: [
-        'http://localhost:8090',
-      ],
-    }),
-  ],
-});
-provider.register({
-  propagator: new B3Propagator(),
-});
-```
-
-After change it will look like this - mixing plugins and instrumentations together
-All plugins will be bound to TracerProvider as well as instrumentations
 
 ### NODE - Auto Loader
 
@@ -263,14 +219,22 @@ If nothing is specified the global registered provider is used. Usually this is 
 There might be usecase where someone has the need for more providers within an application. Please note that special care must be takes in such setups
 to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
+## Limitations
+
+Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call. Therefore following conditions need to be met that this mechanism can work:
+
+* `require` is used. ECMA script modules (using `import`) is not supported as of now
+* Instrumentations are registered **before** the module to instrument is `require`ed
+* modules are not included in a bundle. Tools like `esbuild`, `webpack`, ... usually have some mechanism to exclude specific modules from bundling
+
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
