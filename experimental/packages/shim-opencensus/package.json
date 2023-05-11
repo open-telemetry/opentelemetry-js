@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/shim-opencensus",
-  "version": "0.38.0",
+  "version": "0.39.0",
   "description": "OpenCensus to OpenTelemetry shim",
   "private": true,
   "main": "build/src/index.js",
@@ -45,8 +45,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/core": "1.12.0",
-    "@opentelemetry/context-async-hooks": "1.12.0",
+    "@opentelemetry/core": "1.13.0",
+    "@opentelemetry/context-async-hooks": "1.13.0",
     "@opencensus/core": "0.1.0",
     "@opentelemetry/api": "1.4.1",
     "@types/mocha": "10.0.0",
@@ -64,10 +64,10 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "^1.0.0",
-    "@opentelemetry/context-async-hooks": "^1.0.0",
-    "semver": "^7.3.5",
-    "require-in-the-middle": "^6.0.0"
+    "@opentelemetry/context-async-hooks": "1.13.0",
+    "@opentelemetry/core": "1.13.0",
+    "require-in-the-middle": "^6.0.0",
+    "semver": "^7.3.5"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/shim-opencensus",
   "sideEffects": false
