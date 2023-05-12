@@ -16,6 +16,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+## 0.39.1
+
+### :bug: (Bug Fix)
+
+* fix(otlp-transformer): move api-logs to dependencies [#3798](https://github.com/open-telemetry/opentelemetry-js/pull/3798) @pichlermarc
+
 ## 0.39.0
 
 ### :rocket: (Enhancement)
