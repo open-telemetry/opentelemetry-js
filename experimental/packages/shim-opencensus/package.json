@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/shim-opencensus",
-  "version": "0.39.0",
+  "version": "0.39.1",
   "description": "OpenCensus to OpenTelemetry shim",
   "private": true,
   "main": "build/src/index.js",
