@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-declare module 'require-in-the-middle' {
-  namespace hook {
-    type Options = {
-      internals?: boolean;
-    };
-    type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
-    type Hooked = { unhook(): void };
-  }
-  function hook(
-    modules: string[] | null,
-    options: hook.Options | null,
-    onRequire: hook.OnRequireFn
-  ): hook.Hooked;
-  function hook(
-    modules: string[] | null,
-    onRequire: hook.OnRequireFn
-  ): hook.Hooked;
-  function hook(onRequire: hook.OnRequireFn): hook.Hooked;
-  export = hook;
+import type * as protobuf from 'protobufjs';
+
+export interface ExportType<T, R = T & { toJSON: () => unknown }> {
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
 }

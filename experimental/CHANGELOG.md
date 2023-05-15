@@ -8,16 +8,39 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat(otlp-transformer): support log records. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
-* feat(otlp-grpc-exporter-base): support log records. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
-* feat(exporter-logs-otlp-grpc): otlp-grpc exporter for logs. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+* feat(instrumentation): add ESM support for instrumentation. [#3698](https://github.com/open-telemetry/opentelemetry-js/pull/3698) @JamieDanielson, @pkanal, @vmarchaud, @lizthegrey, @bengl
 * feat(exporter-logs-otlp-http): otlp-http exporter for logs. [#3764](https://github.com/open-telemetry/opentelemetry-js/pull/3764/) @fuaiyi
 
 ### :bug: (Bug Fix)
 
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.39.1
+
+### :bug: (Bug Fix)
+
+* fix(otlp-transformer): move api-logs to dependencies [#3798](https://github.com/open-telemetry/opentelemetry-js/pull/3798) @pichlermarc
+
+## 0.39.0
+
+### :rocket: (Enhancement)
+
+* feat(otlp-transformer): support log records. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+* feat(otlp-grpc-exporter-base): support log records. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+* feat(exporter-logs-otlp-grpc): otlp-grpc exporter for logs. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+* feat(otlp-grpc-exporter-base): use statically generated protobuf code [#3705](https://github.com/open-telemetry/opentelemetry-js/pull/3705) @pichlermarc
+* refactor(otlp-transformer): refine metric transformers. [#3770](https://github.com/open-telemetry/opentelemetry-js/pull/3770/) @llc1123
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): update `require-in-the-middle` to v7.1.0 [#3727](https://github.com/open-telemetry/opentelemetry-js/pull/3727) @trentm
 * fix(instrumentation): update `require-in-the-middle` to v7.0.1 [#3743](https://github.com/open-telemetry/opentelemetry-js/pull/3743) @trentm
 
 ### :books: (Refine Doc)
+
+* doc(instrumentation): add limitiations section to readme [#3786](https://github.com/open-telemetry/opentelemetry-js/pull/3786) @flarna
 
 ### :house: (Internal)
 

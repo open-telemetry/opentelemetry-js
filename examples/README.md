@@ -17,6 +17,7 @@ use the latest and greatest features, and best practices.
 | [grpc](grpc/)                             | gRPC Instrumentation to automatically collect trace data and export them to the backend of choice                        | Intermediate     |
 | [otlp-exporter-node](otlp-exporter-node/) | This example shows how to use `@opentelemetry/exporter-otlp-http` to instrument a simple Node.js application             | Intermediate     |
 | [opentracing-shim](opentracing-shim/)     | This is a simple example that demonstrates how existing OpenTracing instrumentation can be integrated with OpenTelemetry | Intermediate     |
+| [esm-http-ts](esm-http-ts/)     | This is a simple example that demonstrates tracing HTTP request, with an app written in TypeScript and transpiled to ES Modules. | Intermediate     |
 
 Examples of experimental packages can be found at [experimental/examples](../experimental/examples).
 

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-proto-exporter-base",
-  "version": "0.38.0",
+  "version": "0.39.1",
   "description": "OpenTelemetry OTLP-HTTP-protobuf Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -19,7 +19,8 @@
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "protos": "npm run submodule && node scripts/protos.js",
+    "protos": "npm run submodule && npm run protos:generate",
+    "protos:generate": "node ../../../scripts/generate-protos.js",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "version": "node ../../../scripts/version-update.js",
     "watch": "npm run protos && tsc -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
@@ -76,8 +77,8 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.12.0",
-    "@opentelemetry/otlp-exporter-base": "0.38.0",
+    "@opentelemetry/core": "1.13.0",
+    "@opentelemetry/otlp-exporter-base": "0.39.1",
     "protobufjs": "^7.1.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-proto-exporter-base",
