@@ -4,7 +4,31 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
+### :rocket: (Enhancement)
+
+* feat(otlp-trace-exporters): Add User-Agent header to OTLP trace exporters. [#3790](https://github.com/open-telemetry/opentelemetry-js/pull/3790) @JamieDanielson
+
 ### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+* feat(instrumentation): add ESM support for instrumentation. [#3698](https://github.com/open-telemetry/opentelemetry-js/pull/3698) @JamieDanielson, @pkanal, @vmarchaud, @lizthegrey, @bengl
+
+### :bug: (Bug Fix)
+
+* fix(sdk-node): use resource interface instead of concrete class [#3803](https://github.com/open-telemetry/opentelemetry-js/pull/3803) @blumamir
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.39.1
+
+### :bug: (Bug Fix)
+
+* fix(otlp-transformer): move api-logs to dependencies [#3798](https://github.com/open-telemetry/opentelemetry-js/pull/3798) @pichlermarc
+
+## 0.39.0
 
 ### :rocket: (Enhancement)
 
@@ -20,6 +44,8 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation): update `require-in-the-middle` to v7.0.1 [#3743](https://github.com/open-telemetry/opentelemetry-js/pull/3743) @trentm
 
 ### :books: (Refine Doc)
+
+* doc(instrumentation): add limitiations section to readme [#3786](https://github.com/open-telemetry/opentelemetry-js/pull/3786) @flarna
 
 ### :house: (Internal)
 
