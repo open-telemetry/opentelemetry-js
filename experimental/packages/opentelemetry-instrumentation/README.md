@@ -219,12 +219,18 @@ If nothing is specified the global registered provider is used. Usually this is 
 There might be usecase where someone has the need for more providers within an application. Please note that special care must be takes in such setups
 to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
+## Instrumentation for ES Modules In NodeJS (experimental)
+
+As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the esm module it want to patch. To do so, you must provide the `--experimental-loader=@opentelemetry/instrumentation/hook.mjs` flag to the `node` binary. Alternatively you can set the `NODE_OPTIONS` environment variable to `NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs"`.
+As the ESM module loader from NodeJS is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
+
+**Note**: ESM Instrumentation is not yet supported for Node 20.
+
 ## Limitations
 
-Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call. Therefore following conditions need to be met that this mechanism can work:
+Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call or `import` statement. Therefore following conditions need to be met that this mechanism can work:
 
-* `require` is used. ECMA script modules (using `import`) is not supported as of now
-* Instrumentations are registered **before** the module to instrument is `require`ed
+* Instrumentations are registered **before** the module to instrument is `require`ed (CJS only)
 * modules are not included in a bundle. Tools like `esbuild`, `webpack`, ... usually have some mechanism to exclude specific modules from bundling
 
 ## License
