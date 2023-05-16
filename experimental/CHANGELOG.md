@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* chore(instrumentation-grpc): Drop support for package `grpc`. [#3807](https://github.com/open-telemetry/opentelemetry-js/pull/3807) @llc1123
+
 ### :rocket: (Enhancement)
 
 * feat(instrumentation): add ESM support for instrumentation. [#3698](https://github.com/open-telemetry/opentelemetry-js/pull/3698) @JamieDanielson, @pkanal, @vmarchaud, @lizthegrey, @bengl
