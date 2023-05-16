@@ -22,7 +22,8 @@ import {
   OTLPExporterConfigBase,
   sendWithXhr,
 } from '@opentelemetry/otlp-exporter-base';
-import * as root from '../../generated/root';
+
+import { getExportRequestProto } from '../util';
 
 interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
   create(properties?: T): R;
@@ -44,13 +45,7 @@ export abstract class OTLPProtoExporterBrowserBase<
   private _getExportRequestProto(
     clientType: ServiceClientType
   ): ExportRequestType<ServiceRequest> {
-    if (clientType === ServiceClientType.SPANS) {
-      // eslint-disable-next-line
-      return root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
-    } else {
-      // eslint-disable-next-line
-      return root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest as unknown as ExportRequestType<ServiceRequest>;
-    }
+    return getExportRequestProto(clientType);
   }
 
   override send(

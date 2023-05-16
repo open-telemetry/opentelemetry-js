@@ -12,6 +12,9 @@
       "path": "experimental/packages/api-logs/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/exporter-logs-otlp-proto/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/exporter-trace-otlp-http/tsconfig.esm.json"
     },
     {

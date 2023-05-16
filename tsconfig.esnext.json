@@ -12,6 +12,9 @@
       "path": "experimental/packages/api-logs/tsconfig.esnext.json"
     },
     {
+      "path": "experimental/packages/exporter-logs-otlp-proto/tsconfig.esnext.json"
+    },
+    {
       "path": "experimental/packages/exporter-trace-otlp-http/tsconfig.esnext.json"
     },
     {
