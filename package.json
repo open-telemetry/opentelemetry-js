@@ -44,7 +44,7 @@
     "prepare_release:sdk:minor": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:version_minor && npm run _restore:lerna",
 
     "comment_internal": "echo scripts below this line are for internal use",
-    "_check:no_changes": "[[ -z $(git status -uno --porcelain) ]] || (echo Please ensure all changes are committed && exit 1)",
+    "_check:no_changes": "if [ ! -z \"$(git status -uno --porcelain)\" ]; then echo Please ensure all changes are committed; exit 1; fi",
     "_backup:lerna": "cp lerna.json lerna.json.backup",
     "_restore:lerna": "mv lerna.json.backup lerna.json",
     "_lerna:remove_api": "node -e 'var fs=require(\"fs\");var l=require(\"./lerna.json\");l.packages=l.packages.filter(p=>p!==\"api\");fs.writeFileSync(\"lerna.json\",JSON.stringify(l,null,2))'",
