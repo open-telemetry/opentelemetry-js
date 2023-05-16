@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Attributes, Context } from '@opentelemetry/api';
+import { Attributes, AttributeValue, Context } from '@opentelemetry/api';
+
+export interface LogAttributes {
+  [attributeKey: string]: Attributes | AttributeValue | undefined;
+}
 
 export enum SeverityNumber {
   UNSPECIFIED = 0,
@@ -68,7 +72,7 @@ export interface LogRecord {
   /**
    * Attributes that define the log record.
    */
-  attributes?: Attributes;
+  attributes?: LogAttributes;
 
   /**
    * The Context associated with the LogRecord.

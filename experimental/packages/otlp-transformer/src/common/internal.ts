@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Attributes } from '@opentelemetry/api';
+import { LogAttributes } from '@opentelemetry/api-logs';
 import type { IAnyValue, IKeyValue } from './types';
 
-export function toAttributes(attributes: Attributes): IKeyValue[] {
+export function toAttributes(attributes: LogAttributes): IKeyValue[] {
   return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
 }
 
