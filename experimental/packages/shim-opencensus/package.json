@@ -67,7 +67,7 @@
   "dependencies": {
     "@opentelemetry/context-async-hooks": "1.13.0",
     "@opentelemetry/core": "1.13.0",
-    "require-in-the-middle": "^6.0.0",
+    "require-in-the-middle": "^7.0.0",
     "semver": "^7.3.5"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/shim-opencensus",
