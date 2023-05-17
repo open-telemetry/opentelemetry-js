@@ -44,7 +44,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   async forceFlush(): Promise<void> {
-    // await unresolved resources before resolving.
+    // await unresolved resources before resolving
     await Promise.all(Array.from(this._unresolvedExports));
     if (this._exporter.forceFlush) {
       await this._exporter.forceFlush();
