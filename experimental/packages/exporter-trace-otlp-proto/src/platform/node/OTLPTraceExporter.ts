@@ -29,9 +29,13 @@ import {
   createExportTraceServiceRequest,
   IExportTraceServiceRequest,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../version';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const USER_AGENT = {
+  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+};
 
 /**
  * Collector Trace Exporter for Node with protobuf
@@ -42,12 +46,13 @@ export class OTLPTraceExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(config);
-    this.headers = Object.assign(
-      this.headers,
-      baggageUtils.parseKeyPairsIntoRecord(
+    this.headers = {
+      ...this.headers,
+      ...USER_AGENT,
+      ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
-      )
-    );
+      ),
+    };
   }
 
   convert(spans: ReadableSpan[]): IExportTraceServiceRequest {

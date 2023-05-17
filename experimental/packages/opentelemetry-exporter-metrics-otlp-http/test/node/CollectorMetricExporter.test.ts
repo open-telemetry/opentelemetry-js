@@ -50,6 +50,7 @@ import {
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -187,6 +188,13 @@ describe('OTLPMetricExporter - node with json over http', () => {
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
+    it('should include user agent in header', () => {
+      const collectorExporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        collectorExporter._otlpExporter.headers['User-Agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
