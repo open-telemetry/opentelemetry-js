@@ -37,13 +37,15 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
   IExportMetricsServiceRequest
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config);
-    this.headers = Object.assign(
-      this.headers,
-      baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      )
-    );
+    super({
+      ...config,
+      headers: {
+        ...baggageUtils.parseKeyPairsIntoRecord(
+          getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+        ),
+        ...config?.headers,
+      },
+    });
   }
 
   convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {

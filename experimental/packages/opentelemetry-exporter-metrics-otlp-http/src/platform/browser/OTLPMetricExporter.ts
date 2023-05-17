@@ -37,13 +37,15 @@ class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<
   IExportMetricsServiceRequest
 > {
   constructor(config?: OTLPMetricExporterOptions & OTLPExporterConfigBase) {
-    super(config);
-    this._headers = Object.assign(
-      this._headers,
-      baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      )
-    );
+    super({
+      ...config,
+      headers: {
+        ...baggageUtils.parseKeyPairsIntoRecord(
+          getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+        ),
+        ...config?.headers,
+      },
+    });
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {
