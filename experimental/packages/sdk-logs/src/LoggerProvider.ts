@@ -64,8 +64,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    */
   public getLogger(
     name: string,
-    version?: string,
-    options?: logsAPI.LoggerOptions
+    version = "",
+    options: logsAPI.LoggerOptions = {}
   ): logsAPI.Logger {
     if (this._shutdownOnce.isCalled) {
       diag.warn('A shutdown LoggerProvider cannot provide a Logger');
@@ -76,23 +76,27 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       diag.warn('Logger requested without instrumentation scope name.');
     }
     const loggerName = name || DEFAULT_LOGGER_NAME;
-    const key = `${loggerName}@${version || ''}:${options?.schemaUrl || ''}`;
+    const key = `${loggerName}@${version || ''}:${options.schemaUrl || ''}`;
     if (!this._loggers.has(key)) {
+
+      const loggerConfig: LoggerConfig = {
+        logRecordLimits: this._config.logRecordLimits
+      };
+      if (options.includeTraceContext) {
+        loggerConfig.includeTraceContext = options.includeTraceContext;
+      }
       this._loggers.set(
         key,
         new Logger(
-          { name: loggerName, version, schemaUrl: options?.schemaUrl },
-          {
-            logRecordLimits: this._config.logRecordLimits,
-            includeTraceContext: options?.includeTraceContext,
-          },
+          { name: loggerName, version, schemaUrl: options.schemaUrl },
+          loggerConfig,
           this
         )
       );
     }
     return this._loggers.get(key)!;
   }
-
+  
   /**
    * Adds a new {@link LogRecordProcessor} to this logger.
    * @param processor the new LogRecordProcessor to be added.
