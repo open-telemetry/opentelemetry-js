@@ -85,189 +85,104 @@ describe('OTLPTraceExporter - web', () => {
   });
 
   describe('export', () => {
+    let server: any;
+    let clock: sinon.SinonFakeTimers;
     beforeEach(() => {
       collectorExporterConfig = {
         hostname: 'foo',
         url: 'http://foo.bar.com',
       };
+
+      clock = sinon.useFakeTimers();
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+      server = sinon.fakeServer.create();
     });
 
-    describe('when "sendBeacon" is available', () => {
-      beforeEach(() => {
-        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
-      });
+    afterEach(() => {
+      server.restore();
+    });
 
-      it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, () => {});
+    it('should successfully send the spans using XMLHttpRequest', done => {
+      collectorTraceExporter.export(spans, () => {});
 
-        setTimeout(async () => {
-          try {
-            const args = stubBeacon.args[0];
-            const url = args[0];
-            const blob: Blob = args[1];
-            const body = await blob.text();
-            const json = JSON.parse(body) as IExportTraceServiceRequest;
-            const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+      queueMicrotask(() => {
+        const request = server.requests[0];
+        assert.strictEqual(request.method, 'POST');
+        assert.strictEqual(request.url, 'http://foo.bar.com');
 
-            assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-            ensureSpanIsCorrect(span1);
+        const body = request.requestBody;
+        const json = JSON.parse(body) as IExportTraceServiceRequest;
+        const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
-            const resource = json.resourceSpans?.[0].resource;
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-            ensureWebResourceIsCorrect(resource);
+        assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
+        ensureSpanIsCorrect(span1);
 
-            assert.strictEqual(url, 'http://foo.bar.com');
-            assert.strictEqual(stubBeacon.callCount, 1);
+        const resource = json.resourceSpans?.[0].resource;
+        assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+        ensureWebResourceIsCorrect(resource);
 
-            assert.strictEqual(stubOpen.callCount, 0);
+        assert.strictEqual(stubBeacon.callCount, 0);
+        ensureExportTraceServiceRequestIsSet(json);
 
-            ensureExportTraceServiceRequestIsSet(json);
-            done();
-          } catch (err) {
-            done(err);
-          }
-        });
-      });
-
-      it('should log the successful message', done => {
-        const spyLoggerDebug = sinon.stub();
-        const spyLoggerError = sinon.stub();
-        const nop = () => {};
-        const diagLogger: DiagLogger = {
-          debug: spyLoggerDebug,
-          error: spyLoggerError,
-          info: nop,
-          verbose: nop,
-          warn: nop,
-        };
-
-        diag.setLogger(diagLogger, DiagLogLevel.ALL);
-
-        stubBeacon.returns(true);
-
-        collectorTraceExporter.export(spans, () => {});
-
-        setTimeout(() => {
-          const response: any = spyLoggerDebug.args[2][0];
-          assert.strictEqual(response, 'sendBeacon - can send');
-          assert.strictEqual(spyLoggerError.args.length, 0);
-
-          done();
-        });
-      });
-
-      it('should log the error message', done => {
-        stubBeacon.returns(false);
-
-        collectorTraceExporter.export(spans, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('cannot send'));
-          done();
-        });
+        clock.restore();
+        done();
       });
     });
 
-    describe('when "sendBeacon" is NOT available', () => {
-      let server: any;
-      let clock: sinon.SinonFakeTimers;
-      beforeEach(() => {
-        // fakeTimers is used to replace the next setTimeout which is
-        // located in sendWithXhr function called by the export method
-        clock = sinon.useFakeTimers();
+    it('should log the successful message', done => {
+      const spyLoggerDebug = sinon.stub();
+      const spyLoggerError = sinon.stub();
+      const nop = () => {};
+      const diagLogger: DiagLogger = {
+        debug: spyLoggerDebug,
+        error: spyLoggerError,
+        info: nop,
+        verbose: nop,
+        warn: nop,
+      };
 
-        (window.navigator as any).sendBeacon = false;
-        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
-        server = sinon.fakeServer.create();
+      diag.setLogger(diagLogger, DiagLogLevel.ALL);
+
+      collectorTraceExporter.export(spans, () => {});
+
+      queueMicrotask(() => {
+        const request = server.requests[0];
+        request.respond(200);
+        const response: any = spyLoggerDebug.args[2][0];
+        assert.strictEqual(response, 'xhr success');
+        assert.strictEqual(spyLoggerError.args.length, 0);
+        assert.strictEqual(stubBeacon.callCount, 0);
+
+        clock.restore();
+        done();
       });
-      afterEach(() => {
-        server.restore();
-      });
+    });
 
-      it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
-
-        queueMicrotask(() => {
-          const request = server.requests[0];
-          assert.strictEqual(request.method, 'POST');
-          assert.strictEqual(request.url, 'http://foo.bar.com');
-
-          const body = request.requestBody;
-          const json = JSON.parse(body) as IExportTraceServiceRequest;
-          const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
-
-          assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-          ensureSpanIsCorrect(span1);
-
-          const resource = json.resourceSpans?.[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          ensureWebResourceIsCorrect(resource);
-
-          assert.strictEqual(stubBeacon.callCount, 0);
-          ensureExportTraceServiceRequestIsSet(json);
-
-          clock.restore();
-          done();
-        });
+    it('should log the error message', done => {
+      collectorTraceExporter.export(spans, result => {
+        assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+        assert.ok(result.error?.message.includes('Failed to export'));
+        done();
       });
 
-      it('should log the successful message', done => {
-        const spyLoggerDebug = sinon.stub();
-        const spyLoggerError = sinon.stub();
-        const nop = () => {};
-        const diagLogger: DiagLogger = {
-          debug: spyLoggerDebug,
-          error: spyLoggerError,
-          info: nop,
-          verbose: nop,
-          warn: nop,
-        };
-
-        diag.setLogger(diagLogger, DiagLogLevel.ALL);
-
-        collectorTraceExporter.export(spans, () => {});
-
-        queueMicrotask(() => {
-          const request = server.requests[0];
-          request.respond(200);
-          const response: any = spyLoggerDebug.args[2][0];
-          assert.strictEqual(response, 'xhr success');
-          assert.strictEqual(spyLoggerError.args.length, 0);
-          assert.strictEqual(stubBeacon.callCount, 0);
-
-          clock.restore();
-          done();
-        });
+      queueMicrotask(() => {
+        const request = server.requests[0];
+        request.respond(400);
+        clock.restore();
+        done();
       });
+    });
 
-      it('should log the error message', done => {
-        collectorTraceExporter.export(spans, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('Failed to export'));
-          done();
-        });
+    it('should send custom headers', done => {
+      collectorTraceExporter.export(spans, () => {});
 
-        queueMicrotask(() => {
-          const request = server.requests[0];
-          request.respond(400);
-          clock.restore();
-          done();
-        });
-      });
+      queueMicrotask(() => {
+        const request = server.requests[0];
+        request.respond(200);
 
-      it('should send custom headers', done => {
-        collectorTraceExporter.export(spans, () => {});
-
-        queueMicrotask(() => {
-          const request = server.requests[0];
-          request.respond(200);
-
-          assert.strictEqual(stubBeacon.callCount, 0);
-          clock.restore();
-          done();
-        });
+        assert.strictEqual(stubBeacon.callCount, 0);
+        clock.restore();
+        done();
       });
     });
   });
@@ -349,6 +264,7 @@ describe('OTLPTraceExporter - web', () => {
 
   describe('export with custom headers', () => {
     let server: any;
+    let clock: sinon.SinonFakeTimers;
     const customHeaders = {
       foo: 'bar',
       bar: 'baz',
@@ -359,77 +275,44 @@ describe('OTLPTraceExporter - web', () => {
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();
+      // fakeTimers is used to replace the next setTimeout which is
+      // located in sendWithXhr function called by the export method
+      clock = sinon.useFakeTimers();
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
     });
 
     afterEach(() => {
       server.restore();
     });
 
-    describe('when "sendBeacon" is available', () => {
-      let clock: sinon.SinonFakeTimers;
-      beforeEach(() => {
-        // fakeTimers is used to replace the next setTimeout which is
-        // located in sendWithXhr function called by the export method
-        clock = sinon.useFakeTimers();
+    it('should successfully send spans using XMLHttpRequest', done => {
+      collectorTraceExporter.export(spans, () => {});
 
-        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
-      });
-      it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+      queueMicrotask(() => {
+        const [{ requestHeaders }] = server.requests;
 
-        queueMicrotask(() => {
-          const [{ requestHeaders }] = server.requests;
+        ensureHeadersContain(requestHeaders, customHeaders);
+        assert.strictEqual(stubBeacon.callCount, 0);
+        assert.strictEqual(stubOpen.callCount, 0);
 
-          ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(stubBeacon.callCount, 0);
-          assert.strictEqual(stubOpen.callCount, 0);
-
-          clock.restore();
-          done();
-        });
+        clock.restore();
+        done();
       });
     });
+    it('should log the timeout request error message', done => {
+      const responseSpy = sinon.spy();
+      collectorTraceExporter.export(spans, responseSpy);
+      clock.tick(10000);
+      clock.restore();
 
-    describe('when "sendBeacon" is NOT available', () => {
-      let clock: sinon.SinonFakeTimers;
-      beforeEach(() => {
-        // fakeTimers is used to replace the next setTimeout which is
-        // located in sendWithXhr function called by the export method
-        clock = sinon.useFakeTimers();
+      setTimeout(() => {
+        const result = responseSpy.args[0][0] as core.ExportResult;
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
 
-        (window.navigator as any).sendBeacon = false;
-        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
-      });
-
-      it('should successfully send spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
-
-        queueMicrotask(() => {
-          const [{ requestHeaders }] = server.requests;
-
-          ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(stubBeacon.callCount, 0);
-          assert.strictEqual(stubOpen.callCount, 0);
-
-          clock.restore();
-          done();
-        });
-      });
-      it('should log the timeout request error message', done => {
-        const responseSpy = sinon.spy();
-        collectorTraceExporter.export(spans, responseSpy);
-        clock.tick(10000);
-        clock.restore();
-
-        setTimeout(() => {
-          const result = responseSpy.args[0][0] as core.ExportResult;
-          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as OTLPExporterError;
-          assert.ok(error !== undefined);
-          assert.strictEqual(error.message, 'Request Timeout');
-
-          done();
-        });
+        done();
       });
     });
   });
@@ -596,109 +479,92 @@ describe('export with retry - real http request destroyed', () => {
     collectorExporterConfig = {
       timeoutMillis: 1500,
     };
+    collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
   });
 
   afterEach(() => {
     server.restore();
   });
 
-  describe('when "sendBeacon" is NOT available', () => {
-    beforeEach(() => {
-      (window.navigator as any).sendBeacon = false;
-      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+  it('should log the timeout request error message when retrying with exponential backoff with jitter', done => {
+    spans = [];
+    spans.push(Object.assign({}, mockedReadableSpan));
+
+    let retry = 0;
+    server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
+      retry++;
+      xhr.respond(503);
     });
-    it('should log the timeout request error message when retrying with exponential backoff with jitter', done => {
-      spans = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
 
-      let retry = 0;
-      server.respondWith(
-        'http://localhost:4318/v1/traces',
-        function (xhr: any) {
-          retry++;
-          xhr.respond(503);
-        }
-      );
+    collectorTraceExporter.export(spans, result => {
+      assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      assert.strictEqual(retry, 1);
+      done();
+    });
+  }).timeout(3000);
 
-      collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 1);
-        done();
-      });
-    }).timeout(3000);
+  it('should log the timeout request error message when retry-after header is set to 3 seconds', done => {
+    spans = [];
+    spans.push(Object.assign({}, mockedReadableSpan));
 
-    it('should log the timeout request error message when retry-after header is set to 3 seconds', done => {
-      spans = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
+    let retry = 0;
+    server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
+      retry++;
+      xhr.respond(503, { 'Retry-After': 3 });
+    });
 
-      let retry = 0;
-      server.respondWith(
-        'http://localhost:4318/v1/traces',
-        function (xhr: any) {
-          retry++;
-          xhr.respond(503, { 'Retry-After': 3 });
-        }
-      );
+    collectorTraceExporter.export(spans, result => {
+      assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      assert.strictEqual(retry, 1);
+      done();
+    });
+  }).timeout(3000);
+  it('should log the timeout request error message when retry-after header is a date', done => {
+    spans = [];
+    spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 1);
-        done();
-      });
-    }).timeout(3000);
-    it('should log the timeout request error message when retry-after header is a date', done => {
-      spans = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
+    let retry = 0;
+    server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
+      retry++;
+      const d = new Date();
+      d.setSeconds(d.getSeconds() + 1);
+      xhr.respond(503, { 'Retry-After': d });
+    });
 
-      let retry = 0;
-      server.respondWith(
-        'http://localhost:4318/v1/traces',
-        function (xhr: any) {
-          retry++;
-          const d = new Date();
-          d.setSeconds(d.getSeconds() + 1);
-          xhr.respond(503, { 'Retry-After': d });
-        }
-      );
+    collectorTraceExporter.export(spans, result => {
+      assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      assert.strictEqual(retry, 2);
+      done();
+    });
+  }).timeout(3000);
+  it('should log the timeout request error message when retry-after header is a date with long delay', done => {
+    spans = [];
+    spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 2);
-        done();
-      });
-    }).timeout(3000);
-    it('should log the timeout request error message when retry-after header is a date with long delay', done => {
-      spans = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
+    let retry = 0;
+    server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
+      retry++;
+      const d = new Date();
+      d.setSeconds(d.getSeconds() + 120);
+      xhr.respond(503, { 'Retry-After': d });
+    });
 
-      let retry = 0;
-      server.respondWith(
-        'http://localhost:4318/v1/traces',
-        function (xhr: any) {
-          retry++;
-          const d = new Date();
-          d.setSeconds(d.getSeconds() + 120);
-          xhr.respond(503, { 'Retry-After': d });
-        }
-      );
-
-      collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 1);
-        done();
-      });
-    }).timeout(3000);
-  });
+    collectorTraceExporter.export(spans, result => {
+      assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      assert.strictEqual(retry, 1);
+      done();
+    });
+  }).timeout(3000);
 });

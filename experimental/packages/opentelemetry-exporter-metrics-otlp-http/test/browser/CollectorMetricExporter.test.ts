@@ -51,7 +51,6 @@ import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;
   let stubOpen: sinon.SinonStub;
-  let stubBeacon: sinon.SinonStub;
   let metrics: ResourceMetrics;
   let debugStub: sinon.SinonStub;
   let errorStub: sinon.SinonStub;
@@ -60,7 +59,6 @@ describe('OTLPMetricExporter - web', () => {
     setUp([HISTOGRAM_AGGREGATION_VIEW]);
     stubOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     sinon.stub(XMLHttpRequest.prototype, 'send');
-    stubBeacon = sinon.stub(navigator, 'sendBeacon');
 
     const counter: Counter = mockCounter();
     mockObservableGauge(observableResult => {
@@ -98,277 +96,140 @@ describe('OTLPMetricExporter - web', () => {
   });
 
   describe('export', () => {
-    describe('when "sendBeacon" is available', () => {
-      beforeEach(() => {
-        collectorExporter = new OTLPMetricExporter({
-          url: 'http://foo.bar.com',
-          temporalityPreference: AggregationTemporality.CUMULATIVE,
-        });
+    let server: any;
+    beforeEach(() => {
+      collectorExporter = new OTLPMetricExporter({
+        url: 'http://foo.bar.com',
+        temporalityPreference: AggregationTemporality.CUMULATIVE,
       });
-
-      it('should successfully send metrics using sendBeacon', done => {
-        collectorExporter.export(metrics, () => {});
-
-        setTimeout(async () => {
-          const args = stubBeacon.args[0];
-          const url = args[0];
-          const blob: Blob = args[1];
-          const body = await blob.text();
-          const json = JSON.parse(body) as IExportMetricsServiceRequest;
-
-          // The order of the metrics is not guaranteed.
-          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'int-counter'
-          );
-          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'double-observable-gauge2'
-          );
-          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'int-histogram'
-          );
-
-          const metric1 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
-          const metric2 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
-          const metric3 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
-
-          assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
-
-          ensureCounterIsCorrect(
-            metric1,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .startTime
-            )
-          );
-
-          assert.ok(
-            typeof metric2 !== 'undefined',
-            "second metric doesn't exist"
-          );
-          ensureObservableGaugeIsCorrect(
-            metric2,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .startTime
-            ),
-            6,
-            'double-observable-gauge2'
-          );
-
-          assert.ok(
-            typeof metric3 !== 'undefined',
-            "third metric doesn't exist"
-          );
-          ensureHistogramIsCorrect(
-            metric3,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .startTime
-            ),
-            [0, 100],
-            [0, 2, 0]
-          );
-
-          const resource = json.resourceMetrics[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          ensureWebResourceIsCorrect(resource);
-
-          assert.strictEqual(url, 'http://foo.bar.com');
-
-          assert.strictEqual(stubBeacon.callCount, 1);
-          assert.strictEqual(stubOpen.callCount, 0);
-
-          ensureExportMetricsServiceRequestIsSet(json);
-
-          done();
-        });
+      // Overwrites the start time to make tests consistent
+      Object.defineProperty(collectorExporter, '_startTime', {
+        value: 1592602232694000000,
       });
+      server = sinon.fakeServer.create();
+    });
+    afterEach(() => {
+      server.restore();
+    });
 
-      it('should log the successful message', done => {
-        stubBeacon.returns(true);
+    it('should successfully send the metrics using XMLHttpRequest', done => {
+      collectorExporter.export(metrics, () => {});
 
-        collectorExporter.export(metrics, () => {});
+      setTimeout(() => {
+        const request = server.requests[0];
+        assert.strictEqual(request.method, 'POST');
+        assert.strictEqual(request.url, 'http://foo.bar.com');
 
-        setTimeout(() => {
-          const response: any = debugStub.args[2][0];
-          assert.strictEqual(response, 'sendBeacon - can send');
-          assert.strictEqual(errorStub.args.length, 0);
+        const body = request.requestBody;
+        const json = JSON.parse(body) as IExportMetricsServiceRequest;
+        // The order of the metrics is not guaranteed.
+        const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
+          it => it.descriptor.name === 'int-counter'
+        );
+        const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
+          it => it.descriptor.name === 'double-observable-gauge2'
+        );
+        const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
+          it => it.descriptor.name === 'int-histogram'
+        );
 
-          done();
-        });
-      });
+        const metric1 =
+          json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+        const metric2 =
+          json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+        const metric3 =
+          json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
-      it('should log the error message', done => {
-        stubBeacon.returns(false);
+        assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
+        ensureCounterIsCorrect(
+          metric1,
+          hrTimeToNanoseconds(
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime
+          ),
+          hrTimeToNanoseconds(
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+              .startTime
+          )
+        );
 
-        collectorExporter.export(metrics, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('cannot send'));
-          done();
-        });
+        assert.ok(
+          typeof metric2 !== 'undefined',
+          "second metric doesn't exist"
+        );
+        ensureObservableGaugeIsCorrect(
+          metric2,
+          hrTimeToNanoseconds(
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .endTime
+          ),
+          hrTimeToNanoseconds(
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .startTime
+          ),
+          6,
+          'double-observable-gauge2'
+        );
+
+        assert.ok(typeof metric3 !== 'undefined', "third metric doesn't exist");
+        ensureHistogramIsCorrect(
+          metric3,
+          hrTimeToNanoseconds(
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .endTime
+          ),
+          hrTimeToNanoseconds(
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .startTime
+          ),
+          [0, 100],
+          [0, 2, 0]
+        );
+
+        const resource = json.resourceMetrics[0].resource;
+        assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+        ensureWebResourceIsCorrect(resource);
+
+        ensureExportMetricsServiceRequestIsSet(json);
+
+        done();
       });
     });
 
-    describe('when "sendBeacon" is NOT available', () => {
-      let server: any;
-      beforeEach(() => {
-        (window.navigator as any).sendBeacon = false;
-        collectorExporter = new OTLPMetricExporter({
-          url: 'http://foo.bar.com',
-          temporalityPreference: AggregationTemporality.CUMULATIVE,
-        });
-        // Overwrites the start time to make tests consistent
-        Object.defineProperty(collectorExporter, '_startTime', {
-          value: 1592602232694000000,
-        });
-        server = sinon.fakeServer.create();
+    it('should log the successful message', done => {
+      collectorExporter.export(metrics, () => {});
+
+      setTimeout(() => {
+        const request = server.requests[0];
+        request.respond(200);
+
+        const response: any = debugStub.args[2][0];
+        assert.strictEqual(response, 'xhr success');
+        assert.strictEqual(errorStub.args.length, 0);
+
+        done();
       });
-      afterEach(() => {
-        server.restore();
-      });
+    });
 
-      it('should successfully send the metrics using XMLHttpRequest', done => {
-        collectorExporter.export(metrics, () => {});
-
-        setTimeout(() => {
-          const request = server.requests[0];
-          assert.strictEqual(request.method, 'POST');
-          assert.strictEqual(request.url, 'http://foo.bar.com');
-
-          const body = request.requestBody;
-          const json = JSON.parse(body) as IExportMetricsServiceRequest;
-          // The order of the metrics is not guaranteed.
-          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'int-counter'
-          );
-          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'double-observable-gauge2'
-          );
-          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'int-histogram'
-          );
-
-          const metric1 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
-          const metric2 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
-          const metric3 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
-
-          assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
-          ensureCounterIsCorrect(
-            metric1,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .startTime
-            )
-          );
-
-          assert.ok(
-            typeof metric2 !== 'undefined',
-            "second metric doesn't exist"
-          );
-          ensureObservableGaugeIsCorrect(
-            metric2,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .startTime
-            ),
-            6,
-            'double-observable-gauge2'
-          );
-
-          assert.ok(
-            typeof metric3 !== 'undefined',
-            "third metric doesn't exist"
-          );
-          ensureHistogramIsCorrect(
-            metric3,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .startTime
-            ),
-            [0, 100],
-            [0, 2, 0]
-          );
-
-          const resource = json.resourceMetrics[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          ensureWebResourceIsCorrect(resource);
-
-          assert.strictEqual(stubBeacon.callCount, 0);
-          ensureExportMetricsServiceRequestIsSet(json);
-
-          done();
-        });
+    it('should log the error message', done => {
+      collectorExporter.export(metrics, result => {
+        assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+        assert.ok(result.error?.message.includes('Failed to export'));
+        done();
       });
 
-      it('should log the successful message', done => {
-        collectorExporter.export(metrics, () => {});
-
-        setTimeout(() => {
-          const request = server.requests[0];
-          request.respond(200);
-
-          const response: any = debugStub.args[2][0];
-          assert.strictEqual(response, 'xhr success');
-          assert.strictEqual(errorStub.args.length, 0);
-
-          assert.strictEqual(stubBeacon.callCount, 0);
-          done();
-        });
+      setTimeout(() => {
+        const request = server.requests[0];
+        request.respond(400);
       });
+    });
+    it('should send custom headers', done => {
+      collectorExporter.export(metrics, () => {});
 
-      it('should log the error message', done => {
-        collectorExporter.export(metrics, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('Failed to export'));
-          assert.strictEqual(stubBeacon.callCount, 0);
-          done();
-        });
+      setTimeout(() => {
+        const request = server.requests[0];
+        request.respond(200);
 
-        setTimeout(() => {
-          const request = server.requests[0];
-          request.respond(400);
-        });
-      });
-      it('should send custom headers', done => {
-        collectorExporter.export(metrics, () => {});
-
-        setTimeout(() => {
-          const request = server.requests[0];
-          request.respond(200);
-
-          assert.strictEqual(stubBeacon.callCount, 0);
-          done();
-        });
+        done();
       });
     });
   });
@@ -389,49 +250,23 @@ describe('OTLPMetricExporter - web', () => {
         temporalityPreference: AggregationTemporality.CUMULATIVE,
       };
       server = sinon.fakeServer.create();
+      collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
     });
 
     afterEach(() => {
       server.restore();
     });
 
-    describe('when "sendBeacon" is available', () => {
-      beforeEach(() => {
-        collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
-      });
-      it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorExporter.export(metrics, () => {});
+    it('should successfully send metrics using XMLHttpRequest', done => {
+      collectorExporter.export(metrics, () => {});
 
-        setTimeout(() => {
-          const [{ requestHeaders }] = server.requests;
+      setTimeout(() => {
+        const [{ requestHeaders }] = server.requests;
 
-          ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(stubBeacon.callCount, 0);
-          assert.strictEqual(stubOpen.callCount, 0);
+        ensureHeadersContain(requestHeaders, customHeaders);
+        assert.strictEqual(stubOpen.callCount, 0);
 
-          done();
-        });
-      });
-    });
-
-    describe('when "sendBeacon" is NOT available', () => {
-      beforeEach(() => {
-        (window.navigator as any).sendBeacon = false;
-        collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
-      });
-
-      it('should successfully send metrics using XMLHttpRequest', done => {
-        collectorExporter.export(metrics, () => {});
-
-        setTimeout(() => {
-          const [{ requestHeaders }] = server.requests;
-
-          ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(stubBeacon.callCount, 0);
-          assert.strictEqual(stubOpen.callCount, 0);
-
-          done();
-        });
+        done();
       });
     });
   });
