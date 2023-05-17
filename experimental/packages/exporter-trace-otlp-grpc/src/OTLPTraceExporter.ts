@@ -28,6 +28,11 @@ import {
   createExportTraceServiceRequest,
   IExportTraceServiceRequest,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from './version';
+
+const USER_AGENT = {
+  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+};
 
 /**
  * OTLP Trace Exporter for Node
@@ -38,9 +43,12 @@ export class OTLPTraceExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(config);
-    const headers = baggageUtils.parseKeyPairsIntoRecord(
-      getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
-    );
+    const headers = {
+      ...USER_AGENT,
+      ...baggageUtils.parseKeyPairsIntoRecord(
+        getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
+      ),
+    };
     this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
