@@ -38,7 +38,14 @@ export abstract class OTLPProtoExporterBrowserBase<
   ServiceRequest
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config);
+    super({
+      ...config,
+      headers: {
+        accept: 'application/x-protobuf',
+        'content-type': 'application/x-protobuf',
+        ...config.headers,
+      },
+    });
   }
 
   private _getExportRequestProto(
@@ -75,11 +82,7 @@ export abstract class OTLPProtoExporterBrowserBase<
         sendWithXhr(
           new Blob([body], { type: 'application/x-protobuf' }),
           this.url,
-          {
-            ...this._headers,
-            'Content-Type': 'application/x-protobuf',
-            Accept: 'application/x-protobuf',
-          },
+          this._headers,
           this.timeoutMillis,
           onSuccess,
           onError

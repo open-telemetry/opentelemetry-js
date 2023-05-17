@@ -41,14 +41,17 @@ export class OTLPTraceExporter
   implements SpanExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config);
-    this._headers = Object.assign(
-      this._headers,
-      baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
-      )
-    );
+    super({
+      ...config,
+      headers: {
+        ...baggageUtils.parseKeyPairsIntoRecord(
+          getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
+        ),
+        ...config.headers,
+      },
+    });
   }
+
   convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
     return createExportTraceServiceRequest(spans);
   }
