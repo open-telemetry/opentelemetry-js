@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import type { ContextManager, SpanAttributes } from '@opentelemetry/api';
+import type { ContextManager } from '@opentelemetry/api';
 import { TextMapPropagator } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
-import { Detector, DetectorSync, Resource } from '@opentelemetry/resources';
+import { Detector, DetectorSync, IResource } from '@opentelemetry/resources';
 import { MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   Sampler,
@@ -30,12 +30,11 @@ import {
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
-  defaultAttributes: SpanAttributes;
   textMapPropagator: TextMapPropagator;
   metricReader: MetricReader;
   views: View[];
   instrumentations: InstrumentationOption[];
-  resource: Resource;
+  resource: IResource;
   resourceDetectors: Array<Detector | DetectorSync>;
   sampler: Sampler;
   serviceName?: string;

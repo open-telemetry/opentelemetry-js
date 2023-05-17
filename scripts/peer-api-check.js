@@ -24,14 +24,24 @@ const appRoot = process.cwd();
 const packageJsonUrl = path.resolve(`${appRoot}/package.json`);
 const pjson = require(packageJsonUrl);
 
-if (pjson.dependencies && pjson.dependencies["@opentelemetry/api"]) 
-    throw new Error(`Package ${pjson.name} depends on API but it should be a peer dependency`);
+const needCheckPackages = ['@opentelemetry/api'];
 
-const peerVersion = pjson.peerDependencies && pjson.peerDependencies["@opentelemetry/api"]
-const devVersion = pjson.devDependencies && pjson.devDependencies["@opentelemetry/api"]
-if (peerVersion) {
+function checkPackage(package) {
+  if (pjson.dependencies && pjson.dependencies[package])
+    throw new Error(
+      `Package ${pjson.name} depends on API but it should be a peer dependency`
+    );
+
+  const peerVersion = pjson.peerDependencies && pjson.peerDependencies[package];
+  const devVersion = pjson.devDependencies && pjson.devDependencies[package];
+  if (peerVersion) {
     if (!semver.subset(devVersion, peerVersion)) {
-        throw new Error(`Package ${pjson.name} depends on peer API version ${peerVersion} but version ${devVersion} in development`);
+      throw new Error(
+        `Package ${pjson.name} depends on peer API version ${peerVersion} but version ${devVersion} in development`
+      );
     }
     console.log(`${pjson.name} OK`);
+  }
 }
+
+needCheckPackages.forEach(checkPackage);

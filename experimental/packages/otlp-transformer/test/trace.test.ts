@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { TraceState, hexToBase64 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
@@ -133,7 +133,7 @@ describe('Trace', () => {
       span = {
         spanContext: () => ({
           spanId: '0000000000000002',
-          traceFlags: 1,
+          traceFlags: TraceFlags.SAMPLED,
           traceId: '00000000000000000000000000000001',
           isRemote: false,
           traceState: new TraceState('span=bar'),
@@ -163,7 +163,7 @@ describe('Trace', () => {
             context: {
               spanId: '0000000000000003',
               traceId: '00000000000000000000000000000002',
-              traceFlags: 1,
+              traceFlags: TraceFlags.SAMPLED,
               isRemote: false,
               traceState: new TraceState('link=foo'),
             },

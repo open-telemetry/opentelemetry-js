@@ -7,6 +7,7 @@
       "api",
       "experimental/packages/api-events",
       "experimental/packages/api-logs",
+      "experimental/packages/exporter-logs-otlp-grpc",
       "experimental/packages/exporter-trace-otlp-grpc",
       "experimental/packages/exporter-trace-otlp-http",
       "experimental/packages/exporter-trace-otlp-proto",
@@ -25,6 +26,7 @@
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-proto-exporter-base",
       "experimental/packages/otlp-transformer",
+      "experimental/packages/sdk-logs",
       "packages/opentelemetry-context-async-hooks",
       "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
@@ -60,6 +62,9 @@
     },
     {
       "path": "experimental/packages/api-logs"
+    },
+    {
+      "path": "experimental/packages/exporter-logs-otlp-grpc"
     },
     {
       "path": "experimental/packages/exporter-trace-otlp-grpc"
@@ -114,6 +119,12 @@
     },
     {
       "path": "experimental/packages/otlp-transformer"
+    },
+    {
+      "path": "experimental/packages/sdk-logs"
+    },
+    {
+      "path": "experimental/packages/shim-opencensus"
     },
     {
       "path": "packages/opentelemetry-context-async-hooks"

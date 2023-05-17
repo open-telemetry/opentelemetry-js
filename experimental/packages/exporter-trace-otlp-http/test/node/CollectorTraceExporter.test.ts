@@ -36,6 +36,7 @@ import {
 import { nextTick } from 'process';
 import { MockedResponse } from './nodeHelpers';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -159,6 +160,13 @@ describe('OTLPTraceExporter - node with json over http', () => {
       const collectorExporter = new OTLPTraceExporter();
       assert.strictEqual(collectorExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
+    it('should include user agent in header', () => {
+      const collectorExporter = new OTLPTraceExporter();
+      assert.strictEqual(
+        collectorExporter.headers['User-Agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';

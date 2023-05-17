@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-declare module 'require-in-the-middle' {
-  namespace hook {
-    type Options = {
-      internals?: boolean;
-    };
-    type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
-    type Hooked = { unhook(): void };
-  }
-  function hook(
-    modules: string[] | null,
-    options: hook.Options | null,
-    onRequire: hook.OnRequireFn
-  ): hook.Hooked;
-  function hook(
-    modules: string[] | null,
-    onRequire: hook.OnRequireFn
-  ): hook.Hooked;
-  function hook(onRequire: hook.OnRequireFn): hook.Hooked;
-  export = hook;
+import type { ExportResult } from '@opentelemetry/core';
+
+import type { ReadableLogRecord } from './ReadableLogRecord';
+
+export interface LogRecordExporter {
+  /**
+   * Called to export {@link ReadableLogRecord}s.
+   * @param logs the list of sampled LogRecords to be exported.
+   */
+  export(
+    logs: ReadableLogRecord[],
+    resultCallback: (result: ExportResult) => void
+  ): void;
+
+  /** Stops the exporter. */
+  shutdown(): Promise<void>;
 }

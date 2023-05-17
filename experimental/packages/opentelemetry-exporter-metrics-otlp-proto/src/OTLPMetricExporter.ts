@@ -31,9 +31,13 @@ import {
   createExportMetricsServiceRequest,
   IExportMetricsServiceRequest,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from './version';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const USER_AGENT = {
+  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+};
 
 class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
   ResourceMetrics,
@@ -41,12 +45,13 @@ class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(config);
-    this.headers = Object.assign(
-      this.headers,
-      baggageUtils.parseKeyPairsIntoRecord(
+    this.headers = {
+      ...this.headers,
+      ...USER_AGENT,
+      ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      )
-    );
+      ),
+    };
   }
 
   convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
