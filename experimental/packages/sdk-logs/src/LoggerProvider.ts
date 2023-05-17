@@ -19,7 +19,7 @@ import { NOOP_LOGGER } from '@opentelemetry/api-logs';
 import { IResource, Resource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 
-import type { LoggerProviderConfig } from './types';
+import type { LoggerConfig, LoggerProviderConfig } from './types';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import { Logger } from './Logger';
 import { loadDefaultConfig, reconfigureLimits } from './config';
@@ -64,7 +64,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    */
   public getLogger(
     name: string,
-    version = "",
+    version = '',
     options: logsAPI.LoggerOptions = {}
   ): logsAPI.Logger {
     if (this._shutdownOnce.isCalled) {
@@ -78,9 +78,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     const loggerName = name || DEFAULT_LOGGER_NAME;
     const key = `${loggerName}@${version || ''}:${options.schemaUrl || ''}`;
     if (!this._loggers.has(key)) {
-
       const loggerConfig: LoggerConfig = {
-        logRecordLimits: this._config.logRecordLimits
+        logRecordLimits: this._config.logRecordLimits,
       };
       if (options.includeTraceContext) {
         loggerConfig.includeTraceContext = options.includeTraceContext;
@@ -96,7 +95,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     }
     return this._loggers.get(key)!;
   }
-  
+
   /**
    * Adds a new {@link LogRecordProcessor} to this logger.
    * @param processor the new LogRecordProcessor to be added.

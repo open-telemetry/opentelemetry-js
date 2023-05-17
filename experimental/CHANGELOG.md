@@ -15,7 +15,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): use resource interface instead of concrete class [#3803](https://github.com/open-telemetry/opentelemetry-js/pull/3803) @blumamir
-* fix(sdk-logs): logger includeTraceContext setting not defaulting to true  [#3816](https://github.com/open-telemetry/opentelemetry-js/pull/3816) @hectorhdzg
+* fix(sdk-logs): logger includeTraceContext setting not defaulting to true  [#3817](https://github.com/open-telemetry/opentelemetry-js/pull/3817) @hectorhdzg
 
 ### :books: (Refine Doc)
 

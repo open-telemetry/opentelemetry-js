@@ -225,6 +225,15 @@ describe('LoggerProvider', () => {
       assert.ok(logger2 instanceof Logger);
       assert.ok(logger1 === logger2);
     });
+
+    it('should create a logger and default configuration should be preserved if custom one is not provided', () => {
+      const provider = new LoggerProvider();
+      const logger = provider.getLogger('') as Logger;
+      assert.ok(
+        logger['_loggerConfig'].includeTraceContext ===
+          loadDefaultConfig().includeTraceContext
+      );
+    });
   });
 
   describe('addLogRecordProcessor', () => {
