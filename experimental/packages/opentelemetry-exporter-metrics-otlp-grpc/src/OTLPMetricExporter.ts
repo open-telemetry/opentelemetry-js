@@ -32,11 +32,6 @@ import {
   createExportMetricsServiceRequest,
   IExportMetricsServiceRequest,
 } from '@opentelemetry/otlp-transformer';
-import { VERSION } from './version';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
 
 class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
   ResourceMetrics,
@@ -44,13 +39,9 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
 > {
   constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
     super(config);
-    const headers = {
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      ),
-    };
-
+    const headers = baggageUtils.parseKeyPairsIntoRecord(
+      getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+    );
     this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
