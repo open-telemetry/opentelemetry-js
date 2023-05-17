@@ -46,6 +46,10 @@ class DummySpanExporter implements tracing.SpanExporter {
   shutdown() {
     return Promise.resolve();
   }
+
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
 }
 
 const XHR_TIMEOUT = 2000;
