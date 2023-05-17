@@ -37,14 +37,22 @@ export class OTLPLogExporter
   implements LogRecordExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
-    super(config);
     const headers = baggageUtils.parseKeyPairsIntoRecord(
       getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
     );
-    this.metadata ||= new Metadata();
+    const metadata = new Metadata();
     for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v);
+      metadata.set(k, v);
     }
+    if (config.metadata) {
+      for (const [k, v] of Object.entries(config.metadata.getMap())) {
+        metadata.set(k, v);
+      }
+    }
+    super({
+      ...config,
+      metadata,
+    });
   }
 
   convert(logRecords: ReadableLogRecord[]): IExportLogsServiceRequest {

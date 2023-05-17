@@ -58,9 +58,14 @@ export abstract class OTLPGRPCExporterNodeBase<
     const headers = baggageUtils.parseKeyPairsIntoRecord(
       getEnv().OTEL_EXPORTER_OTLP_HEADERS
     );
-    this.metadata = config.metadata || new Metadata();
+    this.metadata = new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
+    }
+    if (config.metadata) {
+      for (const [k, v] of Object.entries(config.metadata.getMap())) {
+        this.metadata.set(k, v);
+      }
     }
     if (this.metadata.get('user-agent')) {
       diag.warn('User-Agent header should not be set via config.');
