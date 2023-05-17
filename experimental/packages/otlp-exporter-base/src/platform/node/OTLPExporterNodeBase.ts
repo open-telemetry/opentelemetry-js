@@ -47,19 +47,15 @@ export abstract class OTLPExporterNodeBase<
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    const headersBeforeUserAgent = {
+    const headersBeforeUserAgent = parseHeaders({
       ...this.DEFAULT_HEADERS,
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_HEADERS
       ),
-      ...parseHeaders(config.headers),
-    };
-    if (
-      Object.keys(headersBeforeUserAgent)
-        .map(key => key.toLowerCase())
-        .includes('user-agent')
-    ) {
-      diag.warn('User-Agent header should not be set via config.');
+      ...config.headers,
+    });
+    if (Object.keys(headersBeforeUserAgent).includes('user-agent')) {
+      diag.warn('Header "user-agent" should not be set by config.');
     }
     this.headers = Object.assign(headersBeforeUserAgent, USER_AGENT);
     this.agent = createHttpAgent(config);

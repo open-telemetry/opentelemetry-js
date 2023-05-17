@@ -67,10 +67,10 @@ export abstract class OTLPGRPCExporterNodeBase<
         this.metadata.set(k, v);
       }
     }
-    if (this.metadata.get('user-agent')) {
+    if (this.metadata.get('User-Agent')) {
       diag.warn('User-Agent header should not be set via config.');
     }
-    this.metadata.set('user-agent', USER_AGENT);
+    this.metadata.set('User-Agent', USER_AGENT);
     this.compression = configureCompression(config.compression);
   }
 

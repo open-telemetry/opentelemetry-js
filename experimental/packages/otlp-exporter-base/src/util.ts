@@ -25,7 +25,7 @@ export const DEFAULT_EXPORT_MAX_BACKOFF = 5000;
 export const DEFAULT_EXPORT_BACKOFF_MULTIPLIER = 1.5;
 
 export const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+  'user-agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
 /**
@@ -38,9 +38,11 @@ export function parseHeaders(
   const headers: Record<string, string> = {};
   Object.entries(partialHeaders).forEach(([key, value]) => {
     if (typeof value !== 'undefined') {
-      headers[key] = String(value);
+      headers[key.toLowerCase()] = String(value);
     } else {
-      diag.warn(`Header "${key}" has wrong value and will be ignored`);
+      diag.warn(
+        `Header "${key.toLowerCase()}" has wrong value and will be ignored`
+      );
     }
   });
   return headers;

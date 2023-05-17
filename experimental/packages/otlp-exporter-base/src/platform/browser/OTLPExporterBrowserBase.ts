@@ -36,21 +36,20 @@ export abstract class OTLPExporterBrowserBase<
    */
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-
-    const headersBeforeUserAgent = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((config as any).metadata) {
+      diag.warn('Metadata cannot be set when using http');
+    }
+    const headersBeforeUserAgent = parseHeaders({
+      accept: 'application/json',
+      'content-type': 'application/json',
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_HEADERS
       ),
-      ...parseHeaders(config.headers),
-    };
-    if (
-      Object.keys(headersBeforeUserAgent)
-        .map(key => key.toLowerCase())
-        .includes('user-agent')
-    ) {
-      diag.warn('User-Agent header should not be set via config.');
+      ...config.headers,
+    });
+    if (Object.keys(headersBeforeUserAgent).includes('user-agent')) {
+      diag.warn('Header "user-agent" should not be set by config.');
     }
     this._headers = Object.assign(headersBeforeUserAgent, USER_AGENT);
   }
