@@ -11,7 +11,7 @@ jobs:
   peer-api-check:
     runs-on: ubuntu-latest
     container:
-      image: node:18
+      image: node:20
     steps:
       - name: Checkout
         uses: actions/checkout@v3
