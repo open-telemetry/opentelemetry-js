@@ -314,27 +314,26 @@ describe('when configuring via environment', () => {
     );
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
-  it('should override global headers config with signal headers defined via env', () => {
+  it('should override global headers config with signal headers defined via env but not config from parameters', () => {
     const metadata = new grpc.Metadata();
-    metadata.set('foo', 'bar');
-    metadata.set('goo', 'lol');
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
+    metadata.set('foo', 'jar');
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo,bar=loo';
     const collectorExporter = new OTLPMetricExporter({
       metadata,
       temporalityPreference: AggregationTemporality.CUMULATIVE,
     });
     assert.deepStrictEqual(
       collectorExporter._otlpExporter.metadata?.get('foo'),
-      ['boo']
+      ['jar']
     );
     assert.deepStrictEqual(
       collectorExporter._otlpExporter.metadata?.get('bar'),
-      ['foo']
+      ['loo']
     );
     assert.deepStrictEqual(
       collectorExporter._otlpExporter.metadata?.get('goo'),
-      ['lol']
+      ['loo']
     );
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';

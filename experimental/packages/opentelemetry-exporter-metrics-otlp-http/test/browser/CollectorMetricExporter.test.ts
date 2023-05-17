@@ -361,20 +361,24 @@ describe('when configuring via environment', () => {
     );
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
-  it('should override global headers config with signal headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
+  it('should override global headers config with signal headers defined via env but not config from parameters', () => {
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo,bar=loo';
     const collectorExporter = new OTLPMetricExporter({
-      headers: {},
+      headers: { foo: 'jar' },
       temporalityPreference: AggregationTemporality.CUMULATIVE,
     });
     assert.strictEqual(
       collectorExporter['_otlpExporter']['_headers'].foo,
-      'boo'
+      'jar'
     );
     assert.strictEqual(
       collectorExporter['_otlpExporter']['_headers'].bar,
-      'foo'
+      'loo'
+    );
+    assert.strictEqual(
+      collectorExporter['_otlpExporter']['_headers'].goo,
+      'loo'
     );
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';

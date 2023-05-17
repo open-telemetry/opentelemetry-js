@@ -135,12 +135,15 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       assert.strictEqual(collectorExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
-    it('should override global headers config with signal headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(collectorExporter.headers.foo, 'boo');
-      assert.strictEqual(collectorExporter.headers.bar, 'foo');
+    it('should override global headers config with signal headers defined via env but not config from parameters', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
+      envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo,bar=loo';
+      const collectorExporter = new OTLPTraceExporter({
+        headers: { foo: 'jar' },
+      });
+      assert.strictEqual(collectorExporter.headers.foo, 'jar');
+      assert.strictEqual(collectorExporter.headers.bar, 'loo');
+      assert.strictEqual(collectorExporter.headers.goo, 'loo');
       envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });

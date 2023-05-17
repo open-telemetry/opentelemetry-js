@@ -336,16 +336,15 @@ describe('when configuring via environment', () => {
     assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['bar']);
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
-  it('should override global headers config with signal headers defined via env', () => {
+  it('should override global headers config with signal headers defined via env but not config from parameters', () => {
     const metadata = new grpc.Metadata();
-    metadata.set('foo', 'bar');
-    metadata.set('goo', 'lol');
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
+    metadata.set('foo', 'jar');
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo,bar=loo';
     const collectorExporter = new OTLPTraceExporter({ metadata });
-    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['boo']);
-    assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['foo']);
-    assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['lol']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['jar']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['loo']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['loo']);
     envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });

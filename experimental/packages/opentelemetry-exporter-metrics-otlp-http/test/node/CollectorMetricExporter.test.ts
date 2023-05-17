@@ -188,12 +188,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
       assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
-    it('should override global headers config with signal headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'boo');
-      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
+    it('should override global headers config with signal headers defined via env but not config from parameters', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo,bar=loo';
+      const collectorExporter = new OTLPMetricExporter({
+        headers: { foo: 'jar' },
+      });
+      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'jar');
+      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'loo');
+      assert.strictEqual(collectorExporter._otlpExporter.headers.goo, 'loo');
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
