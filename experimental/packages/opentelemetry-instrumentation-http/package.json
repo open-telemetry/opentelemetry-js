@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.39.0",
+  "version": "0.39.1",
   "description": "OpenTelemetry http/https automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -73,7 +73,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.13.0",
-    "@opentelemetry/instrumentation": "0.39.0",
+    "@opentelemetry/instrumentation": "0.39.1",
     "@opentelemetry/semantic-conventions": "1.13.0",
     "semver": "^7.3.5"
   },

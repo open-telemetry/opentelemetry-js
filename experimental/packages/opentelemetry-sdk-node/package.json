@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-node",
-  "version": "0.39.0",
+  "version": "0.39.1",
   "description": "OpenTelemetry SDK for Node.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -46,11 +46,11 @@
   "dependencies": {
     "@opentelemetry/core": "1.13.0",
     "@opentelemetry/exporter-jaeger": "1.13.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "0.39.0",
-    "@opentelemetry/exporter-trace-otlp-http": "0.39.0",
-    "@opentelemetry/exporter-trace-otlp-proto": "0.39.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "0.39.1",
+    "@opentelemetry/exporter-trace-otlp-http": "0.39.1",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.39.1",
     "@opentelemetry/exporter-zipkin": "1.13.0",
-    "@opentelemetry/instrumentation": "0.39.0",
+    "@opentelemetry/instrumentation": "0.39.1",
     "@opentelemetry/resources": "1.13.0",
     "@opentelemetry/sdk-metrics": "1.13.0",
     "@opentelemetry/sdk-trace-base": "1.13.0",
