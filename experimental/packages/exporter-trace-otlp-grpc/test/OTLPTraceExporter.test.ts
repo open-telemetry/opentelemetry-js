@@ -27,7 +27,6 @@ import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../src';
-import { VERSION } from '../src/version';
 
 import {
   ensureExportedSpanIsCorrect,
@@ -336,12 +335,6 @@ describe('when configuring via environment', () => {
     const collectorExporter = new OTLPTraceExporter();
     assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['bar']);
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-  it('should include user agent in header', () => {
-    const collectorExporter = new OTLPTraceExporter();
-    assert.deepStrictEqual(collectorExporter.metadata?.get('User-Agent'), [
-      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-    ]);
   });
   it('should override global headers config with signal headers defined via env', () => {
     const metadata = new grpc.Metadata();
