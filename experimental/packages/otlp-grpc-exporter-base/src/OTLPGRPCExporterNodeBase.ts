@@ -23,7 +23,11 @@ import {
 } from './types';
 import { ServiceClient } from './types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { configureCompression, GrpcCompressionAlgorithm } from './util';
+import {
+  configureCompression,
+  GrpcCompressionAlgorithm,
+  USER_AGENT,
+} from './util';
 import {
   OTLPExporterBase,
   OTLPExporterError,
@@ -58,6 +62,10 @@ export abstract class OTLPGRPCExporterNodeBase<
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
     }
+    if (this.metadata.get('user-agent')) {
+      diag.warn('User-Agent header should not be set via config.');
+    }
+    this.metadata.set('user-agent', USER_AGENT);
     this.compression = configureCompression(config.compression);
   }
 

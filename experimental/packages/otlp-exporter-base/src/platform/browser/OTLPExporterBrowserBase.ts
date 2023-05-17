@@ -17,39 +17,42 @@
 import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../types';
 import * as otlpTypes from '../../types';
-import { parseHeaders } from '../../util';
-import { sendWithBeacon, sendWithXhr } from './util';
+import { USER_AGENT, parseHeaders } from '../../util';
+import { sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 /**
- * Collector Metric Exporter abstract base class
+ * OTLP Exporter abstract base class
  */
 export abstract class OTLPExporterBrowserBase<
   ExportItem,
   ServiceRequest
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
-  private _useXHR: boolean = false;
 
   /**
    * @param config
    */
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-    this._useXHR =
-      !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (this._useXHR) {
-      this._headers = Object.assign(
-        {},
-        parseHeaders(config.headers),
-        baggageUtils.parseKeyPairsIntoRecord(
-          getEnv().OTEL_EXPORTER_OTLP_HEADERS
-        )
-      );
-    } else {
-      this._headers = {};
+
+    const headersBeforeUserAgent = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...baggageUtils.parseKeyPairsIntoRecord(
+        getEnv().OTEL_EXPORTER_OTLP_HEADERS
+      ),
+      ...parseHeaders(config.headers),
+    };
+    if (
+      Object.keys(headersBeforeUserAgent)
+        .map(key => key.toLowerCase())
+        .includes('user-agent')
+    ) {
+      diag.warn('User-Agent header should not be set via config.');
     }
+    this._headers = Object.assign(headersBeforeUserAgent, USER_AGENT);
   }
 
   onInit(): void {
@@ -73,24 +76,14 @@ export abstract class OTLPExporterBrowserBase<
     const body = JSON.stringify(serviceRequest);
 
     const promise = new Promise<void>((resolve, reject) => {
-      if (this._useXHR) {
-        sendWithXhr(
-          body,
-          this.url,
-          this._headers,
-          this.timeoutMillis,
-          resolve,
-          reject
-        );
-      } else {
-        sendWithBeacon(
-          body,
-          this.url,
-          { type: 'application/json' },
-          resolve,
-          reject
-        );
-      }
+      sendWithXhr(
+        body,
+        this.url,
+        this._headers,
+        this.timeoutMillis,
+        resolve,
+        reject
+      );
     }).then(onSuccess, onError);
 
     this._sendingPromises.push(promise);

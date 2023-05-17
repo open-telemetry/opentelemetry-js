@@ -20,13 +20,13 @@ import type * as https from 'https';
 import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
 import * as otlpTypes from '../../types';
-import { parseHeaders } from '../../util';
+import { USER_AGENT, parseHeaders } from '../../util';
 import { createHttpAgent, sendWithHttp, configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 /**
- * Collector Metric Exporter abstract base class
+ * OTLP Exporter abstract base class
  */
 export abstract class OTLPExporterNodeBase<
   ExportItem,
@@ -47,11 +47,21 @@ export abstract class OTLPExporterNodeBase<
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    this.headers = Object.assign(
-      this.DEFAULT_HEADERS,
-      parseHeaders(config.headers),
-      baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
-    );
+    const headersBeforeUserAgent = {
+      ...this.DEFAULT_HEADERS,
+      ...baggageUtils.parseKeyPairsIntoRecord(
+        getEnv().OTEL_EXPORTER_OTLP_HEADERS
+      ),
+      ...parseHeaders(config.headers),
+    };
+    if (
+      Object.keys(headersBeforeUserAgent)
+        .map(key => key.toLowerCase())
+        .includes('user-agent')
+    ) {
+      diag.warn('User-Agent header should not be set via config.');
+    }
+    this.headers = Object.assign(headersBeforeUserAgent, USER_AGENT);
     this.agent = createHttpAgent(config);
     this.compression = configureCompression(config.compression);
   }

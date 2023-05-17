@@ -35,8 +35,11 @@ import {
 import { MetricExportServiceClient } from './MetricsExportServiceClient';
 import { TraceExportServiceClient } from './TraceExportServiceClient';
 import { LogsExportServiceClient } from './LogsExportServiceClient';
+import { VERSION } from './version';
 
 export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
+
+export const USER_AGENT = `OTel-OTLP-Exporter-JavaScript/${VERSION}`;
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: OTLPGRPCExporterNodeBase<ExportItem, ServiceRequest>,

@@ -25,30 +25,6 @@ import {
 } from '../../util';
 
 /**
- * Send metrics/spans using browser navigator.sendBeacon
- * @param body
- * @param url
- * @param blobPropertyBag
- * @param onSuccess
- * @param onError
- */
-export function sendWithBeacon(
-  body: string,
-  url: string,
-  blobPropertyBag: BlobPropertyBag,
-  onSuccess: () => void,
-  onError: (error: OTLPExporterError) => void
-): void {
-  if (navigator.sendBeacon(url, new Blob([body], blobPropertyBag))) {
-    diag.debug('sendBeacon - can send', body);
-    onSuccess();
-  } else {
-    const error = new OTLPExporterError(`sendBeacon - cannot send ${body}`);
-    onError(error);
-  }
-}
-
-/**
  * function to send metrics/spans using browser XMLHttpRequest
  *     used when navigator.sendBeacon is not available
  * @param body
@@ -88,16 +64,12 @@ export function sendWithXhr(
     xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
-    const defaultHeaders = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    };
-
-    Object.entries({
-      ...defaultHeaders,
-      ...headers,
-    }).forEach(([k, v]) => {
-      xhr.setRequestHeader(k, v);
+    Object.entries(headers).forEach(([k, v]) => {
+      try {
+        xhr.setRequestHeader(k, v);
+      } catch (e) {
+        // Chrome will throw an error on setting user-agent, ignore it.
+      }
     });
 
     xhr.send(body);
@@ -114,10 +86,9 @@ export function sendWithXhr(
           minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
 
           // retry after interval specified in Retry-After header
-          if (xhr.getResponseHeader('Retry-After')) {
-            retryTime = parseRetryAfterToMills(
-              xhr.getResponseHeader('Retry-After')!
-            );
+          const retryAfter = xhr.getResponseHeader('Retry-After');
+          if (retryAfter) {
+            retryTime = parseRetryAfterToMills(retryAfter);
           } else {
             // exponential backoff with jitter
             retryTime = Math.round(
