@@ -103,8 +103,8 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.12.0",
-    "@opentelemetry/otlp-exporter-base": "0.38.0",
-    "@opentelemetry/otlp-transformer": "0.38.0",
-    "@opentelemetry/sdk-logs": "0.38.0"
+    "@opentelemetry/otlp-exporter-base": "0.39.1",
+    "@opentelemetry/otlp-transformer": "0.39.1",
+    "@opentelemetry/sdk-logs": "0.39.1"
   }
 }
