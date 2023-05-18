@@ -70,7 +70,7 @@ describe('Logger', () => {
       assert.ok(callSpy.calledWith(sinon.match.any, context.active()));
     });
 
-    it('should emit with Context specifie in LogRecord', () => {
+    it('should emit with Context specified in LogRecord', () => {
       const { logger } = setup({});
       const spanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
