@@ -526,6 +526,13 @@ describe('Zipkin Exporter - node', () => {
     });
   });
 
+  describe('force flush', () => {
+    it('forceFlush should flush spans and return', async () => {
+      const exporter = new ZipkinExporter({});
+      await exporter.forceFlush();
+    });
+  });
+
   describe('when env.OTEL_EXPORTER_ZIPKIN_ENDPOINT is set', () => {
     before(() => {
       process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT = 'http://localhost:9412';

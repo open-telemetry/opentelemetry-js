@@ -43,6 +43,7 @@ import {
   IExportMetricsServiceRequest,
   IResourceMetrics,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../src/version';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -313,6 +314,13 @@ describe('when configuring via environment', () => {
       ['bar']
     );
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+  });
+  it('should include user agent in header', () => {
+    const collectorExporter = new OTLPMetricExporter();
+    assert.deepStrictEqual(
+      collectorExporter._otlpExporter.metadata?.get('User-Agent'),
+      [`OTel-OTLP-Exporter-JavaScript/${VERSION}`]
+    );
   });
   it('should override global headers config with signal headers defined via env', () => {
     const metadata = new grpc.Metadata();
