@@ -39,6 +39,7 @@ import {
   ServiceClientType,
 } from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -128,6 +129,13 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
       );
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+    });
+    it('should have user-agent header', () => {
+      const collectorExporter = new OTLPTraceExporter();
+      assert.deepStrictEqual(
+        collectorExporter.headers['user-agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
     });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';

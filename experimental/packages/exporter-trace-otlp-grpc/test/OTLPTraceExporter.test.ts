@@ -41,6 +41,7 @@ import {
   IExportTraceServiceRequest,
   IResourceSpans,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../src/version';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
@@ -329,6 +330,12 @@ describe('when configuring via environment', () => {
     assert.strictEqual(collectorExporter.url, 'foo.traces');
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+  });
+  it('should have user-agent header', () => {
+    const collectorExporter = new OTLPTraceExporter();
+    assert.deepStrictEqual(collectorExporter.metadata?.get('User-Agent'), [
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+    ]);
   });
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';

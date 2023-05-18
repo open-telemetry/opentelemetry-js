@@ -50,6 +50,7 @@ import {
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -181,6 +182,13 @@ describe('OTLPMetricExporter - node with json over http', () => {
         `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
       );
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+    });
+    it('should have user-agent header', () => {
+      const collectorExporter = new OTLPMetricExporter();
+      assert.deepStrictEqual(
+        collectorExporter._otlpExporter.headers['user-agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
     });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
