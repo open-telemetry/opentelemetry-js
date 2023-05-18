@@ -27,7 +27,7 @@ import type { IResource } from '@opentelemetry/resources';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { Logger } from './Logger';
-import {LogAttributes} from "@opentelemetry/api-logs";
+import { LogAttributes } from '@opentelemetry/api-logs';
 
 export class LogRecord implements ReadableLogRecord {
   readonly hrTime: api.HrTime;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { LogAttributes } from './LogRecord'
+import { LogAttributes } from './LogRecord';
 
 export interface LoggerOptions {
   /**
