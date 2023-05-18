@@ -19,7 +19,7 @@ import * as sinon from 'sinon';
 
 import { LogRecord, Logger, LoggerConfig, LoggerProvider } from '../../src';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
-import * as logsAPI from '@opentelemetry/api-logs';
+import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
 
 const setup = (loggerConfig: LoggerConfig = {}) => {
   const logger = new Logger(
@@ -78,7 +78,7 @@ describe('Logger', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
       const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
-      const logRecordData: logsAPI.LogRecord = {
+      const logRecordData: ApiLogRecord = {
         context: activeContext,
       };
 
