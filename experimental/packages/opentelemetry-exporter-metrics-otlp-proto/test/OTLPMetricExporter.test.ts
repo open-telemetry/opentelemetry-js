@@ -46,6 +46,7 @@ import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -58,6 +59,16 @@ describe('OTLPMetricExporter - node with proto over http', () => {
   afterEach(() => {
     fakeRequest = new Stream.PassThrough();
     sinon.restore();
+  });
+
+  describe('default behavior for headers', () => {
+    const collectorExporter = new OTLPMetricExporter();
+    it('should include user agent in header', () => {
+      assert.strictEqual(
+        collectorExporter._otlpExporter.headers['User-Agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
+    });
   });
 
   describe('when configuring via environment', () => {

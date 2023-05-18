@@ -48,6 +48,13 @@ export class InMemorySpanExporter implements SpanExporter {
   shutdown(): Promise<void> {
     this._stopped = true;
     this._finishedSpans = [];
+    return this.forceFlush();
+  }
+
+  /**
+   * Exports any pending spans in the exporter
+   */
+  forceFlush(): Promise<void> {
     return Promise.resolve();
   }
 

@@ -33,7 +33,24 @@
     "lint:markdown": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md",
     "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix",
     "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix",
-    "update-ts-configs": "node scripts/update-ts-configs.js"
+    "update-ts-configs": "node scripts/update-ts-configs.js",
+
+    "comment_prepare_1": "echo scripts in this section automatically prepare releases. Intended for use by maintainers only.",
+    "comment_prepare_2": "echo experimental preparation scripts only prepare experimental packages",
+    "prepare_release:experimental:patch": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:remove_stable && npm run _lerna:version_patch && npm run _restore:lerna",
+    "prepare_release:experimental:minor": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:remove_stable && npm run _lerna:version_minor && npm run _restore:lerna",
+    "comment_prepare_3": "echo sdk preparation scripts prepare all stable and experimental packages",
+    "prepare_release:sdk:patch": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:version_patch && npm run _restore:lerna",
+    "prepare_release:sdk:minor": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:version_minor && npm run _restore:lerna",
+
+    "comment_internal": "echo scripts below this line are for internal use",
+    "_check:no_changes": "if [ ! -z \"$(git status -uall --porcelain)\" ]; then echo Please ensure all changes are committed; exit 1; fi",
+    "_backup:lerna": "cp lerna.json lerna.json.backup",
+    "_restore:lerna": "mv lerna.json.backup lerna.json",
+    "_lerna:remove_api": "node -e 'var fs=require(\"fs\");var l=require(\"./lerna.json\");l.packages=l.packages.filter(p=>p!==\"api\");fs.writeFileSync(\"lerna.json\",JSON.stringify(l,null,2))'",
+    "_lerna:remove_stable": "node -e 'var fs=require(\"fs\");var l=require(\"./lerna.json\");l.packages=l.packages.filter(p=>p!==\"packages/*\");fs.writeFileSync(\"lerna.json\",JSON.stringify(l,null,2))'",
+    "_lerna:version_patch": "npx lerna version patch --exact --no-git-tag-version --no-push --yes",
+    "_lerna:version_minor": "npx lerna version minor --exact --no-git-tag-version --no-push --yes"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
@@ -55,7 +72,6 @@
     "eslint-plugin-prettier": "4.2.1",
     "gh-pages": "5.0.0",
     "lerna": "6.0.3",
-    "lerna-changelog": "2.2.0",
     "linkinator": "4.0.3",
     "markdownlint-cli": "0.32.2",
     "prettier": "2.8.0",
