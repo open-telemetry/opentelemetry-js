@@ -55,9 +55,9 @@ const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
 const testCollectorExporter = (params: TestParams) =>
-  describe(`OTLPLogExporter - node ${
-    params.useTLS ? 'with' : 'without'
-  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
+  describe(`OTLPLogExporter - node ${params.useTLS ? 'with' : 'without'} TLS, ${
+    params.metadata ? 'with' : 'without'
+  } metadata`, () => {
     let collectorExporter: OTLPLogExporter;
     let server: grpc.Server;
     let exportedData: IResourceLogs | undefined;
