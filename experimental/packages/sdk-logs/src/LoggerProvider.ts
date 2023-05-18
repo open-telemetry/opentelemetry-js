@@ -19,7 +19,7 @@ import { NOOP_LOGGER } from '@opentelemetry/api-logs';
 import { IResource, Resource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 
-import type { LoggerConfig, LoggerProviderConfig } from './types';
+import type { LoggerProviderConfig } from './types';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import { Logger } from './Logger';
 import { loadDefaultConfig, reconfigureLimits } from './config';
@@ -64,8 +64,8 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    */
   public getLogger(
     name: string,
-    version = '',
-    options: logsAPI.LoggerOptions = {}
+    version?: string,
+    options?: logsAPI.LoggerOptions
   ): logsAPI.Logger {
     if (this._shutdownOnce.isCalled) {
       diag.warn('A shutdown LoggerProvider cannot provide a Logger');
@@ -76,19 +76,15 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       diag.warn('Logger requested without instrumentation scope name.');
     }
     const loggerName = name || DEFAULT_LOGGER_NAME;
-    const key = `${loggerName}@${version || ''}:${options.schemaUrl || ''}`;
+    const key = `${loggerName}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._loggers.has(key)) {
-      const loggerConfig: LoggerConfig = {
-        logRecordLimits: this._config.logRecordLimits,
-      };
-      if (options.includeTraceContext) {
-        loggerConfig.includeTraceContext = options.includeTraceContext;
-      }
       this._loggers.set(
         key,
         new Logger(
-          { name: loggerName, version, schemaUrl: options.schemaUrl },
-          loggerConfig,
+          { name: loggerName, version, schemaUrl: options?.schemaUrl },
+          {
+            logRecordLimits: this._config.logRecordLimits,
+          },
           this
         )
       );
