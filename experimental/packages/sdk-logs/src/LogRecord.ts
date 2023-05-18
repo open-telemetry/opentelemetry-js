@@ -21,7 +21,6 @@ import {
   timeInputToHrTime,
   isAttributeValue,
   InstrumentationScope,
-  hrTime,
 } from '@opentelemetry/core';
 import type { IResource } from '@opentelemetry/resources';
 
@@ -84,16 +83,9 @@ export class LogRecord implements ReadableLogRecord {
       context,
     } = logRecord;
 
-    if (timestamp && observedTimestamp) {
-      this.hrTime = timeInputToHrTime(timestamp);
-      this.hrTimeObserved = timeInputToHrTime(observedTimestamp);
-    } else {
-      const now = hrTime();
-      this.hrTime = timestamp ? timeInputToHrTime(timestamp) : now;
-      this.hrTimeObserved = observedTimestamp
-        ? timeInputToHrTime(observedTimestamp)
-        : now;
-    }
+    const now = Date.now();
+    this.hrTime = timeInputToHrTime(timestamp ?? now);
+    this.hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
 
     if (context) {
       const spanContext = api.trace.getSpanContext(context);
