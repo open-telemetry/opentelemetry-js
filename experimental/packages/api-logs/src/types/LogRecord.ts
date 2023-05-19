@@ -51,6 +51,11 @@ export interface LogRecord {
   timestamp?: number;
 
   /**
+   * Time when the event was observed by the collection system.
+   */
+  observedTimestamp?: number;
+
+  /**
    * Numerical value of the severity.
    */
   severityNumber?: SeverityNumber;
