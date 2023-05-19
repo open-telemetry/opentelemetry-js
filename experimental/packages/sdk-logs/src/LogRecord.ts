@@ -30,6 +30,7 @@ import { Logger } from './Logger';
 
 export class LogRecord implements ReadableLogRecord {
   readonly hrTime: api.HrTime;
+  readonly hrTimeObserved: api.HrTime;
   readonly spanContext?: api.SpanContext;
   readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
@@ -73,7 +74,8 @@ export class LogRecord implements ReadableLogRecord {
 
   constructor(logger: Logger, logRecord: logsAPI.LogRecord) {
     const {
-      timestamp = Date.now(),
+      timestamp,
+      observedTimestamp,
       severityNumber,
       severityText,
       body,
@@ -81,7 +83,10 @@ export class LogRecord implements ReadableLogRecord {
       context,
     } = logRecord;
 
-    this.hrTime = timeInputToHrTime(timestamp);
+    const now = Date.now();
+    this.hrTime = timeInputToHrTime(timestamp ?? now);
+    this.hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
+
     if (context) {
       const spanContext = api.trace.getSpanContext(context);
       if (spanContext && api.isSpanContextValid(spanContext)) {
