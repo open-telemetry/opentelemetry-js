@@ -20,8 +20,10 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import {
+  AggregationTemporalityPreference,
   CumulativeTemporalitySelector,
   DeltaTemporalitySelector,
+  LowMemoryTemporalitySelector,
   OTLPMetricExporterOptions,
 } from '../../src';
 
@@ -42,6 +44,7 @@ import {
 import { MockedResponse } from './nodeHelpers';
 import {
   AggregationTemporality,
+  InstrumentType,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
 import { PassThrough, Stream } from 'stream';
@@ -102,6 +105,59 @@ describe('OTLPMetricExporter - node with json over http', () => {
       } as any);
       const args = warnStub.args[0];
       assert.strictEqual(args[0], 'Metadata cannot be set when using http');
+    });
+  });
+
+  describe('temporality', () => {
+    it('should use the right temporality when Cumulative preference is selected', () => {
+      const exporter = new OTLPMetricExporter({
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE
+      });
+
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+        AggregationTemporality.CUMULATIVE, 'Counter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.HISTOGRAM),
+        AggregationTemporality.CUMULATIVE, 'Histogram');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.UP_DOWN_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'UpDownCounter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'Asynchronous Counter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'Asynchronous UpDownCounter');
+    });
+
+    it('should use the right temporality when Delta preference is selected', () => {
+      const exporter = new OTLPMetricExporter({
+        temporalityPreference: AggregationTemporalityPreference.DELTA
+      });
+
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+        AggregationTemporality.DELTA, 'Counter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.HISTOGRAM),
+        AggregationTemporality.DELTA, 'Histogram');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.UP_DOWN_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'UpDownCounter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_COUNTER),
+        AggregationTemporality.DELTA, 'Asynchronous Counter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'Asynchronous UpDownCounter');
+    });
+
+    it('should use the right temporality when LowMemory preference is selected', () => {
+      const exporter = new OTLPMetricExporter({
+        temporalityPreference: AggregationTemporalityPreference.LOWMEMORY
+      });
+
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.COUNTER),
+        AggregationTemporality.DELTA, 'Counter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.HISTOGRAM),
+        AggregationTemporality.DELTA, 'Histogram');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.UP_DOWN_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'UpDownCounter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'Asynchronous Counter');
+      assert.equal(exporter.selectAggregationTemporality(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER),
+        AggregationTemporality.CUMULATIVE, 'Asynchronous UpDownCounter');
     });
   });
 
@@ -206,7 +262,12 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should use delta temporality defined via env', () => {
-      for (const envValue of ['delta', 'DELTA', 'DeLTa', 'delta     ']) {
+      for (const envValue of [
+        'delta',
+        'DELTA',
+        'DeLTa',
+        'delta     '
+      ]) {
         envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
         const exporter = new OTLPMetricExporter();
         assert.strictEqual(
@@ -230,6 +291,21 @@ describe('OTLPMetricExporter - node with json over http', () => {
         );
       }
     });
+    it('should use low memory temporality defined via env', () => {
+      for (const envValue of [
+        'lowmemory',
+        'LOWMEMORY',
+        'LoWMeMOrY',
+        'lowmemory    ',
+      ]) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(
+          exporter['_aggregationTemporalitySelector'],
+          LowMemoryTemporalitySelector 
+        );
+      }
+    });
     it('should configure cumulative temporality with invalid value in env', () => {
       for (const envValue of ['invalid', ' ']) {
         envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
@@ -244,7 +320,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
         'cumulative';
       const exporter = new OTLPMetricExporter({
-        temporalityPreference: AggregationTemporality.DELTA,
+        temporalityPreference: AggregationTemporalityPreference.DELTA,
       });
       assert.strictEqual(
         exporter['_aggregationTemporalitySelector'],
@@ -264,7 +340,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        temporalityPreference: AggregationTemporality.CUMULATIVE,
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
       };
 
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
@@ -485,7 +561,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       const url = 'http://foo.bar.com';
       const collectorExporter = new OTLPMetricExporter({
         url,
-        temporalityPreference: AggregationTemporality.CUMULATIVE,
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
       });
       setTimeout(() => {
         assert.strictEqual(collectorExporter._otlpExporter.url, url);
