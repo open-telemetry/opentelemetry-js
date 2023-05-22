@@ -45,6 +45,7 @@ export const mockedReadableLogRecord: ReadableLogRecord = {
     schemaUrl: 'http://url.to.schema',
   },
   hrTime: [1680253513, 123241635] as HrTime,
+  hrTimeObserved: [1683526948, 965142784] as HrTime,
   attributes: {
     'some-attribute': 'some attribute value',
   },
@@ -92,7 +93,7 @@ export function ensureExportedLogRecordIsCorrect(logRecord: ILogRecord) {
   );
   assert.strictEqual(
     logRecord.observedTimeUnixNano,
-    '1680253513123241728',
+    '1683526948965142784',
     'observedTimeUnixNano is wrong'
   );
   assert.strictEqual(
