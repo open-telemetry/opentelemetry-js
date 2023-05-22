@@ -5,8 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides exporter for web and node to be used with OTLP (`http`) compatible receivers.
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.54.0`.
+This module provides an exporter for OTLP (http/json) logs using protocol version `v0.18`.
 
 ## Installation
 
@@ -14,10 +13,8 @@ Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions 
 npm install --save @opentelemetry/exporter-logs-otlp-http
 ```
 
-## Service Name
+## Further Documentation
 
-The OpenTelemetry Collector Exporter does not have a service name configuration.
-In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
 To see documentation and sample code for the traces exporter, as well as instructions for using TLS, visit the [Collector Trace Exporter for web and node][trace-exporter-url].
 To see documentation and sample code for the metric exporter, see the [exporter-metrics-otlp-grpc package][metrics-exporter-url]
 
