@@ -34,8 +34,7 @@ import { SpanExporter } from './SpanExporter';
  * the SDK then pushes them to the exporter pipeline.
  */
 export abstract class BatchSpanProcessorBase<T extends BufferConfig>
-  implements SpanProcessor
-{
+  implements SpanProcessor {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
@@ -45,6 +44,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
+  private _waitingForEventLoop = false;
+  private _exports: Promise<void>[] = [];
 
   constructor(private readonly _exporter: SpanExporter, config?: T) {
     const env = getEnv();
@@ -94,49 +95,49 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
       return;
     }
 
-    this._addToBuffer(span);
+    // only possible if multiple spans are added _synchronously_
+    if (this._finishedSpans.length >= this._maxQueueSize) {
+      this._droppedSpansCount++
+      return;
+    }
+
+    this._finishedSpans.push(span);
+
+    // If many spans are added synchronously, we don't want to export a batch
+    // until the execution yields to the event loop. Otherwise we may end
+    // up with more than `maxQueueSize` spans effectively queued in the
+    // event loop which is a memory leak.
+    if (this._waitingForEventLoop) {
+      return;
+    }
+
+    this._waitingForEventLoop = true;
+    setTimeout(() => {
+      this._waitingForEventLoop = false;
+      this._maybeEagerExportBatch();
+      this._maybeStartTimer();
+    }, 0)
+
+
+    // // Alternate to the above. Don't worry about the queue filling synchronously
+    // // In this scenario, it should be impossible for the queue to fill beyond
+    // //   the size of a single bach because a batch is eagerly exported.
+    // this._maybeEagerExportBatch();
+    // this._maybeStartTimer();
   }
 
   shutdown(): Promise<void> {
     return this._shutdownOnce.call();
   }
 
-  private _shutdown() {
-    return Promise.resolve()
-      .then(() => {
-        return this.onShutdown();
-      })
-      .then(() => {
-        return this._flushAll();
-      })
-      .then(() => {
-        return this._exporter.shutdown();
-      });
-  }
-
-  /** Add a span in the buffer. */
-  private _addToBuffer(span: ReadableSpan) {
-    if (this._finishedSpans.length >= this._maxQueueSize) {
-      // limit reached, drop span
-
-      if (this._droppedSpansCount === 0) {
-        diag.debug('maxQueueSize reached, dropping spans');
-      }
-      this._droppedSpansCount++;
-
-      return;
+  private _maybeEagerExportBatch() {
+    // if the queue contains enough spans for at least one batch
+    // export one batch and process again
+    if (this._finishedSpans.length >= this._maxExportBatchSize) {
+      this._processOneBatch();
+      this._maybeEagerExportBatch();
     }
 
-    if (this._droppedSpansCount > 0) {
-      // some spans were dropped, log once with count of spans dropped
-      diag.warn(
-        `Dropped ${this._droppedSpansCount} spans because maxQueueSize reached`
-      );
-      this._droppedSpansCount = 0;
-    }
-
-    this._finishedSpans.push(span);
-    this._maybeStartTimer();
   }
 
   /**
@@ -144,97 +145,90 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
    * This function is used only on forceFlush or shutdown,
    * for all other cases _flush should be used
    * */
-  private _flushAll(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const promises = [];
-      // calculate number of batches
-      const count = Math.ceil(
-        this._finishedSpans.length / this._maxExportBatchSize
-      );
-      for (let i = 0, j = count; i < j; i++) {
-        promises.push(this._flushOneBatch());
-      }
-      Promise.all(promises)
-        .then(() => {
-          resolve();
-        })
-        .catch(reject);
-    });
+  private async _flushAll(): Promise<void> {
+    const promises = [];
+    // calculate number of batches
+    const count = Math.ceil(
+      this._finishedSpans.length / this._maxExportBatchSize
+    );
+    for (let i = 0, j = count; i < j; i++) {
+      promises.push(this._exportOneBatch());
+    }
+
+    await Promise.all(promises);
   }
 
-  private _flushOneBatch(): Promise<void> {
+  private _processOneBatch() {
     this._clearTimer();
-    if (this._finishedSpans.length === 0) {
-      return Promise.resolve();
+    const batch = this._finishedSpans.splice(0, this._maxExportBatchSize);
+
+    if (this._droppedSpansCount > 0) {
+      diag.warn(
+        `Dropped ${this._droppedSpansCount} spans because maxQueueSize reached`
+      );
     }
-    return new Promise((resolve, reject) => {
+
+    const exportPromise = Promise.all(
+      batch
+        .map(span => span.resource)
+        .filter(resource => resource.asyncAttributesPending)
+        .map(res => res.waitForAsyncAttributes?.())
+    )
+      .then(() => {
+        this._promisifiedExportBatchWithTimeout(batch)
+      });
+
+    this._exports.push(exportPromise);
+
+    // remove from tracked promises on completion
+    exportPromise.finally(() => {
+      this._exports = this._exports.filter(p => p !== exportPromise);
+    })
+
+    // start timer if there are still spans in the queue
+    this._maybeStartTimer();
+  }
+
+  private _promisifiedExportBatchWithTimeout(batch: ReadableSpan[]): Promise<void> {
+    // promisify and add to list of tracked export promises
+    return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         // don't wait anymore for export, this way the next batch can start
         reject(new Error('Timeout'));
       }, this._exportTimeoutMillis);
-      // prevent downstream exporter calls from generating spans
+      unrefTimer(timer);
+
       context.with(suppressTracing(context.active()), () => {
-        // Reset the finished spans buffer here because the next invocations of the _flush method
-        // could pass the same finished spans to the exporter if the buffer is cleared
-        // outside the execution of this callback.
-        const spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
-
-        const doExport = () =>
-          this._exporter.export(spans, result => {
-            clearTimeout(timer);
-            if (result.code === ExportResultCode.SUCCESS) {
-              resolve();
-            } else {
-              reject(
-                result.error ??
-                  new Error('BatchSpanProcessor: span export failed')
-              );
-            }
-          });
-        const pendingResources = spans
-          .map(span => span.resource)
-          .filter(resource => resource.asyncAttributesPending);
-
-        // Avoid scheduling a promise to make the behavior more predictable and easier to test
-        if (pendingResources.length === 0) {
-          doExport();
-        } else {
-          Promise.all(
-            pendingResources.map(resource =>
-              resource.waitForAsyncAttributes?.()
-            )
-          ).then(doExport, err => {
-            globalErrorHandler(err);
-            reject(err);
-          });
-        }
+        this._exporter.export(batch, (result) => {
+          clearTimeout(timer);
+          if (result.code === ExportResultCode.SUCCESS) {
+            resolve();
+          } else {
+            reject(
+              result.error ??
+              new Error('BatchSpanProcessor: span export failed')
+            );
+          }
+        });
       });
     });
   }
 
   private _maybeStartTimer() {
-    if (this._timer !== undefined) return;
-    this._timer = setTimeout(() => {
-      this._flushOneBatch()
-        .then(() => {
-          if (this._finishedSpans.length > 0) {
-            this._clearTimer();
-            this._maybeStartTimer();
-          }
-        })
-        .catch(e => {
-          globalErrorHandler(e);
-        });
-    }, this._scheduledDelayMillis);
+    if (this._finishedSpans.length > 0 && this._timer == null) {
+      this._startTimer(this._processOneBatch.bind(this));
+    }
+  }
+
+  private _startTimer(cb: () => void) {
+    this._timer = setTimeout(cb, this._scheduledDelayMillis);
     unrefTimer(this._timer);
   }
 
   private _clearTimer() {
-    if (this._timer !== undefined) {
+    if (this._timer != null) {
       clearTimeout(this._timer);
       this._timer = undefined;
     }
   }
-
-  protected abstract onShutdown(): void;
 }
