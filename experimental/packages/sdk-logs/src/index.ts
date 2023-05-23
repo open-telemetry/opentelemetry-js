@@ -16,6 +16,7 @@
 
 export {
   LoggerConfig,
+  LoggerProviderConfig,
   LogRecordLimits,
   BufferConfig,
   BatchLogRecordProcessorBrowserConfig,
