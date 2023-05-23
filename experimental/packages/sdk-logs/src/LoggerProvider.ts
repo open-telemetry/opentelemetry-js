@@ -84,7 +84,6 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
           { name: loggerName, version, schemaUrl: options?.schemaUrl },
           {
             logRecordLimits: this._config.logRecordLimits,
-            includeTraceContext: options?.includeTraceContext,
           },
           this
         )
