@@ -7,6 +7,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * fix(exporter-logs-otlp-grpc): change OTLPLogsExporter to OTLPLogExporter [#3819](https://github.com/open-telemetry/opentelemetry-js/pull/3819) @fuaiyi
+* chore(instrumentation-grpc): add 'grpc' deprecation notice postinstall script [#tbd](https://github.com/open-telemetry/opentelemetry-js/pull/3819) @pichlermarc
 
 ### :rocket: (Enhancement)
 
