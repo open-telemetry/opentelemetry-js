@@ -188,6 +188,8 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
+- [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
+- [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [John Bley](https://github.com/johnbley), Splunk
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
@@ -195,6 +197,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
+- [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
