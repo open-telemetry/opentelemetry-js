@@ -22,7 +22,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 
 ## Logs in Node - GRPC
 
-The OTLPLogsExporter in Node expects the URL to only be the hostname. It will not work with `/v1/logs`. All
+The OTLPLogExporter in Node expects the URL to only be the hostname. It will not work with `/v1/logs`. All
 options that work with trace also work with logs.
 
 ```js
@@ -30,14 +30,14 @@ import {
   LoggerProvider,
   BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
-import { OTLPLogsExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
   url: 'http://<collector-hostname>:<port>',
 };
 
-const loggerExporter = new OTLPLogsExporter(collectorOptions);
+const loggerExporter = new OTLPLogExporter(collectorOptions);
 const loggerProvider = new LoggerProvider();
 
 loggerProvider.addLogRecordProcessor(
