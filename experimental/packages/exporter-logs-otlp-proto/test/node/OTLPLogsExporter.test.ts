@@ -341,7 +341,7 @@ describe('export - real http request destroyed before response received', () => 
     }, 200);
   });
   before(done => {
-    server.listen(8080, done);
+    server.listen(8082, done);
   });
   after(done => {
     server.close(done);
