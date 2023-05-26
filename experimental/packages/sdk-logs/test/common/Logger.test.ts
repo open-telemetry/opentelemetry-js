@@ -18,8 +18,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 
 import { LogRecord, Logger, LoggerConfig, LoggerProvider } from '../../src';
-import { loadDefaultConfig } from '../../src/config';
-import { context } from '@opentelemetry/api';
+import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
+import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
 
 const setup = (loggerConfig: LoggerConfig = {}) => {
   const logger = new Logger(
@@ -39,14 +39,6 @@ describe('Logger', () => {
     it('should create an instance', () => {
       const { logger } = setup();
       assert.ok(logger instanceof Logger);
-    });
-
-    it('should a default value with config.includeTraceContext', () => {
-      const { logger } = setup();
-      assert.ok(
-        logger['_loggerConfig'].includeTraceContext ===
-          loadDefaultConfig().includeTraceContext
-      );
     });
   });
 
@@ -69,8 +61,8 @@ describe('Logger', () => {
       assert.ok(makeOnlySpy.called);
     });
 
-    it('should emit with current Context when includeTraceContext is true', () => {
-      const { logger } = setup({ includeTraceContext: true });
+    it('should emit with current Context', () => {
+      const { logger } = setup({});
       const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
       logger.emit({
         body: 'test log body',
@@ -78,13 +70,21 @@ describe('Logger', () => {
       assert.ok(callSpy.calledWith(sinon.match.any, context.active()));
     });
 
-    it('should emit with empty Context when includeTraceContext is false', () => {
-      const { logger } = setup({ includeTraceContext: false });
+    it('should emit with Context specified in LogRecord', () => {
+      const { logger } = setup({});
+      const spanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const activeContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+      const logRecordData: ApiLogRecord = {
+        context: activeContext,
+      };
+
       const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
-      logger.emit({
-        body: 'test log body',
-      });
-      assert.ok(callSpy.calledWith(sinon.match.any, undefined));
+      logger.emit(logRecordData);
+      assert.ok(callSpy.calledWith(sinon.match.any, activeContext));
     });
   });
 });
