@@ -331,12 +331,6 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
   });
-  it('should have user-agent header', () => {
-    const collectorExporter = new OTLPTraceExporter();
-    assert.deepStrictEqual(collectorExporter.metadata?.get('User-Agent'), [
-      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-    ]);
-  });
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPTraceExporter();
@@ -347,11 +341,15 @@ describe('when configuring via environment', () => {
     const metadata = new grpc.Metadata();
     metadata.set('foo', 'jar');
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo,bar=loo';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS =
+      'foo=boo,bar=loo,User-Agent=baz';
     const collectorExporter = new OTLPTraceExporter({ metadata });
     assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['jar']);
     assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['loo']);
     assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['loo']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('User-Agent'), [
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+    ]);
     envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });

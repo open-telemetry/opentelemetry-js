@@ -183,13 +183,6 @@ describe('OTLPMetricExporter - node with json over http', () => {
       );
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
-    it('should have user-agent header', () => {
-      const collectorExporter = new OTLPMetricExporter();
-      assert.deepStrictEqual(
-        collectorExporter._otlpExporter.headers['user-agent'],
-        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-      );
-    });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
       const collectorExporter = new OTLPMetricExporter();
@@ -198,13 +191,18 @@ describe('OTLPMetricExporter - node with json over http', () => {
     });
     it('should override global headers config with signal headers defined via env but not config from parameters', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo,bar=loo';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS =
+        'foo=boo,bar=loo,user-agent=baz';
       const collectorExporter = new OTLPMetricExporter({
         headers: { foo: 'jar' },
       });
       assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'jar');
       assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'loo');
       assert.strictEqual(collectorExporter._otlpExporter.headers.goo, 'loo');
+      assert.strictEqual(
+        collectorExporter._otlpExporter.headers['user-agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });

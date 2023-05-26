@@ -33,6 +33,7 @@ import {
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../src/version';
 
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;
@@ -455,7 +456,8 @@ describe('when configuring via environment', () => {
   });
   it('should override global headers config with signal headers defined via env but not config from parameters', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo,bar=loo';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS =
+      'foo=boo,bar=loo,user-agent=baz';
     const collectorExporter = new OTLPTraceExporter({
       headers: { foo: 'jar' },
     });
@@ -465,6 +467,11 @@ describe('when configuring via environment', () => {
     assert.strictEqual(collectorExporter._headers.bar, 'loo');
     // @ts-expect-error access internal property for testing
     assert.strictEqual(collectorExporter._headers.goo, 'loo');
+    assert.strictEqual(
+      // @ts-expect-error access internal property for testing
+      collectorExporter._headers['user-agent'],
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+    );
     envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });

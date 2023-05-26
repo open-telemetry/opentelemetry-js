@@ -47,6 +47,7 @@ import {
 import { OTLPMetricExporterOptions } from '../../src';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../src/version';
 
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;
@@ -363,7 +364,8 @@ describe('when configuring via environment', () => {
   });
   it('should override global headers config with signal headers defined via env but not config from parameters', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo,goo=loo';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo,bar=loo';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS =
+      'foo=boo,bar=loo,user-agent=baz';
     const collectorExporter = new OTLPMetricExporter({
       headers: { foo: 'jar' },
       temporalityPreference: AggregationTemporality.CUMULATIVE,
@@ -379,6 +381,10 @@ describe('when configuring via environment', () => {
     assert.strictEqual(
       collectorExporter['_otlpExporter']['_headers'].goo,
       'loo'
+    );
+    assert.strictEqual(
+      collectorExporter['_otlpExporter']['_headers']['user-agent'],
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`
     );
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
