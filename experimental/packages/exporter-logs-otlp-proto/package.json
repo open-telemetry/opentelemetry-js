@@ -36,7 +36,8 @@
     "tracing",
     "profiling",
     "metrics",
-    "stats"
+    "stats",
+    "logs"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
