@@ -90,7 +90,6 @@ This retry policy first checks if the response has a `'Retry-After'` header. If 
 
   > The exporter will retry exporting within the [exporter timeout configuration](#Exporter-Timeout-Configuration) time.
 
-## Running opentelemetry-collector locally to see the logs
 
 ## Useful links
 
