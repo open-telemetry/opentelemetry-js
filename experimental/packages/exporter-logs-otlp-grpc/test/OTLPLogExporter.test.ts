@@ -44,7 +44,7 @@ const includeDirs = [
   path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
 ];
 
-const address = 'localhost:1501';
+const address = 'localhost:1503';
 
 type TestParams = {
   useTLS?: boolean;
