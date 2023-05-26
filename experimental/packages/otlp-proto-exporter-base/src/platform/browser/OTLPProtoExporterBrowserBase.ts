@@ -25,12 +25,6 @@ import {
 
 import { getExportRequestProto } from '../util';
 
-interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
-  create(properties?: T): R;
-  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
-  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
-}
-
 /**
  * Collector Exporter abstract base class
  */
@@ -40,12 +34,6 @@ export abstract class OTLPProtoExporterBrowserBase<
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-  }
-
-  private _getExportRequestProto(
-    clientType: ServiceClientType
-  ): ExportRequestType<ServiceRequest> {
-    return getExportRequestProto(clientType);
   }
 
   override send(
@@ -59,7 +47,7 @@ export abstract class OTLPProtoExporterBrowserBase<
     }
 
     const serviceRequest = this.convert(objects);
-    const exportRequestType = this._getExportRequestProto(
+    const exportRequestType = getExportRequestProto(
       this.getServiceClientType()
     );
     const message = exportRequestType.create(serviceRequest);
