@@ -20,7 +20,7 @@ The OpenTelemetry Collector Exporter does not have a service name configuration.
 In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
 To see documentation and sample code for the logs exporter, see the [exporter-metrics-otlp-proto package][logs-exporter-url]
 
-## Logs in Web - PROTO over http
+## Example Setup
 
 ```js
 const { LoggerProvider, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
