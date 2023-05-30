@@ -22,7 +22,6 @@ import {
   Span,
   SpanKind,
   SpanOptions,
-  SpanStatus,
   SpanStatusCode,
   trace,
   Histogram,
@@ -61,7 +60,7 @@ import { errorMonitor } from 'events';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
- * Http instrumentation instrumentation for Opentelemetry
+ * HTTP instrumentation for OpenTelemetry
  */
 export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** keep track on spans not ended */
@@ -350,6 +349,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           header => response.headers[header]
         );
 
+        span.setStatus({
+          code: utils.parseResponseStatus(SpanKind.CLIENT, response.statusCode),
+        });
+
         context.bind(context.active(), response);
 
         const endHandler = () => {
@@ -358,20 +361,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             return;
           }
           responseFinished = true;
-          let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
-            status = { code: SpanStatusCode.ERROR };
-          } else {
-            status = {
-              code: utils.parseResponseStatus(
-                SpanKind.CLIENT,
-                response.statusCode
-              ),
-            };
+            span.setStatus({ code: SpanStatusCode.ERROR });
           }
-
-          span.setStatus(status);
 
           if (this._getConfig().applyCustomAttributesOnSpan) {
             safeExecuteInTheMiddle(
@@ -424,6 +417,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       if (request.aborted || responseFinished) {
         return;
       }
+
       responseFinished = true;
       this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
