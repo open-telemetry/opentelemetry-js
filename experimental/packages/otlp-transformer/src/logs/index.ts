@@ -22,7 +22,7 @@ import {
   IResourceLogs,
 } from './types';
 import { IResource } from '@opentelemetry/resources';
-import { toAnyValue, toAttributes } from '../common/internal';
+import { toAnyValue, toAttributes, toLogAttributes } from '../common/internal';
 import { hexToBase64, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 
@@ -97,7 +97,7 @@ function toLogRecord(log: ReadableLogRecord, useHex?: boolean): ILogRecord {
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),
-    attributes: toAttributes(log.attributes),
+    attributes: toLogAttributes(log.attributes),
     droppedAttributesCount: 0,
     flags: log.spanContext?.traceFlags,
     traceId: useHex

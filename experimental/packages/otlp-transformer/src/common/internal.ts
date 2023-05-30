@@ -15,8 +15,13 @@
  */
 import { LogAttributes } from '@opentelemetry/api-logs';
 import type { IAnyValue, IKeyValue } from './types';
+import { Attributes } from '@opentelemetry/api';
 
-export function toAttributes(attributes: LogAttributes): IKeyValue[] {
+export function toAttributes(attributes: Attributes): IKeyValue[] {
+  return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
+}
+
+export function toLogAttributes(attributes: LogAttributes): IKeyValue[] {
   return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
 }
 
