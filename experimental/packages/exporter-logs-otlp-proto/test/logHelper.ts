@@ -41,6 +41,7 @@ export const mockedReadableLogRecord: ReadableLogRecord = {
     schemaUrl: 'http://url.to.schema',
   },
   hrTime: [1680253513, 123241635] as HrTime,
+  hrTimeObserved: [1680253513, 123241635] as HrTime,
   attributes: {
     'some-attribute': 'some attribute value',
   },

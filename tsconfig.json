@@ -8,8 +8,8 @@
       "experimental/packages/api-events",
       "experimental/packages/api-logs",
       "experimental/packages/exporter-logs-otlp-grpc",
-      "experimental/packages/exporter-logs-otlp-proto",
       "experimental/packages/exporter-logs-otlp-http",
+      "experimental/packages/exporter-logs-otlp-proto",
       "experimental/packages/exporter-trace-otlp-grpc",
       "experimental/packages/exporter-trace-otlp-http",
       "experimental/packages/exporter-trace-otlp-proto",
@@ -69,11 +69,10 @@
       "path": "experimental/packages/exporter-logs-otlp-grpc"
     },
     {
-<<<<<<< HEAD
-      "path": "experimental/packages/exporter-logs-otlp-proto"
-=======
       "path": "experimental/packages/exporter-logs-otlp-http"
->>>>>>> origin
+    },
+    {
+      "path": "experimental/packages/exporter-logs-otlp-proto"
     },
     {
       "path": "experimental/packages/exporter-trace-otlp-grpc"
