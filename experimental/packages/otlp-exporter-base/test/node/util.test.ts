@@ -60,6 +60,13 @@ class Exporter extends OTLPExporterNodeBase<object, object> {
   }
 }
 
+describe('force flush', () => {
+  it('forceFlush should flush spans and return', async () => {
+    const exporter = new Exporter({});
+    await exporter.forceFlush();
+  });
+});
+
 describe('configureExporterTimeout', () => {
   const envSource = process.env;
   it('should use timeoutMillis parameter as export timeout value', () => {

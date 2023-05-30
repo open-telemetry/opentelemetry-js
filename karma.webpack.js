@@ -32,12 +32,12 @@ module.exports = {
         test: /\.ts$/,
         use: {
           loader: 'istanbul-instrumenter-loader',
-          options: { esModules: true }
-        }
+          options: { esModules: true },
+        },
       },
       // This setting configures Node polyfills for the browser that will be
       // added to the webpack bundle for Karma tests.
-      { parser: { node: webpackNodePolyfills } }
-    ]
-  }
+      { parser: { node: webpackNodePolyfills } },
+    ],
+  },
 };

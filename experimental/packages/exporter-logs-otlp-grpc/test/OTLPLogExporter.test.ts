@@ -22,7 +22,7 @@ import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import { OTLPLogsExporter } from '../src';
+import { OTLPLogExporter } from '../src';
 
 import {
   ensureExportedLogRecordIsCorrect,
@@ -55,10 +55,10 @@ const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
 const testCollectorExporter = (params: TestParams) =>
-  describe(`OTLPLogsExporter - node ${
-    params.useTLS ? 'with' : 'without'
-  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
-    let collectorExporter: OTLPLogsExporter;
+  describe(`OTLPLogExporter - node ${params.useTLS ? 'with' : 'without'} TLS, ${
+    params.metadata ? 'with' : 'without'
+  } metadata`, () => {
+    let collectorExporter: OTLPLogExporter;
     let server: grpc.Server;
     let exportedData: IResourceLogs | undefined;
     let reqMetadata: grpc.Metadata | undefined;
@@ -122,7 +122,7 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.crt')
           )
         : grpc.credentials.createInsecure();
-      collectorExporter = new OTLPLogsExporter({
+      collectorExporter = new OTLPLogExporter({
         url: 'https://' + address,
         credentials,
         metadata: params.metadata,
@@ -140,7 +140,7 @@ const testCollectorExporter = (params: TestParams) =>
       it('should warn about headers when using grpc', () => {
         // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
-        collectorExporter = new OTLPLogsExporter({
+        collectorExporter = new OTLPLogExporter({
           url: `http://${address}`,
           headers: {
             foo: 'bar',
@@ -151,7 +151,7 @@ const testCollectorExporter = (params: TestParams) =>
       });
       it('should warn about path in url', () => {
         const spyLoggerWarn = sinon.stub(diag, 'warn');
-        collectorExporter = new OTLPLogsExporter({
+        collectorExporter = new OTLPLogExporter({
           url: `http://${address}/v1/logs`,
         });
         const args = spyLoggerWarn.args[0];
@@ -198,7 +198,7 @@ const testCollectorExporter = (params: TestParams) =>
             )
           : grpc.credentials.createInsecure();
 
-        const collectorExporterWithTimeout = new OTLPLogsExporter({
+        const collectorExporterWithTimeout = new OTLPLogExporter({
           url: 'grpcs://' + address,
           credentials,
           metadata: params.metadata,
@@ -229,7 +229,7 @@ const testCollectorExporter = (params: TestParams) =>
               fs.readFileSync('./test/certs/client.crt')
             )
           : grpc.credentials.createInsecure();
-        collectorExporter = new OTLPLogsExporter({
+        collectorExporter = new OTLPLogExporter({
           url: 'https://' + address,
           credentials,
           metadata: params.metadata,
@@ -272,7 +272,7 @@ const testCollectorExporter = (params: TestParams) =>
           : grpc.credentials.createInsecure();
 
         envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
-        collectorExporter = new OTLPLogsExporter({
+        collectorExporter = new OTLPLogExporter({
           url: 'https://' + address,
           credentials,
           metadata: params.metadata,
@@ -286,9 +286,9 @@ const testCollectorExporter = (params: TestParams) =>
     });
   });
 
-describe('OTLPLogsExporter - node (getDefaultUrl)', () => {
+describe('OTLPLogExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
-    const collectorExporter = new OTLPLogsExporter({});
+    const collectorExporter = new OTLPLogExporter({});
     setTimeout(() => {
       assert.strictEqual(collectorExporter['url'], 'localhost:4317');
       done();
@@ -296,7 +296,7 @@ describe('OTLPLogsExporter - node (getDefaultUrl)', () => {
   });
   it('should keep the URL if included', done => {
     const url = 'http://foo.bar.com';
-    const collectorExporter = new OTLPLogsExporter({ url });
+    const collectorExporter = new OTLPLogExporter({ url });
     setTimeout(() => {
       assert.strictEqual(collectorExporter['url'], 'foo.bar.com');
       done();
@@ -308,21 +308,21 @@ describe('when configuring via environment', () => {
   const envSource = process.env;
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPLogsExporter();
+    const collectorExporter = new OTLPLogExporter();
     assert.strictEqual(collectorExporter.url, 'foo.bar');
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should override global exporter url with signal url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.logs';
-    const collectorExporter = new OTLPLogsExporter();
+    const collectorExporter = new OTLPLogExporter();
     assert.strictEqual(collectorExporter.url, 'foo.logs');
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
   });
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-    const collectorExporter = new OTLPLogsExporter();
+    const collectorExporter = new OTLPLogExporter();
     assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['bar']);
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
@@ -332,7 +332,7 @@ describe('when configuring via environment', () => {
     metadata.set('goo', 'lol');
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
     envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=boo';
-    const collectorExporter = new OTLPLogsExporter({ metadata });
+    const collectorExporter = new OTLPLogExporter({ metadata });
     assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['boo']);
     assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['foo']);
     assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['lol']);
