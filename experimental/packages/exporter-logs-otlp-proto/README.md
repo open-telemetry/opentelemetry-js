@@ -14,11 +14,10 @@ Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions 
 npm install --save @opentelemetry/exporter-logs-otlp-proto
 ```
 
-## Service Name
+## Further Documentation
 
-The OpenTelemetry Collector Exporter does not have a service name configuration.
-In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
-To see documentation and sample code for the logs exporter, see the [exporter-metrics-otlp-proto package][logs-exporter-url]
+To see documentation and sample code for the traces exporter, as well as instructions for using TLS, see the [exporter-trace-otlp-proto package][trace-exporter-url].
+To see documentation and sample code for the metric exporter, see the [exporter-trace-otlp-proto package][metrics-exporter-url].
 
 ## Example Setup
 
