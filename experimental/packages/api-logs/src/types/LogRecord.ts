@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue, Context } from '@opentelemetry/api';
+import { AttributeValue, Context } from '@opentelemetry/api';
 
+export type LogAttributeValue = AttributeValue | LogAttributes;
 export interface LogAttributes {
-  [attributeKey: string]: Attributes | AttributeValue | undefined;
+  [attributeKey: string]: LogAttributeValue | undefined;
 }
 
 export enum SeverityNumber {
