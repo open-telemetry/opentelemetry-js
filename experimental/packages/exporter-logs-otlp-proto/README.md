@@ -5,8 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides exporter for logs in node/web to be used with OTLP (`http/protobuf`) compatible receivers.
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.32 <=0.50`.
+This module provides an exporter for OTLP (http/json) logs using protocol version `v0.18`.
 
 ## Installation
 
