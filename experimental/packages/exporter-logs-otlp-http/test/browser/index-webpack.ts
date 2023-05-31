@@ -14,4 +14,7 @@
  * limitations under the License.
  */
 
-export * from './OTLPLogExporter';
+{
+  const testsContext = require.context('../browser', true, /test$/);
+  testsContext.keys().forEach(testsContext);
+}

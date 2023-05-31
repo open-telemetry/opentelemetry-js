@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from './OTLPLogExporter';
+import { installShim } from './shim';
+
+installShim();
