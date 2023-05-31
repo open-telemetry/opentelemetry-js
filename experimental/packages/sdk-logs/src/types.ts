@@ -33,9 +33,6 @@ export interface LoggerProviderConfig {
 export interface LoggerConfig {
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
-
-  /** include Trace Context */
-  includeTraceContext?: boolean;
 }
 
 export interface LogRecordLimits {

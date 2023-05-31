@@ -52,6 +52,7 @@ const ignoredLernaProjects = [
   'examples/opentelemetry-web',
   'examples/http',
   'examples/https',
+  'examples/esm-http-ts',
 ];
 
 let dryRun = false;

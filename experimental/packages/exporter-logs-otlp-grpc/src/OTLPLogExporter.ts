@@ -32,7 +32,7 @@ import {
 /**
  * OTLP Logs Exporter for Node
  */
-export class OTLPLogsExporter
+export class OTLPLogExporter
   extends OTLPGRPCExporterNodeBase<ReadableLogRecord, IExportLogsServiceRequest>
   implements LogRecordExporter
 {
