@@ -27,10 +27,21 @@ import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { Tracer, context } from '@opentelemetry/api';
+import { Tracer, TracerProvider, context } from '@opentelemetry/api';
 
 export async function withTestTracer(
   func: (shimTracer: ShimTracer, otelTracer: Tracer) => void | Promise<void>
+): Promise<ReadableSpan[]> {
+  return await withTestTracerProvider(tracerProvider =>
+    func(
+      new ShimTracer(tracerProvider.getTracer('test-shim')),
+      tracerProvider.getTracer('test-otel')
+    )
+  );
+}
+
+export async function withTestTracerProvider(
+  func: (otelTracerProvider: TracerProvider) => void | Promise<void>
 ): Promise<ReadableSpan[]> {
   const tracerProvider = new BasicTracerProvider({
     sampler: new AlwaysOnSampler(),
@@ -38,10 +49,7 @@ export async function withTestTracer(
   const inMemExporter = new InMemorySpanExporter();
   tracerProvider.addSpanProcessor(new SimpleSpanProcessor(inMemExporter));
 
-  await func(
-    new ShimTracer(tracerProvider.getTracer('test-shim')),
-    tracerProvider.getTracer('test-otel')
-  );
+  await func(tracerProvider);
 
   await tracerProvider.forceFlush();
   const spans = inMemExporter.getFinishedSpans();
