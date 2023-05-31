@@ -18,7 +18,8 @@
     "watch": "tsc --build --watch",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "postinstall": "node -e \"console.log(\\\"\\x1b[95m%s\\x1b[0m\\\", \\\"@opentelemetry/instrumentation-grpc - warning: The package 'grpc' (https://www.npmjs.com/package/grpc) is deprecated. It will no longer be instrumented in the next release of '@opentelemetry/instrumentation-grpc'. Please migrate to '@grpc/grpc-js' (https://www.npmjs.com/package/@grpc/grpc-js) to continue receiving telemetry.\\\");\""
   },
   "keywords": [
     "opentelemetry",
