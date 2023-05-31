@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
+import { AttributeValue, diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import {
@@ -103,7 +103,7 @@ export class LogRecord implements ReadableLogRecord {
     this.setAttributes(attributes);
   }
 
-  public setAttribute(key: string, value?: Attributes | AttributeValue) {
+  public setAttribute(key: string, value?: LogAttributes | AttributeValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }
