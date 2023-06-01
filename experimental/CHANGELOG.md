@@ -7,6 +7,9 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * fix(exporter-logs-otlp-grpc): change OTLPLogsExporter to OTLPLogExporter [#3819](https://github.com/open-telemetry/opentelemetry-js/pull/3819) @fuaiyi
+* chore(instrumentation-grpc): add 'grpc' deprecation notice postinstall script [#3833](https://github.com/open-telemetry/opentelemetry-js/pull/3833) @pichlermarc
+  * Support for telemetry generation for the [`grpc`](https://www.npmjs.com/package/grpc) module will be dropped in the next release as the package has been
+    deprecated for over 1 year, please migrate to [`@grpc/grpc-js`](https://www.npmjs.com/package/@grpc/grpc-js) to continue receiving telemetry.
 
 ### :rocket: (Enhancement)
 
@@ -15,6 +18,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(exporter-logs-otlp-http): otlp-http exporter for logs. [#3764](https://github.com/open-telemetry/opentelemetry-js/pull/3764/) @fuaiyi
 * feat(otlp-trace-exporters): Add User-Agent header to OTLP trace exporters. [#3790](https://github.com/open-telemetry/opentelemetry-js/pull/3790) @JamieDanielson
 * feat(otlp-metric-exporters): Add User-Agent header to OTLP metric exporters. [#3806](https://github.com/open-telemetry/opentelemetry-js/pull/3806) @JamieDanielson
+* feat(opencensus-shim): add OpenCensus trace shim [#3809](https://github.com/open-telemetry/opentelemetry-js/pull/3809) @aabmass
 
 ### :bug: (Bug Fix)
 
