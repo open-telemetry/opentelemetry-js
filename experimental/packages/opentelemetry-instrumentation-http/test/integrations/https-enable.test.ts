@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import {
+  SpanKind,
+  Span,
+  context,
+  propagation,
+  SpanStatusCode,
+} from '@opentelemetry/api';
 import {
   HttpFlavorValues,
   NetTransportValues,
@@ -43,6 +49,7 @@ instrumentation.disable();
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
+import { IncomingMessage, ServerResponse } from 'http';
 
 const protocol = 'https';
 const serverPort = 42345;
@@ -57,27 +64,29 @@ describe('HttpsInstrumentation Integration tests', () => {
   let mockServerPort = 0;
   let mockServer: https.Server;
   const sockets: Array<Socket> = [];
-  before(done => {
-    mockServer = https.createServer(
-      {
-        key: fs.readFileSync(
-          path.join(__dirname, '..', 'fixtures', 'server-key.pem')
-        ),
-        cert: fs.readFileSync(
-          path.join(__dirname, '..', 'fixtures', 'server-cert.pem')
-        ),
-      },
-      (req, res) => {
-        res.statusCode = 200;
-        res.setHeader('content-type', 'application/json');
-        res.write(
-          JSON.stringify({
-            success: true,
-          })
-        );
-        res.end();
-      }
+  const succeedingRequestListener = (
+    req: IncomingMessage,
+    res: ServerResponse
+  ) => {
+    res.statusCode = 200;
+    res.setHeader('content-type', 'application/json');
+    res.write(
+      JSON.stringify({
+        success: true,
+      })
     );
+    res.end();
+  };
+
+  before(done => {
+    mockServer = https.createServer({
+      key: fs.readFileSync(
+        path.join(__dirname, '..', 'fixtures', 'server-key.pem')
+      ),
+      cert: fs.readFileSync(
+        path.join(__dirname, '..', 'fixtures', 'server-cert.pem')
+      ),
+    });
 
     mockServer.listen(0, () => {
       const addr = mockServer.address();
@@ -106,11 +115,13 @@ describe('HttpsInstrumentation Integration tests', () => {
   });
 
   beforeEach(() => {
+    mockServer.addListener('request', succeedingRequestListener);
     memoryExporter.reset();
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
   });
 
   afterEach(() => {
+    mockServer.removeAllListeners('request');
     context.disable();
   });
 
@@ -299,6 +310,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(span.name, 'GET');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
+
     for (const headers of [
       { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
       { 'user-agent': 'http-plugin-test' },
@@ -359,5 +371,44 @@ describe('HttpsInstrumentation Integration tests', () => {
         });
       });
     }
+
+    it('should set span status when response is ignored on the client', async () => {
+      // Prepare server with listener that returns 400
+      mockServer.removeAllListeners('request');
+      mockServer.addListener(
+        'request',
+        (req: IncomingMessage, res: ServerResponse) => {
+          res.statusCode = 400;
+          res.end('400 Bad Request');
+        }
+      );
+
+      // Make request
+      await new Promise<void>(resolve => {
+        // Ignore response entirely.
+        const req = https.get(`${protocol}://localhost:${mockServerPort}/`);
+        req.on('close', () => {
+          resolve();
+        });
+      });
+
+      const spans = memoryExporter.getFinishedSpans();
+
+      // Must have exactly two spans (one client, one server)
+      assert.strictEqual(spans.length, 2);
+
+      // Get spans to ensure we don't rely on order
+      const clientSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+      const serverSpan = spans.find(s => s.kind === SpanKind.SERVER);
+
+      // Spans found?
+      assert.ok(clientSpan);
+      assert.ok(serverSpan);
+
+      // Semantic conventions require status to be ERROR on client
+      assert.strictEqual(clientSpan.status.code, SpanStatusCode.ERROR);
+      // Semantic conventions require status to be UNSET on server
+      assert.strictEqual(serverSpan.status.code, SpanStatusCode.UNSET);
+    });
   });
 });

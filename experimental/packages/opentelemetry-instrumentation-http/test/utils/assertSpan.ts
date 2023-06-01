@@ -34,7 +34,7 @@ export const assertSpan = (
   validations: {
     httpStatusCode?: number;
     httpMethod: string;
-    resHeaders: http.IncomingHttpHeaders;
+    resHeaders?: http.IncomingHttpHeaders;
     hostname: string;
     pathname: string;
     reqHeaders?: http.OutgoingHttpHeaders;
@@ -104,7 +104,10 @@ export const assertSpan = (
     }
   }
   if (span.kind === SpanKind.CLIENT) {
-    if (validations.resHeaders['content-length']) {
+    if (
+      validations.resHeaders != null &&
+      validations.resHeaders['content-length']
+    ) {
       const contentLength = Number(validations.resHeaders['content-length']);
 
       if (

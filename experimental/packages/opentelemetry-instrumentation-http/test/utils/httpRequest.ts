@@ -15,6 +15,7 @@
  */
 import * as http from 'http';
 import { URL } from 'url';
+import { diag } from '@opentelemetry/api';
 
 type GetResult = Promise<{
   data: string;
@@ -68,6 +69,13 @@ function get(input: any, options?: any): GetResult {
   });
 }
 
+function getIgnoreData(input: any, options?: any): void {
+  http.get(input, response => {
+    diag.info('' + response.statusCode);
+  });
+}
+
 export const httpRequest = {
   get,
+  getIgnoreData,
 };

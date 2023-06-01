@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import {
+  SpanKind,
+  Span,
+  context,
+  propagation,
+  SpanStatusCode,
+} from '@opentelemetry/api';
 import {
   HttpFlavorValues,
   NetTransportValues,
@@ -41,6 +47,7 @@ import { httpRequest } from '../utils/httpRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { Socket } from 'net';
 import { sendRequestTwice } from '../utils/rawRequest';
+import { IncomingMessage, ServerResponse } from 'http';
 
 const protocol = 'http';
 const serverPort = 32345;
@@ -55,22 +62,23 @@ describe('HttpInstrumentation Integration tests', () => {
   let mockServerPort = 0;
   let mockServer: http.Server;
   const sockets: Array<Socket> = [];
+  const listener = (req: IncomingMessage, res: ServerResponse) => {
+    if (req.url === '/timeout') {
+      setTimeout(() => {
+        res.end();
+      }, 1000);
+    }
+    res.statusCode = 200;
+    res.setHeader('content-type', 'application/json');
+    res.write(
+      JSON.stringify({
+        success: true,
+      })
+    );
+    res.end();
+  };
   before(done => {
-    mockServer = http.createServer((req, res) => {
-      if (req.url === '/timeout') {
-        setTimeout(() => {
-          res.end();
-        }, 1000);
-      }
-      res.statusCode = 200;
-      res.setHeader('content-type', 'application/json');
-      res.write(
-        JSON.stringify({
-          success: true,
-        })
-      );
-      res.end();
-    });
+    mockServer = http.createServer();
 
     mockServer.listen(0, () => {
       const addr = mockServer.address();
@@ -99,6 +107,8 @@ describe('HttpInstrumentation Integration tests', () => {
   });
 
   beforeEach(() => {
+    mockServer.removeAllListeners('request');
+    mockServer.addListener('request', listener);
     memoryExporter.reset();
   });
 
@@ -386,6 +396,45 @@ describe('HttpInstrumentation Integration tests', () => {
         span.attributes[SemanticAttributes.HTTP_HOST],
         `localhost:${mockServerPort}`
       );
+    });
+
+    it('should set span status when response is ignored on the client', async () => {
+      // Prepare server with listener that returns 400
+      mockServer.removeAllListeners('request');
+      mockServer.addListener(
+        'request',
+        (req: IncomingMessage, res: ServerResponse) => {
+          res.statusCode = 400;
+          res.end('400 Bad Request');
+        }
+      );
+
+      // Make request
+      await new Promise<void>(resolve => {
+        // Ignore response entirely.
+        const req = http.get(`${protocol}://localhost:${mockServerPort}/`);
+        req.on('close', () => {
+          resolve();
+        });
+      });
+
+      const spans = memoryExporter.getFinishedSpans();
+
+      // Must have exactly two spans (one client, one server)
+      assert.strictEqual(spans.length, 2);
+
+      // Get spans to ensure we don't rely on order
+      const clientSpan = spans.find(s => s.kind === SpanKind.CLIENT);
+      const serverSpan = spans.find(s => s.kind === SpanKind.SERVER);
+
+      // Spans found?
+      assert.ok(clientSpan);
+      assert.ok(serverSpan);
+
+      // Semantic conventions require status to be ERROR on client
+      assert.strictEqual(clientSpan.status.code, SpanStatusCode.ERROR);
+      // Semantic conventions require status to be UNSET on server
+      assert.strictEqual(serverSpan.status.code, SpanStatusCode.UNSET);
     });
   });
 });
