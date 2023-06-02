@@ -28,6 +28,7 @@
       "experimental/packages/otlp-proto-exporter-base",
       "experimental/packages/otlp-transformer",
       "experimental/packages/sdk-logs",
+      "experimental/packages/shim-opencensus",
       "packages/opentelemetry-context-async-hooks",
       "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
