@@ -360,4 +360,5 @@ describe('when configuring via environment', () => {
 testOTLPMetricExporter({ useTLS: true });
 testOTLPMetricExporter({ useTLS: false });
 testOTLPMetricExporter({ metadata });
-testOTLPMetricExporter({ address: udsAddr });
+// skip UDS tests on windows
+process.platform !== 'win32' && testOTLPMetricExporter({ address: udsAddr });

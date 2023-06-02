@@ -352,4 +352,5 @@ describe('when configuring via environment', () => {
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });
 testCollectorExporter({ metadata });
-testCollectorExporter({ address: udsAddr });
+// skip UDS tests on windows
+process.platform !== 'win32' && testCollectorExporter({ address: udsAddr });
