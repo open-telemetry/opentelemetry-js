@@ -23,7 +23,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * feat(SpanExpoter): Add optional forceFlush to SpanExporter interface [#3753](https://github.com/open-telemetry/opentelemetry-js/pull/3753/) @sgracias1 @JacksonWeber
 
-
 ## 1.13.0
 
 ### :rocket: (Enhancement)
