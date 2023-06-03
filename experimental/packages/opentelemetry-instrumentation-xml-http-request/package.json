@@ -18,7 +18,7 @@
     "tdd": "karma start",
     "test:browser": "nyc karma start --single-run",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js"
   },
@@ -65,6 +65,7 @@
     "@types/webpack-env": "1.16.3",
     "babel-loader": "8.2.3",
     "codecov": "3.8.3",
+    "cross-var": "1.1.0",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",
