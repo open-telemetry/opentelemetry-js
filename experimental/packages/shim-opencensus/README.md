@@ -3,10 +3,6 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-> **Note**
-> This package is in active development and has not yet been released. You cannot install this
-> package from NPM yet.
-
 OpenCensus shim allows existing OpenCensus instrumentation to report to OpenTelemetry. This
 allows you to incrementally migrate your existing OpenCensus instrumentation to OpenTelemetry.
 More details are available in the [OpenCensus Compatibility Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/compatibility/opencensus.md).

@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-export {
-  OTLPProtoExporterNodeBase,
-  ExportRequestType,
-  getExportRequestProto,
-  send,
-} from './node';
+export { OTLPProtoExporterNodeBase, send } from './node';
 export { OTLPProtoExporterBrowserBase } from './browser';
 export { ServiceClientType } from './types';
+export { ExportRequestType, getExportRequestProto } from './util';

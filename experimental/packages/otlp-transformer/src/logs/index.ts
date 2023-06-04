@@ -22,9 +22,11 @@ import {
   IResourceLogs,
 } from './types';
 import { IResource } from '@opentelemetry/resources';
-import { toAnyValue, toAttributes } from '../common/internal';
+import { toAnyValue, toAttributes, toKeyValue } from '../common/internal';
 import { hexToBase64, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { SeverityNumber } from '@opentelemetry/api-logs';
+import { IKeyValue } from '../common/types';
+import { LogAttributes } from '@opentelemetry/api-logs';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
@@ -93,11 +95,11 @@ function logRecordsToResourceLogs(
 function toLogRecord(log: ReadableLogRecord, useHex?: boolean): ILogRecord {
   return {
     timeUnixNano: hrTimeToNanoseconds(log.hrTime),
-    observedTimeUnixNano: hrTimeToNanoseconds(log.hrTime),
+    observedTimeUnixNano: hrTimeToNanoseconds(log.hrTimeObserved),
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),
-    attributes: toAttributes(log.attributes),
+    attributes: toLogAttributes(log.attributes),
     droppedAttributesCount: 0,
     flags: log.spanContext?.traceFlags,
     traceId: useHex
@@ -118,4 +120,8 @@ function toSeverityNumber(
 function optionalHexToBase64(str: string | undefined): string | undefined {
   if (str === undefined) return undefined;
   return hexToBase64(str);
+}
+
+export function toLogAttributes(attributes: LogAttributes): IKeyValue[] {
+  return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
 }

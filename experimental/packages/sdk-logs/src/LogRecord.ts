@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
+import { AttributeValue, diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import * as api from '@opentelemetry/api';
 import {
@@ -27,13 +27,15 @@ import type { IResource } from '@opentelemetry/resources';
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
 import { Logger } from './Logger';
+import { LogAttributes } from '@opentelemetry/api-logs';
 
 export class LogRecord implements ReadableLogRecord {
   readonly hrTime: api.HrTime;
+  readonly hrTimeObserved: api.HrTime;
   readonly spanContext?: api.SpanContext;
   readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
-  readonly attributes: Attributes = {};
+  readonly attributes: logsAPI.LogAttributes = {};
   private _severityText?: string;
   private _severityNumber?: logsAPI.SeverityNumber;
   private _body?: string;
@@ -73,7 +75,8 @@ export class LogRecord implements ReadableLogRecord {
 
   constructor(logger: Logger, logRecord: logsAPI.LogRecord) {
     const {
-      timestamp = Date.now(),
+      timestamp,
+      observedTimestamp,
       severityNumber,
       severityText,
       body,
@@ -81,7 +84,10 @@ export class LogRecord implements ReadableLogRecord {
       context,
     } = logRecord;
 
-    this.hrTime = timeInputToHrTime(timestamp);
+    const now = Date.now();
+    this.hrTime = timeInputToHrTime(timestamp ?? now);
+    this.hrTimeObserved = timeInputToHrTime(observedTimestamp ?? now);
+
     if (context) {
       const spanContext = api.trace.getSpanContext(context);
       if (spanContext && api.isSpanContextValid(spanContext)) {
@@ -97,12 +103,19 @@ export class LogRecord implements ReadableLogRecord {
     this.setAttributes(attributes);
   }
 
-  public setAttribute(key: string, value?: AttributeValue) {
+  public setAttribute(key: string, value?: LogAttributes | AttributeValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }
     if (value === null) {
       return this;
+    }
+    if (
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      Object.keys(value).length > 0
+    ) {
+      this.attributes[key] = value;
     }
     if (key.length === 0) {
       api.diag.warn(`Invalid attribute key: ${key}`);
@@ -123,7 +136,7 @@ export class LogRecord implements ReadableLogRecord {
     return this;
   }
 
-  public setAttributes(attributes: Attributes) {
+  public setAttributes(attributes: LogAttributes) {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }

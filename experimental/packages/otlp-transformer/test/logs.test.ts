@@ -52,7 +52,7 @@ function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
                 // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
                 timeUnixNano: 1680253513123241635,
                 // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                observedTimeUnixNano: 1680253513123241635,
+                observedTimeUnixNano: 1683526948965142784,
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
@@ -105,6 +105,7 @@ describe('Logs', () => {
       };
       const log_fragment_1 = {
         hrTime: [1680253513, 123241635] as HrTime,
+        hrTimeObserved: [1683526948, 965142784] as HrTime,
         attributes: {
           'some-attribute': 'some attribute value',
         },
@@ -119,6 +120,7 @@ describe('Logs', () => {
       };
       const log_fragment_2 = {
         hrTime: [1680253797, 687038506] as HrTime,
+        hrTimeObserved: [1680253797, 687038506] as HrTime,
         attributes: {
           'another-attribute': 'another attribute value',
         },
