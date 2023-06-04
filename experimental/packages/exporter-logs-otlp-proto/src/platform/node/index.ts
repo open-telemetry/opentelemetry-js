@@ -14,5 +14,4 @@
  * limitations under the License.
  */
 
-export { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
-export { send } from './util';
+export { OTLPLogsExporter } from './OTLPLogsExporter';

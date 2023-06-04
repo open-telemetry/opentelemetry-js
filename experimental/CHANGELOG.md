@@ -13,11 +13,13 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(api-logs): support map in log attributes. [#3821](https://github.com/open-telemetry/opentelemetry-js/pull/3821) @Abinet18
 * feat(instrumentation): add ESM support for instrumentation. [#3698](https://github.com/open-telemetry/opentelemetry-js/pull/3698) @JamieDanielson, @pkanal, @vmarchaud, @lizthegrey, @bengl
 * feat(exporter-logs-otlp-http): otlp-http exporter for logs. [#3764](https://github.com/open-telemetry/opentelemetry-js/pull/3764/) @fuaiyi
 * feat(otlp-trace-exporters): Add User-Agent header to OTLP trace exporters. [#3790](https://github.com/open-telemetry/opentelemetry-js/pull/3790) @JamieDanielson
 * feat(otlp-metric-exporters): Add User-Agent header to OTLP metric exporters. [#3806](https://github.com/open-telemetry/opentelemetry-js/pull/3806) @JamieDanielson
 * feat(opencensus-shim): add OpenCensus trace shim [#3809](https://github.com/open-telemetry/opentelemetry-js/pull/3809) @aabmass
+* feat(exporter-logs-otlp-proto): protobuf exporter for logs. [#3779](https://github.com/open-telemetry/opentelemetry-js/pull/3779) @Abinet18
 
 ### :bug: (Bug Fix)
 
