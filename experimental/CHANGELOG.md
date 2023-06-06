@@ -6,6 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* chore(instrumentation-grpc): Drop support for package `grpc`. [#3807](https://github.com/open-telemetry/opentelemetry-js/pull/3807) @llc1123
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
@@ -22,7 +24,6 @@ All notable changes to experimental packages in this project will be documented 
 * chore(instrumentation-grpc): add 'grpc' deprecation notice postinstall script [#3833](https://github.com/open-telemetry/opentelemetry-js/pull/3833) @pichlermarc
   * Support for telemetry generation for the [`grpc`](https://www.npmjs.com/package/grpc) module will be dropped in the next release as the package has been
     deprecated for over 1 year, please migrate to [`@grpc/grpc-js`](https://www.npmjs.com/package/@grpc/grpc-js) to continue receiving telemetry.
-* chore(instrumentation-grpc): Drop support for package `grpc`. [#3807](https://github.com/open-telemetry/opentelemetry-js/pull/3807) @llc1123
 
 ### :rocket: (Enhancement)
 
