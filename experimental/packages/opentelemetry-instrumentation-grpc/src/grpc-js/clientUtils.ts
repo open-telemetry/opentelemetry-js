@@ -23,7 +23,7 @@ import {
   propagation,
   context,
 } from '@opentelemetry/api';
-import type * as grpcJs from '@grpc/grpc-js';
+import { Client, Metadata, ServiceError } from '@grpc/grpc-js';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
@@ -42,7 +42,7 @@ import { GRPC_STATUS_CODE_OK } from '../status-code';
  */
 export function getMethodsToWrap(
   this: GrpcJsInstrumentation,
-  client: typeof grpcJs.Client,
+  client: typeof Client,
   methods: { [key: string]: { originalName?: string } }
 ): string[] {
   const methodList: string[] = [];
@@ -74,8 +74,8 @@ export function makeGrpcClientRemoteCall(
   metadataCapture: metadataCaptureType,
   original: GrpcClientFunc,
   args: unknown[],
-  metadata: grpcJs.Metadata,
-  self: grpcJs.Client
+  metadata: Metadata,
+  self: Client
 ): (span: Span) => EventEmitter {
   /**
    * Patches a callback so that the current span for this trace is also ended
@@ -86,7 +86,7 @@ export function makeGrpcClientRemoteCall(
     callback: SendUnaryDataCallback<ResponseType>
   ) {
     const wrappedFn: SendUnaryDataCallback<ResponseType> = (
-      err: grpcJs.ServiceError | null,
+      err: ServiceError | null,
       res?: ResponseType
     ) => {
       if (err) {
@@ -145,7 +145,7 @@ export function makeGrpcClientRemoteCall(
         }
       };
       context.bind(context.active(), call);
-      call.on('error', (err: grpcJs.ServiceError) => {
+      call.on('error', (err: ServiceError) => {
         if (call[CALL_SPAN_ENDED]) {
           return;
         }
@@ -185,26 +185,25 @@ export function makeGrpcClientRemoteCall(
  */
 export function getMetadata(
   this: GrpcJsInstrumentation,
-  grpcClient: typeof grpcJs,
   original: GrpcClientFunc,
-  args: Array<unknown | grpcJs.Metadata>
-): grpcJs.Metadata {
-  let metadata: grpcJs.Metadata;
+  args: Array<unknown | Metadata>
+): Metadata {
+  let metadata: Metadata;
 
   // This finds an instance of Metadata among the arguments.
   // A possible issue that could occur is if the 'options' parameter from
   // the user contains an '_internal_repr' as well as a 'getMap' function,
   // but this is an extremely rare case.
-  let metadataIndex = args.findIndex((arg: unknown | grpcJs.Metadata) => {
+  let metadataIndex = args.findIndex((arg: unknown | Metadata) => {
     return (
       arg &&
       typeof arg === 'object' &&
-      (arg as grpcJs.Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
-      typeof (arg as grpcJs.Metadata).getMap === 'function'
+      (arg as Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
+      typeof (arg as Metadata).getMap === 'function'
     );
   });
   if (metadataIndex === -1) {
-    metadata = new grpcClient.Metadata();
+    metadata = new Metadata();
     if (!original.requestStream) {
       // unary or server stream
       metadataIndex = 1;
@@ -214,7 +213,7 @@ export function getMetadata(
     }
     args.splice(metadataIndex, 0, metadata);
   } else {
-    metadata = args[metadataIndex] as grpcJs.Metadata;
+    metadata = args[metadataIndex] as Metadata;
   }
   return metadata;
 }
@@ -224,7 +223,7 @@ export function getMetadata(
  * grpc receiver
  * @param metadata
  */
-export function setSpanContext(metadata: grpcJs.Metadata): void {
+export function setSpanContext(metadata: Metadata): void {
   propagation.inject(context.active(), metadata, {
     set: (meta, k, v) => meta.set(k, v),
   });
