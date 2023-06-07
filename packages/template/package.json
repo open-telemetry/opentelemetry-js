@@ -78,8 +78,8 @@
     "build/esnext/**/*.d.ts"
   ],
   "devDependencies": {
-    "@types/node": "18.6.5",
-    "typescript": "4.4.4"
+    "@types/node": "18.16.16",
+    "typescript": "4.9.5"
   },
   "Add these to devDependencies for testing": {
     "@types/mocha": "9.1.1",

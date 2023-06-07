@@ -58,15 +58,15 @@
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.5.0",
-    "@types/mocha": "10.0.0",
-    "@types/node": "18.6.5",
+    "@types/mocha": "10.0.1",
+    "@types/node": "18.16.16",
     "codecov": "3.8.3",
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
-    "typescript": "4.4.4"
+    "typescript": "4.9.5"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3",
   "sideEffects": false
