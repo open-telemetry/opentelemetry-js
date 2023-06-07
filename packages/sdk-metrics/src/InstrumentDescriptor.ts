@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricOptions, ValueType } from '@opentelemetry/api';
+import { MetricAdvice, MetricOptions, ValueType } from '@opentelemetry/api';
 import { View } from './view/View';
 
 /**
@@ -38,6 +38,10 @@ export interface InstrumentDescriptor {
   readonly unit: string;
   readonly type: InstrumentType;
   readonly valueType: ValueType;
+  /**
+   * Status: Experimental.
+   */
+  readonly advice: MetricAdvice;
 }
 
 export function createInstrumentDescriptor(
@@ -51,6 +55,7 @@ export function createInstrumentDescriptor(
     description: options?.description ?? '',
     unit: options?.unit ?? '',
     valueType: options?.valueType ?? ValueType.DOUBLE,
+    advice: options?.advice ?? {},
   };
 }
 
@@ -64,6 +69,7 @@ export function createInstrumentDescriptorWithView(
     type: instrument.type,
     unit: instrument.unit,
     valueType: instrument.valueType,
+    advice: instrument.advice,
   };
 }
 

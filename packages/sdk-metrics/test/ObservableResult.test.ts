@@ -33,7 +33,8 @@ describe('ObservableResultImpl', () => {
   describe('observe', () => {
     it('should observe common values', () => {
       const observableResult = new ObservableResultImpl(
-        defaultInstrumentDescriptor
+        'instrument_name',
+        ValueType.DOUBLE
       );
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
@@ -44,7 +45,8 @@ describe('ObservableResultImpl', () => {
 
     it('should deduplicate observations', () => {
       const observableResult = new ObservableResultImpl(
-        defaultInstrumentDescriptor
+        'instrument_name',
+        ValueType.DOUBLE
       );
       observableResult.observe(1, {});
       observableResult.observe(2, {});
@@ -55,13 +57,10 @@ describe('ObservableResultImpl', () => {
     });
 
     it('should trunc value if ValueType is INT', () => {
-      const observableResult = new ObservableResultImpl({
-        name: 'test',
-        description: '',
-        type: InstrumentType.COUNTER,
-        unit: '',
-        valueType: ValueType.INT,
-      });
+      const observableResult = new ObservableResultImpl(
+        'instrument_name',
+        ValueType.INT
+      );
       observableResult.observe(1.1, {});
       assert.strictEqual(observableResult._buffer.get({}), 1);
     });
@@ -120,6 +119,7 @@ describe('BatchObservableResultImpl', () => {
           type: InstrumentType.COUNTER,
           unit: '',
           valueType: ValueType.INT,
+          advice: {},
         },
         [],
         new ObservableRegistry()
