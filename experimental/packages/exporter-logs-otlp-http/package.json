@@ -90,6 +90,7 @@
     "karma-webpack": "4.0.2",
     "lerna": "7.0.2",
     "mocha": "10.2.0",
+    "mock-require": "^3.0.3",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "8.4.0",

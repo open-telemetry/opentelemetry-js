@@ -16,8 +16,13 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { default as mock } from 'mock-require';
+
+const fakeOTLPTransformer = { createExportLogsServiceRequest: sinon.stub() };
+mock('@opentelemetry/otlp-transformer', fakeOTLPTransformer);
 
 import * as Config from '../../src/platform/config';
+
 import { OTLPLogExporter } from '../../src/platform/node';
 
 describe('OTLPLogExporter', () => {
@@ -59,6 +64,17 @@ describe('OTLPLogExporter', () => {
       exporter.getDefaultUrl({});
       // this callCount is 2, because new OTLPLogExporter also call it
       assert.strictEqual(getDefaultUrl.callCount, 2);
+    });
+  });
+
+  describe('convert', () => {
+    it('should call createExportLogsServiceRequest with useHex parameter to true', () => {
+      const exporter = new OTLPLogExporter();
+      exporter.convert([]);
+      assert.strictEqual(
+        fakeOTLPTransformer.createExportLogsServiceRequest.calledWith([], true),
+        true
+      );
     });
   });
 });
