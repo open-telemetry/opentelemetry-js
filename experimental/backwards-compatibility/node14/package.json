@@ -2,7 +2,7 @@
   "name": "backcompat-node14",
   "version": "0.40.0",
   "private": true,
-  "description": "Backwards compatability app for node 14 types and the OpenTelemetry Node.js SDK",
+  "description": "Backwards compatibility app for node 14 types and the OpenTelemetry Node.js SDK",
   "main": "index.js",
   "scripts": {
     "test:backcompat": "tsc --noEmit index.ts && tsc --noEmit --esModuleInterop index.ts",
