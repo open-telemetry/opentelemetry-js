@@ -512,8 +512,15 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       };
 
       const startTime = hrTime();
-      const metricAttributes =
-        utils.getIncomingRequestMetricAttributes(spanAttributes);
+      const metricAttributes = utils.getIncomingRequestMetricAttributes(
+        spanAttributes,
+        request,
+        {
+          ignoreHostMetricAttribute:
+            instrumentation._getConfig()
+              .ignoreIncomingRequestHostMetricAttribute,
+        }
+      );
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(method, spanOptions, ctx);

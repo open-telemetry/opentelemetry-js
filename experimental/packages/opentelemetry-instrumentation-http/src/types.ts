@@ -60,6 +60,10 @@ export interface IgnoreIncomingRequestFunction {
   (request: IncomingMessage): boolean;
 }
 
+export interface IgnoreIncomingRequestHostFunction {
+  (request: IncomingMessage, host: string): boolean;
+}
+
 export interface IgnoreOutgoingRequestFunction {
   (request: RequestOptions): boolean;
 }
@@ -119,6 +123,8 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
     client?: { requestHeaders?: string[]; responseHeaders?: string[] };
     server?: { requestHeaders?: string[]; responseHeaders?: string[] };
   };
+  /** Function for adding filtering for incoming requests' host name which may have unbounded cardinality */
+  ignoreIncomingRequestHostMetricAttribute?: IgnoreIncomingRequestHostFunction;
 }
 
 export interface Err extends Error {

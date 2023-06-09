@@ -35,7 +35,12 @@ import {
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
-import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
+import {
+  Err,
+  IgnoreIncomingRequestHostFunction,
+  IgnoreMatcher,
+  ParsedRequestOptions,
+} from './types';
 
 /**
  * Get an absolute url
@@ -499,21 +504,35 @@ export const getIncomingRequestAttributes = (
 /**
  * Returns incoming request Metric attributes scoped to the request data
  * @param {SpanAttributes} spanAttributes the span attributes
- * @param {{ component: string }} options used to pass data needed to create attributes
+ * @param {IncomingMessage} request the request object
+ * @param {{ ignoreHostMetricAttribute?: IgnoreIncomingRequestHostFunction }} options used to pass data needed to create attributes
  */
 export const getIncomingRequestMetricAttributes = (
-  spanAttributes: SpanAttributes
+  spanAttributes: SpanAttributes,
+  request: IncomingMessage,
+  options: { ignoreHostMetricAttribute?: IgnoreIncomingRequestHostFunction }
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
   metricAttributes[SemanticAttributes.HTTP_SCHEME] =
     spanAttributes[SemanticAttributes.HTTP_SCHEME];
   metricAttributes[SemanticAttributes.HTTP_METHOD] =
     spanAttributes[SemanticAttributes.HTTP_METHOD];
-  metricAttributes[SemanticAttributes.NET_HOST_NAME] =
-    spanAttributes[SemanticAttributes.NET_HOST_NAME];
   metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
     spanAttributes[SemanticAttributes.HTTP_FLAVOR];
-  //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
+
+  // The span attributes set this from the request URL or the Host header which does not have bounded cardinality
+  const netHostNameAttributeValue =
+    spanAttributes[SemanticAttributes.NET_HOST_NAME];
+  if (
+    typeof options.ignoreHostMetricAttribute !== 'function' ||
+    (typeof netHostNameAttributeValue === 'string' &&
+      !options.ignoreHostMetricAttribute(request, netHostNameAttributeValue))
+  ) {
+    metricAttributes[SemanticAttributes.NET_HOST_NAME] =
+      netHostNameAttributeValue;
+  }
+
+  //TODO: http.target attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
 
