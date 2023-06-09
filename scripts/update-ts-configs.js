@@ -45,13 +45,14 @@ const tsConfigMergeKeys = [
 const tsConfigPriorityKeys = ['extends'];
 const ignoredLernaProjects = [
   'experimental/examples/*',
-  'experimental/backwards-compatability/*',
+  'experimental/backwards-compatibility/*',
   'integration-tests/*',
   'selenium-tests',
   'examples/otlp-exporter-node',
   'examples/opentelemetry-web',
   'examples/http',
   'examples/https',
+  'examples/esm-http-ts',
 ];
 
 let dryRun = false;

@@ -30,6 +30,7 @@ const describeDocument =
   typeof document === 'object' ? describe : describe.skip;
 
 describeDocument('BatchSpanProcessor - web main context', () => {
+  // TODO: change to DocumentVisibilityState when TypeScript is upgraded to 4.6+
   let visibilityState: WebVisibilityState = 'visible';
   let exporter: SpanExporter;
   let processor: BatchSpanProcessor;
