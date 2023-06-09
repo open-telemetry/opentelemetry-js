@@ -85,7 +85,12 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
   addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
   addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-  addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  if (
+    hasKey(resource as PerformanceResourceTiming, 'name') &&
+    getProtocol((resource as PerformanceResourceTiming)['name']) === 'https'
+  ) {
+    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  }
   addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
@@ -440,4 +445,19 @@ export function shouldPropagateTraceHeaders(
       urlMatches(spanUrl, propagateTraceHeaderUrl)
     );
   }
+}
+
+export function getURL(urlString: string | undefined) {
+  if (urlString) {
+    try {
+      return new URL(urlString);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
+export function getProtocol(urlString: string | undefined) {
+  return getURL(urlString)?.protocol;
 }
