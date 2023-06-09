@@ -119,7 +119,8 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 2);
       //secure connect start should not be added to non-https resource
       assert.strictEqual(addEventSpy.callCount, 8);
-      //secure connect start should be added to https resource
+      //secure connect start should be added to an https resource
+      addEventSpy.resetHistory();
       addSpanNetworkEvents(span, {
         ...entries,
         name: 'https://foo',
