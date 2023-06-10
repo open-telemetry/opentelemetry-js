@@ -49,7 +49,7 @@ const includeDirs = [
   path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
 ];
 
-const httpAddr = 'localhost:1501';
+const httpAddr = 'https://localhost:1501';
 const udsAddr = 'unix:///tmp/otlp-traces.sock';
 
 type TestParams = {
