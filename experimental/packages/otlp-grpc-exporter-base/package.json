@@ -19,7 +19,7 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "npm run protos && tsc -w",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "keywords": [
@@ -58,6 +58,7 @@
     "@types/sinon": "10.0.15",
     "codecov": "3.8.3",
     "cpx": "1.5.0",
+    "cross-var": "1.1.0",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "protobufjs-cli": "1.0.2",

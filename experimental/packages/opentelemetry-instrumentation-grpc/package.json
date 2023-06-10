@@ -16,7 +16,7 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "postinstall": "node -e \"console.log(\\\"\\x1b[95m%s\\x1b[0m\\\", \\\"@opentelemetry/instrumentation-grpc - warning: The package 'grpc' (https://www.npmjs.com/package/grpc) is deprecated. It will no longer be instrumented in the next release of '@opentelemetry/instrumentation-grpc'. Please migrate to '@grpc/grpc-js' (https://www.npmjs.com/package/@grpc/grpc-js) to continue receiving telemetry.\\\");\""
@@ -58,6 +58,7 @@
     "@types/semver": "7.3.9",
     "@types/sinon": "10.0.15",
     "codecov": "3.8.3",
+    "cross-var": "1.1.0",
     "grpc": "1.24.11",
     "mocha": "10.2.0",
     "node-pre-gyp": "0.17.0",
