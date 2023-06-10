@@ -13,6 +13,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
@@ -20,6 +21,7 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:browser": "nyc karma start --single-run",
+    "prewatch": "node ../../../scripts/version-update.js",
     "watch": "tsc --build -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
@@ -61,6 +63,7 @@
     "@types/mocha": "10.0.1",
     "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
+    "cross-var": "1.1.0",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",
