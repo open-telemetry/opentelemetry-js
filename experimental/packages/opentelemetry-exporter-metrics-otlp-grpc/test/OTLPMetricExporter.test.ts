@@ -116,10 +116,15 @@ const testOTLPMetricExporter = (params: TestParams) => {
                 ]
               )
             : grpc.ServerCredentials.createInsecure();
-          server.bindAsync(address, credentials, () => {
-            server.start();
-            done();
-          });
+          const serverAddr = new URL(address);
+          server.bindAsync(
+            serverAddr.protocol === 'https:' ? serverAddr.host : address,
+            credentials,
+            () => {
+              server.start();
+              done();
+            }
+          );
         });
     });
 
