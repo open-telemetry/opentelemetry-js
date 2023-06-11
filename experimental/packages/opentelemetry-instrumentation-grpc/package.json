@@ -16,7 +16,7 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js"
   },
@@ -57,6 +57,7 @@
     "@types/semver": "7.3.9",
     "@types/sinon": "10.0.15",
     "codecov": "3.8.3",
+    "cross-var": "1.1.0",
     "mocha": "10.2.0",
     "node-pre-gyp": "0.17.0",
     "nyc": "15.1.0",
