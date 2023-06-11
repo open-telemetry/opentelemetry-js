@@ -24,7 +24,7 @@
     "test:browser": "nyc karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
@@ -70,6 +70,7 @@
     "@types/sinon": "10.0.15",
     "codecov": "3.8.3",
     "cpx": "1.5.0",
+    "cross-var": "1.1.0",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "sinon": "15.0.0",
