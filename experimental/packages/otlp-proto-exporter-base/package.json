@@ -80,7 +80,7 @@
   "dependencies": {
     "@opentelemetry/core": "1.14.0",
     "@opentelemetry/otlp-exporter-base": "0.40.0",
-    "protobufjs": "^7.1.2"
+    "protobufjs": "^7.2.3"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-proto-exporter-base",
   "sideEffects": false
