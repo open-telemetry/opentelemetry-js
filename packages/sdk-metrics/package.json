@@ -79,7 +79,7 @@
   "dependencies": {
     "@opentelemetry/core": "1.14.0",
     "@opentelemetry/resources": "1.14.0",
-    "lodash.merge": "4.6.2"
+    "lodash.merge": "^4.6.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics",
   "sideEffects": false
