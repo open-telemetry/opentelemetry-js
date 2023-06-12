@@ -10,7 +10,6 @@
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "postinstall": "npm run update-ts-configs && npm run bootstrap",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
-    "version:update": "lerna run version:update",
     "test": "lerna run test",
     "test:browser": "lerna run test:browser",
     "test:webworker": "lerna run test:webworker",
