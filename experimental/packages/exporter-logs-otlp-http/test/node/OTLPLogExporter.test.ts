@@ -23,7 +23,12 @@ import * as Config from '../../src/platform/config';
 import { OTLPLogExporter } from '../../src/platform/node';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { MockedResponse, ensureExportLogsServiceRequestIsSet, ensureExportedLogRecordIsCorrect, mockedReadableLogRecord } from '../logHelper';
+import {
+  MockedResponse,
+  ensureExportLogsServiceRequestIsSet,
+  ensureExportedLogRecordIsCorrect,
+  mockedReadableLogRecord,
+} from '../logHelper';
 import { PassThrough, Stream } from 'stream';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
@@ -115,7 +120,6 @@ describe('OTLPLogExporter', () => {
     });
 
     it('should set custom headers', done => {
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
@@ -130,7 +134,6 @@ describe('OTLPLogExporter', () => {
     });
 
     it('should have keep alive and keepAliveMsecs option set', done => {
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
