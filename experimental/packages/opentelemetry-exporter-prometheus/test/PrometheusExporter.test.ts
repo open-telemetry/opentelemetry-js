@@ -514,7 +514,12 @@ describe('PrometheusExporter', () => {
         `test_histogram_bucket{key1="attributeValue1",le="100"} 1 ${mockedHrTimeMs}`,
         `test_histogram_bucket{key1="attributeValue1",le="250"} 1 ${mockedHrTimeMs}`,
         `test_histogram_bucket{key1="attributeValue1",le="500"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="750"} 1 ${mockedHrTimeMs}`,
         `test_histogram_bucket{key1="attributeValue1",le="1000"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="2500"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="5000"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="7500"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="10000"} 1 ${mockedHrTimeMs}`,
         `test_histogram_bucket{key1="attributeValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
         '',
       ]);
