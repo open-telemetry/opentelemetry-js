@@ -13,6 +13,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics): Update default Histogram's boundary to match OTEL's spec [#3893](https://github.com/open-telemetry/opentelemetry-js/pull/3893/) @chigia001
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
