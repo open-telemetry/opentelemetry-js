@@ -87,7 +87,7 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
   if (
     hasKey(resource as PerformanceResourceTiming, 'name') &&
-    getProtocol((resource as PerformanceResourceTiming)['name']) === 'https:'
+    (resource as PerformanceResourceTiming)['name'].startsWith('https:')
   ) {
     addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
   }
