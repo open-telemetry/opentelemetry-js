@@ -19,5 +19,5 @@ export {
   InstrumentationModuleDefinition,
   InstrumentationModuleFile,
   InstrumentationNodeModuleDefinition,
-  InstrumentationNodeModuleFile
+  InstrumentationNodeModuleFile,
 } from './node';
