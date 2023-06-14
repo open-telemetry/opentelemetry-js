@@ -4,6 +4,10 @@
   "description": "OpenCensus to OpenTelemetry shim",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
+  "exports": {
+    ".": "./build/src/index.js",
+    "./register": "./build/src/register.js"
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

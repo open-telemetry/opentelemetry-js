@@ -15,7 +15,64 @@ npm install --save @opentelemetry/shim-opencensus
 
 ## Usage
 
-TODO
+### Installing the shim's require-in-the-middle hook
+
+This is the recommended way to use the shim.
+
+This package provides a `require-in-the-middle` hook which replaces OpenCensus's `CoreTracer`
+class with a shim implementation that writes to the OpenTelemetry API. This will cause all
+usage of OpenCensus's tracing methods (in OpenCensus instrumentation or your own custom
+instrumentation) to be reported to OpenTelemetry.
+
+There are two options for installing the hook:
+
+1. Using Node's `--require` flag to load the register module:
+
+   ```sh
+   node --require @opentelemetry/shim-opencensus/register ./app.js
+   ```
+
+2. Programmatically:
+
+   ```js
+   // Early in your application startup
+   require('@opentelemetry/shim-opencensus').installShim();
+   ```
+
+   Note that this has to be run before any OpenCensus tracers have been created.
+
+### Replace OpenCensus tracer with the `ShimTracer` in your code
+
+Alternatively, you can replace any usage of OpenCensus tracers in your code with the `ShimTracer` directly.
+
+Before:
+
+```js
+const tracing = require('@opencensus/nodejs');
+const tracer = tracing.start({samplingRate: 1}).tracer;
+
+// ...
+
+tracer.startRootSpan({name: 'main'}, rootSpan => {
+  rootSpan.end();
+});
+```
+
+After:
+
+```js
+const { trace } = require('@opentelemetry/api');
+const { ShimTracer } = require('@opentelemetry/shim-opencensus');
+const tracer = new ShimTracer(trace.getTracer('my-module'));  
+
+// ...
+
+tracer.startRootSpan({name: 'main'}, rootSpan => {
+  rootSpan.end();
+});
+```
+
+## Example
 
 See [examples/opencensus-shim](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/opencensus-shim) for a short example.
 
