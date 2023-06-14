@@ -37,7 +37,7 @@
     "@babel/plugin-transform-runtime": "7.22.5",
     "@babel/preset-env": "7.22.5",
     "@opentelemetry/api": "^1.0.0",
-    "babel-loader": "8.2.3",
+    "babel-loader": "8.3.0",
     "babel-polyfill": "6.26.0",
     "browserstack-local": "1.4.8",
     "chromedriver": "114.0.2",
