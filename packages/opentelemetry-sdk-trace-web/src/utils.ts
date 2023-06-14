@@ -446,18 +446,3 @@ export function shouldPropagateTraceHeaders(
     );
   }
 }
-
-export function getURL(urlString: string | undefined) {
-  if (urlString) {
-    try {
-      return new URL(urlString);
-    } catch (e) {
-      return null;
-    }
-  }
-  return null;
-}
-
-export function getProtocol(urlString: string | undefined) {
-  return getURL(urlString)?.protocol;
-}
