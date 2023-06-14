@@ -13,23 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-import { TracerProvider, MeterProvider } from '@opentelemetry/api';
-import { InstrumentationBase } from './platform';
-import { Instrumentation } from './types';
-
-export type InstrumentationOption =
-  | typeof InstrumentationBase
-  | (typeof InstrumentationBase)[]
-  | Instrumentation
-  | Instrumentation[];
-
-export interface AutoLoaderResult {
-  instrumentations: Instrumentation[];
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export interface AutoLoaderOptions {
-  instrumentations?: InstrumentationOption[];
-  tracerProvider?: TracerProvider;
-  meterProvider?: MeterProvider;
-}
+exports.sleep = sleep;
