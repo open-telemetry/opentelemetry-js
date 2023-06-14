@@ -28,7 +28,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js"
   },
@@ -70,6 +70,7 @@
     "@types/sinon": "10.0.15",
     "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
+    "cross-var": "1.1.0",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",

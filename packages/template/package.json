@@ -30,7 +30,7 @@
     "compile": "tsc --build",
     "version": "node ../../scripts/version-update.js",
     "clean": "tsc --build --clean",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js"
   },
@@ -79,6 +79,7 @@
   ],
   "devDependencies": {
     "@types/node": "18.6.5",
+    "cross-var": "1.1.0",
     "typescript": "4.4.4"
   },
   "Add these to devDependencies for testing": {
@@ -87,7 +88,7 @@
     "codecov": "3.8.3",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "sinon": "14.0.0",
+    "sinon": "15.0.0",
     "ts-mocha": "10.0.0"
   },
   "Add these to devDependencies if browser is targeted": {

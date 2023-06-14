@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides automatic instrumentation for [`grpc`](https://grpc.github.io/grpc/node/) and [`@grpc/grpc-js`](https://grpc.io/blog/grpc-js-1.0/). Currently, version [`1.x`](https://www.npmjs.com/package/grpc?activeTab=versions) of `grpc` and version [`1.x`](https://www.npmjs.com/package/@grpc/grpc-js?activeTab=versions) of `@grpc/grpc-js` is supported.
+This module provides automatic instrumentation for [`@grpc/grpc-js`](https://grpc.io/blog/grpc-js-1.0/). Currently, version [`1.x`](https://www.npmjs.com/package/@grpc/grpc-js?activeTab=versions) of `@grpc/grpc-js` is supported.
 
 For automatic instrumentation see the
 [@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node) package.
@@ -18,7 +18,7 @@ npm install --save @opentelemetry/instrumentation-grpc
 
 ## Usage
 
-OpenTelemetry gRPC Instrumentation allows the user to automatically collect trace data and export them to the backend of choice, to give observability to distributed systems when working with [gRPC](https://www.npmjs.com/package/grpc) or ([grpc-js](https://www.npmjs.com/package/@grpc/grpc-js)).
+OpenTelemetry gRPC Instrumentation allows the user to automatically collect trace data and export them to the backend of choice, to give observability to distributed systems when working with ([grpc-js](https://www.npmjs.com/package/@grpc/grpc-js)).
 
 To load a specific instrumentation (**gRPC** in this case), specify it in the Node Tracer's configuration.
 
@@ -38,15 +38,15 @@ registerInstrumentations({
 
 ```
 
-See [examples/grpc](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc) or [examples/grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) for examples.
+See [examples/grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) for examples.
 
 ### gRPC Instrumentation Options
 
 gRPC instrumentation accepts the following configuration:
 
-| Options                                                                                                                                                              | Type              | Description                                                                                                                                                                                                                                                               |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`ignoreGrpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L25)        | `IgnoreMatcher[]` | gRPC instrumentation will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function.                                                                                                |
+| Options                                                                                                                                                              | Type              | Description                                                                                                                                                                                                                                                                          |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`ignoreGrpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L25)        | `IgnoreMatcher[]` | gRPC instrumentation will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function.                                                                                                           |
 | [`metadataToSpanAttributes`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L27) | `object`          | List of case insensitive metadata to convert to span attributes. Client and server (outgoing requests, incoming responses) metadata attributes will be converted to span attributes in the form of `rpc.{request\response}.metadata.metadata_key`, e.g. `rpc.response.metadata.date` |
 
 ## Useful links
