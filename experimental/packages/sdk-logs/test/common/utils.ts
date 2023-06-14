@@ -21,11 +21,12 @@ export const validAttributes = {
   'array<string>': ['str1', 'str2'],
   'array<number>': [1, 2],
   'array<bool>': [true, false],
+  object: { bar: 'foo' },
 };
 
 export const invalidAttributes = {
-  // invalid attribute type object
-  object: { foo: 'bar' },
+  // invalid attribute empty object
+  object: {},
   // invalid attribute inhomogeneous array
   'non-homogeneous-array': [0, ''],
   // This empty length attribute should not be set

@@ -15,3 +15,4 @@
  */
 
 export { ShimTracer } from './ShimTracer';
+export { installShim, uninstallShim } from './shim';

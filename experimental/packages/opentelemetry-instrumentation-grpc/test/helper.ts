@@ -32,7 +32,6 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as protoLoader from '@grpc/proto-loader';
-import type * as grpcNapi from 'grpc';
 import type * as grpcJs from '@grpc/grpc-js';
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
@@ -54,25 +53,17 @@ interface TestRequestResponse {
   num: number;
 }
 
-type ServiceError = grpcNapi.ServiceError | grpcJs.ServiceError;
-type Client = grpcNapi.Client | grpcJs.Client;
-type Server = grpcNapi.Server | grpcJs.Server;
-type ServerUnaryCall =
-  | grpcNapi.ServerUnaryCall<any>
-  | grpcJs.ServerUnaryCall<any, any>;
+type ServiceError = grpcJs.ServiceError;
+type Client = grpcJs.Client;
+type Server = grpcJs.Server;
+type ServerUnaryCall = grpcJs.ServerUnaryCall<any, any>;
 type RequestCallback = grpcJs.requestCallback<any>;
-type ServerReadableStream =
-  | grpcNapi.ServerReadableStream<any>
-  | grpcJs.ServerReadableStream<any, any>;
-type ServerWriteableStream =
-  | grpcNapi.ServerWriteableStream<any>
-  | grpcJs.ServerWritableStream<any, any>;
-type ServerDuplexStream =
-  | grpcNapi.ServerDuplexStream<any, any>
-  | grpcJs.ServerDuplexStream<any, any>;
-type Metadata = grpcNapi.Metadata | grpcJs.Metadata;
+type ServerReadableStream = grpcJs.ServerReadableStream<any, any>;
+type ServerWriteableStream = grpcJs.ServerWritableStream<any, any>;
+type ServerDuplexStream = grpcJs.ServerDuplexStream<any, any>;
+type Metadata = grpcJs.Metadata;
 
-type TestGrpcClient = (typeof grpcJs | typeof grpcNapi)['Client'] & {
+type TestGrpcClient = (typeof grpcJs)['Client'] & {
   unaryMethodWithMetadata: any;
   unaryMethod: any;
   UnaryMethod: any;
@@ -117,7 +108,7 @@ const checkEqual =
 export const runTests = (
   plugin: GrpcInstrumentation,
   moduleName: string,
-  grpc: typeof grpcNapi | typeof grpcJs,
+  grpc: typeof grpcJs,
   grpcPort: number
 ) => {
   const MAX_ERROR_STATUS = grpc.status.UNAUTHENTICATED;
@@ -289,10 +280,7 @@ export const runTests = (
     return result;
   };
 
-  async function startServer(
-    grpc: typeof grpcJs | typeof grpcNapi,
-    proto: any
-  ) {
+  async function startServer(grpc: typeof grpcJs, proto: any) {
     const server = new grpc.Server();
 
     function getError(msg: string, code: number): ServiceError | null {
@@ -302,6 +290,7 @@ export const runTests = (
         message: msg,
         code,
         details: msg,
+        metadata: new grpc.Metadata(),
       };
       return err;
     }
@@ -422,7 +411,7 @@ export const runTests = (
     return server;
   }
 
-  function createClient(grpc: typeof grpcJs | typeof grpcNapi, proto: any) {
+  function createClient(grpc: typeof grpcJs, proto: any) {
     return new proto.GrpcTester(
       'localhost:' + grpcPort,
       grpc.credentials.createInsecure()
@@ -544,7 +533,7 @@ export const runTests = (
     };
 
     const ClientServerValidationTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
@@ -588,7 +577,7 @@ export const runTests = (
     };
 
     const ErrorValidationTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
@@ -646,7 +635,7 @@ export const runTests = (
     };
 
     const runTestWithAttributeValidation = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation: {
@@ -664,7 +653,7 @@ export const runTests = (
     };
 
     const runTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true
     ) => {
@@ -678,7 +667,7 @@ export const runTests = (
         request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       key: string,
       errorCode: number,
       provider: NodeTracerProvider
@@ -761,7 +750,7 @@ export const runTests = (
       });
     };
 
-    const runClientMethodTest = (method: typeof methodList[0]) => {
+    const runClientMethodTest = (method: (typeof methodList)[0]) => {
       it(`should assign original properties for grpc remote method ${method.methodName}`, async () => {
         const patchedClientMethod = (client as any)[method.methodName];
         const properties = Object.keys(patchedClientMethod);
