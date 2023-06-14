@@ -106,6 +106,7 @@
     "@opentelemetry/core": "1.14.0",
     "@opentelemetry/otlp-exporter-base": "0.40.0",
     "@opentelemetry/otlp-transformer": "0.40.0",
-    "@opentelemetry/sdk-logs": "0.40.0"
+    "@opentelemetry/sdk-logs": "0.40.0",
+    "tslib": "^2.3.1"
   }
 }

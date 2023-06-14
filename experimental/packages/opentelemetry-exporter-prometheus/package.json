@@ -63,7 +63,8 @@
   "dependencies": {
     "@opentelemetry/core": "1.14.0",
     "@opentelemetry/resources": "1.14.0",
-    "@opentelemetry/sdk-metrics": "1.14.0"
+    "@opentelemetry/sdk-metrics": "1.14.0",
+    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-prometheus",
   "sideEffects": false

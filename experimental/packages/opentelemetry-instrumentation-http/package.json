@@ -77,7 +77,8 @@
     "@opentelemetry/core": "1.14.0",
     "@opentelemetry/instrumentation": "0.40.0",
     "@opentelemetry/semantic-conventions": "1.14.0",
-    "semver": "^7.5.1"
+    "semver": "^7.5.1",
+    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http",
   "sideEffects": false

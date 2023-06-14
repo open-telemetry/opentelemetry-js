@@ -73,7 +73,8 @@
     "@opentelemetry/otlp-proto-exporter-base": "0.40.0",
     "@opentelemetry/otlp-transformer": "0.40.0",
     "@opentelemetry/resources": "1.14.0",
-    "@opentelemetry/sdk-metrics": "1.14.0"
+    "@opentelemetry/sdk-metrics": "1.14.0",
+    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
   "sideEffects": false
