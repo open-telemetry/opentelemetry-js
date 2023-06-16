@@ -71,7 +71,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
     "gh-pages": "5.0.0",
-    "lerna": "6.0.3",
+    "lerna": "6.6.2",
     "linkinator": "5.0.1",
     "markdownlint-cli": "0.34.0",
     "prettier": "2.8.8",
