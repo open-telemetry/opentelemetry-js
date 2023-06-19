@@ -64,7 +64,7 @@ const histogram = meter.createHistogram('test_histogram', {
   boundaries: [0, 10, 100, 1000],
 });
 
-const exponentialHistogram = meter.createHistogram('test_exp_histogram', {
+const exponentialHistogram = meter.createHistogram('test_exponential_histogram', {
   description: 'Example of an ExponentialHistogram',
 });
 
