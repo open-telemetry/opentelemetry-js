@@ -19,8 +19,7 @@
 
     /* Completeness */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
-    "importHelpers": true,
-    "noEmitHelpers": true
+    "importHelpers": true
   },
   "include": ["**/*.ts", "**/*.js", "*.config.js"],
   "exclude": ["node_modules"]
