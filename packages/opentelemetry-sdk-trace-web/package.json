@@ -94,7 +94,8 @@
   "dependencies": {
     "@opentelemetry/core": "1.14.0",
     "@opentelemetry/sdk-trace-base": "1.14.0",
-    "@opentelemetry/semantic-conventions": "1.14.0"
+    "@opentelemetry/semantic-conventions": "1.14.0",
+    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web",
   "sideEffects": false
