@@ -58,8 +58,6 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.4.1",
-    "@opentelemetry/api-logs": "0.39.1",
-    "@opentelemetry/sdk-logs": "0.39.1",
     "@types/mocha": "10.0.1",
     "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
@@ -71,7 +69,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "4.0.2",
-    "lerna": "6.6.2",
+    "lerna": "7.0.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "ts-loader": "8.4.0",
