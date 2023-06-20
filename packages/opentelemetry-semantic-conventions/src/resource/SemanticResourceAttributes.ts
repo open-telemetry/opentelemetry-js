@@ -486,7 +486,7 @@ export const CloudProviderValues = {
   GCP: 'gcp',
 } as const;
 export type CloudProviderValues =
-  typeof CloudProviderValues[keyof typeof CloudProviderValues];
+  (typeof CloudProviderValues)[keyof typeof CloudProviderValues];
 
 export const CloudPlatformValues = {
   /** Alibaba Cloud Elastic Compute Service. */
@@ -525,7 +525,7 @@ export const CloudPlatformValues = {
   GCP_APP_ENGINE: 'gcp_app_engine',
 } as const;
 export type CloudPlatformValues =
-  typeof CloudPlatformValues[keyof typeof CloudPlatformValues];
+  (typeof CloudPlatformValues)[keyof typeof CloudPlatformValues];
 
 export const AwsEcsLaunchtypeValues = {
   /** ec2. */
@@ -534,7 +534,7 @@ export const AwsEcsLaunchtypeValues = {
   FARGATE: 'fargate',
 } as const;
 export type AwsEcsLaunchtypeValues =
-  typeof AwsEcsLaunchtypeValues[keyof typeof AwsEcsLaunchtypeValues];
+  (typeof AwsEcsLaunchtypeValues)[keyof typeof AwsEcsLaunchtypeValues];
 
 export const HostArchValues = {
   /** AMD64. */
@@ -552,7 +552,8 @@ export const HostArchValues = {
   /** 32-bit x86. */
   X86: 'x86',
 } as const;
-export type HostArchValues = typeof HostArchValues[keyof typeof HostArchValues];
+export type HostArchValues =
+  (typeof HostArchValues)[keyof typeof HostArchValues];
 
 export const OsTypeValues = {
   /** Microsoft Windows. */
@@ -578,7 +579,7 @@ export const OsTypeValues = {
   /** IBM z/OS. */
   Z_OS: 'z_os',
 } as const;
-export type OsTypeValues = typeof OsTypeValues[keyof typeof OsTypeValues];
+export type OsTypeValues = (typeof OsTypeValues)[keyof typeof OsTypeValues];
 
 export const TelemetrySdkLanguageValues = {
   /** cpp. */
@@ -603,4 +604,4 @@ export const TelemetrySdkLanguageValues = {
   WEBJS: 'webjs',
 } as const;
 export type TelemetrySdkLanguageValues =
-  typeof TelemetrySdkLanguageValues[keyof typeof TelemetrySdkLanguageValues];
+  (typeof TelemetrySdkLanguageValues)[keyof typeof TelemetrySdkLanguageValues];

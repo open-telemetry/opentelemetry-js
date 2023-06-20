@@ -87,7 +87,7 @@ export function makeGrpcClientRemoteCall(
   ) {
     const wrappedFn: SendUnaryDataCallback<ResponseType> = (
       err: grpcJs.ServiceError | null,
-      res: any
+      res?: ResponseType
     ) => {
       if (err) {
         if (err.code) {
@@ -226,6 +226,6 @@ export function getMetadata(
  */
 export function setSpanContext(metadata: grpcJs.Metadata): void {
   propagation.inject(context.active(), metadata, {
-    set: (metadata, k, v) => metadata.set(k, v as grpcJs.MetadataValue),
+    set: (meta, k, v) => meta.set(k, v),
   });
 }

@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-import { runTests } from './helper';
-import { GrpcInstrumentation } from '../src/instrumentation';
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-const instrumentation = new GrpcInstrumentation();
-instrumentation.enable();
-instrumentation.disable();
-
-import * as grpc from 'grpc';
-
-describe('#grpc', () => {
-  runTests(instrumentation, 'grpc', grpc, 12345);
-});
+exports.sleep = sleep;
