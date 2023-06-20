@@ -48,6 +48,11 @@ describe('validateAndNormalizeUrl()', () => {
       expected: 'api.datacat.io:1234',
     },
     {
+      name: 'should accept unix socket',
+      input: 'unix:///tmp/grpc.sock',
+      expected: 'unix:///tmp/grpc.sock',
+    },
+    {
       name: 'bad protocol should warn but return host:port',
       input: 'badproto://api.datacat.io:1234',
       expected: 'api.datacat.io:1234',
