@@ -58,8 +58,6 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.4.1",
-    "@opentelemetry/api-logs": "0.39.1",
-    "@opentelemetry/sdk-logs": "0.39.1",
     "@types/mocha": "10.0.1",
     "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
