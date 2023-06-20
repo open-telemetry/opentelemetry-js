@@ -30,6 +30,7 @@ const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc'
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
+  // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
   url: 'http://<collector-hostname>:<port>',
 };
 
@@ -54,6 +55,7 @@ const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc'
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
+  // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
   url: 'http://<collector-hostname>:<port>',
   credentials: grpc.credentials.createSsl(),
 };
@@ -94,6 +96,7 @@ metadata.set('k', 'v');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
+  // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
   url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
@@ -120,6 +123,7 @@ The OTLPTraceExporter has a timeout configuration option which is the maximum ti
   const collectorOptions = {
     timeoutMillis: 15000,
     // url is optional and can be omitted - default is localhost:4317
+    // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
     url: '<collector-hostname>:<port>',
     metadata, // // an optional grpc.Metadata object to be sent with each request
   };
@@ -138,6 +142,7 @@ const { CompressionAlgorithm } = require('@opentelemetry/exporter-trace-otlp-grp
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
+  // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
   url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
   compression: CompressionAlgorithm.GZIP,
