@@ -32,6 +32,7 @@ const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
+  // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
   url: 'http://<collector-hostname>:<port>',
 };
 

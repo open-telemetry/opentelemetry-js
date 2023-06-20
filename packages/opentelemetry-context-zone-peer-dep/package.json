@@ -70,7 +70,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "4.0.2",
-    "lerna": "6.6.2",
+    "lerna": "7.0.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
@@ -84,6 +84,9 @@
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.5.0",
     "zone.js": "^0.10.2 || ^0.11.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.1"
   },
   "sideEffects": false,
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"

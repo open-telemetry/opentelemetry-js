@@ -51,9 +51,11 @@ const includeDirs = [
   path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
 ];
 
-const address = 'localhost:1502';
+const httpAddr = 'https://localhost:1502';
+const udsAddr = 'unix:///tmp/otlp-metrics.sock';
 
 type TestParams = {
+  address?: string;
   useTLS?: boolean;
   metadata?: grpc.Metadata;
 };
@@ -61,10 +63,11 @@ type TestParams = {
 const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
-const testOTLPMetricExporter = (params: TestParams) =>
-  describe(`OTLPMetricExporter - node ${
-    params.useTLS ? 'with' : 'without'
-  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
+const testOTLPMetricExporter = (params: TestParams) => {
+  const { address = httpAddr, useTLS, metadata } = params;
+  return describe(`OTLPMetricExporter - node ${
+    useTLS ? 'with' : 'without'
+  } TLS, ${metadata ? 'with' : 'without'} metadata, target ${address}`, () => {
     let collectorExporter: OTLPMetricExporter;
     let server: grpc.Server;
     let exportedData: IResourceMetrics[] | undefined;
@@ -102,7 +105,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
               },
             }
           );
-          const credentials = params.useTLS
+          const credentials = useTLS
             ? grpc.ServerCredentials.createSsl(
                 fs.readFileSync('./test/certs/ca.crt'),
                 [
@@ -113,10 +116,15 @@ const testOTLPMetricExporter = (params: TestParams) =>
                 ]
               )
             : grpc.ServerCredentials.createInsecure();
-          server.bindAsync(address, credentials, () => {
-            server.start();
-            done();
-          });
+          const serverAddr = new URL(address);
+          server.bindAsync(
+            serverAddr.protocol === 'https:' ? serverAddr.host : address,
+            credentials,
+            () => {
+              server.start();
+              done();
+            }
+          );
         });
     });
 
@@ -125,7 +133,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
     });
 
     beforeEach(async () => {
-      const credentials = params.useTLS
+      const credentials = useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
             fs.readFileSync('./test/certs/client.key'),
@@ -133,9 +141,9 @@ const testOTLPMetricExporter = (params: TestParams) =>
           )
         : grpc.credentials.createInsecure();
       collectorExporter = new OTLPMetricExporter({
-        url: 'https://' + address,
+        url: address,
         credentials,
-        metadata: params.metadata,
+        metadata: metadata,
         temporalityPreference: AggregationTemporality.CUMULATIVE,
       });
 
@@ -187,7 +195,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
 
       it('should warn about headers', () => {
         collectorExporter = new OTLPMetricExporter({
-          url: `http://${address}`,
+          url: address,
           headers: {
             foo: 'bar',
           },
@@ -197,8 +205,12 @@ const testOTLPMetricExporter = (params: TestParams) =>
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
       });
       it('should warn about path in url', () => {
+        if (new URL(address).protocol === 'unix:') {
+          // Skip this test for UDS
+          return;
+        }
         collectorExporter = new OTLPMetricExporter({
-          url: `http://${address}/v1/metrics`,
+          url: `${address}/v1/metrics`,
           temporalityPreference: AggregationTemporality.CUMULATIVE,
         });
         const args = warnStub.args[0];
@@ -261,13 +273,14 @@ const testOTLPMetricExporter = (params: TestParams) =>
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           ensureResourceIsCorrect(resource);
 
-          ensureMetadataIsCorrect(reqMetadata, params.metadata);
+          ensureMetadataIsCorrect(reqMetadata, metadata);
 
           done();
         }, 500);
       });
     });
   });
+};
 
 describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
@@ -352,3 +365,5 @@ describe('when configuring via environment', () => {
 testOTLPMetricExporter({ useTLS: true });
 testOTLPMetricExporter({ useTLS: false });
 testOTLPMetricExporter({ metadata });
+// skip UDS tests on windows
+process.platform !== 'win32' && testOTLPMetricExporter({ address: udsAddr });
