@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-metrics): add LowMemory metrics temporality preference [#3915](https://github.com/open-telemetry/opentelemetry-js/pull/3915)
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): Update default Histogram's boundary to match OTEL's spec [#3893](https://github.com/open-telemetry/opentelemetry-js/pull/3893/) @chigia001
