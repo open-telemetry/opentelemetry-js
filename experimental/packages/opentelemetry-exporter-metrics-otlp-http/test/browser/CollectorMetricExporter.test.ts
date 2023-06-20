@@ -22,9 +22,7 @@ import {
   Histogram,
 } from '@opentelemetry/api';
 import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
-import {
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
@@ -43,7 +41,10 @@ import {
   setUp,
   shutdown,
 } from '../metricsHelper';
-import { AggregationTemporalityPreference, OTLPMetricExporterOptions } from '../../src';
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporterOptions,
+} from '../../src';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 

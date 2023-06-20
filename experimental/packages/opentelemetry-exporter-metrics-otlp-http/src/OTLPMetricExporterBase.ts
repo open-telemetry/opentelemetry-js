@@ -22,7 +22,10 @@ import {
   PushMetricExporter,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
-import { AggregationTemporalityPreference, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporterOptions,
+} from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { diag } from '@opentelemetry/api';
@@ -88,7 +91,9 @@ function chooseTemporalitySelector(
   if (temporalityPreference != null) {
     if (temporalityPreference === AggregationTemporalityPreference.DELTA) {
       return DeltaTemporalitySelector;
-    } else if (temporalityPreference === AggregationTemporalityPreference.LOWMEMORY) {
+    } else if (
+      temporalityPreference === AggregationTemporalityPreference.LOWMEMORY
+    ) {
       return LowMemoryTemporalitySelector;
     }
     return CumulativeTemporalitySelector;
