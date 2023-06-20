@@ -25,7 +25,7 @@
     "lint": "eslint . --ext .ts",
     "test:browser": "karma start --single-run",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
-    "test:webworker": "nyc karma start karma.worker.js --single-run",
+    "test:webworker": "karma start karma.worker.js --single-run",
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node ../scripts/version-update.js",
     "prewatch": "npm run precompile",
