@@ -35,9 +35,7 @@ import {
   setUp,
   shutdown,
 } from './metricsHelper';
-import {
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
   IExportMetricsServiceRequest,
   IResourceMetrics,
