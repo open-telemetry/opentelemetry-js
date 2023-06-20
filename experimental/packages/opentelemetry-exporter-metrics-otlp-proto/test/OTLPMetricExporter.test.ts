@@ -38,10 +38,11 @@ import {
   setUp,
   shutdown,
 } from './metricsHelper';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics';
-import { AggregationTemporalityPreference, OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+  AggregationTemporalityPreference,
+  OTLPMetricExporterOptions,
+} from '@opentelemetry/exporter-metrics-otlp-http';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
