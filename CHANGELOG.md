@@ -19,6 +19,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* feat(minification): [Minification] Add noEmitHelpers, importHelpers and tslib as a dependency [#3913](https://github.com/open-telemetry/opentelemetry-js/issues/3913)
+
 ## 1.14.0
 
 ### :rocket: (Enhancement)

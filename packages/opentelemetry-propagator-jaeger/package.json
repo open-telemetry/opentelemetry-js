@@ -68,7 +68,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "4.0.2",
-    "lerna": "6.6.2",
+    "lerna": "7.0.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
@@ -81,7 +81,8 @@
     "@opentelemetry/api": ">=1.0.0 <1.5.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.14.0"
+    "@opentelemetry/core": "1.14.0",
+    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-jaeger",
   "sideEffects": false
