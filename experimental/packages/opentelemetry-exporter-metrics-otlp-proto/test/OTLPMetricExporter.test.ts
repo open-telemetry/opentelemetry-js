@@ -39,10 +39,9 @@ import {
   shutdown,
 } from './metricsHelper';
 import {
-  AggregationTemporality,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
-import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+import { AggregationTemporalityPreference, OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
@@ -176,7 +175,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        temporalityPreference: AggregationTemporality.CUMULATIVE,
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       setUp();
