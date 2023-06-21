@@ -22,6 +22,18 @@ export interface IExportMetricsServiceRequest {
   resourceMetrics: IResourceMetrics[];
 }
 
+export interface IExportMetricsServiceResponse {
+  partialSuccess?: IExportMetricsPartialSuccess;
+}
+
+export interface IExportMetricsPartialSuccess {
+  /** ExportMetricsPartialSuccess rejectedDataPoints */
+  rejectedDataPoints?: number;
+
+  /** ExportMetricsPartialSuccess errorMessage */
+  errorMessage?: string;
+}
+
 /** Properties of a ResourceMetrics. */
 export interface IResourceMetrics {
   /** ResourceMetrics resource */

@@ -23,6 +23,18 @@ export interface IExportTraceServiceRequest {
   resourceSpans?: IResourceSpans[];
 }
 
+export interface IExportTraceServiceResponse {
+  partialSuccess?: IExportTracePartialSuccess
+}
+
+export interface IExportTracePartialSuccess {
+  /** ExportLogsServiceResponse rejectedLogRecords */
+  rejectedSpans?: number;
+
+  /** ExportLogsServiceResponse errorMessage */
+  errorMessage?: string;
+}
+
 /** Properties of a ResourceSpans. */
 export interface IResourceSpans {
   /** ResourceSpans resource */
