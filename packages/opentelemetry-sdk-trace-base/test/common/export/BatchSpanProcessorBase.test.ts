@@ -150,6 +150,7 @@ describe('BatchSpanProcessorBase', () => {
 
       assert.strictEqual(spy.args.length, 1);
       await processor.shutdown();
+      console.log(spy.args)
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 

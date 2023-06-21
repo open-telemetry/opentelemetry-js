@@ -19,7 +19,6 @@ import {
   BindOnceFuture,
   ExportResultCode,
   getEnv,
-  globalErrorHandler,
   suppressTracing,
   unrefTimer,
 } from '@opentelemetry/core';
@@ -44,8 +43,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
-  private _waitingForEventLoop = false;
-  private _exports: Promise<void>[] = [];
+  private _waiting = false;
+  private _processing = false;
 
   constructor(private readonly _exporter: SpanExporter, config?: T) {
     const env = getEnv();
@@ -95,7 +94,6 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
       return;
     }
 
-    // only possible if multiple spans are added _synchronously_
     if (this._finishedSpans.length >= this._maxQueueSize) {
       this._droppedSpansCount++
       return;
@@ -103,41 +101,31 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
 
     this._finishedSpans.push(span);
 
-    // If many spans are added synchronously, we don't want to export a batch
-    // until the execution yields to the event loop. Otherwise we may end
-    // up with more than `maxQueueSize` spans effectively queued in the
-    // event loop which is a memory leak.
-    if (this._waitingForEventLoop) {
-      return;
-    }
-
-    this._waitingForEventLoop = true;
-    setTimeout(() => {
-      this._waitingForEventLoop = false;
-      this._maybeEagerExportBatch();
-      this._maybeStartTimer();
-    }, 0)
-
-
-    // // Alternate to the above. Don't worry about the queue filling synchronously
-    // // In this scenario, it should be impossible for the queue to fill beyond
-    // //   the size of a single bach because a batch is eagerly exported.
-    // this._maybeEagerExportBatch();
-    // this._maybeStartTimer();
+    this._maybeEagerlyProcessBatch();
+    this._maybeStartTimer();
   }
 
   shutdown(): Promise<void> {
     return this._shutdownOnce.call();
   }
 
-  private _maybeEagerExportBatch() {
-    // if the queue contains enough spans for at least one batch
-    // export one batch and process again
-    if (this._finishedSpans.length >= this._maxExportBatchSize) {
-      this._processOneBatch();
-      this._maybeEagerExportBatch();
-    }
+  private _shutdown() {
+    return Promise.resolve()
+      .then(() => {
+        return this.onShutdown();
+      })
+      .then(() => {
+        return this._flushAll();
+      })
+      .then(() => {
+        return this._exporter.shutdown();
+      });
+  }
 
+  private _maybeEagerlyProcessBatch() {
+    if (!this._processing && this._finishedSpans.length >= this._maxExportBatchSize) {
+      this._processOneBatch();
+    }
   }
 
   /**
@@ -152,41 +140,70 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
       this._finishedSpans.length / this._maxExportBatchSize
     );
     for (let i = 0, j = count; i < j; i++) {
-      promises.push(this._exportOneBatch());
+      promises.push(this._processOneBatch());
     }
 
     await Promise.all(promises);
   }
 
   private _processOneBatch() {
+    // because we eagerly export, we need to limit concurrency or we may have infinite concurrent exports
+    if (this._processing) {
+      this._waiting = true;
+      return;
+    };
+    this._waiting = false;
+    this._processing = true;
     this._clearTimer();
+
+    if (this._shutdownOnce.isCalled) {
+      return;
+    }
+
+    // TODO decide if we want to favor spans without pending async resource attributes
+    // this is only important if a span processor is shared with multiple tracer providers
+    // this._finishedSpans.sort((a, b) => {
+    //   if (a.resource.asyncAttributesPending == b.resource.asyncAttributesPending) return 0;
+    //   if (a.resource.asyncAttributesPending && !b.resource.asyncAttributesPending) return 1;
+    //   return -1;
+    // });
+
+    // drain 1 batch from queue.
     const batch = this._finishedSpans.splice(0, this._maxExportBatchSize);
+
+    console.log('drained', batch.length, 'spans from the queue');
+    console.log('queue length', this._finishedSpans.length);
+
+
+    // start timer if there are still spans in the queue
+    this._maybeStartTimer();
 
     if (this._droppedSpansCount > 0) {
       diag.warn(
         `Dropped ${this._droppedSpansCount} spans because maxQueueSize reached`
       );
     }
+    this._droppedSpansCount = 0;
 
-    const exportPromise = Promise.all(
+    Promise.all(
       batch
         .map(span => span.resource)
         .filter(resource => resource.asyncAttributesPending)
         .map(res => res.waitForAsyncAttributes?.())
     )
-      .then(() => {
-        this._promisifiedExportBatchWithTimeout(batch)
+      .then(() => this._promisifiedExportBatchWithTimeout(batch))
+      .catch((err) => {
+        // TODO improve error message with some contextual info and err object
+        diag.error("Failed to export batch")
+      })
+      .finally(() => {
+        this._processing = false;
+        if (this._waiting) {
+          this._processOneBatch();
+        }
+        this._maybeEagerlyProcessBatch();
+        this._maybeStartTimer();
       });
-
-    this._exports.push(exportPromise);
-
-    // remove from tracked promises on completion
-    exportPromise.finally(() => {
-      this._exports = this._exports.filter(p => p !== exportPromise);
-    })
-
-    // start timer if there are still spans in the queue
-    this._maybeStartTimer();
   }
 
   private _promisifiedExportBatchWithTimeout(batch: ReadableSpan[]): Promise<void> {
@@ -194,6 +211,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
     return new Promise<void>((resolve, reject) => {
       const timer = setTimeout(() => {
         // don't wait anymore for export, this way the next batch can start
+        // we can't cancel the export so we have to just forget about it
         reject(new Error('Timeout'));
       }, this._exportTimeoutMillis);
       unrefTimer(timer);
@@ -216,13 +234,9 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
 
   private _maybeStartTimer() {
     if (this._finishedSpans.length > 0 && this._timer == null) {
-      this._startTimer(this._processOneBatch.bind(this));
+      this._timer = setTimeout(this._processOneBatch.bind(this), this._scheduledDelayMillis);
+      unrefTimer(this._timer);
     }
-  }
-
-  private _startTimer(cb: () => void) {
-    this._timer = setTimeout(cb, this._scheduledDelayMillis);
-    unrefTimer(this._timer);
   }
 
   private _clearTimer() {
@@ -231,4 +245,6 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
       this._timer = undefined;
     }
   }
+
+  protected abstract onShutdown(): void;
 }
