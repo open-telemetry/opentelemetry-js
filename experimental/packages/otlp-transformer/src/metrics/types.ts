@@ -23,6 +23,7 @@ export interface IExportMetricsServiceRequest {
 }
 
 export interface IExportMetricsServiceResponse {
+  /** ExportMetricsServiceResponse partialSuccess */
   partialSuccess?: IExportMetricsPartialSuccess;
 }
 

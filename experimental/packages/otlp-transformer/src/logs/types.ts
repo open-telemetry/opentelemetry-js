@@ -28,6 +28,7 @@ export interface IExportLogsServiceRequest {
 }
 
 export interface IExportLogsServiceResponse {
+  /** ExportLogsServiceResponse partialSuccess */
   partialSuccess?: IExportLogsPartialSuccess;
 }
 

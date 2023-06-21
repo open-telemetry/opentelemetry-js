@@ -24,6 +24,7 @@ export interface IExportTraceServiceRequest {
 }
 
 export interface IExportTraceServiceResponse {
+  /** ExportTraceServiceResponse partialSuccess */
   partialSuccess?: IExportTracePartialSuccess;
 }
 
