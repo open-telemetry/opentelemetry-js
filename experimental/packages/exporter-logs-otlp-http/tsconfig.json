@@ -1,7 +1,6 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "esModuleInterop": true,
     "outDir": "build",
     "rootDir": "."
   },
@@ -24,6 +23,9 @@
     },
     {
       "path": "../sdk-logs"
-    }
+    },
+    {
+      "path": "../../../packages/opentelemetry-resources"
+    },
   ]
 }
