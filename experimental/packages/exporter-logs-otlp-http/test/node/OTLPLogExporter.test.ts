@@ -24,7 +24,6 @@ import { OTLPLogExporter } from '../../src/platform/node';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import {
-  MockedResponse,
   ensureExportLogsServiceRequestIsSet,
   ensureExportedLogRecordIsCorrect,
   mockedReadableLogRecord,
@@ -34,6 +33,25 @@ import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
 
 let fakeRequest: PassThrough;
+
+class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
+}
 
 describe('OTLPLogExporter', () => {
   let envSource: Record<string, any>;

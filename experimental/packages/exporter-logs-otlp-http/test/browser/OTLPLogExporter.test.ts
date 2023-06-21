@@ -13,36 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import * as http from 'http';
 
 import * as Config from '../../src/platform/config';
 import { OTLPLogExporter } from '../../src/platform/browser';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import {
-  MockedResponse,
-  ensureExportLogsServiceRequestIsSet,
-  ensureExportedLogRecordIsCorrect,
-  mockedReadableLogRecord,
-} from '../logHelper';
-import { PassThrough, Stream } from 'stream';
-import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { mockedReadableLogRecord } from '../logHelper';
 import { ExportResultCode } from '@opentelemetry/core';
-
-let fakeRequest: PassThrough;
 
 describe('OTLPLogExporter', () => {
   let envSource: Record<string, any>;
   let collectorExporter: OTLPLogExporter;
   let collectorExporterConfig: OTLPExporterConfigBase;
-  let logs: ReadableLogRecord[];
 
   afterEach(() => {
-    fakeRequest = new Stream.PassThrough();
     sinon.restore();
   });
 
@@ -85,126 +71,77 @@ describe('OTLPLogExporter', () => {
     });
   });
 
-  describe('export', () => {
+  describe('export - common', () => {
+    let spySend: any;
     beforeEach(() => {
-      collectorExporterConfig = {
-        headers: {
-          foo: 'bar',
-        },
-        hostname: 'foo',
-        url: 'http://foo.bar.com',
-      };
+      spySend = sinon.stub(OTLPLogExporter.prototype, 'send');
       collectorExporter = new OTLPLogExporter(collectorExporterConfig);
-      logs = [];
+    });
+
+    it('should export spans as otlpTypes.Spans', done => {
+      const logs: ReadableLogRecord[] = [];
       logs.push(Object.assign({}, mockedReadableLogRecord));
-    });
-    afterEach(() => {
-      sinon.restore();
-    });
-
-    it('should open the connection', done => {
-      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        assert.strictEqual(options.hostname, 'foo.bar.com');
-        assert.strictEqual(options.method, 'POST');
-        assert.strictEqual(options.path, '/');
-
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
-        return fakeRequest as any;
-      });
-      collectorExporter.export(logs, () => {});
-    });
-
-    it('should set custom headers', done => {
-      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        assert.strictEqual(options.headers['foo'], 'bar');
-
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
-        return fakeRequest as any;
-      });
 
       collectorExporter.export(logs, () => {});
-    });
-
-    it('should have keep alive and keepAliveMsecs option set', done => {
-      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        assert.strictEqual(options.agent.keepAlive, true);
-        assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
-
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
-        return fakeRequest as any;
-      });
-
-      collectorExporter.export(logs, () => {});
-    });
-
-    it('should successfully send the logs', done => {
-      const fakeRequest = new Stream.PassThrough();
-      sinon.stub(http, 'request').returns(fakeRequest as any);
-
-      let buff = Buffer.from('');
-      fakeRequest.on('end', () => {
-        const responseBody = buff.toString();
-        const json = JSON.parse(responseBody) as IExportLogsServiceRequest;
-        const log1 = json.resourceLogs?.[0].scopeLogs?.[0].logRecords?.[0];
-        assert.ok(typeof log1 !== 'undefined', "log doesn't exist");
-        ensureExportedLogRecordIsCorrect(log1);
-
-        ensureExportLogsServiceRequestIsSet(json);
-
+      setTimeout(() => {
+        const log = spySend.args[0][0][0] as ReadableLogRecord;
+        assert.deepStrictEqual(logs[0], log);
         done();
       });
-
-      fakeRequest.on('data', chunk => {
-        buff = Buffer.concat([buff, chunk]);
-      });
-
-      const clock = sinon.useFakeTimers();
-      collectorExporter.export(logs, () => {});
-      clock.tick(200);
-      clock.restore();
+      assert.strictEqual(spySend.callCount, 1);
     });
 
-    it('should log the successful message', done => {
-      // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerError = sinon.stub(diag, 'error');
+    describe('when exporter is shutdown', () => {
+      it(
+        'should not export anything but return callback with code' +
+          ' "FailedNotRetryable"',
+        async () => {
+          const spans: ReadableLogRecord[] = [];
+          spans.push(Object.assign({}, mockedReadableLogRecord));
+          await collectorExporter.shutdown();
+          spySend.resetHistory();
 
-      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        return fakeRequest as any;
-      });
+          const callbackSpy = sinon.spy();
+          collectorExporter.export(spans, callbackSpy);
+          const returnCode = callbackSpy.args[0][0];
 
-      collectorExporter.export(logs, result => {
-        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(spyLoggerError.args.length, 0);
-        done();
-      });
+          assert.strictEqual(
+            returnCode.code,
+            ExportResultCode.FAILED,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 0, 'should not call send');
+        }
+      );
     });
-
-    it('should log the error message', done => {
-      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        const mockResError = new MockedResponse(400);
-        cb(mockResError);
-        mockResError.send('failed');
-
-        return fakeRequest as any;
-      });
-
-      collectorExporter.export(logs, result => {
-        assert.strictEqual(result.code, ExportResultCode.FAILED);
-        // @ts-expect-error verify error code
-        assert.strictEqual(result.error.code, 400);
-        done();
+    describe('when an error occurs', () => {
+      it('should return failed export result', done => {
+        const spans: ReadableLogRecord[] = [];
+        spans.push(Object.assign({}, mockedReadableLogRecord));
+        spySend.throws({
+          code: 100,
+          details: 'Test error',
+          metadata: {},
+          message: 'Non-retryable',
+          stack: 'Stack',
+        });
+        const callbackSpy = sinon.spy();
+        collectorExporter.export(spans, callbackSpy);
+        setTimeout(() => {
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode.code,
+            ExportResultCode.FAILED,
+            'return value is wrong'
+          );
+          assert.strictEqual(
+            returnCode.error.message,
+            'Non-retryable',
+            'return error message is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 1, 'should call send');
+          done();
+        });
       });
     });
   });

@@ -27,7 +27,6 @@ import {
   IResource,
 } from '@opentelemetry/otlp-transformer';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { Stream } from 'stream';
 
 export const mockedReadableLogRecord: ReadableLogRecord = {
   resource: Resource.default().merge(
@@ -164,23 +163,4 @@ export function ensureExportLogsServiceRequestIsSet(
 
   const logRecords = scopeLogs?.[0].logRecords;
   assert.strictEqual(logRecords?.length, 1, 'logs are missing');
-}
-
-export class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
-    super();
-  }
-
-  send(data: string) {
-    this.emit('data', data);
-    this.emit('end');
-  }
-
-  get statusCode() {
-    return this._code;
-  }
-
-  get statusMessage() {
-    return this._msg;
-  }
 }
