@@ -16,6 +16,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(exporter-logs-otlp-http): set useHex to true [#3875](https://github.com/open-telemetry/opentelemetry-js/pull/3875) @Nico385412
+  fix(otlp-proto-exporter-base): add missing type import [#3937](https://github.com/open-telemetry/opentelemetry-js/pull/3937) @pichlermarc
 
 ### :books: (Refine Doc)
 
