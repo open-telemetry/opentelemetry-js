@@ -16,6 +16,7 @@
 
 import * as root from '../generated/root';
 import { ServiceClientType } from './types';
+import type * as protobuf from 'protobufjs';
 
 export interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
   create(properties?: T): R;
