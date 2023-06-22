@@ -52,7 +52,17 @@ export abstract class OTLPExporterNodeBase<
       parseHeaders(config.headers),
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
     );
-    this.agent = createHttpAgent(config);
+
+    if (
+      config.httpAgent !== undefined &&
+      config.httpAgentOptions !== undefined
+    ) {
+      diag.warn(
+        'Both httpAgent and httpAgentOptions are set. Using httpAgent and ignoring httpAgentOptions'
+      );
+    }
+
+    this.agent = config.httpAgent ?? createHttpAgent(config);
     this.compression = configureCompression(config.compression);
   }
 

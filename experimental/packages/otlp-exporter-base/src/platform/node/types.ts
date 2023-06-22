@@ -25,6 +25,11 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
   keepAlive?: boolean;
   compression?: CompressionAlgorithm;
   httpAgentOptions?: http.AgentOptions | https.AgentOptions;
+
+  /**
+   * If provided, httpAgentOptions are ignored, and this agent is used instead.
+   */
+  httpAgent?: http.Agent | https.Agent;
 }
 
 export enum CompressionAlgorithm {
