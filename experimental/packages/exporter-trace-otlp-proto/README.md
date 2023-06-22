@@ -7,7 +7,6 @@
 
 This module provides a trace-exporter for OTLP (http/protobuf) using protocol version `v0.20.0`.
 
-
 ## Installation
 
 ```bash
