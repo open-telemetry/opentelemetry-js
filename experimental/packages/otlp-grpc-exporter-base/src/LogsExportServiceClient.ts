@@ -16,9 +16,11 @@
 
 import * as root from './generated/root';
 import * as grpc from '@grpc/grpc-js';
-import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  IExportLogsServiceRequest,
+  IExportLogsServiceResponse,
+} from '@opentelemetry/otlp-transformer';
 import { ExportType } from './internal-types';
-import IExportLogsServiceResponse = root.opentelemetry.proto.collector.logs.v1.IExportLogsServiceResponse;
 
 const responseType = root.opentelemetry.proto.collector.logs.v1
   .ExportLogsServiceResponse as ExportType<IExportLogsServiceResponse>;
