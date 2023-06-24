@@ -26,6 +26,7 @@ import {
 } from 'http';
 import * as url from 'url';
 import { InstrumentationConfig } from '@opentelemetry/instrumentation';
+import { MetricAttributes } from '@opentelemetry/api';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
@@ -47,6 +48,34 @@ export type Http = typeof http;
 export type Https = typeof https;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Func<T> = (...args: any[]) => T;
+
+export interface AttributeCollector {
+  /**
+   * Returns incoming request attributes scoped to the request data
+   * @param {IncomingMessage} request the request object
+   * @param {{ component: string, serverName?: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
+   */
+  getIncomingRequestSpanAttributes(
+    request: IncomingMessage,
+    options: {
+      component: string;
+      serverName?: string;
+      hookAttributes?: SpanAttributes;
+    }
+  ): SpanAttributes;
+
+  /**
+   * Returns incoming request Metric attributes scoped to the request data
+   * @param {SpanAttributes} spanAttributes the span attributes
+   * @param {{ includeOptional: boolean }} options used to pass data needed to create attributes
+   */
+  getIncomingRequestMetricAttributes(
+    spanAttributes: SpanAttributes,
+    options: {
+      includeOptional: boolean;
+    }
+  ): MetricAttributes;
+}
 
 export interface HttpCustomAttributeFunction {
   (

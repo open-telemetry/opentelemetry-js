@@ -30,6 +30,7 @@ import {
   ValueType,
 } from '@opentelemetry/api';
 import {
+  getEnv,
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
@@ -41,6 +42,7 @@ import { Socket } from 'net';
 import * as semver from 'semver';
 import * as url from 'url';
 import {
+  AttributeCollector,
   Err,
   Func,
   Http,
@@ -66,12 +68,14 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
+  private _attributeCollector;
   private _headerCapture;
   private _httpServerDurationHistogram!: Histogram;
   private _httpClientDurationHistogram!: Histogram;
 
   constructor(config?: HttpInstrumentationConfig) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
+    this._attributeCollector = this._createAttributeCollector();
     this._headerCapture = this._createHeaderCapture();
   }
 
@@ -497,14 +501,18 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       const headers = request.headers;
 
-      const spanAttributes = utils.getIncomingRequestAttributes(request, {
-        component: component,
-        serverName: instrumentation._getConfig().serverName,
-        hookAttributes: instrumentation._callStartSpanHook(
+      const spanAttributes =
+        instrumentation._attributeCollector.getIncomingRequestSpanAttributes(
           request,
-          instrumentation._getConfig().startIncomingSpanHook
-        ),
-      });
+          {
+            component: component,
+            serverName: instrumentation._getConfig().serverName,
+            hookAttributes: instrumentation._callStartSpanHook(
+              request,
+              instrumentation._getConfig().startIncomingSpanHook
+            ),
+          }
+        );
 
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,
@@ -513,7 +521,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       const startTime = hrTime();
       const metricAttributes =
-        utils.getIncomingRequestMetricAttributes(spanAttributes);
+        instrumentation._attributeCollector.getIncomingRequestMetricAttributes(
+          spanAttributes,
+          { includeOptional: true }
+        );
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(method, spanOptions, ctx);
@@ -880,5 +891,19 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         ),
       },
     };
+  }
+
+  private _createAttributeCollector() {
+    const optIn = getEnv().OTEL_SEMCONV_STABILITY_OPT_IN;
+
+    if (optIn.includes('none') || optIn.length === 0) {
+      return new utils.ExperimentalAttributeCollector();
+    } else if (optIn.includes('http')) {
+      return new utils.StableAttributeCollector();
+    } else if (optIn.includes('http/dup')) {
+      return new utils.BackwardsCompatibleAttributeCollector();
+    }
+
+    return new utils.ExperimentalAttributeCollector();
   }
 }

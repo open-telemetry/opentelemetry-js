@@ -35,7 +35,12 @@ import {
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
-import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
+import {
+  Err,
+  IgnoreMatcher,
+  ParsedRequestOptions,
+  AttributeCollector,
+} from './types';
 
 /**
  * Get an absolute url
@@ -438,84 +443,213 @@ export const getOutgoingRequestMetricAttributesOnResponse = (
   return metricAttributes;
 };
 
-/**
- * Returns incoming request attributes scoped to the request data
- * @param {IncomingMessage} request the request object
- * @param {{ component: string, serverName?: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
- */
-export const getIncomingRequestAttributes = (
-  request: IncomingMessage,
-  options: {
-    component: string;
-    serverName?: string;
-    hookAttributes?: SpanAttributes;
+export class ExperimentalAttributeCollector implements AttributeCollector {
+  getIncomingRequestSpanAttributes(
+    request: IncomingMessage,
+    options: {
+      component: string;
+      serverName?: string;
+      hookAttributes?: SpanAttributes;
+    }
+  ): SpanAttributes {
+    const headers = request.headers;
+    const userAgent = headers['user-agent'];
+    const ips = headers['x-forwarded-for'];
+    const method = request.method || 'GET';
+    const httpVersion = request.httpVersion;
+    const requestUrl = request.url ? url.parse(request.url) : null;
+    const host = requestUrl?.host || headers.host;
+    const hostname =
+      requestUrl?.hostname ||
+      host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
+      'localhost';
+    const serverName = options.serverName;
+    const attributes: SpanAttributes = {
+      [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
+        requestUrl,
+        headers,
+        `${options.component}:`
+      ),
+      [SemanticAttributes.HTTP_HOST]: host,
+      [SemanticAttributes.NET_HOST_NAME]: hostname,
+      [SemanticAttributes.HTTP_METHOD]: method,
+      [SemanticAttributes.HTTP_SCHEME]: options.component,
+    };
+
+    if (typeof ips === 'string') {
+      attributes[SemanticAttributes.HTTP_CLIENT_IP] = ips.split(',')[0];
+    }
+
+    if (typeof serverName === 'string') {
+      attributes[SemanticAttributes.HTTP_SERVER_NAME] = serverName;
+    }
+
+    if (requestUrl) {
+      attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.path || '/';
+    }
+
+    if (userAgent !== undefined) {
+      attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
+    }
+    setRequestContentLengthAttribute(request, attributes);
+
+    const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
+    return Object.assign(
+      attributes,
+      httpKindAttributes,
+      options.hookAttributes
+    );
   }
-): SpanAttributes => {
-  const headers = request.headers;
-  const userAgent = headers['user-agent'];
-  const ips = headers['x-forwarded-for'];
-  const method = request.method || 'GET';
-  const httpVersion = request.httpVersion;
-  const requestUrl = request.url ? url.parse(request.url) : null;
-  const host = requestUrl?.host || headers.host;
-  const hostname =
-    requestUrl?.hostname ||
-    host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
-    'localhost';
-  const serverName = options.serverName;
-  const attributes: SpanAttributes = {
-    [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
-      requestUrl,
-      headers,
-      `${options.component}:`
-    ),
-    [SemanticAttributes.HTTP_HOST]: host,
-    [SemanticAttributes.NET_HOST_NAME]: hostname,
-    [SemanticAttributes.HTTP_METHOD]: method,
-    [SemanticAttributes.HTTP_SCHEME]: options.component,
-  };
 
-  if (typeof ips === 'string') {
-    attributes[SemanticAttributes.HTTP_CLIENT_IP] = ips.split(',')[0];
+  getIncomingRequestMetricAttributes(
+    spanAttributes: SpanAttributes,
+    options: {
+      includeOptional: boolean;
+    }
+  ): MetricAttributes {
+    const metricAttributes: MetricAttributes = {};
+    metricAttributes[SemanticAttributes.HTTP_SCHEME] =
+      spanAttributes[SemanticAttributes.HTTP_SCHEME];
+    metricAttributes[SemanticAttributes.HTTP_METHOD] =
+      spanAttributes[SemanticAttributes.HTTP_METHOD];
+    metricAttributes[SemanticAttributes.NET_HOST_NAME] =
+      spanAttributes[SemanticAttributes.NET_HOST_NAME];
+    metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
+      spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+    //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
+    return metricAttributes;
+  }
+}
+
+export class StableAttributeCollector implements AttributeCollector {
+  getIncomingRequestSpanAttributes(
+    request: IncomingMessage,
+    options: {
+      component: string;
+      serverName?: string;
+      hookAttributes?: SpanAttributes;
+    }
+  ): SpanAttributes {
+    return {};
+    // const headers = request.headers;
+    // const userAgent = headers['user-agent'];
+    // const ips = headers['x-forwarded-for'];
+    // const method = request.method || 'GET';
+    // const httpVersion = request.httpVersion;
+    // const requestUrl = request.url ? url.parse(request.url) : null;
+    // const host = requestUrl?.host || headers.host;
+    // const hostname =
+    //   requestUrl?.hostname ||
+    //   host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
+    //   'localhost';
+    // const serverName = options.serverName;
+    // const attributes: SpanAttributes = {
+    //   [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
+    //     requestUrl,
+    //     headers,
+    //     `${options.component}:`
+    //   ),
+    //   [SemanticAttributes.HTTP_HOST]: host,
+    //   [SemanticAttributes.NET_HOST_NAME]: hostname,
+    //   [SemanticAttributes.HTTP_METHOD]: method,
+    //   [SemanticAttributes.HTTP_SCHEME]: options.component,
+    // };
+
+    // if (typeof ips === 'string') {
+    //   attributes[SemanticAttributes.HTTP_CLIENT_IP] = ips.split(',')[0];
+    // }
+
+    // if (typeof serverName === 'string') {
+    //   attributes[SemanticAttributes.HTTP_SERVER_NAME] = serverName;
+    // }
+
+    // if (requestUrl) {
+    //   attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.path || '/';
+    // }
+
+    // if (userAgent !== undefined) {
+    //   attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
+    // }
+    // setRequestContentLengthAttribute(request, attributes);
+
+    // const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
+    // return Object.assign(
+    //   attributes,
+    //   httpKindAttributes,
+    //   options.hookAttributes
+    // );
   }
 
-  if (typeof serverName === 'string') {
-    attributes[SemanticAttributes.HTTP_SERVER_NAME] = serverName;
+  getIncomingRequestMetricAttributes(
+    spanAttributes: SpanAttributes,
+    options: {
+      includeOptional: boolean;
+    }
+  ): MetricAttributes {
+    return {};
+    // const metricAttributes: MetricAttributes = {};
+    // metricAttributes[SemanticAttributes.HTTP_SCHEME] =
+    //   spanAttributes[SemanticAttributes.HTTP_SCHEME];
+    // metricAttributes[SemanticAttributes.HTTP_METHOD] =
+    //   spanAttributes[SemanticAttributes.HTTP_METHOD];
+    // metricAttributes[SemanticAttributes.NET_HOST_NAME] =
+    //   spanAttributes[SemanticAttributes.NET_HOST_NAME];
+    // metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
+    //   spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+    // //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
+    // return metricAttributes;
+  }
+}
+
+export class BackwardsCompatibleAttributeCollector
+  implements AttributeCollector
+{
+  private readonly _experimentalAttributeCollector =
+    new ExperimentalAttributeCollector();
+  private readonly _stableAttributeCollector = new StableAttributeCollector();
+
+  getIncomingRequestSpanAttributes(
+    request: IncomingMessage,
+    options: {
+      component: string;
+      serverName?: string;
+      hookAttributes?: SpanAttributes;
+    }
+  ): SpanAttributes {
+    const experimentalSpanAttributes =
+      this._experimentalAttributeCollector.getIncomingRequestSpanAttributes(
+        request,
+        options
+      );
+    const stableSpanAttributes =
+      this._stableAttributeCollector.getIncomingRequestSpanAttributes(
+        request,
+        options
+      );
+
+    return Object.assign(experimentalSpanAttributes, stableSpanAttributes);
   }
 
-  if (requestUrl) {
-    attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.path || '/';
+  getIncomingRequestMetricAttributes(
+    spanAttributes: SpanAttributes,
+    options: {
+      includeOptional: boolean;
+    }
+  ): MetricAttributes {
+    const experimentalAttributes =
+      this._experimentalAttributeCollector.getIncomingRequestMetricAttributes(
+        spanAttributes,
+        options
+      );
+    const stableAttributes =
+      this._stableAttributeCollector.getIncomingRequestMetricAttributes(
+        spanAttributes,
+        options
+      );
+
+    return Object.assign(experimentalAttributes, stableAttributes);
   }
-
-  if (userAgent !== undefined) {
-    attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
-  }
-  setRequestContentLengthAttribute(request, attributes);
-
-  const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-  return Object.assign(attributes, httpKindAttributes, options.hookAttributes);
-};
-
-/**
- * Returns incoming request Metric attributes scoped to the request data
- * @param {SpanAttributes} spanAttributes the span attributes
- * @param {{ component: string }} options used to pass data needed to create attributes
- */
-export const getIncomingRequestMetricAttributes = (
-  spanAttributes: SpanAttributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_SCHEME] =
-    spanAttributes[SemanticAttributes.HTTP_SCHEME];
-  metricAttributes[SemanticAttributes.HTTP_METHOD] =
-    spanAttributes[SemanticAttributes.HTTP_METHOD];
-  metricAttributes[SemanticAttributes.NET_HOST_NAME] =
-    spanAttributes[SemanticAttributes.NET_HOST_NAME];
-  metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
-    spanAttributes[SemanticAttributes.HTTP_FLAVOR];
-  //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
-  return metricAttributes;
-};
+}
 
 /**
  * Returns incoming request attributes scoped to the response data
