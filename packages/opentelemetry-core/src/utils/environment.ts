@@ -27,7 +27,7 @@ const DEFAULT_LIST_SEPARATOR = ',';
 const ENVIRONMENT_BOOLEAN_KEYS = ['OTEL_SDK_DISABLED'] as const;
 
 type ENVIRONMENT_BOOLEANS = {
-  [K in typeof ENVIRONMENT_BOOLEAN_KEYS[number]]?: boolean;
+  [K in (typeof ENVIRONMENT_BOOLEAN_KEYS)[number]]?: boolean;
 };
 
 function isEnvVarABoolean(key: unknown): key is keyof ENVIRONMENT_BOOLEANS {
@@ -63,7 +63,7 @@ const ENVIRONMENT_NUMBERS_KEYS = [
 ] as const;
 
 type ENVIRONMENT_NUMBERS = {
-  [K in typeof ENVIRONMENT_NUMBERS_KEYS[number]]?: number;
+  [K in (typeof ENVIRONMENT_NUMBERS_KEYS)[number]]?: number;
 };
 
 function isEnvVarANumber(key: unknown): key is keyof ENVIRONMENT_NUMBERS {
@@ -78,7 +78,7 @@ const ENVIRONMENT_LISTS_KEYS = [
 ] as const;
 
 type ENVIRONMENT_LISTS = {
-  [K in typeof ENVIRONMENT_LISTS_KEYS[number]]?: string[];
+  [K in (typeof ENVIRONMENT_LISTS_KEYS)[number]]?: string[];
 };
 
 function isEnvVarAList(key: unknown): key is keyof ENVIRONMENT_LISTS {

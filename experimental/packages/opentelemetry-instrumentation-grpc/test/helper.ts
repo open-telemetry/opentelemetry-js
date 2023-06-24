@@ -529,7 +529,7 @@ export const runTests = (
     };
 
     const ClientServerValidationTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
@@ -573,7 +573,7 @@ export const runTests = (
     };
 
     const ErrorValidationTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
@@ -631,7 +631,7 @@ export const runTests = (
     };
 
     const runTestWithAttributeValidation = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation: {
@@ -649,7 +649,7 @@ export const runTests = (
     };
 
     const runTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true
     ) => {
@@ -663,7 +663,7 @@ export const runTests = (
         request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       key: string,
       errorCode: number,
       provider: NodeTracerProvider
@@ -746,7 +746,7 @@ export const runTests = (
       });
     };
 
-    const runClientMethodTest = (method: typeof methodList[0]) => {
+    const runClientMethodTest = (method: (typeof methodList)[0]) => {
       it(`should assign original properties for grpc remote method ${method.methodName}`, async () => {
         const patchedClientMethod = (client as any)[method.methodName];
         const properties = Object.keys(patchedClientMethod);

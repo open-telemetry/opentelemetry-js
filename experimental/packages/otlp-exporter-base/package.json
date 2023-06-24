@@ -61,7 +61,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.14.0"
+    "@opentelemetry/core": "1.14.0",
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@opentelemetry/api": "1.4.1",
@@ -71,10 +72,11 @@
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
     "istanbul-instrumenter-loader": "3.0.1",
+    "lerna": "7.0.2",
     "mocha": "10.2.0",
     "nock": "13.3.1",
     "nyc": "15.1.0",
-    "sinon": "15.0.0",
+    "sinon": "15.1.2",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
