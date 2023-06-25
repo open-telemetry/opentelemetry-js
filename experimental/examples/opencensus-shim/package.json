@@ -1,0 +1,41 @@
+{
+  "name": "opencensus-shim",
+  "private": true,
+  "version": "0.40.0",
+  "description": "Example of using @opentelemetry/shim-opencensus in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "client": "node -r @opentelemetry/shim-opencensus/register ./client.js",
+    "server": "node -r @opentelemetry/shim-opencensus/register ./server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "http",
+    "tracing",
+    "opencensus"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "1.4.1",
+    "@opentelemetry/sdk-trace-node": "1.14.0",
+    "@opencensus/core": "0.1.0",
+    "@opencensus/nodejs": "0.1.0",
+    "@opentelemetry/semantic-conventions": "1.14.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "0.40.0",
+    "@opentelemetry/resources": "1.14.0",
+    "@opentelemetry/shim-opencensus": "0.40.0"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/opencensus-shim",
+  "devDependencies": {}
+}

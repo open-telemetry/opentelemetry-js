@@ -125,6 +125,9 @@ export function validateAndNormalizeUrl(url: string): string {
     url = `https://${url}`;
   }
   const target = new URL(url);
+  if (target.protocol === 'unix:') {
+    return url;
+  }
   if (target.pathname && target.pathname !== '/') {
     diag.warn(
       'URL path should not be set when using grpc, the path part of the URL will be ignored.'

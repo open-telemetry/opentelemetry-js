@@ -80,7 +80,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports.Server.prototype,
             'register',
-            this._patchServer() as any
+            this._patchServer()
           );
           // Patch Client methods
           if (isWrapped(moduleExports.makeGenericClientConstructor)) {
