@@ -55,6 +55,10 @@ export type GrpcClientFunc = ((...args: unknown[]) => GrpcEmitter) & {
 
 export type ServerRegisterFunction = typeof grpcJs.Server.prototype.register;
 
+export type ClientRequestFunction<ReturnType> = (
+  ...args: unknown[]
+) => ReturnType;
+
 export type MakeClientConstructorFunction =
   typeof grpcJs.makeGenericClientConstructor;
 
