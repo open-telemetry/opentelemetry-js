@@ -81,7 +81,7 @@
     "@types/node": "18.6.5",
     "cross-var": "1.1.0",
     "lerna": "7.0.2",
-    "typescript": "4.4.4"
+    "typescript": "4.9.5"
   },
   "dependencies": {
     "tslib": "^2.3.1"

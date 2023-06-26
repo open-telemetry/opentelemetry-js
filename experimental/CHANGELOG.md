@@ -22,6 +22,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* chore(deps): update `typescript` to `4.9.5` [#3952](https://github.com/open-telemetry/opentelemetry-js/pull/3952) @llc1123
+
 ## 0.40.0
 
 ### :boom: Breaking Change
