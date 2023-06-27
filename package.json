@@ -68,7 +68,8 @@
     "webpack": "4.46.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "^1.0.0"
+    "@opentelemetry/core": "^1.0.0",
+    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/propagators/opentelemetry-propagator-aws-xray#readme"
 }
