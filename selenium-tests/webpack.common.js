@@ -11,7 +11,7 @@ module.exports = {
     filename: '[name].js',
     sourceMapFilename: '[file].map',
   },
-  target: ['web', 'es5'],
+  target: 'web',
   module: {
     rules: [
       {
