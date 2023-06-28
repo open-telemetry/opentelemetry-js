@@ -21,6 +21,7 @@ import {
   diag,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
+import { logs } from '@opentelemetry/api-logs';
 import {
   InstrumentationOption,
   registerInstrumentations,
@@ -35,6 +36,7 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
+import {  LogRecordProcessor, LoggerProvider  } from '@opentelemetry/sdk-logs';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
@@ -63,6 +65,13 @@ export type MeterProviderConfig = {
   views?: View[];
 };
 
+export type LoggerProviderConfig = {
+    /**
+   * Reference to the Logger instance by the NodeSDK
+   */
+    logRecordProcessor?: LogRecordProcessor;
+}
+
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -70,6 +79,7 @@ export class NodeSDK {
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
+  private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
 
@@ -79,6 +89,7 @@ export class NodeSDK {
   private _autoDetectResources: boolean;
 
   private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
+  private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
 
@@ -175,6 +186,16 @@ export class NodeSDK {
     };
   }
 
+  /**Set configurations neeeded to register a LoggerProvider */
+  public configureLoggerProvider(config: LoggerProviderConfig): void {
+    // nothing is set yet, we can set config and then return
+    if(this._loggerProviderConfig == null) { 
+      this._loggerProviderConfig = config;
+      return;
+    }
+
+  }
+
   /** Set configurations needed to register a MeterProvider */
   public configureMeterProvider(config: MeterProviderConfig): void {
     // nothing is set yet, we can set config and return.
@@ -269,6 +290,17 @@ export class NodeSDK {
       propagator: this._tracerProviderConfig?.textMapPropagator,
     });
 
+    if(this._loggerProviderConfig) {
+      const loggerProvider= new LoggerProvider({
+        resource: this._resource
+      });
+      loggerProvider.addLogRecordProcessor(this._loggerProviderConfig.logRecordProcessor)
+
+      this._loggerProvider= loggerProvider;
+
+      logs.setGlobalLoggerProvider(loggerProvider);      
+    }
+
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
@@ -298,6 +330,9 @@ export class NodeSDK {
     const promises: Promise<unknown>[] = [];
     if (this._tracerProvider) {
       promises.push(this._tracerProvider.shutdown());
+    }
+    if (this._loggerProvider) {
+      promises.push(this._loggerProvider.shutdown());
     }
     if (this._meterProvider) {
       promises.push(this._meterProvider.shutdown());
