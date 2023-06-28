@@ -29,7 +29,7 @@ const {
 } = require('@opentelemetry/semantic-conventions');
 
 module.exports = function setup(serviceName) {
-  const tracing = require('@opencensus/nodejs');
+  const tracing = require('@opencensus/nodejs-base');
 
   diag.setLogger(new DiagConsoleLogger(), { logLevel: DiagLogLevel.ALL });
   const provider = new NodeTracerProvider({
