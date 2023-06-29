@@ -34,8 +34,7 @@ import { SpanExporter } from './SpanExporter';
  * the SDK then pushes them to the exporter pipeline.
  */
 export abstract class BatchSpanProcessorBase<T extends BufferConfig>
-  implements SpanProcessor
-{
+  implements SpanProcessor {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
@@ -83,7 +82,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   }
 
   // does nothing.
-  onStart(_span: Span, _parentContext: Context): void {}
+  onStart(_span: Span, _parentContext: Context): void { }
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {
@@ -187,7 +186,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
             } else {
               reject(
                 result.error ??
-                  new Error('BatchSpanProcessor: span export failed')
+                new Error('BatchSpanProcessor: span export failed')
               );
             }
           });
@@ -213,8 +212,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   }
 
   private _maybeStartTimer() {
-    if (this._timer !== undefined) return;
-    this._timer = setTimeout(() => {
+    const flush = () => {
       this._flushOneBatch()
         .then(() => {
           if (this._finishedSpans.length > 0) {
@@ -224,8 +222,14 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         })
         .catch(e => {
           globalErrorHandler(e);
-        });
-    }, this._scheduledDelayMillis);
+        })
+    }
+    // we only wait if the queue doesn't have enough elements yet
+    if (this._finishedSpans.length >= this._maxExportBatchSize) {
+      return flush();
+    }
+    if (this._timer !== undefined) return;
+    this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
     unrefTimer(this._timer);
   }
 
@@ -238,3 +242,4 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
 
   protected abstract onShutdown(): void;
 }
+
