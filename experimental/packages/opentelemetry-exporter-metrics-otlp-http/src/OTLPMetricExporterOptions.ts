@@ -21,7 +21,7 @@ export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
 }
 
 export enum AggregationTemporalityPreference {
-  CUMULATIVE,
   DELTA,
+  CUMULATIVE,
   LOWMEMORY,
 }
