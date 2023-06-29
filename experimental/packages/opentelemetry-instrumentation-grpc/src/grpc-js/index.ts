@@ -26,7 +26,7 @@ import type {
   loadPackageDefinition,
   GrpcObject,
 } from '@grpc/grpc-js';
-import * as grpcJs from '@grpc/grpc-js';
+import type * as grpcJs from '@grpc/grpc-js';
 
 import type {
   ServerCallWithMeta,
@@ -103,7 +103,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports,
             'makeGenericClientConstructor',
-            this._patchClient(grpcJs)
+            this._patchClient(moduleExports)
           );
           if (isWrapped(moduleExports.makeClientConstructor)) {
             this._unwrap(moduleExports, 'makeClientConstructor');
@@ -111,7 +111,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports,
             'makeClientConstructor',
-            this._patchClient(grpcJs)
+            this._patchClient(moduleExports)
           );
           if (isWrapped(moduleExports.loadPackageDefinition)) {
             this._unwrap(moduleExports, 'loadPackageDefinition');
@@ -119,7 +119,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports,
             'loadPackageDefinition',
-            this._patchLoadPackageDefinition(grpcJs)
+            this._patchLoadPackageDefinition(moduleExports)
           );
           return moduleExports;
         },
