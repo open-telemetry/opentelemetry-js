@@ -403,12 +403,12 @@ export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage
 ): SpanAttributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
-  const attributes: SpanAttributes = {}
+  const attributes: SpanAttributes = {};
   if (socket) {
     const { remoteAddress, remotePort } = socket;
     attributes[SemanticAttributes.NET_PEER_IP] = remoteAddress;
     attributes[SemanticAttributes.NET_PEER_PORT] = remotePort;
-  };
+  }
   setResponseContentLengthAttribute(response, attributes);
 
   if (statusCode) {
@@ -532,16 +532,18 @@ export const getIncomingRequestAttributesOnResponse = (
   const { statusCode, statusMessage } = response;
 
   const rpcMetadata = getRPCMetadata(context.active());
-  const attributes: SpanAttributes = {}
+  const attributes: SpanAttributes = {};
   if (socket) {
     const { localAddress, localPort, remoteAddress, remotePort } = socket;
     attributes[SemanticAttributes.NET_HOST_IP] = localAddress;
     attributes[SemanticAttributes.NET_HOST_PORT] = localPort;
     attributes[SemanticAttributes.NET_PEER_IP] = remoteAddress;
     attributes[SemanticAttributes.NET_PEER_PORT] = remotePort;
-  };
+  }
   attributes[SemanticAttributes.HTTP_STATUS_CODE] = statusCode;
-  attributes[AttributeNames.HTTP_STATUS_TEXT] = (statusMessage || '').toUpperCase();
+  attributes[AttributeNames.HTTP_STATUS_TEXT] = (
+    statusMessage || ''
+  ).toUpperCase();
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
     attributes[SemanticAttributes.HTTP_ROUTE] = rpcMetadata.route;
