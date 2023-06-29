@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { SpanStatusCode, SpanStatus, Span } from '@opentelemetry/api';
+import { SpanStatusCode } from '@opentelemetry/api';
+import type { SpanStatus, Span } from '@opentelemetry/api';
 import type { status as GrpcStatus, Metadata } from '@grpc/grpc-js';
-import { IgnoreMatcher } from './types';
+import type { IgnoreMatcher } from './types';
 
 // e.g., "dns:otel-productcatalogservice:8080" or "otel-productcatalogservice:8080" or "127.0.0.1:8080"
 export const URI_REGEX =

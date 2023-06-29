@@ -16,7 +16,7 @@
 
 import type { EventEmitter } from 'events';
 import type { CALL_SPAN_ENDED } from './serverUtils';
-import {
+import type {
   requestCallback,
   ServerUnaryCall,
   ServerReadableStream,

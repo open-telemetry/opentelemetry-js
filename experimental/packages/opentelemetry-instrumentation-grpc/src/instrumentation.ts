@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { GrpcInstrumentationConfig } from './types';
+import type { GrpcInstrumentationConfig } from './types';
+import type { MeterProvider, TracerProvider } from '@opentelemetry/api';
+
 import { VERSION } from './version';
 import { GrpcJsInstrumentation } from './grpc-js';
-import { MeterProvider, TracerProvider } from '@opentelemetry/api';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';

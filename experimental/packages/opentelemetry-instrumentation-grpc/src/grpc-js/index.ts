@@ -14,45 +14,9 @@
  * limitations under the License.
  */
 
-import {
-  InstrumentationNodeModuleDefinition,
-  isWrapped,
-} from '@opentelemetry/instrumentation';
-import { InstrumentationBase } from '@opentelemetry/instrumentation';
-import { GrpcInstrumentationConfig } from '../types';
-import { metadataCaptureType } from '../internal-types';
-import {
-  ServerCallWithMeta,
-  SendUnaryDataCallback,
-  ServerRegisterFunction,
-  HandleCall,
-  MakeClientConstructorFunction,
-  PackageDefinition,
-  GrpcClientFunc,
-} from './types';
-import {
-  context,
-  propagation,
-  ROOT_CONTEXT,
-  SpanOptions,
-  SpanKind,
-  trace,
-} from '@opentelemetry/api';
-import {
-  shouldNotTraceServerCall,
-  handleServerFunction,
-  handleUntracedServerFunction,
-} from './serverUtils';
-import {
-  getMethodsToWrap,
-  makeGrpcClientRemoteCall,
-  getMetadata,
-} from './clientUtils';
-import { EventEmitter } from 'events';
-import { _extractMethodAndService, metadataCapture, URI_REGEX } from '../utils';
-import { AttributeValues } from '../enums/AttributeValues';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import {
+import type { EventEmitter } from 'events';
+
+import type {
   Server,
   serialize as Serialize,
   deserialize as Deserialize,
@@ -63,6 +27,46 @@ import {
   GrpcObject,
 } from '@grpc/grpc-js';
 import * as grpcJs from '@grpc/grpc-js';
+
+import type {
+  ServerCallWithMeta,
+  SendUnaryDataCallback,
+  ServerRegisterFunction,
+  HandleCall,
+  MakeClientConstructorFunction,
+  PackageDefinition,
+  GrpcClientFunc,
+} from './types';
+import type { GrpcInstrumentationConfig } from '../types';
+import type { metadataCaptureType } from '../internal-types';
+
+import {
+  context,
+  propagation,
+  ROOT_CONTEXT,
+  SpanOptions,
+  SpanKind,
+  trace,
+} from '@opentelemetry/api';
+import {
+  InstrumentationNodeModuleDefinition,
+  isWrapped,
+  InstrumentationBase,
+} from '@opentelemetry/instrumentation';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+
+import {
+  shouldNotTraceServerCall,
+  handleServerFunction,
+  handleUntracedServerFunction,
+} from './serverUtils';
+import {
+  getMethodsToWrap,
+  makeGrpcClientRemoteCall,
+  getMetadata,
+} from './clientUtils';
+import { _extractMethodAndService, metadataCapture, URI_REGEX } from '../utils';
+import { AttributeValues } from '../enums/AttributeValues';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
   private _metadataCapture: metadataCaptureType;
@@ -99,7 +103,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports,
             'makeGenericClientConstructor',
-            this._patchClient()
+            this._patchClient(grpcJs)
           );
           if (isWrapped(moduleExports.makeClientConstructor)) {
             this._unwrap(moduleExports, 'makeClientConstructor');
@@ -107,7 +111,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports,
             'makeClientConstructor',
-            this._patchClient()
+            this._patchClient(grpcJs)
           );
           if (isWrapped(moduleExports.loadPackageDefinition)) {
             this._unwrap(moduleExports, 'loadPackageDefinition');
@@ -115,7 +119,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports,
             'loadPackageDefinition',
-            this._patchLoadPackageDefinition()
+            this._patchLoadPackageDefinition(grpcJs)
           );
           return moduleExports;
         },
@@ -257,7 +261,9 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    * Entry point for applying client patches to `grpc.makeClientConstructor(...)` equivalents
    * @param this GrpcJsPlugin
    */
-  private _patchClient(): (
+  private _patchClient(
+    grpcClient: typeof grpcJs
+  ): (
     original: MakeClientConstructorFunction
   ) => MakeClientConstructorFunction {
     const instrumentation = this;
@@ -273,7 +279,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         instrumentation._massWrap<typeof client.prototype, string>(
           client.prototype,
           getMethodsToWrap.call(instrumentation, client, methods),
-          instrumentation._getPatchedClientMethods()
+          instrumentation._getPatchedClientMethods(grpcClient)
         );
         return client;
       };
@@ -284,7 +290,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    * Entry point for client patching for grpc.loadPackageDefinition(...)
    * @param this - GrpcJsPlugin
    */
-  private _patchLoadPackageDefinition() {
+  private _patchLoadPackageDefinition(grpcClient: typeof grpcJs) {
     const instrumentation = this;
     instrumentation._diag.debug('patching loadPackageDefinition');
     return (original: typeof loadPackageDefinition) => {
@@ -296,7 +302,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this,
           packageDef
         ) as GrpcObject;
-        instrumentation._patchLoadedPackage(result);
+        instrumentation._patchLoadedPackage(grpcClient, result);
         return result;
       } as typeof loadPackageDefinition;
     };
@@ -305,16 +311,21 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   /**
    * Parse initial client call properties and start a span to trace its execution
    */
-  private _getPatchedClientMethods(): (
-    original: GrpcClientFunc
-  ) => () => EventEmitter {
+  private _getPatchedClientMethods(
+    grpcClient: typeof grpcJs
+  ): (original: GrpcClientFunc) => () => EventEmitter {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
       instrumentation._diag.debug('patch all client methods');
       function clientMethodTrace(this: Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = [...arguments];
-        const metadata = getMetadata.call(instrumentation, original, args);
+        const metadata = getMetadata.call(
+          instrumentation,
+          original,
+          grpcClient,
+          args
+        );
         const { service, method } = _extractMethodAndService(original.path);
 
         const span = instrumentation.tracer
@@ -363,17 +374,20 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    * parsing done by grpc.loadPackageDefinition
    * https://github.com/grpc/grpc-node/blob/1d14203c382509c3f36132bd0244c99792cb6601/packages/grpc-js/src/make-client.ts#L200-L217
    */
-  private _patchLoadedPackage(result: GrpcObject): void {
+  private _patchLoadedPackage(
+    grpcClient: typeof grpcJs,
+    result: GrpcObject
+  ): void {
     Object.values(result).forEach(service => {
       if (typeof service === 'function') {
         this._massWrap<typeof service.prototype, string>(
           service.prototype,
           getMethodsToWrap.call(this, service, service.service),
-          this._getPatchedClientMethods.call(this)
+          this._getPatchedClientMethods.call(this, grpcClient)
         );
       } else if (typeof service.format !== 'string') {
         // GrpcObject
-        this._patchLoadedPackage.call(this, service as GrpcObject);
+        this._patchLoadedPackage.call(this, grpcClient, service as GrpcObject);
       }
     });
   }

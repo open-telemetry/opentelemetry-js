@@ -15,4 +15,4 @@
  */
 
 export * from './instrumentation';
-export { GrpcInstrumentationConfig } from './types';
+export type { GrpcInstrumentationConfig } from './types';

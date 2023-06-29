@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/api';
+import type { Span } from '@opentelemetry/api';
 import type { Metadata } from '@grpc/grpc-js';
 
 export type metadataCaptureType = {

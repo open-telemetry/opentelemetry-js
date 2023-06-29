@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-import { GrpcJsInstrumentation } from './';
+import type { EventEmitter } from 'events';
+import type { Span, SpanStatus } from '@opentelemetry/api';
+import type { Client, Metadata, ServiceError } from '@grpc/grpc-js';
+import type * as grpcJs from '@grpc/grpc-js';
+import type { GrpcJsInstrumentation } from './';
 import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
-import {
-  Span,
-  SpanStatusCode,
-  SpanStatus,
-  propagation,
-  context,
-} from '@opentelemetry/api';
-import { Client, Metadata, ServiceError } from '@grpc/grpc-js';
+import type { metadataCaptureType } from '../internal-types';
+
+import { SpanStatusCode, propagation, context } from '@opentelemetry/api';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { CALL_SPAN_ENDED } from './serverUtils';
+import { AttributeNames } from '../enums/AttributeNames';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
 } from '../utils';
-import { CALL_SPAN_ENDED } from './serverUtils';
-import { EventEmitter } from 'events';
-import { AttributeNames } from '../enums/AttributeNames';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { metadataCaptureType } from '../internal-types';
-import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -186,6 +183,7 @@ export function makeGrpcClientRemoteCall(
 export function getMetadata(
   this: GrpcJsInstrumentation,
   original: GrpcClientFunc,
+  grpcClient: typeof grpcJs,
   args: Array<unknown | Metadata>
 ): Metadata {
   let metadata: Metadata;
@@ -203,7 +201,7 @@ export function getMetadata(
     );
   });
   if (metadataIndex === -1) {
-    metadata = new Metadata();
+    metadata = new grpcClient.Metadata();
     if (!original.requestStream) {
       // unary or server stream
       metadataIndex = 1;

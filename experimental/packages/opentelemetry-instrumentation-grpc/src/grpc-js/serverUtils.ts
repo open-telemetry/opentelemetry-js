@@ -20,28 +20,32 @@
  * error event should be processed.
  */
 
-import { context, Span, SpanStatusCode } from '@opentelemetry/api';
 import type {
-  ServerCallWithMeta,
-  SendUnaryDataCallback,
-  GrpcEmitter,
-  HandleCall,
-} from './types';
-import {
-  _grpcStatusCodeToOpenTelemetryStatusCode,
-  _methodIsIgnored,
-} from '../utils';
-import { IgnoreMatcher } from '../types';
-import { AttributeNames } from '../enums/AttributeNames';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { GRPC_STATUS_CODE_OK } from '../status-code';
-import {
   ClientReadableStream,
   handleBidiStreamingCall,
   handleServerStreamingCall,
   handleUnaryCall,
   ServiceError,
 } from '@grpc/grpc-js';
+import type { Span } from '@opentelemetry/api';
+
+import type {
+  ServerCallWithMeta,
+  SendUnaryDataCallback,
+  GrpcEmitter,
+  HandleCall,
+} from './types';
+import type { IgnoreMatcher } from '../types';
+
+import { context, SpanStatusCode } from '@opentelemetry/api';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+
+import {
+  _grpcStatusCodeToOpenTelemetryStatusCode,
+  _methodIsIgnored,
+} from '../utils';
+import { AttributeNames } from '../enums/AttributeNames';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
