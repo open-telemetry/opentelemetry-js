@@ -175,7 +175,7 @@ describe('BatchSpanProcessorBase', () => {
       assert.strictEqual(spy.args.length, 0);
     });
 
-    it('should export the sampled spans with buffer size reached', async ()=> {
+    it('should export the sampled spans with buffer size reached', async () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       const span = createSampledSpan(name);
       for (let i = 1; i < defaultBufferConfig.maxExportBatchSize; i++) {

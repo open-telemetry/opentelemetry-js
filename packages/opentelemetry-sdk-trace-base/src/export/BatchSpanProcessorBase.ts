@@ -34,7 +34,8 @@ import { SpanExporter } from './SpanExporter';
  * the SDK then pushes them to the exporter pipeline.
  */
 export abstract class BatchSpanProcessorBase<T extends BufferConfig>
-  implements SpanProcessor {
+  implements SpanProcessor
+{
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
@@ -83,7 +84,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   }
 
   // does nothing.
-  onStart(_span: Span, _parentContext: Context): void { }
+  onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {
@@ -187,7 +188,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
             } else {
               reject(
                 result.error ??
-                new Error('BatchSpanProcessor: span export failed')
+                  new Error('BatchSpanProcessor: span export failed')
               );
             }
           });
@@ -218,17 +219,17 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
       this._isExporting = true;
       this._flushOneBatch()
         .then(() => {
-          this._isExporting =false
+          this._isExporting = false;
           if (this._finishedSpans.length > 0) {
             this._clearTimer();
             this._maybeStartTimer();
           }
         })
         .catch(e => {
-          this._isExporting =false
+          this._isExporting = false;
           globalErrorHandler(e);
-        })
-    }
+        });
+    };
     // we only wait if the queue doesn't have enough elements yet
     if (this._finishedSpans.length >= this._maxExportBatchSize) {
       return flush();
@@ -247,4 +248,3 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
 
   protected abstract onShutdown(): void;
 }
-
