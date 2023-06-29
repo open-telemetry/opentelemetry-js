@@ -574,6 +574,15 @@ describe('ExponentialHistogramAggregation', () => {
       assert.deepStrictEqual(acc0.toPointValue(), acc0Snapshot);
       assert.deepStrictEqual(acc1.toPointValue(), acc1Snapshot);
     });
+
+    it("keeps the previous point's startTime", () => {
+      const agg = new ExponentialHistogramAggregator(4, true);
+      const acc0 = agg.createAccumulation([0, 0]);
+      const acc1 = agg.createAccumulation([3, 0]);
+
+      const result = agg.merge(acc0, acc1);
+      assert.strictEqual(result.startTime, acc0.startTime);
+    });
   });
 
   describe('diff', () => {
