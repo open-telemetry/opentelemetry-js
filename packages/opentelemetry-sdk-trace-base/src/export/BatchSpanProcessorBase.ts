@@ -40,6 +40,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
 
+  private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
@@ -212,15 +213,19 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   }
 
   private _maybeStartTimer() {
+    if (this._isExporting) return;
     const flush = () => {
+      this._isExporting = true;
       this._flushOneBatch()
         .then(() => {
+          this._isExporting =false
           if (this._finishedSpans.length > 0) {
             this._clearTimer();
             this._maybeStartTimer();
           }
         })
         .catch(e => {
+          this._isExporting =false
           globalErrorHandler(e);
         })
     }
