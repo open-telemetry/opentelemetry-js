@@ -15,9 +15,10 @@
  */
 
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { AggregationTemporality } from '@opentelemetry/sdk-metrics';
 
 export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
-  temporalityPreference?: AggregationTemporalityPreference;
+  temporalityPreference?: AggregationTemporalityPreference | AggregationTemporality;
 }
 
 export enum AggregationTemporalityPreference {
