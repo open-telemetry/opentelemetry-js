@@ -85,7 +85,9 @@ function chooseTemporalitySelectorFromEnvironment() {
 }
 
 function chooseTemporalitySelector(
-  temporalityPreference?: AggregationTemporalityPreference | AggregationTemporality
+  temporalityPreference?:
+    | AggregationTemporalityPreference
+    | AggregationTemporality
 ): AggregationTemporalitySelector {
   // Directly passed preference has priority.
   if (temporalityPreference != null) {
