@@ -236,6 +236,29 @@ describe('Node SDK', () => {
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
     });
+
+    it('should register a logger provider if a log record processor is provided', async () => {
+      const sdk= new NodeSDK({
+        logRecordProcessor: logRecordProcessor,
+        autoDetectResources: false
+      })
+
+      sdk.start();
+
+      assert.strictEqual(
+        context['_getContextManager'](),
+        ctxManager,
+        'context manager should not change'
+      );
+      assert.strictEqual(
+        propagation['_getGlobalPropagator'](),
+        propagator,
+        'propagator should not change'
+      );
+
+      assert.ok(logs.getLoggerProvider() instanceof LoggerProvider);
+      await sdk.shutdown();
+    })
   });
 
   async function waitForNumberOfMetrics(
@@ -404,6 +427,27 @@ describe('Node SDK', () => {
       (error: Error) => {
         return error.message.includes(
           'MetricReader passed but MetricReader has already been configured.'
+        );
+      }
+    );
+  });
+
+  it('should throw error when calling configureLoggerProvider when logRecordProcessor is already configured', () => {
+
+    const sdk = new NodeSDK({
+      logRecordProcessor: logRecordProcessor,
+      autoDetectResources: false,
+    });
+
+    assert.throws(
+      () => {
+        sdk.configureLoggerProvider({
+          logRecordProcessor: logRecordProcessor,
+        });
+      },
+      (error: Error) => {
+        return error.message.includes(
+          'LogRecordProcesspor passed but LogRecordProcesspor has already been configured.'
         );
       }
     );

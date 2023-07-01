@@ -187,13 +187,15 @@ export class NodeSDK {
   }
 
   /**Set configurations neeeded to register a LoggerProvider */
-  public configureLoggerProvider(config: LoggerProviderConfig): void {
-    // nothing is set yet, we can set config and then return
-    if(this._loggerProviderConfig == null) { 
-      this._loggerProviderConfig = config;
-      return;
+  if(configuration.logRecordProcessor){
+    public configureLoggerProvider(config: LoggerProviderConfig): void {
+      // nothing is set yet, we can set config and then return
+      if(this._loggerProviderConfig == null) { 
+        this._loggerProviderConfig = config;
+        return;
+      }
+  
     }
-
   }
 
   /** Set configurations needed to register a MeterProvider */
