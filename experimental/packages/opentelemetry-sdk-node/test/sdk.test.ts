@@ -60,7 +60,11 @@ import {
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs } from '@opentelemetry/api-logs';
-import { LoggerProvider } from '@opentelemetry/sdk-logs';
+import {
+  SimpleLogRecordProcessor,
+  InMemoryLogRecordExporter,
+  LoggerProvider,
+} from '@opentelemetry/sdk-logs';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -238,7 +242,12 @@ describe('Node SDK', () => {
     });
 
     it('should register a logger provider if a log record processor is provided', async () => {
-      const sdk= new NodeSDK({
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const logRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
+      const sdk = new NodeSDK({
         logRecordProcessor: logRecordProcessor,
         autoDetectResources: false,
       });
@@ -255,9 +264,15 @@ describe('Node SDK', () => {
         propagator,
         'propagator should not change'
       );
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
 
       assert.ok(logs.getLoggerProvider() instanceof LoggerProvider);
       await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
     });
   });
 
@@ -433,6 +448,8 @@ describe('Node SDK', () => {
   });
 
   it('should throw error when calling configureLoggerProvider when logRecordProcessor is already configured', () => {
+    const logRecordExporter = new InMemoryLogRecordExporter();
+    const logRecordProcessor = new SimpleLogRecordProcessor(logRecordExporter);
     const sdk = new NodeSDK({
       logRecordProcessor: logRecordProcessor,
       autoDetectResources: false,
@@ -446,7 +463,7 @@ describe('Node SDK', () => {
       },
       (error: Error) => {
         return error.message.includes(
-          'LogRecordProcesspor passed but LogRecordProcesspor has already been configured.'
+          'LogRecordProvider passed but LogRecordProcessor has already been configured.'
         );
       }
     );

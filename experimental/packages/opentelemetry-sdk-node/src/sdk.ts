@@ -36,7 +36,7 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import {  LogRecordProcessor, LoggerProvider  } from '@opentelemetry/sdk-logs';
+import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
@@ -66,11 +66,11 @@ export type MeterProviderConfig = {
 };
 
 export type LoggerProviderConfig = {
-    /**
+  /**
    * Reference to the Logger instance by the NodeSDK
    */
-    logRecordProcessor?: LogRecordProcessor;
-}
+  logRecordProcessor?: LogRecordProcessor;
+};
 
 export class NodeSDK {
   private _tracerProviderConfig?: {
@@ -151,10 +151,11 @@ export class NodeSDK {
       );
     }
 
-    if(configuration.logRecordProcessor){
+    if (configuration.logRecordProcessor) {
       const loggerProviderConfig: LoggerProviderConfig = {};
-      if(configuration.logRecordProcessor) {
-        loggerProviderConfig.logRecordProcessor= configuration.logRecordProcessor;
+      if (configuration.logRecordProcessor) {
+        loggerProviderConfig.logRecordProcessor =
+          configuration.logRecordProcessor;
       }
 
       this.configureLoggerProvider(loggerProviderConfig);
@@ -198,9 +199,24 @@ export class NodeSDK {
   /**Set configurations neeeded to register a LoggerProvider */
   public configureLoggerProvider(config: LoggerProviderConfig): void {
     // nothing is set yet, we can set config and then return
-    if(this._loggerProviderConfig == null) { 
+    if (this._loggerProviderConfig == null) {
       this._loggerProviderConfig = config;
       return;
+    }
+
+    // make sure we do not override existing logRecordProcessor with other logRecordProcessors.
+    if (
+      this._loggerProviderConfig.logRecordProcessor != null &&
+      config.logRecordProcessor != null
+    ) {
+      throw new Error(
+        'LogRecordProvider passed but LogRecordProcessor has already been configured.'
+      );
+    }
+
+    // set logRecordProcessor, but make sure we do not override existing logRecordProcessors with null/undefined.
+    if (config.logRecordProcessor != null) {
+      this._loggerProviderConfig.logRecordProcessor = config.logRecordProcessor;
     }
   }
 
@@ -298,15 +314,17 @@ export class NodeSDK {
       propagator: this._tracerProviderConfig?.textMapPropagator,
     });
 
-    if(this._loggerProviderConfig) {
-      const loggerProvider= new LoggerProvider({
-        resource: this._resource
+    if (this._loggerProviderConfig) {
+      const loggerProvider = new LoggerProvider({
+        resource: this._resource,
       });
-      loggerProvider.addLogRecordProcessor(this._loggerProviderConfig.logRecordProcessor)
+      loggerProvider.addLogRecordProcessor(
+        this._loggerProviderConfig.logRecordProcessor
+      );
 
-      this._loggerProvider= loggerProvider;
+      this._loggerProvider = loggerProvider;
 
-      logs.setGlobalLoggerProvider(loggerProvider);      
+      logs.setGlobalLoggerProvider(loggerProvider);
     }
 
     if (this._meterProviderConfig) {
