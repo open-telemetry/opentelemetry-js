@@ -20,7 +20,14 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
-import { sdkLanguage, sdkName, sdkVersion, serviceName } from './util';
+import {
+  mockHrTime,
+  sdkLanguage,
+  sdkName,
+  sdkVersion,
+  serviceName,
+  mockedHrTimeMs,
+} from './util';
 import { SinonStubbedInstance } from 'sinon';
 
 const infoLine = `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1`;
@@ -32,6 +39,9 @@ const serializedDefaultResourceLines = [
 ];
 
 describe('PrometheusExporter', () => {
+  beforeEach(() => {
+    mockHrTime();
+  });
   afterEach(() => {
     sinon.restore();
   });
@@ -622,10 +632,10 @@ describe('PrometheusExporter', () => {
       );
     });
 
-    it('should export a metric without timestamp', done => {
+    it('should export a metric with timestamp', done => {
       exporter = new PrometheusExporter(
         {
-          appendTimestamp: false,
+          appendTimestamp: true,
         },
         async () => {
           setup(exporter);
@@ -639,7 +649,7 @@ describe('PrometheusExporter', () => {
                   ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
-                  'counter_total{key1="attributeValue1"} 10',
+                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
                   '',
                 ]);
 

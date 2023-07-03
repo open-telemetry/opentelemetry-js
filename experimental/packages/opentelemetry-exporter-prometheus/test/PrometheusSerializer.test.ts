@@ -179,17 +179,17 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('serialize metric record with sum aggregator without timestamp', async () => {
-        const serializer = new PrometheusSerializer(undefined, false);
+      it('serialize metric record with sum aggregator with timestamp', async () => {
+        const serializer = new PrometheusSerializer(undefined, true);
         const result = await testSerializer(serializer);
         assert.strictEqual(
           result,
-          'test_count{foo1="bar1",foo2="bar2"} 1\n' +
-            'test_sum{foo1="bar1",foo2="bar2"} 5\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="1"} 0\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="10"} 1\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="100"} 1\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1\n'
+          `test_count{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
+            `test_sum{foo1="bar1",foo2="bar2"} 5 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="1"} 0 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="10"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="100"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -238,15 +238,15 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('should serialize metric record without timestamp', async () => {
-        const serializer = new PrometheusSerializer(undefined, false);
+      it('should serialize metric record with timestamp', async () => {
+        const serializer = new PrometheusSerializer(undefined, true);
         const result = await testSerializer(serializer);
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total counter\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -292,15 +292,15 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('serialize metric record without timestamp', async () => {
-        const serializer = new PrometheusSerializer(undefined, false);
+      it('serialize metric record with timestamp', async () => {
+        const serializer = new PrometheusSerializer(undefined, true);
         const result = await testSerializer(serializer);
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -346,15 +346,15 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('serialize metric record without timestamp', async () => {
-        const serializer = new PrometheusSerializer(undefined, false);
+      it('serialize metric record with timestamp', async () => {
+        const serializer = new PrometheusSerializer(undefined, true);
         const result = await testSerializer(serializer);
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
             '# TYPE test_total gauge\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
