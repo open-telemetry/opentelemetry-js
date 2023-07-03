@@ -206,7 +206,6 @@ export class PrometheusExporter extends MetricReader {
             ...errors
           );
         }
-        console.log(this._serializer.serialize(resourceMetrics));
         response.end(this._serializer.serialize(resourceMetrics));
       },
       err => {
