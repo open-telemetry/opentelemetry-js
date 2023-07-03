@@ -21,8 +21,6 @@ import * as sinon from 'sinon';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
 import {
-  mockedHrTimeMs,
-  mockHrTime,
   sdkLanguage,
   sdkName,
   sdkVersion,
@@ -39,9 +37,6 @@ const serializedDefaultResourceLines = [
 ];
 
 describe('PrometheusExporter', () => {
-  beforeEach(() => {
-    mockHrTime();
-  });
   afterEach(() => {
     sinon.restore();
   });
@@ -290,7 +285,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
-        `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        `counter_total{key1="attributeValue1"} 10`,
         '',
       ]);
     });
@@ -320,7 +315,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP metric_observable_gauge a test description',
         '# TYPE metric_observable_gauge gauge',
-        `metric_observable_gauge{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
+        `metric_observable_gauge{pid="123",core="1"} 0.999`,
         '',
       ]);
     });
@@ -340,8 +335,8 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
-        `counter_total{counterKey1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-        `counter_total{counterKey1="attributeValue2"} 20 ${mockedHrTimeMs}`,
+        `counter_total{counterKey1="attributeValue1"} 10`,
+        `counter_total{counterKey1="attributeValue2"} 20`,
         '',
       ]);
     });
@@ -389,7 +384,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
-        `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        `counter_total{key1="attributeValue1"} 10`,
         '',
       ]);
     });
@@ -406,7 +401,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter_bad_name_total description missing',
         '# TYPE counter_bad_name_total counter',
-        `counter_bad_name_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        `counter_bad_name_total{key1="attributeValue1"} 10`,
         '',
       ]);
     });
@@ -424,7 +419,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP counter a test description',
         '# TYPE counter gauge',
-        `counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+        `counter{key1="attributeValue1"} 20`,
         '',
       ]);
     });
@@ -453,7 +448,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP metric_observable_counter a test description',
         '# TYPE metric_observable_counter counter',
-        `metric_observable_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+        `metric_observable_counter{key1="attributeValue1"} 20`,
         '',
       ]);
     });
@@ -484,7 +479,7 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP metric_observable_up_down_counter a test description',
         '# TYPE metric_observable_up_down_counter gauge',
-        `metric_observable_up_down_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+        `metric_observable_up_down_counter{key1="attributeValue1"} 20`,
         '',
       ]);
     });
@@ -503,24 +498,24 @@ describe('PrometheusExporter', () => {
         ...serializedDefaultResourceLines,
         '# HELP test_histogram a test description',
         '# TYPE test_histogram histogram',
-        `test_histogram_count{key1="attributeValue1"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_sum{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="0"} 0 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="5"} 0 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="10"} 0 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="25"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="50"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="75"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="100"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="250"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="500"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="750"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="1000"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="2500"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="5000"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="7500"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="10000"} 1 ${mockedHrTimeMs}`,
-        `test_histogram_bucket{key1="attributeValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_count{key1="attributeValue1"} 1`,
+        `test_histogram_sum{key1="attributeValue1"} 20`,
+        `test_histogram_bucket{key1="attributeValue1",le="0"} 0`,
+        `test_histogram_bucket{key1="attributeValue1",le="5"} 0`,
+        `test_histogram_bucket{key1="attributeValue1",le="10"} 0`,
+        `test_histogram_bucket{key1="attributeValue1",le="25"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="50"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="75"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="100"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="250"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="500"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="750"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="1000"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="2500"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="5000"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="7500"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="10000"} 1`,
+        `test_histogram_bucket{key1="attributeValue1",le="+Inf"} 1`,
         '',
       ]);
     });
@@ -562,7 +557,7 @@ describe('PrometheusExporter', () => {
                   ...serializedDefaultResourceLines,
                   '# HELP test_prefix_counter_total description missing',
                   '# TYPE test_prefix_counter_total counter',
-                  `test_prefix_counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+                  `test_prefix_counter_total{key1="attributeValue1"} 10`,
                   '',
                 ]);
 
@@ -591,7 +586,7 @@ describe('PrometheusExporter', () => {
                   ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
-                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+                  `counter_total{key1="attributeValue1"} 10`,
                   '',
                 ]);
 
@@ -620,7 +615,7 @@ describe('PrometheusExporter', () => {
                   ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
-                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+                  `counter_total{key1="attributeValue1"} 10`,
                   '',
                 ]);
 
