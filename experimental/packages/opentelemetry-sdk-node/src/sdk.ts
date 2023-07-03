@@ -151,6 +151,15 @@ export class NodeSDK {
       );
     }
 
+    if(configuration.logRecordProcessor){
+      const loggerProviderConfig: LoggerProviderConfig = {};
+      if(configuration.logRecordProcessor) {
+        loggerProviderConfig.logRecordProcessor= configuration.logRecordProcessor;
+      }
+
+      this.configureLoggerProvider(loggerProviderConfig);
+    }
+
     if (configuration.metricReader || configuration.views) {
       const meterProviderConfig: MeterProviderConfig = {};
       if (configuration.metricReader) {
@@ -187,14 +196,11 @@ export class NodeSDK {
   }
 
   /**Set configurations neeeded to register a LoggerProvider */
-  if(configuration.logRecordProcessor){
-    public configureLoggerProvider(config: LoggerProviderConfig): void {
-      // nothing is set yet, we can set config and then return
-      if(this._loggerProviderConfig == null) { 
-        this._loggerProviderConfig = config;
-        return;
-      }
-  
+  public configureLoggerProvider(config: LoggerProviderConfig): void {
+    // nothing is set yet, we can set config and then return
+    if(this._loggerProviderConfig == null) { 
+      this._loggerProviderConfig = config;
+      return;
     }
   }
 

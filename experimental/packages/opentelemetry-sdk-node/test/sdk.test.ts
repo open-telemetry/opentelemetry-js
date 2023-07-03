@@ -240,8 +240,8 @@ describe('Node SDK', () => {
     it('should register a logger provider if a log record processor is provided', async () => {
       const sdk= new NodeSDK({
         logRecordProcessor: logRecordProcessor,
-        autoDetectResources: false
-      })
+        autoDetectResources: false,
+      });
 
       sdk.start();
 
@@ -258,7 +258,7 @@ describe('Node SDK', () => {
 
       assert.ok(logs.getLoggerProvider() instanceof LoggerProvider);
       await sdk.shutdown();
-    })
+    });
   });
 
   async function waitForNumberOfMetrics(
@@ -433,7 +433,6 @@ describe('Node SDK', () => {
   });
 
   it('should throw error when calling configureLoggerProvider when logRecordProcessor is already configured', () => {
-
     const sdk = new NodeSDK({
       logRecordProcessor: logRecordProcessor,
       autoDetectResources: false,
