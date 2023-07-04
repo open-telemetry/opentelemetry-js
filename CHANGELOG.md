@@ -18,6 +18,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(opentelemetry-exporter-prometheus): Update default PrometheusExporter to not append a timestamp to match the text based exposition format [#3961](https://github.com/open-telemetry/opentelemetry-js/pull/3961) @JacksonWeber
 * fix(sdk-metrics): Update default Histogram's boundary to match OTEL's spec [#3893](https://github.com/open-telemetry/opentelemetry-js/pull/3893/) @chigia001
 * fix(sdk-metrics): preserve startTime for cumulative ExponentialHistograms [#3934](https://github.com/open-telemetry/opentelemetry-js/pull/3934/) @aabmass
 
