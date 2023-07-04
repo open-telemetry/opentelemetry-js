@@ -24,6 +24,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* chore(instrumentation-grpc): Cleanup remnants of grpc-native support. [#3886](https://github.com/open-telemetry/opentelemetry-js/pull/3886) @llc1123
+
 ## 0.40.0
 
 ### :boom: Breaking Change

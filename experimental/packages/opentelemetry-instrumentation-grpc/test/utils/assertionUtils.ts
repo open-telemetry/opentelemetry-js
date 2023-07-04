@@ -16,7 +16,7 @@
 
 import { SpanKind, SpanStatusCode } from '@opentelemetry/api';
 import * as assert from 'assert';
-import type * as grpcJs from '@grpc/grpc-js';
+import type { status as GrpcStatus } from '@grpc/grpc-js';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   hrTimeToMilliseconds,
@@ -25,7 +25,7 @@ import {
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
-  status: grpcJs.status
+  status: GrpcStatus
 ): SpanStatusCode => {
   if (status !== undefined && status === 0) {
     return SpanStatusCode.UNSET;
@@ -39,7 +39,7 @@ export const assertSpan = (
   kind: SpanKind,
   validations: {
     name: string;
-    status: grpcJs.status;
+    status: GrpcStatus;
     netPeerName?: string;
     netPeerPort?: number;
   }
