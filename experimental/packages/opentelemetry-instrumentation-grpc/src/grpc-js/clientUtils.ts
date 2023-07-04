@@ -235,13 +235,11 @@ export function extractMetadataOrSpliceDefault(
   original: GrpcClientFunc,
   args: Array<unknown | grpcJs.Metadata>
 ): grpcJs.Metadata {
-  if (!original.requestStream) {
-    // unary or server stream
-    return extractMetadataOrSplice(grpcClient, args, 1);
-  } else {
-    // client stream or bidi
-    return extractMetadataOrSplice(grpcClient, args, 0);
-  }
+  return extractMetadataOrSplice(
+    grpcClient,
+    args,
+    original.requestStream ? 0 : 1
+  );
 }
 
 /**
