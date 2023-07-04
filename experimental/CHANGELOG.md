@@ -32,10 +32,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(example-opencensus-shim): avoid OpenCensus auto instrumentations [#3951](https://github.com/open-telemetry/opentelemetry-js/pull/3951) @llc1123
 * fix(http-intrumentation): prevent request socket null from throwing uncaught error [#3858](https://github.com/open-telemetry/opentelemetry-js/pull/3858) @aodysseos
 
-### :books: (Refine Doc)
-
-### :house: (Internal)
-
 ## 0.40.0
 
 ### :boom: Breaking Change
