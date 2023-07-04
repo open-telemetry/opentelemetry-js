@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides an exporter for OTLP gRPC logs using protocol version `v0.18`.
+This module provides a logs-exporter for OTLP (gRPC) using protocol version `v0.20.0`.
 
 ## Installation
 

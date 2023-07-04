@@ -33,7 +33,7 @@ export class PrometheusExporter extends MetricReader {
     port: 9464,
     endpoint: '/metrics',
     prefix: '',
-    appendTimestamp: true,
+    appendTimestamp: false,
   };
 
   private readonly _host?: string;

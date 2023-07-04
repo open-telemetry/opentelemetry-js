@@ -35,15 +35,13 @@ import {
   setUp,
   shutdown,
 } from './metricsHelper';
-import {
-  AggregationTemporality,
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
   IExportMetricsServiceRequest,
   IResourceMetrics,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../src/version';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -144,7 +142,7 @@ const testOTLPMetricExporter = (params: TestParams) => {
         url: address,
         credentials,
         metadata: metadata,
-        temporalityPreference: AggregationTemporality.CUMULATIVE,
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
       });
 
       setUp();
@@ -199,7 +197,7 @@ const testOTLPMetricExporter = (params: TestParams) => {
           headers: {
             foo: 'bar',
           },
-          temporalityPreference: AggregationTemporality.CUMULATIVE,
+          temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
         });
         const args = warnStub.args[0];
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
@@ -211,7 +209,7 @@ const testOTLPMetricExporter = (params: TestParams) => {
         }
         collectorExporter = new OTLPMetricExporter({
           url: `${address}/v1/metrics`,
-          temporalityPreference: AggregationTemporality.CUMULATIVE,
+          temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
         });
         const args = warnStub.args[0];
         assert.strictEqual(
@@ -294,7 +292,7 @@ describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new OTLPMetricExporter({
       url,
-      temporalityPreference: AggregationTemporality.CUMULATIVE,
+      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
     });
     setTimeout(() => {
       assert.strictEqual(collectorExporter._otlpExporter.url, 'foo.bar.com');
@@ -343,7 +341,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPMetricExporter({
       metadata,
-      temporalityPreference: AggregationTemporality.CUMULATIVE,
+      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
     });
     assert.deepStrictEqual(
       collectorExporter._otlpExporter.metadata?.get('foo'),
