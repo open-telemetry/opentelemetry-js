@@ -85,7 +85,12 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
   addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
   addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-  addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  if (
+    hasKey(resource as PerformanceResourceTiming, 'name') &&
+    (resource as PerformanceResourceTiming)['name'].startsWith('https:')
+  ) {
+    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  }
   addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
