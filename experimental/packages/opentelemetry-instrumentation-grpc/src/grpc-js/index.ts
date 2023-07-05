@@ -273,7 +273,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
                       [SemanticAttributes.RPC_SYSTEM]:
-                      AttributeValues.RPC_SYSTEM,
+                        AttributeValues.RPC_SYSTEM,
                       [SemanticAttributes.RPC_METHOD]: method,
                       [SemanticAttributes.RPC_SERVICE]: service,
                     });

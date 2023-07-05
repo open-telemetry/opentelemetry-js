@@ -89,11 +89,11 @@ interface TestGrpcCall {
 // Compare two arrays using an equal function f
 const arrayIsEqual =
   (f: any) =>
-    ([x, ...xs]: any) =>
-      ([y, ...ys]: any): any =>
-        x === undefined && y === undefined
-          ? true
-          : Boolean(f(x)(y)) && arrayIsEqual(f)(xs)(ys);
+  ([x, ...xs]: any) =>
+  ([y, ...ys]: any): any =>
+    x === undefined && y === undefined
+      ? true
+      : Boolean(f(x)(y)) && arrayIsEqual(f)(xs)(ys);
 
 // Return true if two requests has the same num value
 const requestEqual = (x: TestRequestResponse) => (y: TestRequestResponse) =>
@@ -102,12 +102,12 @@ const requestEqual = (x: TestRequestResponse) => (y: TestRequestResponse) =>
 // Check if its equal requests or array of requests
 const checkEqual =
   (x: TestRequestResponse | TestRequestResponse[]) =>
-    (y: TestRequestResponse | TestRequestResponse[]) =>
-      x instanceof Array && y instanceof Array
-        ? arrayIsEqual(requestEqual)(x as any)(y as any)
-        : !(x instanceof Array) && !(y instanceof Array)
-          ? requestEqual(x)(y)
-          : false;
+  (y: TestRequestResponse | TestRequestResponse[]) =>
+    x instanceof Array && y instanceof Array
+      ? arrayIsEqual(requestEqual)(x as any)(y as any)
+      : !(x instanceof Array) && !(y instanceof Array)
+      ? requestEqual(x)(y)
+      : false;
 
 const replicate = (request: TestRequestResponse) => {
   const result: TestRequestResponse[] = [];
@@ -151,11 +151,11 @@ export async function startServer(proto: any, port: number) {
 
       call.request.num <= MAX_ERROR_STATUS
         ? callback(
-          getError(
-            'Unary Method with Metadata Error',
-            call.request.num
-          ) as ServiceError
-        )
+            getError(
+              'Unary Method with Metadata Error',
+              call.request.num
+            ) as ServiceError
+          )
         : callback(null, { num: call.request.num });
     },
 
@@ -166,8 +166,8 @@ export async function startServer(proto: any, port: number) {
     ) {
       call.request.num <= MAX_ERROR_STATUS
         ? callback(
-          getError('Unary Method Error', call.request.num) as ServiceError
-        )
+            getError('Unary Method Error', call.request.num) as ServiceError
+          )
         : callback(null, { num: call.request.num });
     },
 
@@ -178,8 +178,8 @@ export async function startServer(proto: any, port: number) {
     ) {
       call.request.num <= MAX_ERROR_STATUS
         ? callback(
-          getError('Unary Method Error', call.request.num) as ServiceError
-        )
+            getError('Unary Method Error', call.request.num) as ServiceError
+          )
         : callback(null, { num: call.request.num });
     },
 
@@ -661,8 +661,8 @@ export const runTests = (
 
     const insertError =
       (request: TestRequestResponse | TestRequestResponse[]) =>
-        (code: number) =>
-          request instanceof Array ? [{ num: code }, ...request] : { num: code };
+      (code: number) =>
+        request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
       method: (typeof methodList)[0],

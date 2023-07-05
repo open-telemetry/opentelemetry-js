@@ -188,9 +188,7 @@ export function makeGrpcClientRemoteCall(
   };
 }
 
-export function getMetadataIndex(
-  args: Array<unknown | Metadata>
-): number {
+export function getMetadataIndex(args: Array<unknown | Metadata>): number {
   // This finds an instance of Metadata among the arguments.
   // A possible issue that could occur is if the 'options' parameter from
   // the user contains an '_internal_repr' as well as a 'getMap' function,
