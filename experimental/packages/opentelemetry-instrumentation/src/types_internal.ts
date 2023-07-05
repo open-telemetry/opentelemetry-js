@@ -20,7 +20,7 @@ import { Instrumentation } from './types';
 
 export type InstrumentationOption =
   | typeof InstrumentationBase
-  | typeof InstrumentationBase[]
+  | (typeof InstrumentationBase)[]
   | Instrumentation
   | Instrumentation[];
 
