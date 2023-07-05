@@ -32,8 +32,21 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as protoLoader from '@grpc/proto-loader';
-import type * as grpcNapi from 'grpc';
-import type * as grpcJs from '@grpc/grpc-js';
+import {
+  status as GrpcStatus,
+  requestCallback,
+  ServerUnaryCall,
+  ServerReadableStream,
+  ServerWritableStream,
+  ServerDuplexStream,
+  Client,
+  Metadata,
+  ServiceError,
+  Server,
+  ServerCredentials,
+  credentials,
+  loadPackageDefinition,
+} from '@grpc/grpc-js';
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import { promisify } from 'util';
 import type { GrpcInstrumentation } from '../src';
@@ -54,25 +67,7 @@ interface TestRequestResponse {
   num: number;
 }
 
-type ServiceError = grpcNapi.ServiceError | grpcJs.ServiceError;
-type Client = grpcNapi.Client | grpcJs.Client;
-type Server = grpcNapi.Server | grpcJs.Server;
-type ServerUnaryCall =
-  | grpcNapi.ServerUnaryCall<any>
-  | grpcJs.ServerUnaryCall<any, any>;
-type RequestCallback = grpcJs.requestCallback<any>;
-type ServerReadableStream =
-  | grpcNapi.ServerReadableStream<any>
-  | grpcJs.ServerReadableStream<any, any>;
-type ServerWriteableStream =
-  | grpcNapi.ServerWriteableStream<any>
-  | grpcJs.ServerWritableStream<any, any>;
-type ServerDuplexStream =
-  | grpcNapi.ServerDuplexStream<any, any>
-  | grpcJs.ServerDuplexStream<any, any>;
-type Metadata = grpcNapi.Metadata | grpcJs.Metadata;
-
-type TestGrpcClient = (typeof grpcJs | typeof grpcNapi)['Client'] & {
+type TestGrpcClient = Client & {
   unaryMethodWithMetadata: any;
   unaryMethod: any;
   UnaryMethod: any;
@@ -117,10 +112,9 @@ const checkEqual =
 export const runTests = (
   plugin: GrpcInstrumentation,
   moduleName: string,
-  grpc: typeof grpcNapi | typeof grpcJs,
   grpcPort: number
 ) => {
-  const MAX_ERROR_STATUS = grpc.status.UNAUTHENTICATED;
+  const MAX_ERROR_STATUS = GrpcStatus.UNAUTHENTICATED;
 
   const grpcClient = {
     unaryMethodWithMetadata: (
@@ -146,7 +140,7 @@ export const runTests = (
     unaryMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse,
-      metadata: Metadata = new grpc.Metadata()
+      metadata = new Metadata()
     ): Promise<TestRequestResponse> => {
       return new Promise((resolve, reject) => {
         return client.unaryMethod(
@@ -166,7 +160,7 @@ export const runTests = (
     UnaryMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse,
-      metadata: Metadata = new grpc.Metadata()
+      metadata = new Metadata()
     ): Promise<TestRequestResponse> => {
       return new Promise((resolve, reject) => {
         return client.UnaryMethod(
@@ -186,7 +180,7 @@ export const runTests = (
     camelCaseMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse,
-      metadata: Metadata = new grpc.Metadata()
+      metadata = new Metadata()
     ): Promise<TestRequestResponse> => {
       return new Promise((resolve, reject) => {
         return client.camelCaseMethod(
@@ -206,7 +200,7 @@ export const runTests = (
     clientStreamMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse[],
-      metadata: Metadata = new grpc.Metadata()
+      metadata = new Metadata()
     ): Promise<TestRequestResponse> => {
       return new Promise((resolve, reject) => {
         const writeStream = client.clientStreamMethod(
@@ -230,7 +224,7 @@ export const runTests = (
     serverStreamMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse,
-      metadata: Metadata = new grpc.Metadata()
+      metadata = new Metadata()
     ): Promise<TestRequestResponse[]> => {
       return new Promise((resolve, reject) => {
         const result: TestRequestResponse[] = [];
@@ -251,7 +245,7 @@ export const runTests = (
     bidiStreamMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse[],
-      metadata: Metadata = new grpc.Metadata()
+      metadata = new Metadata()
     ): Promise<TestRequestResponse[]> => {
       return new Promise((resolve, reject) => {
         const result: TestRequestResponse[] = [];
@@ -289,11 +283,8 @@ export const runTests = (
     return result;
   };
 
-  async function startServer(
-    grpc: typeof grpcJs | typeof grpcNapi,
-    proto: any
-  ) {
-    const server = new grpc.Server();
+  async function startServer(proto: any) {
+    const server = new Server();
 
     function getError(msg: string, code: number): ServiceError | null {
       const err: ServiceError = {
@@ -302,6 +293,7 @@ export const runTests = (
         message: msg,
         code,
         details: msg,
+        metadata: new Metadata(),
       };
       return err;
     }
@@ -313,56 +305,49 @@ export const runTests = (
 
       // This method returns the request
       unaryMethodWithMetadata(
-        call: ServerUnaryCall,
-        callback: RequestCallback
+        call: ServerUnaryCall<any, any>,
+        callback: requestCallback<any>
       ) {
-        const serverMetadata: any = new grpc.Metadata();
+        const serverMetadata = new Metadata();
         serverMetadata.add('server_metadata_key', 'server_metadata_value');
 
         call.sendMetadata(serverMetadata);
 
         call.request.num <= MAX_ERROR_STATUS
           ? callback(
-              getError(
-                'Unary Method with Metadata Error',
-                call.request.num
-              ) as grpcJs.ServiceError
+              getError('Unary Method with Metadata Error', call.request.num)
             )
           : callback(null, { num: call.request.num });
       },
 
       // This method returns the request
-      unaryMethod(call: ServerUnaryCall, callback: RequestCallback) {
+      unaryMethod(
+        call: ServerUnaryCall<any, any>,
+        callback: requestCallback<any>
+      ) {
         call.request.num <= MAX_ERROR_STATUS
-          ? callback(
-              getError(
-                'Unary Method Error',
-                call.request.num
-              ) as grpcJs.ServiceError
-            )
+          ? callback(getError('Unary Method Error', call.request.num))
           : callback(null, { num: call.request.num });
       },
 
       // This method returns the request
-      camelCaseMethod(call: ServerUnaryCall, callback: RequestCallback) {
+      camelCaseMethod(
+        call: ServerUnaryCall<any, any>,
+        callback: requestCallback<any>
+      ) {
         call.request.num <= MAX_ERROR_STATUS
-          ? callback(
-              getError(
-                'Unary Method Error',
-                call.request.num
-              ) as grpcJs.ServiceError
-            )
+          ? callback(getError('Unary Method Error', call.request.num))
           : callback(null, { num: call.request.num });
       },
 
       // This method sums the requests
       clientStreamMethod(
-        call: ServerReadableStream,
-        callback: RequestCallback
+        call: ServerReadableStream<any, any>,
+        callback: requestCallback<any>
       ) {
         let sum = 0;
         let hasError = false;
-        let code = grpc.status.OK;
+        let code = GrpcStatus.OK;
         call.on('data', (data: TestRequestResponse) => {
           sum += data.num;
           if (data.num <= MAX_ERROR_STATUS) {
@@ -379,7 +364,7 @@ export const runTests = (
 
       // This method returns an array that replicates the request, request.num of
       // times
-      serverStreamMethod: (call: ServerWriteableStream) => {
+      serverStreamMethod: (call: ServerWritableStream<any, any>) => {
         const result = replicate(call.request);
 
         if (call.request.num <= MAX_ERROR_STATUS) {
@@ -396,7 +381,7 @@ export const runTests = (
       },
 
       // This method returns the request
-      bidiStreamMethod: (call: ServerDuplexStream) => {
+      bidiStreamMethod: (call: ServerDuplexStream<any, any>) => {
         call.on('data', (data: TestRequestResponse) => {
           if (data.num <= MAX_ERROR_STATUS) {
             call.emit(
@@ -416,16 +401,16 @@ export const runTests = (
     await bindAwait.call(
       server,
       'localhost:' + grpcPort,
-      grpc.ServerCredentials.createInsecure() as grpcJs.ServerCredentials
+      ServerCredentials.createInsecure()
     );
     server.start();
     return server;
   }
 
-  function createClient(grpc: typeof grpcJs | typeof grpcNapi, proto: any) {
+  function createClient(proto: any) {
     return new proto.GrpcTester(
       'localhost:' + grpcPort,
-      grpc.credentials.createInsecure()
+      credentials.createInsecure()
     );
   }
 
@@ -514,7 +499,7 @@ export const runTests = (
     ) => {
       const validations = {
         name: `grpc.pkg_test.GrpcTester/${methodName}`,
-        status: grpc.status.OK,
+        status: GrpcStatus.OK,
         netPeerName: 'localhost',
         netPeerPort: grpcPort,
       };
@@ -544,7 +529,7 @@ export const runTests = (
     };
 
     const ClientServerValidationTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
@@ -588,7 +573,7 @@ export const runTests = (
     };
 
     const ErrorValidationTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation?: {
@@ -646,7 +631,7 @@ export const runTests = (
     };
 
     const runTestWithAttributeValidation = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true,
       attributesValidation: {
@@ -664,7 +649,7 @@ export const runTests = (
     };
 
     const runTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       provider: NodeTracerProvider,
       checkSpans = true
     ) => {
@@ -678,7 +663,7 @@ export const runTests = (
         request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
-      method: typeof methodList[0],
+      method: (typeof methodList)[0],
       key: string,
       errorCode: number,
       provider: NodeTracerProvider
@@ -761,7 +746,7 @@ export const runTests = (
       });
     };
 
-    const runClientMethodTest = (method: typeof methodList[0]) => {
+    const runClientMethodTest = (method: (typeof methodList)[0]) => {
       it(`should assign original properties for grpc remote method ${method.methodName}`, async () => {
         const patchedClientMethod = (client as any)[method.methodName];
         const properties = Object.keys(patchedClientMethod);
@@ -781,10 +766,10 @@ export const runTests = (
         plugin.enable();
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
-        const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
+        const proto = loadPackageDefinition(packageDefinition).pkg_test;
 
-        server = await startServer(grpc, proto);
-        client = createClient(grpc, proto);
+        server = await startServer(proto);
+        client = createClient(proto);
       });
 
       after(done => {
@@ -803,9 +788,9 @@ export const runTests = (
 
       methodList.forEach(method => {
         describe(`Test error raising for grpc remote ${method.description}`, () => {
-          Object.keys(grpc.status).forEach((statusKey: string) => {
-            const errorCode = Number(grpc.status[statusKey as any]);
-            if (errorCode > grpc.status.OK) {
+          Object.keys(GrpcStatus).forEach((statusKey: string) => {
+            const errorCode = Number(GrpcStatus[statusKey as any]);
+            if (errorCode > GrpcStatus.OK) {
               runErrorTest(method, statusKey, errorCode, provider);
             }
           });
@@ -824,10 +809,10 @@ export const runTests = (
         plugin.disable();
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
-        const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
+        const proto = loadPackageDefinition(packageDefinition).pkg_test;
 
-        server = await startServer(grpc, proto);
-        client = createClient(grpc, proto);
+        server = await startServer(proto);
+        client = createClient(proto);
       });
 
       after(done => {
@@ -858,10 +843,10 @@ export const runTests = (
         plugin.enable();
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
-        const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
+        const proto = loadPackageDefinition(packageDefinition).pkg_test;
 
-        server = await startServer(grpc, proto);
-        client = createClient(grpc, proto);
+        server = await startServer(proto);
+        client = createClient(proto);
       });
 
       after(done => {
@@ -902,10 +887,10 @@ export const runTests = (
         plugin.enable();
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
-        const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
+        const proto = loadPackageDefinition(packageDefinition).pkg_test;
 
-        server = await startServer(grpc, proto);
-        client = createClient(grpc, proto);
+        server = await startServer(proto);
+        client = createClient(proto);
       });
 
       after(done => {
@@ -932,9 +917,9 @@ export const runTests = (
         plugin.enable();
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
-        const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
+        const proto = loadPackageDefinition(packageDefinition).pkg_test;
 
-        client = createClient(grpc, proto);
+        client = createClient(proto);
       });
 
       after(done => {
@@ -954,7 +939,7 @@ export const runTests = (
       const provider = new NodeTracerProvider();
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
-      const clientMetadata: Metadata = new grpc.Metadata();
+      const clientMetadata = new Metadata();
       clientMetadata.add('client_metadata_key', 'client_metadata_value');
 
       const customMetadataMethod: TestGrpcCall = {
@@ -989,10 +974,10 @@ export const runTests = (
         plugin.enable();
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
-        const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
+        const proto = loadPackageDefinition(packageDefinition).pkg_test;
 
-        server = await startServer(grpc, proto);
-        client = createClient(grpc, proto);
+        server = await startServer(proto);
+        client = createClient(proto);
       });
 
       after(done => {

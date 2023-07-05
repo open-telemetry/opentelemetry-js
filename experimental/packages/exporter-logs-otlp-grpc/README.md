@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides an exporter for OTLP gRPC logs using protocol version `v0.18`.
+This module provides a logs-exporter for OTLP (gRPC) using protocol version `v0.20.0`.
 
 ## Installation
 
@@ -34,6 +34,7 @@ import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
+  // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
   url: 'http://<collector-hostname>:<port>',
 };
 

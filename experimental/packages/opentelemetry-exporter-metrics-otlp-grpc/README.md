@@ -5,8 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides exporter for node to be used with OTLP (`grpc`) compatible receivers.
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.16 <=0.53`.
+This module provides a metrics-exporter for OTLP (gRPC) using protocol version `v0.20.0`.
 
 ## Installation
 
@@ -32,6 +31,7 @@ const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
+  // Unix domain sockets are also supported: 'unix:///path/to/socket.sock'
   url: 'http://<collector-hostname>:<port>',
 };
 
@@ -70,7 +70,7 @@ In addition to settings passed to the constructor, the exporter also supports co
 | OTEL_EXPORTER_OTLP_CLIENT_KEY | The path to the file containing private client key to use when verifying an OTLP trace, metric or log client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used. |
 | OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP metric server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
 | OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace, metric and log server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
-| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE | The exporters aggregation temporality preference. Valid values are `cumulative`, and `delta`. `cumulative` selects cumulative temporality for all instrument kinds. `delta` selects delta aggregation temporality for Counter, Asynchronous Counter and Histogram instrument kinds, and selects cumulative aggregation for UpDownCounter and Asynchronous UpDownCounter instrument kinds. By default `cumulative` is used. |
+| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE | The exporters aggregation temporality preference. Valid values are `cumulative`, `delta`, and `lowmemory`. `cumulative` selects cumulative temporality for all instrument kinds. `delta` selects delta aggregation temporality for Counter, Asynchronous Counter and Histogram instrument kinds, and selects cumulative aggregation for UpDownCounter and Asynchronous UpDownCounter instrument kinds. `lowmemory` select delta aggregation temporality for Synchronous Counter and Histogram instrument kinds, and selects cumulative aggregation for Synchronous UpDownCounter, Asynchronous Counter and Asynchronous UpDownCounter instrument kinds. By default `cumulative` is used. |
 
 > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
 
