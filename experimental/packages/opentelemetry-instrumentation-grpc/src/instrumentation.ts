@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { GrpcInstrumentationConfig } from './types';
+import type { GrpcInstrumentationConfig } from './types';
+import type { MeterProvider, TracerProvider } from '@opentelemetry/api';
+
 import { VERSION } from './version';
 import { GrpcJsInstrumentation } from './grpc-js';
-import * as api from '@opentelemetry/api';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
@@ -68,7 +69,7 @@ export class GrpcInstrumentation {
    * Sets MeterProvider to this plugin
    * @param meterProvider
    */
-  public setMeterProvider(meterProvider: api.MeterProvider) {
+  public setMeterProvider(meterProvider: MeterProvider) {
     this._grpcJsInstrumentation.setMeterProvider(meterProvider);
   }
 
@@ -76,7 +77,7 @@ export class GrpcInstrumentation {
    * Sets TraceProvider to this plugin
    * @param tracerProvider
    */
-  public setTracerProvider(tracerProvider: api.TracerProvider) {
+  public setTracerProvider(tracerProvider: TracerProvider) {
     this._grpcJsInstrumentation.setTracerProvider(tracerProvider);
   }
 }

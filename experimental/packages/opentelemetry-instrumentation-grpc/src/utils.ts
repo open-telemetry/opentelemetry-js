@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { SpanStatusCode, SpanStatus, Span } from '@opentelemetry/api';
-import type * as grpcJsTypes from '@grpc/grpc-js';
-import { IgnoreMatcher } from './types';
+import { SpanStatusCode } from '@opentelemetry/api';
+import type { SpanStatus, Span } from '@opentelemetry/api';
+import type { status as GrpcStatus, Metadata } from '@grpc/grpc-js';
+import type { IgnoreMatcher } from './types';
 
 // e.g., "dns:otel-productcatalogservice:8080" or "otel-productcatalogservice:8080" or "127.0.0.1:8080"
 export const URI_REGEX =
@@ -42,7 +43,7 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
  * @param status
  */
 export const _grpcStatusCodeToOpenTelemetryStatusCode = (
-  status?: grpcJsTypes.status
+  status?: GrpcStatus
 ): SpanStatusCode => {
   if (status !== undefined && status === 0) {
     return SpanStatusCode.UNSET;
@@ -127,7 +128,7 @@ export function metadataCapture(
     ])
   );
 
-  return (span: Span, metadata: grpcJsTypes.Metadata) => {
+  return (span: Span, metadata: Metadata) => {
     for (const [
       capturedMetadata,
       normalizedMetadata,

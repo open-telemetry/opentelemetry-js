@@ -403,11 +403,12 @@ export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage
 ): SpanAttributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
-  const { remoteAddress, remotePort } = socket;
-  const attributes: SpanAttributes = {
-    [SemanticAttributes.NET_PEER_IP]: remoteAddress,
-    [SemanticAttributes.NET_PEER_PORT]: remotePort,
-  };
+  const attributes: SpanAttributes = {};
+  if (socket) {
+    const { remoteAddress, remotePort } = socket;
+    attributes[SemanticAttributes.NET_PEER_IP] = remoteAddress;
+    attributes[SemanticAttributes.NET_PEER_PORT] = remotePort;
+  }
   setResponseContentLengthAttribute(response, attributes);
 
   if (statusCode) {
@@ -529,17 +530,20 @@ export const getIncomingRequestAttributesOnResponse = (
   // since it may be detached from the response object in keep-alive mode
   const { socket } = request;
   const { statusCode, statusMessage } = response;
-  const { localAddress, localPort, remoteAddress, remotePort } = socket;
-  const rpcMetadata = getRPCMetadata(context.active());
 
-  const attributes: SpanAttributes = {
-    [SemanticAttributes.NET_HOST_IP]: localAddress,
-    [SemanticAttributes.NET_HOST_PORT]: localPort,
-    [SemanticAttributes.NET_PEER_IP]: remoteAddress,
-    [SemanticAttributes.NET_PEER_PORT]: remotePort,
-    [SemanticAttributes.HTTP_STATUS_CODE]: statusCode,
-    [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
-  };
+  const rpcMetadata = getRPCMetadata(context.active());
+  const attributes: SpanAttributes = {};
+  if (socket) {
+    const { localAddress, localPort, remoteAddress, remotePort } = socket;
+    attributes[SemanticAttributes.NET_HOST_IP] = localAddress;
+    attributes[SemanticAttributes.NET_HOST_PORT] = localPort;
+    attributes[SemanticAttributes.NET_PEER_IP] = remoteAddress;
+    attributes[SemanticAttributes.NET_PEER_PORT] = remotePort;
+  }
+  attributes[SemanticAttributes.HTTP_STATUS_CODE] = statusCode;
+  attributes[AttributeNames.HTTP_STATUS_TEXT] = (
+    statusMessage || ''
+  ).toUpperCase();
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
     attributes[SemanticAttributes.HTTP_ROUTE] = rpcMetadata.route;
