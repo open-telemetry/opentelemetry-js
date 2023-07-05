@@ -27,6 +27,19 @@ export interface IExportLogsServiceRequest {
   resourceLogs?: IResourceLogs[];
 }
 
+export interface IExportLogsServiceResponse {
+  /** ExportLogsServiceResponse partialSuccess */
+  partialSuccess?: IExportLogsPartialSuccess;
+}
+
+export interface IExportLogsPartialSuccess {
+  /** ExportLogsPartialSuccess rejectedLogRecords */
+  rejectedLogRecords?: number;
+
+  /** ExportLogsPartialSuccess errorMessage */
+  errorMessage?: string;
+}
+
 /** Properties of a ResourceLogs. */
 export interface IResourceLogs {
   /** ResourceLogs resource */
