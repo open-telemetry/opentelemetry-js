@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
+import type { EventEmitter } from 'events';
+
+import type {
+  Server,
+  serialize as Serialize,
+  deserialize as Deserialize,
+  Metadata,
+  Client,
+  ServiceDefinition,
+  loadPackageDefinition,
+  GrpcObject,
+} from '@grpc/grpc-js';
+
 import type * as grpcJs from '@grpc/grpc-js';
-import {
-  InstrumentationNodeModuleDefinition,
-  isWrapped,
-  InstrumentationBase,
-} from '@opentelemetry/instrumentation';
-import { GrpcInstrumentationConfig } from '../types';
-import { metadataCaptureType } from '../internal-types';
-import {
+
+import type {
   ServerCallWithMeta,
   SendUnaryDataCallback,
   ServerRegisterFunction,
@@ -31,8 +38,10 @@ import {
   PackageDefinition,
   GrpcClientFunc,
   ClientRequestFunction,
-  GrpcEmitter,
 } from './types';
+import type { GrpcInstrumentationConfig } from '../types';
+import type { metadataCaptureType } from '../internal-types';
+
 import {
   context,
   propagation,
@@ -42,6 +51,13 @@ import {
   trace,
   Span,
 } from '@opentelemetry/api';
+import {
+  InstrumentationNodeModuleDefinition,
+  isWrapped,
+  InstrumentationBase,
+} from '@opentelemetry/instrumentation';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+
 import {
   shouldNotTraceServerCall,
   handleServerFunction,
@@ -57,15 +73,13 @@ import {
   patchResponseMetadataEvent,
   extractMetadataOrSplice,
 } from './clientUtils';
-import { EventEmitter } from 'events';
 import {
   _extractMethodAndService,
-  _methodIsIgnored,
   metadataCapture,
   URI_REGEX,
+  _methodIsIgnored,
 } from '../utils';
 import { AttributeValues } from '../enums/AttributeValues';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
   private _metadataCapture: metadataCaptureType;
@@ -201,11 +215,11 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
       const config = this.getConfig();
       instrumentation._diag.debug('patched gRPC server');
       return function register<RequestType, ResponseType>(
-        this: grpcJs.Server,
+        this: Server,
         name: string,
         handler: HandleCall<unknown, unknown>,
-        serialize: grpcJs.serialize<unknown>,
-        deserialize: grpcJs.deserialize<unknown>,
+        serialize: Serialize<unknown>,
+        deserialize: Deserialize<unknown>,
         type: string
       ): boolean {
         const originalRegisterResult = originalRegister.call(
@@ -229,13 +243,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
             ) {
               const self = this;
 
-              if (
-                shouldNotTraceServerCall(
-                  call.metadata,
-                  name,
-                  config.ignoreGrpcMethods
-                )
-              ) {
+              if (shouldNotTraceServerCall(name, config.ignoreGrpcMethods)) {
                 return handleUntracedServerFunction(
                   type,
                   originalFunc,
@@ -265,7 +273,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
                       [SemanticAttributes.RPC_SYSTEM]:
-                        AttributeValues.RPC_SYSTEM,
+                      AttributeValues.RPC_SYSTEM,
                       [SemanticAttributes.RPC_METHOD]: method,
                       [SemanticAttributes.RPC_SERVICE]: service,
                     });
@@ -278,14 +286,13 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                   instrumentation._wrap(
                     call,
                     'sendMetadata',
-                    originalSendMetadata =>
-                      (responseMetadata: grpcJs.Metadata) => {
-                        instrumentation._metadataCapture.server.captureResponseMetadata(
-                          span,
-                          responseMetadata
-                        );
-                        originalSendMetadata.call(call, responseMetadata);
-                      }
+                    originalSendMetadata => (responseMetadata: Metadata) => {
+                      instrumentation._metadataCapture.server.captureResponseMetadata(
+                        span,
+                        responseMetadata
+                      );
+                      originalSendMetadata.call(call, responseMetadata);
+                    }
                   );
 
                   context.with(trace.setSpan(context.active(), span), () => {
@@ -304,7 +311,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           }
         );
         return originalRegisterResult;
-      } as typeof grpcJs.Server.prototype.register;
+      } as typeof Server.prototype.register;
     };
   }
 
@@ -313,7 +320,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    * Provides auto-instrumentation for client requests when using a Client without
    * makeGenericClientConstructor/makeClientConstructor
    */
-  private _patchClientRequestMethod<ReturnType extends GrpcEmitter>(
+  private _patchClientRequestMethod<ReturnType extends EventEmitter>(
     grpcLib: typeof grpcJs,
     hasResponseStream: boolean
   ): (
@@ -399,8 +406,8 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     return (original: MakeClientConstructorFunction) => {
       instrumentation._diag.debug('patching client');
       return function makeClientConstructor(
-        this: typeof grpcJs.Client,
-        methods: grpcJs.ServiceDefinition,
+        this: typeof Client,
+        methods: ServiceDefinition,
         serviceName: string,
         options?: object
       ) {
@@ -422,18 +429,18 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   private _patchLoadPackageDefinition(grpcClient: typeof grpcJs) {
     const instrumentation = this;
     instrumentation._diag.debug('patching loadPackageDefinition');
-    return (original: typeof grpcJs.loadPackageDefinition) => {
+    return (original: typeof loadPackageDefinition) => {
       return function patchedLoadPackageDefinition(
         this: null,
         packageDef: PackageDefinition
       ) {
-        const result: grpcJs.GrpcObject = original.call(
+        const result: GrpcObject = original.call(
           this,
           packageDef
-        ) as grpcJs.GrpcObject;
+        ) as GrpcObject;
         instrumentation._patchLoadedPackage(grpcClient, result);
         return result;
-      } as typeof grpcJs.loadPackageDefinition;
+      } as typeof loadPackageDefinition;
     };
   }
 
@@ -446,7 +453,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
       instrumentation._diag.debug('patch all client methods');
-      function clientMethodTrace(this: grpcJs.Client) {
+      function clientMethodTrace(this: Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = [...arguments];
         const metadata = extractMetadataOrSpliceDefault.call(
@@ -539,7 +546,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    */
   private _patchLoadedPackage(
     grpcClient: typeof grpcJs,
-    result: grpcJs.GrpcObject
+    result: GrpcObject
   ): void {
     Object.values(result).forEach(service => {
       if (typeof service === 'function') {
@@ -550,11 +557,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         );
       } else if (typeof service.format !== 'string') {
         // GrpcObject
-        this._patchLoadedPackage.call(
-          this,
-          grpcClient,
-          service as grpcJs.GrpcObject
-        );
+        this._patchLoadedPackage.call(this, grpcClient, service as GrpcObject);
       }
     });
   }

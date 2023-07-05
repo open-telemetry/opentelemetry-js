@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import { GrpcJsInstrumentation } from './';
-import type {
-  GrpcClientFunc,
-  GrpcEmitter,
-  SendUnaryDataCallback,
-} from './types';
-import { context, propagation, Span, SpanStatus } from '@opentelemetry/api';
+import type { EventEmitter } from 'events';
+import type { Span, SpanStatus } from '@opentelemetry/api';
+import type { Client, Metadata, ServiceError } from '@grpc/grpc-js';
 import type * as grpcJs from '@grpc/grpc-js';
+import type { GrpcJsInstrumentation } from './';
+import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
+import type { metadataCaptureType } from '../internal-types';
+
+import { propagation, context } from '@opentelemetry/api';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { AttributeNames } from '../enums/AttributeNames';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 import {
-  _grpcStatusCodeToOpenTelemetryStatusCode,
   _grpcStatusCodeToSpanStatus,
+  _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
 } from '../utils';
-import { errorMonitor, EventEmitter } from 'events';
-import { AttributeNames } from '../enums/AttributeNames';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { metadataCaptureType } from '../internal-types';
-import { GRPC_STATUS_CODE_OK } from '../status-code';
+import { errorMonitor } from 'events';
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -39,7 +39,7 @@ import { GRPC_STATUS_CODE_OK } from '../status-code';
  */
 export function getMethodsToWrap(
   this: GrpcJsInstrumentation,
-  client: typeof grpcJs.Client,
+  client: typeof Client,
   methods: { [key: string]: { originalName?: string } }
 ): string[] {
   const methodList: string[] = [];
@@ -99,7 +99,7 @@ export function patchedCallback(
 
 export function patchResponseMetadataEvent(
   span: Span,
-  call: GrpcEmitter,
+  call: EventEmitter,
   metadataCapture: metadataCaptureType
 ) {
   call.on('metadata', (responseMetadata: any) => {
@@ -107,7 +107,7 @@ export function patchResponseMetadataEvent(
   });
 }
 
-export function patchResponseStreamEvents(span: Span, call: GrpcEmitter) {
+export function patchResponseStreamEvents(span: Span, call: EventEmitter) {
   // Both error and status events can be emitted
   // the first one emitted set spanEnded to true
   let spanEnded = false;
@@ -118,7 +118,7 @@ export function patchResponseStreamEvents(span: Span, call: GrpcEmitter) {
     }
   };
   context.bind(context.active(), call);
-  call.on(errorMonitor, (err: grpcJs.ServiceError) => {
+  call.on(errorMonitor, (err: ServiceError) => {
     if (spanEnded) {
       return;
     }
@@ -189,18 +189,18 @@ export function makeGrpcClientRemoteCall(
 }
 
 export function getMetadataIndex(
-  args: Array<unknown | grpcJs.Metadata>
+  args: Array<unknown | Metadata>
 ): number {
   // This finds an instance of Metadata among the arguments.
   // A possible issue that could occur is if the 'options' parameter from
   // the user contains an '_internal_repr' as well as a 'getMap' function,
   // but this is an extremely rare case.
-  return args.findIndex((arg: unknown | grpcJs.Metadata) => {
+  return args.findIndex((arg: unknown | Metadata) => {
     return (
       arg &&
       typeof arg === 'object' &&
-      (arg as grpcJs.Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
-      typeof (arg as grpcJs.Metadata).getMap === 'function'
+      (arg as Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
+      typeof (arg as Metadata).getMap === 'function'
     );
   });
 }
@@ -221,7 +221,7 @@ export function extractMetadataOrSplice(
     metadata = new grpcLib.Metadata();
     args.splice(spliceIndex, 0, metadata);
   } else {
-    metadata = args[metadataIndex] as grpcJs.Metadata;
+    metadata = args[metadataIndex] as Metadata;
   }
   return metadata;
 }
@@ -247,7 +247,7 @@ export function extractMetadataOrSpliceDefault(
  * grpc receiver
  * @param metadata
  */
-export function setSpanContext(metadata: grpcJs.Metadata): void {
+export function setSpanContext(metadata: Metadata): void {
   propagation.inject(context.active(), metadata, {
     set: (meta, k, v) => meta.set(k, v),
   });

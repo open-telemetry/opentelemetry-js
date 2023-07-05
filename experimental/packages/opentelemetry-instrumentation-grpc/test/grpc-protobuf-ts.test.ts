@@ -80,7 +80,7 @@ async function loadAndStartServer() {
   // instrumentation is enabled will be instrumented.
   const packageDefinition = await protoLoader.load(PROTO_PATH, options);
   const proto = grpc.loadPackageDefinition(packageDefinition).pkg_test;
-  return startServer(grpc, proto, 3333);
+  return startServer(proto, 3333);
 }
 
 /**
