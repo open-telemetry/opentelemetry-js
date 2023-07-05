@@ -61,7 +61,7 @@ describe('tree-shaking', () => {
         import { ${testAPI.export} } from '../../';
         console.log(${testAPI.export});
       `;
-      mfs.mkdirpSync(path.dirname(sourceCodePath));
+      mfs.mkdirSync(path.dirname(sourceCodePath), { recursive: true });
       mfs.writeFileSync(sourceCodePath, sourceCode, { encoding: 'utf8' });
 
       const compiler = webpack({
