@@ -12,6 +12,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(otlp-grpc-exporters): add support for UDS endpoints. [#3853](https://github.com/open-telemetry/opentelemetry-js/pull/3853) @llc1123
 * feat(otlp-exporters): bump otlp proto to 0.20.0 [#3932](https://github.com/open-telemetry/opentelemetry-js/pull/3932) @pichlermarc
+* feat(otlp-exporter-base): allow agent override in Node exporter [#3935](https://github.com/open-telemetry/opentelemetry-js/pull/3935) @henrinormak
 
 ### :bug: (Bug Fix)
 
