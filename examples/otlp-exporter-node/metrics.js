@@ -28,10 +28,10 @@ const metricExporter = new OTLPMetricExporter({
 // Define view for the exponential histogram metric
 const expHistogramView = new View({
   aggregation: new ExponentialHistogramAggregation(),
+  // Note, the instrumentName is the same as the name that has been passed for
+  // the Meter#createHistogram function for exponentialHistogram.
   instrumentName: 'test_exponential_histogram',
 });
-// Note, the instrumentName is the same as the name that has been passed for
-// the Meter#createHistogram function for exponentialHistogram.
 
 // Create an instance of the metric provider
 const meterProvider = new MeterProvider({
