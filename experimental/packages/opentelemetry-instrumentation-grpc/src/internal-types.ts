@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/api';
-import type * as grpcJsTypes from '@grpc/grpc-js';
+import type { Span } from '@opentelemetry/api';
+import type { Metadata } from '@grpc/grpc-js';
 
 export type metadataCaptureType = {
   client: {
-    captureRequestMetadata: (
-      span: Span,
-      metadata: grpcJsTypes.Metadata
-    ) => void;
-    captureResponseMetadata: (
-      span: Span,
-      metadata: grpcJsTypes.Metadata
-    ) => void;
+    captureRequestMetadata: (span: Span, metadata: Metadata) => void;
+    captureResponseMetadata: (span: Span, metadata: Metadata) => void;
   };
   server: {
-    captureRequestMetadata: (
-      span: Span,
-      metadata: grpcJsTypes.Metadata
-    ) => void;
-    captureResponseMetadata: (
-      span: Span,
-      metadata: grpcJsTypes.Metadata
-    ) => void;
+    captureRequestMetadata: (span: Span, metadata: Metadata) => void;
+    captureResponseMetadata: (span: Span, metadata: Metadata) => void;
   };
 };

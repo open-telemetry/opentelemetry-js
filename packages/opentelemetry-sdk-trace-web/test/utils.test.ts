@@ -116,9 +116,16 @@ describe('utils', () => {
       assert.strictEqual(addEventSpy.callCount, 0);
 
       addSpanNetworkEvents(span, entries);
-
-      assert.strictEqual(addEventSpy.callCount, 9);
       assert.strictEqual(setAttributeSpy.callCount, 2);
+      //secure connect start should not be added to non-https resource
+      assert.strictEqual(addEventSpy.callCount, 8);
+      //secure connect start should be added to an https resource
+      addEventSpy.resetHistory();
+      addSpanNetworkEvents(span, {
+        ...entries,
+        name: 'https://foo',
+      } as PerformanceResourceTiming);
+      assert.strictEqual(addEventSpy.callCount, 9);
     });
     it('should only include encoded size when content encoding is being used', () => {
       const addEventSpy = sinon.spy();
