@@ -70,7 +70,6 @@
     "@types/sinon": "10.0.15",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "istanbul-instrumenter-loader": "3.0.1",
     "lerna": "7.1.1",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
