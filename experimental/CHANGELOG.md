@@ -2,6 +2,9 @@
 
 All notable changes to experimental packages in this project will be documented in this file.
 
+## New Feature 
+logs feature added in SDK-NODE
+
 ## Unreleased
 
 ### :boom: Breaking Change
