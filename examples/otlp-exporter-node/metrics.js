@@ -61,7 +61,6 @@ const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
 
 const histogram = meter.createHistogram('test_histogram', {
   description: 'Example of a Histogram',
-  boundaries: [0, 10, 100, 1000],
 });
 
 const exponentialHistogram = meter.createHistogram('test_exponential_histogram', {
