@@ -67,7 +67,7 @@ export type MeterProviderConfig = {
 
 export type LoggerProviderConfig = {
   /**
-   * Reference to the Logger instance by the NodeSDK
+   * Reference to the LoggerRecordProcessor instance by the NodeSDK
    */
   logRecordProcessor: LogRecordProcessor;
 };
@@ -193,7 +193,7 @@ export class NodeSDK {
     };
   }
 
-  /**Set configurations neeeded to register a LoggerProvider */
+  /**Set configurations needed to register a LoggerProvider */
   public configureLoggerProvider(config: LoggerProviderConfig): void {
     // nothing is set yet, we can set config and then return
     if (this._loggerProviderConfig == null) {
@@ -207,7 +207,7 @@ export class NodeSDK {
       config.logRecordProcessor != null
     ) {
       throw new Error(
-        'LogRecordProvider passed but LogRecordProcessor has already been configured.'
+        'LogRecordProcessor passed but LogRecordProcessor has already been configured.'
       );
     }
 

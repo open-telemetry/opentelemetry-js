@@ -463,7 +463,7 @@ describe('Node SDK', () => {
       },
       (error: Error) => {
         return error.message.includes(
-          'LogRecordProvider passed but LogRecordProcessor has already been configured.'
+          'LogRecordProcessor passed but LogRecordProcessor has already been configured.'
         );
       }
     );
