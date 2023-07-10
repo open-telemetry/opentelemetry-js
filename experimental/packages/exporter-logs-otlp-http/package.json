@@ -71,7 +71,7 @@
   ],
   "sideEffects": false,
   "devDependencies": {
-    "@babel/core": "7.22.6",
+    "@babel/core": "7.22.8",
     "@opentelemetry/api-logs": "0.41.0",
     "@opentelemetry/resources": "1.15.0",
     "@types/mocha": "10.0.1",
@@ -85,7 +85,7 @@
     "babel-plugin-istanbul": "6.1.1",
     "karma": "6.4.2",
     "karma-chrome-launcher": "3.1.0",
-    "karma-coverage": "2.2.0",
+    "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "4.0.2",
