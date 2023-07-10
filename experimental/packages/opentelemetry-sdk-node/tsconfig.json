@@ -13,6 +13,9 @@
       "path": "../../../api"
     },
     {
+      "path": "../../packages/api-logs"
+    },
+    {
       "path": "../../../packages/opentelemetry-context-async-hooks"
     },
     {
@@ -35,6 +38,9 @@
     },
     {
       "path": "../../../packages/opentelemetry-semantic-conventions"
+    },
+    {
+      "path": "../../packages/sdk-logs"
     },
     {
       "path": "../../../packages/sdk-metrics"
