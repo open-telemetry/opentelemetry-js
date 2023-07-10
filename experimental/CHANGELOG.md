@@ -4,6 +4,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
+### :books: (Refine Doc)
+
+* docs(sdk-metrics): add example of exponential histogram metric [#3855](https://github.com/open-telemetry/opentelemetry-js/pull/3855) @JamieDanielson
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
