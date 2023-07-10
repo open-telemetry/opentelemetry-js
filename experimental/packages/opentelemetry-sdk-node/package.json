@@ -44,6 +44,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@opentelemetry/api-logs":"0.41.0",
     "@opentelemetry/core": "1.15.0",
     "@opentelemetry/exporter-jaeger": "1.15.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "0.41.0",
@@ -52,6 +53,7 @@
     "@opentelemetry/exporter-zipkin": "1.15.0",
     "@opentelemetry/instrumentation": "0.41.0",
     "@opentelemetry/resources": "1.15.0",
+    "@opentelemetry/sdk-logs":"0.41.0",
     "@opentelemetry/sdk-metrics": "1.15.0",
     "@opentelemetry/sdk-trace-base": "1.15.0",
     "@opentelemetry/sdk-trace-node": "1.15.0",
@@ -70,11 +72,10 @@
     "@types/sinon": "10.0.15",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "istanbul-instrumenter-loader": "3.0.1",
     "lerna": "7.1.1",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
-    "semver": "7.5.3",
+    "semver": "7.5.4",
     "sinon": "15.1.2",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",

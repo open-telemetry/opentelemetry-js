@@ -21,6 +21,7 @@ import {
   diag,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
+import { logs } from '@opentelemetry/api-logs';
 import {
   InstrumentationOption,
   registerInstrumentations,
@@ -35,6 +36,7 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
+import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
@@ -63,6 +65,13 @@ export type MeterProviderConfig = {
   views?: View[];
 };
 
+export type LoggerProviderConfig = {
+  /**
+   * Reference to the LoggerRecordProcessor instance by the NodeSDK
+   */
+  logRecordProcessor: LogRecordProcessor;
+};
+
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -70,6 +79,7 @@ export class NodeSDK {
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
+  private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
 
@@ -79,6 +89,7 @@ export class NodeSDK {
   private _autoDetectResources: boolean;
 
   private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
+  private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
 
@@ -140,6 +151,13 @@ export class NodeSDK {
       );
     }
 
+    if (configuration.logRecordProcessor) {
+      const loggerProviderConfig: LoggerProviderConfig = {
+        logRecordProcessor: configuration.logRecordProcessor,
+      };
+      this.configureLoggerProvider(loggerProviderConfig);
+    }
+
     if (configuration.metricReader || configuration.views) {
       const meterProviderConfig: MeterProviderConfig = {};
       if (configuration.metricReader) {
@@ -173,6 +191,30 @@ export class NodeSDK {
       contextManager,
       textMapPropagator,
     };
+  }
+
+  /**Set configurations needed to register a LoggerProvider */
+  public configureLoggerProvider(config: LoggerProviderConfig): void {
+    // nothing is set yet, we can set config and then return
+    if (this._loggerProviderConfig == null) {
+      this._loggerProviderConfig = config;
+      return;
+    }
+
+    // make sure we do not override existing logRecordProcessor with other logRecordProcessors.
+    if (
+      this._loggerProviderConfig.logRecordProcessor != null &&
+      config.logRecordProcessor != null
+    ) {
+      throw new Error(
+        'LogRecordProcessor passed but LogRecordProcessor has already been configured.'
+      );
+    }
+
+    // set logRecordProcessor, but make sure we do not override existing logRecordProcessors with null/undefined.
+    if (config.logRecordProcessor != null) {
+      this._loggerProviderConfig.logRecordProcessor = config.logRecordProcessor;
+    }
   }
 
   /** Set configurations needed to register a MeterProvider */
@@ -269,6 +311,19 @@ export class NodeSDK {
       propagator: this._tracerProviderConfig?.textMapPropagator,
     });
 
+    if (this._loggerProviderConfig) {
+      const loggerProvider = new LoggerProvider({
+        resource: this._resource,
+      });
+      loggerProvider.addLogRecordProcessor(
+        this._loggerProviderConfig.logRecordProcessor
+      );
+
+      this._loggerProvider = loggerProvider;
+
+      logs.setGlobalLoggerProvider(loggerProvider);
+    }
+
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
@@ -298,6 +353,9 @@ export class NodeSDK {
     const promises: Promise<unknown>[] = [];
     if (this._tracerProvider) {
       promises.push(this._tracerProvider.shutdown());
+    }
+    if (this._loggerProvider) {
+      promises.push(this._loggerProvider.shutdown());
     }
     if (this._meterProvider) {
       promises.push(this._meterProvider.shutdown());
