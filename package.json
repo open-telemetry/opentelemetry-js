@@ -76,7 +76,7 @@
     "linkinator": "5.0.1",
     "markdownlint-cli": "0.35.0",
     "prettier": "2.8.8",
-    "semver": "7.5.3",
+    "semver": "7.5.4",
     "typedoc": "0.22.18",
     "typedoc-plugin-missing-exports": "1.0.0",
     "typedoc-plugin-resolve-crossmodule-references": "0.2.2",
