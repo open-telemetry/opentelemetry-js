@@ -37,7 +37,6 @@ import {
   SendFunction,
   XhrMem,
 } from './types';
-import { VERSION } from './version';
 import { AttributeNames } from './enums/AttributeNames';
 
 // how long to wait for observer to collect information about resources
@@ -81,7 +80,6 @@ export interface XMLHttpRequestInstrumentationConfig
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
-  readonly version: string = VERSION;
   moduleName = this.component;
 
   private _tasksCount = 0;
@@ -89,7 +87,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
   constructor(config?: XMLHttpRequestInstrumentationConfig) {
-    super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
+    super('middleware.io-instrumentation-xml-http-request', '0.1', config);
   }
 
   init() {}
@@ -329,7 +327,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
-    const spanName = method.toUpperCase();
+    const spanName = method.toUpperCase()+' '+parseUrl(url).toString();
 
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
@@ -512,7 +510,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   override enable() {
-    this._diag.debug('applying patch to', this.moduleName, this.version);
+    this._diag.debug('applying patch to', this.moduleName, 0.1);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
       this._unwrap(XMLHttpRequest.prototype, 'open');
@@ -532,7 +530,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   override disable() {
-    this._diag.debug('removing patch from', this.moduleName, this.version);
+    this._diag.debug('removing patch from', this.moduleName, 0.1);
 
     this._unwrap(XMLHttpRequest.prototype, 'open');
     this._unwrap(XMLHttpRequest.prototype, 'send');
