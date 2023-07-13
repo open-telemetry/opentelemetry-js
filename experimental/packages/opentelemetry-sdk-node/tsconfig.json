@@ -13,9 +13,6 @@
       "path": "../../../api"
     },
     {
-      "path": "../../packages/api-logs"
-    },
-    {
       "path": "../../../packages/opentelemetry-context-async-hooks"
     },
     {
@@ -40,10 +37,10 @@
       "path": "../../../packages/opentelemetry-semantic-conventions"
     },
     {
-      "path": "../../packages/sdk-logs"
+      "path": "../../../packages/sdk-metrics"
     },
     {
-      "path": "../../../packages/sdk-metrics"
+      "path": "../api-logs"
     },
     {
       "path": "../exporter-trace-otlp-grpc"
@@ -56,6 +53,9 @@
     },
     {
       "path": "../opentelemetry-instrumentation"
+    },
+    {
+      "path": "../sdk-logs"
     }
   ]
 }
