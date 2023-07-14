@@ -12,10 +12,10 @@ All notable changes to experimental packages in this project will be documented 
 
 * chore(sdk-node): deprecate methods in favor of constructor options [#3996](https://github.com/open-telemetry/opentelemetry-js/pull/3996) @pichlermarc
   * The following methods are now deprecated and will be removed in a later release
-    - `NodeSDK.configureTracerProvider()`, please use constructor options instead
-    - `NodeSDK.configureMeterProvider()`, please use constructor options instead
-    - `NodeSDK.addResource()`, please use constructor options instead
-    - `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
+    * `NodeSDK.configureTracerProvider()`, please use constructor options instead
+    * `NodeSDK.configureMeterProvider()`, please use constructor options instead
+    * `NodeSDK.addResource()`, please use constructor options instead
+    * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
 
 ### :rocket: (Enhancement)
 
