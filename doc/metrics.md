@@ -20,7 +20,7 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/class
   - [Customizing the metric attributes of instrument](#customizing-the-metric-attributes-of-instrument)
 - [Exporting measurements](#exporting-measurements)
   - [Exporting measurements to Prometheus](#exporting-measurements-to-prometheus)
-  - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
+  - [Exporting measurements to OpenTelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
 
 ## Getting Started
 
@@ -266,7 +266,7 @@ Most of the time, instruments will be used to measure operations in your applica
 
 ```typescript
 async function myTask() {
-  const histogram = meter.createHistogram("taks.duration");
+  const histogram = meter.createHistogram("task.duration");
   const startTime = new Date().getTime()
   try {
     // Wait for five seconds before continuing code execution
@@ -479,7 +479,7 @@ new View({
 
 After you have instrumented your application with metrics, you also need to make
 sure that the metrics get collected by your metrics backend. The most common formats
-that are used are Prometheus and OLTP.
+that are used are Prometheus and OTLP.
 
 The latter is the [OpenTelemetry protocol format](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md)
 which is supported by the OpenTelemetry Collector. The former is based on the [OpenMetrics
@@ -528,7 +528,7 @@ at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/e
 ## Exporting measurements to OpenTelemetry Protocol
 
 OpenTelemetry JavaScript comes with three different kinds of exporters that export
-the OTLP protocol, a) [over HTTP](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http), b) [over GRPC](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc), c) [over Protofbuf](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto).
+the OTLP protocol, a) [over HTTP](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http), b) [over GRPC](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc), c) [over Protobuf](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto).
 
 The example below shows how you can configure OpenTelemetry JavaScript to use
 the OTLP exporter using http/protobuf.
