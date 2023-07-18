@@ -13,6 +13,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(sdk-node): logs support added [#3969](https://github.com/open-telemetry/opentelemetry-js/pull/3969) @psk001
+* feat(exporter-metrics-otlp-*): configure default histogram aggregation via environment variable [#tofill](https://github.com/open-telemetry/opentelemetry-js/pull/tofill) @evantorrie
 
 ### :bug: (Bug Fix)
 

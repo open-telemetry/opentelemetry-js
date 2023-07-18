@@ -23,6 +23,9 @@ import {
   AggregationTemporalityPreference,
   CumulativeTemporalitySelector,
   DeltaTemporalitySelector,
+  ExplicitHistogramAggregationSelector,
+  ExponentialHistogramAggregationSelector,
+  HistogramAggregationPreference,
   LowMemoryTemporalitySelector,
   OTLPMetricExporterOptions,
 } from '../../src';
@@ -43,6 +46,7 @@ import {
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 import {
+  Aggregation,
   AggregationTemporality,
   InstrumentType,
   ResourceMetrics,
@@ -218,6 +222,59 @@ describe('OTLPMetricExporter - node with json over http', () => {
     });
   });
 
+  describe('aggregation', () => {
+    it('should use the right aggregation when Explicit Bucket Histogram preference is selected', () => {
+      const exporter = new OTLPMetricExporter({
+        histogramPreference:
+          HistogramAggregationPreference.EXPLICIT_BUCKET_HISTOGRAM,
+      });
+
+      assert.equal(
+        exporter.selectAggregation(InstrumentType.HISTOGRAM),
+        Aggregation.Histogram(),
+        'Histogram'
+      );
+      for (const instrumentType of [
+        InstrumentType.COUNTER,
+        InstrumentType.UP_DOWN_COUNTER,
+        InstrumentType.OBSERVABLE_COUNTER,
+        InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+        InstrumentType.OBSERVABLE_GAUGE,
+      ]) {
+        assert.strictEqual(
+          exporter.selectAggregation(instrumentType),
+          Aggregation.Default(),
+          instrumentType.toString()
+        );
+      }
+    });
+
+    it('should use the right aggregation when Exponential Bucket Histogram preference is selected', () => {
+      const exporter = new OTLPMetricExporter({
+        histogramPreference:
+          HistogramAggregationPreference.EXPONENTIAL_BUCKET_HISTOGRAM,
+      });
+      assert.equal(
+        exporter.selectAggregation(InstrumentType.HISTOGRAM),
+        Aggregation.ExponentialHistogram(),
+        'HISTOGRAM'
+      );
+      for (const instrumentType of [
+        InstrumentType.COUNTER,
+        InstrumentType.UP_DOWN_COUNTER,
+        InstrumentType.OBSERVABLE_COUNTER,
+        InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+        InstrumentType.OBSERVABLE_GAUGE,
+      ]) {
+        assert.strictEqual(
+          exporter.selectAggregation(instrumentType),
+          Aggregation.Default(),
+          instrumentType.toString()
+        );
+      }
+    });
+  });
+
   describe('when configuring via environment', () => {
     const envSource = process.env;
     it('should use url defined in env that ends with root path and append version and signal path', () => {
@@ -368,7 +425,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         );
       }
     });
-    it('should respect explicit config over environment variable', () => {
+    it('should respect explicit config over environment variable for temporality', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
         'cumulative';
       const exporter = new OTLPMetricExporter({
@@ -378,6 +435,67 @@ describe('OTLPMetricExporter - node with json over http', () => {
         exporter['_aggregationTemporalitySelector'],
         DeltaTemporalitySelector
       );
+    });
+    it('should use exponential bucket histogram defined via environment variables', () => {
+      for (const envValue of [
+        'base2_exponential_bucket_histogram',
+        'BASE2_EXPONENTIAL_BUCKET_HISTOGRAM',
+        'Base2_Exponential_Bucket_HiSTOgram',
+        'base2_exponential_bucket_histogram   ',
+        '     base2_exponential_bucket_histogram   ',
+      ]) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+          envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(
+          exporter['_aggregationSelector'],
+          ExponentialHistogramAggregationSelector
+        );
+        envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION = '';
+      }
+    });
+    it('should use explicit bucket histogram defined via environment variables', () => {
+      for (const envValue of [
+        'explicit_bucket_histogram',
+        'EXPLICIT_BUCKET_HISTOGRAM',
+        'Explicit_Bucket_Histogram',
+        'explicit_bucket_histogram   ',
+        '     explicit_bucket_histogram   ',
+      ]) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+          envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(
+          exporter['_aggregationSelector'],
+          ExplicitHistogramAggregationSelector
+        );
+        envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION = '';
+      }
+    });
+    it('should configure explicit bucket histogram with invalid value in env', () => {
+      for (const envValue of ['buckets', '']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+          envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(
+          exporter['_aggregationSelector'],
+          ExplicitHistogramAggregationSelector
+        );
+        envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION = '';
+      }
+    });
+    it('should respect explicit config over environment variable for aggregation', () => {
+      envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION =
+        'explicit_bucket_histogram';
+      const exporter = new OTLPMetricExporter({
+        histogramPreference:
+          HistogramAggregationPreference.EXPONENTIAL_BUCKET_HISTOGRAM,
+      });
+      assert.strictEqual(
+        exporter['_aggregationSelector'],
+        ExponentialHistogramAggregationSelector
+      );
+      envSource.OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION = '';
     });
   });
 
