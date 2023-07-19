@@ -13,6 +13,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+- Revert [#3913](https://github.com/open-telemetry/opentelemetry-js/issues/3913) @dyladan
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

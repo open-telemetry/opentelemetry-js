@@ -75,8 +75,7 @@
     "@grpc/grpc-js": "^1.7.1",
     "@opentelemetry/core": "1.15.0",
     "@opentelemetry/otlp-exporter-base": "0.41.0",
-    "protobufjs": "^7.2.3",
-    "tslib": "^2.3.1"
+    "protobufjs": "^7.2.3"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base",
   "sideEffects": false
