@@ -39,6 +39,10 @@ export const {{class}} = {
   *
   * @deprecated {{attribute.deprecated | to_doc_brief}}.
     {%- endif %}
+    {%- if (attribute.stability | string())  == "StabilityLevel.DEPRECATED" %}
+  *
+  * @deprecated {{attribute.brief | to_doc_brief}}
+    {%- endif %}
   */
   {{attribute.fqn | to_const_name}}: '{{attribute.fqn}}',
   {%- endfor %}

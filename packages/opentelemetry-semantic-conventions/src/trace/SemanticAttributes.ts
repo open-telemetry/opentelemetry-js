@@ -42,101 +42,141 @@ export const SemanticAttributes = {
 
   /**
    * Deprecated, use `http.request.method` instead.
+   *
+   * @deprecated Deprecated, use `http.request.method` instead
    */
   HTTP_METHOD: 'http.method',
 
   /**
    * Deprecated, use `http.response.status_code` instead.
+   *
+   * @deprecated Deprecated, use `http.response.status_code` instead
    */
   HTTP_STATUS_CODE: 'http.status_code',
 
   /**
    * Deprecated, use `url.scheme` instead.
+   *
+   * @deprecated Deprecated, use `url.scheme` instead
    */
   HTTP_SCHEME: 'http.scheme',
 
   /**
    * Deprecated, use `url.full` instead.
+   *
+   * @deprecated Deprecated, use `url.full` instead
    */
   HTTP_URL: 'http.url',
 
   /**
    * Deprecated, use `url.path` and `url.query` instead.
+   *
+   * @deprecated Deprecated, use `url.path` and `url.query` instead
    */
   HTTP_TARGET: 'http.target',
 
   /**
    * Deprecated, use `http.request.body.size` instead.
+   *
+   * @deprecated Deprecated, use `http.request.body.size` instead
    */
   HTTP_REQUEST_CONTENT_LENGTH: 'http.request_content_length',
 
   /**
    * Deprecated, use `http.response.body.size` instead.
+   *
+   * @deprecated Deprecated, use `http.response.body.size` instead
    */
   HTTP_RESPONSE_CONTENT_LENGTH: 'http.response_content_length',
 
   /**
    * Deprecated, use `server.socket.domain` on client spans.
+   *
+   * @deprecated Deprecated, use `server.socket.domain` on client spans
    */
   NET_SOCK_PEER_NAME: 'net.sock.peer.name',
 
   /**
    * Deprecated, use `server.socket.address` on client spans and `client.socket.address` on server spans.
+   *
+   * @deprecated Deprecated, use `server.socket.address` on client spans and `client.socket.address` on server spans
    */
   NET_SOCK_PEER_ADDR: 'net.sock.peer.addr',
 
   /**
    * Deprecated, use `server.socket.port` on client spans and `client.socket.port` on server spans.
+   *
+   * @deprecated Deprecated, use `server.socket.port` on client spans and `client.socket.port` on server spans
    */
   NET_SOCK_PEER_PORT: 'net.sock.peer.port',
 
   /**
    * Deprecated, use `server.address` on client spans and `client.address` on server spans.
+   *
+   * @deprecated Deprecated, use `server.address` on client spans and `client.address` on server spans
    */
   NET_PEER_NAME: 'net.peer.name',
 
   /**
    * Deprecated, use `server.port` on client spans and `client.port` on server spans.
+   *
+   * @deprecated Deprecated, use `server.port` on client spans and `client.port` on server spans
    */
   NET_PEER_PORT: 'net.peer.port',
 
   /**
    * Deprecated, use `server.address`.
+   *
+   * @deprecated Deprecated, use `server.address`
    */
   NET_HOST_NAME: 'net.host.name',
 
   /**
    * Deprecated, use `server.port`.
+   *
+   * @deprecated Deprecated, use `server.port`
    */
   NET_HOST_PORT: 'net.host.port',
 
   /**
    * Deprecated, use `server.socket.address`.
+   *
+   * @deprecated Deprecated, use `server.socket.address`
    */
   NET_SOCK_HOST_ADDR: 'net.sock.host.addr',
 
   /**
    * Deprecated, use `server.socket.port`.
+   *
+   * @deprecated Deprecated, use `server.socket.port`
    */
   NET_SOCK_HOST_PORT: 'net.sock.host.port',
 
   /**
    * Deprecated, use `network.transport`.
+   *
+   * @deprecated Deprecated, use `network.transport`
    */
   NET_TRANSPORT: 'net.transport',
 
   /**
    * Deprecated, use `network.protocol.name`.
+   *
+   * @deprecated Deprecated, use `network.protocol.name`
    */
   NET_PROTOCOL_NAME: 'net.protocol.name',
 
   /**
    * Deprecated, use `network.protocol.version`.
+   *
+   * @deprecated Deprecated, use `network.protocol.version`
    */
   NET_PROTOCOL_VERSION: 'net.protocol.version',
 
   /**
    * Deprecated, use `network.transport` and `network.type`.
+   *
+   * @deprecated Deprecated, use `network.transport` and `network.type`
    */
   NET_SOCK_FAMILY: 'net.sock.family',
 

@@ -648,11 +648,15 @@ All custom identifiers SHOULD be stable across different versions of an implemen
 
   /**
    * Deprecated, use the `otel.scope.name` attribute.
+   *
+   * @deprecated Deprecated, use the `otel.scope.name` attribute
    */
   OTEL_LIBRARY_NAME: 'otel.library.name',
 
   /**
    * Deprecated, use the `otel.scope.version` attribute.
+   *
+   * @deprecated Deprecated, use the `otel.scope.version` attribute
    */
   OTEL_LIBRARY_VERSION: 'otel.library.version',
 };
