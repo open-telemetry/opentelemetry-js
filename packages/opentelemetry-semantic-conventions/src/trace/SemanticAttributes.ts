@@ -17,11 +17,335 @@
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
 export const SemanticAttributes = {
   /**
+   * Client address - unix domain socket name, IPv4 or IPv6 address.
+   *
+   * Note: When observed from the server side, and when communicating through an intermediary, `client.address` SHOULD represent client address behind any intermediaries (e.g. proxies) if it&#39;s available.
+   */
+  CLIENT_ADDRESS: 'client.address',
+
+  /**
+   * Client port number.
+   *
+   * Note: When observed from the server side, and when communicating through an intermediary, `client.port` SHOULD represent client port behind any intermediaries (e.g. proxies) if it&#39;s available.
+   */
+  CLIENT_PORT: 'client.port',
+
+  /**
+   * Immediate client peer address - unix domain socket name, IPv4 or IPv6 address.
+   */
+  CLIENT_SOCKET_ADDRESS: 'client.socket.address',
+
+  /**
+   * Immediate client peer port number.
+   */
+  CLIENT_SOCKET_PORT: 'client.socket.port',
+
+  /**
+   * Deprecated, use `http.request.method` instead.
+   */
+  HTTP_METHOD: 'http.method',
+
+  /**
+   * Deprecated, use `http.response.status_code` instead.
+   */
+  HTTP_STATUS_CODE: 'http.status_code',
+
+  /**
+   * Deprecated, use `url.scheme` instead.
+   */
+  HTTP_SCHEME: 'http.scheme',
+
+  /**
+   * Deprecated, use `url.full` instead.
+   */
+  HTTP_URL: 'http.url',
+
+  /**
+   * Deprecated, use `url.path` and `url.query` instead.
+   */
+  HTTP_TARGET: 'http.target',
+
+  /**
+   * Deprecated, use `http.request.body.size` instead.
+   */
+  HTTP_REQUEST_CONTENT_LENGTH: 'http.request_content_length',
+
+  /**
+   * Deprecated, use `http.response.body.size` instead.
+   */
+  HTTP_RESPONSE_CONTENT_LENGTH: 'http.response_content_length',
+
+  /**
+   * Deprecated, use `server.socket.domain` on client spans.
+   */
+  NET_SOCK_PEER_NAME: 'net.sock.peer.name',
+
+  /**
+   * Deprecated, use `server.socket.address` on client spans and `client.socket.address` on server spans.
+   */
+  NET_SOCK_PEER_ADDR: 'net.sock.peer.addr',
+
+  /**
+   * Deprecated, use `server.socket.port` on client spans and `client.socket.port` on server spans.
+   */
+  NET_SOCK_PEER_PORT: 'net.sock.peer.port',
+
+  /**
+   * Deprecated, use `server.address` on client spans and `client.address` on server spans.
+   */
+  NET_PEER_NAME: 'net.peer.name',
+
+  /**
+   * Deprecated, use `server.port` on client spans and `client.port` on server spans.
+   */
+  NET_PEER_PORT: 'net.peer.port',
+
+  /**
+   * Deprecated, use `server.address`.
+   */
+  NET_HOST_NAME: 'net.host.name',
+
+  /**
+   * Deprecated, use `server.port`.
+   */
+  NET_HOST_PORT: 'net.host.port',
+
+  /**
+   * Deprecated, use `server.socket.address`.
+   */
+  NET_SOCK_HOST_ADDR: 'net.sock.host.addr',
+
+  /**
+   * Deprecated, use `server.socket.port`.
+   */
+  NET_SOCK_HOST_PORT: 'net.sock.host.port',
+
+  /**
+   * Deprecated, use `network.transport`.
+   */
+  NET_TRANSPORT: 'net.transport',
+
+  /**
+   * Deprecated, use `network.protocol.name`.
+   */
+  NET_PROTOCOL_NAME: 'net.protocol.name',
+
+  /**
+   * Deprecated, use `network.protocol.version`.
+   */
+  NET_PROTOCOL_VERSION: 'net.protocol.version',
+
+  /**
+   * Deprecated, use `network.transport` and `network.type`.
+   */
+  NET_SOCK_FAMILY: 'net.sock.family',
+
+  /**
+   * The domain name of the destination system.
+   *
+   * Note: This value may be a host name, a fully qualified domain name, or another host naming format.
+   */
+  DESTINATION_DOMAIN: 'destination.domain',
+
+  /**
+   * Peer address, for example IP address or UNIX socket name.
+   */
+  DESTINATION_ADDRESS: 'destination.address',
+
+  /**
+   * Peer port number.
+   */
+  DESTINATION_PORT: 'destination.port',
+
+  /**
+   * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
+   */
+  EXCEPTION_TYPE: 'exception.type',
+
+  /**
+   * The exception message.
+   */
+  EXCEPTION_MESSAGE: 'exception.message',
+
+  /**
+   * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+   */
+  EXCEPTION_STACKTRACE: 'exception.stacktrace',
+
+  /**
+  * HTTP request method.
+  *
+  * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
+By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
+and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
+
+If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER` and, except if reporting a metric, MUST
+set the exact method received in the request line as value of the `http.request.method_original` attribute.
+
+If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
+the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
+OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
+(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
+
+HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
+Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
+Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+  */
+  HTTP_REQUEST_METHOD: 'http.request.method',
+
+  /**
+   * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
+   */
+  HTTP_RESPONSE_STATUS_CODE: 'http.response.status_code',
+
+  /**
+  * The matched route (path template in the format used by the respective server framework). See note below.
+  *
+  * Note: MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
+SHOULD include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
+  */
+  HTTP_ROUTE: 'http.route',
+
+  /**
+   * The name identifies the event.
+   */
+  EVENT_NAME: 'event.name',
+
+  /**
+  * The domain identifies the business context for the events.
+  *
+  * Note: Events across different domains may have same `event.name`, yet be
+unrelated events.
+  */
+  EVENT_DOMAIN: 'event.domain',
+
+  /**
+  * A unique identifier for the Log Record.
+  *
+  * Note: If an id is provided, other log records with the same id will be considered duplicates and can be removed safely. This means, that two distinguishable log records MUST have different values.
+The id MAY be an [Universally Unique Lexicographically Sortable Identifier (ULID)](https://github.com/ulid/spec), but other identifiers (e.g. UUID) may be used as needed.
+  */
+  LOG_RECORD_UID: 'log.record.uid',
+
+  /**
+   * The stream associated with the log. See below for a list of well-known values.
+   */
+  LOG_IOSTREAM: 'log.iostream',
+
+  /**
+   * The basename of the file.
+   */
+  LOG_FILE_NAME: 'log.file.name',
+
+  /**
+   * The full path to the file.
+   */
+  LOG_FILE_PATH: 'log.file.path',
+
+  /**
+   * The basename of the file, with symlinks resolved.
+   */
+  LOG_FILE_NAME_RESOLVED: 'log.file.name_resolved',
+
+  /**
+   * The full path to the file, with symlinks resolved.
+   */
+  LOG_FILE_PATH_RESOLVED: 'log.file.path_resolved',
+
+  /**
+   * The type of memory.
+   */
+  TYPE: 'type',
+
+  /**
+   * Name of the memory pool.
+   *
+   * Note: Pool names are generally obtained via [MemoryPoolMXBean#getName()](https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html#getName()).
+   */
+  POOL: 'pool',
+
+  /**
+   * Logical server hostname, matches server FQDN if available, and IP or socket address if FQDN is not known.
+   */
+  SERVER_ADDRESS: 'server.address',
+
+  /**
+   * Logical server port number.
+   */
+  SERVER_PORT: 'server.port',
+
+  /**
+   * The domain name of an immediate peer.
+   *
+   * Note: Typically observed from the client side, and represents a proxy or other intermediary domain name.
+   */
+  SERVER_SOCKET_DOMAIN: 'server.socket.domain',
+
+  /**
+   * Physical server IP address or Unix socket address. If set from the client, should simply use the socket&#39;s peer address, and not attempt to find any actual server IP (i.e., if set from client, this may represent some proxy server instead of the logical server).
+   */
+  SERVER_SOCKET_ADDRESS: 'server.socket.address',
+
+  /**
+   * Physical server port.
+   */
+  SERVER_SOCKET_PORT: 'server.socket.port',
+
+  /**
+   * The domain name of the source system.
+   *
+   * Note: This value may be a host name, a fully qualified domain name, or another host naming format.
+   */
+  SOURCE_DOMAIN: 'source.domain',
+
+  /**
+   * Source address, for example IP address or Unix socket name.
+   */
+  SOURCE_ADDRESS: 'source.address',
+
+  /**
+   * Source port number.
+   */
+  SOURCE_PORT: 'source.port',
+
+  /**
    * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
    *
-   * Note: This may be different from `faas.id` if an alias is involved.
+   * Note: This may be different from `cloud.resource_id` if an alias is involved.
    */
   AWS_LAMBDA_INVOKED_ARN: 'aws.lambda.invoked_arn',
+
+  /**
+   * The [event_id](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#id) uniquely identifies the event.
+   */
+  CLOUDEVENTS_EVENT_ID: 'cloudevents.event_id',
+
+  /**
+   * The [source](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#source-1) identifies the context in which an event happened.
+   */
+  CLOUDEVENTS_EVENT_SOURCE: 'cloudevents.event_source',
+
+  /**
+   * The [version of the CloudEvents specification](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#specversion) which the event uses.
+   */
+  CLOUDEVENTS_EVENT_SPEC_VERSION: 'cloudevents.event_spec_version',
+
+  /**
+   * The [event_type](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#type) contains a value describing the type of event related to the originating occurrence.
+   */
+  CLOUDEVENTS_EVENT_TYPE: 'cloudevents.event_type',
+
+  /**
+   * The [subject](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject) of the event in the context of the event producer (identified by source).
+   */
+  CLOUDEVENTS_EVENT_SUBJECT: 'cloudevents.event_subject',
+
+  /**
+   * Parent-child Reference type.
+   *
+   * Note: The causal relationship between a child Span and a parent Span.
+   */
+  OPENTRACING_REF_TYPE: 'opentracing.ref_type',
 
   /**
    * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
@@ -44,16 +368,14 @@ export const SemanticAttributes = {
   DB_JDBC_DRIVER_CLASSNAME: 'db.jdbc.driver_classname',
 
   /**
-   * If no [tech-specific attribute](#call-level-attributes-for-specific-technologies) is defined, this attribute is used to report the name of the database being accessed. For commands that switch the database, this should be set to the target database (even if the command fails).
+   * This attribute is used to report the name of the database being accessed. For commands that switch the database, this should be set to the target database (even if the command fails).
    *
-   * Note: In some SQL databases, the database name to be used is called &#34;schema name&#34;.
+   * Note: In some SQL databases, the database name to be used is called &#34;schema name&#34;. In case there are multiple layers that could be considered for database name (e.g. Oracle instance name and schema name), the database name to be used is the more specific layer (e.g. Oracle schema name).
    */
   DB_NAME: 'db.name',
 
   /**
    * The database statement being executed.
-   *
-   * Note: The value may be sanitized to exclude sensitive information.
    */
   DB_STATEMENT: 'db.statement',
 
@@ -67,14 +389,9 @@ export const SemanticAttributes = {
   /**
    * The Microsoft SQL Server [instance name](https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15) connecting to. This name is used to determine the port of a named instance.
    *
-   * Note: If setting a `db.mssql.instance_name`, `net.peer.port` is no longer required (but still recommended if non-standard).
+   * Note: If setting a `db.mssql.instance_name`, `server.port` is no longer required (but still recommended if non-standard).
    */
   DB_MSSQL_INSTANCE_NAME: 'db.mssql.instance_name',
-
-  /**
-   * The name of the keyspace being accessed. To be used instead of the generic `db.name` attribute.
-   */
-  DB_CASSANDRA_KEYSPACE: 'db.cassandra.keyspace',
 
   /**
    * The fetch size used for paging, i.e. how many rows will be returned at once.
@@ -87,7 +404,7 @@ export const SemanticAttributes = {
   DB_CASSANDRA_CONSISTENCY_LEVEL: 'db.cassandra.consistency_level',
 
   /**
-   * The name of the primary table that the operation is acting upon, including the schema name (if applicable).
+   * The name of the primary table that the operation is acting upon, including the keyspace name (if applicable).
    *
    * Note: This mirrors the db.sql.table attribute but references cassandra rather than sql. It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
    */
@@ -115,11 +432,6 @@ export const SemanticAttributes = {
   DB_CASSANDRA_COORDINATOR_DC: 'db.cassandra.coordinator.dc',
 
   /**
-   * The [HBase namespace](https://hbase.apache.org/book.html#_namespace) being accessed. To be used instead of the generic `db.name` attribute.
-   */
-  DB_HBASE_NAMESPACE: 'db.hbase.namespace',
-
-  /**
    * The index of the database being accessed as used in the [`SELECT` command](https://redis.io/commands/select), provided as an integer. To be used instead of the generic `db.name` attribute.
    */
   DB_REDIS_DATABASE_INDEX: 'db.redis.database_index',
@@ -130,58 +442,81 @@ export const SemanticAttributes = {
   DB_MONGODB_COLLECTION: 'db.mongodb.collection',
 
   /**
-   * The name of the primary table that the operation is acting upon, including the schema name (if applicable).
+   * The name of the primary table that the operation is acting upon, including the database name (if applicable).
    *
    * Note: It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
    */
   DB_SQL_TABLE: 'db.sql.table',
 
   /**
-   * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
+   * Unique Cosmos client instance id.
    */
-  EXCEPTION_TYPE: 'exception.type',
+  DB_COSMOSDB_CLIENT_ID: 'db.cosmosdb.client_id',
 
   /**
-   * The exception message.
+   * CosmosDB Operation Type.
    */
-  EXCEPTION_MESSAGE: 'exception.message',
+  DB_COSMOSDB_OPERATION_TYPE: 'db.cosmosdb.operation_type',
 
   /**
-   * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+   * Cosmos client connection mode.
    */
-  EXCEPTION_STACKTRACE: 'exception.stacktrace',
+  DB_COSMOSDB_CONNECTION_MODE: 'db.cosmosdb.connection_mode',
 
   /**
-  * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+   * Cosmos DB container name.
+   */
+  DB_COSMOSDB_CONTAINER: 'db.cosmosdb.container',
+
+  /**
+   * Request payload size in bytes.
+   */
+  DB_COSMOSDB_REQUEST_CONTENT_LENGTH: 'db.cosmosdb.request_content_length',
+
+  /**
+   * Cosmos DB status code.
+   */
+  DB_COSMOSDB_STATUS_CODE: 'db.cosmosdb.status_code',
+
+  /**
+   * Cosmos DB sub status code.
+   */
+  DB_COSMOSDB_SUB_STATUS_CODE: 'db.cosmosdb.sub_status_code',
+
+  /**
+   * RU consumed for that operation.
+   */
+  DB_COSMOSDB_REQUEST_CHARGE: 'db.cosmosdb.request_charge',
+
+  /**
+   * Name of the code, either &#34;OK&#34; or &#34;ERROR&#34;. MUST NOT be set if the status code is UNSET.
+   */
+  OTEL_STATUS_CODE: 'otel.status_code',
+
+  /**
+   * Description of the Status if it has a value, otherwise not set.
+   */
+  OTEL_STATUS_DESCRIPTION: 'otel.status_description',
+
+  /**
+  * Type of the trigger which caused this function invocation.
   *
-  * Note: An exception is considered to have escaped (or left) the scope of a span,
-if that span is ended while the exception is still logically &#34;in flight&#34;.
-This may be actually &#34;in flight&#34; in some languages (e.g. if the exception
-is passed to a Context manager&#39;s `__exit__` method in Python) but will
-usually be caught at the point of recording the exception in most languages.
+  * Note: For the server/consumer span on the incoming side,
+`faas.trigger` MUST be set.
 
-It is usually not possible to determine at the point where an exception is thrown
-whether it will escape the scope of a span.
-However, it is trivial to know that an exception
-will escape, if one checks for an active exception just before ending the span,
-as done in the [example above](#exception-end-example).
-
-It follows that an exception may still escape the scope of the span
-even if the `exception.escaped` attribute was not set or set to false,
-since the event might have been recorded at a time where it was not
-clear whether the exception will escape.
+Clients invoking FaaS instances usually cannot set `faas.trigger`,
+since they would typically need to look in the payload to determine
+the event type. If clients set it, it should be the same as the
+trigger that corresponding incoming would have (i.e., this has
+nothing to do with the underlying transport used to make the API
+call to invoke the lambda, which is often HTTP).
   */
-  EXCEPTION_ESCAPED: 'exception.escaped',
-
-  /**
-   * Type of the trigger on which the function is executed.
-   */
   FAAS_TRIGGER: 'faas.trigger',
 
   /**
-   * The execution ID of the current function execution.
+   * The invocation ID of the current function invocation.
    */
-  FAAS_EXECUTION: 'faas.execution',
+  FAAS_INVOCATION_ID: 'faas.invocation_id',
 
   /**
    * The name of the source on which the triggering operation was performed. For example, in Cloud Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
@@ -240,72 +575,83 @@ clear whether the exception will escape.
   FAAS_INVOKED_REGION: 'faas.invoked_region',
 
   /**
-   * Transport protocol used. See note below.
+   * The unique identifier of the feature flag.
    */
-  NET_TRANSPORT: 'net.transport',
+  FEATURE_FLAG_KEY: 'feature_flag.key',
 
   /**
-   * Remote address of the peer (dotted decimal for IPv4 or [RFC5952](https://tools.ietf.org/html/rfc5952) for IPv6).
+   * The name of the service provider that performs the flag evaluation.
    */
-  NET_PEER_IP: 'net.peer.ip',
+  FEATURE_FLAG_PROVIDER_NAME: 'feature_flag.provider_name',
 
   /**
-   * Remote port number.
-   */
-  NET_PEER_PORT: 'net.peer.port',
+  * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
+  *
+  * Note: A semantic identifier, commonly referred to as a variant, provides a means
+for referring to a value without including the value itself. This can
+provide additional context for understanding the meaning behind a value.
+For example, the variant `red` maybe be used for the value `#c05543`.
+
+A stringified version of the value can be used in situations where a
+semantic identifier is unavailable. String representation of the value
+should be determined by the implementer.
+  */
+  FEATURE_FLAG_VARIANT: 'feature_flag.variant',
 
   /**
-   * Remote hostname or similar, see note below.
+   * [OSI Transport Layer](https://osi-model.com/transport-layer/) or [Inter-process Communication method](https://en.wikipedia.org/wiki/Inter-process_communication). The value SHOULD be normalized to lowercase.
    */
-  NET_PEER_NAME: 'net.peer.name',
+  NETWORK_TRANSPORT: 'network.transport',
 
   /**
-   * Like `net.peer.ip` but for the host IP. Useful in case of a multi-IP host.
+   * [OSI Network Layer](https://osi-model.com/network-layer/) or non-OSI equivalent. The value SHOULD be normalized to lowercase.
    */
-  NET_HOST_IP: 'net.host.ip',
+  NETWORK_TYPE: 'network.type',
 
   /**
-   * Like `net.peer.port` but for the host port.
+   * [OSI Application Layer](https://osi-model.com/application-layer/) or non-OSI equivalent. The value SHOULD be normalized to lowercase.
    */
-  NET_HOST_PORT: 'net.host.port',
+  NETWORK_PROTOCOL_NAME: 'network.protocol.name',
 
   /**
-   * Local hostname or similar, see note below.
+   * Version of the application layer protocol used. See note below.
+   *
+   * Note: `network.protocol.version` refers to the version of the protocol used and might be different from the protocol client&#39;s version. If the HTTP client used has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
    */
-  NET_HOST_NAME: 'net.host.name',
+  NETWORK_PROTOCOL_VERSION: 'network.protocol.version',
 
   /**
-   * The internet connection type currently being used by the host.
+   * The internet connection type.
    */
-  NET_HOST_CONNECTION_TYPE: 'net.host.connection.type',
+  NETWORK_CONNECTION_TYPE: 'network.connection.type',
 
   /**
    * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
    */
-  NET_HOST_CONNECTION_SUBTYPE: 'net.host.connection.subtype',
+  NETWORK_CONNECTION_SUBTYPE: 'network.connection.subtype',
 
   /**
    * The name of the mobile carrier.
    */
-  NET_HOST_CARRIER_NAME: 'net.host.carrier.name',
+  NETWORK_CARRIER_NAME: 'network.carrier.name',
 
   /**
    * The mobile carrier country code.
    */
-  NET_HOST_CARRIER_MCC: 'net.host.carrier.mcc',
+  NETWORK_CARRIER_MCC: 'network.carrier.mcc',
 
   /**
    * The mobile carrier network code.
    */
-  NET_HOST_CARRIER_MNC: 'net.host.carrier.mnc',
+  NETWORK_CARRIER_MNC: 'network.carrier.mnc',
 
   /**
    * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
    */
-  NET_HOST_CARRIER_ICC: 'net.host.carrier.icc',
+  NETWORK_CARRIER_ICC: 'network.carrier.icc',
 
   /**
-   * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
+   * The [`service.name`](/docs/resource/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
    */
   PEER_SERVICE: 'peer.service',
 
@@ -355,101 +701,36 @@ clear whether the exception will escape.
   CODE_LINENO: 'code.lineno',
 
   /**
-   * HTTP request method.
+   * The column number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
    */
-  HTTP_METHOD: 'http.method',
+  CODE_COLUMN: 'code.column',
 
   /**
-   * Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`. Usually the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
+   * Original HTTP method sent by the client in the request line.
+   */
+  HTTP_REQUEST_METHOD_ORIGINAL: 'http.request.method_original',
+
+  /**
+   * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
+   */
+  HTTP_REQUEST_BODY_SIZE: 'http.request.body.size',
+
+  /**
+   * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
+   */
+  HTTP_RESPONSE_BODY_SIZE: 'http.response.body.size',
+
+  /**
+   * The ordinal number of request resending attempt (for any reason, including redirects).
    *
-   * Note: `http.url` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case the attribute&#39;s value should be `https://www.example.com/`.
+   * Note: The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
    */
-  HTTP_URL: 'http.url',
+  HTTP_RESEND_COUNT: 'http.resend_count',
 
   /**
-   * The full request target as passed in a HTTP request line or equivalent.
+   * The AWS request ID as returned in the response headers `x-amz-request-id` or `x-amz-requestid`.
    */
-  HTTP_TARGET: 'http.target',
-
-  /**
-   * The value of the [HTTP host header](https://tools.ietf.org/html/rfc7230#section-5.4). An empty Host header should also be reported, see note.
-   *
-   * Note: When the header is present but empty the attribute SHOULD be set to the empty string. Note that this is a valid situation that is expected in certain cases, according the aforementioned [section of RFC 7230](https://tools.ietf.org/html/rfc7230#section-5.4). When the header is not set the attribute MUST NOT be set.
-   */
-  HTTP_HOST: 'http.host',
-
-  /**
-   * The URI scheme identifying the used protocol.
-   */
-  HTTP_SCHEME: 'http.scheme',
-
-  /**
-   * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
-   */
-  HTTP_STATUS_CODE: 'http.status_code',
-
-  /**
-   * Kind of HTTP protocol used.
-   *
-   * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
-   */
-  HTTP_FLAVOR: 'http.flavor',
-
-  /**
-   * Value of the [HTTP User-Agent](https://tools.ietf.org/html/rfc7231#section-5.5.3) header sent by the client.
-   */
-  HTTP_USER_AGENT: 'http.user_agent',
-
-  /**
-   * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
-   */
-  HTTP_REQUEST_CONTENT_LENGTH: 'http.request_content_length',
-
-  /**
-   * The size of the uncompressed request payload body after transport decoding. Not set if transport encoding not used.
-   */
-  HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED:
-    'http.request_content_length_uncompressed',
-
-  /**
-   * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
-   */
-  HTTP_RESPONSE_CONTENT_LENGTH: 'http.response_content_length',
-
-  /**
-   * The size of the uncompressed response payload body after transport decoding. Not set if transport encoding not used.
-   */
-  HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED:
-    'http.response_content_length_uncompressed',
-
-  /**
-   * The primary server name of the matched virtual host. This should be obtained via configuration. If no such configuration can be obtained, this attribute MUST NOT be set ( `net.host.name` should be used instead).
-   *
-   * Note: `http.url` is usually not readily available on the server side but would have to be assembled in a cumbersome and sometimes lossy process from other information (see e.g. open-telemetry/opentelemetry-python/pull/148). It is thus preferred to supply the raw data that is available.
-   */
-  HTTP_SERVER_NAME: 'http.server_name',
-
-  /**
-   * The matched route (path template).
-   */
-  HTTP_ROUTE: 'http.route',
-
-  /**
-  * The IP address of the original client behind all proxies, if known (e.g. from [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For)).
-  *
-  * Note: This is not necessarily the same as `net.peer.ip`, which would
-identify the network-level peer, which may be a proxy.
-
-This attribute should be set when a source of information different
-from the one used for `net.peer.ip`, is available even if that other
-source just confirms the same value as `net.peer.ip`.
-Rationale: For `net.peer.ip`, one typically does not know if it
-comes from a proxy, reverse proxy, or the actual client. Setting
-`http.client_ip` when it&#39;s the same as `net.peer.ip` means that
-one is at least somewhat confident that the address is not that of
-the closest proxy.
-  */
-  HTTP_CLIENT_IP: 'http.client_ip',
+  AWS_REQUEST_ID: 'aws.request_id',
 
   /**
    * The keys in the `RequestItems` object field.
@@ -566,105 +847,251 @@ the closest proxy.
     'aws.dynamodb.global_secondary_index_updates',
 
   /**
-   * A string identifying the messaging system.
-   */
-  MESSAGING_SYSTEM: 'messaging.system',
+  * The S3 bucket name the request refers to. Corresponds to the `--bucket` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
+  *
+  * Note: The `bucket` attribute is applicable to all S3 operations that reference a bucket, i.e. that require the bucket name as a mandatory parameter.
+This applies to almost all S3 operations except `list-buckets`.
+  */
+  AWS_S3_BUCKET: 'aws.s3.bucket',
 
   /**
-   * The message destination name. This might be equal to the span name but is required nevertheless.
-   */
-  MESSAGING_DESTINATION: 'messaging.destination',
+  * The S3 object key the request refers to. Corresponds to the `--key` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
+  *
+  * Note: The `key` attribute is applicable to all object-related S3 operations, i.e. that require the object key as a mandatory parameter.
+This applies in particular to the following operations:
+
+- [copy-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html)
+- [delete-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html)
+- [get-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html)
+- [head-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/head-object.html)
+- [put-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object.html)
+- [restore-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/restore-object.html)
+- [select-object-content](https://docs.aws.amazon.com/cli/latest/reference/s3api/select-object-content.html)
+- [abort-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html)
+- [complete-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html)
+- [create-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/create-multipart-upload.html)
+- [list-parts](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html)
+- [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
+- [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
+  */
+  AWS_S3_KEY: 'aws.s3.key',
 
   /**
-   * The kind of message destination.
-   */
-  MESSAGING_DESTINATION_KIND: 'messaging.destination_kind',
+  * The source object (in the form `bucket`/`key`) for the copy operation.
+  *
+  * Note: The `copy_source` attribute applies to S3 copy operations and corresponds to the `--copy-source` parameter
+of the [copy-object operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html).
+This applies in particular to the following operations:
+
+- [copy-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html)
+- [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
+  */
+  AWS_S3_COPY_SOURCE: 'aws.s3.copy_source',
 
   /**
-   * A boolean that is true if the message destination is temporary.
-   */
-  MESSAGING_TEMP_DESTINATION: 'messaging.temp_destination',
+  * Upload ID that identifies the multipart upload.
+  *
+  * Note: The `upload_id` attribute applies to S3 multipart-upload operations and corresponds to the `--upload-id` parameter
+of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) multipart operations.
+This applies in particular to the following operations:
+
+- [abort-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html)
+- [complete-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html)
+- [list-parts](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html)
+- [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
+- [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
+  */
+  AWS_S3_UPLOAD_ID: 'aws.s3.upload_id',
 
   /**
-   * The name of the transport protocol.
-   */
-  MESSAGING_PROTOCOL: 'messaging.protocol',
+  * The delete request container that specifies the objects to be deleted.
+  *
+  * Note: The `delete` attribute is only applicable to the [delete-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html) operation.
+The `delete` attribute corresponds to the `--delete` parameter of the
+[delete-objects operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-objects.html).
+  */
+  AWS_S3_DELETE: 'aws.s3.delete',
 
   /**
-   * The version of the transport protocol.
-   */
-  MESSAGING_PROTOCOL_VERSION: 'messaging.protocol_version',
+  * The part number of the part being uploaded in a multipart-upload operation. This is a positive integer between 1 and 10,000.
+  *
+  * Note: The `part_number` attribute is only applicable to the [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
+and [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html) operations.
+The `part_number` attribute corresponds to the `--part-number` parameter of the
+[upload-part operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html).
+  */
+  AWS_S3_PART_NUMBER: 'aws.s3.part_number',
 
   /**
-   * Connection string.
+   * The name of the operation being executed.
    */
-  MESSAGING_URL: 'messaging.url',
+  GRAPHQL_OPERATION_NAME: 'graphql.operation.name',
+
+  /**
+   * The type of the operation being executed.
+   */
+  GRAPHQL_OPERATION_TYPE: 'graphql.operation.type',
+
+  /**
+   * The GraphQL document being executed.
+   *
+   * Note: The value may be sanitized to exclude sensitive information.
+   */
+  GRAPHQL_DOCUMENT: 'graphql.document',
 
   /**
    * A value used by the messaging system as an identifier for the message, represented as a string.
    */
-  MESSAGING_MESSAGE_ID: 'messaging.message_id',
+  MESSAGING_MESSAGE_ID: 'messaging.message.id',
 
   /**
    * The [conversation ID](#conversations) identifying the conversation to which the message belongs, represented as a string. Sometimes called &#34;Correlation ID&#34;.
    */
-  MESSAGING_CONVERSATION_ID: 'messaging.conversation_id',
+  MESSAGING_MESSAGE_CONVERSATION_ID: 'messaging.message.conversation_id',
 
   /**
    * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
    */
-  MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES: 'messaging.message_payload_size_bytes',
+  MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES: 'messaging.message.payload_size_bytes',
 
   /**
    * The compressed size of the message payload in bytes.
    */
   MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES:
-    'messaging.message_payload_compressed_size_bytes',
+    'messaging.message.payload_compressed_size_bytes',
 
   /**
-   * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
+  * The message destination name.
+  *
+  * Note: Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
+the broker does not have such notion, the destination name SHOULD uniquely identify the broker.
+  */
+  MESSAGING_DESTINATION_NAME: 'messaging.destination.name',
+
+  /**
+   * Low cardinality representation of the messaging destination name.
+   *
+   * Note: Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
+   */
+  MESSAGING_DESTINATION_TEMPLATE: 'messaging.destination.template',
+
+  /**
+   * A boolean that is true if the message destination is temporary and might not exist anymore after messages are processed.
+   */
+  MESSAGING_DESTINATION_TEMPORARY: 'messaging.destination.temporary',
+
+  /**
+   * A boolean that is true if the message destination is anonymous (could be unnamed or have auto-generated name).
+   */
+  MESSAGING_DESTINATION_ANONYMOUS: 'messaging.destination.anonymous',
+
+  /**
+   * A string identifying the messaging system.
+   */
+  MESSAGING_SYSTEM: 'messaging.system',
+
+  /**
+   * A string identifying the kind of messaging operation as defined in the [Operation names](#operation-names) section above.
+   *
+   * Note: If a custom value is used, it MUST be of low cardinality.
    */
   MESSAGING_OPERATION: 'messaging.operation',
 
   /**
-   * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer_group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer_group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
+   * The number of messages sent, received, or processed in the scope of the batching operation.
+   *
+   * Note: Instrumentations SHOULD NOT set `messaging.batch.message_count` on spans that operate with a single message. When a messaging client library supports both batch and single-message API for the same operation, instrumentations SHOULD use `messaging.batch.message_count` for batching APIs and SHOULD NOT use it for single-message APIs.
    */
-  MESSAGING_CONSUMER_ID: 'messaging.consumer_id',
+  MESSAGING_BATCH_MESSAGE_COUNT: 'messaging.batch.message_count',
+
+  /**
+   * A unique identifier for the client that consumes or produces a message.
+   */
+  MESSAGING_CLIENT_ID: 'messaging.client_id',
 
   /**
    * RabbitMQ message routing key.
    */
-  MESSAGING_RABBITMQ_ROUTING_KEY: 'messaging.rabbitmq.routing_key',
+  MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY:
+    'messaging.rabbitmq.destination.routing_key',
 
   /**
-   * Message keys in Kafka are used for grouping alike messages to ensure they&#39;re processed on the same partition. They differ from `messaging.message_id` in that they&#39;re not unique. If the key is `null`, the attribute MUST NOT be set.
+   * Message keys in Kafka are used for grouping alike messages to ensure they&#39;re processed on the same partition. They differ from `messaging.message.id` in that they&#39;re not unique. If the key is `null`, the attribute MUST NOT be set.
    *
    * Note: If the key type is not string, it&#39;s string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don&#39;t include its value.
    */
-  MESSAGING_KAFKA_MESSAGE_KEY: 'messaging.kafka.message_key',
+  MESSAGING_KAFKA_MESSAGE_KEY: 'messaging.kafka.message.key',
 
   /**
    * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
    */
-  MESSAGING_KAFKA_CONSUMER_GROUP: 'messaging.kafka.consumer_group',
-
-  /**
-   * Client Id for the Consumer or Producer that is handling the message.
-   */
-  MESSAGING_KAFKA_CLIENT_ID: 'messaging.kafka.client_id',
+  MESSAGING_KAFKA_CONSUMER_GROUP: 'messaging.kafka.consumer.group',
 
   /**
    * Partition the message is sent to.
    */
-  MESSAGING_KAFKA_PARTITION: 'messaging.kafka.partition',
+  MESSAGING_KAFKA_DESTINATION_PARTITION:
+    'messaging.kafka.destination.partition',
+
+  /**
+   * The offset of a record in the corresponding Kafka partition.
+   */
+  MESSAGING_KAFKA_MESSAGE_OFFSET: 'messaging.kafka.message.offset',
 
   /**
    * A boolean that is true if the message is a tombstone.
    */
-  MESSAGING_KAFKA_TOMBSTONE: 'messaging.kafka.tombstone',
+  MESSAGING_KAFKA_MESSAGE_TOMBSTONE: 'messaging.kafka.message.tombstone',
 
   /**
-   * A string identifying the remoting system.
+   * Namespace of RocketMQ resources, resources in different namespaces are individual.
+   */
+  MESSAGING_ROCKETMQ_NAMESPACE: 'messaging.rocketmq.namespace',
+
+  /**
+   * Name of the RocketMQ producer/consumer group that is handling the message. The client type is identified by the SpanKind.
+   */
+  MESSAGING_ROCKETMQ_CLIENT_GROUP: 'messaging.rocketmq.client_group',
+
+  /**
+   * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
+   */
+  MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP:
+    'messaging.rocketmq.message.delivery_timestamp',
+
+  /**
+   * The delay time level for delay message, which determines the message delay time.
+   */
+  MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL:
+    'messaging.rocketmq.message.delay_time_level',
+
+  /**
+   * It is essential for FIFO message. Messages that belong to the same message group are always processed one by one within the same consumer group.
+   */
+  MESSAGING_ROCKETMQ_MESSAGE_GROUP: 'messaging.rocketmq.message.group',
+
+  /**
+   * Type of message.
+   */
+  MESSAGING_ROCKETMQ_MESSAGE_TYPE: 'messaging.rocketmq.message.type',
+
+  /**
+   * The secondary classifier of message besides topic.
+   */
+  MESSAGING_ROCKETMQ_MESSAGE_TAG: 'messaging.rocketmq.message.tag',
+
+  /**
+   * Key(s) of message, another way to mark message besides message id.
+   */
+  MESSAGING_ROCKETMQ_MESSAGE_KEYS: 'messaging.rocketmq.message.keys',
+
+  /**
+   * Model of message consumption. This only applies to consumer spans.
+   */
+  MESSAGING_ROCKETMQ_CONSUMPTION_MODEL: 'messaging.rocketmq.consumption_model',
+
+  /**
+   * A string identifying the remoting system. See below for a list of well-known identifiers.
    */
   RPC_SYSTEM: 'rpc.system',
 
@@ -728,13 +1155,168 @@ the closest proxy.
    * Uncompressed size of the message in bytes.
    */
   MESSAGE_UNCOMPRESSED_SIZE: 'message.uncompressed_size',
+
+  /**
+   * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+   */
+  RPC_CONNECT_RPC_ERROR_CODE: 'rpc.connect_rpc.error_code',
+
+  /**
+  * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+  *
+  * Note: An exception is considered to have escaped (or left) the scope of a span,
+if that span is ended while the exception is still logically &#34;in flight&#34;.
+This may be actually &#34;in flight&#34; in some languages (e.g. if the exception
+is passed to a Context manager&#39;s `__exit__` method in Python) but will
+usually be caught at the point of recording the exception in most languages.
+
+It is usually not possible to determine at the point where an exception is thrown
+whether it will escape the scope of a span.
+However, it is trivial to know that an exception
+will escape, if one checks for an active exception just before ending the span,
+as done in the [example above](#recording-an-exception).
+
+It follows that an exception may still escape the scope of the span
+even if the `exception.escaped` attribute was not set or set to false,
+since the event might have been recorded at a time where it was not
+clear whether the exception will escape.
+  */
+  EXCEPTION_ESCAPED: 'exception.escaped',
+
+  /**
+   * The [URI scheme](https://www.rfc-editor.org/rfc/rfc3986#section-3.1) component identifying the used protocol.
+   */
+  URL_SCHEME: 'url.scheme',
+
+  /**
+  * Absolute URL describing a network resource according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986).
+  *
+  * Note: For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
+`url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password should be redacted and attribute&#39;s value should be `https://REDACTED:REDACTED@www.example.com/`.
+`url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed) and SHOULD NOT be validated or modified except for sanitizing purposes.
+  */
+  URL_FULL: 'url.full',
+
+  /**
+   * The [URI path](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) component.
+   *
+   * Note: When missing, the value is assumed to be `/`.
+   */
+  URL_PATH: 'url.path',
+
+  /**
+   * The [URI query](https://www.rfc-editor.org/rfc/rfc3986#section-3.4) component.
+   *
+   * Note: Sensitive content provided in query string SHOULD be scrubbed when instrumentations can identify it.
+   */
+  URL_QUERY: 'url.query',
+
+  /**
+   * The [URI fragment](https://www.rfc-editor.org/rfc/rfc3986#section-3.5) component.
+   */
+  URL_FRAGMENT: 'url.fragment',
+
+  /**
+   * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
+   */
+  USER_AGENT_ORIGINAL: 'user_agent.original',
 };
+
+export const NetTransportValues = {
+  /** ip_tcp. */
+  IP_TCP: 'ip_tcp',
+  /** ip_udp. */
+  IP_UDP: 'ip_udp',
+  /** Named or anonymous pipe. */
+  PIPE: 'pipe',
+  /** In-process communication. */
+  INPROC: 'inproc',
+  /** Something else (non IP-based). */
+  OTHER: 'other',
+} as const;
+export type NetTransportValues =
+  (typeof NetTransportValues)[keyof typeof NetTransportValues];
+
+export const NetSockFamilyValues = {
+  /** IPv4 address. */
+  INET: 'inet',
+  /** IPv6 address. */
+  INET6: 'inet6',
+  /** Unix domain socket path. */
+  UNIX: 'unix',
+} as const;
+export type NetSockFamilyValues =
+  (typeof NetSockFamilyValues)[keyof typeof NetSockFamilyValues];
+
+export const HttpRequestMethodValues = {
+  /** CONNECT method. */
+  CONNECT: 'CONNECT',
+  /** DELETE method. */
+  DELETE: 'DELETE',
+  /** GET method. */
+  GET: 'GET',
+  /** HEAD method. */
+  HEAD: 'HEAD',
+  /** OPTIONS method. */
+  OPTIONS: 'OPTIONS',
+  /** PATCH method. */
+  PATCH: 'PATCH',
+  /** POST method. */
+  POST: 'POST',
+  /** PUT method. */
+  PUT: 'PUT',
+  /** TRACE method. */
+  TRACE: 'TRACE',
+  /** Any HTTP method that the instrumentation has no prior knowledge of. */
+  OTHER: '_OTHER',
+} as const;
+export type HttpRequestMethodValues =
+  (typeof HttpRequestMethodValues)[keyof typeof HttpRequestMethodValues];
+
+export const EventDomainValues = {
+  /** Events from browser apps. */
+  BROWSER: 'browser',
+  /** Events from mobile apps. */
+  DEVICE: 'device',
+  /** Events from Kubernetes. */
+  K8S: 'k8s',
+} as const;
+export type EventDomainValues =
+  (typeof EventDomainValues)[keyof typeof EventDomainValues];
+
+export const LogIostreamValues = {
+  /** Logs from stdout stream. */
+  STDOUT: 'stdout',
+  /** Events from stderr stream. */
+  STDERR: 'stderr',
+} as const;
+export type LogIostreamValues =
+  (typeof LogIostreamValues)[keyof typeof LogIostreamValues];
+
+export const TypeValues = {
+  /** Heap memory. */
+  HEAP: 'heap',
+  /** Non-heap memory. */
+  NON_HEAP: 'non_heap',
+} as const;
+export type TypeValues = (typeof TypeValues)[keyof typeof TypeValues];
+
+export const OpentracingRefTypeValues = {
+  /** The parent Span depends on the child Span in some capacity. */
+  CHILD_OF: 'child_of',
+  /** The parent Span does not depend in any way on the result of the child Span. */
+  FOLLOWS_FROM: 'follows_from',
+} as const;
+export type OpentracingRefTypeValues =
+  (typeof OpentracingRefTypeValues)[keyof typeof OpentracingRefTypeValues];
 
 export const DbSystemValues = {
   /** Some other SQL database. Fallback only. See notes. */
   OTHER_SQL: 'other_sql',
   /** Microsoft SQL Server. */
   MSSQL: 'mssql',
+  /** Microsoft SQL Server Compact. */
+  MSSQLCOMPACT: 'mssqlcompact',
   /** MySQL. */
   MYSQL: 'mysql',
   /** Oracle Database. */
@@ -825,6 +1407,14 @@ export const DbSystemValues = {
   MEMCACHED: 'memcached',
   /** CockroachDB. */
   COCKROACHDB: 'cockroachdb',
+  /** OpenSearch. */
+  OPENSEARCH: 'opensearch',
+  /** ClickHouse. */
+  CLICKHOUSE: 'clickhouse',
+  /** Cloud Spanner. */
+  SPANNER: 'spanner',
+  /** Trino. */
+  TRINO: 'trino',
 } as const;
 export type DbSystemValues =
   (typeof DbSystemValues)[keyof typeof DbSystemValues];
@@ -855,6 +1445,59 @@ export const DbCassandraConsistencyLevelValues = {
 } as const;
 export type DbCassandraConsistencyLevelValues =
   (typeof DbCassandraConsistencyLevelValues)[keyof typeof DbCassandraConsistencyLevelValues];
+
+export const DbCosmosdbOperationTypeValues = {
+  /** invalid. */
+  INVALID: 'Invalid',
+  /** create. */
+  CREATE: 'Create',
+  /** patch. */
+  PATCH: 'Patch',
+  /** read. */
+  READ: 'Read',
+  /** read_feed. */
+  READ_FEED: 'ReadFeed',
+  /** delete. */
+  DELETE: 'Delete',
+  /** replace. */
+  REPLACE: 'Replace',
+  /** execute. */
+  EXECUTE: 'Execute',
+  /** query. */
+  QUERY: 'Query',
+  /** head. */
+  HEAD: 'Head',
+  /** head_feed. */
+  HEAD_FEED: 'HeadFeed',
+  /** upsert. */
+  UPSERT: 'Upsert',
+  /** batch. */
+  BATCH: 'Batch',
+  /** query_plan. */
+  QUERY_PLAN: 'QueryPlan',
+  /** execute_javascript. */
+  EXECUTE_JAVASCRIPT: 'ExecuteJavaScript',
+} as const;
+export type DbCosmosdbOperationTypeValues =
+  (typeof DbCosmosdbOperationTypeValues)[keyof typeof DbCosmosdbOperationTypeValues];
+
+export const DbCosmosdbConnectionModeValues = {
+  /** Gateway (HTTP) connections mode. */
+  GATEWAY: 'gateway',
+  /** Direct connection. */
+  DIRECT: 'direct',
+} as const;
+export type DbCosmosdbConnectionModeValues =
+  (typeof DbCosmosdbConnectionModeValues)[keyof typeof DbCosmosdbConnectionModeValues];
+
+export const OtelStatusCodeValues = {
+  /** The operation has been validated by an Application developer or Operator to have completed successfully. */
+  OK: 'OK',
+  /** The operation contains an error. */
+  ERROR: 'ERROR',
+} as const;
+export type OtelStatusCodeValues =
+  (typeof OtelStatusCodeValues)[keyof typeof OtelStatusCodeValues];
 
 export const FaasTriggerValues = {
   /** A response to some data source operation such as a database or filesystem read/write. */
@@ -891,30 +1534,35 @@ export const FaasInvokedProviderValues = {
   AZURE: 'azure',
   /** Google Cloud Platform. */
   GCP: 'gcp',
+  /** Tencent Cloud. */
+  TENCENT_CLOUD: 'tencent_cloud',
 } as const;
 export type FaasInvokedProviderValues =
   (typeof FaasInvokedProviderValues)[keyof typeof FaasInvokedProviderValues];
 
-export const NetTransportValues = {
-  /** ip_tcp. */
-  IP_TCP: 'ip_tcp',
-  /** ip_udp. */
-  IP_UDP: 'ip_udp',
-  /** Another IP-based protocol. */
-  IP: 'ip',
-  /** Unix Domain socket. See below. */
-  UNIX: 'unix',
+export const NetworkTransportValues = {
+  /** TCP. */
+  TCP: 'tcp',
+  /** UDP. */
+  UDP: 'udp',
   /** Named or anonymous pipe. See note below. */
   PIPE: 'pipe',
-  /** In-process communication. */
-  INPROC: 'inproc',
-  /** Something else (non IP-based). */
-  OTHER: 'other',
+  /** Unix domain socket. */
+  UNIX: 'unix',
 } as const;
-export type NetTransportValues =
-  (typeof NetTransportValues)[keyof typeof NetTransportValues];
+export type NetworkTransportValues =
+  (typeof NetworkTransportValues)[keyof typeof NetworkTransportValues];
 
-export const NetHostConnectionTypeValues = {
+export const NetworkTypeValues = {
+  /** IPv4. */
+  IPV4: 'ipv4',
+  /** IPv6. */
+  IPV6: 'ipv6',
+} as const;
+export type NetworkTypeValues =
+  (typeof NetworkTypeValues)[keyof typeof NetworkTypeValues];
+
+export const NetworkConnectionTypeValues = {
   /** wifi. */
   WIFI: 'wifi',
   /** wired. */
@@ -926,10 +1574,10 @@ export const NetHostConnectionTypeValues = {
   /** unknown. */
   UNKNOWN: 'unknown',
 } as const;
-export type NetHostConnectionTypeValues =
-  (typeof NetHostConnectionTypeValues)[keyof typeof NetHostConnectionTypeValues];
+export type NetworkConnectionTypeValues =
+  (typeof NetworkConnectionTypeValues)[keyof typeof NetworkConnectionTypeValues];
 
-export const NetHostConnectionSubtypeValues = {
+export const NetworkConnectionSubtypeValues = {
   /** GPRS. */
   GPRS: 'gprs',
   /** EDGE. */
@@ -973,34 +1621,23 @@ export const NetHostConnectionSubtypeValues = {
   /** LTE CA. */
   LTE_CA: 'lte_ca',
 } as const;
-export type NetHostConnectionSubtypeValues =
-  (typeof NetHostConnectionSubtypeValues)[keyof typeof NetHostConnectionSubtypeValues];
+export type NetworkConnectionSubtypeValues =
+  (typeof NetworkConnectionSubtypeValues)[keyof typeof NetworkConnectionSubtypeValues];
 
-export const HttpFlavorValues = {
-  /** HTTP 1.0. */
-  HTTP_1_0: '1.0',
-  /** HTTP 1.1. */
-  HTTP_1_1: '1.1',
-  /** HTTP 2. */
-  HTTP_2_0: '2.0',
-  /** SPDY protocol. */
-  SPDY: 'SPDY',
-  /** QUIC protocol. */
-  QUIC: 'QUIC',
+export const GraphqlOperationTypeValues = {
+  /** GraphQL query. */
+  QUERY: 'query',
+  /** GraphQL mutation. */
+  MUTATION: 'mutation',
+  /** GraphQL subscription. */
+  SUBSCRIPTION: 'subscription',
 } as const;
-export type HttpFlavorValues =
-  (typeof HttpFlavorValues)[keyof typeof HttpFlavorValues];
-
-export const MessagingDestinationKindValues = {
-  /** A message sent to a queue. */
-  QUEUE: 'queue',
-  /** A message sent to a topic. */
-  TOPIC: 'topic',
-} as const;
-export type MessagingDestinationKindValues =
-  (typeof MessagingDestinationKindValues)[keyof typeof MessagingDestinationKindValues];
+export type GraphqlOperationTypeValues =
+  (typeof GraphqlOperationTypeValues)[keyof typeof GraphqlOperationTypeValues];
 
 export const MessagingOperationValues = {
+  /** publish. */
+  PUBLISH: 'publish',
   /** receive. */
   RECEIVE: 'receive',
   /** process. */
@@ -1008,6 +1645,43 @@ export const MessagingOperationValues = {
 } as const;
 export type MessagingOperationValues =
   (typeof MessagingOperationValues)[keyof typeof MessagingOperationValues];
+
+export const MessagingRocketmqMessageTypeValues = {
+  /** Normal message. */
+  NORMAL: 'normal',
+  /** FIFO message. */
+  FIFO: 'fifo',
+  /** Delay message. */
+  DELAY: 'delay',
+  /** Transaction message. */
+  TRANSACTION: 'transaction',
+} as const;
+export type MessagingRocketmqMessageTypeValues =
+  (typeof MessagingRocketmqMessageTypeValues)[keyof typeof MessagingRocketmqMessageTypeValues];
+
+export const MessagingRocketmqConsumptionModelValues = {
+  /** Clustering consumption model. */
+  CLUSTERING: 'clustering',
+  /** Broadcasting consumption model. */
+  BROADCASTING: 'broadcasting',
+} as const;
+export type MessagingRocketmqConsumptionModelValues =
+  (typeof MessagingRocketmqConsumptionModelValues)[keyof typeof MessagingRocketmqConsumptionModelValues];
+
+export const RpcSystemValues = {
+  /** gRPC. */
+  GRPC: 'grpc',
+  /** Java RMI. */
+  JAVA_RMI: 'java_rmi',
+  /** .NET WCF. */
+  DOTNET_WCF: 'dotnet_wcf',
+  /** Apache Dubbo. */
+  APACHE_DUBBO: 'apache_dubbo',
+  /** Connect RPC. */
+  CONNECT_RPC: 'connect_rpc',
+} as const;
+export type RpcSystemValues =
+  (typeof RpcSystemValues)[keyof typeof RpcSystemValues];
 
 export const RpcGrpcStatusCodeValues = {
   /** OK. */
@@ -1056,3 +1730,40 @@ export const MessageTypeValues = {
 } as const;
 export type MessageTypeValues =
   (typeof MessageTypeValues)[keyof typeof MessageTypeValues];
+
+export const RpcConnectRpcErrorCodeValues = {
+  /** cancelled. */
+  CANCELLED: 'cancelled',
+  /** unknown. */
+  UNKNOWN: 'unknown',
+  /** invalid_argument. */
+  INVALID_ARGUMENT: 'invalid_argument',
+  /** deadline_exceeded. */
+  DEADLINE_EXCEEDED: 'deadline_exceeded',
+  /** not_found. */
+  NOT_FOUND: 'not_found',
+  /** already_exists. */
+  ALREADY_EXISTS: 'already_exists',
+  /** permission_denied. */
+  PERMISSION_DENIED: 'permission_denied',
+  /** resource_exhausted. */
+  RESOURCE_EXHAUSTED: 'resource_exhausted',
+  /** failed_precondition. */
+  FAILED_PRECONDITION: 'failed_precondition',
+  /** aborted. */
+  ABORTED: 'aborted',
+  /** out_of_range. */
+  OUT_OF_RANGE: 'out_of_range',
+  /** unimplemented. */
+  UNIMPLEMENTED: 'unimplemented',
+  /** internal. */
+  INTERNAL: 'internal',
+  /** unavailable. */
+  UNAVAILABLE: 'unavailable',
+  /** data_loss. */
+  DATA_LOSS: 'data_loss',
+  /** unauthenticated. */
+  UNAUTHENTICATED: 'unauthenticated',
+} as const;
+export type RpcConnectRpcErrorCodeValues =
+  (typeof RpcConnectRpcErrorCodeValues)[keyof typeof RpcConnectRpcErrorCodeValues];
