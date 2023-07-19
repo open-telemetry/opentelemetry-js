@@ -101,7 +101,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
    * for all other cases _flush should be used
    * */
   private _flushAll(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       const promises = [];
       const batchCount = Math.ceil(
         this._finishedLogRecords.length / this._maxExportBatchSize
@@ -113,7 +113,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
         .then(() => {
           resolve();
         })
-        .catch(reject);
+        .catch(e => globalErrorHandler(e));
     });
   }
 

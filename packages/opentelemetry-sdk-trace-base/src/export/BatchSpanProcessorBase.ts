@@ -145,7 +145,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
    * for all other cases _flush should be used
    * */
   private _flushAll(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       const promises = [];
       // calculate number of batches
       const count = Math.ceil(
@@ -154,11 +154,12 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
       for (let i = 0, j = count; i < j; i++) {
         promises.push(this._flushOneBatch());
       }
+
       Promise.all(promises)
         .then(() => {
           resolve();
         })
-        .catch(reject);
+        .catch(e => globalErrorHandler(e));
     });
   }
 
