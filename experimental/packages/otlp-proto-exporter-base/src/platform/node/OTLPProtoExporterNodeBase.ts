@@ -22,6 +22,7 @@ import {
   OTLPExporterError,
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
+import { send } from './util';
 
 type SendFn = <ExportItem, ServiceRequest>(
   collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,
@@ -74,8 +75,6 @@ export abstract class OTLPProtoExporterNodeBase<
       // defer to next tick and lazy load to avoid loading protobufjs too early
       // and making this impossible to be instrumented
       setImmediate(() => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { send } = require('./util');
         this._send = send;
         this._sendPromise(objects, onSuccess, onError);
       });
