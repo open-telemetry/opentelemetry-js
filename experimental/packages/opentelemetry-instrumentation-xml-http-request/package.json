@@ -91,8 +91,7 @@
     "@opentelemetry/core": "1.15.0",
     "@opentelemetry/instrumentation": "0.41.0",
     "@opentelemetry/sdk-trace-web": "1.15.0",
-    "@opentelemetry/semantic-conventions": "1.15.0",
-    "tslib": "^2.3.1"
+    "@opentelemetry/semantic-conventions": "1.15.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request",
   "sideEffects": false

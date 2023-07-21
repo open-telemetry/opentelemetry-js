@@ -51,8 +51,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.15.0",
-    "tslib": "^2.3.1"
+    "@opentelemetry/core": "1.15.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.5.0"
