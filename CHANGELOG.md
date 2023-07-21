@@ -13,12 +13,16 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
-* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
-  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
-
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.15.1
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
 
 ## 1.15.0
 
