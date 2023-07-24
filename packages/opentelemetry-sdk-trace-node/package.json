@@ -70,8 +70,7 @@
     "@opentelemetry/propagator-b3": "1.15.0",
     "@opentelemetry/propagator-jaeger": "1.15.0",
     "@opentelemetry/sdk-trace-base": "1.15.0",
-    "semver": "^7.5.1",
-    "tslib": "^2.3.1"
+    "semver": "^7.5.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node",
   "sideEffects": false

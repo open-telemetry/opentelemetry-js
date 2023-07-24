@@ -100,7 +100,6 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.15.0",
-    "@opentelemetry/resources": "1.15.0",
-    "tslib": "^2.3.1"
+    "@opentelemetry/resources": "1.15.0"
   }
 }
