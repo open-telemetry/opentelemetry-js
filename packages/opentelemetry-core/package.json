@@ -91,8 +91,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.5.0"
   },
   "dependencies": {
-    "@opentelemetry/semantic-conventions": "1.15.0",
-    "tslib": "^2.3.1"
+    "@opentelemetry/semantic-conventions": "1.15.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core",
   "sideEffects": false
