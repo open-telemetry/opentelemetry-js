@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "1.15.0",
+  "version": "1.15.1",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -61,9 +61,6 @@
     "sinon": "15.1.2",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
-  },
-  "dependencies": {
-    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-semantic-conventions",
   "sideEffects": false
