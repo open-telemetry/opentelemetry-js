@@ -4,6 +4,62 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
+### :books: (Refine Doc)
+
+### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.41.1
+
+### :books: (Refine Doc)
+
+* docs(sdk-metrics): add example of exponential histogram metric [#3855](https://github.com/open-telemetry/opentelemetry-js/pull/3855) @JamieDanielson
+
+### :rocket: (Enhancement)
+
+* feat(sdk-node): logs support added [#3969](https://github.com/open-telemetry/opentelemetry-js/pull/3969) @psk001
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
+
+## 0.41.0
+
+### :boom: Breaking Change
+
+* chore(instrumentation-grpc): Drop support for package `grpc`. [#3807](https://github.com/open-telemetry/opentelemetry-js/pull/3807) @llc1123
+
+### :rocket: (Enhancement)
+
+* feat(otlp-grpc-exporters): add support for UDS endpoints. [#3853](https://github.com/open-telemetry/opentelemetry-js/pull/3853) @llc1123
+* feat(otlp-exporters): bump otlp proto to 0.20.0 [#3932](https://github.com/open-telemetry/opentelemetry-js/pull/3932) @pichlermarc
+* feat(exporter-metrics-otlp-*): add LowMemory metrics temporality preference [#3915](https://github.com/open-telemetry/opentelemetry-js/pull/3915) @martinkuba
+  * Adds support for [LowMemory temporality preference](https://github.com/open-telemetry/opentelemetry-specification/blob/f09624bb97e9be3be259733b93be507df18927bd/specification/metrics/sdk_exporters/otlp.md#additional-configuration)
+  * Adds support for `lowmemory` in `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`
+
+### :bug: (Bug Fix)
+
+* fix(exporter-logs-otlp-http): set useHex to true [#3875](https://github.com/open-telemetry/opentelemetry-js/pull/3875) @Nico385412
+* fix(otlp-proto-exporter-base): add missing type import [#3937](https://github.com/open-telemetry/opentelemetry-js/pull/3937) @pichlermarc
+* fix(example-opencensus-shim): avoid OpenCensus auto instrumentations [#3951](https://github.com/open-telemetry/opentelemetry-js/pull/3951) @llc1123
+* fix(http-intrumentation): prevent request socket null from throwing uncaught error [#3858](https://github.com/open-telemetry/opentelemetry-js/pull/3858) @aodysseos
+
+### :house: (Internal)
+
+* chore(instrumentation-grpc): Cleanup remnants of grpc-native support. [#3886](https://github.com/open-telemetry/opentelemetry-js/pull/3886) @llc1123
+
+## 0.40.0
+
 ### :boom: Breaking Change
 
 * fix(exporter-logs-otlp-grpc): change OTLPLogsExporter to OTLPLogExporter [#3819](https://github.com/open-telemetry/opentelemetry-js/pull/3819) @fuaiyi
@@ -13,20 +69,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(api-logs): support map in log attributes. [#3821](https://github.com/open-telemetry/opentelemetry-js/pull/3821) @Abinet18
 * feat(instrumentation): add ESM support for instrumentation. [#3698](https://github.com/open-telemetry/opentelemetry-js/pull/3698) @JamieDanielson, @pkanal, @vmarchaud, @lizthegrey, @bengl
 * feat(exporter-logs-otlp-http): otlp-http exporter for logs. [#3764](https://github.com/open-telemetry/opentelemetry-js/pull/3764/) @fuaiyi
 * feat(otlp-trace-exporters): Add User-Agent header to OTLP trace exporters. [#3790](https://github.com/open-telemetry/opentelemetry-js/pull/3790) @JamieDanielson
 * feat(otlp-metric-exporters): Add User-Agent header to OTLP metric exporters. [#3806](https://github.com/open-telemetry/opentelemetry-js/pull/3806) @JamieDanielson
 * feat(opencensus-shim): add OpenCensus trace shim [#3809](https://github.com/open-telemetry/opentelemetry-js/pull/3809) @aabmass
+* feat(exporter-logs-otlp-proto): protobuf exporter for logs. [#3779](https://github.com/open-telemetry/opentelemetry-js/pull/3779) @Abinet18
 
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): use resource interface instead of concrete class [#3803](https://github.com/open-telemetry/opentelemetry-js/pull/3803) @blumamir
 * fix(sdk-logs): remove includeTraceContext configuration and use LogRecord context when available  [#3817](https://github.com/open-telemetry/opentelemetry-js/pull/3817) @hectorhdzg
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 0.39.1
 

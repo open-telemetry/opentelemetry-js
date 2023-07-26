@@ -5,8 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides exporter for node to be used with OTLP (`http/protobuf`) compatible receivers.
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.32 <=0.53`.
+This module provides a metrics-exporter for OTLP (http/protobuf) using protocol version `v0.20.0`.
 
 ## Installation
 
@@ -51,7 +50,7 @@ In addition to settings passed to the constructor, the exporter also supports co
 |---------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | OTEL_EXPORTER_OTLP_ENDPOINT                       | The endpoint to send metrics to. This will also be used for the traces exporter if `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is not configured. By default `http://localhost:4318` will be used. `/v1/metrics` will be automatically appended to configured values.                                                                                                                                                             |
 | OTEL_EXPORTER_OTLP_METRICS_ENDPOINT               | The endpoint to send metrics to. By default `https://localhost:4318/v1/metrics` will be used. `v1/metrics` will not be appended automatically and has to be added explicitly.                                                                                                                                                                                                                                              |
-| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE | The exporters aggregation temporality preference. Valid values are `cumulative`, and `delta`. `cumulative` selects cumulative temporality for all instrument kinds. `delta` selects delta aggregation temporality for Counter, Asynchronous Counter and Histogram instrument kinds, and selects cumulative aggregation for UpDownCounter and Asynchronous UpDownCounter instrument kinds. By default `cumulative` is used. |
+| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE | The exporters aggregation temporality preference. Valid values are `cumulative`, `delta` and `lowmemory`. `cumulative` selects cumulative temporality for all instrument kinds. `delta` selects delta aggregation temporality for Counter, Asynchronous Counter and Histogram instrument kinds, and selects cumulative aggregation for UpDownCounter and Asynchronous UpDownCounter instrument kinds. `lowmemory` selects delta aggregation temporality for Counter and Histogram instrument kinds, and selects cumulative aggregation for UpDownCounter, Asynchronous Counter and Asynchronous UpDownCounter instrument kinds. By default `cumulative` is used. |
 
 > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take
 > precedence over non-per-signal environment variables.
