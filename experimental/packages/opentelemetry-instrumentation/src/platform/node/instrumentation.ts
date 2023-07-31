@@ -25,7 +25,7 @@ import {
   Hooked,
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
-import * as ImportInTheMiddle from 'import-in-the-middle';
+import ImportInTheMiddle from 'import-in-the-middle';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
