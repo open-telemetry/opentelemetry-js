@@ -14,6 +14,7 @@ All notable changes to experimental packages in this project will be documented 
   * The following methods are now deprecated and will be removed in a later release
     * `NodeSDK.configureTracerProvider()`, please use constructor options instead
     * `NodeSDK.configureMeterProvider()`, please use constructor options instead
+    * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
     * `NodeSDK.addResource()`, please use constructor options instead
     * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
 

@@ -447,6 +447,28 @@ describe('Node SDK', () => {
     );
   });
 
+  it('should throw error when calling configureLoggerProvider when logRecordProcessor is already configured', () => {
+    const logRecordExporter = new InMemoryLogRecordExporter();
+    const logRecordProcessor = new SimpleLogRecordProcessor(logRecordExporter);
+    const sdk = new NodeSDK({
+      logRecordProcessor: logRecordProcessor,
+      autoDetectResources: false,
+    });
+
+    assert.throws(
+      () => {
+        sdk.configureLoggerProvider({
+          logRecordProcessor: logRecordProcessor,
+        });
+      },
+      (error: Error) => {
+        return error.message.includes(
+          'LogRecordProcessor passed but LogRecordProcessor has already been configured.'
+        );
+      }
+    );
+  });
+
   describe('detectResources', async () => {
     beforeEach(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
