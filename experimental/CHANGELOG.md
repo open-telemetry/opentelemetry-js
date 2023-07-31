@@ -4,17 +4,34 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
+### :books: (Refine Doc)
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
-* fix(exporter-logs-otlp-http): add @opentelemetry/api as peer/dev dependency, add @opentelemetry/api-logs depenency
+* fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as depenency
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.41.1
+
+### :books: (Refine Doc)
+
+* docs(sdk-metrics): add example of exponential histogram metric [#3855](https://github.com/open-telemetry/opentelemetry-js/pull/3855) @JamieDanielson
+
+### :rocket: (Enhancement)
+
+* feat(sdk-node): logs support added [#3969](https://github.com/open-telemetry/opentelemetry-js/pull/3969) @psk001
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
 
 ## 0.41.0
 

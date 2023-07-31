@@ -59,6 +59,12 @@ import {
   Resource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { logs } from '@opentelemetry/api-logs';
+import {
+  SimpleLogRecordProcessor,
+  InMemoryLogRecordExporter,
+  LoggerProvider,
+} from '@opentelemetry/sdk-logs';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -112,6 +118,7 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.ok(!(logs.getLoggerProvider() instanceof LoggerProvider));
       delete env.OTEL_TRACES_EXPORTER;
     });
 
@@ -230,6 +237,40 @@ describe('Node SDK', () => {
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
+      await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should register a logger provider if a log record processor is provided', async () => {
+      env.OTEL_TRACES_EXPORTER = 'none';
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const logRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
+      const sdk = new NodeSDK({
+        logRecordProcessor: logRecordProcessor,
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.strictEqual(
+        context['_getContextManager'](),
+        ctxManager,
+        'context manager should not change'
+      );
+      assert.strictEqual(
+        propagation['_getGlobalPropagator'](),
+        propagator,
+        'propagator should not change'
+      );
+      assert.strictEqual(
+        (trace.getTracerProvider() as ProxyTracerProvider).getDelegate(),
+        delegate,
+        'tracer provider should not have changed'
+      );
+
+      assert.ok(logs.getLoggerProvider() instanceof LoggerProvider);
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
     });
@@ -401,6 +442,28 @@ describe('Node SDK', () => {
       (error: Error) => {
         return error.message.includes(
           'MetricReader passed but MetricReader has already been configured.'
+        );
+      }
+    );
+  });
+
+  it('should throw error when calling configureLoggerProvider when logRecordProcessor is already configured', () => {
+    const logRecordExporter = new InMemoryLogRecordExporter();
+    const logRecordProcessor = new SimpleLogRecordProcessor(logRecordExporter);
+    const sdk = new NodeSDK({
+      logRecordProcessor: logRecordProcessor,
+      autoDetectResources: false,
+    });
+
+    assert.throws(
+      () => {
+        sdk.configureLoggerProvider({
+          logRecordProcessor: logRecordProcessor,
+        });
+      },
+      (error: Error) => {
+        return error.message.includes(
+          'LogRecordProcessor passed but LogRecordProcessor has already been configured.'
         );
       }
     );
