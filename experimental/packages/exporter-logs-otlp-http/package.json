@@ -72,7 +72,7 @@
   "sideEffects": false,
   "devDependencies": {
     "@babel/core": "7.22.9",
-    "@opentelemetry/api-logs": "0.41.1",
+    "@opentelemetry/api": "1.4.1",
     "@opentelemetry/resources": "1.15.1",
     "@types/mocha": "10.0.1",
     "@types/node": "18.6.5",
