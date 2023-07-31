@@ -6,8 +6,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
-* docs(sdk-metrics): add example of exponential histogram metric [#3855](https://github.com/open-telemetry/opentelemetry-js/pull/3855) @JamieDanielson
-
 ### :boom: Breaking Change
 
 * chore(sdk-node): deprecate methods in favor of constructor options [#3996](https://github.com/open-telemetry/opentelemetry-js/pull/3996) @pichlermarc
@@ -20,13 +18,28 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-node): logs support added [#3969](https://github.com/open-telemetry/opentelemetry-js/pull/3969) @psk001
+### :bug: (Bug Fix)
 
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.41.1
+
+### :books: (Refine Doc)
+
+* docs(sdk-metrics): add example of exponential histogram metric [#3855](https://github.com/open-telemetry/opentelemetry-js/pull/3855) @JamieDanielson
+
+### :rocket: (Enhancement)
+
+* feat(sdk-node): logs support added [#3969](https://github.com/open-telemetry/opentelemetry-js/pull/3969) @psk001
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
 
 ## 0.41.0
 
