@@ -26,6 +26,7 @@ import type {
   loadPackageDefinition,
   GrpcObject,
 } from '@grpc/grpc-js';
+
 import type * as grpcJs from '@grpc/grpc-js';
 
 import type {
@@ -36,6 +37,7 @@ import type {
   MakeClientConstructorFunction,
   PackageDefinition,
   GrpcClientFunc,
+  ClientRequestFunction,
 } from './types';
 import type { GrpcInstrumentationConfig } from '../types';
 import type { metadataCaptureType } from '../internal-types';
@@ -47,6 +49,7 @@ import {
   SpanOptions,
   SpanKind,
   trace,
+  Span,
 } from '@opentelemetry/api';
 import {
   InstrumentationNodeModuleDefinition,
@@ -63,9 +66,19 @@ import {
 import {
   getMethodsToWrap,
   makeGrpcClientRemoteCall,
-  getMetadata,
+  extractMetadataOrSpliceDefault,
+  setSpanContext,
+  patchedCallback,
+  patchResponseStreamEvents,
+  patchResponseMetadataEvent,
+  extractMetadataOrSplice,
 } from './clientUtils';
-import { _extractMethodAndService, metadataCapture, URI_REGEX } from '../utils';
+import {
+  _extractMethodAndService,
+  metadataCapture,
+  URI_REGEX,
+  _methodIsIgnored,
+} from '../utils';
 import { AttributeValues } from '../enums/AttributeValues';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
@@ -121,6 +134,41 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
             'loadPackageDefinition',
             this._patchLoadPackageDefinition(moduleExports)
           );
+          if (isWrapped(moduleExports.Client.prototype)) {
+            this._unwrap(moduleExports.Client.prototype, 'makeUnaryRequest');
+            this._unwrap(
+              moduleExports.Client.prototype,
+              'makeClientStreamRequest'
+            );
+            this._unwrap(
+              moduleExports.Client.prototype,
+              'makeServerStreamRequest'
+            );
+            this._unwrap(
+              moduleExports.Client.prototype,
+              'makeBidiStreamRequest'
+            );
+          }
+          this._wrap(
+            moduleExports.Client.prototype,
+            'makeUnaryRequest',
+            this._patchClientRequestMethod(moduleExports, false) as any
+          );
+          this._wrap(
+            moduleExports.Client.prototype,
+            'makeClientStreamRequest',
+            this._patchClientRequestMethod(moduleExports, false) as any
+          );
+          this._wrap(
+            moduleExports.Client.prototype,
+            'makeServerStreamRequest',
+            this._patchClientRequestMethod(moduleExports, true) as any
+          );
+          this._wrap(
+            moduleExports.Client.prototype,
+            'makeBidiStreamRequest',
+            this._patchClientRequestMethod(moduleExports, true) as any
+          );
           return moduleExports;
         },
         (moduleExports, version) => {
@@ -131,6 +179,16 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._unwrap(moduleExports, 'makeClientConstructor');
           this._unwrap(moduleExports, 'makeGenericClientConstructor');
           this._unwrap(moduleExports, 'loadPackageDefinition');
+          this._unwrap(moduleExports.Client.prototype, 'makeUnaryRequest');
+          this._unwrap(
+            moduleExports.Client.prototype,
+            'makeClientStreamRequest'
+          );
+          this._unwrap(
+            moduleExports.Client.prototype,
+            'makeServerStreamRequest'
+          );
+          this._unwrap(moduleExports.Client.prototype, 'makeBidiStreamRequest');
         }
       ),
     ];
@@ -258,6 +316,84 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   }
 
   /**
+   * Patch for grpc.Client.make*Request(...) functions.
+   * Provides auto-instrumentation for client requests when using a Client without
+   * makeGenericClientConstructor/makeClientConstructor
+   */
+  private _patchClientRequestMethod<ReturnType extends EventEmitter>(
+    grpcLib: typeof grpcJs,
+    hasResponseStream: boolean
+  ): (
+    original: ClientRequestFunction<ReturnType>
+  ) => ClientRequestFunction<ReturnType> {
+    const instrumentation = this;
+    return (original: ClientRequestFunction<ReturnType>) => {
+      instrumentation._diag.debug(
+        'patched makeClientStreamRequest on grpc client'
+      );
+
+      return function makeClientStreamRequest(this: grpcJs.Client) {
+        // method must always be at first position
+        const method = arguments[0];
+        const { name, service, methodAttributeValue } =
+          instrumentation._splitMethodString(method);
+
+        // Do not attempt to trace/inject context if method is ignored
+        if (
+          method != null &&
+          _methodIsIgnored(
+            methodAttributeValue,
+            instrumentation.getConfig().ignoreGrpcMethods
+          )
+        ) {
+          return original.apply(this, [...arguments]);
+        }
+
+        const modifiedArgs = [...arguments];
+        const metadata = extractMetadataOrSplice(grpcLib, modifiedArgs, 4);
+
+        const span = instrumentation.createClientSpan(
+          name,
+          methodAttributeValue,
+          service,
+          metadata
+        );
+        instrumentation.extractNetMetadata(this, span);
+
+        // Callback is only present when there is no responseStream
+        if (!hasResponseStream) {
+          // Replace the callback with the patched one if it is there.
+          // If the callback arg is not a function on the last position then the client will throw
+          // and never call the callback -> so there's nothing to patch
+          const lastArgIndex = modifiedArgs.length - 1;
+          const callback = modifiedArgs[lastArgIndex];
+          if (typeof callback === 'function') {
+            modifiedArgs[lastArgIndex] = patchedCallback(span, callback);
+          }
+        }
+
+        return context.with(trace.setSpan(context.active(), span), () => {
+          setSpanContext(metadata);
+
+          const call = original.apply(this, [...modifiedArgs]);
+          patchResponseMetadataEvent(
+            span,
+            call,
+            instrumentation._metadataCapture
+          );
+
+          // Subscribe to response stream events when there's a response stream.
+          if (hasResponseStream) {
+            patchResponseStreamEvents(span, call);
+          }
+
+          return call;
+        });
+      };
+    };
+  }
+
+  /**
    * Entry point for applying client patches to `grpc.makeClientConstructor(...)` equivalents
    * @param this GrpcJsPlugin
    */
@@ -320,10 +456,10 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
       function clientMethodTrace(this: Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = [...arguments];
-        const metadata = getMetadata.call(
+        const metadata = extractMetadataOrSpliceDefault.call(
           instrumentation,
-          original,
           grpcClient,
+          original,
           args
         );
         const { service, method } = _extractMethodAndService(original.path);
@@ -335,18 +471,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
             [SemanticAttributes.RPC_METHOD]: method,
             [SemanticAttributes.RPC_SERVICE]: service,
           });
-        // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
-        const parsedUri = URI_REGEX.exec(this.getChannel().getTarget());
-        if (parsedUri != null && parsedUri.groups != null) {
-          span.setAttribute(
-            SemanticAttributes.NET_PEER_NAME,
-            parsedUri.groups['name']
-          );
-          span.setAttribute(
-            SemanticAttributes.NET_PEER_PORT,
-            parseInt(parsedUri.groups['port'])
-          );
-        }
+        instrumentation.extractNetMetadata(this, span);
 
         instrumentation._metadataCapture.client.captureRequestMetadata(
           span,
@@ -366,6 +491,51 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
       Object.assign(clientMethodTrace, original);
       return clientMethodTrace;
     };
+  }
+
+  private _splitMethodString(method: string) {
+    if (method == null) {
+      return { name: '', service: '', methodAttributeValue: '' };
+    }
+    const name = `grpc.${method.replace('/', '')}`;
+    const { service, method: methodAttributeValue } =
+      _extractMethodAndService(method);
+    return { name, service, methodAttributeValue };
+  }
+
+  private createClientSpan(
+    name: string,
+    methodAttributeValue: string,
+    service: string,
+    metadata?: grpcJs.Metadata
+  ) {
+    const span = this.tracer
+      .startSpan(name, { kind: SpanKind.CLIENT })
+      .setAttributes({
+        [SemanticAttributes.RPC_SYSTEM]: 'grpc',
+        [SemanticAttributes.RPC_METHOD]: methodAttributeValue,
+        [SemanticAttributes.RPC_SERVICE]: service,
+      });
+
+    if (metadata != null) {
+      this._metadataCapture.client.captureRequestMetadata(span, metadata);
+    }
+    return span;
+  }
+
+  private extractNetMetadata(client: grpcJs.Client, span: Span) {
+    // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
+    const parsedUri = URI_REGEX.exec(client.getChannel().getTarget());
+    if (parsedUri != null && parsedUri.groups != null) {
+      span.setAttribute(
+        SemanticAttributes.NET_PEER_NAME,
+        parsedUri.groups['name']
+      );
+      span.setAttribute(
+        SemanticAttributes.NET_PEER_PORT,
+        parseInt(parsedUri.groups['port'])
+      );
+    }
   }
 
   /**
