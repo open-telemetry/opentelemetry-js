@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "npm run protos:generate && nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -18,7 +18,8 @@
     "watch": "tsc --build --watch",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "protos:generate": "cd test/fixtures && buf generate"
   },
   "keywords": [
     "opentelemetry",
@@ -45,6 +46,10 @@
     "access": "public"
   },
   "devDependencies": {
+    "@bufbuild/buf": "1.21.0-1",
+    "@protobuf-ts/grpc-transport": "2.9.0",
+    "@protobuf-ts/runtime-rpc": "2.9.0",
+    "@protobuf-ts/runtime": "2.9.0",
     "@grpc/grpc-js": "^1.7.1",
     "@grpc/proto-loader": "^0.7.3",
     "@opentelemetry/api": "1.4.1",
