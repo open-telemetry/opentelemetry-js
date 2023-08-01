@@ -18,6 +18,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(opencensus-shim): implement OpenCensus metric producer [#4066](https://github.com/open-telemetry/opentelemetry-js/pull/4066)
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
