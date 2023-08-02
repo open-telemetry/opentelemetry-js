@@ -12,11 +12,15 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-### :bug: (Bug Fix)
-
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.42.2
+
+### :bug: (Bug Fix)
+
+* fix(opentelemetry-exporter-logs-otlp-http): Add otel-api as dev dep for tests as they are directly importing the api and which is breaking the web-sandbox tests which is using rollup
 
 ## 0.41.1
 

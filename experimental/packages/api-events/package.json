@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-events",
-  "version": "0.41.1",
+  "version": "0.41.2",
   "description": "Public events API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
