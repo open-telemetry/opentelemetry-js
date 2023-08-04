@@ -22,7 +22,7 @@ import { getContextAttributes } from './utils';
  * Implementation of the {@link SpanProcessor} that simply forwards all
  * received events to a list of {@link SpanProcessor}s.
  */
-export class ContextAttributesProcessor implements SpanProcessor {
+export class ContextAttributesSpanProcessor implements SpanProcessor {
   onStart(span: Span, context: Context): void {
     const contextAttributes = getContextAttributes(context);
     if (contextAttributes) {

@@ -22,7 +22,9 @@ import { getGlobalAttributes } from './utils';
  * Implementation of the {@link SpanProcessor} that simply forwards all
  * received events to a list of {@link SpanProcessor}s.
  */
-export class ContextAttributesProcessor implements SpanProcessor {
+export class GlobalAttributesSpanProcessor implements SpanProcessor {
+  constructor() {}
+
   onStart(span: Span, context: Context): void {
     const attributes = getGlobalAttributes();
     if (attributes) {

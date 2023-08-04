@@ -22,7 +22,7 @@ import { getContextAttributes } from './utils';
  * Implementation of the {@link LogRecordProcessor} that simply forwards all
  * received events to a list of {@link LogRecordProcessor}s.
  */
-export class GlobalAttributesLogRecordProcessor implements LogRecordProcessor {
+export class ContextAttributesLogRecordProcessor implements LogRecordProcessor {
   public async forceFlush(): Promise<void> {
     return Promise.resolve();
   }
