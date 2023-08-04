@@ -109,7 +109,6 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-
 | Platform Version    | Supported                                     |
 |---------------------|-----------------------------------------------|
 | Node.JS `v18`       | ✅                                             |
