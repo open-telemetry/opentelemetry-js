@@ -14,6 +14,7 @@ const common = {
     fetchXhrB3: 'examples/fetchXhrB3/index.js',
     "fetch-proto": "examples/fetch-proto/index.js",
     zipkin: 'examples/zipkin/index.js',
+    'shared-attributes': 'examples/shared-attributes/index.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
