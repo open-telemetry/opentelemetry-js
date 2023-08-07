@@ -121,7 +121,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 Only Node.js Active or Maintenance LTS versions are supported.
 Previous versions of node *may* work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
-Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the
+Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the
 `perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
