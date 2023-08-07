@@ -181,9 +181,9 @@ describe('W3CBaggagePropagator', () => {
 
   describe('.extract()', () => {
     const baggageValue =
-      'key1=d4cda95b,key3=c88815a7, keyn   = valn, keym =valm';
+      'key1=d4cda95b==,key3=c88815a7, keyn   = valn, keym =valm';
     const expected = propagation.createBaggage({
-      key1: { value: 'd4cda95b' },
+      key1: { value: 'd4cda95b==' },
       key3: { value: 'c88815a7' },
       keyn: { value: 'valn' },
       keym: { value: 'valm' },
@@ -217,7 +217,7 @@ describe('W3CBaggagePropagator', () => {
 
     it('should extract context of a sampled span when the headerValue comes as array with multiple items', () => {
       carrier[BAGGAGE_HEADER] = [
-        'key1=d4cda95b,key3=c88815a7, keyn   = valn',
+        'key1=d4cda95b==,key3=c88815a7, keyn   = valn',
         'keym =valm',
       ];
       const extractedBaggage = propagation.getBaggage(
@@ -282,10 +282,6 @@ describe('W3CBaggagePropagator', () => {
         header: '289371298nekjh2939299283jbk2b',
         baggage: undefined,
       },
-      invalidDoubleEqual: {
-        header: 'key1==value;key2=value2',
-        baggage: undefined,
-      },
       invalidWrongKeyValueFormat: {
         header: 'key1:value;key2=value2',
         baggage: undefined,
@@ -295,7 +291,7 @@ describe('W3CBaggagePropagator', () => {
         baggage: undefined,
       },
       mixInvalidAndValidKeys: {
-        header: 'key1==value,key2=value2',
+        header: 'key1:value,key2=value2',
         baggage: propagation.createBaggage({
           key2: {
             value: 'value2',
