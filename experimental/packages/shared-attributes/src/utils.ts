@@ -49,6 +49,13 @@ export function getGlobalAttributes(): Attributes {
   return globalAttributes;
 }
 
+export function setContextAttribute(context: Context, key: string, value: unknown): Context {
+  return context.setValue(CONTEXT_ATTRIBUTES_KEY, {
+    ...(context.getValue(CONTEXT_ATTRIBUTES_KEY) as Attributes || {}),
+    [key]: value,
+  });
+}
+
 export function setContextAttributes(
   context: Context,
   attributes: Attributes

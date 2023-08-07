@@ -3,17 +3,41 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Fetch Plugin Example</title>
+  <title>Shared attributes example</title>
   <base href="/">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-  Example of using Web Tracer with Fetch plugin with console exporter and collector exporter
+  <p>
+  This example shows the usage of shared attributes. There are two types of attributes - global and trace-context-based.
+  Global attributes are applied to all spans and logs, which means that spans in different traces will receive the same global attributes.
+  Examples of global attributes are session ID or the current URL.
+  </p>
+
+  <p>
+  Trace-context attributes are applied to spans and logs that belong to the same trace. An example of such attribute would be
+  an identifier of the user interaction that started the trace.
+  </p>
+
+  <p>
+  The `session.id` attribute is set at the beginning when the app initializes, and the value is included on all spans and logs.
+  </p>
+
+  <p>
+  The `page.url` attribute is set at the beginning, and can also be changed by clicking the `Change URL` button.
+  </p>
+  
+  <p>
+  Clicking the Test button will generate a single event (log record) and a trace with two spans. All these three signals will have
+  the same session.id, pageUrl and element attributes added to them.
+  </p>
+
   <script type="text/javascript" src="shared-attributes.js"></script>
   <br/>
   <button id="button1">Test</button>
+  <button id="button2">Change URL</button>
 
 </body>
 

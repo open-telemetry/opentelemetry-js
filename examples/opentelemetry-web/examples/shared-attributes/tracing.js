@@ -4,7 +4,10 @@ const { FetchInstrumentation } = require( '@opentelemetry/instrumentation-fetch'
 const { ZoneContextManager } = require( '@opentelemetry/context-zone');
 const { B3Propagator } = require( '@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
-const { GlobalAttributesSpanProcessor } = require('@opentelemetry/shared-attributes');
+const { 
+  GlobalAttributesSpanProcessor,
+  ContextAttributesSpanProcessor
+} = require('@opentelemetry/shared-attributes');
 
 const provider = new WebTracerProvider();
 
@@ -12,6 +15,7 @@ const provider = new WebTracerProvider();
 // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
 // exporter without delay
 provider.addSpanProcessor(new GlobalAttributesSpanProcessor());
+provider.addSpanProcessor(new ContextAttributesSpanProcessor());
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register({
   contextManager: new ZoneContextManager(),

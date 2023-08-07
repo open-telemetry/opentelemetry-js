@@ -4,10 +4,14 @@ const {
   SimpleLogRecordProcessor,
   ConsoleLogRecordExporter,
 } = require('@opentelemetry/sdk-logs');
-const { GlobalAttributesLogRecordProcessor } = require('@opentelemetry/shared-attributes');
+const { 
+  GlobalAttributesLogRecordProcessor,
+  ContextAttributesLogRecordProcessor
+} = require('@opentelemetry/shared-attributes');
 
 const loggerProvider = new LoggerProvider();
 loggerProvider.addLogRecordProcessor(new GlobalAttributesLogRecordProcessor());
+loggerProvider.addLogRecordProcessor(new ContextAttributesLogRecordProcessor());
 loggerProvider.addLogRecordProcessor(
   new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())
 );

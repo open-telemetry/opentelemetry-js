@@ -17,3 +17,5 @@
 export * from './utils';
 export * from './GlobalAttributesSpanProcessor';
 export * from './GlobalAttributesLogRecordProcessor';
+export * from './ContextAttributesSpanProcessor';
+export * from './ContextAttributesLogRecordProcessor';
