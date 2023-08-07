@@ -36,6 +36,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * fix(sdk-metrics): Update default Histogram's boundary to match OTEL's spec [#3893](https://github.com/open-telemetry/opentelemetry-js/pull/3893/) @chigia001
 * fix(sdk-metrics): preserve startTime for cumulative ExponentialHistograms [#3934](https://github.com/open-telemetry/opentelemetry-js/pull/3934/) @aabmass
 * fix(sdk-trace-web): add secureConnectionStart to https only [#3879](https://github.com/open-telemetry/opentelemetry-js/pull/3879) @Abinet18
+* fix(core): add baggage support for values containing an equals sign [#3975](https://github.com/open-telemetry/opentelemetry-js/pull/3975) @krosenk729
 
 ### :house: (Internal)
 
