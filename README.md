@@ -128,7 +128,7 @@ Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, becaus
 
 > [!IMPORTANT]
 > Client instrumentation for the browser is **experimental** and mostly **unspecified**. If you are interested in
-> helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig]
+> helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig].
 
 There is currently no list of officially supported browsers. OpenTelemetry is developed using standard web
 technologies and aims to work in currently supported versions of major browsers.
