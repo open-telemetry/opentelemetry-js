@@ -6,9 +6,28 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
-* docs(sdk-metrics): add example of exponential histogram metric [#3855](https://github.com/open-telemetry/opentelemetry-js/pull/3855) @JamieDanielson
-
 ### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.42.2
+
+### :bug: (Bug Fix)
+
+* fix(opentelemetry-exporter-logs-otlp-http): Add otel-api as dev dep for tests as they are directly importing the api and which is breaking the web-sandbox tests which is using rollup
+* fix(instrumentation-grpc): instrument @grpc/grpc-js Client methods [#3804](https://github.com/open-telemetry/opentelemetry-js/pull/3804) @pichlermarc
+
+## 0.41.1
+
+### :books: (Refine Doc)
+
+* docs(sdk-metrics): add example of exponential histogram metric [#3855](https://github.com/open-telemetry/opentelemetry-js/pull/3855) @JamieDanielson
 
 ### :rocket: (Enhancement)
 
@@ -16,9 +35,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
 
 ## 0.41.0
 

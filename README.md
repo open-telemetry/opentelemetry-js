@@ -37,7 +37,7 @@
 
 ## About this project
 
-This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
+This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics, and logs from applications.
 
 ## Quick Start
 
@@ -109,24 +109,29 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-| Platform Version    | Supported                                       |
-| ------------------- | ----------------------------------------------- |
-| Node.JS `v18`       | ✅                                               |
-| Node.JS `v16`       | ✅                                               |
-| Node.JS `v14`       | ✅                                               |
-| Older Node Versions | See [Node Support](#node-support)               |
-| Web Browsers        | ✅ See [Browser Support](#browser-support) below |
+| Platform Version    | Supported                                     |
+|---------------------|-----------------------------------------------|
+| Node.JS `v18`       | :heavy_check_mark:                            |
+| Node.JS `v16`       | :heavy_check_mark:                            |
+| Node.JS `v14`       | :heavy_check_mark:                            |
+| Older Node Versions | See [Node Support](#node-support)             |
+| Web Browsers        | See [Browser Support](#browser-support) below |
 
 ### Node Support
 
 Only Node.js Active or Maintenance LTS versions are supported.
 Previous versions of node *may* work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
-Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
+Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the
+`perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
 
-Automated browser tests are run in the latest version of Headless Chrome.
-There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.
+> [!IMPORTANT]
+> Client instrumentation for the browser is **experimental** and mostly **unspecified**. If you are interested in
+> helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig].
+
+There is currently no list of officially supported browsers. OpenTelemetry is developed using standard web
+technologies and aims to work in currently supported versions of major browsers.
 
 ## Package Version Compatibility
 
@@ -551,6 +556,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [up-for-grabs-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
+
+[client-instrumentation-sig]: https://docs.google.com/document/d/16Vsdh-DM72AfMg_FIt9yT9ExEWF4A_vRbQ3jRNBe09w/edit
 
 [docs]: https://open-telemetry.github.io/opentelemetry-js
 [compliance-matrix]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md

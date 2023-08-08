@@ -19,6 +19,21 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+## 1.15.2
+
+### :bug: (Bug Fix)
+
+* fix(core): stop rounding to nearest int in hrTimeTo*seconds() functions [#4014](https://github.com/open-telemetry/opentelemetry-js/pull/4014/) @aabmass
+* fix(sdk-metrics): ignore invalid metric values [#3988](https://github.com/open-telemetry/opentelemetry-js/pull/3988) @legendecas
+* fix(core): add baggage support for values containing an equals sign [#3975](https://github.com/open-telemetry/opentelemetry-js/pull/3975) @krosenk729
+
+## 1.15.1
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
+
 ## 1.15.0
 
 ### :bug: (Bug Fix)

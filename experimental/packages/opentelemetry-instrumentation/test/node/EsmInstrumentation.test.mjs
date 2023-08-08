@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
-} from '../../build/src/platform/index.js';
+} from '../../build/src/index.js';
 import * as exported from 'test-esm-module';
 
 class TestInstrumentationWrapFn extends InstrumentationBase {
