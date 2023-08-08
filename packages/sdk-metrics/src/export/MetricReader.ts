@@ -149,14 +149,15 @@ export abstract class MetricReader {
       throw new Error('MetricReader is shutdown');
     }
 
-    const collectionOptions = {
-      timeoutMillis: options?.timeoutMillis,
-    };
     const [sdkCollectionResults, ...additionalCollectionResults] =
       await Promise.all([
-        this._sdkMetricProducer.collect(collectionOptions),
+        this._sdkMetricProducer.collect({
+          timeoutMillis: options?.timeoutMillis,
+        }),
         ...this._metricProducers.map(producer =>
-          producer.collect(collectionOptions)
+          producer.collect({
+            timeoutMillis: options?.timeoutMillis,
+          })
         ),
       ]);
 
