@@ -48,7 +48,7 @@ export interface MetricReaderOptions {
   /**
    * **Note, this option is experimental**. Additional MetricProducers to use as a source of
    * aggregated metric data in addition to the SDK's metric data. The resource returned by
-   * these MetricProducers is ignore; the SDK's resource will be used instead.
+   * these MetricProducers is ignored; the SDK's resource will be used instead.
    * @experimental
    */
   metricProducers?: MetricProducer[];
