@@ -5,7 +5,8 @@ This document outlines the essential guidelines for contributing code to the Ope
 ## Dependencies
 
 This section refers to `"dependencies"` and `"devDependencies"` entries in `package.json` file.
-It's important to note that not all libraries follow the `semver` convention, and those who do, might occasionally introduce breaking changes due to human errors (like putting breaking API changes in a patch version).
+> [!IMPORTANT]
+> Not all libraries follow [Semantic Versioning](https://semver.org/). Even those who do might occasionally introduce breaking changes due to human errors. Exceptions to the guidelines in this document MAY be granted by Approvers or Maintainers to work around this.
 
 ### "DevDependencies"
 
