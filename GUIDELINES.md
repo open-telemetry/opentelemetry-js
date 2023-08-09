@@ -17,7 +17,7 @@ This section refers to `"dependencies"` and `"devDependencies"` entries in `pack
 > [!NOTE]
 > As this approach might leave our project with outdated tooling, we adopt `renovate-bot`. This automated dependency update tool proactively opens pull requests upon the release of new patch/minor/major versions. The complete configuration for renovate-bot can be found in [renovate.json](./renovate.json) file.
 
-### "Dependencies of the same monorepo"
+### @opentelemetry/* dependencies
 
 All packages from the `@opentelemetry/` namespace MUST have the same pinned version, as these dependencies are automatically updated on each release by lerna. 
 
