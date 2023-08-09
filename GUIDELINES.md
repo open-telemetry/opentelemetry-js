@@ -9,7 +9,9 @@ It's important to note that not all libraries follow the `semver` convention, an
 
 ### "DevDependencies"
 
-`"devDependencies"` SHOULD be pinned to reduce the risk of autobreaking the build. Since we do not have the option of using the `package-lock.json` file (because the libraries are distributed without it), our control over the version our users will get is limited. By using pinned versions, we prevent potential disruptions caused by using unpinned versions such as `^1.2.3`, which might inadvertently lead to version `1.2.6` with unintended breaking changes.
+`"devDependencies"` SHOULD be pinned to reduce the risk of autobreaking the build. Since we cannot use the `package-lock.json` file (because the libraries are distributed without it), control over the version our contributors will get is limited. By using pinned versions, we prevent potential disruptions caused by unpinned versions.
+
+**Example:** `^1.2.3` might inadvertently lead to version `1.2.6` which includes unintended breaking changes).
 
 As this behavior might leave our users with outdated libraries, we adopt `renovate-bot`. This automated dependency update tool proactively opens pull requests upon the release of new patch/minor/major versions. The complete configuration for renovate-bot can be found in [renovate.json](./renovate.json) file.
 
