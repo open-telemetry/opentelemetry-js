@@ -79,8 +79,13 @@ export abstract class MetricReader {
   }
 
   /**
-   * Set the {@link MetricProducer} used by this instance.
+   * Set the {@link MetricProducer} used by this instance. **This should only be called by the
+   * SDK and should be considered internal.**
    *
+   * To add additional {@link MetricProducer}s to a {@link MetricReader}, pass them to the
+   * constructor as {@link MetricReaderOptions.metricProducers}.
+   *
+   * @internal
    * @param metricProducer
    */
   setMetricProducer(metricProducer: MetricProducer) {
