@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation): allow different export types for files within a Node module [#4046](https://github.com/open-telemetry/opentelemetry-js/pull/4046) @haines
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

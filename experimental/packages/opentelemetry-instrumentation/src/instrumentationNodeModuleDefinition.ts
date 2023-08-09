@@ -22,7 +22,7 @@ import {
 export class InstrumentationNodeModuleDefinition<T>
   implements InstrumentationModuleDefinition<T>
 {
-  files: InstrumentationModuleFile<T>[];
+  files: InstrumentationModuleFile<any>[];
   constructor(
     public name: string,
     public supportedVersions: string[],
