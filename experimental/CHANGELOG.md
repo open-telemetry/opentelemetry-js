@@ -21,6 +21,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(exporter-logs-otlp-http): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
 * fix(exporter-logs-otlp-proto): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
 * fix(instrumentation-fetch): compatibility with Map types for fetch headers
+* fix(instrumentation): allow different export types for files within a Node module [#4046](https://github.com/open-telemetry/opentelemetry-js/pull/4046) @haines
 
 ### :books: (Refine Doc)
 
