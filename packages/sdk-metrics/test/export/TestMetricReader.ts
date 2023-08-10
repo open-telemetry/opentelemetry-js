@@ -31,7 +31,7 @@ export class TestMetricReader extends MetricReader {
   }
 
   getMetricCollector(): MetricCollector {
-    return this['_metricProducer'] as MetricCollector;
+    return this['_sdkMetricProducer'] as MetricCollector;
   }
 }
 
