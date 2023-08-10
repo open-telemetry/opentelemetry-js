@@ -19,7 +19,7 @@ This section refers to `"dependencies"` and `"devDependencies"` entries in `pack
 
 ### @opentelemetry/* dependencies
 
-All packages from the `@opentelemetry/` namespace MUST have the same pinned version, as these dependencies are automatically updated on each release by lerna. 
+All packages from the `@opentelemetry/` namespace MUST have the same pinned version, as these dependencies are automatically updated on each release by lerna.
 
 **Example:** all packages under `packages/` should consistently maintain the same version as should those under `experimental/packages/`.
 
