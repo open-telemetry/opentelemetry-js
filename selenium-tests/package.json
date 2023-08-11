@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/selenium-tests",
-  "version": "1.15.1",
+  "version": "1.15.2",
   "private": true,
   "description": "OpenTelemetry Selenium Tests",
   "main": "index.js",
@@ -31,16 +31,16 @@
     "access": "restricted"
   },
   "devDependencies": {
-    "@babel/core": "7.22.9",
+    "@babel/core": "7.22.10",
     "@babel/plugin-proposal-class-properties": "7.18.6",
-    "@babel/plugin-proposal-decorators": "7.22.7",
-    "@babel/plugin-transform-runtime": "7.22.9",
-    "@babel/preset-env": "7.22.9",
+    "@babel/plugin-proposal-decorators": "7.22.10",
+    "@babel/plugin-transform-runtime": "7.22.10",
+    "@babel/preset-env": "7.22.10",
     "@opentelemetry/api": "^1.0.0",
     "babel-loader": "8.3.0",
     "babel-polyfill": "6.26.0",
     "browserstack-local": "1.4.8",
-    "chromedriver": "114.0.2",
+    "chromedriver": "114.0.3",
     "dotenv": "16.0.0",
     "fast-safe-stringify": "2.1.1",
     "geckodriver": "3.0.1",
@@ -56,16 +56,16 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "1.15.1",
-    "@opentelemetry/core": "1.15.1",
-    "@opentelemetry/exporter-trace-otlp-http": "0.41.1",
-    "@opentelemetry/exporter-zipkin": "1.15.1",
-    "@opentelemetry/instrumentation": "0.41.1",
-    "@opentelemetry/instrumentation-fetch": "0.41.1",
-    "@opentelemetry/instrumentation-xml-http-request": "0.41.1",
-    "@opentelemetry/sdk-metrics": "1.15.1",
-    "@opentelemetry/sdk-trace-base": "1.15.1",
-    "@opentelemetry/sdk-trace-web": "1.15.1",
+    "@opentelemetry/context-zone-peer-dep": "1.15.2",
+    "@opentelemetry/core": "1.15.2",
+    "@opentelemetry/exporter-trace-otlp-http": "0.41.2",
+    "@opentelemetry/exporter-zipkin": "1.15.2",
+    "@opentelemetry/instrumentation": "0.41.2",
+    "@opentelemetry/instrumentation-fetch": "0.41.2",
+    "@opentelemetry/instrumentation-xml-http-request": "0.41.2",
+    "@opentelemetry/sdk-metrics": "1.15.2",
+    "@opentelemetry/sdk-trace-base": "1.15.2",
+    "@opentelemetry/sdk-trace-web": "1.15.2",
     "zone.js": "0.11.4"
   }
 }
