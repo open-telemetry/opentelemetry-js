@@ -16,7 +16,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
-## 0.42.2
+## 0.41.2
 
 ### :bug: (Bug Fix)
 
