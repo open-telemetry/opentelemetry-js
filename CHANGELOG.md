@@ -15,6 +15,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics): metric names should be case-insensitive
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

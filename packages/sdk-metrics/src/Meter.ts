@@ -25,10 +25,12 @@ import {
   ObservableUpDownCounter,
   BatchObservableCallback,
   Observable,
+  diag,
 } from '@opentelemetry/api';
 import {
   createInstrumentDescriptor,
   InstrumentType,
+  isValidName,
 } from './InstrumentDescriptor';
 import {
   CounterInstrument,
@@ -50,6 +52,7 @@ export class Meter implements IMeter {
    * Create a {@link Histogram} instrument.
    */
   createHistogram(name: string, options?: MetricOptions): Histogram {
+    this._warnIfInvalidName(name);
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.HISTOGRAM,
@@ -63,6 +66,7 @@ export class Meter implements IMeter {
    * Create a {@link Counter} instrument.
    */
   createCounter(name: string, options?: MetricOptions): Counter {
+    this._warnIfInvalidName(name);
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.COUNTER,
@@ -76,6 +80,7 @@ export class Meter implements IMeter {
    * Create a {@link UpDownCounter} instrument.
    */
   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter {
+    this._warnIfInvalidName(name);
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.UP_DOWN_COUNTER,
@@ -92,6 +97,7 @@ export class Meter implements IMeter {
     name: string,
     options?: MetricOptions
   ): ObservableGauge {
+    this._warnIfInvalidName(name);
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.OBSERVABLE_GAUGE,
@@ -113,6 +119,7 @@ export class Meter implements IMeter {
     name: string,
     options?: MetricOptions
   ): ObservableCounter {
+    this._warnIfInvalidName(name);
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.OBSERVABLE_COUNTER,
@@ -134,6 +141,7 @@ export class Meter implements IMeter {
     name: string,
     options?: MetricOptions
   ): ObservableUpDownCounter {
+    this._warnIfInvalidName(name);
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
@@ -172,5 +180,13 @@ export class Meter implements IMeter {
       callback,
       observables
     );
+  }
+
+  _warnIfInvalidName(name: string) {
+    if (!isValidName(name)) {
+      diag.warn(
+        `Invalid metric name: "${name}". The metric name should be a ASCII string with a length no greater than 63 characters.`
+      );
+    }
   }
 }

@@ -16,6 +16,7 @@
 
 import { MetricOptions, ValueType } from '@opentelemetry/api';
 import { View } from './view/View';
+import { equalsCaseInsensitive } from './utils';
 
 /**
  * Supported types of metric instruments.
@@ -71,10 +72,16 @@ export function isDescriptorCompatibleWith(
   descriptor: InstrumentDescriptor,
   otherDescriptor: InstrumentDescriptor
 ) {
+  // Names are case-insensitive strings.
   return (
-    descriptor.name === otherDescriptor.name &&
+    equalsCaseInsensitive(descriptor.name, otherDescriptor.name) &&
     descriptor.unit === otherDescriptor.unit &&
     descriptor.type === otherDescriptor.type &&
     descriptor.valueType === otherDescriptor.valueType
   );
+}
+
+const NAME_REGEXP = /^[a-z][a-z0-9_.-]{0,62}$/i;
+export function isValidName(name: string): boolean {
+  return name.match(NAME_REGEXP) != null;
 }
