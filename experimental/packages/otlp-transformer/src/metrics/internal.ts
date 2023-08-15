@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   DataPoint,
@@ -25,7 +24,7 @@ import {
   ResourceMetrics,
   ScopeMetrics,
 } from '@opentelemetry/sdk-metrics';
-import { toAttributes } from '../common/internal';
+import { hrTimeToFixed64Nanos, toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
   IExponentialHistogramDataPoint,
@@ -112,8 +111,8 @@ function toSingularDataPoint(
 ) {
   const out: INumberDataPoint = {
     attributes: toAttributes(dataPoint.attributes),
-    startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-    timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
+    startTimeUnixNano: hrTimeToFixed64Nanos(dataPoint.startTime),
+    timeUnixNano: hrTimeToFixed64Nanos(dataPoint.endTime),
   };
 
   switch (valueType) {
@@ -145,8 +144,8 @@ function toHistogramDataPoints(metricData: MetricData): IHistogramDataPoint[] {
       sum: histogram.sum,
       min: histogram.min,
       max: histogram.max,
-      startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-      timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
+      startTimeUnixNano: hrTimeToFixed64Nanos(dataPoint.startTime),
+      timeUnixNano: hrTimeToFixed64Nanos(dataPoint.endTime),
     };
   });
 }
@@ -172,8 +171,8 @@ function toExponentialHistogramDataPoints(
       },
       scale: histogram.scale,
       zeroCount: histogram.zeroCount,
-      startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-      timeUnixNano: hrTimeToNanoseconds(dataPoint.endTime),
+      startTimeUnixNano: hrTimeToFixed64Nanos(dataPoint.startTime),
+      timeUnixNano: hrTimeToFixed64Nanos(dataPoint.endTime),
     };
   });
 }

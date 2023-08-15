@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IInstrumentationScope, IKeyValue } from '../common/types';
+import { IFixed64, IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
 
 /** Properties of an ExportMetricsServiceRequest. */
@@ -134,10 +134,10 @@ export interface INumberDataPoint {
   attributes: IKeyValue[];
 
   /** NumberDataPoint startTimeUnixNano */
-  startTimeUnixNano?: number;
+  startTimeUnixNano?: IFixed64;
 
   /** NumberDataPoint timeUnixNano */
-  timeUnixNano?: number;
+  timeUnixNano?: IFixed64;
 
   /** NumberDataPoint asDouble */
   asDouble?: number | null;
@@ -158,10 +158,10 @@ export interface IHistogramDataPoint {
   attributes?: IKeyValue[];
 
   /** HistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: number;
+  startTimeUnixNano?: IFixed64;
 
   /** HistogramDataPoint timeUnixNano */
-  timeUnixNano?: number;
+  timeUnixNano?: IFixed64;
 
   /** HistogramDataPoint count */
   count?: number;
@@ -194,10 +194,10 @@ export interface IExponentialHistogramDataPoint {
   attributes?: IKeyValue[];
 
   /** ExponentialHistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: number;
+  startTimeUnixNano?: IFixed64;
 
   /** ExponentialHistogramDataPoint timeUnixNano */
-  timeUnixNano?: number;
+  timeUnixNano?: IFixed64;
 
   /** ExponentialHistogramDataPoint count */
   count?: number;
