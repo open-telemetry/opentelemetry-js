@@ -1,7 +1,6 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "esModuleInterop": true,
     "outDir": "build",
     "rootDir": "."
   },
@@ -11,7 +10,13 @@
   ],
   "references": [
     {
+      "path": "../../../api"
+    },
+    {
       "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/opentelemetry-resources"
     },
     {
       "path": "../api-logs"

@@ -11,6 +11,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-metrics): implement MetricProducer specification [#4007](https://github.com/open-telemetry/opentelemetry-js/pull/4007)
 * feat(metrics): prototype experimental advice support [#3876](https://github.com/open-telemetry/opentelemetry-js/pull/3876) @legendecas
 
 ### :bug: (Bug Fix)
@@ -18,6 +19,34 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.15.2
+
+### :bug: (Bug Fix)
+
+* fix(core): stop rounding to nearest int in hrTimeTo*seconds() functions [#4014](https://github.com/open-telemetry/opentelemetry-js/pull/4014/) @aabmass
+* fix(sdk-metrics): ignore invalid metric values [#3988](https://github.com/open-telemetry/opentelemetry-js/pull/3988) @legendecas
+* fix(core): add baggage support for values containing an equals sign [#3975](https://github.com/open-telemetry/opentelemetry-js/pull/3975) @krosenk729
+
+## 1.15.1
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
+
+## 1.15.0
+
+### :bug: (Bug Fix)
+
+* fix(opentelemetry-exporter-prometheus): Update default PrometheusExporter to not append a timestamp to match the text based exposition format [#3961](https://github.com/open-telemetry/opentelemetry-js/pull/3961) @JacksonWeber
+* fix(sdk-metrics): Update default Histogram's boundary to match OTEL's spec [#3893](https://github.com/open-telemetry/opentelemetry-js/pull/3893/) @chigia001
+* fix(sdk-metrics): preserve startTime for cumulative ExponentialHistograms [#3934](https://github.com/open-telemetry/opentelemetry-js/pull/3934/) @aabmass
+* fix(sdk-trace-web): add secureConnectionStart to https only [#3879](https://github.com/open-telemetry/opentelemetry-js/pull/3879) @Abinet18
+
+### :house: (Internal)
+
+* feat(minification): [Minification] Add noEmitHelpers, importHelpers and tslib as a dependency [#3913](https://github.com/open-telemetry/opentelemetry-js/issues/3913) @MSNev
 
 ## 1.14.0
 

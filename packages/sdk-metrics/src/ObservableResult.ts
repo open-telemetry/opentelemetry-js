@@ -40,11 +40,24 @@ export class ObservableResultImpl implements ObservableResult {
    * Observe a measurement of the value associated with the given attributes.
    */
   observe(value: number, attributes: MetricAttributes = {}): void {
-    if (this._valueType === ValueType.INT && !Number.isInteger(value)) {
+    if (typeof value !== 'number') {
+      diag.warn(
+        `non-number value provided to metric ${this._instrumentName}: ${value}`
+      );
+      return;
+    }
+    if (
+      this._valueType === ValueType.INT &&
+      !Number.isInteger(value)
+    ) {
       diag.warn(
         `INT value type cannot accept a floating-point value for ${this._instrumentName}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
+      // ignore non-finite values.
+      if (!Number.isInteger(value)) {
+        return;
+      }
     }
     this._buffer.set(attributes, value);
   }
@@ -75,6 +88,12 @@ export class BatchObservableResultImpl implements BatchObservableResult {
       map = new AttributeHashMap();
       this._buffer.set(metric, map);
     }
+    if (typeof value !== 'number') {
+      diag.warn(
+        `non-number value provided to metric ${metric._descriptor.name}: ${value}`
+      );
+      return;
+    }
     if (
       metric._descriptor.valueType === ValueType.INT &&
       !Number.isInteger(value)
@@ -83,6 +102,10 @@ export class BatchObservableResultImpl implements BatchObservableResult {
         `INT value type cannot accept a floating-point value for ${metric._descriptor.name}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
+      // ignore non-finite values.
+      if (!Number.isInteger(value)) {
+        return;
+      }
     }
     map.set(attributes, value);
   }

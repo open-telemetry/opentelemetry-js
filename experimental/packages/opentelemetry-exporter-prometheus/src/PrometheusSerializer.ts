@@ -176,7 +176,7 @@ export class PrometheusSerializer {
   private _prefix: string | undefined;
   private _appendTimestamp: boolean;
 
-  constructor(prefix?: string, appendTimestamp = true) {
+  constructor(prefix?: string, appendTimestamp = false) {
     if (prefix) {
       this._prefix = prefix + '_';
     }

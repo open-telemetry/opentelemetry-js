@@ -19,12 +19,12 @@ module.exports = {
   hostname: 'localhost',
   browsers: ['ChromeHeadless'],
   frameworks: ['mocha'],
-  coverageIstanbulReporter: {
-    reports: ['html', 'json'],
-    dir: '.nyc_output',
-    fixWebpackSourcePaths: true
+  coverageReporter: {
+    type : 'json',
+    subdir: '.',
+    dir : '.nyc_output/'
   },
-  reporters: ['spec', 'coverage-istanbul'],
+  reporters: ['spec', 'coverage'],
   files: ['test/index-webpack.ts'],
   preprocessors: {
     'test/index-webpack*.ts': ['webpack']

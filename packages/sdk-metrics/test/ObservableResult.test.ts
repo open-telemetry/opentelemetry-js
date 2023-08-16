@@ -62,7 +62,19 @@ describe('ObservableResultImpl', () => {
         ValueType.INT
       );
       observableResult.observe(1.1, {});
+      // should ignore non-finite/non-number values.
+      observableResult.observe(Infinity, {});
+      observableResult.observe(-Infinity, {});
+      observableResult.observe(NaN, {});
+
       assert.strictEqual(observableResult._buffer.get({}), 1);
+    });
+
+    it('should ignore non-number values', () => {
+      const observableResult = new ObservableResultImpl('test', ValueType.INT);
+      observableResult.observe('1' as any, {});
+
+      assert.strictEqual(observableResult._buffer.get({}), undefined);
     });
   });
 });
@@ -126,7 +138,35 @@ describe('BatchObservableResultImpl', () => {
       );
 
       observableResult.observe(observable, 1.1, {});
+      // should ignore non-finite/non-number values.
+      observableResult.observe(observable, Infinity, {});
+      observableResult.observe(observable, -Infinity, {});
+      observableResult.observe(observable, NaN, {});
       assert.strictEqual(observableResult._buffer.get(observable)?.get({}), 1);
+    });
+
+    it('should ignore invalid values', () => {
+      const observableResult = new BatchObservableResultImpl();
+      const observable = new ObservableInstrument(
+        {
+          name: 'test',
+          description: '',
+          type: InstrumentType.COUNTER,
+          unit: '',
+          valueType: ValueType.INT,
+          advice: {},
+        },
+        [],
+        new ObservableRegistry()
+      );
+
+      observableResult.observe(observable, '1' as any, {});
+      observableResult.observe(/** invalid observable */ {} as any, 1, {});
+      assert.strictEqual(
+        observableResult._buffer.get(observable)!.get({}),
+        undefined
+      );
+      assert.strictEqual(observableResult._buffer.size, 1);
     });
   });
 });

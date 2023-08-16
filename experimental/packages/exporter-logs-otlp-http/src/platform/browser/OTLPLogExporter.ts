@@ -48,7 +48,7 @@ export class OTLPLogExporter
   }
 
   convert(logRecords: ReadableLogRecord[]): IExportLogsServiceRequest {
-    return createExportLogsServiceRequest(logRecords);
+    return createExportLogsServiceRequest(logRecords, true);
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {

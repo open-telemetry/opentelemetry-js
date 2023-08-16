@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import { GrpcInstrumentationConfig } from './types';
+import type { GrpcInstrumentationConfig } from './types';
+import type { MeterProvider, TracerProvider } from '@opentelemetry/api';
+
 import { VERSION } from './version';
-import { GrpcNativeInstrumentation } from './grpc';
 import { GrpcJsInstrumentation } from './grpc-js';
-import * as api from '@opentelemetry/api';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
 
 export class GrpcInstrumentation {
-  private _grpcNativeInstrumentation: GrpcNativeInstrumentation;
   private _grpcJsInstrumentation: GrpcJsInstrumentation;
 
   public readonly instrumentationName: string =
@@ -37,16 +36,10 @@ export class GrpcInstrumentation {
       this.instrumentationVersion,
       config
     );
-    this._grpcNativeInstrumentation = new GrpcNativeInstrumentation(
-      this.instrumentationName,
-      this.instrumentationVersion,
-      config
-    );
   }
 
   public setConfig(config?: GrpcInstrumentationConfig) {
     this._grpcJsInstrumentation.setConfig(config);
-    this._grpcNativeInstrumentation.setConfig(config);
   }
 
   /**
@@ -66,29 +59,25 @@ export class GrpcInstrumentation {
 
   enable() {
     this._grpcJsInstrumentation.enable();
-    this._grpcNativeInstrumentation.enable();
   }
 
   disable() {
     this._grpcJsInstrumentation.disable();
-    this._grpcNativeInstrumentation.disable();
   }
 
   /**
    * Sets MeterProvider to this plugin
    * @param meterProvider
    */
-  public setMeterProvider(meterProvider: api.MeterProvider) {
+  public setMeterProvider(meterProvider: MeterProvider) {
     this._grpcJsInstrumentation.setMeterProvider(meterProvider);
-    this._grpcNativeInstrumentation.setMeterProvider(meterProvider);
   }
 
   /**
    * Sets TraceProvider to this plugin
    * @param tracerProvider
    */
-  public setTracerProvider(tracerProvider: api.TracerProvider) {
+  public setTracerProvider(tracerProvider: TracerProvider) {
     this._grpcJsInstrumentation.setTracerProvider(tracerProvider);
-    this._grpcNativeInstrumentation.setTracerProvider(tracerProvider);
   }
 }
