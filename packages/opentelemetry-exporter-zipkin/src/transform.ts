@@ -48,7 +48,7 @@ export function toZipkinSpan(
     id: span.spanContext().spanId,
     kind: ZIPKIN_SPAN_KIND_MAPPING[span.kind],
     timestamp: hrTimeToMicroseconds(span.startTime),
-    duration: hrTimeToMicroseconds(span.duration),
+    duration: Math.round(hrTimeToMicroseconds(span.duration)),
     localEndpoint: { serviceName },
     tags: _toZipkinTags(span, statusCodeTagName, statusErrorTagName),
     annotations: span.events.length
