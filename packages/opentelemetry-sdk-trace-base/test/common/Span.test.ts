@@ -1203,6 +1203,46 @@ describe('Span', () => {
         const event = span.events[0];
         assert.deepStrictEqual(event.time, [0, 123]);
       });
+
+      it('should record an exception with provided time as a 3rd arg', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
+        span['_performanceOffset'] = 0;
+        assert.strictEqual(span.events.length, 0);
+        span.recordException('boom', undefined, [0, 123]);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.time, [0, 123]);
+      });
+    });
+
+    describe('when attributes are provided', () => {
+      it('should sanitized and merge attributes when provided', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
+        span['_performanceOffset'] = 0;
+        assert.strictEqual(span.events.length, 0);
+        span.recordException('boom', {
+          ...validAttributes,
+          ...invalidAttributes,
+        } as unknown as SpanAttributes);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+          ...validAttributes,
+        });
+      });
     });
 
     describe('when exception code is numeric', () => {
