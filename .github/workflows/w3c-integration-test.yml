@@ -10,45 +10,51 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
 
+    steps:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      - name: restore lock files
-        uses: actions/cache@master # must use unreleased master to cache multiple paths
-        id: cache
+      - uses: actions/checkout@v3
+
+      - name: Lint changelog file
+        uses: avto-dev/markdown-lint@v1
         with:
-          # must be done before bootstrap to not include node_modules files in the cache paths
+          config: "/lint/config/changelog.yml"
+          args: "./CHANGELOG.md"
+
+      - name: Lint markdown files
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: "./**/*.md"
+          ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
+
+      - name: restore npm cache
+        id: cache
+        uses: actions/cache@v3
+        with:
           path: |
+            node_modules
             package-lock.json
+            packages/*/node_modules
             packages/*/package-lock.json
-            metapackages/*/package-lock.json
-            packages/*/package-lock.json
-            integration-tests/*/package-lock.json
-          key: ${{ runner.os }}-w3c_integration-${{ hashFiles('**/package.json') }}
+            experimental/packages/*/node_modules
+            experimental/packages/*/package-lock.json
+          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04142022
 
-      - name: Install and Bootstrap (cache miss) 🔧
-        if: steps.cache.outputs.cache-hit != 'true'
+      # On a cache miss, install dependencies
+      - name: Install dependencies
         run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --scope=propagation-validation-server --include-dependencies
+          npm install --workspaces --ignore-scripts
 
-      - name: Install and Bootstrap (cache hit) 🔧
-        if: steps.cache.outputs.cache-hit == 'true'
+      - name: Lint
         run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --scope=propagation-validation-server --include-dependencies
+          npm run lint
+          npm run lint:examples
 
-      - name: Generate version.ts files
-        run: lerna run version
-
-      - name: Build 🔧
-        run: npm run compile
-        working-directory: ./integration-tests/propagation-validation-server
-
-      - name: Run W3C Test harness
-        run: ./integration-tests/tracecontext-integration-test.sh
+      - name: Lint doc files
+        run: |
+          npm run compile
+          NODE_OPTIONS=--max-old-space-size=6144 npm run docs
+          npm run docs:test

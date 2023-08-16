@@ -24,7 +24,6 @@
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "version": "node ../../../scripts/version-update.js",
     "watch": "npm run protos && tsc -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "keywords": [
@@ -66,7 +65,6 @@
     "@types/sinon": "10.0.16",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "lerna": "7.1.4",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "protobufjs-cli": "1.1.1",

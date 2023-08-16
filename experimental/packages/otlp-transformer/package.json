@@ -13,7 +13,6 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
@@ -69,7 +68,6 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "4.0.2",
-    "lerna": "7.1.4",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "ts-loader": "8.4.0",
