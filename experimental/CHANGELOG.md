@@ -20,6 +20,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* Revert "fix(example-opencensus-shim): avoid OpenCensus auto instrumentations (#3951)" [#4072](https://github.com/open-telemetry/opentelemetry-js/pull/4072) @aabmass
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
