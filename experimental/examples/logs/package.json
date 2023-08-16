@@ -6,7 +6,7 @@
     "start": "ts-node index.ts"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.4.1",
+    "@opentelemetry/api": "1.4.1",
     "@opentelemetry/api-logs": "0.41.0",
     "@opentelemetry/sdk-logs": "0.41.0"
   },

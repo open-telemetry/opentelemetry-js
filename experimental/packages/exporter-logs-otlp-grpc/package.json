@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.22.10",
-    "@grpc/proto-loader": "^0.7.3",
+    "@grpc/proto-loader": "0.7.3",
     "@opentelemetry/api": "1.4.1",
     "@opentelemetry/api-logs": "0.41.2",
     "@opentelemetry/otlp-exporter-base": "0.41.2",
@@ -69,7 +69,7 @@
     "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.0"
+    "@opentelemetry/api": "1.0.0"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",

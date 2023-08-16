@@ -27,7 +27,6 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@lerna/legacy-package-management": "7.1.4",
     "@typescript-eslint/eslint-plugin": "5.59.11",
     "@typescript-eslint/parser": "5.59.11",
     "eslint": "8.44.0",
@@ -36,7 +35,6 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
     "gh-pages": "5.0.0",
-    "lerna": "7.1.4",
     "linkinator": "5.0.1",
     "markdownlint-cli": "0.35.0",
     "prettier": "2.8.8",
