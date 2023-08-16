@@ -153,15 +153,14 @@ Please also see [GitHub workflow](https://github.com/open-telemetry/community/bl
 
 - [NPM](https://npmjs.com)
 - [TypeScript](https://www.typescriptlang.org/)
-- [lerna](https://github.com/lerna/lerna) to manage dependencies, compilations, and links between packages. Most lerna commands should be run by calling the provided npm scripts.
 - [MochaJS](https://mochajs.org/) for tests
 - [eslint](https://eslint.org/)
 
-Most of the commands needed for development are accessed as [npm scripts](https://docs.npmjs.com/cli/v6/using-npm/scripts). It is recommended that you use the provided npm scripts instead of using `lerna run` in most cases.
+Most of the commands needed for development are accessed as [npm scripts](https://docs.npmjs.com/cli/v6/using-npm/scripts).
 
 ### Install dependencies
 
-This will install all dependencies for the root project and all modules managed by `lerna`. By default, a `postinstall` script will run `lerna bootstrap` automatically after an install. This can be avoided using the `--ignore-scripts` option if desired.
+This will install all dependencies for the root project and all modules managed by `npm`.
 
 ```sh
 npm install
