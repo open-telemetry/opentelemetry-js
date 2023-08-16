@@ -28,18 +28,17 @@ jobs:
             packages/*/package-lock.json
             integration-tests/*/package-lock.json
           key: ${{ runner.os }}-unit_test-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
+
       - name: Install and Build (cache miss) 🔧
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
+          npm install --workspaces --ignore-scripts
           npm run compile
 
       - name: Install and Build (cache hit) 🔧
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --nohoist='zone.js'
+          npm ci --workspaces --ignore-scripts
           npm run compile
 
       - name: Build Docs

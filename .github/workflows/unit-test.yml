@@ -28,31 +28,26 @@ jobs:
 
       - run: npm install -g npm@latest
 
-      - name: restore lerna
+      - name: Restore Cache
         id: cache
         uses: actions/cache@v3
         with:
           path: |
             node_modules
             package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
+            # other directories if you use workspaces
+          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json') }}-04292022
 
-      - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+      - name: Install Dependencies
+        run: npm install
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: |
-          # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
+        # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesu
+nsupported
           if [ "${{ matrix.node_version }}" = "18" ]; then
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
@@ -74,23 +69,17 @@ jobs:
 
       - run: npm install -g npm@latest
 
-      - name: restore lerna
+      - name: Restore Cache
         id: cache
         uses: actions/cache@v3
         with:
           path: |
             node_modules
             package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
+          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package.json') }}
 
-      - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+      - name: Install Dependencies
+        run: npm install
 
       - name: Build 🔧
         run: |
@@ -99,6 +88,7 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+
   browser-tests:
     runs-on: ubuntu-latest
     env:
@@ -111,32 +101,27 @@ jobs:
         with:
           node-version: 16
 
-      - name: restore lerna
+      - name: Restore Cache
         id: cache
         uses: actions/cache@v3
         with:
           path: |
             node_modules
             package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: browser-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
+          key: browser-tests-${{ runner.os }}-${{ hashFiles('package.json') }}
 
-      - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+      - name: Install Dependencies
+        run: npm install
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: npm run test:browser
+
       - name: Report Coverage
         run: npm run codecov:browser
+
   webworker-tests:
     runs-on: ubuntu-latest
     env:
@@ -144,36 +129,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3.5.3
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: restore lerna
+      - name: Restore Cache
         id: cache
         uses: actions/cache@v3
         with:
           path: |
             node_modules
             package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
+          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package.json') }}
 
-      - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
+      - name: Install Dependencies
+        run: npm install
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: npm run test:webworker
+
       - name: Report Coverage
         run: npm run codecov:webworker
+
   api-eol-node-test:
     strategy:
       fail-fast: false
@@ -201,9 +182,4 @@ jobs:
 
       - name: Test
         working-directory: ./api
-        # running test:eol as node 8 is not supported anymore by the version of nyc we use, as we don't report coverage
-        # for this step we leave it out.
-        # Details: nyc requires istanbul-lib-report, which silently dropped support for Node.js v8 when going from
-        # 3.0.0 to 3.0.1 by requiring make-dir@^4.0.0 to fix https://github.com/advisories/GHSA-c2qf-rxjj-qqgw.
-        # make-dir does not support Node.js v8 anymore.
         run: npm run test:eol

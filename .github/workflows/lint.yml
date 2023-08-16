@@ -34,7 +34,7 @@ jobs:
           args: "./**/*.md"
           ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
-      - name: restore lerna
+      - name: restore npm cache
         id: cache
         uses: actions/cache@v3
         with:
@@ -48,10 +48,9 @@ jobs:
           key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04142022
 
       # On a cache miss, install dependencies
-      - name: Bootstrap
+      - name: Install dependencies
         run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
+          npm install --workspaces --ignore-scripts
 
       - name: Lint
         run: |
