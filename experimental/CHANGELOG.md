@@ -8,7 +8,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* chore(sdk-node): add notice that '@opentelemetry/exporter-jaeger' has to be installed manually in the next version [#????](https://github.com/open-telemetry/opentelemetry-js/pull/????) @pichlermarc
+* chore(sdk-node): add notice that '@opentelemetry/exporter-jaeger' has to be installed manually in the next version [4068](https://github.com/open-telemetry/opentelemetry-js/pull/4068) @pichlermarc
   *  Starting with 0.43.0 '@opentelemetry/exporter-jaeger' will no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
      * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described in https://www.npmjs.com/package/@opentelemetry/exporter-jaeger
 
