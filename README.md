@@ -579,3 +579,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-propagator-b3]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3
 
 [spec-versioning]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md
+
