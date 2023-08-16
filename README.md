@@ -182,7 +182,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 #### Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
 
-- [Amir Blum](https://github.com/blumamir), Aspecto
+- [Amir Blum](https://github.com/blumamir), Keyval
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
