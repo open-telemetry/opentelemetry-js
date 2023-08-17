@@ -26,7 +26,6 @@ import {
   MetricData,
   SumMetricData,
 } from '@opentelemetry/sdk-metrics';
-import { FlatMap } from '@opentelemetry/sdk-metrics/src/utils';
 
 type BaseMetric = Omit<MetricData, 'dataPoints' | 'dataPointType'>;
 interface MappedType {
@@ -174,7 +173,7 @@ function dataPoints<T>(
   metric: oc.Metric,
   valueMapper: (value: oc.TimeSeriesPoint['value']) => T
 ): DataPoint<T>[] {
-  return FlatMap(metric.timeseries, ts => {
+  return metric.timeseries.flatMap(ts => {
     const attributes = zipOcLabels(metric.descriptor.labelKeys, ts.labelValues);
 
     // use zeroed hrTime if it is undefined, which probably shouldn't happen
