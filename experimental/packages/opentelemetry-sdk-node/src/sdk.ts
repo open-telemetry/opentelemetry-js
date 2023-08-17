@@ -178,7 +178,14 @@ export class NodeSDK {
     this._instrumentations = instrumentations;
   }
 
-  /** Set configurations required to register a NodeTracerProvider */
+  /**
+   *
+   * @deprecated Please pass {@code sampler}, {@code generalLimits}, {@code spanLimits}, {@code resource},
+   * {@code IdGenerator}, {@code spanProcessor}, {@code contextManager} and {@code textMapPropagator},
+   * to the constructor options instead.
+   *
+   * Set configurations needed to register a TracerProvider
+   */
   public configureTracerProvider(
     tracerConfig: NodeTracerConfig,
     spanProcessor: SpanProcessor,
@@ -193,7 +200,11 @@ export class NodeSDK {
     };
   }
 
-  /**Set configurations needed to register a LoggerProvider */
+  /**
+   * @deprecated Please pass {@code logRecordProcessor} to the constructor options instead.
+   *
+   * Set configurations needed to register a LoggerProvider
+   */
   public configureLoggerProvider(config: LoggerProviderConfig): void {
     // nothing is set yet, we can set config and then return
     if (this._loggerProviderConfig == null) {
@@ -217,7 +228,11 @@ export class NodeSDK {
     }
   }
 
-  /** Set configurations needed to register a MeterProvider */
+  /**
+   * @deprecated Please pass {@code views} and {@code reader} to the constructor options instead.
+   *
+   * Set configurations needed to register a MeterProvider
+   */
   public configureMeterProvider(config: MeterProviderConfig): void {
     // nothing is set yet, we can set config and return.
     if (this._meterProviderConfig == null) {
@@ -248,7 +263,12 @@ export class NodeSDK {
     }
   }
 
-  /** Detect resource attributes */
+  /**
+   * @deprecated Resources are detected automatically on {@link NodeSDK.start()}, when the {@code autoDetectResources}
+   * constructor option is set to {@code true} or left {@code undefined}.
+   *
+   * Detect resource attributes
+   */
   public detectResources(): void {
     if (this._disabled) {
       return;
@@ -261,13 +281,18 @@ export class NodeSDK {
     this.addResource(detectResourcesSync(internalConfig));
   }
 
-  /** Manually add a resource */
+  /**
+   * @deprecated Please pre-merge resources and pass them to the constructor
+   *
+   * Manually add a Resource
+   * @param resource
+   */
   public addResource(resource: IResource): void {
     this._resource = this._resource.merge(resource);
   }
 
   /**
-   * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
+   * Call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public start(): void {
     if (this._disabled) {
