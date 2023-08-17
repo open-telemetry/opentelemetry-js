@@ -30,6 +30,14 @@ const SCOPE = {
   version: VERSION,
 } as const;
 
+interface OpenCensusMetricProducerOptions {
+  /**
+   * An instance of OpenCensus MetricProducerManager. If not provided,
+   * `oc.Metrics.getMetricProducerManager()` will be used.
+   */
+  openCensusMetricProducerManager?: oc.MetricProducerManager;
+}
+
 /**
  * A {@link MetricProducer} which collects metrics from OpenCensus. Provide an instance to your
  * {@link MetricReader} when you create it to include all OpenCensus metrics in the collection
@@ -46,6 +54,14 @@ const SCOPE = {
  * ```
  */
 export class OpenCensusMetricProducer implements MetricProducer {
+  private _openCensusMetricProducerManager: oc.MetricProducerManager;
+
+  constructor(options?: OpenCensusMetricProducerOptions) {
+    this._openCensusMetricProducerManager =
+      options?.openCensusMetricProducerManager ??
+      oc.Metrics.getMetricProducerManager();
+  }
+
   async collect(): Promise<CollectionResult> {
     const metrics = await this._collectOpenCensus();
     const scopeMetrics: ScopeMetrics[] =
@@ -73,7 +89,7 @@ export class OpenCensusMetricProducer implements MetricProducer {
 
     // The use of oc.Metrics.getMetricProducerManager() was adapted from
     // https://github.com/census-instrumentation/opencensus-node/blob/d46c8891b15783803d724b717db9a8c22cb73d6a/packages/opencensus-exporter-stackdriver/src/stackdriver-monitoring.ts#L122
-    for (const metricProducer of oc.Metrics.getMetricProducerManager().getAllMetricProducer()) {
+    for (const metricProducer of this._openCensusMetricProducerManager.getAllMetricProducer()) {
       for (const metric of metricProducer.getMetrics()) {
         const metricData = mapOcMetric(metric);
         if (metricData !== null) {
