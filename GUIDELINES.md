@@ -8,7 +8,7 @@ This section refers to `"dependencies"` and `"devDependencies"` entries in `pack
 > [!IMPORTANT]
 > Not all libraries follow [Semantic Versioning](https://semver.org/). Even those who do might occasionally introduce breaking changes due to human errors. Exceptions to the guidelines in this document MAY be granted by Approvers or Maintainers to work around this.
 
-### "DevDependencies"
+### Development Dependencies
 
 `"devDependencies"` SHOULD be pinned to reduce the risk of autobreaking the build. Since we cannot use the `package-lock.json` file (because the libraries are distributed without it), control over the version our contributors will get is limited. By using pinned versions, we prevent potential disruptions caused by unpinned versions.
 
