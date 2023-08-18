@@ -20,7 +20,13 @@ import { MeterProvider } from '../../src/MeterProvider';
 import { assertRejects } from '../test-utils';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
-import { Aggregation, AggregationTemporality } from '../../src';
+import {
+  Aggregation,
+  AggregationTemporality,
+  DataPointType,
+  InstrumentType,
+  ScopeMetrics,
+} from '../../src';
 import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
@@ -29,6 +35,39 @@ import {
   assertAggregationSelector,
   assertAggregationTemporalitySelector,
 } from './utils';
+import { defaultResource } from '../util';
+import { ValueType } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
+
+const testScopeMetrics: ScopeMetrics[] = [
+  {
+    scope: {
+      name: 'additionalMetricProducerMetrics',
+    },
+    metrics: [
+      {
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.SUM,
+        dataPoints: [
+          {
+            attributes: {},
+            value: 1,
+            startTime: [0, 0],
+            endTime: [1, 0],
+          },
+        ],
+        descriptor: {
+          name: 'additionalCounter',
+          unit: '',
+          type: InstrumentType.COUNTER,
+          description: '',
+          valueType: ValueType.INT,
+        },
+        isMonotonic: true,
+      },
+    ],
+  },
+];
 
 describe('MetricReader', () => {
   describe('setMetricProducer', () => {
@@ -83,18 +122,89 @@ describe('MetricReader', () => {
       assertRejects(reader.collect(), /MetricReader is shutdown/);
     });
 
-    it('should call MetricProduce.collect with timeout', async () => {
+    it('should call MetricProducer.collect with timeout', async () => {
       const reader = new TestMetricReader();
       const producer = new TestMetricProducer();
       reader.setMetricProducer(producer);
 
-      const collectStub = sinon.stub(producer, 'collect');
+      const collectSpy = sinon.spy(producer, 'collect');
 
       await reader.collect({ timeoutMillis: 20 });
-      assert(collectStub.calledOnce);
-      const args = collectStub.args[0];
+      assert(collectSpy.calledOnce);
+      const args = collectSpy.args[0];
       assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 
+      await reader.shutdown();
+    });
+
+    it('should collect metrics from the SDK and the additional metricProducers', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const additionalProducer = new TestMetricProducer({
+        resourceMetrics: {
+          resource: new Resource({
+            shouldBeDiscarded: 'should-be-discarded',
+          }),
+          scopeMetrics: testScopeMetrics,
+        },
+      });
+      const reader = new TestMetricReader({
+        metricProducers: [additionalProducer],
+      });
+      meterProvider.addMetricReader(reader);
+
+      // Make a measurement
+      meterProvider
+        .getMeter('someSdkMetrics')
+        .createCounter('sdkCounter')
+        .add(5, { hello: 'world' });
+      const collectionResult = await reader.collect();
+
+      assert.strictEqual(collectionResult.errors.length, 0);
+      // Should keep the SDK's Resource only
+      assert.deepStrictEqual(
+        collectionResult.resourceMetrics.resource,
+        defaultResource
+      );
+      assert.strictEqual(
+        collectionResult.resourceMetrics.scopeMetrics.length,
+        2
+      );
+      const [sdkScopeMetrics, additionalScopeMetrics] =
+        collectionResult.resourceMetrics.scopeMetrics;
+
+      assert.strictEqual(sdkScopeMetrics.scope.name, 'someSdkMetrics');
+      assert.strictEqual(
+        additionalScopeMetrics.scope.name,
+        'additionalMetricProducerMetrics'
+      );
+
+      await reader.shutdown();
+    });
+
+    it('should merge the errors from the SDK and all metricProducers', async () => {
+      const meterProvider = new MeterProvider();
+      const reader = new TestMetricReader({
+        metricProducers: [
+          new TestMetricProducer({ errors: ['err1'] }),
+          new TestMetricProducer({ errors: ['err2'] }),
+        ],
+      });
+      meterProvider.addMetricReader(reader);
+
+      // Provide a callback throwing an error too
+      meterProvider
+        .getMeter('someSdkMetrics')
+        .createObservableCounter('sdkCounter')
+        .addCallback(result => {
+          throw 'errsdk';
+        });
+      const collectionResult = await reader.collect();
+
+      assert.deepStrictEqual(collectionResult.errors, [
+        'errsdk',
+        'err1',
+        'err2',
+      ]);
       await reader.shutdown();
     });
   });
