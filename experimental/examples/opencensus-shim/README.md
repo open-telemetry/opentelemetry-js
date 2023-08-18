@@ -9,6 +9,8 @@ The example has:
 - Root Spans (on client), instrumented with OpenCensus's HTTP instrumentation
 - Child Span from a remote parent (on server), instrumented with OpenCensus's HTTP instrumentation
 - Another Child Span created in the server representing some work being done, instrumented manually with OpenTelemetry.
+- Server metrics coming from OpenCensus's HTTP instrumentation, available through the
+OpenTelemetry's Prometheus exporter.
 
 ## Installation
 
@@ -63,6 +65,14 @@ Go to Jaeger with your browser <http://localhost:16686/> and click on the "Servi
       Notice this span is correctly recorded as a child of the OpenCensus instrumentation.
 
 <p align="center"><img src="./images/jaeger-trace.png"/></p>
+
+## Check the Prometheus metrics
+
+Load the Prometheus metrics endpoint of the server at <http://localhost:9464/metrics> in your
+browser. You should see the `opencensus_io_http_server_*` related metrics in
+the output.
+
+<p align="center"><img src="./images/prom-metrics.png"/></p>
 
 ## Useful links
 
