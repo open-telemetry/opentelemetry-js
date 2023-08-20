@@ -132,7 +132,9 @@ export class FetchInstrumentation extends InstrumentationBase<
       SemanticAttributes.HTTP_SCHEME,
       parsedUrl.protocol.replace(':', '')
     );
-    span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, navigator.userAgent);
+    if (typeof navigator !== 'undefined') {
+      span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, navigator.userAgent);
+    }
   }
 
   /**

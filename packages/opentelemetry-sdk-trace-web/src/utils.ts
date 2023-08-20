@@ -131,6 +131,11 @@ export function sortResources(
   });
 }
 
+/** Returns the origin if present (if in browser context) */
+function getOrigin(): string | undefined{
+  return typeof location !== 'undefined' ? location.origin : undefined;
+}
+
 /**
  * Get closest performance resource ignoring the resources that have been
  * already used.
@@ -174,7 +179,7 @@ export function getResource(
   }
   const sorted = sortResources(filteredResources);
 
-  if (parsedSpanUrl.origin !== location.origin && sorted.length > 1) {
+  if (parsedSpanUrl.origin !== getOrigin() && sorted.length > 1) {
     let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
     let mainRequest: PerformanceResourceTiming = findMainRequest(
       sorted,
@@ -438,7 +443,7 @@ export function shouldPropagateTraceHeaders(
   }
   const parsedSpanUrl = parseUrl(spanUrl);
 
-  if (parsedSpanUrl.origin === location.origin) {
+  if (parsedSpanUrl.origin === getOrigin()) {
     return true;
   } else {
     return propagateTraceHeaderUrls.some(propagateTraceHeaderUrl =>
