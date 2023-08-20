@@ -1233,14 +1233,45 @@ describe('Span', () => {
         // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
         span['_performanceOffset'] = 0;
         assert.strictEqual(span.events.length, 0);
-        span.recordException('boom', {
+        const exception = { code: 'Error', message: 'boom', stack: 'bar' };
+        span.recordException(exception, {
           ...validAttributes,
           ...invalidAttributes,
         } as unknown as SpanAttributes);
         const event = span.events[0];
         assert.deepStrictEqual(event.attributes, {
+          [SemanticAttributes.EXCEPTION_TYPE]: 'Error',
           [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+          [SemanticAttributes.EXCEPTION_STACKTRACE]: 'bar',
           ...validAttributes,
+        });
+      });
+
+      it('should prioritize the provided attributes over generated', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
+        span['_performanceOffset'] = 0;
+        assert.strictEqual(span.events.length, 0);
+        const exception = { code: 'Error', message: 'boom', stack: 'bar' };
+        span.recordException(exception, {
+          [SemanticAttributes.EXCEPTION_TYPE]: 'OverrideError',
+          [SemanticAttributes.EXCEPTION_MESSAGE]: 'override-boom',
+          [SemanticAttributes.EXCEPTION_STACKTRACE]: 'override-bar',
+          ...validAttributes,
+          ...invalidAttributes,
+        } as unknown as SpanAttributes);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          ...validAttributes,
+          [SemanticAttributes.EXCEPTION_TYPE]: 'OverrideError',
+          [SemanticAttributes.EXCEPTION_MESSAGE]: 'override-boom',
+          [SemanticAttributes.EXCEPTION_STACKTRACE]: 'override-bar',
         });
       });
     });

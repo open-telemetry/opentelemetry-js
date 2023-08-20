@@ -284,7 +284,7 @@ export class Span implements APISpan, ReadableSpan {
       attributesOrStartTime = undefined;
     }
 
-    const attributes = sanitizeAttributes(attributesOrStartTime);
+    const attributes: SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
@@ -300,6 +300,9 @@ export class Span implements APISpan, ReadableSpan {
       if (exception.stack) {
         attributes[SemanticAttributes.EXCEPTION_STACKTRACE] = exception.stack;
       }
+    }
+    if (attributesOrStartTime) {
+      Object.assign(attributes, sanitizeAttributes(attributesOrStartTime));
     }
 
     // these are minimum requirements from spec
