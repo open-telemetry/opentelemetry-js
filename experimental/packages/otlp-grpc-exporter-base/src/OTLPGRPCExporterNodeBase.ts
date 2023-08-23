@@ -34,7 +34,7 @@ import {
  */
 export abstract class OTLPGRPCExporterNodeBase<
   ExportItem,
-  ServiceRequest
+  ServiceRequest,
 > extends OTLPExporterBase<
   OTLPGRPCExporterConfigNode,
   ExportItem,
