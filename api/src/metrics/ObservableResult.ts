@@ -20,7 +20,7 @@ import { MetricAttributes, Observable } from './Metric';
  * Interface that is being used in callback function for Observable Metric.
  */
 export interface ObservableResult<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > {
   /**
    * Observe a measurement of the value associated with the given attributes.
@@ -41,7 +41,7 @@ export interface ObservableResult<
  * Interface that is being used in batch observable callback function.
  */
 export interface BatchObservableResult<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > {
   /**
    * Observe a measurement of the value associated with the given attributes.
