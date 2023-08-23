@@ -35,7 +35,10 @@ import { ExportResultCode } from '@opentelemetry/core';
 let fakeRequest: PassThrough;
 
 class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
+  constructor(
+    private _code: number,
+    private _msg?: string
+  ) {
     super();
   }
 
