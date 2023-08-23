@@ -110,7 +110,7 @@ export class MeterSharedState {
 
   private _registerMetricStorage<
     MetricStorageType extends MetricStorageConstructor,
-    R extends InstanceType<MetricStorageType>
+    R extends InstanceType<MetricStorageType>,
   >(
     descriptor: InstrumentDescriptor,
     MetricStorageType: MetricStorageType
