@@ -14,7 +14,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "version": "node ../../scripts/version-update.js",
+    "version": "deno run --allow-read --allow-write=src/version.ts ../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",

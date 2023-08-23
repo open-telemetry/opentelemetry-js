@@ -15,7 +15,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:webworker": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "version": "node ../../scripts/version-update.js",
+    "version": "deno run --allow-read --allow-write=src/version.ts ../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
     "test:webworker": "karma start karma.worker.js --single-run",

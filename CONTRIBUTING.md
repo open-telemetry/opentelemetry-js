@@ -26,6 +26,8 @@ We'd love your help!
 To get the project started quickly, you can follow these steps. For more
 detailed instructions, see [development](#development) below.
 
+Make sure you have both [Node/NPM](https://nodejs.org/) and [Deno](https://deno.com/) installed.
+
 ```sh
 git clone https://github.com/open-telemetry/opentelemetry-js.git
 cd opentelemetry-js
@@ -153,6 +155,7 @@ Please also see [GitHub workflow](https://github.com/open-telemetry/community/bl
 
 - [NPM](https://npmjs.com)
 - [TypeScript](https://www.typescriptlang.org/)
+- [Deno](https://deno.com/)
 - [lerna](https://github.com/lerna/lerna) to manage dependencies, compilations, and links between packages. Most lerna commands should be run by calling the provided npm scripts.
 - [MochaJS](https://mochajs.org/) for tests
 - [eslint](https://eslint.org/)

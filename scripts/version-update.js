@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const appRoot = Deno.cwd();
 
-const appRoot = process.cwd();
-
-const packageJsonUrl = path.resolve(`${appRoot}/package.json`);
-const pjson = require(packageJsonUrl);
+const decoder = new TextDecoder('utf-8');
+const pjson = JSON.parse(
+  decoder.decode(Deno.readFileSync(`${appRoot}/package.json`))
+);
 
 const content = `/*
  * Copyright The OpenTelemetry Authors
@@ -43,6 +41,5 @@ const content = `/*
 export const VERSION = '${pjson.version}';
 `;
 
-const fileUrl = path.join(appRoot, "src", "version.ts")
-
-fs.writeFileSync(fileUrl, content);
+const encoder = new TextEncoder('utf-8');
+Deno.writeFileSync(`${appRoot}/src/version.ts`, encoder.encode(content));

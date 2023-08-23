@@ -22,7 +22,7 @@
     "protos": "npm run submodule && npm run protos:generate",
     "protos:generate": "node ../../../scripts/generate-protos.js",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
-    "version": "node ../../../scripts/version-update.js",
+    "version": "deno run --allow-read --allow-write=src/version.ts ../../../scripts/version-update.js",
     "watch": "npm run protos && tsc -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile"

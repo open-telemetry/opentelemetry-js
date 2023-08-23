@@ -52,10 +52,10 @@
     "test:esm": "nyc node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs' test/node/*.test.mjs",
     "test": "npm run test:cjs && npm run test:esm",
     "test:browser": "karma start --single-run",
-    "version": "node ../../../scripts/version-update.js",
+    "version": "deno run --allow-read --allow-write=src/version.ts ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "prewatch": "node ../../../scripts/version-update.js",
+    "prewatch": "deno run --allow-read --allow-write=src/version.ts ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js"
   },
   "keywords": [

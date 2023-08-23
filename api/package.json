@@ -28,7 +28,7 @@
     "test:eol": "ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:webworker": "karma start karma.worker.js --single-run",
     "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
-    "version": "node ../scripts/version-update.js",
+    "version": "deno run --allow-read --allow-write=src/version.ts ../scripts/version-update.js",
     "prewatch": "npm run precompile",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "peer-api-check": "node ../scripts/peer-api-check.js"
