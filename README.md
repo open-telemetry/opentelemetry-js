@@ -195,13 +195,10 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
-- [John Bley](https://github.com/johnbley), Splunk
-- [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
-- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
@@ -216,6 +213,9 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
 - [Roch Devost](https://github.com/rochdev), DataDog, Approver
+- [John Bley](https://github.com/johnbley), Splunk, Approver
+- [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
+- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
 
 *Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
 
