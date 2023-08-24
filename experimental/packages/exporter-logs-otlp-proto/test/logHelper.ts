@@ -167,7 +167,10 @@ export function ensureExportLogsServiceRequestIsSet(
 }
 
 export class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
+  constructor(
+    private _code: number,
+    private _msg?: string
+  ) {
     super();
   }
 
