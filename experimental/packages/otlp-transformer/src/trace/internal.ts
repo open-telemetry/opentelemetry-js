@@ -15,7 +15,8 @@
  */
 import type { Link } from '@opentelemetry/api';
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
-import { hrTimeToFixed64Nanos, toAttributes } from '../common/internal';
+import { hrTimeToFixed64Nanos } from '../common';
+import { toAttributes } from '../common/internal';
 import { EStatusCode, IEvent, ILink, ISpan } from './types';
 import * as core from '@opentelemetry/core';
 

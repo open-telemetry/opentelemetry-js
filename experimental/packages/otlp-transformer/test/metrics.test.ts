@@ -26,7 +26,7 @@ import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
 import { EAggregationTemporality } from '../src/metrics/types';
 import { hrTime } from '@opentelemetry/core';
-import { hrTimeToFixed64Nanos } from '../src/common/internal';
+import { hrTimeToFixed64Nanos } from '../src/common';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();

@@ -24,7 +24,8 @@ import {
   ResourceMetrics,
   ScopeMetrics,
 } from '@opentelemetry/sdk-metrics';
-import { hrTimeToFixed64Nanos, toAttributes } from '../common/internal';
+import { hrTimeToFixed64Nanos } from '../common';
+import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
   IExponentialHistogramDataPoint,

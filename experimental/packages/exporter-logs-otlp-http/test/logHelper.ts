@@ -20,6 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { VERSION } from '@opentelemetry/core';
 import {
+  hrTimeToFixed64Nanos,
   IAnyValue,
   IExportLogsServiceRequest,
   IKeyValue,
@@ -27,7 +28,6 @@ import {
   IResource,
 } from '@opentelemetry/otlp-transformer';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { hrTimeToFixed64Nanos } from '@opentelemetry/otlp-transformer/src/common/internal';
 
 export const mockedReadableLogRecord: ReadableLogRecord = {
   resource: Resource.default().merge(

@@ -34,12 +34,12 @@ import {
   View,
 } from '@opentelemetry/sdk-metrics';
 import {
+  hrTimeToFixed64Nanos,
   IExportMetricsServiceRequest,
   IKeyValue,
   IMetric,
   IResource,
 } from '@opentelemetry/otlp-transformer';
-import { hrTimeToFixed64Nanos } from '@opentelemetry/otlp-transformer/src/common/internal';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {

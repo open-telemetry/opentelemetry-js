@@ -22,12 +22,8 @@ import {
   IResourceLogs,
 } from './types';
 import { IResource } from '@opentelemetry/resources';
-import {
-  hrTimeToFixed64Nanos,
-  toAnyValue,
-  toAttributes,
-  toKeyValue,
-} from '../common/internal';
+import { hrTimeToFixed64Nanos } from '../common';
+import { toAnyValue, toAttributes, toKeyValue } from '../common/internal';
 import { hexToBase64 } from '@opentelemetry/core';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { IKeyValue } from '../common/types';

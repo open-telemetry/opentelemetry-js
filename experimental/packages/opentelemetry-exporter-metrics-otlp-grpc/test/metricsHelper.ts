@@ -32,9 +32,13 @@ import {
   MetricReader,
   View,
 } from '@opentelemetry/sdk-metrics';
-import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
-import { UnsignedLong } from '@opentelemetry/otlp-transformer/src/common/unsigned_long';
-import { hrTimeToFixed64Nanos } from '@opentelemetry/otlp-transformer/src/common/internal';
+import {
+  hrTimeToFixed64Nanos,
+  IKeyValue,
+  IMetric,
+  IResource,
+  UnsignedLong,
+} from '@opentelemetry/otlp-transformer';
 
 class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {

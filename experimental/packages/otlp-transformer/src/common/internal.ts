@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { IAnyValue, IFixed64, IKeyValue } from './types';
-import { Attributes, HrTime } from '@opentelemetry/api';
-import { UnsignedLong } from './unsigned_long';
+import type { IAnyValue, IKeyValue } from './types';
+import { Attributes } from '@opentelemetry/api';
 
 export function toAttributes(attributes: Attributes): IKeyValue[] {
   return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
@@ -49,12 +48,4 @@ export function toAnyValue(value: unknown): IAnyValue {
     };
 
   return {};
-}
-
-const NANOSECONDS = UnsignedLong.fromU32(1_000_000_000);
-
-export function hrTimeToFixed64Nanos(hrTime: HrTime): IFixed64 {
-  return UnsignedLong.fromU32(hrTime[0])
-    .multiply(NANOSECONDS)
-    .add(UnsignedLong.fromU32(hrTime[1]));
 }
