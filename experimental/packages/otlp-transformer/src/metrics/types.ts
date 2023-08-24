@@ -134,10 +134,10 @@ export interface INumberDataPoint {
   attributes: IKeyValue[];
 
   /** NumberDataPoint startTimeUnixNano */
-  startTimeUnixNano?: IFixed64;
+  startTimeUnixNano?: IFixed64 | string;
 
   /** NumberDataPoint timeUnixNano */
-  timeUnixNano?: IFixed64;
+  timeUnixNano?: IFixed64 | string;
 
   /** NumberDataPoint asDouble */
   asDouble?: number | null;
@@ -158,10 +158,10 @@ export interface IHistogramDataPoint {
   attributes?: IKeyValue[];
 
   /** HistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: IFixed64;
+  startTimeUnixNano?: IFixed64 | string;
 
   /** HistogramDataPoint timeUnixNano */
-  timeUnixNano?: IFixed64;
+  timeUnixNano?: IFixed64 | string;
 
   /** HistogramDataPoint count */
   count?: number;
@@ -194,10 +194,10 @@ export interface IExponentialHistogramDataPoint {
   attributes?: IKeyValue[];
 
   /** ExponentialHistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: IFixed64;
+  startTimeUnixNano?: IFixed64 | string;
 
   /** ExponentialHistogramDataPoint timeUnixNano */
-  timeUnixNano?: IFixed64;
+  timeUnixNano?: IFixed64 | string;
 
   /** ExponentialHistogramDataPoint count */
   count?: number;

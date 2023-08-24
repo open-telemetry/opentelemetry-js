@@ -99,4 +99,22 @@ export class UnsignedLong {
 
     return new UnsignedLong((c16 << 16) | c00, (c48 << 16) | c32);
   }
+
+  static fromString(str: string): UnsignedLong {
+    let result = UnsignedLong.fromU32(0);
+
+    for (let i = 0; i < str.length; i += 8) {
+      const size = Math.min(8, str.length - i);
+      const value = parseInt(str.substring(i, i + size));
+      if (size < 8) {
+        const power = UnsignedLong.fromU32(Math.pow(10, size));
+        result = result.multiply(power).add(UnsignedLong.fromU32(value));
+      } else {
+        result = result.multiply(UnsignedLong.fromU32(100_000_000));
+        result = result.add(UnsignedLong.fromU32(value));
+      }
+    }
+
+    return result;
+  }
 }

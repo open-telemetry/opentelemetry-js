@@ -27,6 +27,7 @@ import {
   IResource,
 } from '@opentelemetry/otlp-transformer';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
+import { hrTimeToFixed64Nanos } from '@opentelemetry/otlp-transformer/src/common/internal';
 
 export const mockedReadableLogRecord: ReadableLogRecord = {
   resource: Resource.default().merge(
@@ -76,17 +77,22 @@ export function ensureExportedBodyIsCorrect(body?: IAnyValue) {
   );
 }
 
+function hrTimeToFixed64(hrTime: HrTime) {
+  const { low, high } = hrTimeToFixed64Nanos(hrTime);
+  return { low, high };
+}
+
 export function ensureExportedLogRecordIsCorrect(logRecord: ILogRecord) {
   ensureExportedBodyIsCorrect(logRecord.body);
   ensureExportedAttributesAreCorrect(logRecord.attributes);
-  assert.strictEqual(
+  assert.deepStrictEqual(
     logRecord.timeUnixNano,
-    1680253513123241700,
+    hrTimeToFixed64(mockedReadableLogRecord.hrTime),
     'timeUnixNano is wrong'
   );
-  assert.strictEqual(
+  assert.deepStrictEqual(
     logRecord.observedTimeUnixNano,
-    1680253513123241700,
+    hrTimeToFixed64(mockedReadableLogRecord.hrTimeObserved),
     'observedTimeUnixNano is wrong'
   );
   assert.strictEqual(

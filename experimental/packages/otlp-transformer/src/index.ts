@@ -15,6 +15,7 @@
  */
 
 export * from './common/types';
+export * from './common/unsigned_long';
 export * from './metrics/types';
 export * from './resource/types';
 export * from './trace/types';
