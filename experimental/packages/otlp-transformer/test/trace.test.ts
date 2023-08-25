@@ -22,8 +22,8 @@ import {
   createExportTraceServiceRequest,
   ESpanKind,
   EStatusCode,
+  UnsignedLong,
 } from '../src';
-import { UnsignedLong } from '../src/common/unsigned_long';
 
 function createExpectedSpanJson(useHex: boolean) {
   const traceId = useHex

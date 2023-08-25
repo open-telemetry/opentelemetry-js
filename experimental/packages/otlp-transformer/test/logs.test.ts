@@ -21,10 +21,10 @@ import {
   createExportLogsServiceRequest,
   ESeverityNumber,
   IExportLogsServiceRequest,
+  UnsignedLong,
 } from '../src';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
-import { UnsignedLong } from '../src/common/unsigned_long';
 
 function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
   const traceId = useHex
