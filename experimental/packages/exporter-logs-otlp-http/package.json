@@ -71,7 +71,7 @@
   ],
   "sideEffects": false,
   "devDependencies": {
-    "@babel/core": "7.22.10",
+    "@babel/core": "7.22.11",
     "@opentelemetry/api": "1.4.1",
     "@opentelemetry/api-logs": "0.41.2",
     "@opentelemetry/resources": "1.15.2",
