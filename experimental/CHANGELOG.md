@@ -25,6 +25,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
