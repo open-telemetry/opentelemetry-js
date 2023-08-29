@@ -17,7 +17,8 @@
     "watch": "tsc --build --watch",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "postinstall": "node -e \"console.log(\\\"\\x1b[95m%s\\x1b[0m\\\", \\\"@opentelemetry/sdk-node - warning: Starting with 0.43.0 '@opentelemetry/exporter-jaeger' will no longer be automatically installed by this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.\\n(NOTE: '@opentelemetry/exporter-jaeger' is deprecated, consider switching to one of the alternatives described in https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)\\\");\""
   },
   "keywords": [
     "opentelemetry",
