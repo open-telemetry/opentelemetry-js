@@ -75,7 +75,7 @@
     "@lerna/legacy-package-management": "7.1.5",
     "linkinator": "5.0.2",
     "markdownlint-cli": "0.35.0",
-    "prettier": "3.0.2",
+    "prettier": "3.0.3",
     "semver": "7.5.4",
     "typedoc": "0.22.18",
     "typedoc-plugin-missing-exports": "1.0.0",
