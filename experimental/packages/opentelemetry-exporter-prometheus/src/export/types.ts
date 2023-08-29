@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { MetricProducer } from '@opentelemetry/sdk-metrics';
+
 /**
  * Configuration interface for prometheus exporter
  */
@@ -56,4 +58,12 @@ export interface ExporterConfig {
    * @default false
    */
   preventServerStart?: boolean;
+
+  /**
+   * **Note, this option is experimental**. Additional MetricProducers to use as a source of
+   * aggregated metric data in addition to the SDK's metric data. The resource returned by
+   * these MetricProducers is ignored; the SDK's resource will be used instead.
+   * @experimental
+   */
+  metricProducers?: MetricProducer[];
 }
