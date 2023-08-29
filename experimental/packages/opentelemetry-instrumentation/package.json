@@ -81,12 +81,12 @@
     "@opentelemetry/api": "^1.3.0"
   },
   "devDependencies": {
-    "@babel/core": "7.22.10",
+    "@babel/core": "7.22.11",
     "@opentelemetry/api": "1.4.1",
     "@opentelemetry/sdk-metrics": "1.15.2",
     "@types/mocha": "10.0.1",
     "@types/node": "18.6.5",
-    "@types/semver": "7.5.0",
+    "@types/semver": "7.5.1",
     "@types/sinon": "10.0.16",
     "@types/webpack-env": "1.16.3",
     "babel-loader": "8.3.0",
