@@ -1438,6 +1438,86 @@ describe('Span', () => {
         const event = span.events[0];
         assert.deepStrictEqual(event.time, [0, 123]);
       });
+
+      it('should record an exception with provided time as a 3rd arg', () => {
+        const span = new SpanImpl({
+          scope: tracer.instrumentationScope,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
+          name,
+          spanContext,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
+        // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
+        span['_performanceOffset'] = 0;
+        assert.strictEqual(span.events.length, 0);
+        span.recordException('boom', undefined, [0, 123]);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.time, [0, 123]);
+      });
+    });
+
+    describe('when attributes are provided', () => {
+      it('should sanitized and merge attributes when provided', () => {
+        const span = new SpanImpl({
+          scope: tracer.instrumentationScope,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
+          name,
+          spanContext,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
+        // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
+        span['_performanceOffset'] = 0;
+        assert.strictEqual(span.events.length, 0);
+        const exception = { code: 'Error', message: 'boom', stack: 'bar' };
+        span.recordException(exception, {
+          ...validAttributes,
+          ...invalidAttributes,
+        } as unknown as Attributes);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          [SEMATTRS_EXCEPTION_TYPE]: 'Error',
+          [SEMATTRS_EXCEPTION_MESSAGE]: 'boom',
+          [SEMATTRS_EXCEPTION_STACKTRACE]: 'bar',
+          ...validAttributes,
+        });
+      });
+
+      it('should prioritize the provided attributes over generated', () => {
+        const span = new SpanImpl({
+          scope: tracer.instrumentationScope,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
+          name,
+          spanContext,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
+        // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
+        span['_performanceOffset'] = 0;
+        assert.strictEqual(span.events.length, 0);
+        const exception = { code: 'Error', message: 'boom', stack: 'bar' };
+        span.recordException(exception, {
+          [SEMATTRS_EXCEPTION_TYPE]: 'OverrideError',
+          [SEMATTRS_EXCEPTION_MESSAGE]: 'override-boom',
+          [SEMATTRS_EXCEPTION_STACKTRACE]: 'override-bar',
+          ...validAttributes,
+          ...invalidAttributes,
+        } as unknown as Attributes);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          ...validAttributes,
+          [SEMATTRS_EXCEPTION_TYPE]: 'OverrideError',
+          [SEMATTRS_EXCEPTION_MESSAGE]: 'override-boom',
+          [SEMATTRS_EXCEPTION_STACKTRACE]: 'override-bar',
+        });
+      });
     });
 
     describe('when exception code is numeric', () => {

@@ -318,7 +318,18 @@ export class SpanImpl implements Span {
     return this._ended === false;
   }
 
-  recordException(exception: Exception, time?: TimeInput): void {
+  recordException(
+    exception: Exception,
+    attributesOrStartTime?: Attributes | TimeInput,
+    timeStamp?: TimeInput
+  ): void {
+    if (isTimeInput(attributesOrStartTime)) {
+      if (!isTimeInput(timeStamp)) {
+        timeStamp = attributesOrStartTime;
+      }
+      attributesOrStartTime = undefined;
+    }
+
     const attributes: Attributes = {};
     if (typeof exception === 'string') {
       attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception;
@@ -335,13 +346,16 @@ export class SpanImpl implements Span {
         attributes[SEMATTRS_EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
+    if (attributesOrStartTime) {
+      Object.assign(attributes, sanitizeAttributes(attributesOrStartTime));
+    }
 
     // these are minimum requirements from spec
     if (
       attributes[SEMATTRS_EXCEPTION_TYPE] ||
       attributes[SEMATTRS_EXCEPTION_MESSAGE]
     ) {
-      this.addEvent(ExceptionEventName, attributes, time);
+      this.addEvent(ExceptionEventName, attributes, timeStamp);
     } else {
       diag.warn(`Failed to record an exception ${exception}`);
     }
