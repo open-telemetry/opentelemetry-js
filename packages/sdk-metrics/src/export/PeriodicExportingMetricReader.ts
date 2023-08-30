@@ -25,6 +25,7 @@ import { MetricReader } from './MetricReader';
 import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 import { diag } from '@opentelemetry/api';
+import { MetricProducer } from './MetricProducer';
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -40,6 +41,13 @@ export type PeriodicExportingMetricReaderOptions = {
    * Milliseconds for the async observable callback to timeout.
    */
   exportTimeoutMillis?: number;
+  /**
+   * **Note, this option is experimental**. Additional MetricProducers to use as a source of
+   * aggregated metric data in addition to the SDK's metric data. The resource returned by
+   * these MetricProducers is ignored; the SDK's resource will be used instead.
+   * @experimental
+   */
+  metricProducers?: MetricProducer[];
 };
 
 /**
@@ -59,6 +67,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       ),
       aggregationTemporalitySelector:
         options.exporter.selectAggregationTemporality?.bind(options.exporter),
+      metricProducers: options.metricProducers,
     });
 
     if (
