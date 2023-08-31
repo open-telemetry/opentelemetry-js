@@ -159,7 +159,7 @@ The below table describes which versions of each set of packages are expected to
 | 1.2.x                                                               | 0.29.x                |
 | 1.1.x                                                               | 0.28.x                |
 | 1.0.x                                                               | 0.27.x                |
-| 1.0.x (this and following versions require API >= 1.0.0 for traces) | 0.26.x                |
+| 1.0.x (this and following versions require API >=1.0.0 for traces)  | 0.26.x                |
 
 ## Versioning
 
