@@ -20,6 +20,7 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
     "test:webworker": "karma start karma.worker.js --single-run",
+    "test:bench": "node test/performance/benchmark/index.js",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
