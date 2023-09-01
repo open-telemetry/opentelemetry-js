@@ -512,8 +512,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       };
 
       const startTime = hrTime();
-      const metricAttributes =
-        utils.getIncomingRequestMetricAttributes(spanAttributes);
+      const metricAttributes: MetricAttributes = Object.assign(
+        utils.getIncomingRequestMetricAttributes(spanAttributes),
+        instrumentation._getConfig().customMetricAttributes?.()
+      );
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(method, spanOptions, ctx);
@@ -658,8 +660,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       });
 
       const startTime = hrTime();
-      const metricAttributes: MetricAttributes =
-        utils.getOutgoingRequestMetricAttributes(attributes);
+      const metricAttributes: MetricAttributes = Object.assign(
+        utils.getOutgoingRequestMetricAttributes(attributes),
+        instrumentation._getConfig().customMetricAttributes?.()
+      );
 
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,

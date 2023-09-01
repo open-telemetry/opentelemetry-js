@@ -26,7 +26,14 @@ import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
 import { TestMetricReader } from '../utils/TestMetricReader';
 
-const instrumentation = new HttpInstrumentation();
+const instrumentation = new HttpInstrumentation({
+  customMetricAttributes: () => {
+    return {
+      foo: 'bar',
+    };
+  },
+});
+
 instrumentation.enable();
 instrumentation.disable();
 
@@ -115,6 +122,8 @@ describe('metrics', () => {
       metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_PORT],
       22346
     );
+    // Custom attributes
+    assert.strictEqual(metrics[0].dataPoints[0].attributes['foo'], 'bar');
 
     assert.strictEqual(metrics[1].dataPointType, DataPointType.HISTOGRAM);
     assert.strictEqual(
@@ -148,5 +157,7 @@ describe('metrics', () => {
       metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR],
       '1.1'
     );
+    // Custom attributes
+    assert.strictEqual(metrics[1].dataPoints[0].attributes['foo'], 'bar');
   });
 });
