@@ -19,14 +19,9 @@
     {
       "matchPackageNames": ["typescript", "webpack", "webpack-cli"],
       "dependencyDashboardApproval": true
-    },
-    {
-      "matchPaths": ["experimental/backwards-compatibility/**"],
-      "matchPackageNames": ["@types/node"],
-      "enabled": false
     }
   ],
-  "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0"],
+  "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0", "@types/node"],
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
   "labels": ["dependencies"]
 }
