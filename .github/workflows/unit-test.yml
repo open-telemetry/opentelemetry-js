@@ -27,6 +27,11 @@ jobs:
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest
+        if: ${{ matrix.node_version == '18' || matrix.node_version == '20' }}
+
+      # npm@10.0.0 drops support for Node.js v14 and v16
+      - run: npm install -g npm@"<10.0.0"
+        if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
       - name: restore lerna
         id: cache
