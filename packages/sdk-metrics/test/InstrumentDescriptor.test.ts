@@ -46,7 +46,7 @@ describe('InstrumentDescriptor', () => {
       string,
       boolean,
       InstrumentDescriptor,
-      InstrumentDescriptor
+      InstrumentDescriptor,
     ][] = [
       [
         'Compatible with identical descriptors',
