@@ -79,7 +79,7 @@ server.on("GET", "/user/:id", onGet);
 Using span relationships, attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions), we can more accurately describe the span in a way our tracing backend will more easily understand. The following example uses these mechanisms, which are described below.
 
 ```typescript
-import { NetTransportValues SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { NetTransportValues, SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { trace, context, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 
 async function onGet(request, response) {
