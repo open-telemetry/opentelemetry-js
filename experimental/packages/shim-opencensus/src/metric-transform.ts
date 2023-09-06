@@ -179,6 +179,8 @@ function dataPoints<T>(
     // use zeroed hrTime if it is undefined, which probably shouldn't happen
     const startTime = ocTimestampToHrTime(ts.startTimestamp) ?? ZEROED_HRTIME;
 
+    // points should be an array with a single value, so this will return a single point per
+    // attribute set.
     return ts.points.map(
       (point): DataPoint<T> => ({
         startTime,
