@@ -17,7 +17,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :house: (Internal)
 
 
-## Unreleased
+## 0.42.0
 
 ### :boom: Breaking Change
 
