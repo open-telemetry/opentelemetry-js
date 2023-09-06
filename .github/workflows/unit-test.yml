@@ -46,7 +46,7 @@ jobs:
             experimental/packages/*/package-lock.json
           key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
 
-      - run: npm install nx@15.9.6
+      - run: npm install --save-dev nx@15.9.6
         if: ${{ matrix.node_version == '14' }}
 
       - name: Bootstrap
