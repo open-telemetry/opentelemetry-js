@@ -8,9 +8,24 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* chore(sdk-node): deprecate methods in favor of constructor options [#3996](https://github.com/open-telemetry/opentelemetry-js/pull/3996) @pichlermarc
+  * The following methods are now deprecated and will be removed in `0.43.0`
+    * `NodeSDK.configureTracerProvider()`, please use constructor options instead
+    * `NodeSDK.configureMeterProvider()`, please use constructor options instead
+    * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
+    * `NodeSDK.addResource()`, please use constructor options instead
+    * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
+* chore(sdk-node): add notice that '@opentelemetry/exporter-jaeger' has to be installed manually in the next version [#4068](https://github.com/open-telemetry/opentelemetry-js/pull/4068) @pichlermarc
+  * Starting with 0.43.0 '@opentelemetry/exporter-jaeger' will no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+
 ### :rocket: (Enhancement)
 
+* feat: update PeriodicExportingMetricReader and PrometheusExporter to accept optional metric producers [#4077](https://github.com/open-telemetry/opentelemetry-js/pull/4077) @aabmass
+
 ### :bug: (Bug Fix)
+
+* fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
 
 ### :books: (Refine Doc)
 
