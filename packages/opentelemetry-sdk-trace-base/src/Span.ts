@@ -272,7 +272,18 @@ export class Span implements APISpan, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: Exception, time?: TimeInput): void {
+  recordException(
+    exception: Exception,
+    attributesOrStartTime?: SpanAttributes | TimeInput,
+    timeStamp?: TimeInput
+  ): void {
+    if (isTimeInput(attributesOrStartTime)) {
+      if (!isTimeInput(timeStamp)) {
+        timeStamp = attributesOrStartTime;
+      }
+      attributesOrStartTime = undefined;
+    }
+
     const attributes: SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
@@ -290,13 +301,16 @@ export class Span implements APISpan, ReadableSpan {
         attributes[SemanticAttributes.EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
+    if (attributesOrStartTime) {
+      Object.assign(attributes, sanitizeAttributes(attributesOrStartTime));
+    }
 
     // these are minimum requirements from spec
     if (
       attributes[SemanticAttributes.EXCEPTION_TYPE] ||
       attributes[SemanticAttributes.EXCEPTION_MESSAGE]
     ) {
-      this.addEvent(ExceptionEventName, attributes, time);
+      this.addEvent(ExceptionEventName, attributes, timeStamp);
     } else {
       diag.warn(`Failed to record an exception ${exception}`);
     }
