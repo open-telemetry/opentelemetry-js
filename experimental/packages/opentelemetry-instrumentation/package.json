@@ -81,7 +81,7 @@
     "@opentelemetry/api": "^1.3.0"
   },
   "devDependencies": {
-    "@babel/core": "7.22.11",
+    "@babel/core": "7.22.17",
     "@opentelemetry/api": "1.4.1",
     "@opentelemetry/sdk-metrics": "1.15.2",
     "@types/mocha": "10.0.1",
