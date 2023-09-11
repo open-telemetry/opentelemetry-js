@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.6.0
+
 ### :bug: (Bug Fix)
 
 * Revert "feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)"
