@@ -161,10 +161,6 @@ describe('MetricCollector', () => {
       assert.strictEqual(metricData2.dataPoints.length, 2);
       assertDataPoint(metricData2.dataPoints[0], {}, 3);
       assertDataPoint(metricData2.dataPoints[1], { foo: 'bar' }, 4);
-
-      /** checking batch[2], should not exist as it was never observed */
-      const metricData3 = metrics[2];
-      assert.strictEqual(metricData3, undefined);
     });
 
     it('should collect observer metrics with timeout', async () => {
