@@ -19,7 +19,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * fix(exporter-zipkin): rounding duration to the nearest int to be compliant with zipkin protocol [#4064](https://github.com/open-telemetry/opentelemetry-js/pull/4064) @n0cloud
 * fix(sdk-metrics): metric names should be case-insensitive
-*  fix(sdk-metrics): do not report empty scopes and metrics [#4135](https://github.com/open-telemetry/opentelemetry-js/pull/4135) @pichlermarc
+* fix(sdk-metrics): do not report empty scopes and metrics [#4135](https://github.com/open-telemetry/opentelemetry-js/pull/4135) @pichlermarc
   * Instruments that were created, but did not have measurements will not be exported anymore
   * Meters (Scopes) that were created, but did not have any instruments with measurements under them will not be exported anymore.
 
