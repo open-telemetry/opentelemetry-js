@@ -8,6 +8,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.42.0
+
+### :boom: Breaking Change
+
 * chore(sdk-node): deprecate methods in favor of constructor options [#3996](https://github.com/open-telemetry/opentelemetry-js/pull/3996) @pichlermarc
   * The following methods are now deprecated and will be removed in `0.43.0`
     * `NodeSDK.configureTracerProvider()`, please use constructor options instead
@@ -26,10 +38,6 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 0.41.2
 
