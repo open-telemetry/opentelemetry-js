@@ -8,6 +8,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(exporter-logs-otlp-proto): change OTLPLogExporter to OTLPLogExporter [#4140](https://github.com/open-telemetry/opentelemetry-js/pull/4140) @Vunovati
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
