@@ -143,6 +143,8 @@ The below table describes which versions of each set of packages are expected to
 
 | Stable Packages                                                 | Experimental Packages |
 |-----------------------------------------------------------------|-----------------------|
+| 1.17.x                                                          | 0.43.x                |
+| 1.16.x                                                          | 0.42.x                |
 | 1.15.x                                                          | 0.41.x                |
 | 1.14.x                                                          | 0.40.x                |
 | 1.13.x                                                          | 0.39.x                |
@@ -150,7 +152,7 @@ The below table describes which versions of each set of packages are expected to
 | 1.11.x                                                          | 0.37.x                |
 | 1.10.x                                                          | 0.36.x                |
 | 1.9.x                                                           | 0.35.x                |
-| 1.8.x (this and above versions require API >=1.3.0 for metrics) | 0.34.x                |
+| 1.8.x (this and later versions require API >=1.3.0 for metrics) | 0.34.x                |
 | 1.7.x                                                           | 0.33.x                |
 | 1.6.x                                                           | 0.32.x                |
 | 1.5.x                                                           | 0.31.x                |
@@ -159,7 +161,7 @@ The below table describes which versions of each set of packages are expected to
 | 1.2.x                                                           | 0.29.x                |
 | 1.1.x                                                           | 0.28.x                |
 | 1.0.x                                                           | 0.27.x                |
-| 1.0.x (this and above versions require API >=1.0.0 for traces)  | 0.26.x                |
+| 1.0.x (this and later versions require API >=1.0.0 for traces)  | 0.26.x                |
 
 ## Versioning
 
