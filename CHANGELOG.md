@@ -11,19 +11,35 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.17.0
+
+### :bug: (Bug Fix)
+
+* Revert "feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)"
+  * This feature was an unintentional breaking change introduced with API 1.5.0
+  * This PR updates all SDK packages to allow API 1.6.0, where this change has been reverted.
+
+## 1.16.0
+
+### :rocket: (Enhancement)
+
 * feat(sdk-metrics): implement MetricProducer specification [#4007](https://github.com/open-telemetry/opentelemetry-js/pull/4007)
 * feat: update PeriodicExportingMetricReader and PrometheusExporter to accept optional metric producers [#4077](https://github.com/open-telemetry/opentelemetry-js/pull/4077) @aabmass
 
 ### :bug: (Bug Fix)
 
 * fix(exporter-zipkin): rounding duration to the nearest int to be compliant with zipkin protocol [#4064](https://github.com/open-telemetry/opentelemetry-js/pull/4064) @n0cloud
+* fix(sdk-metrics): metric names should be case-insensitive
 
 ### :books: (Refine Doc)
 
 * docs(guidelines): add dependencies guidelines [#4040](https://github.com/open-telemetry/opentelemetry-js/pull/4040)
-
-### :house: (Internal)
 
 ## 1.15.2
 
