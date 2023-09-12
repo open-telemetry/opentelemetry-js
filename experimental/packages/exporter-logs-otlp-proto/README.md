@@ -22,7 +22,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 
 ```js
 const { LoggerProvider, SimpleLogRecordProcessor } = require('@opentelemetry/sdk-logs');
-const { OTLPLogsExporter } =  require('@opentelemetry/exporter-logs-otlp-proto');
+const { OTLPLogExporter } =  require('@opentelemetry/exporter-logs-otlp-proto');
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/logs
@@ -32,7 +32,7 @@ const collectorOptions = {
 };
 
 const logProvider = new LoggerProvider({resource: new Resource({'service.name': 'testApp'})});
-const logExporter = new OTLPLogsExporter(collectorOptions);
+const logExporter = new OTLPLogExporter(collectorOptions);
 logProvider.addLogRecordProcessor(new SimpleLogRecordProcessor(exporter));
 
 const logger = logProvider.getLogger('test_log_instrumentation');
@@ -44,7 +44,7 @@ logger.emit({
 
 ## Exporter Timeout Configuration
 
-The OTLPLogsExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
+The OTLPLogExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
 
 To override the default timeout duration, use the following options:
 
@@ -57,7 +57,7 @@ To override the default timeout duration, use the following options:
 
   > `OTEL_EXPORTER_OTLP_LOGS_TIMEOUT` takes precedence and overrides `OTEL_EXPORTER_OTLP_TIMEOUT`.
 
-+ Provide `timeoutMillis` to OTLPLogsExporter with `collectorOptions`:
++ Provide `timeoutMillis` to OTLPLogExporter with `collectorOptions`:
 
   ```js
   const collectorOptions = {
@@ -68,7 +68,7 @@ To override the default timeout duration, use the following options:
     }, //an optional object containing custom headers to be sent with each request will only work with http
   };
 
-  const exporter = new OTLPLogsExporter(collectorOptions);
+  const exporter = new OTLPLogExporter(collectorOptions);
   ```
 
   > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
