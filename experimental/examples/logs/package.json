@@ -1,12 +1,12 @@
 {
   "name": "logs-example",
-  "version": "0.42.0",
+  "version": "0.43.0",
   "private": true,
   "scripts": {
     "start": "ts-node index.ts"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.5.0",
+    "@opentelemetry/api": "^1.6.0",
     "@opentelemetry/api-logs": "0.41.0",
     "@opentelemetry/sdk-logs": "0.41.0"
   },
