@@ -8,10 +8,8 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          # - "14"
-          # - "16"
           - "18"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
@@ -48,12 +46,15 @@ jobs:
 
       - name: Benchmark tests
         run: |
-          npm run test:bench 
+          npm run test:bench
+          find . -name benchmarks.txt -exec cat {} + > combined_benchmarks.txt
 
       - name: Store benchmark results
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'benchmarkjs'
-          output-file-path: benchmarks.txt
+          output-file-path: combined_benchmarks.txt
+          gh-pages-branch: benchmarks
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          benchmark-data-dir-path: "docs/benchmarks/loadtests"
           auto-push: true
