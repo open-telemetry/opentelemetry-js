@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-const Benchmark = require('benchmark');
-const { BasicTracerProvider } = require('../../../build/src');
+import * as Benchmark from 'benchmark';
+import { BasicTracerProvider } from '../../../src';
 
 const tracerProvider = new BasicTracerProvider();
 const tracer = tracerProvider.getTracer('test')
 
 const suite = new Benchmark.Suite();
 
-suite.on('cycle', event => {
+suite.on('cycle', (event: any) => {
   console.log(String(event.target));
 });
 

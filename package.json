@@ -35,7 +35,6 @@
     "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix",
     "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix",
     "update-ts-configs": "node scripts/update-ts-configs.js",
-
     "comment_prepare_1": "echo scripts in this section automatically prepare releases. Intended for use by maintainers only.",
     "comment_prepare_2": "echo experimental preparation scripts only prepare experimental packages",
     "prepare_release:experimental:patch": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:remove_stable && npm run _lerna:version_patch && npm run _restore:lerna",
@@ -43,7 +42,6 @@
     "comment_prepare_3": "echo sdk preparation scripts prepare all stable and experimental packages",
     "prepare_release:sdk:patch": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:version_patch && npm run _restore:lerna",
     "prepare_release:sdk:minor": "npm run _check:no_changes && npm run _backup:lerna && npm run _lerna:remove_api && npm run _lerna:version_minor && npm run _restore:lerna",
-
     "comment_internal": "echo scripts below this line are for internal use",
     "_check:no_changes": "if [ ! -z \"$(git status -uall --porcelain)\" ]; then echo Please ensure all changes are committed; exit 1; fi",
     "_backup:lerna": "cp lerna.json lerna.json.backup",
@@ -64,6 +62,8 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@lerna/legacy-package-management": "7.1.5",
+    "@types/benchmark": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "5.59.11",
     "@typescript-eslint/parser": "5.59.11",
     "benchmark": "2.1.4",
@@ -74,7 +74,6 @@
     "eslint-plugin-prettier": "5.0.0",
     "gh-pages": "6.0.0",
     "lerna": "7.1.5",
-    "@lerna/legacy-package-management": "7.1.5",
     "linkinator": "5.0.2",
     "markdownlint-cli": "0.36.0",
     "prettier": "3.0.3",
