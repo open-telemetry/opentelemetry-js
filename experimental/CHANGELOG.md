@@ -48,6 +48,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
+* fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger.
 
 ## 0.41.2
 
