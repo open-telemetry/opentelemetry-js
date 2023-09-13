@@ -1,6 +1,8 @@
 name: Benchmark Tests
 
-on: workflow_dispatch
+on:
+  release:
+    types: [published]
 
 jobs:
   node-tests:
