@@ -18,15 +18,15 @@ import * as Benchmark from 'benchmark';
 import { BasicTracerProvider } from '../../../src';
 
 const tracerProvider = new BasicTracerProvider();
-const tracer = tracerProvider.getTracer('test')
+const tracer = tracerProvider.getTracer('test');
 
 const suite = new Benchmark.Suite();
 
 suite.on('cycle', (event: any) => {
-  console.log(String(event.target));
+  console.log(String(event.target)); // eslint-disable-line no-console
 });
 
-suite.add('create spans (10 attributes)', function() {
+suite.add('create spans (10 attributes)', function () {
   const span = tracer.startSpan('span');
   span.setAttribute('aaaaaaaaaaaaaaaaaaaa', 'aaaaaaaaaaaaaaaaaaaa');
   span.setAttribute('bbbbbbbbbbbbbbbbbbbb', 'aaaaaaaaaaaaaaaaaaaa');
