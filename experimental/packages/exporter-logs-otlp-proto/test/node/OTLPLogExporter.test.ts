@@ -21,7 +21,7 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { Stream, PassThrough } from 'stream';
 import * as zlib from 'zlib';
-import { OTLPLogsExporter } from '../../src';
+import { OTLPLogExporter } from '../../src';
 import {
   ensureExportLogsServiceRequestIsSet,
   ensureExportedLogRecordIsCorrect,
@@ -42,8 +42,8 @@ import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 
 let fakeRequest: PassThrough;
 
-describe('OTLPLogsExporter - node with proto over http', () => {
-  let collectorExporter: OTLPLogsExporter;
+describe('OTLPLogExporter - node with proto over http', () => {
+  let collectorExporter: OTLPLogExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let logs: ReadableLogRecord[];
 
@@ -56,7 +56,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     const envSource = process.env;
     it('should use url defined in env that ends with root path and append version and signal path', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/logs`
@@ -65,7 +65,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     });
     it('should use url defined in env without checking if path is already present', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/logs';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs`
@@ -74,7 +74,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     });
     it('should use url defined in env and append version and signal', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs`
@@ -84,7 +84,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     it('should override global exporter url with signal url defined in env', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.logs/';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT
@@ -94,7 +94,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     });
     it('should add root path when signal url defined in env contains no path and no root path', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}/`
@@ -103,7 +103,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     });
     it('should not add root path when signal url defined in env contains root path but no path', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}`
@@ -112,7 +112,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     });
     it('should not add root path when signal url defined in env contains path', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar/v1/logs';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}`
@@ -121,7 +121,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     });
     it('should not add root path when signal url defined in env contains path and ends in /', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar/v1/logs/';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}`
@@ -130,14 +130,14 @@ describe('OTLPLogsExporter - node with proto over http', () => {
     });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=bar';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(collectorExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=boo';
-      const collectorExporter = new OTLPLogsExporter();
+      const collectorExporter = new OTLPLogExporter();
       assert.strictEqual(collectorExporter.headers.foo, 'boo');
       assert.strictEqual(collectorExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = '';
@@ -156,7 +156,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
       };
-      collectorExporter = new OTLPLogsExporter(collectorExporterConfig);
+      collectorExporter = new OTLPLogExporter(collectorExporterConfig);
       logs = [];
       logs.push(Object.assign({}, mockedReadableLogRecord));
     });
@@ -286,7 +286,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
         compression: CompressionAlgorithm.GZIP,
         httpAgentOptions: { keepAliveMsecs: 2000 },
       };
-      collectorExporter = new OTLPLogsExporter(collectorExporterConfig);
+      collectorExporter = new OTLPLogExporter(collectorExporterConfig);
       logs = [];
       logs.push(Object.assign({}, mockedReadableLogRecord));
     });
@@ -331,7 +331,7 @@ describe('OTLPLogsExporter - node with proto over http', () => {
 });
 
 describe('export - real http request destroyed before response received', () => {
-  let collectorExporter: OTLPLogsExporter;
+  let collectorExporter: OTLPLogExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let logs: ReadableLogRecord[];
   const server = http.createServer((_, res) => {
@@ -351,7 +351,7 @@ describe('export - real http request destroyed before response received', () => 
       url: 'http://localhost:8082',
       timeoutMillis: 1,
     };
-    collectorExporter = new OTLPLogsExporter(collectorExporterConfig);
+    collectorExporter = new OTLPLogExporter(collectorExporterConfig);
     logs = [];
     logs.push(Object.assign({}, mockedReadableLogRecord));
 
@@ -368,7 +368,7 @@ describe('export - real http request destroyed before response received', () => 
       url: 'http://localhost:8082',
       timeoutMillis: 100,
     };
-    collectorExporter = new OTLPLogsExporter(collectorExporterConfig);
+    collectorExporter = new OTLPLogExporter(collectorExporterConfig);
     logs = [];
     logs.push(Object.assign({}, mockedReadableLogRecord));
 
@@ -383,7 +383,7 @@ describe('export - real http request destroyed before response received', () => 
 });
 
 describe('export - real http request destroyed after response received', () => {
-  let collectorExporter: OTLPLogsExporter;
+  let collectorExporter: OTLPLogExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let logs: ReadableLogRecord[];
 
@@ -401,7 +401,7 @@ describe('export - real http request destroyed after response received', () => {
       url: 'http://localhost:8082',
       timeoutMillis: 300,
     };
-    collectorExporter = new OTLPLogsExporter(collectorExporterConfig);
+    collectorExporter = new OTLPLogExporter(collectorExporterConfig);
     logs = [];
     logs.push(Object.assign({}, mockedReadableLogRecord));
 

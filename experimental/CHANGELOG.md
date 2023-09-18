@@ -8,6 +8,28 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(exporter-logs-otlp-proto): change OTLPLogExporter to OTLPLogExporter [#4140](https://github.com/open-telemetry/opentelemetry-js/pull/4140) @Vunovati
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.43.0
+
+### :bug: (Bug Fix)
+
+* Revert "feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)"
+  * This feature was an unintentional breaking change introduced with API 1.5.0
+  * This PR updates all experimental packages to allow API 1.6.0, where this change has been reverted.
+
+## 0.42.0
+
+### :boom: Breaking Change
+
 * chore(sdk-node): deprecate methods in favor of constructor options [#3996](https://github.com/open-telemetry/opentelemetry-js/pull/3996) @pichlermarc
   * The following methods are now deprecated and will be removed in `0.43.0`
     * `NodeSDK.configureTracerProvider()`, please use constructor options instead
@@ -22,15 +44,13 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat: update PeriodicExportingMetricReader and PrometheusExporter to accept optional metric producers [#4077](https://github.com/open-telemetry/opentelemetry-js/pull/4077) @aabmass
+* feat(opencensus-shim): implement OpenCensus metric producer [#4066](https://github.com/open-telemetry/opentelemetry-js/pull/4066) @aabmass
 
 ### :bug: (Bug Fix)
 
 * fix(otlp-transformer): Avoid precision loss when converting from HrTime to unix nanoseconds. [#4062](https://github.com/open-telemetry/opentelemetry-js/pull/4062)
 * fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger.
 
 ## 0.41.2
 
