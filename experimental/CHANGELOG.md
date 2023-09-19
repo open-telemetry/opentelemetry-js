@@ -9,8 +9,14 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * fix(exporter-logs-otlp-proto): change OTLPLogExporter to OTLPLogExporter [#4140](https://github.com/open-telemetry/opentelemetry-js/pull/4140) @Vunovati
+* fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger
+  * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
 
 ### :rocket: (Enhancement)
+
+* feat(exporter-metrics-otlp-proto): add esm build [#4099](https://github.com/open-telemetry/opentelemetry-js/pull/4099) @pichlermarc
+* feat(opencensus-shim): implement OpenCensus metric producer [#4066](https://github.com/open-telemetry/opentelemetry-js/pull/4066) @aabmass
 
 ### :bug: (Bug Fix)
 
@@ -48,7 +54,6 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
-* fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger.
 
 ## 0.41.2
 

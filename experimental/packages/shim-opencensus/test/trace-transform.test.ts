@@ -19,14 +19,14 @@ import {
   mapSpanContext,
   mapSpanKind,
   reverseMapSpanContext,
-} from '../src/transform';
+} from '../src/trace-transform';
 
 import * as oc from '@opencensus/core';
 import { SpanKind } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
 import * as assert from 'assert';
 
-describe('transform', () => {
+describe('trace-transform', () => {
   describe('mapSpanKind', () => {
     it('should return undefined with undefined input', () => {
       assert.strictEqual(mapSpanKind(undefined), undefined);
