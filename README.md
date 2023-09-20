@@ -37,7 +37,7 @@
 
 ## About this project
 
-This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
+This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics, and logs from applications.
 
 ## Quick Start
 
@@ -109,24 +109,29 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-| Platform Version    | Supported                                       |
-| ------------------- | ----------------------------------------------- |
-| Node.JS `v18`       | ✅                                               |
-| Node.JS `v16`       | ✅                                               |
-| Node.JS `v14`       | ✅                                               |
-| Older Node Versions | See [Node Support](#node-support)               |
-| Web Browsers        | ✅ See [Browser Support](#browser-support) below |
+| Platform Version    | Supported                                     |
+|---------------------|-----------------------------------------------|
+| Node.JS `v18`       | :heavy_check_mark:                            |
+| Node.JS `v16`       | :heavy_check_mark:                            |
+| Node.JS `v14`       | :heavy_check_mark:                            |
+| Older Node Versions | See [Node Support](#node-support)             |
+| Web Browsers        | See [Browser Support](#browser-support) below |
 
 ### Node Support
 
 Only Node.js Active or Maintenance LTS versions are supported.
 Previous versions of node *may* work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
-Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
+Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the
+`perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
 
-Automated browser tests are run in the latest version of Headless Chrome.
-There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.
+> [!IMPORTANT]
+> Client instrumentation for the browser is **experimental** and mostly **unspecified**. If you are interested in
+> helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig].
+
+There is currently no list of officially supported browsers. OpenTelemetry is developed using standard web
+technologies and aims to work in currently supported versions of major browsers.
 
 ## Package Version Compatibility
 
@@ -136,19 +141,27 @@ There may also be API packages for experimental signals in the experimental dire
 All stable packages are released with the same version, and all experimental packages are released with the same version.
 The below table describes which versions of each set of packages are expected to work together.
 
-| API   | Stable Packages | Experimental Packages |
-| ----- | --------------- | --------------------- |
-| 1.3.x | 1.9.x           | 0.35.x                |
-| 1.3.x | 1.8.x           | 0.34.x                |
-| 1.2.x | 1.7.x           | 0.33.x                |
-| 1.2.x | 1.6.x           | 0.32.x                |
-| 1.1.x | 1.5.x           | 0.31.x                |
-| 1.1.x | 1.4.x           | 0.30.x                |
-| 1.1.x | 1.3.x           | 0.29.x                |
-| 1.1.x | 1.2.x           | 0.29.x                |
-| 1.1.x | 1.1.x           | 0.28.x                |
-| 1.0.x | 1.0.x           | 0.27.x                |
-| 1.0.x | 1.0.x           | 0.26.x                |
+| Stable Packages                                                 | Experimental Packages |
+|-----------------------------------------------------------------|-----------------------|
+| 1.17.x                                                          | 0.43.x                |
+| 1.16.x                                                          | 0.42.x                |
+| 1.15.x                                                          | 0.41.x                |
+| 1.14.x                                                          | 0.40.x                |
+| 1.13.x                                                          | 0.39.x                |
+| 1.12.x                                                          | 0.38.x                |
+| 1.11.x                                                          | 0.37.x                |
+| 1.10.x                                                          | 0.36.x                |
+| 1.9.x                                                           | 0.35.x                |
+| 1.8.x (this and later versions require API >=1.3.0 for metrics) | 0.34.x                |
+| 1.7.x                                                           | 0.33.x                |
+| 1.6.x                                                           | 0.32.x                |
+| 1.5.x                                                           | 0.31.x                |
+| 1.4.x                                                           | 0.30.x                |
+| 1.3.x                                                           | 0.29.x                |
+| 1.2.x                                                           | 0.29.x                |
+| 1.1.x                                                           | 0.28.x                |
+| 1.0.x                                                           | 0.27.x                |
+| 1.0.x (this and later versions require API >=1.0.0 for traces)  | 0.26.x                |
 
 ## Versioning
 
@@ -177,7 +190,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 #### Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
 
-- [Amir Blum](https://github.com/blumamir), Aspecto
+- [Amir Blum](https://github.com/blumamir), Keyval
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
@@ -190,13 +203,10 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
-- [John Bley](https://github.com/johnbley), Splunk
-- [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
-- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
@@ -211,6 +221,9 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
 - [Roch Devost](https://github.com/rochdev), DataDog, Approver
+- [John Bley](https://github.com/johnbley), Splunk, Approver
+- [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
+- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
 
 *Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
 
@@ -551,6 +564,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [up-for-grabs-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
+
+[client-instrumentation-sig]: https://docs.google.com/document/d/16Vsdh-DM72AfMg_FIt9yT9ExEWF4A_vRbQ3jRNBe09w/edit
 
 [docs]: https://open-telemetry.github.io/opentelemetry-js
 [compliance-matrix]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md

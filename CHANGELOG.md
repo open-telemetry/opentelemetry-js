@@ -11,22 +11,65 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(exporter-metrics-otlp-*)!: add LowMemory metrics temporality preference [#3915](https://github.com/open-telemetry/opentelemetry-js/pull/3915)
-  * Breaking: From now on `AggregationTemporalityPreference` has to be used instead of `AggregationTemporality` when configuring the exporter.
-  * Adds support for [LowMemory temporality preference](https://github.com/open-telemetry/opentelemetry-specification/blob/f09624bb97e9be3be259733b93be507df18927bd/specification/metrics/sdk_exporters/otlp.md#additional-configuration)
-  * Adds support for `lowmemory` in `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+* test: added a performance benchmark test for span creation [#4105](https://github.com/open-telemetry/opentelemetry-js/pull/4105)
+
+## 1.17.0
+
+### :bug: (Bug Fix)
+
+* Revert "feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)"
+  * This feature was an unintentional breaking change introduced with API 1.5.0
+  * This PR updates all SDK packages to allow API 1.6.0, where this change has been reverted.
+
+## 1.16.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): implement MetricProducer specification [#4007](https://github.com/open-telemetry/opentelemetry-js/pull/4007)
+* feat: update PeriodicExportingMetricReader and PrometheusExporter to accept optional metric producers [#4077](https://github.com/open-telemetry/opentelemetry-js/pull/4077) @aabmass
+
+### :bug: (Bug Fix)
+
+* fix(exporter-zipkin): rounding duration to the nearest int to be compliant with zipkin protocol [#4064](https://github.com/open-telemetry/opentelemetry-js/pull/4064) @n0cloud
+* fix(sdk-metrics): metric names should be case-insensitive
+
+### :books: (Refine Doc)
+
+* docs(guidelines): add dependencies guidelines [#4040](https://github.com/open-telemetry/opentelemetry-js/pull/4040)
+
+## 1.15.2
+
+### :bug: (Bug Fix)
+
+* fix(core): stop rounding to nearest int in hrTimeTo*seconds() functions [#4014](https://github.com/open-telemetry/opentelemetry-js/pull/4014/) @aabmass
+* fix(sdk-metrics): ignore invalid metric values [#3988](https://github.com/open-telemetry/opentelemetry-js/pull/3988) @legendecas
+* fix(core): add baggage support for values containing an equals sign [#3975](https://github.com/open-telemetry/opentelemetry-js/pull/3975) @krosenk729
+
+## 1.15.1
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
+
+## 1.15.0
 
 ### :bug: (Bug Fix)
 
 * fix(opentelemetry-exporter-prometheus): Update default PrometheusExporter to not append a timestamp to match the text based exposition format [#3961](https://github.com/open-telemetry/opentelemetry-js/pull/3961) @JacksonWeber
 * fix(sdk-metrics): Update default Histogram's boundary to match OTEL's spec [#3893](https://github.com/open-telemetry/opentelemetry-js/pull/3893/) @chigia001
 * fix(sdk-metrics): preserve startTime for cumulative ExponentialHistograms [#3934](https://github.com/open-telemetry/opentelemetry-js/pull/3934/) @aabmass
-
-### :books: (Refine Doc)
+* fix(sdk-trace-web): add secureConnectionStart to https only [#3879](https://github.com/open-telemetry/opentelemetry-js/pull/3879) @Abinet18
 
 ### :house: (Internal)
 
-* feat(minification): [Minification] Add noEmitHelpers, importHelpers and tslib as a dependency [#3913](https://github.com/open-telemetry/opentelemetry-js/issues/3913)
+* feat(minification): [Minification] Add noEmitHelpers, importHelpers and tslib as a dependency [#3913](https://github.com/open-telemetry/opentelemetry-js/issues/3913) @MSNev
 
 ## 1.14.0
 
@@ -42,7 +85,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-trace-web): add secureConnectionStart to https only [#3879](https://github.com/open-telemetry/opentelemetry-js/pull/3879) @Abinet18
 * fix(http-instrumentation): stop listening to `request`'s `close` event once it has emitted `response` [#3625](https://github.com/open-telemetry/opentelemetry-js/pull/3625) @SimenB
 * fix(sdk-node): fix initialization in bundled environments by not loading @opentelemetry/exporter-jaeger [#3739](https://github.com/open-telemetry/opentelemetry-js/pull/3739) @pichlermarc
 

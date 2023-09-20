@@ -40,6 +40,9 @@
       "path": "../../../packages/sdk-metrics"
     },
     {
+      "path": "../api-logs"
+    },
+    {
       "path": "../exporter-trace-otlp-grpc"
     },
     {
@@ -50,6 +53,9 @@
     },
     {
       "path": "../opentelemetry-instrumentation"
+    },
+    {
+      "path": "../sdk-logs"
     }
   ]
 }

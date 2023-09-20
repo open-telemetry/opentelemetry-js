@@ -16,19 +16,19 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPLogsExporter } from '../../src/platform/browser/index';
+import { OTLPLogExporter } from '../../src/platform/browser/index';
 
-describe('OTLPLogsExporter - web', () => {
-  let collectorLogsExporter: OTLPLogsExporter;
+describe('OTLPLogExporter - web', () => {
+  let collectorLogsExporter: OTLPLogExporter;
   describe('constructor', () => {
     let onInitSpy: any;
     beforeEach(() => {
-      onInitSpy = sinon.stub(OTLPLogsExporter.prototype, 'onInit');
+      onInitSpy = sinon.stub(OTLPLogExporter.prototype, 'onInit');
       const collectorExporterConfig = {
         hostname: 'foo',
         url: 'http://foo.bar.com',
       };
-      collectorLogsExporter = new OTLPLogsExporter(collectorExporterConfig);
+      collectorLogsExporter = new OTLPLogExporter(collectorExporterConfig);
     });
     afterEach(() => {
       sinon.restore();

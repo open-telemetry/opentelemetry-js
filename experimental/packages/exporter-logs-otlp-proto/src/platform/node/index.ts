@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export { OTLPLogsExporter } from './OTLPLogsExporter';
+export { OTLPLogExporter } from './OTLPLogExporter';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CollectionResult } from '../../src/export/MetricData';
+import { CollectionResult, ResourceMetrics } from '../../src/export/MetricData';
 import { MetricProducer } from '../../src/export/MetricProducer';
 import { defaultResource } from '../util';
 
@@ -24,10 +24,21 @@ export const emptyResourceMetrics = {
 };
 
 export class TestMetricProducer implements MetricProducer {
+  private resourceMetrics: ResourceMetrics;
+  private errors: unknown[];
+
+  constructor(params?: {
+    resourceMetrics?: ResourceMetrics;
+    errors?: unknown[];
+  }) {
+    this.resourceMetrics = params?.resourceMetrics ?? emptyResourceMetrics;
+    this.errors = params?.errors ?? [];
+  }
+
   async collect(): Promise<CollectionResult> {
     return {
-      resourceMetrics: { resource: defaultResource, scopeMetrics: [] },
-      errors: [],
+      resourceMetrics: this.resourceMetrics,
+      errors: this.errors,
     };
   }
 }
