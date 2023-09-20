@@ -88,7 +88,7 @@ export function isDescriptorCompatibleWith(
 
 // ASCII string with a length no greater than 255 characters.
 // NB: the first character counted separately from the rest.
-const NAME_REGEXP = /^[a-z][a-z0-9_.-]{0,254}$/i;
+const NAME_REGEXP = /^[a-z][a-z0-9_.\-/]{0,254}$/i;
 export function isValidName(name: string): boolean {
   return name.match(NAME_REGEXP) != null;
 }
