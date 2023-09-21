@@ -26,7 +26,7 @@ import {
   SpanStatusCode,
   trace,
   Histogram,
-  MetricAttributes,
+  Attributes,
   ValueType,
 } from '@opentelemetry/api';
 import {
@@ -310,7 +310,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request: http.ClientRequest,
     span: Span,
     startTime: HrTime,
-    metricAttributes: MetricAttributes
+    metricAttributes: Attributes
   ): http.ClientRequest {
     if (this._getConfig().requestHook) {
       this._callRequestHook(span, request);
@@ -376,7 +376,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           if (this._getConfig().applyCustomAttributesOnSpan) {
             safeExecuteInTheMiddle(
               () =>
-                this._getConfig().applyCustomAttributesOnSpan!(
+                this._getConfig().applyCustomAttributesOnSpan?.(
                   span,
                   request,
                   response
@@ -512,9 +512,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       };
 
       const startTime = hrTime();
-      const metricAttributes: MetricAttributes = Object.assign(
+      const customMetricAttributes = safeExecuteInTheMiddle(
+        () => instrumentation._getConfig().customMetricAttributes?.(),
+        () => {},
+        true
+      );
+      const metricAttributes: Attributes = Object.assign(
         utils.getIncomingRequestMetricAttributes(spanAttributes),
-        instrumentation._getConfig().customMetricAttributes?.()
+        customMetricAttributes
       );
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
@@ -660,9 +665,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       });
 
       const startTime = hrTime();
-      const metricAttributes: MetricAttributes = Object.assign(
+      const customMetricAttributes = safeExecuteInTheMiddle(
+        () => instrumentation._getConfig().customMetricAttributes?.(),
+        () => {},
+        true
+      );
+      const metricAttributes: Attributes = Object.assign(
         utils.getOutgoingRequestMetricAttributes(attributes),
-        instrumentation._getConfig().customMetricAttributes?.()
+        customMetricAttributes
       );
 
       const spanOptions: SpanOptions = {
@@ -723,7 +733,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request: http.IncomingMessage,
     response: http.ServerResponse,
     span: Span,
-    metricAttributes: MetricAttributes,
+    metricAttributes: Attributes,
     startTime: HrTime
   ) {
     const attributes = utils.getIncomingRequestAttributesOnResponse(
@@ -751,7 +761,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     if (this._getConfig().applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(
         () =>
-          this._getConfig().applyCustomAttributesOnSpan!(
+          this._getConfig().applyCustomAttributesOnSpan?.(
             span,
             request,
             response
@@ -766,7 +776,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
   private _onServerResponseError(
     span: Span,
-    metricAttributes: MetricAttributes,
+    metricAttributes: Attributes,
     startTime: HrTime,
     error: Err
   ) {
@@ -806,7 +816,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     span: Span,
     spanKind: SpanKind,
     startTime: HrTime,
-    metricAttributes: MetricAttributes
+    metricAttributes: Attributes
   ) {
     if (!this._spanNotEnded.has(span)) {
       return;
@@ -829,7 +839,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     response: http.IncomingMessage | http.ServerResponse
   ) {
     safeExecuteInTheMiddle(
-      () => this._getConfig().responseHook!(span, response),
+      () => this._getConfig().responseHook?.(span, response),
       () => {},
       true
     );
@@ -840,7 +850,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request: http.ClientRequest | http.IncomingMessage
   ) {
     safeExecuteInTheMiddle(
-      () => this._getConfig().requestHook!(span, request),
+      () => this._getConfig().requestHook?.(span, request),
       () => {},
       true
     );
