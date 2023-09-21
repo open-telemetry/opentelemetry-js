@@ -19,10 +19,11 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { Logger, LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
 import { loadDefaultConfig } from '../../src/config';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
+import { Logger } from '../../src/Logger';
 
 describe('LoggerProvider', () => {
   let envSource: Record<string, any>;

@@ -19,12 +19,12 @@ import * as sinon from 'sinon';
 
 import {
   LogRecord,
-  Logger,
   LoggerProvider,
   NoopLogRecordProcessor,
 } from '../../src';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
 import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
+import { Logger } from '../../src/Logger';
 
 const setup = () => {
   const loggerProvider = new LoggerProvider();
