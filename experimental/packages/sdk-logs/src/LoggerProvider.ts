@@ -30,7 +30,7 @@ export const DEFAULT_LOGGER_NAME = 'unknown';
 
 export class LoggerProvider implements logsAPI.LoggerProvider {
   private _shutdownOnce: BindOnceFuture<void>;
-  private _sharedState: LoggerProviderSharedState;
+  private readonly _sharedState: LoggerProviderSharedState;
 
   constructor(config: LoggerProviderConfig = {}) {
     const {

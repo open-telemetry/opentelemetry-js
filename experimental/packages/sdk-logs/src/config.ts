@@ -37,7 +37,7 @@ export function loadDefaultConfig() {
 /**
  * When general limits are provided and model specific limits are not,
  * configures the model specific limits by using the values from the general ones.
- * @param logRecordLimits User provided tracer configuration
+ * @param logRecordLimits User provided limits configuration
  */
 export function reconfigureLimits(
   logRecordLimits: LogRecordLimits

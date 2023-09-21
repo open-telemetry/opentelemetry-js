@@ -21,7 +21,6 @@ export {
   BatchLogRecordProcessorBrowserConfig,
 } from './types';
 export { LoggerProvider } from './LoggerProvider';
-export { Logger } from './Logger';
 export { LogRecord } from './LogRecord';
 export { LogRecordProcessor } from './LogRecordProcessor';
 export { ReadableLogRecord } from './export/ReadableLogRecord';
