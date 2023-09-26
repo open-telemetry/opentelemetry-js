@@ -42,11 +42,15 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   constructor(
     _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    private _attributesProcessor: AttributesProcessor
+    private _attributesProcessor: AttributesProcessor,
+    collectorHandles: MetricCollectorHandle[]
   ) {
     super(_instrumentDescriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
-    this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
+    this._temporalMetricStorage = new TemporalMetricProcessor(
+      aggregator,
+      collectorHandles
+    );
   }
 
   record(measurements: AttributeHashMap<number>, observationTime: HrTime) {
@@ -76,9 +80,5 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
       accumulations,
       collectionTime
     );
-  }
-
-  registerCollector(collector: MetricCollectorHandle): void {
-    this._temporalMetricStorage.registerCollector(collector);
   }
 }

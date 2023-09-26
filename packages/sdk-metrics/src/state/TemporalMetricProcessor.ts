@@ -61,14 +61,13 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     LastReportedHistory<T>
   >();
 
-  constructor(private _aggregator: Aggregator<T>) {}
-
-  registerCollector(collector: MetricCollectorHandle) {
-    let stash = this._unreportedAccumulations.get(collector);
-    if (stash === undefined) {
-      stash = [];
-      this._unreportedAccumulations.set(collector, stash);
-    }
+  constructor(
+    private _aggregator: Aggregator<T>,
+    collectorHandles: MetricCollectorHandle[]
+  ) {
+    collectorHandles.forEach(handle => {
+      this._unreportedAccumulations.set(handle, []);
+    });
   }
 
   /**

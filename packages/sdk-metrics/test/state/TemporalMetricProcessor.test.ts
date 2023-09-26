@@ -54,8 +54,9 @@ describe('TemporalMetricProcessor', () => {
 
         const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
-        const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
-        temporalMetricStorage.registerCollector(deltaCollector1);
+        const temporalMetricStorage = new TemporalMetricProcessor(aggregator, [
+          deltaCollector1,
+        ]);
         deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {
           const metric = temporalMetricStorage.buildMetrics(
@@ -121,9 +122,10 @@ describe('TemporalMetricProcessor', () => {
       it('should build delta recording metrics', () => {
         const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
-        const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
-        temporalMetricStorage.registerCollector(deltaCollector1);
-        temporalMetricStorage.registerCollector(deltaCollector2);
+        const temporalMetricStorage = new TemporalMetricProcessor(aggregator, [
+          deltaCollector1,
+          deltaCollector2,
+        ]);
 
         deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {
@@ -173,8 +175,10 @@ describe('TemporalMetricProcessor', () => {
 
         const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
-        const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
-        temporalMetricStorage.registerCollector(cumulativeCollector1);
+        const temporalMetricStorage = new TemporalMetricProcessor(aggregator, [
+          cumulativeCollector1,
+        ]);
+
         deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {
           const metric = temporalMetricStorage.buildMetrics(
@@ -222,9 +226,10 @@ describe('TemporalMetricProcessor', () => {
       it('should build delta recording metrics', () => {
         const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
-        const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
-        temporalMetricStorage.registerCollector(cumulativeCollector1);
-        temporalMetricStorage.registerCollector(deltaCollector1);
+        const temporalMetricStorage = new TemporalMetricProcessor(aggregator, [
+          cumulativeCollector1,
+          deltaCollector1,
+        ]);
 
         deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {

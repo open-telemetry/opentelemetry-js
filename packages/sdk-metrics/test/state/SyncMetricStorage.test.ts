@@ -45,7 +45,8 @@ describe('SyncMetricStorage', () => {
       const metricStorage = new SyncMetricStorage(
         defaultInstrumentDescriptor,
         new SumAggregator(true),
-        new NoopAttributesProcessor()
+        new NoopAttributesProcessor(),
+        []
       );
 
       for (const value of commonValues) {
@@ -62,9 +63,9 @@ describe('SyncMetricStorage', () => {
         const metricStorage = new SyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [deltaCollector]
         );
-        metricStorage.registerCollector(deltaCollector);
 
         metricStorage.record(1, {}, api.context.active(), [0, 0]);
         metricStorage.record(2, {}, api.context.active(), [1, 1]);
@@ -101,9 +102,9 @@ describe('SyncMetricStorage', () => {
         const metricStorage = new SyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [cumulativeCollector]
         );
-        metricStorage.registerCollector(cumulativeCollector);
         metricStorage.record(1, {}, api.context.active(), [0, 0]);
         metricStorage.record(2, {}, api.context.active(), [1, 1]);
         metricStorage.record(3, {}, api.context.active(), [2, 2]);

@@ -42,16 +42,6 @@ export abstract class MetricStorage {
     collectionTime: HrTime
   ): Maybe<MetricData>;
 
-  /**
-   * Registers a collector that this storage will be used with. Failing to register
-   * a collector will result in dropped metrics.
-   *
-   * Note: Memory pressure may build if a collector is registered but does not collect
-   * on this instance. Once registered, ensure that `collect()` is called in reasonable intervals.
-   * @param collector
-   */
-  abstract registerCollector(collector: MetricCollectorHandle): void;
-
   getInstrumentDescriptor(): Readonly<InstrumentDescriptor> {
     return this._instrumentDescriptor;
   }

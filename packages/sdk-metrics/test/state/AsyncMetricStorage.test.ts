@@ -49,9 +49,9 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [deltaCollector]
         );
-        metricStorage.registerCollector(deltaCollector);
 
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -156,9 +156,9 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [deltaCollector]
         );
-        metricStorage.registerCollector(deltaCollector);
 
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -249,9 +249,9 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(false),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [deltaCollector]
         );
-        metricStorage.registerCollector(deltaCollector);
 
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -344,9 +344,9 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [cumulativeCollector]
         );
-        metricStorage.registerCollector(cumulativeCollector);
 
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -476,9 +476,9 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [cumulativeCollector]
         );
-        metricStorage.registerCollector(cumulativeCollector);
 
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
@@ -570,9 +570,9 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(false),
-          new NoopAttributesProcessor()
+          new NoopAttributesProcessor(),
+          [cumulativeCollector]
         );
-        metricStorage.registerCollector(cumulativeCollector);
 
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
