@@ -63,6 +63,14 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
 
   constructor(private _aggregator: Aggregator<T>) {}
 
+  registerCollector(collector: MetricCollectorHandle) {
+    let stash = this._unreportedAccumulations.get(collector);
+    if (stash === undefined) {
+      stash = [];
+      this._unreportedAccumulations.set(collector, stash);
+    }
+  }
+
   /**
    * Builds the {@link MetricData} streams to report against a specific MetricCollector.
    * @param collector The information of the MetricCollector.
@@ -74,12 +82,11 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
    */
   buildMetrics(
     collector: MetricCollectorHandle,
-    collectors: MetricCollectorHandle[],
     instrumentDescriptor: InstrumentDescriptor,
     currentAccumulations: AttributeHashMap<T>,
     collectionTime: HrTime
   ): Maybe<MetricData> {
-    this._stashAccumulations(collectors, currentAccumulations);
+    this._stashAccumulations(currentAccumulations);
     const unreportedAccumulations =
       this._getMergedUnreportedAccumulations(collector);
 
@@ -141,18 +148,16 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
     );
   }
 
-  private _stashAccumulations(
-    collectors: MetricCollectorHandle[],
-    currentAccumulation: AttributeHashMap<T>
-  ) {
-    collectors.forEach(it => {
-      let stash = this._unreportedAccumulations.get(it);
+  private _stashAccumulations(currentAccumulation: AttributeHashMap<T>) {
+    const registeredCollectors = this._unreportedAccumulations.keys();
+    for (const collector of registeredCollectors) {
+      let stash = this._unreportedAccumulations.get(collector);
       if (stash === undefined) {
         stash = [];
-        this._unreportedAccumulations.set(it, stash);
+        this._unreportedAccumulations.set(collector, stash);
       }
       stash.push(currentAccumulation);
-    });
+    }
   }
 
   private _getMergedUnreportedAccumulations(collector: MetricCollectorHandle) {

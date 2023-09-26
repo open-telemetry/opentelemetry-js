@@ -66,17 +66,19 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
    */
   collect(
     collector: MetricCollectorHandle,
-    collectors: MetricCollectorHandle[],
     collectionTime: HrTime
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 
     return this._temporalMetricStorage.buildMetrics(
       collector,
-      collectors,
       this._instrumentDescriptor,
       accumulations,
       collectionTime
     );
+  }
+
+  registerCollector(collector: MetricCollectorHandle): void {
+    this._temporalMetricStorage.registerCollector(collector);
   }
 }

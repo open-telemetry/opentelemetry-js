@@ -91,11 +91,7 @@ export class MeterSharedState {
       this.metricStorageRegistry.getStorages(collector)
     )
       .map(metricStorage => {
-        return metricStorage.collect(
-          collector,
-          this._meterProviderSharedState.metricCollectors,
-          collectionTime
-        );
+        return metricStorage.collect(collector, collectionTime);
       })
       .filter(isNotNullish);
 
@@ -137,6 +133,9 @@ export class MeterSharedState {
         aggregator,
         view.attributesProcessor
       ) as R;
+      for (const collector of this._meterProviderSharedState.metricCollectors) {
+        viewStorage.registerCollector(collector);
+      }
       this.metricStorageRegistry.register(viewStorage);
       return viewStorage;
     });
@@ -161,6 +160,7 @@ export class MeterSharedState {
             aggregator,
             AttributesProcessor.Noop()
           ) as R;
+          storage.registerCollector(collector);
           this.metricStorageRegistry.registerForCollector(collector, storage);
           return storage;
         }

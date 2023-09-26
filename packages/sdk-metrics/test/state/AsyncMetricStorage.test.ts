@@ -43,7 +43,6 @@ const cumulativeCollector: MetricCollectorHandle = {
 describe('AsyncMetricStorage', () => {
   describe('collect', () => {
     describe('Delta Collector', () => {
-      const collectors = [deltaCollector];
       it('should collect and reset memos', async () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
@@ -52,6 +51,8 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
+        metricStorage.registerCollector(deltaCollector);
+
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
           [metricStorage],
@@ -70,7 +71,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -104,11 +104,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [1, 1];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectors,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 0);
@@ -124,7 +120,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -163,6 +158,8 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
+        metricStorage.registerCollector(deltaCollector);
+
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
           [metricStorage],
@@ -181,7 +178,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -207,7 +203,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -233,7 +228,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -257,6 +251,8 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(false),
           new NoopAttributesProcessor()
         );
+        metricStorage.registerCollector(deltaCollector);
+
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
           [metricStorage],
@@ -275,7 +271,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -301,7 +296,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -327,7 +321,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             deltaCollector,
-            collectors,
             collectionTime
           );
 
@@ -345,7 +338,6 @@ describe('AsyncMetricStorage', () => {
     });
 
     describe('Cumulative Collector', () => {
-      const collectors = [cumulativeCollector];
       it('should collect cumulative metrics', async () => {
         const delegate = new ObservableCallbackDelegate();
         const observableRegistry = new ObservableRegistry();
@@ -354,6 +346,8 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
+        metricStorage.registerCollector(cumulativeCollector);
+
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
           [metricStorage],
@@ -373,7 +367,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -410,7 +403,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -449,7 +441,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -487,6 +478,8 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(true),
           new NoopAttributesProcessor()
         );
+        metricStorage.registerCollector(cumulativeCollector);
+
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
           [metricStorage],
@@ -505,7 +498,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -531,7 +523,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -558,7 +549,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -582,6 +572,8 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(false),
           new NoopAttributesProcessor()
         );
+        metricStorage.registerCollector(cumulativeCollector);
+
         const observable = new ObservableInstrument(
           defaultInstrumentDescriptor,
           [metricStorage],
@@ -600,7 +592,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -626,7 +617,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
@@ -652,7 +642,6 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(
             cumulativeCollector,
-            collectors,
             collectionTime
           );
 
