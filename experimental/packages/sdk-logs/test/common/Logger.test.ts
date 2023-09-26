@@ -17,21 +17,19 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LogRecord, Logger, LoggerConfig, LoggerProvider } from '../../src';
+import { LogRecord, LoggerProvider, NoopLogRecordProcessor } from '../../src';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
 import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
+import { Logger } from '../../src/Logger';
 
-const setup = (loggerConfig: LoggerConfig = {}) => {
-  const logger = new Logger(
-    {
-      name: 'test name',
-      version: 'test version',
-      schemaUrl: 'test schema url',
-    },
-    loggerConfig,
-    new LoggerProvider()
-  );
-  return { logger };
+const setup = () => {
+  const loggerProvider = new LoggerProvider();
+  const logProcessor = new NoopLogRecordProcessor();
+  loggerProvider.addLogRecordProcessor(logProcessor);
+  const logger = loggerProvider.getLogger('test name', 'test version', {
+    schemaUrl: 'test schema url',
+  }) as Logger;
+  return { logger, logProcessor };
 };
 
 describe('Logger', () => {
@@ -44,8 +42,8 @@ describe('Logger', () => {
 
   describe('emit', () => {
     it('should emit a logRecord instance', () => {
-      const { logger } = setup();
-      const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
+      const { logger, logProcessor } = setup();
+      const callSpy = sinon.spy(logProcessor, 'onEmit');
       logger.emit({
         body: 'test log body',
       });
@@ -54,7 +52,7 @@ describe('Logger', () => {
 
     it('should make log record instance readonly after emit it', () => {
       const { logger } = setup();
-      const makeOnlySpy = sinon.spy(LogRecord.prototype, 'makeReadonly');
+      const makeOnlySpy = sinon.spy(LogRecord.prototype, '_makeReadonly');
       logger.emit({
         body: 'test log body',
       });
@@ -62,8 +60,8 @@ describe('Logger', () => {
     });
 
     it('should emit with current Context', () => {
-      const { logger } = setup({});
-      const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
+      const { logger, logProcessor } = setup();
+      const callSpy = sinon.spy(logProcessor, 'onEmit');
       logger.emit({
         body: 'test log body',
       });
@@ -71,7 +69,7 @@ describe('Logger', () => {
     });
 
     it('should emit with Context specified in LogRecord', () => {
-      const { logger } = setup({});
+      const { logger, logProcessor } = setup();
       const spanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
@@ -82,7 +80,7 @@ describe('Logger', () => {
         context: activeContext,
       };
 
-      const callSpy = sinon.spy(logger.getActiveLogRecordProcessor(), 'onEmit');
+      const callSpy = sinon.spy(logProcessor, 'onEmit');
       logger.emit(logRecordData);
       assert.ok(callSpy.calledWith(sinon.match.any, activeContext));
     });

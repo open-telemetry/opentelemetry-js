@@ -19,9 +19,11 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { Logger, LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
 import { loadDefaultConfig } from '../../src/config';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
+import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
+import { Logger } from '../../src/Logger';
 
 describe('LoggerProvider', () => {
   let envSource: Record<string, any>;
@@ -48,45 +50,35 @@ describe('LoggerProvider', () => {
         assert.ok(provider instanceof LoggerProvider);
       });
 
-      it('should use noop log record processor by default and no diag error', () => {
-        const errorStub = sinon.spy(diag, 'error');
+      it('should use noop log record processor by default', () => {
         const provider = new LoggerProvider();
-        const processors = provider.getActiveLogRecordProcessor().processors;
-        assert.ok(processors.length === 1);
-        assert.ok(processors[0] instanceof NoopLogRecordProcessor);
-        sinon.assert.notCalled(errorStub);
+        const sharedState = provider['_sharedState'];
+        const processor = sharedState.activeProcessor;
+        assert.ok(processor instanceof NoopLogRecordProcessor);
       });
 
       it('should have default resource if not pass', () => {
         const provider = new LoggerProvider();
-        const { resource } = provider;
+        const { resource } = provider['_sharedState'];
         assert.deepStrictEqual(resource, Resource.default());
       });
 
       it('should have default forceFlushTimeoutMillis if not pass', () => {
         const provider = new LoggerProvider();
-        const activeProcessor = provider.getActiveLogRecordProcessor();
+        const sharedState = provider['_sharedState'];
         assert.ok(
-          activeProcessor.forceFlushTimeoutMillis ===
+          sharedState.forceFlushTimeoutMillis ===
             loadDefaultConfig().forceFlushTimeoutMillis
         );
-      });
-    });
-
-    describe('when user sets unavailable exporter', () => {
-      it('should use noop log record processor by default', () => {
-        const provider = new LoggerProvider();
-        const processors = provider.getActiveLogRecordProcessor().processors;
-        assert.ok(processors.length === 1);
-        assert.ok(processors[0] instanceof NoopLogRecordProcessor);
       });
     });
 
     describe('logRecordLimits', () => {
       describe('when not defined default values', () => {
         it('should have logger with default values', () => {
-          const logger = new LoggerProvider({}).getLogger('default') as Logger;
-          assert.deepStrictEqual(logger.getLogRecordLimits(), {
+          const loggerProvider = new LoggerProvider();
+          const sharedState = loggerProvider['_sharedState'];
+          assert.deepStrictEqual(sharedState.logRecordLimits, {
             attributeValueLengthLimit: Infinity,
             attributeCountLimit: 128,
           });
@@ -95,34 +87,37 @@ describe('LoggerProvider', () => {
 
       describe('when "attributeCountLimit" is defined', () => {
         it('should have logger with defined value', () => {
-          const logger = new LoggerProvider({
+          const loggerProvider = new LoggerProvider({
             logRecordLimits: {
               attributeCountLimit: 100,
             },
-          }).getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          });
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeCountLimit, 100);
         });
       });
 
       describe('when "attributeValueLengthLimit" is defined', () => {
         it('should have logger with defined value', () => {
-          const logger = new LoggerProvider({
+          const loggerProvider = new LoggerProvider({
             logRecordLimits: {
               attributeValueLengthLimit: 10,
             },
-          }).getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          });
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeValueLengthLimit, 10);
         });
 
         it('should have logger with negative "attributeValueLengthLimit" value', () => {
-          const logger = new LoggerProvider({
+          const loggerProvider = new LoggerProvider({
             logRecordLimits: {
               attributeValueLengthLimit: -10,
             },
-          }).getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          });
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeValueLengthLimit, -10);
         });
       });
@@ -130,8 +125,9 @@ describe('LoggerProvider', () => {
       describe('when attribute value length limit is defined via env', () => {
         it('should have attribute value length limit as default of Infinity', () => {
           envSource.OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
-          const logger = new LoggerProvider().getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          const loggerProvider = new LoggerProvider();
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(
             logRecordLimits.attributeValueLengthLimit,
             Infinity
@@ -142,8 +138,9 @@ describe('LoggerProvider', () => {
 
       describe('when attribute value length limit is not defined via env', () => {
         it('should use default value of Infinity', () => {
-          const logger = new LoggerProvider().getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          const loggerProvider = new LoggerProvider();
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(
             logRecordLimits.attributeValueLengthLimit,
             Infinity
@@ -154,15 +151,17 @@ describe('LoggerProvider', () => {
       describe('when attribute count limit is defined via env', () => {
         it('should have attribute count limits as defined in env', () => {
           envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '35';
-          const logger = new LoggerProvider().getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          const loggerProvider = new LoggerProvider();
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeCountLimit, 35);
           delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
         });
         it('should have attribute count limit as default of 128', () => {
           envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT = '128';
-          const logger = new LoggerProvider().getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          const loggerProvider = new LoggerProvider();
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeCountLimit, 128);
           delete envSource.OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT;
         });
@@ -170,8 +169,9 @@ describe('LoggerProvider', () => {
 
       describe('when attribute count limit is not defined via env', () => {
         it('should use default value of 128', () => {
-          const logger = new LoggerProvider().getLogger('default') as Logger;
-          const logRecordLimits = logger.getLogRecordLimits();
+          const loggerProvider = new LoggerProvider();
+          const logRecordLimits =
+            loggerProvider['_sharedState'].logRecordLimits;
           assert.strictEqual(logRecordLimits.attributeCountLimit, 128);
         });
       });
@@ -186,55 +186,61 @@ describe('LoggerProvider', () => {
     it('should create a logger instance with default name if the name is invalid ', () => {
       const provider = new LoggerProvider();
       const logger = provider.getLogger('') as Logger;
-      assert.ok(logger.instrumentationScope.name === DEFAULT_LOGGER_NAME);
+      assert.strictEqual(logger.instrumentationScope.name, DEFAULT_LOGGER_NAME);
     });
 
     it("should create a logger instance if the name doesn't exist", () => {
       const provider = new LoggerProvider();
-      assert.ok(provider.getActiveLoggers().size === 0);
+      const sharedState = provider['_sharedState'];
+      assert.strictEqual(sharedState.loggers.size, 0);
       provider.getLogger(testName);
-      assert.ok(provider.getActiveLoggers().size === 1);
+      assert.strictEqual(sharedState.loggers.size, 1);
     });
 
     it('should create A new object if the name & version & schemaUrl are not unique', () => {
       const provider = new LoggerProvider();
-      assert.ok(provider.getActiveLoggers().size === 0);
+      const sharedState = provider['_sharedState'];
+      assert.strictEqual(sharedState.loggers.size, 0);
 
       provider.getLogger(testName);
-      assert.ok(provider.getActiveLoggers().size === 1);
+      assert.strictEqual(sharedState.loggers.size, 1);
       provider.getLogger(testName, testVersion);
-      assert.ok(provider.getActiveLoggers().size === 2);
+      assert.strictEqual(sharedState.loggers.size, 2);
       provider.getLogger(testName, testVersion, { schemaUrl: testSchemaURL });
-      assert.ok(provider.getActiveLoggers().size === 3);
+      assert.strictEqual(sharedState.loggers.size, 3);
     });
 
     it('should not create A new object if the name & version & schemaUrl are unique', () => {
       const provider = new LoggerProvider();
+      const sharedState = provider['_sharedState'];
 
-      assert.ok(provider.getActiveLoggers().size === 0);
+      assert.strictEqual(sharedState.loggers.size, 0);
       provider.getLogger(testName);
-      assert.ok(provider.getActiveLoggers().size === 1);
+      assert.strictEqual(sharedState.loggers.size, 1);
       const logger1 = provider.getLogger(testName, testVersion, {
         schemaUrl: testSchemaURL,
       });
-      assert.ok(provider.getActiveLoggers().size === 2);
+      assert.strictEqual(sharedState.loggers.size, 2);
       const logger2 = provider.getLogger(testName, testVersion, {
         schemaUrl: testSchemaURL,
       });
-      assert.ok(provider.getActiveLoggers().size === 2);
+      assert.strictEqual(sharedState.loggers.size, 2);
       assert.ok(logger2 instanceof Logger);
-      assert.ok(logger1 === logger2);
+      assert.strictEqual(logger1, logger2);
     });
   });
 
   describe('addLogRecordProcessor', () => {
     it('should add logRecord processor', () => {
-      const logRecordProcessor = new NoopLogRecordProcessor();
       const provider = new LoggerProvider();
+      const sharedState = provider['_sharedState'];
+      const logRecordProcessor = new NoopLogRecordProcessor();
       provider.addLogRecordProcessor(logRecordProcessor);
+      assert.ok(sharedState.activeProcessor instanceof MultiLogRecordProcessor);
+      assert.strictEqual(sharedState.activeProcessor.processors.length, 1);
       assert.strictEqual(
-        provider.getActiveLogRecordProcessor().processors.length,
-        1
+        sharedState.activeProcessor.processors[0],
+        logRecordProcessor
       );
     });
   });
@@ -301,10 +307,9 @@ describe('LoggerProvider', () => {
   describe('.shutdown()', () => {
     it('should trigger shutdown when manually invoked', () => {
       const provider = new LoggerProvider();
-      const shutdownStub = sinon.stub(
-        provider.getActiveLogRecordProcessor(),
-        'shutdown'
-      );
+      const processor = new NoopLogRecordProcessor();
+      provider.addLogRecordProcessor(processor);
+      const shutdownStub = sinon.stub(processor, 'shutdown');
       provider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
     });
@@ -321,10 +326,7 @@ describe('LoggerProvider', () => {
       const provider = new LoggerProvider();
       const logRecordProcessor = new NoopLogRecordProcessor();
       provider.addLogRecordProcessor(logRecordProcessor);
-      const forceFlushStub = sinon.stub(
-        provider.getActiveLogRecordProcessor(),
-        'forceFlush'
-      );
+      const forceFlushStub = sinon.stub(logRecordProcessor, 'forceFlush');
       const warnStub = sinon.spy(diag, 'warn');
       provider.shutdown();
       provider.forceFlush();
@@ -336,10 +338,7 @@ describe('LoggerProvider', () => {
       const provider = new LoggerProvider();
       const logRecordProcessor = new NoopLogRecordProcessor();
       provider.addLogRecordProcessor(logRecordProcessor);
-      const shutdownStub = sinon.stub(
-        provider.getActiveLogRecordProcessor(),
-        'shutdown'
-      );
+      const shutdownStub = sinon.stub(logRecordProcessor, 'shutdown');
       const warnStub = sinon.spy(diag, 'warn');
       provider.shutdown();
       provider.shutdown();
