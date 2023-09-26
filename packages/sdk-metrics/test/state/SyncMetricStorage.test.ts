@@ -118,10 +118,7 @@ describe('SyncMetricStorage', () => {
 
         // The attributes should be memorized.
         {
-          const metric = metricStorage.collect(
-            cumulativeCollector,
-            [4, 4]
-          );
+          const metric = metricStorage.collect(cumulativeCollector, [4, 4]);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -130,10 +127,7 @@ describe('SyncMetricStorage', () => {
 
         metricStorage.record(1, {}, api.context.active(), [5, 5]);
         {
-          const metric = metricStorage.collect(
-            cumulativeCollector,
-            [6, 6]
-          );
+          const metric = metricStorage.collect(cumulativeCollector, [6, 6]);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);

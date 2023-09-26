@@ -48,7 +48,6 @@ describe('TemporalMetricProcessor', () => {
 
   describe('buildMetrics', () => {
     describe('single delta collector', () => {
-
       it('should build delta recording metrics', () => {
         const spy = sinon.spy(deltaCollector1, 'selectAggregationTemporality');
 

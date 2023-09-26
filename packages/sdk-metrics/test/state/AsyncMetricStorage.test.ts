@@ -69,10 +69,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [0, 0];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
@@ -118,10 +115,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [2, 2];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
@@ -176,10 +170,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [0, 0];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -201,10 +192,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [1, 1];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -226,10 +214,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [2, 2];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -269,10 +254,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [0, 0];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -294,10 +276,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [0, 0];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -319,10 +298,7 @@ describe('AsyncMetricStorage', () => {
         {
           const collectionTime: HrTime = [2, 2];
           await observableRegistry.observe(collectionTime);
-          const metric = metricStorage.collect(
-            deltaCollector,
-            collectionTime
-          );
+          const metric = metricStorage.collect(deltaCollector, collectionTime);
 
           assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
