@@ -21,6 +21,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(otlp-exporter-base): replaced usage of window with _globalThis [#4157](https://github.com/open-telemetry/opentelemetry-js/pull/4157) @cristianmadularu
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
