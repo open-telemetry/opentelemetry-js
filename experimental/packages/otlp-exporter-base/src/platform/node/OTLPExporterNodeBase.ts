@@ -18,12 +18,13 @@ import type * as http from 'http';
 import type * as https from 'https';
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
+import { OTLPExporterNodeConfigBase } from './types';
 import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { createHttpAgent, sendWithHttp, configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { CompressionAlgorithm } from '../../types';
 
 /**
  * Collector Metric Exporter abstract base class

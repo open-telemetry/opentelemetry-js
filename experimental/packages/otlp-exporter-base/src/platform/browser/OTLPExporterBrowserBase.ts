@@ -15,10 +15,10 @@
  */
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterConfigBase } from '../../types';
+import { CompressionAlgorithm, OTLPExporterConfigBase } from '../../types';
 import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
-import { sendWithBeacon, sendWithXhr } from './util';
+import { sendWithBeacon, sendWithXhr, configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
@@ -29,7 +29,8 @@ export abstract class OTLPExporterBrowserBase<
   ExportItem,
   ServiceRequest,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
-  protected _headers: Record<string, string>;
+  headers: Record<string, string>;
+  compression: CompressionAlgorithm;
   private _useXHR: boolean = false;
 
   /**
@@ -40,7 +41,7 @@ export abstract class OTLPExporterBrowserBase<
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
     if (this._useXHR) {
-      this._headers = Object.assign(
+      this.headers = Object.assign(
         {},
         parseHeaders(config.headers),
         baggageUtils.parseKeyPairsIntoRecord(
@@ -48,8 +49,9 @@ export abstract class OTLPExporterBrowserBase<
         )
       );
     } else {
-      this._headers = {};
+      this.headers = {};
     }
+    this.compression = configureCompression(config.compression);
   }
 
   onInit(): void {
@@ -74,14 +76,7 @@ export abstract class OTLPExporterBrowserBase<
 
     const promise = new Promise<void>((resolve, reject) => {
       if (this._useXHR) {
-        sendWithXhr(
-          body,
-          this.url,
-          this._headers,
-          this.timeoutMillis,
-          resolve,
-          reject
-        );
+        sendWithXhr(this, body, 'application/json', resolve, reject);
       } else {
         sendWithBeacon(
           body,

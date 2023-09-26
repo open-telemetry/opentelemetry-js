@@ -21,9 +21,9 @@ import { Readable } from 'stream';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { OTLPExporterNodeConfigBase } from '.';
 import { diag } from '@opentelemetry/api';
-import { CompressionAlgorithm } from './types';
+import { CompressionAlgorithm, OTLPExporterError } from '../../types';
 import { getEnv } from '@opentelemetry/core';
-import { OTLPExporterError } from '../../types';
+
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
   DEFAULT_EXPORT_INITIAL_BACKOFF,

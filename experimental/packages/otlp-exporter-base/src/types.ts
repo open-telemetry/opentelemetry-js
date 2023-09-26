@@ -49,7 +49,13 @@ export interface OTLPExporterConfigBase {
   hostname?: string;
   url?: string;
   concurrencyLimit?: number;
+  compression?: CompressionAlgorithm;
   /** Maximum time the OTLP exporter will wait for each batch export.
    * The default value is 10000ms. */
   timeoutMillis?: number;
+}
+
+export enum CompressionAlgorithm {
+  NONE = 'none',
+  GZIP = 'gzip',
 }

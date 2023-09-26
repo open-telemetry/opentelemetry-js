@@ -47,7 +47,7 @@ describe('OTLPLogExporter', () => {
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=bar';
       const exporter = new OTLPLogExporter();
-      assert.strictEqual(exporter['_headers'].foo, 'bar');
+      assert.strictEqual(exporter['headers'].foo, 'bar');
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
     });
 

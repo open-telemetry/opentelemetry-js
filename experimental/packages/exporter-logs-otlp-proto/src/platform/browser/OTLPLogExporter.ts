@@ -46,8 +46,8 @@ export class OTLPLogExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-    this._headers = Object.assign(
-      this._headers,
+    this.headers = Object.assign(
+      this.headers,
       baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
       )

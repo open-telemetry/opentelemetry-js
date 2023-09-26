@@ -18,6 +18,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(exporter-metrics-otlp-proto): add esm build [#4099](https://github.com/open-telemetry/opentelemetry-js/pull/4099) @pichlermarc
 * feat(opencensus-shim): implement OpenCensus metric producer [#4066](https://github.com/open-telemetry/opentelemetry-js/pull/4066) @aabmass
+* feat(otlp-exporter-base): supports gzip compression in the browser environment [#4162](https://github.com/open-telemetry/opentelemetry-js/pull/4162) @fuaiyi
 
 ### :bug: (Bug Fix)
 

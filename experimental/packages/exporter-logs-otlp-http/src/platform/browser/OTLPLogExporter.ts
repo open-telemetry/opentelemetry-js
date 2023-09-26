@@ -39,8 +39,8 @@ export class OTLPLogExporter
       timeoutMillis: getEnv().OTEL_EXPORTER_OTLP_LOGS_TIMEOUT,
       ...config,
     });
-    this._headers = {
-      ...this._headers,
+    this.headers = {
+      ...this.headers,
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
       ),

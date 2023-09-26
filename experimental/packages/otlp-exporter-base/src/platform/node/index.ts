@@ -15,5 +15,7 @@
  */
 
 export { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
-export { sendWithHttp, createHttpAgent, configureCompression } from './util';
-export { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
+export { sendWithHttp, createHttpAgent } from './util';
+export { configureCompression } from './util';
+export { OTLPExporterNodeConfigBase } from './types';
+export { CompressionAlgorithm } from '../../types';

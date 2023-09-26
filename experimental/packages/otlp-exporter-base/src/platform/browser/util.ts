@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { diag } from '@opentelemetry/api';
-import { OTLPExporterError } from '../../types';
+import { gzip } from 'pako';
+import { CompressionAlgorithm, OTLPExporterError } from '../../types';
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
   DEFAULT_EXPORT_INITIAL_BACKOFF,
@@ -23,6 +24,7 @@ import {
   isExportRetryable,
   parseRetryAfterToMills,
 } from '../../util';
+import { OTLPExporterBrowserBase } from './OTLPExporterBrowserBase';
 
 /**
  * Send metrics/spans using browser navigator.sendBeacon
@@ -51,17 +53,16 @@ export function sendWithBeacon(
 /**
  * function to send metrics/spans using browser XMLHttpRequest
  *     used when navigator.sendBeacon is not available
+ * @param collector
  * @param body
- * @param url
- * @param headers
+ * @param contentType
  * @param onSuccess
  * @param onError
  */
-export function sendWithXhr(
-  body: string | Blob,
-  url: string,
-  headers: Record<string, string>,
-  exporterTimeout: number,
+export function sendWithXhr<ExportItem, ServiceRequest>(
+  collector: OTLPExporterBrowserBase<ExportItem, ServiceRequest>,
+  body: string | Uint8Array,
+  contentType: string,
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
 ): void {
@@ -79,28 +80,37 @@ export function sendWithXhr(
     } else {
       xhr.abort();
     }
-  }, exporterTimeout);
+  }, collector.timeoutMillis);
 
   const sendWithRetry = (
     retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
     minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
   ) => {
     xhr = new XMLHttpRequest();
-    xhr.open('POST', url);
+    xhr.open('POST', collector.url);
 
     const defaultHeaders = {
       Accept: 'application/json',
-      'Content-Type': 'application/json',
+      'Content-Type': contentType || 'application/json',
     };
 
     Object.entries({
       ...defaultHeaders,
-      ...headers,
+      ...collector.headers,
     }).forEach(([k, v]) => {
       xhr.setRequestHeader(k, v);
     });
 
-    xhr.send(body);
+    switch (collector.compression) {
+      case CompressionAlgorithm.GZIP: {
+        xhr.setRequestHeader('Content-Encoding', 'gzip');
+        xhr.send(gzip(body));
+        break;
+      }
+      default:
+        xhr.send(body);
+        break;
+    }
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === false) {
@@ -160,4 +170,10 @@ export function sendWithXhr(
   };
 
   sendWithRetry();
+}
+
+export function configureCompression(
+  compression: CompressionAlgorithm | undefined
+): CompressionAlgorithm {
+  return compression || CompressionAlgorithm.NONE;
 }

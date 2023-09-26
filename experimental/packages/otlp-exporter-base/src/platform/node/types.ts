@@ -23,11 +23,5 @@ import { OTLPExporterConfigBase } from '../../types';
  */
 export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
   keepAlive?: boolean;
-  compression?: CompressionAlgorithm;
   httpAgentOptions?: http.AgentOptions | https.AgentOptions;
-}
-
-export enum CompressionAlgorithm {
-  NONE = 'none',
-  GZIP = 'gzip',
 }

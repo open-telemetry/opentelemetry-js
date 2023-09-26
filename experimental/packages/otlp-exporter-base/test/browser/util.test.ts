@@ -15,13 +15,17 @@
  */
 
 import * as sinon from 'sinon';
+import * as assert from 'assert';
+import { gzip } from 'pako';
 import { sendWithXhr } from '../../src/platform/browser/util';
 import { nextTick } from 'process';
 import { ensureHeadersContain } from '../testHelper';
+import { OTLPExporterBrowserBase } from '../../src/platform/browser';
+import { CompressionAlgorithm } from '../../src/types';
 
 describe('util - browser', () => {
   let server: any;
-  const body = '';
+  const body = 'test body';
   const url = '';
 
   let onSuccessStub: sinon.SinonStub;
@@ -54,15 +58,16 @@ describe('util - browser', () => {
     });
     describe('and Content-Type header is set', () => {
       beforeEach(() => {
-        const explicitContentType = {
-          'Content-Type': 'application/json',
-        };
+        const explicitContentType = 'application/json';
         const exporterTimeout = 10000;
         sendWithXhr(
+          {
+            headers: {},
+            url,
+            timeoutMillis: exporterTimeout,
+          } as OTLPExporterBrowserBase<unknown, unknown>,
           body,
-          url,
           explicitContentType,
-          exporterTimeout,
           onSuccessStub,
           onErrorStub
         );
@@ -91,10 +96,13 @@ describe('util - browser', () => {
         // use default exporter timeout
         const exporterTimeout = 10000;
         sendWithXhr(
+          {
+            headers: emptyHeaders,
+            url: url,
+            timeoutMillis: exporterTimeout,
+          } as OTLPExporterBrowserBase<unknown, unknown>,
           body,
-          url,
-          emptyHeaders,
-          exporterTimeout,
+          '',
           onSuccessStub,
           onErrorStub
         );
@@ -116,16 +124,20 @@ describe('util - browser', () => {
         });
       });
     });
+
     describe('and custom headers are set', () => {
       let customHeaders: Record<string, string>;
       beforeEach(() => {
         customHeaders = { aHeader: 'aValue', bHeader: 'bValue' };
         const exporterTimeout = 10000;
         sendWithXhr(
+          {
+            headers: customHeaders,
+            url,
+            timeoutMillis: exporterTimeout,
+          } as OTLPExporterBrowserBase<unknown, unknown>,
           body,
-          url,
-          customHeaders,
-          exporterTimeout,
+          '',
           onSuccessStub,
           onErrorStub
         );
@@ -150,6 +162,43 @@ describe('util - browser', () => {
         nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, customHeaders);
+          clock.restore();
+          done();
+        });
+      });
+    });
+
+    describe('and compression is set to "gzip"', () => {
+      beforeEach(() => {
+        const compression = CompressionAlgorithm.GZIP;
+        const exporterTimeout = 10000;
+        sendWithXhr(
+          {
+            headers: {},
+            url,
+            timeoutMillis: exporterTimeout,
+            compression,
+          } as OTLPExporterBrowserBase<unknown, unknown>,
+          body,
+          '',
+          onSuccessStub,
+          onErrorStub
+        );
+      });
+
+      it('Request Headers should contain "Content-Encoding" header', done => {
+        nextTick(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
+          done();
+        });
+      });
+
+      it('Request Body should be compressed by gzip', done => {
+        nextTick(() => {
+          const { requestBody } = server.requests[0];
+          assert.deepStrictEqual(requestBody, gzip(body));
           clock.restore();
           done();
         });

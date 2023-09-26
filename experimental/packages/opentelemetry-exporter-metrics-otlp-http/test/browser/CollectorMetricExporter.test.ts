@@ -521,7 +521,7 @@ describe('when configuring via environment', () => {
       temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
     });
     assert.strictEqual(
-      collectorExporter['_otlpExporter']['_headers'].foo,
+      collectorExporter['_otlpExporter']['headers'].foo,
       'bar'
     );
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
@@ -534,11 +534,11 @@ describe('when configuring via environment', () => {
       temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
     });
     assert.strictEqual(
-      collectorExporter['_otlpExporter']['_headers'].foo,
+      collectorExporter['_otlpExporter']['headers'].foo,
       'boo'
     );
     assert.strictEqual(
-      collectorExporter['_otlpExporter']['_headers'].bar,
+      collectorExporter['_otlpExporter']['headers'].bar,
       'foo'
     );
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';

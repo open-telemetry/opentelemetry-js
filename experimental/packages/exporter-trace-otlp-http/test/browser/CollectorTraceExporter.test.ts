@@ -566,18 +566,15 @@ describe('when configuring via environment', () => {
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPTraceExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'bar');
+    assert.strictEqual(collectorExporter.headers.foo, 'bar');
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
   it('should override global headers config with signal headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
     envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPTraceExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'boo');
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.bar, 'foo');
+    assert.strictEqual(collectorExporter.headers.foo, 'boo');
+    assert.strictEqual(collectorExporter.headers.bar, 'foo');
     envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });

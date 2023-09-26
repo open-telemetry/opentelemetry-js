@@ -33,7 +33,10 @@ export abstract class OTLPProtoExporterBrowserBase<
   ServiceRequest,
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config);
+    super({
+      headers: { Accept: 'application/x-protobuf', ...config.headers },
+      ...config,
+    });
   }
 
   override send(
@@ -55,18 +58,7 @@ export abstract class OTLPProtoExporterBrowserBase<
     if (message) {
       const body = exportRequestType.encode(message).finish();
       if (body) {
-        sendWithXhr(
-          new Blob([body], { type: 'application/x-protobuf' }),
-          this.url,
-          {
-            ...this._headers,
-            'Content-Type': 'application/x-protobuf',
-            Accept: 'application/x-protobuf',
-          },
-          this.timeoutMillis,
-          onSuccess,
-          onError
-        );
+        sendWithXhr(this, body, 'application/x-protobuf', onSuccess, onError);
       }
     } else {
       onError(new OTLPExporterError('No proto'));
