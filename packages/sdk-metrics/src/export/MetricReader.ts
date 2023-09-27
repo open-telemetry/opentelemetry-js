@@ -18,7 +18,7 @@ import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { CollectionResult } from './MetricData';
-import { callWithTimeout } from '../utils';
+import { FlatMap, callWithTimeout } from '../utils';
 import { InstrumentType } from '../InstrumentDescriptor';
 import {
   CollectionOptions,
@@ -45,6 +45,13 @@ export interface MetricReaderOptions {
    * not configured, cumulative is used for all instruments.
    */
   aggregationTemporalitySelector?: AggregationTemporalitySelector;
+  /**
+   * **Note, this option is experimental**. Additional MetricProducers to use as a source of
+   * aggregated metric data in addition to the SDK's metric data. The resource returned by
+   * these MetricProducers is ignored; the SDK's resource will be used instead.
+   * @experimental
+   */
+  metricProducers?: MetricProducer[];
 }
 
 /**
@@ -55,8 +62,10 @@ export abstract class MetricReader {
   // Tracks the shutdown state.
   // TODO: use BindOncePromise here once a new version of @opentelemetry/core is available.
   private _shutdown = false;
-  // MetricProducer used by this instance.
-  private _metricProducer?: MetricProducer;
+  // Additional MetricProducers which will be combined with the SDK's output
+  private _metricProducers: MetricProducer[];
+  // MetricProducer used by this instance which produces metrics from the SDK
+  private _sdkMetricProducer?: MetricProducer;
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
 
@@ -66,20 +75,26 @@ export abstract class MetricReader {
     this._aggregationTemporalitySelector =
       options?.aggregationTemporalitySelector ??
       DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
+    this._metricProducers = options?.metricProducers ?? [];
   }
 
   /**
-   * Set the {@link MetricProducer} used by this instance.
+   * Set the {@link MetricProducer} used by this instance. **This should only be called by the
+   * SDK and should be considered internal.**
    *
+   * To add additional {@link MetricProducer}s to a {@link MetricReader}, pass them to the
+   * constructor as {@link MetricReaderOptions.metricProducers}.
+   *
+   * @internal
    * @param metricProducer
    */
   setMetricProducer(metricProducer: MetricProducer) {
-    if (this._metricProducer) {
+    if (this._sdkMetricProducer) {
       throw new Error(
         'MetricReader can not be bound to a MeterProvider again.'
       );
     }
-    this._metricProducer = metricProducer;
+    this._sdkMetricProducer = metricProducer;
     this.onInitialized();
   }
 
@@ -130,7 +145,7 @@ export abstract class MetricReader {
    * Collect all metrics from the associated {@link MetricProducer}
    */
   async collect(options?: CollectionOptions): Promise<CollectionResult> {
-    if (this._metricProducer === undefined) {
+    if (this._sdkMetricProducer === undefined) {
       throw new Error('MetricReader is not bound to a MetricProducer');
     }
 
@@ -139,9 +154,37 @@ export abstract class MetricReader {
       throw new Error('MetricReader is shutdown');
     }
 
-    return this._metricProducer.collect({
-      timeoutMillis: options?.timeoutMillis,
-    });
+    const [sdkCollectionResults, ...additionalCollectionResults] =
+      await Promise.all([
+        this._sdkMetricProducer.collect({
+          timeoutMillis: options?.timeoutMillis,
+        }),
+        ...this._metricProducers.map(producer =>
+          producer.collect({
+            timeoutMillis: options?.timeoutMillis,
+          })
+        ),
+      ]);
+
+    // Merge the results, keeping the SDK's Resource
+    const errors = sdkCollectionResults.errors.concat(
+      FlatMap(additionalCollectionResults, result => result.errors)
+    );
+    const resource = sdkCollectionResults.resourceMetrics.resource;
+    const scopeMetrics =
+      sdkCollectionResults.resourceMetrics.scopeMetrics.concat(
+        FlatMap(
+          additionalCollectionResults,
+          result => result.resourceMetrics.scopeMetrics
+        )
+      );
+    return {
+      resourceMetrics: {
+        resource,
+        scopeMetrics,
+      },
+      errors,
+    };
   }
 
   /**

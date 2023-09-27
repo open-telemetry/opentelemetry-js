@@ -33,30 +33,32 @@ import {
   LogRecordLimits,
   LogRecordProcessor,
   LogRecord,
-  Logger,
   LoggerProvider,
 } from './../../src';
 import { invalidAttributes, validAttributes } from './utils';
+import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
+import { reconfigureLimits } from '../../src/config';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
-const setup = (limits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
+const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const instrumentationScope = {
     name: 'test name',
     version: 'test version',
     schemaUrl: 'test schema url',
   };
   const resource = Resource.default();
-  const loggerProvider = new LoggerProvider({ resource });
-  const logger = new Logger(
-    instrumentationScope,
-    {
-      logRecordLimits: limits,
-    },
-    loggerProvider
+  const sharedState = new LoggerProviderSharedState(
+    resource,
+    Infinity,
+    reconfigureLimits(logRecordLimits ?? {})
   );
-  const logRecord = new LogRecord(logger, data || {});
-  return { logger, logRecord, instrumentationScope, resource };
+  const logRecord = new LogRecord(
+    sharedState,
+    instrumentationScope,
+    data ?? {}
+  );
+  return { logRecord, instrumentationScope, resource };
 };
 
 describe('LogRecord', () => {
@@ -320,7 +322,7 @@ describe('LogRecord', () => {
     it('should not rewrite directly through the property method', () => {
       const warnStub = sinon.spy(diag, 'warn');
       const { logRecord } = setup(undefined, logRecordData);
-      logRecord.makeReadonly();
+      logRecord._makeReadonly();
 
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
@@ -346,7 +348,7 @@ describe('LogRecord', () => {
     it('should not rewrite using the set method', () => {
       const warnStub = sinon.spy(diag, 'warn');
       const { logRecord } = setup(undefined, logRecordData);
-      logRecord.makeReadonly();
+      logRecord._makeReadonly();
 
       logRecord.setBody(newBody);
       logRecord.setSeverityNumber(newSeverityNumber);

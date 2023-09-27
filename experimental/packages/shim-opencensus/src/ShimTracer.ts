@@ -26,7 +26,7 @@ import {
   Tracer,
 } from '@opentelemetry/api';
 import { DEFAULT_SPAN_NAME, ShimSpan } from './ShimSpan';
-import { mapSpanContext, mapSpanKind } from './transform';
+import { mapSpanContext, mapSpanKind } from './trace-transform';
 import { shimPropagation } from './propagation';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
