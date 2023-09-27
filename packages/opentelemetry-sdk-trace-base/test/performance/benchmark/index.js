@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-export { ShimTracer } from './ShimTracer';
-export { OpenCensusMetricProducer } from './OpenCensusMetricProducer';
-export { installShim, uninstallShim } from './shim';
+require('./span');

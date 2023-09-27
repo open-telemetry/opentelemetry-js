@@ -23,7 +23,7 @@ import {
   TextMapGetter,
   TextMapSetter,
 } from '@opentelemetry/api';
-import { mapSpanContext, reverseMapSpanContext } from './transform';
+import { mapSpanContext, reverseMapSpanContext } from './trace-transform';
 
 class Getter implements TextMapGetter<void> {
   constructor(private ocGetter: oc.HeaderGetter) {}

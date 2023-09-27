@@ -27,13 +27,30 @@ import {
   LogRecordExporter,
   SimpleLogRecordProcessor,
   LogRecord,
-  LoggerProvider,
-  Logger,
 } from './../../../src';
+import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
+import { Resource } from '@opentelemetry/resources';
+import { reconfigureLimits } from '../../../src/config';
 
 const setup = (exporter: LogRecordExporter) => {
+  const sharedState = new LoggerProviderSharedState(
+    Resource.default(),
+    Infinity,
+    reconfigureLimits({})
+  );
+  const logRecord = new LogRecord(
+    sharedState,
+    {
+      name: 'test name',
+      version: 'test version',
+      schemaUrl: 'test schema url',
+    },
+    {
+      body: 'body',
+    }
+  );
   const processor = new SimpleLogRecordProcessor(exporter);
-  return { exporter, processor };
+  return { exporter, processor, logRecord };
 };
 
 describe('SimpleLogRecordProcessor', () => {
@@ -49,21 +66,9 @@ describe('SimpleLogRecordProcessor', () => {
   describe('onEmit', () => {
     it('should handle onEmit', async () => {
       const exporter = new InMemoryLogRecordExporter();
-      const { processor } = setup(exporter);
+      const { processor, logRecord } = setup(exporter);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
 
-      const logger = new Logger(
-        {
-          name: 'test name',
-          version: 'test version',
-          schemaUrl: 'test schema url',
-        },
-        {},
-        new LoggerProvider()
-      );
-      const logRecord = new LogRecord(logger, {
-        body: 'body',
-      });
       processor.onEmit(logRecord);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 1);
 
@@ -82,20 +87,8 @@ describe('SimpleLogRecordProcessor', () => {
           ),
         shutdown: () => Promise.resolve(),
       };
-      const { processor } = setup(exporter);
+      const { processor, logRecord } = setup(exporter);
 
-      const logger = new Logger(
-        {
-          name: 'test name',
-          version: 'test version',
-          schemaUrl: 'test schema url',
-        },
-        {},
-        new LoggerProvider()
-      );
-      const logRecord = new LogRecord(logger, {
-        body: 'body',
-      });
       const errorHandlerSpy = sinon.spy();
       setGlobalErrorHandler(errorHandlerSpy);
       processor.onEmit(logRecord);

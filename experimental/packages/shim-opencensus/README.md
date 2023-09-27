@@ -13,11 +13,11 @@ More details are available in the [OpenCensus Compatibility Specification](https
 npm install --save @opentelemetry/shim-opencensus
 ```
 
-## Usage
+## Tracing usage
 
 ### Installing the shim's require-in-the-middle hook
 
-This is the recommended way to use the shim.
+This is the recommended way to use the shim for tracing.
 
 This package provides a `require-in-the-middle` hook which replaces OpenCensus's `CoreTracer`
 class with a shim implementation that writes to the OpenTelemetry API. This will cause all
@@ -70,6 +70,25 @@ const tracer = new ShimTracer(trace.getTracer('my-module'));
 tracer.startRootSpan({name: 'main'}, rootSpan => {
   rootSpan.end();
 });
+```
+
+## Metrics usage
+
+OpenCensus metrics can be collected and sent to an OpenTelemetry exporter by providing the
+`OpenCensusMetricProducer` to your `MetricReader`. For example, to export OpenCensus metrics
+through the OpenTelemetry Prometheus exporter:
+
+```js
+meterProvider.addMetricReader(
+  new PrometheusExporter({
+    metricProducers: [
+      new OpenCensusMetricProducer({
+        openCensusMetricProducerManager:
+          oc.Metrics.getMetricProducerManager(),
+      }),
+    ],
+  })
+);
 ```
 
 ## Example

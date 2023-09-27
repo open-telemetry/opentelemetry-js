@@ -15,37 +15,64 @@
  */
 'use strict';
 
-const { DiagConsoleLogger, diag, DiagLogLevel } = require('@opentelemetry/api');
+const { diag, metrics } = require('@opentelemetry/api');
 const {
   NodeTracerProvider,
   BatchSpanProcessor,
 } = require('@opentelemetry/sdk-trace-node');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics');
 const {
   OTLPTraceExporter,
 } = require('@opentelemetry/exporter-trace-otlp-grpc');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const { Resource } = require('@opentelemetry/resources');
 const {
   SemanticResourceAttributes,
 } = require('@opentelemetry/semantic-conventions');
+const { OpenCensusMetricProducer } = require('@opentelemetry/shim-opencensus');
+const instrumentationHttp = require('@opencensus/instrumentation-http');
+const { TracingBase } = require('@opencensus/nodejs-base');
+const oc = require('@opencensus/core');
 
 module.exports = function setup(serviceName) {
-  const tracing = require('@opencensus/nodejs-base');
+  /**
+   * You can alternatively just use the @opentelemetry/nodejs package directly:
+   *
+   * ```js
+   * const tracing = require('@opencensus/nodejs');
+   * ```
+   */
+  const tracing = new TracingBase(['http']);
+  tracing.tracer = new oc.CoreTracer();
 
-  diag.setLogger(new DiagConsoleLogger(), { logLevel: DiagLogLevel.ALL });
-  const provider = new NodeTracerProvider({
-    resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
-    }),
+  const resource = new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
   });
-  provider.addSpanProcessor(
+  const tracerProvider = new NodeTracerProvider({ resource });
+  tracerProvider.addSpanProcessor(
     new BatchSpanProcessor(new OTLPTraceExporter(), {
       scheduledDelayMillis: 5000,
     })
   );
-  provider.register();
+  tracerProvider.register();
+
+  const meterProvider = new MeterProvider({ resource });
+  meterProvider.addMetricReader(
+    new PrometheusExporter({
+      metricProducers: [
+        new OpenCensusMetricProducer({
+          openCensusMetricProducerManager:
+            oc.Metrics.getMetricProducerManager(),
+        }),
+      ],
+    })
+  );
+  metrics.setGlobalMeterProvider(meterProvider);
 
   // Start OpenCensus tracing
-  tracing.start({ samplingRate: 1, logger: diag });
+  tracing.start({ samplingRate: 1, logger: diag, stats: oc.globalStats });
+  // Register OpenCensus HTTP stats views
+  instrumentationHttp.registerAllViews(oc.globalStats);
 
-  return provider;
+  return tracerProvider;
 };
