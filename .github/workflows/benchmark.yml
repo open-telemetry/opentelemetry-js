@@ -57,7 +57,7 @@ jobs:
         with:
           tool: 'benchmarkjs'
           output-file-path: combined_benchmarks.txt
-          gh-pages-branch: benchmarks
+          gh-pages-branch: gh-pages
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          benchmark-data-dir-path: "docs/benchmarks/loadtests"
+          benchmark-data-dir-path: "benchmarks"
           auto-push: true
