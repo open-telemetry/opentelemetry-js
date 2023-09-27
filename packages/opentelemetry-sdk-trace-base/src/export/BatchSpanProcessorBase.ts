@@ -47,7 +47,10 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
-  constructor(private readonly _exporter: SpanExporter, config?: T) {
+  constructor(
+    private readonly _exporter: SpanExporter,
+    config?: T
+  ) {
     const env = getEnv();
     this._maxExportBatchSize =
       typeof config?.maxExportBatchSize === 'number'
@@ -193,8 +196,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
           doExport();
         } else {
           Promise.all(
-            pendingResources.map(resource =>
-              resource.waitForAsyncAttributes?.()
+            pendingResources.map(
+              resource => resource.waitForAsyncAttributes?.()
             )
           ).then(doExport, err => {
             globalErrorHandler(err);

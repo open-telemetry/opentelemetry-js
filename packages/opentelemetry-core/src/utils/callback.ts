@@ -22,11 +22,14 @@ import { Deferred } from './promise';
 export class BindOnceFuture<
   R,
   This = unknown,
-  T extends (this: This, ...args: unknown[]) => R = () => R
+  T extends (this: This, ...args: unknown[]) => R = () => R,
 > {
   private _isCalled = false;
   private _deferred = new Deferred<R>();
-  constructor(private _callback: T, private _that: This) {}
+  constructor(
+    private _callback: T,
+    private _that: This
+  ) {}
 
   get isCalled() {
     return this._isCalled;

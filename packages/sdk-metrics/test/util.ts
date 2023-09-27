@@ -66,6 +66,17 @@ export const defaultInstrumentationScope: InstrumentationScope = {
   schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
 };
 
+export const invalidNames = ['', 'a'.repeat(256), '1a', '-a', '.a', '_a'];
+export const validNames = [
+  'a',
+  'a'.repeat(255),
+  'a1',
+  'a-1',
+  'a.1',
+  'a_1',
+  'a/1',
+];
+
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
 export const commonAttributes: MetricAttributes[] = [
   {},

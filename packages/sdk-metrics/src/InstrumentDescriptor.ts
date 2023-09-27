@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { MetricOptions, ValueType } from '@opentelemetry/api';
+import { MetricOptions, ValueType, diag } from '@opentelemetry/api';
 import { View } from './view/View';
+import { equalsCaseInsensitive } from './utils';
 
 /**
  * Supported types of metric instruments.
@@ -45,6 +46,11 @@ export function createInstrumentDescriptor(
   type: InstrumentType,
   options?: MetricOptions
 ): InstrumentDescriptor {
+  if (!isValidName(name)) {
+    diag.warn(
+      `Invalid metric name: "${name}". The metric name should be a ASCII string with a length no greater than 255 characters.`
+    );
+  }
   return {
     name,
     type,
@@ -71,10 +77,18 @@ export function isDescriptorCompatibleWith(
   descriptor: InstrumentDescriptor,
   otherDescriptor: InstrumentDescriptor
 ) {
+  // Names are case-insensitive strings.
   return (
-    descriptor.name === otherDescriptor.name &&
+    equalsCaseInsensitive(descriptor.name, otherDescriptor.name) &&
     descriptor.unit === otherDescriptor.unit &&
     descriptor.type === otherDescriptor.type &&
     descriptor.valueType === otherDescriptor.valueType
   );
+}
+
+// ASCII string with a length no greater than 255 characters.
+// NB: the first character counted separately from the rest.
+const NAME_REGEXP = /^[a-z][a-z0-9_.\-/]{0,254}$/i;
+export function isValidName(name: string): boolean {
+  return name.match(NAME_REGEXP) != null;
 }

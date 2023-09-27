@@ -61,10 +61,14 @@ export function parsePairKeyValue(
   if (valueProps.length <= 0) return;
   const keyPairPart = valueProps.shift();
   if (!keyPairPart) return;
-  const keyPair = keyPairPart.split(BAGGAGE_KEY_PAIR_SEPARATOR);
-  if (keyPair.length !== 2) return;
-  const key = decodeURIComponent(keyPair[0].trim());
-  const value = decodeURIComponent(keyPair[1].trim());
+  const separatorIndex = keyPairPart.indexOf(BAGGAGE_KEY_PAIR_SEPARATOR);
+  if (separatorIndex <= 0) return;
+  const key = decodeURIComponent(
+    keyPairPart.substring(0, separatorIndex).trim()
+  );
+  const value = decodeURIComponent(
+    keyPairPart.substring(separatorIndex + 1).trim()
+  );
   let metadata;
   if (valueProps.length > 0) {
     metadata = baggageEntryMetadataFromString(
