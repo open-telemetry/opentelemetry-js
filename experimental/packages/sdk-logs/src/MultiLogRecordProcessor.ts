@@ -15,7 +15,7 @@
  */
 
 import { callWithTimeout } from '@opentelemetry/core';
-
+import type { Context } from '@opentelemetry/api';
 import type { LogRecordProcessor } from './LogRecordProcessor';
 import type { LogRecord } from './LogRecord';
 
@@ -38,8 +38,10 @@ export class MultiLogRecordProcessor implements LogRecordProcessor {
     );
   }
 
-  public onEmit(logRecord: LogRecord): void {
-    this.processors.forEach(processors => processors.onEmit(logRecord));
+  public onEmit(logRecord: LogRecord, context?: Context): void {
+    this.processors.forEach(processors =>
+      processors.onEmit(logRecord, context)
+    );
   }
 
   public async shutdown(): Promise<void> {

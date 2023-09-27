@@ -28,10 +28,13 @@
   },
   "dependencies": {
     "@opencensus/core": "0.1.0",
+    "@opencensus/instrumentation-http": "0.1.0",
     "@opencensus/nodejs-base": "0.1.0",
     "@opentelemetry/api": "1.6.0",
+    "@opentelemetry/exporter-prometheus": "0.43.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "0.43.0",
     "@opentelemetry/resources": "1.17.0",
+    "@opentelemetry/sdk-metrics": "1.17.0",
     "@opentelemetry/sdk-trace-node": "1.17.0",
     "@opentelemetry/semantic-conventions": "1.17.0",
     "@opentelemetry/shim-opencensus": "0.43.0"

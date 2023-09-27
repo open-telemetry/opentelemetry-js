@@ -28,10 +28,11 @@ import {
   LogRecordLimits,
   LogRecord,
   InMemoryLogRecordExporter,
-  LoggerProvider,
-  Logger,
 } from '../../../src';
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
+import { reconfigureLimits } from '../../../src/config';
+import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
+import { Resource } from '@opentelemetry/resources';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onInit() {}
@@ -39,18 +40,22 @@ class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> 
 }
 
 const createLogRecord = (limits?: LogRecordLimits): LogRecord => {
-  const logger = new Logger(
+  const sharedState = new LoggerProviderSharedState(
+    Resource.default(),
+    Infinity,
+    reconfigureLimits(limits ?? {})
+  );
+  const logRecord = new LogRecord(
+    sharedState,
     {
       name: 'test name',
       version: 'test version',
       schemaUrl: 'test schema url',
     },
     {
-      logRecordLimits: limits,
-    },
-    new LoggerProvider()
+      body: 'body',
+    }
   );
-  const logRecord = new LogRecord(logger, { body: 'body' });
   return logRecord;
 };
 

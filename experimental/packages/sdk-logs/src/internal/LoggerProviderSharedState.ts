@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
+import { Logger } from '@opentelemetry/api-logs';
+import { IResource } from '@opentelemetry/resources';
 import { LogRecordProcessor } from '../LogRecordProcessor';
-import { ReadableLogRecord } from './ReadableLogRecord';
+import { LogRecordLimits } from '../types';
+import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
 
-export class NoopLogRecordProcessor implements LogRecordProcessor {
-  forceFlush(): Promise<void> {
-    return Promise.resolve();
-  }
+export class LoggerProviderSharedState {
+  readonly loggers: Map<string, Logger> = new Map();
+  activeProcessor: LogRecordProcessor;
+  readonly registeredLogRecordProcessors: LogRecordProcessor[] = [];
 
-  onEmit(_logRecord: ReadableLogRecord, _context: Context): void {}
-
-  shutdown(): Promise<void> {
-    return Promise.resolve();
+  constructor(
+    readonly resource: IResource,
+    readonly forceFlushTimeoutMillis: number,
+    readonly logRecordLimits: Required<LogRecordLimits>
+  ) {
+    this.activeProcessor = new NoopLogRecordProcessor();
   }
 }
