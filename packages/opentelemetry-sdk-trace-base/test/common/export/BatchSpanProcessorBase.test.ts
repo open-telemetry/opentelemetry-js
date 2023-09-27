@@ -35,6 +35,7 @@ import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
 import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { TestExporterWithDelay } from './TestExporterWithDelay';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -181,10 +182,8 @@ describe('BatchSpanProcessorBase', () => {
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
         processor.onStart(span, ROOT_CONTEXT);
-        assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
         processor.onEnd(span);
-        assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
       const span = createSampledSpan(`${name}_6`);
       processor.onStart(span, ROOT_CONTEXT);
@@ -195,15 +194,15 @@ describe('BatchSpanProcessorBase', () => {
         await processor.shutdown();
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
         done();
-      }, defaultBufferConfig.scheduledDelayMillis + 1000);
-      clock.tick(defaultBufferConfig.scheduledDelayMillis + 1000);
+      }, 1000);
+      clock.tick(1000);
       clock.restore();
     });
 
     it('should force flush when timeout exceeded', done => {
       const clock = sinon.useFakeTimers();
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-      for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
+      for (let i = 0; i < 4; i++) {
         const span = createSampledSpan(`${name}_${i}`);
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
@@ -211,7 +210,7 @@ describe('BatchSpanProcessorBase', () => {
       }
 
       setTimeout(() => {
-        assert.strictEqual(exporter.getFinishedSpans().length, 5);
+        assert.strictEqual(exporter.getFinishedSpans().length, 4);
         done();
       }, defaultBufferConfig.scheduledDelayMillis + 1000);
 
@@ -222,14 +221,14 @@ describe('BatchSpanProcessorBase', () => {
 
     it('should force flush on demand', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-      for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
+      for (let i = 0; i < 4; i++) {
         const span = createSampledSpan(`${name}_${i}`);
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
       }
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
       processor.forceFlush();
-      assert.strictEqual(exporter.getFinishedSpans().length, 5);
+      assert.strictEqual(exporter.getFinishedSpans().length, 4);
     });
 
     it('should not export empty span lists', done => {
@@ -278,7 +277,6 @@ describe('BatchSpanProcessorBase', () => {
         const span = createSampledSpan(`${name}_last`);
         processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
-        clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
 
         // because there is an async promise that will be trigger original
         // timeout is needed to simulate a real tick to the next
@@ -286,20 +284,22 @@ describe('BatchSpanProcessorBase', () => {
           clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
           originalTimeout(async () => {
             clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
-            clock.restore();
+            originalTimeout(async () => {
+              clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
+              clock.restore();
 
-            diag.info(
-              'finished spans count',
-              exporter.getFinishedSpans().length
-            );
-            assert.strictEqual(
-              exporter.getFinishedSpans().length,
-              totalSpans + 1
-            );
-
-            await processor.shutdown();
-            assert.strictEqual(exporter.getFinishedSpans().length, 0);
-            done();
+              diag.info(
+                'finished spans count',
+                exporter.getFinishedSpans().length
+              );
+              assert.strictEqual(
+                exporter.getFinishedSpans().length,
+                totalSpans + 1
+              );
+              await processor.shutdown();
+              assert.strictEqual(exporter.getFinishedSpans().length, 0);
+              done();
+            });
           });
         });
       }
@@ -448,28 +448,32 @@ describe('BatchSpanProcessorBase', () => {
     describe('when there are more spans then "maxQueueSize"', () => {
       beforeEach(() => {
         processor = new BatchSpanProcessor(
-          exporter,
+          new TestExporterWithDelay(1000),
           Object.assign({}, defaultBufferConfig, {
             maxQueueSize: 6,
           })
         );
       });
       it('should drop spans', () => {
+        const clock = sinon.useFakeTimers();
         const span = createSampledSpan('test');
         for (let i = 0, j = 20; i < j; i++) {
           processor.onStart(span, ROOT_CONTEXT);
           processor.onEnd(span);
         }
+        clock.tick(1000);
         assert.equal(processor['_finishedSpans'].length, 6);
       });
       it('should count and report dropped spans', done => {
+        const clock = sinon.useFakeTimers();
         const debugStub = sinon.spy(diag, 'debug');
         const warnStub = sinon.spy(diag, 'warn');
         const span = createSampledSpan('test');
-        for (let i = 0, j = 6; i < j; i++) {
+        for (let i = 0, j = 11; i < j; i++) {
           processor.onStart(span, ROOT_CONTEXT);
           processor.onEnd(span);
         }
+        // One batch of 5 in-flight. 6 are left in the buffer. No span loss until this point.
         assert.equal(processor['_finishedSpans'].length, 6);
         assert.equal(processor['_droppedSpansCount'], 0);
         sinon.assert.notCalled(debugStub);
@@ -495,6 +499,8 @@ describe('BatchSpanProcessorBase', () => {
 
           done();
         });
+        clock.tick(3000);
+        clock.restore();
       });
     });
   });
