@@ -17,7 +17,7 @@
 import * as types from '../../types';
 import * as path from 'path';
 import { types as utilTypes } from 'util';
-import { satisfies } from 'semver';
+import { satisfies } from 'compare-versions';
 import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
@@ -191,7 +191,7 @@ export abstract class InstrumentationBase<T = any>
     if (module.name === name) {
       // main module
       if (
-        isSupported(module.supportedVersions, version, module.includePrerelease)
+        isSupported(module.supportedVersions, version)
       ) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
@@ -207,7 +207,7 @@ export abstract class InstrumentationBase<T = any>
     const supportedFileInstrumentations = files
       .filter(f => f.name === name)
       .filter(f =>
-        isSupported(f.supportedVersions, version, module.includePrerelease)
+        isSupported(f.supportedVersions, version)
       );
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
@@ -301,8 +301,7 @@ export abstract class InstrumentationBase<T = any>
 
 function isSupported(
   supportedVersions: string[],
-  version?: string,
-  includePrerelease?: boolean
+  version?: string
 ): boolean {
   if (typeof version === 'undefined') {
     // If we don't have the version, accept the wildcard case only
@@ -310,6 +309,6 @@ function isSupported(
   }
 
   return supportedVersions.some(supportedVersion => {
-    return satisfies(version, supportedVersion, { includePrerelease });
+    return satisfies(version, supportedVersion);
   });
 }

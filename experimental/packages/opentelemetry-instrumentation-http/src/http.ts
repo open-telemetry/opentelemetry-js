@@ -38,7 +38,7 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
-import * as semver from 'semver';
+import { compare } from 'compare-versions';
 import * as url from 'url';
 import {
   Err,
@@ -396,7 +396,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
         response.on('end', endHandler);
         // See https://github.com/open-telemetry/opentelemetry-js/pull/3625#issuecomment-1475673533
-        if (semver.lt(process.version, '16.0.0')) {
+        if (compare(process.version, '16.0.0', '<')) {
           response.on('close', endHandler);
         }
         response.on(errorMonitor, (error: Err) => {
@@ -583,7 +583,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       );
     };
   }
-
   private _outgoingRequestFunction(
     component: 'http' | 'https',
     original: Func<http.ClientRequest>
@@ -613,7 +612,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
        */
       if (
         component === 'http' &&
-        semver.lt(process.version, '9.0.0') &&
+        compare(process.version, '9.0.0', '<') &&
         optionsParsed.protocol === 'https:'
       ) {
         return original.apply(this, [optionsParsed, ...args]);
