@@ -103,8 +103,7 @@ describe('AsyncMetricStorage', () => {
           await observableRegistry.observe(collectionTime);
           const metric = metricStorage.collect(deltaCollector, collectionTime);
 
-          assertMetricData(metric, DataPointType.SUM);
-          assert.strictEqual(metric.dataPoints.length, 0);
+          assert.equal(metric, undefined);
         }
 
         delegate.setDelegate(observableResult => {

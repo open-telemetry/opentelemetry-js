@@ -73,3 +73,8 @@ export interface IKeyValueList {
   /** KeyValueList values */
   values: IKeyValue[];
 }
+
+export interface IFixed64 {
+  low: number;
+  high: number;
+}
