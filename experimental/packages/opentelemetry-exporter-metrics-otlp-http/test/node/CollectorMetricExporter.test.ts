@@ -491,13 +491,8 @@ describe('OTLPMetricExporter - node with json over http', () => {
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(
           metric1,
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime
-          ),
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-              .startTime
-          )
+          metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+          metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime
         );
         assert.ok(
           typeof metric2 !== 'undefined',
@@ -505,28 +500,19 @@ describe('OTLPMetricExporter - node with json over http', () => {
         );
         ensureObservableGaugeIsCorrect(
           metric2,
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-              .endTime
-          ),
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-              .startTime
-          ),
+          metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+            .endTime,
+          metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+            .startTime,
           6,
           'double-observable-gauge2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureHistogramIsCorrect(
           metric3,
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-              .endTime
-          ),
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-              .startTime
-          ),
+          metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime,
+          metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+            .startTime,
           [0, 100],
           [0, 2, 0]
         );

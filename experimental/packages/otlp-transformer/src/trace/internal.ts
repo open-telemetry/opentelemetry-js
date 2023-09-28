@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import type { Link } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
+import { hrTimeToFixed64Nanos } from '../common';
 import { toAttributes } from '../common/internal';
 import { EStatusCode, IEvent, ILink, ISpan } from './types';
 import * as core from '@opentelemetry/core';
@@ -36,8 +36,8 @@ export function sdkSpanToOtlpSpan(span: ReadableSpan, useHex?: boolean): ISpan {
     name: span.name,
     // Span kind is offset by 1 because the API does not define a value for unset
     kind: span.kind == null ? 0 : span.kind + 1,
-    startTimeUnixNano: hrTimeToNanoseconds(span.startTime),
-    endTimeUnixNano: hrTimeToNanoseconds(span.endTime),
+    startTimeUnixNano: hrTimeToFixed64Nanos(span.startTime),
+    endTimeUnixNano: hrTimeToFixed64Nanos(span.endTime),
     attributes: toAttributes(span.attributes),
     droppedAttributesCount: span.droppedAttributesCount,
     events: span.events.map(toOtlpSpanEvent),
@@ -72,7 +72,7 @@ export function toOtlpSpanEvent(timedEvent: TimedEvent): IEvent {
       ? toAttributes(timedEvent.attributes)
       : [],
     name: timedEvent.name,
-    timeUnixNano: hrTimeToNanoseconds(timedEvent.time),
+    timeUnixNano: hrTimeToFixed64Nanos(timedEvent.time),
     droppedAttributesCount: timedEvent.droppedAttributesCount || 0,
   };
 }

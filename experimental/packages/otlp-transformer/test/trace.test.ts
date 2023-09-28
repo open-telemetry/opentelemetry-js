@@ -22,6 +22,7 @@ import {
   createExportTraceServiceRequest,
   ESpanKind,
   EStatusCode,
+  UnsignedLong,
 } from '../src';
 
 function createExpectedSpanJson(useHex: boolean) {
@@ -79,10 +80,8 @@ function createExpectedSpanJson(useHex: boolean) {
                     ],
                   },
                 ],
-                // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                startTimeUnixNano: 1640715557342725388,
-                // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                endTimeUnixNano: 1640715558642725388,
+                startTimeUnixNano: new UnsignedLong(1155450124, 382008859),
+                endTimeUnixNano: new UnsignedLong(-1839517172, 382008859),
                 events: [
                   {
                     droppedAttributesCount: 0,
@@ -95,7 +94,7 @@ function createExpectedSpanJson(useHex: boolean) {
                       },
                     ],
                     name: 'some event',
-                    timeUnixNano: 1640715558542725400,
+                    timeUnixNano: new UnsignedLong(-1939517172, 382008859),
                   },
                 ],
                 attributes: [

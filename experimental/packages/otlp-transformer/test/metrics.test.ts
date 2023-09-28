@@ -25,7 +25,8 @@ import {
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
 import { EAggregationTemporality } from '../src/metrics/types';
-import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { hrTime } from '@opentelemetry/core';
+import { hrTimeToFixed64Nanos } from '../src/common';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
@@ -350,8 +351,8 @@ describe('Metrics', () => {
                       dataPoints: [
                         {
                           attributes: expectedAttributes,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                          timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           asInt: 10,
                         },
                       ],
@@ -393,8 +394,8 @@ describe('Metrics', () => {
                       dataPoints: [
                         {
                           attributes: expectedAttributes,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                          timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           asInt: 10,
                         },
                       ],
@@ -437,8 +438,8 @@ describe('Metrics', () => {
                       dataPoints: [
                         {
                           attributes: expectedAttributes,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                          timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           asInt: 10,
                         },
                       ],
@@ -481,8 +482,8 @@ describe('Metrics', () => {
                       dataPoints: [
                         {
                           attributes: expectedAttributes,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                          timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           asInt: 10,
                         },
                       ],
@@ -523,8 +524,8 @@ describe('Metrics', () => {
                       dataPoints: [
                         {
                           attributes: expectedAttributes,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                          timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           asDouble: 10.5,
                         },
                       ],
@@ -581,8 +582,8 @@ describe('Metrics', () => {
                             sum: 9,
                             min: 1,
                             max: 8,
-                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                            startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                            timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           },
                         ],
                       },
@@ -635,8 +636,8 @@ describe('Metrics', () => {
                             sum: 9,
                             min: undefined,
                             max: undefined,
-                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                            startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                            timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           },
                         ],
                       },
@@ -701,8 +702,8 @@ describe('Metrics', () => {
                               bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0],
                             },
                             negative: { offset: 0, bucketCounts: [0] },
-                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                            startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                            timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           },
                         ],
                       },
@@ -763,8 +764,8 @@ describe('Metrics', () => {
                               bucketCounts: [1, 0, 0, 0, 1, 0, 1, 0],
                             },
                             negative: { offset: 0, bucketCounts: [0] },
-                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                            startTimeUnixNano: hrTimeToFixed64Nanos(START_TIME),
+                            timeUnixNano: hrTimeToFixed64Nanos(END_TIME),
                           },
                         ],
                       },
