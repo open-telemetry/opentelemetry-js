@@ -88,8 +88,7 @@ describe('SyncMetricStorage', () => {
             [4, 4]
           );
 
-          assertMetricData(metric, DataPointType.SUM);
-          assert.strictEqual(metric.dataPoints.length, 0);
+          assert.strictEqual(metric, undefined);
         }
 
         metricStorage.record(1, {}, api.context.active(), [5, 5]);

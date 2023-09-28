@@ -133,10 +133,17 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       aggregationTemporality,
     });
 
+    const accumulationRecords = AttributesMapToAccumulationRecords(result);
+
+    // do not convert to metric data if there is nothing to convert.
+    if (accumulationRecords.length === 0) {
+      return undefined;
+    }
+
     return this._aggregator.toMetricData(
       instrumentDescriptor,
       aggregationTemporality,
-      AttributesMapToAccumulationRecords(result),
+      accumulationRecords,
       /* endTime */ collectionTime
     );
   }
