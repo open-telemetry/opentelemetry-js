@@ -1,8 +1,8 @@
 name: Benchmark Tests
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [ main ]
 
 jobs:
   benchmark-tests:
