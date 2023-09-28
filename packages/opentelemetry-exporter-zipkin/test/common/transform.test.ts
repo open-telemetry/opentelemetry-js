@@ -82,7 +82,7 @@ describe('transform', () => {
         annotations: [
           {
             value: 'my-event',
-            timestamp: hrTimeToMicroseconds(span.events[0].time),
+            timestamp: Math.round(hrTimeToMicroseconds(span.events[0].time)),
           },
         ],
         duration: Math.round(
@@ -329,11 +329,11 @@ describe('transform', () => {
       assert.deepStrictEqual(annotations, [
         {
           value: 'my-event1',
-          timestamp: hrTimeToMicroseconds(span.events[0].time),
+          timestamp: Math.round(hrTimeToMicroseconds(span.events[0].time)),
         },
         {
           value: 'my-event2',
-          timestamp: hrTimeToMicroseconds(span.events[1].time),
+          timestamp: Math.round(hrTimeToMicroseconds(span.events[1].time)),
         },
       ]);
     });

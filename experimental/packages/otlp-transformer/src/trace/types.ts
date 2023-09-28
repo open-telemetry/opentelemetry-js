@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IInstrumentationScope, IKeyValue } from '../common/types';
+import { IFixed64, IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
 
 /** Properties of an ExportTraceServiceRequest. */
@@ -81,10 +81,10 @@ export interface ISpan {
   kind: ESpanKind;
 
   /** Span startTimeUnixNano */
-  startTimeUnixNano: number;
+  startTimeUnixNano: IFixed64;
 
   /** Span endTimeUnixNano */
-  endTimeUnixNano: number;
+  endTimeUnixNano: IFixed64;
 
   /** Span attributes */
   attributes: IKeyValue[];
@@ -166,7 +166,7 @@ export const enum EStatusCode {
 /** Properties of an Event. */
 export interface IEvent {
   /** Event timeUnixNano */
-  timeUnixNano: number;
+  timeUnixNano: IFixed64;
 
   /** Event name */
   name: string;
