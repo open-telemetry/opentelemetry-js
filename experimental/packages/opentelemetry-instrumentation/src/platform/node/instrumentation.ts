@@ -36,8 +36,7 @@ import { Hook } from 'require-in-the-middle';
  */
 export abstract class InstrumentationBase<T = any>
   extends InstrumentationAbstract
-  implements types.Instrumentation
-{
+  implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: (Hooked | Hook)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
@@ -62,8 +61,8 @@ export abstract class InstrumentationBase<T = any>
     if (this._modules.length === 0) {
       diag.debug(
         'No modules instrumentation has been defined for ' +
-          `'${this.instrumentationName}@${this.instrumentationVersion}'` +
-          ', nothing will be patched'
+        `'${this.instrumentationName}@${this.instrumentationVersion}'` +
+        ', nothing will be patched'
       );
     }
 
@@ -309,6 +308,6 @@ function isSupported(
   }
 
   return supportedVersions.some(supportedVersion => {
-    return satisfies(version, supportedVersion);
+    return supportedVersion === '*' || satisfies(version, supportedVersion);
   });
 }
