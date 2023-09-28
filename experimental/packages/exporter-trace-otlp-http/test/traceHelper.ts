@@ -31,6 +31,7 @@ import {
   ILink,
   IResource,
   ISpan,
+  UnsignedLong,
 } from '@opentelemetry/otlp-transformer';
 
 if (typeof Buffer === 'undefined') {
@@ -243,54 +244,59 @@ export const multiInstrumentationLibraryTrace: ReadableSpan[] = [
   },
 ];
 
+function fixed64FromString(str: string) {
+  const { low, high } = UnsignedLong.fromString(str);
+  return { low, high };
+}
+
 export function ensureEventsAreCorrect(events: IEvent[]) {
   assert.deepStrictEqual(
     events,
     [
       {
-        timeUnixNano: 1574120165429803000,
+        timeUnixNano: fixed64FromString('1574120165429803070'),
         name: 'fetchStart',
         attributes: [],
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: 1574120165429803000,
+        timeUnixNano: fixed64FromString('1574120165429803070'),
         name: 'domainLookupStart',
         attributes: [],
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: 1574120165429803000,
+        timeUnixNano: fixed64FromString('1574120165429803070'),
         name: 'domainLookupEnd',
         attributes: [],
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: 1574120165429803000,
+        timeUnixNano: fixed64FromString('1574120165429803070'),
         name: 'connectStart',
         attributes: [],
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: 1574120165429803000,
+        timeUnixNano: fixed64FromString('1574120165429803070'),
         name: 'connectEnd',
         attributes: [],
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: 1574120165435513000,
+        timeUnixNano: fixed64FromString('1574120165435513070'),
         name: 'requestStart',
         attributes: [],
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: 1574120165436923100,
+        timeUnixNano: fixed64FromString('1574120165436923070'),
         name: 'responseStart',
         attributes: [],
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: 1574120165438688000,
+        timeUnixNano: fixed64FromString('1574120165438688070'),
         name: 'responseEnd',
         attributes: [],
         droppedAttributesCount: 0,
@@ -364,14 +370,14 @@ export function ensureSpanIsCorrect(span: ISpan, useHex = true) {
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
   assert.strictEqual(span.kind, ESpanKind.SPAN_KIND_INTERNAL, 'kind is wrong');
-  assert.strictEqual(
+  assert.deepStrictEqual(
     span.startTimeUnixNano,
-    1574120165429803008,
+    fixed64FromString('1574120165429803070'),
     'startTimeUnixNano is wrong'
   );
-  assert.strictEqual(
+  assert.deepStrictEqual(
     span.endTimeUnixNano,
-    1574120165438688000,
+    fixed64FromString('1574120165438688070'),
     'endTimeUnixNano is wrong'
   );
   assert.strictEqual(

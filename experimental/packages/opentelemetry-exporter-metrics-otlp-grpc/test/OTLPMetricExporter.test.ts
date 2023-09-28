@@ -253,18 +253,23 @@ const testOTLPMetricExporter = (params: TestParams) => {
             exportedData[0].scopeMetrics[0].metrics[histogramIndex];
           ensureExportedCounterIsCorrect(
             counter,
-            counter.sum?.dataPoints[0].timeUnixNano,
-            counter.sum?.dataPoints[0].startTimeUnixNano
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+              .startTime
           );
           ensureExportedObservableGaugeIsCorrect(
             observableGauge,
-            observableGauge.gauge?.dataPoints[0].timeUnixNano,
-            observableGauge.gauge?.dataPoints[0].startTimeUnixNano
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .startTime
           );
           ensureExportedHistogramIsCorrect(
             histogram,
-            histogram.histogram?.dataPoints[0].timeUnixNano,
-            histogram.histogram?.dataPoints[0].startTimeUnixNano,
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .startTime,
             [0, 100],
             ['0', '2', '0']
           );
