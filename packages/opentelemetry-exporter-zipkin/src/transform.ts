@@ -111,7 +111,7 @@ export function _toZipkinAnnotations(
   events: TimedEvent[]
 ): zipkinTypes.Annotation[] {
   return events.map(event => ({
-    timestamp: hrTimeToMicroseconds(event.time),
+    timestamp: Math.round(hrTimeToMicroseconds(event.time)),
     value: event.name,
   }));
 }
