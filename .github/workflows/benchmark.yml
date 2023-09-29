@@ -50,7 +50,7 @@ jobs:
       - name: Benchmark tests
         run: |
           npm run test:bench
-          find . -name benchmarks.txt -exec cat {} + > combined_benchmarks.txt
+          find . -name .benchmark-results.txt -exec cat {} + > combined_benchmarks.txt
 
       - name: Store benchmark results
         uses: benchmark-action/github-action-benchmark@v1
