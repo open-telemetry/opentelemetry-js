@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-export * from './common/types';
-export * from './common';
-export * from './metrics/types';
-export * from './resource/types';
-export * from './trace/types';
-export * from './logs/types';
+import type { IFixed64 } from './types';
+import { HrTime } from '@opentelemetry/api';
+import { UnsignedLong } from './unsigned_long';
 
-export { createExportTraceServiceRequest } from './trace';
-export { createExportMetricsServiceRequest } from './metrics';
-export { createExportLogsServiceRequest } from './logs';
+export * from './unsigned_long';
+
+const NANOSECONDS = UnsignedLong.fromU32(1_000_000_000);
+
+export function hrTimeToFixed64Nanos(hrTime: HrTime): IFixed64 {
+  return UnsignedLong.fromU32(hrTime[0])
+    .multiply(NANOSECONDS)
+    .add(UnsignedLong.fromU32(hrTime[1]));
+}
