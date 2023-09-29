@@ -24,6 +24,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :house: (Internal)
 
 * test: added a performance benchmark test for span creation [#4105](https://github.com/open-telemetry/opentelemetry-js/pull/4105)
+* test: added a workflow to run performance benchmark tests automatically [#4144](https://github.com/open-telemetry/opentelemetry-js/pull/4144)
 
 ## 1.17.0
 
