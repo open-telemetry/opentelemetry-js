@@ -97,7 +97,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     return [
       new InstrumentationNodeModuleDefinition<typeof grpcJs>(
         '@grpc/grpc-js',
-        ['^1.*'],
+        ['1.*'],
         (moduleExports, version) => {
           this._diag.debug(`Applying patch for @grpc/grpc-js@${version}`);
           if (isWrapped(moduleExports.Server.prototype.register)) {
