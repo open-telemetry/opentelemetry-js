@@ -23,7 +23,7 @@ import {
   PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
 } from '@opentelemetry/sdk-trace-base';
-import { compare } from 'compare-versions'
+import { compare } from 'compare-versions';
 import { NodeTracerConfig } from './config';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 

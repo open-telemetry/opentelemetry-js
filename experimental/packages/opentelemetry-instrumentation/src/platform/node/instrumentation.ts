@@ -36,7 +36,8 @@ import { Hook } from 'require-in-the-middle';
  */
 export abstract class InstrumentationBase<T = any>
   extends InstrumentationAbstract
-  implements types.Instrumentation {
+  implements types.Instrumentation
+{
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: (Hooked | Hook)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
@@ -61,8 +62,8 @@ export abstract class InstrumentationBase<T = any>
     if (this._modules.length === 0) {
       diag.debug(
         'No modules instrumentation has been defined for ' +
-        `'${this.instrumentationName}@${this.instrumentationVersion}'` +
-        ', nothing will be patched'
+          `'${this.instrumentationName}@${this.instrumentationVersion}'` +
+          ', nothing will be patched'
       );
     }
 
@@ -189,9 +190,7 @@ export abstract class InstrumentationBase<T = any>
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
-      if (
-        isSupported(module.supportedVersions, version)
-      ) {
+      if (isSupported(module.supportedVersions, version)) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
@@ -205,9 +204,7 @@ export abstract class InstrumentationBase<T = any>
     const files = module.files ?? [];
     const supportedFileInstrumentations = files
       .filter(f => f.name === name)
-      .filter(f =>
-        isSupported(f.supportedVersions, version)
-      );
+      .filter(f => isSupported(f.supportedVersions, version));
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
       if (this._enabled) {
@@ -298,10 +295,7 @@ export abstract class InstrumentationBase<T = any>
   }
 }
 
-function isSupported(
-  supportedVersions: string[],
-  version?: string
-): boolean {
+function isSupported(supportedVersions: string[], version?: string): boolean {
   if (typeof version === 'undefined') {
     // If we don't have the version, accept the wildcard case only
     return supportedVersions.includes('*');
