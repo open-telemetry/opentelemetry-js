@@ -44,7 +44,7 @@ suite.run();
 
 ## Automatically running benchmark tests
 
-If you want your test to run automatically with every release (to track trend over time), register the new test file by requiring it in `test/performance/benchmark/index.js`.
+If you want your test to run automatically with every merge to main (to track trend over time), register the new test file by requiring it in `test/performance/benchmark/index.js`.
 
 Add the `test:bench` script in package.json, if the module does not contain it already.
 
