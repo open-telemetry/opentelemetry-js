@@ -1,6 +1,6 @@
 # Metrics
 
-This quick start is for end users of OpenTelemetry who wish to manually measure their applications. If you are a library author, please see the [Library Authors Guide](library-author.md). If you wish to automatically instrument your application, see the automatic instrumentation documentation for the SDK you wish to use.
+This quick start is for end users of OpenTelemetry who wish to manually measure their applications. If you wish to automatically instrument your application, see the automatic instrumentation documentation for the SDK you wish to use.
 
 For a high-level overview of OpenTelemetry metrics in general and definitions of some common terms, you can refer to the [OpenTelemetry Specification Overview][spec-overview]
 
