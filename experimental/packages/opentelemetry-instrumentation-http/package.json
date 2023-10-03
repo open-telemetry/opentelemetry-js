@@ -54,7 +54,7 @@
     "@types/node": "18.6.5",
     "@types/request-promise-native": "1.0.19",
     "@types/semver": "7.5.3",
-    "@types/sinon": "10.0.17",
+    "@types/sinon": "10.0.18",
     "@types/superagent": "4.1.19",
     "axios": "1.5.1",
     "codecov": "3.8.3",
