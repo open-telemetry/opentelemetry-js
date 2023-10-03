@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696190501614,
+  "lastUpdate": 1696341690255,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -31,6 +31,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.17%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5af865386ad40d85daf94c45926521ffc6df7a18",
+          "message": "chore(deps): update dependency @types/sinon to v10.0.18 (#4179)",
+          "timestamp": "2023-10-03T15:59:56+02:00",
+          "tree_id": "e0502e5babbbf2aeebe9108aefcca8d3a9338a9b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5af865386ad40d85daf94c45926521ffc6df7a18"
+        },
+        "date": 1696341687223,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 773990,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
