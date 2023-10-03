@@ -286,7 +286,7 @@ await myTask()
 
 ## Describing a instrument measurement
 
-Using attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/metrics/semantic_conventions), we can more accurately describe the measurement in a way our metrics backend will more easily understand. The following example uses these mechanisms, which are described below, for recording a measurement
+Using attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metrics.md), we can more accurately describe the measurement in a way our metrics backend will more easily understand. The following example uses these mechanisms, which are described below, for recording a measurement
 of a HTTP request.
 
 Each metric instruments allows to associate a description, unit of measure, and the value type.
@@ -343,7 +343,7 @@ One problem with metrics names and attributes is recognizing, categorizing, and 
 
 The use of semantic conventions is always recommended where applicable, but they are merely conventions. For example, you may find that some name other than the name suggested by the semantic conventions more accurately describes your metric, you may decide not to include a metric attribute which is suggested by semantic conventions for privacy reasons, or you may wish to add a custom attribute which isn't covered by semantic conventions. All of these cases are fine, but please keep in mind that if you stray from the semantic conventions, the categorization of metrics in your metrics backend may be affected.
 
-_See the current metrics semantic conventions in the OpenTelemetry Specification repository: <https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/metrics/semantic_conventions>_
+_See the current metrics semantic conventions in the OpenTelemetry Specification repository: <https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metrics.md>_
 
 [spec-overview]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/overview.md
 
