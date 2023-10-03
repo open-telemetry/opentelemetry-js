@@ -46,8 +46,8 @@ suite.run();
 
 If you want your test to run automatically with every release (to track trend over time), register the new test file by requiring it in `test/performance/benchmark/index.js`.
 
-Add the `test:bench` script in package.json, if the module does not contain.
+Add the `test:bench` script in package.json, if the module does not contain it already.
 
 ``` json
-"test:bench": "node test/performance/benchmark/index.js"
+"test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt"
 ```
