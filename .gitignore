@@ -89,3 +89,6 @@ package.json.lerna_backup
 #IDEA
 .idea
 *.iml
+
+# non-aggregated benchmark results
+.benchmark-results.txt
