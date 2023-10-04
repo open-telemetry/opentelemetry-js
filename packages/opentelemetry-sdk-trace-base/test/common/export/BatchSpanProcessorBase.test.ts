@@ -16,7 +16,7 @@
 
 import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
-    ExportResult,
+  ExportResult,
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
@@ -506,41 +506,44 @@ describe('BatchSpanProcessorBase', () => {
     });
   });
 
-  describe('Concurrency', ()=> {
+  describe('Concurrency', () => {
     it('should only send a single batch at a time', async () => {
-      let callbacks: ((result: ExportResult) => void)[] = [] 
-      let spans: ReadableSpan[] = []
+      const callbacks: ((result: ExportResult) => void)[] = [];
+      const spans: ReadableSpan[] = [];
       const exporter: SpanExporter = {
-        export: async (exportedSpans: ReadableSpan[], resultCallback: (result: ExportResult) => void) => {
-          callbacks.push(resultCallback)
-          spans.push(...exportedSpans)
+        export: async (
+          exportedSpans: ReadableSpan[],
+          resultCallback: (result: ExportResult) => void
+        ) => {
+          callbacks.push(resultCallback);
+          spans.push(...exportedSpans);
         },
         shutdown: async () => {},
+      };
+      const processor = new BatchSpanProcessor(exporter, {
+        maxExportBatchSize: 5,
+        maxQueueSize: 6,
+      });
+      const totalSpans = 50;
+      for (let i = 0; i < totalSpans; i++) {
+        const span = createSampledSpan(`${name}_${i}`);
+        processor.onStart(span, ROOT_CONTEXT);
+        processor.onEnd(span);
       }
-        const processor = new BatchSpanProcessor(exporter, {
-          maxExportBatchSize: 5,
-          maxQueueSize: 6,
-        });
-        const totalSpans = 50; 
-        for (let i = 0; i < totalSpans; i++) {
-          const span = createSampledSpan(`${name}_${i}`);
-          processor.onStart(span, ROOT_CONTEXT);
-          processor.onEnd(span);
-        }
-        assert.equal(callbacks.length, 1)
-        assert.equal(spans.length, 5)
-        callbacks[0]({ code: ExportResultCode.SUCCESS })
-        await new Promise(resolve => setImmediate(resolve))
-        // After the first batch completes we will have dropped a number
-        // of spans and the next batch will be smaller
-        assert.equal(callbacks.length, 2)
-        assert.equal(spans.length, 10)
-        callbacks[1]({ code: ExportResultCode.SUCCESS })
+      assert.equal(callbacks.length, 1);
+      assert.equal(spans.length, 5);
+      callbacks[0]({ code: ExportResultCode.SUCCESS });
+      await new Promise(resolve => setTimeout(resolve, 0));
+      // After the first batch completes we will have dropped a number
+      // of spans and the next batch will be smaller
+      assert.equal(callbacks.length, 2);
+      assert.equal(spans.length, 10);
+      callbacks[1]({ code: ExportResultCode.SUCCESS });
 
-        // We expect that all the other spans have been dropped
-        await new Promise(resolve => setImmediate(resolve))
-        assert.equal(callbacks.length, 2)
-        assert.equal(spans.length, 10)
-    })
-  })
+      // We expect that all the other spans have been dropped
+      await new Promise(resolve => setTimeout(resolve, 0));
+      assert.equal(callbacks.length, 2);
+      assert.equal(spans.length, 10);
+    });
+  });
 });
