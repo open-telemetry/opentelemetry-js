@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696341690255,
+  "lastUpdate": 1696403017754,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -62,6 +62,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5ce32c0fe53dc3c1c49e88961ee7cc223255ad70",
+          "message": "Added performance benchmarking doc (#4169)\n\nCo-authored-by: Tyler Benson <tylerbenson@gmail.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-10-04T09:02:25+02:00",
+          "tree_id": "8aac14043884009d754afe0e25500ee309a2106a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5ce32c0fe53dc3c1c49e88961ee7cc223255ad70"
+        },
+        "date": 1696403016974,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 737739,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
