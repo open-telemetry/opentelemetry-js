@@ -530,7 +530,7 @@ describe('BatchSpanProcessorBase', () => {
         assert.equal(callbacks.length, 1)
         assert.equal(spans.length, 5)
         callbacks[0]({ code: ExportResultCode.SUCCESS })
-        await new Promise(resolve => process.nextTick(resolve))
+        await new Promise(resolve => setImmediate(resolve))
         // After the first batch completes we will have dropped a number
         // of spans and the next batch will be smaller
         assert.equal(callbacks.length, 2)
@@ -538,7 +538,7 @@ describe('BatchSpanProcessorBase', () => {
         callbacks[1]({ code: ExportResultCode.SUCCESS })
 
         // We expect that all the other spans have been dropped
-        await new Promise(resolve => process.nextTick(resolve))
+        await new Promise(resolve => setImmediate(resolve))
         assert.equal(callbacks.length, 2)
         assert.equal(spans.length, 10)
     })
