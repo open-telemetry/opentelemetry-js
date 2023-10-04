@@ -21,6 +21,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :books: (Refine Doc)
 
+* docs(contributing): added guidelines for adding benchmark tests [#4169](https://github.com/open-telemetry/opentelemetry-js/pull/4169)
+
 ### :house: (Internal)
 
 * test: added a performance benchmark test for span creation [#4105](https://github.com/open-telemetry/opentelemetry-js/pull/4105)
