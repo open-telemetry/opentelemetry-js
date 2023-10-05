@@ -27,6 +27,10 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
   * Meters (Scopes) that were created, but did not have any instruments with measurements under them will not be exported anymore.
 * fix(exporter-zipkin): round duration to the nearest int in annotations to be compliant with zipkin protocol [#4167](https://github.com/open-telemetry/opentelemetry-js/pull/4167) @FelipeEmerim
 
+### :books: (Refine Doc)
+
+* docs(contributing): added guidelines for adding benchmark tests [#4169](https://github.com/open-telemetry/opentelemetry-js/pull/4169)
+
 ### :house: (Internal)
 
 * test: added a performance benchmark test for span creation [#4105](https://github.com/open-telemetry/opentelemetry-js/pull/4105)
