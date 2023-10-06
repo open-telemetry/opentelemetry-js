@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696602668910,
+  "lastUpdate": 1696603256959,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -122,6 +122,37 @@ window.BENCHMARK_DATA = {
             "name": "create spans (10 attributes)",
             "value": 809279,
             "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "84861cd82722d507906a64016ef59b35bf7770ed",
+          "message": "chore(deps): update dependency @types/jquery to v3.5.21 (#4187)\n\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>",
+          "timestamp": "2023-10-06T10:30:35-04:00",
+          "tree_id": "f56cd4f431a7966473947b9741051d508034d522",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/84861cd82722d507906a64016ef59b35bf7770ed"
+        },
+        "date": 1696603253953,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 785190,
+            "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "95 samples"
           }
