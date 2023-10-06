@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696403017754,
+  "lastUpdate": 1696602668910,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -93,6 +93,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "gloogankle@gmail.com",
+            "name": "Einar Norðfjörð",
+            "username": "nordfjord"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "912256184c07e9f510f4166e41d8b6e131e9446a",
+          "message": "fix: BatchExporter should export continuously when batch size is reached (#3958)\n\n* fix: BathExporter should export continuously when batch size is reached\r\n\r\n* fix: add tests\r\n\r\n* lintfix\r\n\r\n* add changelog\r\n\r\n* add test for concurrency\r\n\r\n* Update CHANGELOG.md\r\n\r\n* Apply suggestions from code review\r\n\r\n* Lint and fix browser tests\r\n\r\n* fix: lint\r\n\r\n---------\r\n\r\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-10-06T10:27:47-04:00",
+          "tree_id": "afea10697db5270e2fc4c027033e3cbe8dbc9882",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/912256184c07e9f510f4166e41d8b6e131e9446a"
+        },
+        "date": 1696602667956,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 809279,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
