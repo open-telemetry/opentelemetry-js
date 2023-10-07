@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { MetricDescriptor } from './export/MetricData';
+
 export {
   Sum,
   LastValue,
@@ -57,7 +59,11 @@ export { ConsoleMetricExporter } from './export/ConsoleMetricExporter';
 
 export { MetricCollectOptions, MetricProducer } from './export/MetricProducer';
 
-export { InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
+export { InstrumentType } from './InstrumentDescriptor';
+/**
+ * @deprecated Use {@link MetricDescriptor} instead.
+ */
+export type InstrumentDescriptor = MetricDescriptor;
 
 export { MeterProvider, MeterProviderOptions } from './MeterProvider';
 

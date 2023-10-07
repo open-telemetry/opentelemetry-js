@@ -31,7 +31,10 @@ export enum InstrumentType {
 }
 
 /**
- * An interface describing the instrument.
+ * An internal interface describing the instrument.
+ *
+ * This is intentionally distinguished from the public MetricDescriptor (a.k.a. InstrumentDescriptor)
+ * which may not contains internal fields like metric advice.
  */
 export interface InstrumentDescriptor {
   readonly name: string;
@@ -40,7 +43,7 @@ export interface InstrumentDescriptor {
   readonly type: InstrumentType;
   readonly valueType: ValueType;
   /**
-   * Status: Experimental.
+   * @experimental
    */
   readonly advice: MetricAdvice;
 }

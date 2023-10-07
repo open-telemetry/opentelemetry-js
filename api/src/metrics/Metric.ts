@@ -18,6 +18,10 @@ import { Attributes, AttributeValue } from '../common/Attributes';
 import { Context } from '../context/types';
 import { BatchObservableResult, ObservableResult } from './ObservableResult';
 
+/**
+ * Advisory options influencing aggregation configuration parameters.
+ * @experimental
+ */
 export interface MetricAdvice {
   /**
    * Hint the explicit bucket boundaries for SDK if the metric is been
@@ -49,8 +53,8 @@ export interface MetricOptions {
   valueType?: ValueType;
 
   /**
-   * Status: Experimental.
    * The advice influencing aggregation configuration parameters.
+   * @experimental
    */
   advice?: MetricAdvice;
 }
