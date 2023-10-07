@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696671732146,
+  "lastUpdate": 1696672502315,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -186,6 +186,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.17%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c320c981c5b8cd9c42d65183c2c2c5b737a0b2a1",
+          "message": "deps: update proto-loader (#4192)",
+          "timestamp": "2023-10-07T17:53:41+08:00",
+          "tree_id": "29cbf846515e22c9ce692aa5b0f03edef19b560d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c320c981c5b8cd9c42d65183c2c2c5b737a0b2a1"
+        },
+        "date": 1696672501351,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 753400,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
