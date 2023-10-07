@@ -19,7 +19,7 @@ import { diag, ValueType } from '@opentelemetry/api';
 import { MetricStorage } from '../../src/state/MetricStorage';
 import { HrTime } from '@opentelemetry/api';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
-import { MetricData, InstrumentDescriptor, InstrumentType } from '../../src';
+import { MetricData, InstrumentType } from '../../src';
 import { Maybe } from '../../src/utils';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -29,6 +29,7 @@ import {
   getUnitConflictResolutionRecipe,
   getValueTypeConflictResolutionRecipe,
 } from '../../src/view/RegistrationConflicts';
+import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
 
 class TestMetricStorage extends MetricStorage {
   collect(
