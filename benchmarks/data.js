@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696603256959,
+  "lastUpdate": 1696671732146,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -155,6 +155,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5fd3737aa3c4f27fd68bb06bfb435d8badae63f0",
+          "message": "chore: remove outdated and empty docs (#4181)",
+          "timestamp": "2023-10-07T17:40:54+08:00",
+          "tree_id": "38368c5e6682a7b9b24937e784671538b04e750a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5fd3737aa3c4f27fd68bb06bfb435d8badae63f0"
+        },
+        "date": 1696671731262,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 731833,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
