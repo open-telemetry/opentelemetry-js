@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.15.2",
+  "version": "1.17.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -80,7 +80,7 @@
   "devDependencies": {
     "@types/node": "18.6.5",
     "cross-var": "1.1.0",
-    "lerna": "7.1.4",
+    "lerna": "7.1.5",
     "typescript": "4.4.4"
   },
   "Add these to devDependencies for testing": {

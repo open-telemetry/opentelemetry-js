@@ -125,7 +125,10 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
    * @param boundaries the bucket boundaries of the histogram aggregation
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
-  constructor(boundaries: number[], private readonly _recordMinMax = true) {
+  constructor(
+    boundaries: number[],
+    private readonly _recordMinMax = true
+  ) {
     super();
     if (boundaries === undefined || boundaries.length === 0) {
       throw new Error('HistogramAggregator should be created with boundaries.');

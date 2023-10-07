@@ -109,42 +109,42 @@ export function ensureProtoEventsAreCorrect(events: IEvent[]) {
     events,
     [
       {
-        timeUnixNano: '1574120165429803008',
+        timeUnixNano: '1574120165429803070',
         name: 'fetchStart',
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: '1574120165429803008',
+        timeUnixNano: '1574120165429803070',
         name: 'domainLookupStart',
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: '1574120165429803008',
+        timeUnixNano: '1574120165429803070',
         name: 'domainLookupEnd',
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: '1574120165429803008',
+        timeUnixNano: '1574120165429803070',
         name: 'connectStart',
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: '1574120165429803008',
+        timeUnixNano: '1574120165429803070',
         name: 'connectEnd',
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: '1574120165435513088',
+        timeUnixNano: '1574120165435513070',
         name: 'requestStart',
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: '1574120165436923136',
+        timeUnixNano: '1574120165436923070',
         name: 'responseStart',
         droppedAttributesCount: 0,
       },
       {
-        timeUnixNano: '1574120165438688000',
+        timeUnixNano: '1574120165438688070',
         name: 'responseEnd',
         droppedAttributesCount: 0,
       },
@@ -219,12 +219,12 @@ export function ensureProtoSpanIsCorrect(span: ISpan) {
   assert.strictEqual(span.kind, 'SPAN_KIND_INTERNAL', 'kind is wrong');
   assert.strictEqual(
     span.startTimeUnixNano,
-    '1574120165429803008',
+    '1574120165429803070',
     'startTimeUnixNano is wrong'
   );
   assert.strictEqual(
     span.endTimeUnixNano,
-    '1574120165438688000',
+    '1574120165438688070',
     'endTimeUnixNano is wrong'
   );
   assert.strictEqual(
@@ -261,7 +261,10 @@ export function ensureExportTraceServiceRequestIsSet(
 }
 
 export class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
+  constructor(
+    private _code: number,
+    private _msg?: string
+  ) {
     super();
   }
 

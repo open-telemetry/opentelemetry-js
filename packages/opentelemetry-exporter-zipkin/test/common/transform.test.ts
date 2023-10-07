@@ -82,11 +82,11 @@ describe('transform', () => {
         annotations: [
           {
             value: 'my-event',
-            timestamp: hrTimeToMicroseconds(span.events[0].time),
+            timestamp: Math.round(hrTimeToMicroseconds(span.events[0].time)),
           },
         ],
-        duration: hrTimeToMicroseconds(
-          hrTimeDuration(span.startTime, span.endTime)
+        duration: Math.round(
+          hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
         ),
         id: span.spanContext().spanId,
         localEndpoint: {
@@ -128,8 +128,8 @@ describe('transform', () => {
       assert.deepStrictEqual(zipkinSpan, {
         kind: 'SERVER',
         annotations: undefined,
-        duration: hrTimeToMicroseconds(
-          hrTimeDuration(span.startTime, span.endTime)
+        duration: Math.round(
+          hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
         ),
         id: span.spanContext().spanId,
         localEndpoint: {
@@ -179,8 +179,8 @@ describe('transform', () => {
         assert.deepStrictEqual(zipkinSpan, {
           kind: item.zipkin,
           annotations: undefined,
-          duration: hrTimeToMicroseconds(
-            hrTimeDuration(span.startTime, span.endTime)
+          duration: Math.round(
+            hrTimeToMicroseconds(hrTimeDuration(span.startTime, span.endTime))
           ),
           id: span.spanContext().spanId,
           localEndpoint: {
@@ -329,11 +329,11 @@ describe('transform', () => {
       assert.deepStrictEqual(annotations, [
         {
           value: 'my-event1',
-          timestamp: hrTimeToMicroseconds(span.events[0].time),
+          timestamp: Math.round(hrTimeToMicroseconds(span.events[0].time)),
         },
         {
           value: 'my-event2',
-          timestamp: hrTimeToMicroseconds(span.events[1].time),
+          timestamp: Math.round(hrTimeToMicroseconds(span.events[1].time)),
         },
       ]);
     });

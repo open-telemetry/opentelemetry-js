@@ -76,10 +76,10 @@ server.on("GET", "/user/:id", onGet);
 
 ## Describing a Span
 
-Using span relationships, attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions), we can more accurately describe the span in a way our tracing backend will more easily understand. The following example uses these mechanisms, which are described below.
+Using span relationships, attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/trace.md), we can more accurately describe the span in a way our tracing backend will more easily understand. The following example uses these mechanisms, which are described below.
 
 ```typescript
-import { NetTransportValues SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { NetTransportValues, SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { trace, context, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 
 async function onGet(request, response) {
@@ -209,6 +209,6 @@ Consumer spans represent the processing of a job created by a producer and may s
 
 One problem with span names and attributes is recognizing, categorizing, and analyzing them in your tracing backend. Between different applications, libraries, and tracing backends there might be different names and expected values for various attributes. For example, your application may use `http.status` to describe the HTTP status code, but a library you use may use `http.status_code`. In order to solve this problem, OpenTelemetry uses a library of semantic conventions which describe the name and attributes which should be used for specific types of spans. The use of semantic conventions is always recommended where applicable, but they are merely conventions. For example, you may find that some name other than the name suggested by the semantic conventions more accurately describes your span, you may decide not to include a span attribute which is suggested by semantic conventions for privacy reasons, or you may wish to add a custom attribute which isn't covered by semantic conventions. All of these cases are fine, but please keep in mind that if you stray from the semantic conventions, the categorization of spans in your tracing backend may be affected.
 
-_See the current trace semantic conventions in the OpenTelemetry Specification repository: <https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions>_
+_See the current trace semantic conventions in the OpenTelemetry Specification repository: <https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/trace.md>_
 
 [spec-overview]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/overview.md

@@ -11,14 +11,49 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-metrics): implement MetricProducer specification [#4007](https://github.com/open-telemetry/opentelemetry-js/pull/4007)
 * feat(metrics): prototype experimental advice support [#3876](https://github.com/open-telemetry/opentelemetry-js/pull/3876) @legendecas
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): BatchSpanProcessor flushes when `maxExportBatchSize` is reached [#3958](https://github.com/open-telemetry/opentelemetry-js/pull/3958) @nordfjord
+* fix(sdk-metrics): allow instrument names to contain '/' [#4155](https://github.com/open-telemetry/opentelemetry-js/pull/4155)
+* fix(sdk-metrics): do not report empty scopes and metrics [#4135](https://github.com/open-telemetry/opentelemetry-js/pull/4135) @pichlermarc
+  * Instruments that were created, but did not have measurements will not be exported anymore
+  * Meters (Scopes) that were created, but did not have any instruments with measurements under them will not be exported anymore.
+* fix(exporter-zipkin): round duration to the nearest int in annotations to be compliant with zipkin protocol [#4167](https://github.com/open-telemetry/opentelemetry-js/pull/4167) @FelipeEmerim
+
 ### :books: (Refine Doc)
 
+* docs(contributing): added guidelines for adding benchmark tests [#4169](https://github.com/open-telemetry/opentelemetry-js/pull/4169)
+
 ### :house: (Internal)
+
+* test: added a performance benchmark test for span creation [#4105](https://github.com/open-telemetry/opentelemetry-js/pull/4105)
+* test: added a workflow to run performance benchmark tests automatically [#4144](https://github.com/open-telemetry/opentelemetry-js/pull/4144)
+
+## 1.17.0
+
+### :bug: (Bug Fix)
+
+* Revert "feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)"
+  * This feature was an unintentional breaking change introduced with API 1.5.0
+  * This PR updates all SDK packages to allow API 1.6.0, where this change has been reverted.
+
+## 1.16.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): implement MetricProducer specification [#4007](https://github.com/open-telemetry/opentelemetry-js/pull/4007)
+* feat: update PeriodicExportingMetricReader and PrometheusExporter to accept optional metric producers [#4077](https://github.com/open-telemetry/opentelemetry-js/pull/4077) @aabmass
+
+### :bug: (Bug Fix)
+
+* fix(exporter-zipkin): rounding duration to the nearest int to be compliant with zipkin protocol [#4064](https://github.com/open-telemetry/opentelemetry-js/pull/4064) @n0cloud
+* fix(sdk-metrics): metric names should be case-insensitive
+
+### :books: (Refine Doc)
+
+* docs(guidelines): add dependencies guidelines [#4040](https://github.com/open-telemetry/opentelemetry-js/pull/4040)
 
 ## 1.15.2
 

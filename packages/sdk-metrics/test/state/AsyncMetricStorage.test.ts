@@ -110,8 +110,7 @@ describe('AsyncMetricStorage', () => {
             collectionTime
           );
 
-          assertMetricData(metric, DataPointType.SUM);
-          assert.strictEqual(metric.dataPoints.length, 0);
+          assert.equal(metric, undefined);
         }
 
         delegate.setDelegate(observableResult => {

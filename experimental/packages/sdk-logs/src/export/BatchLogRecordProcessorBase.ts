@@ -42,7 +42,10 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
-  constructor(private readonly _exporter: LogRecordExporter, config?: T) {
+  constructor(
+    private readonly _exporter: LogRecordExporter,
+    config?: T
+  ) {
     const env = getEnv();
     this._maxExportBatchSize =
       config?.maxExportBatchSize ?? env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;

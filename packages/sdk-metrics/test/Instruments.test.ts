@@ -488,10 +488,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(-1, { foo: 'bar' });
-      await validateExport(deltaReader, {
-        dataPointType: DataPointType.HISTOGRAM,
-        dataPoints: [],
-      });
+      const result = await deltaReader.collect();
+
+      // nothing observed
+      assert.equal(result.resourceMetrics.scopeMetrics.length, 0);
     });
 
     it('should record DOUBLE values', async () => {
@@ -553,10 +553,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(-0.5, { foo: 'bar' });
-      await validateExport(deltaReader, {
-        dataPointType: DataPointType.HISTOGRAM,
-        dataPoints: [],
-      });
+      const result = await deltaReader.collect();
+
+      // nothing observed
+      assert.equal(result.resourceMetrics.scopeMetrics.length, 0);
     });
   });
 

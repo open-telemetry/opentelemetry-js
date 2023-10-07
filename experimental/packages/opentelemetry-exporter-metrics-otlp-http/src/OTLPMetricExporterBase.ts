@@ -109,7 +109,7 @@ export class OTLPMetricExporterBase<
     OTLPMetricExporterOptions,
     ResourceMetrics,
     IExportMetricsServiceRequest
-  >
+  >,
 > implements PushMetricExporter
 {
   public _otlpExporter: T;

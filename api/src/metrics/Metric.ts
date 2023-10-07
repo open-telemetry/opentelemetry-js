@@ -77,7 +77,7 @@ export enum ValueType {
  * <ol>
  */
 export interface Counter<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > {
   /**
    * Increment value of counter by the input. Inputs must not be negative.
@@ -86,7 +86,7 @@ export interface Counter<
 }
 
 export interface UpDownCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > {
   /**
    * Increment value of counter by the input. Inputs may be negative.
@@ -95,7 +95,7 @@ export interface UpDownCounter<
 }
 
 export interface Histogram<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > {
   /**
    * Records a measurement. Value of the measurement must not be negative.
@@ -117,7 +117,7 @@ export type MetricAttributeValue = AttributeValue;
  * The observable callback for Observable instruments.
  */
 export type ObservableCallback<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > = (
   observableResult: ObservableResult<AttributesTypes>
 ) => void | Promise<void>;
@@ -126,13 +126,13 @@ export type ObservableCallback<
  * The observable callback for a batch of Observable instruments.
  */
 export type BatchObservableCallback<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > = (
   observableResult: BatchObservableResult<AttributesTypes>
 ) => void | Promise<void>;
 
 export interface Observable<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > {
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
@@ -148,11 +148,11 @@ export interface Observable<
 }
 
 export type ObservableCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > = Observable<AttributesTypes>;
 export type ObservableUpDownCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > = Observable<AttributesTypes>;
 export type ObservableGauge<
-  AttributesTypes extends MetricAttributes = MetricAttributes
+  AttributesTypes extends MetricAttributes = MetricAttributes,
 > = Observable<AttributesTypes>;

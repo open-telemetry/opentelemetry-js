@@ -107,13 +107,8 @@ describe('TemporalMetricProcessor', () => {
             [5, 5]
           );
 
-          assertMetricData(
-            metric,
-            DataPointType.SUM,
-            defaultInstrumentDescriptor,
-            AggregationTemporality.DELTA
-          );
-          assert.strictEqual(metric.dataPoints.length, 0);
+          // nothing recorded -> nothing collected
+          assert.equal(metric, undefined);
         }
 
         // selectAggregationTemporality should be called only once.

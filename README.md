@@ -141,19 +141,27 @@ There may also be API packages for experimental signals in the experimental dire
 All stable packages are released with the same version, and all experimental packages are released with the same version.
 The below table describes which versions of each set of packages are expected to work together.
 
-| API   | Stable Packages | Experimental Packages |
-| ----- | --------------- | --------------------- |
-| 1.3.x | 1.9.x           | 0.35.x                |
-| 1.3.x | 1.8.x           | 0.34.x                |
-| 1.2.x | 1.7.x           | 0.33.x                |
-| 1.2.x | 1.6.x           | 0.32.x                |
-| 1.1.x | 1.5.x           | 0.31.x                |
-| 1.1.x | 1.4.x           | 0.30.x                |
-| 1.1.x | 1.3.x           | 0.29.x                |
-| 1.1.x | 1.2.x           | 0.29.x                |
-| 1.1.x | 1.1.x           | 0.28.x                |
-| 1.0.x | 1.0.x           | 0.27.x                |
-| 1.0.x | 1.0.x           | 0.26.x                |
+| Stable Packages                                                 | Experimental Packages |
+|-----------------------------------------------------------------|-----------------------|
+| 1.17.x                                                          | 0.43.x                |
+| 1.16.x                                                          | 0.42.x                |
+| 1.15.x                                                          | 0.41.x                |
+| 1.14.x                                                          | 0.40.x                |
+| 1.13.x                                                          | 0.39.x                |
+| 1.12.x                                                          | 0.38.x                |
+| 1.11.x                                                          | 0.37.x                |
+| 1.10.x                                                          | 0.36.x                |
+| 1.9.x                                                           | 0.35.x                |
+| 1.8.x (this and later versions require API >=1.3.0 for metrics) | 0.34.x                |
+| 1.7.x                                                           | 0.33.x                |
+| 1.6.x                                                           | 0.32.x                |
+| 1.5.x                                                           | 0.31.x                |
+| 1.4.x                                                           | 0.30.x                |
+| 1.3.x                                                           | 0.29.x                |
+| 1.2.x                                                           | 0.29.x                |
+| 1.1.x                                                           | 0.28.x                |
+| 1.0.x                                                           | 0.27.x                |
+| 1.0.x (this and later versions require API >=1.0.0 for traces)  | 0.26.x                |
 
 ## Versioning
 
@@ -195,13 +203,10 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
-- [John Bley](https://github.com/johnbley), Splunk
-- [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
-- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
@@ -216,6 +221,9 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Valentin Marchaud](https://github.com/vmarchaud), Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
 - [Roch Devost](https://github.com/rochdev), DataDog, Approver
+- [John Bley](https://github.com/johnbley), Splunk, Approver
+- [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
+- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
 
 *Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
 
