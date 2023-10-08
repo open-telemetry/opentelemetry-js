@@ -34,7 +34,10 @@ export class ObservableResultImpl implements ObservableResult {
    */
   _buffer = new AttributeHashMap<number>();
 
-  constructor(private _instrumentName: string, private _valueType: ValueType) {}
+  constructor(
+    private _instrumentName: string,
+    private _valueType: ValueType
+  ) {}
 
   /**
    * Observe a measurement of the value associated with the given attributes.
@@ -46,10 +49,7 @@ export class ObservableResultImpl implements ObservableResult {
       );
       return;
     }
-    if (
-      this._valueType === ValueType.INT &&
-      !Number.isInteger(value)
-    ) {
+    if (this._valueType === ValueType.INT && !Number.isInteger(value)) {
       diag.warn(
         `INT value type cannot accept a floating-point value for ${this._instrumentName}, ignoring the fractional digits.`
       );

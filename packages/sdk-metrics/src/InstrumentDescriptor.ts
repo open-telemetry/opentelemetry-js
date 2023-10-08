@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { MetricAdvice, MetricOptions, ValueType, diag } from '@opentelemetry/api';
+import {
+  MetricAdvice,
+  MetricOptions,
+  ValueType,
+  diag,
+} from '@opentelemetry/api';
 import { View } from './view/View';
 import { equalsCaseInsensitive } from './utils';
 
