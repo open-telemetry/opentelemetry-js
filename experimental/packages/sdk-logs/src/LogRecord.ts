@@ -114,18 +114,18 @@ export class LogRecord implements ReadableLogRecord {
     if (value === null) {
       return this;
     }
-    if (
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      Object.keys(value).length > 0
-    ) {
-      this.attributes[key] = value;
-    }
     if (key.length === 0) {
       api.diag.warn(`Invalid attribute key: ${key}`);
       return this;
     }
-    if (!isAttributeValue(value)) {
+    if (
+      !isAttributeValue(value) &&
+      !(
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        Object.keys(value).length > 0
+      )
+    ) {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
       return this;
     }
@@ -136,7 +136,11 @@ export class LogRecord implements ReadableLogRecord {
     ) {
       return this;
     }
-    this.attributes[key] = this._truncateToSize(value);
+    if (isAttributeValue(value)) {
+      this.attributes[key] = this._truncateToSize(value);
+    } else {
+      this.attributes[key] = value;
+    }
     return this;
   }
 
