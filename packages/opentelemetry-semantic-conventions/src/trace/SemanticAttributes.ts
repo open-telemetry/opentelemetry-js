@@ -576,9 +576,11 @@ the closest proxy.
   MESSAGING_DESTINATION: 'messaging.destination',
 
   /**
-   * The message destination name.
-   * Note: Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
-   * the broker does not have such notion, the destination name SHOULD uniquely identify the broker.
+   * Represents the name of the message destination.
+   *
+   * Note: The destination name should provide a unique identifier for a specific queue, topic, or other entity within
+   * the broker. If the broker does not support this concept, the destination name should uniquely identify the broker
+   * itself.
    */
   MESSAGING_DESTINATION_NAME: "messaging.destination.name",
 
