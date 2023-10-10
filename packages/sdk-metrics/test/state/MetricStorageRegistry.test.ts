@@ -37,8 +37,6 @@ class TestMetricStorage extends MetricStorage {
   ): Maybe<MetricData> {
     return undefined;
   }
-
-  registerCollector(collector: MetricCollectorHandle): void {}
 }
 
 describe('MetricStorageRegistry', () => {
