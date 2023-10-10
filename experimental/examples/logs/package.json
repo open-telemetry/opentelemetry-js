@@ -1,6 +1,6 @@
 {
   "name": "logs-example",
-  "version": "0.43.0",
+  "version": "0.44.0",
   "private": true,
   "scripts": {
     "start": "ts-node index.ts"

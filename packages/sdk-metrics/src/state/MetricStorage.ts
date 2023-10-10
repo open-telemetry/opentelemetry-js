@@ -39,7 +39,6 @@ export abstract class MetricStorage {
    */
   abstract collect(
     collector: MetricCollectorHandle,
-    collectors: MetricCollectorHandle[],
     collectionTime: HrTime
   ): Maybe<MetricData>;
 
