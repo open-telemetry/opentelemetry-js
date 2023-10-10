@@ -23,6 +23,7 @@ export {
 export { LoggerProvider } from './LoggerProvider';
 export { LogRecord } from './LogRecord';
 export { LogRecordProcessor } from './LogRecordProcessor';
+export { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
 export { ReadableLogRecord } from './export/ReadableLogRecord';
 export { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';
 export { ConsoleLogRecordExporter } from './export/ConsoleLogRecordExporter';
