@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696944512137,
+  "lastUpdate": 1696945691363,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -248,6 +248,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f8e187b473274cc2011e7385992f07d319d667dc",
+          "message": "chore: release SDK 1.17.1/Experimental 0.44.0 (#4183)",
+          "timestamp": "2023-10-10T15:46:49+02:00",
+          "tree_id": "c663a17a9beca2a158fc5f1447dc0d0f45630af0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f8e187b473274cc2011e7385992f07d319d667dc"
+        },
+        "date": 1696945690445,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 705811,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
