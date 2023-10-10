@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696672502315,
+  "lastUpdate": 1696944512137,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -217,6 +217,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4eb10f7c9dbdc1075d2705bb7c305c063b86a2f9",
+          "message": "fix(sdk-metrics): prevent per-reader storages from keeping unreported accumulations in memory (#4163)",
+          "timestamp": "2023-10-10T15:27:12+02:00",
+          "tree_id": "02e65c14508848e33b9a814bdc044bfd018e64ee",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4eb10f7c9dbdc1075d2705bb7c305c063b86a2f9"
+        },
+        "date": 1696944511230,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 741622,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
