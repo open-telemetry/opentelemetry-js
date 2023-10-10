@@ -33,7 +33,6 @@ import {
 class TestMetricStorage extends MetricStorage {
   collect(
     collector: MetricCollectorHandle,
-    collectors: MetricCollectorHandle[],
     collectionTime: HrTime
   ): Maybe<MetricData> {
     return undefined;
