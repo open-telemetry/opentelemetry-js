@@ -33,6 +33,7 @@ import {
   DataPoint,
   DataPointType,
   ScopeMetrics,
+  MetricDescriptor,
 } from '../src/export/MetricData';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
@@ -58,6 +59,7 @@ export const defaultInstrumentDescriptor: InstrumentDescriptor = {
   type: InstrumentType.COUNTER,
   unit: '1',
   valueType: ValueType.DOUBLE,
+  advice: {},
 };
 
 export const defaultInstrumentationScope: InstrumentationScope = {
@@ -104,12 +106,12 @@ export function assertScopeMetrics(
 export function assertMetricData(
   actual: unknown,
   dataPointType?: DataPointType,
-  instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
+  metricDescriptor: Partial<MetricDescriptor> | null = defaultInstrumentDescriptor,
   aggregationTemporality?: AggregationTemporality
 ): asserts actual is MetricData {
   const it = actual as MetricData;
-  if (instrumentDescriptor != null) {
-    assertPartialDeepStrictEqual(it.descriptor, instrumentDescriptor);
+  if (metricDescriptor != null) {
+    assertPartialDeepStrictEqual(it.descriptor, metricDescriptor);
   }
   if (isNotNullish(dataPointType)) {
     assert.strictEqual(it.dataPointType, dataPointType);

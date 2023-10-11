@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### :rocket: (Enhancement)
+
+* feat(metrics): prototype experimental advice support [#3876](https://github.com/open-telemetry/opentelemetry-js/pull/3876) @legendecas
+
 ## 1.6.0
 
 ### :bug: (Bug Fix)

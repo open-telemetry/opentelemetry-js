@@ -19,13 +19,13 @@ import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import {
-  InstrumentDescriptor,
   InstrumentType,
   MeterProvider,
   MetricReader,
   DataPoint,
   DataPointType,
   Histogram,
+  MetricDescriptor,
 } from '../src';
 import {
   TestDeltaMetricReader,
@@ -341,6 +341,60 @@ describe('Instruments', () => {
                   7500, 10000,
                 ],
                 counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+              },
+              count: 2,
+              sum: 100,
+              max: 100,
+              min: 0,
+            },
+          },
+        ],
+      });
+    });
+
+    it('should recognize metric advice', async () => {
+      const { meter, deltaReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.INT,
+        advice: {
+          // Set explicit boundaries that are different from the default one.
+          explicitBucketBoundaries: [1, 9, 100],
+        },
+      });
+
+      histogram.record(10);
+      histogram.record(0);
+      histogram.record(100, { foo: 'bar' });
+      histogram.record(0, { foo: 'bar' });
+      await validateExport(deltaReader, {
+        descriptor: {
+          name: 'test',
+          description: '',
+          unit: '',
+          type: InstrumentType.HISTOGRAM,
+          valueType: ValueType.INT,
+        },
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            value: {
+              buckets: {
+                boundaries: [1, 9, 100],
+                counts: [1, 0, 1, 0],
+              },
+              count: 2,
+              sum: 10,
+              max: 10,
+              min: 0,
+            },
+          },
+          {
+            attributes: { foo: 'bar' },
+            value: {
+              buckets: {
+                boundaries: [1, 9, 100],
+                counts: [1, 0, 0, 1],
               },
               count: 2,
               sum: 100,
@@ -721,7 +775,7 @@ function setup() {
 interface ValidateMetricData {
   resource?: Resource;
   instrumentationScope?: InstrumentationScope;
-  descriptor?: InstrumentDescriptor;
+  descriptor?: MetricDescriptor;
   dataPointType?: DataPointType;
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
   isMonotonic?: boolean;
