@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1696945691363,
+  "lastUpdate": 1697011580076,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -277,6 +277,37 @@ window.BENCHMARK_DATA = {
             "name": "create spans (10 attributes)",
             "value": 705811,
             "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "legendecas@gmail.com",
+            "name": "Chengzhong Wu",
+            "username": "legendecas"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b6e532bf52c9553e51aa6d3375e85f0dd9bd67c1",
+          "message": "feat(metrics): prototype experimental advice support (#3876)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-10-11T10:05:03+02:00",
+          "tree_id": "74fe3a870c6238109b0a32e614bf13eb6699f042",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b6e532bf52c9553e51aa6d3375e85f0dd9bd67c1"
+        },
+        "date": 1697011579208,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 726527,
+            "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
