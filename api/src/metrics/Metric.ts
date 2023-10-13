@@ -19,6 +19,18 @@ import { Context } from '../context/types';
 import { BatchObservableResult, ObservableResult } from './ObservableResult';
 
 /**
+ * Advisory options influencing aggregation configuration parameters.
+ * @experimental
+ */
+export interface MetricAdvice {
+  /**
+   * Hint the explicit bucket boundaries for SDK if the metric is been
+   * aggregated with a HistogramAggregator.
+   */
+  explicitBucketBoundaries?: number[];
+}
+
+/**
  * Options needed for metric creation
  */
 export interface MetricOptions {
@@ -39,6 +51,12 @@ export interface MetricOptions {
    * @default {@link ValueType.DOUBLE}
    */
   valueType?: ValueType;
+
+  /**
+   * The advice influencing aggregation configuration parameters.
+   * @experimental
+   */
+  advice?: MetricAdvice;
 }
 
 /** The Type of value. It describes how the data is reported. */
