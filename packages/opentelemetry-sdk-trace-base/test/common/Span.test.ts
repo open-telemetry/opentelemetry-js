@@ -1222,5 +1222,64 @@ describe('Span', () => {
         });
       });
     });
+
+    describe('when attributes are added in constructor', () => {
+      it('should not map undefined value', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+          assert.deepStrictEqual(span.attributes,{});
+      });
+
+      it('should map correctly sent keys', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT,
+          "",
+          [],
+          undefined,
+          undefined,
+          {
+            "key1":"value",
+            "key2":"value"
+          }
+        );
+          assert.deepStrictEqual(span.attributes,{
+            "key1":"value",
+            "key2":"value"
+          });
+      });
+
+      it('should correctly map new keys set ', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT,
+          "",
+          [],
+          undefined,
+          undefined,
+          {
+            "key1":"value",
+            "key2":"value"
+          }
+        );
+        span.setAttributes({"key3":"value"});
+          assert.deepStrictEqual(span.attributes,{
+            "key1":"value",
+            "key2":"value",
+            "key3":"value"
+          });
+      });
+    });
   });
 });

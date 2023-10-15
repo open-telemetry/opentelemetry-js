@@ -100,13 +100,17 @@ export class Span implements APISpan, ReadableSpan {
     parentSpanId?: string,
     links: Link[] = [],
     startTime?: TimeInput,
-    _deprecatedClock?: unknown // keeping this argument even though it is unused to ensure backwards compatibility
+    _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
+    initAttributes?:SpanAttributes
   ) {
     this.name = spanName;
     this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
+    if(initAttributes){
+      this.setAttributes(initAttributes);
+    }
 
     const now = Date.now();
     this._performanceStartTime = otperformance.now();
