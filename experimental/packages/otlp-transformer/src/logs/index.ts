@@ -22,8 +22,9 @@ import {
   IResourceLogs,
 } from './types';
 import { IResource } from '@opentelemetry/resources';
+import { hrTimeToFixed64Nanos } from '../common';
 import { toAnyValue, toAttributes, toKeyValue } from '../common/internal';
-import { hexToBase64, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { hexToBase64 } from '@opentelemetry/core';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { IKeyValue } from '../common/types';
 import { LogAttributes } from '@opentelemetry/api-logs';
@@ -94,8 +95,8 @@ function logRecordsToResourceLogs(
 
 function toLogRecord(log: ReadableLogRecord, useHex?: boolean): ILogRecord {
   return {
-    timeUnixNano: hrTimeToNanoseconds(log.hrTime),
-    observedTimeUnixNano: hrTimeToNanoseconds(log.hrTimeObserved),
+    timeUnixNano: hrTimeToFixed64Nanos(log.hrTime),
+    observedTimeUnixNano: hrTimeToFixed64Nanos(log.hrTimeObserved),
     severityNumber: toSeverityNumber(log.severityNumber),
     severityText: log.severityText,
     body: toAnyValue(log.body),

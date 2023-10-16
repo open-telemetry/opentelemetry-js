@@ -33,7 +33,7 @@ export class PrometheusExporter extends MetricReader {
     port: 9464,
     endpoint: '/metrics',
     prefix: '',
-    appendTimestamp: true,
+    appendTimestamp: false,
   };
 
   private readonly _host?: string;
@@ -62,6 +62,7 @@ export class PrometheusExporter extends MetricReader {
       aggregationSelector: _instrumentType => Aggregation.Default(),
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
+      metricProducers: config.metricProducers,
     });
     this._host =
       config.host ||

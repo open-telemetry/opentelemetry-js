@@ -16,6 +16,7 @@
 
 import type {
   IAnyValue,
+  IFixed64,
   IInstrumentationScope,
   IKeyValue,
 } from '../common/types';
@@ -25,6 +26,19 @@ import type { IResource } from '../resource/types';
 export interface IExportLogsServiceRequest {
   /** ExportLogsServiceRequest resourceLogs */
   resourceLogs?: IResourceLogs[];
+}
+
+export interface IExportLogsServiceResponse {
+  /** ExportLogsServiceResponse partialSuccess */
+  partialSuccess?: IExportLogsPartialSuccess;
+}
+
+export interface IExportLogsPartialSuccess {
+  /** ExportLogsPartialSuccess rejectedLogRecords */
+  rejectedLogRecords?: number;
+
+  /** ExportLogsPartialSuccess errorMessage */
+  errorMessage?: string;
 }
 
 /** Properties of a ResourceLogs. */
@@ -54,10 +68,10 @@ export interface IScopeLogs {
 /** Properties of a LogRecord. */
 export interface ILogRecord {
   /** LogRecord timeUnixNano */
-  timeUnixNano: number;
+  timeUnixNano: IFixed64;
 
   /** LogRecord observedTimeUnixNano */
-  observedTimeUnixNano: number;
+  observedTimeUnixNano: IFixed64;
 
   /** LogRecord severityNumber */
   severityNumber?: ESeverityNumber;

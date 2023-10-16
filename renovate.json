@@ -2,18 +2,26 @@
   "extends": ["config:base"],
   "packageRules": [
     {
-      "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch",
-      "matchUpdateTypes": ["patch", "minor"]
+      "groupName": "all patch versions",
+      "groupSlug": "all-patch",
+      "matchUpdateTypes": ["patch"],
+      "excludePackageNames": ["prettier"],
+      "schedule": ["before 3am every weekday"]
     },
     {
-      "matchPaths": ["backwards-compatibility"],
-      "matchPackageNames": ["@types/node"],
-      "enabled": false
+      "matchUpdateTypes": ["minor"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "schedule": ["before 3am on Monday"]
+    },
+    {
+      "matchPackageNames": ["typescript", "webpack", "webpack-cli"],
+      "dependencyDashboardApproval": true
     }
   ],
-  "ignoreDeps": ["gcp-metadata", "got", "mocha", "husky", "karma-webpack", "@opentelemetry/api"],
-  "assignees": ["@blumamir", "@dyladan", "@legendecas"],
-  "schedule": ["before 3am on Friday"],
+  "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0", "@types/node"],
+  "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
   "labels": ["dependencies"]
 }

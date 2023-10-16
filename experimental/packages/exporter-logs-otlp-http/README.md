@@ -5,7 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides an exporter for OTLP (http/json) logs using protocol version `v0.18`.
+This module provides a logs-exporter for OTLP (http/json) using protocol version `v0.20.0`.
 
 ## Installation
 

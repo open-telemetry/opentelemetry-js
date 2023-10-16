@@ -27,7 +27,7 @@ import { getEnv, baggageUtils, _globalThis } from '@opentelemetry/core';
  */
 export abstract class OTLPExporterBrowserBase<
   ExportItem,
-  ServiceRequest
+  ServiceRequest,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
   private sendMethod: 'beacon' | 'xhr' | 'fetch' = 'beacon';

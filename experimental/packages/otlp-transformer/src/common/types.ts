@@ -21,6 +21,12 @@ export interface IInstrumentationScope {
 
   /** InstrumentationScope version */
   version?: string;
+
+  /** InstrumentationScope attributes */
+  attributes?: IKeyValue[];
+
+  /** InstrumentationScope droppedAttributesCount */
+  droppedAttributesCount?: number;
 }
 
 /** Properties of a KeyValue. */
@@ -66,4 +72,9 @@ export interface IArrayValue {
 export interface IKeyValueList {
   /** KeyValueList values */
   values: IKeyValue[];
+}
+
+export interface IFixed64 {
+  low: number;
+  high: number;
 }

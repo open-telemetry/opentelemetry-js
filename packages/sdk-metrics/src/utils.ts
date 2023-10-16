@@ -190,3 +190,7 @@ export function binarySearchLB(arr: number[], value: number): number {
   }
   return -1;
 }
+
+export function equalsCaseInsensitive(lhs: string, rhs: string): boolean {
+  return lhs.toLowerCase() === rhs.toLowerCase();
+}

@@ -141,7 +141,8 @@ describe('MetricCollector', () => {
       assert.strictEqual(errors.length, 0);
       const { scopeMetrics } = resourceMetrics;
       const { metrics } = scopeMetrics[0];
-      assert.strictEqual(metrics.length, 3);
+      // Should not export observableCounter3, as it was never observed
+      assert.strictEqual(metrics.length, 2);
 
       /** checking batch[0] */
       const metricData1 = metrics[0];
@@ -160,13 +161,6 @@ describe('MetricCollector', () => {
       assert.strictEqual(metricData2.dataPoints.length, 2);
       assertDataPoint(metricData2.dataPoints[0], {}, 3);
       assertDataPoint(metricData2.dataPoints[1], { foo: 'bar' }, 4);
-
-      /** checking batch[2] */
-      const metricData3 = metrics[2];
-      assertMetricData(metricData3, DataPointType.SUM, {
-        name: 'observable3',
-      });
-      assert.strictEqual(metricData3.dataPoints.length, 0);
     });
 
     it('should collect observer metrics with timeout', async () => {
@@ -205,19 +199,15 @@ describe('MetricCollector', () => {
         assert(errors[0] instanceof TimeoutError);
         const { scopeMetrics } = resourceMetrics;
         const { metrics } = scopeMetrics[0];
-        assert.strictEqual(metrics.length, 2);
 
-        /** observer1 */
-        assertMetricData(metrics[0], DataPointType.SUM, {
-          name: 'observer1',
-        });
-        assert.strictEqual(metrics[0].dataPoints.length, 0);
+        // Only observer2 is exported, observer1 never reported a measurement
+        assert.strictEqual(metrics.length, 1);
 
         /** observer2 */
-        assertMetricData(metrics[1], DataPointType.SUM, {
+        assertMetricData(metrics[0], DataPointType.SUM, {
           name: 'observer2',
         });
-        assert.strictEqual(metrics[1].dataPoints.length, 1);
+        assert.strictEqual(metrics[0].dataPoints.length, 1);
       }
 
       /** now the observer1 is back to normal */
@@ -272,19 +262,13 @@ describe('MetricCollector', () => {
       assert.strictEqual(`${errors[0]}`, 'Error: foobar');
       const { scopeMetrics } = resourceMetrics;
       const { metrics } = scopeMetrics[0];
-      assert.strictEqual(metrics.length, 2);
 
-      /** counter1 data points are collected */
+      /** only counter1 data points are collected */
+      assert.strictEqual(metrics.length, 1);
       assertMetricData(metrics[0], DataPointType.SUM, {
         name: 'counter1',
       });
       assert.strictEqual(metrics[0].dataPoints.length, 1);
-
-      /** observer1 data points are not collected */
-      assertMetricData(metrics[1], DataPointType.SUM, {
-        name: 'observer1',
-      });
-      assert.strictEqual(metrics[1].dataPoints.length, 0);
     });
 
     it('should collect batch observer metrics with timeout', async () => {
@@ -327,19 +311,13 @@ describe('MetricCollector', () => {
         assert(errors[0] instanceof TimeoutError);
         const { scopeMetrics } = resourceMetrics;
         const { metrics } = scopeMetrics[0];
-        assert.strictEqual(metrics.length, 2);
 
-        /** observer1 */
+        /** only observer2 is present; observer1's promise never settled*/
+        assert.strictEqual(metrics.length, 1);
         assertMetricData(metrics[0], DataPointType.SUM, {
-          name: 'observer1',
-        });
-        assert.strictEqual(metrics[0].dataPoints.length, 0);
-
-        /** observer2 */
-        assertMetricData(metrics[1], DataPointType.SUM, {
           name: 'observer2',
         });
-        assert.strictEqual(metrics[1].dataPoints.length, 1);
+        assert.strictEqual(metrics[0].dataPoints.length, 1);
       }
 
       /** now the observer1 is back to normal */
@@ -398,19 +376,13 @@ describe('MetricCollector', () => {
       assert.strictEqual(`${errors[0]}`, 'Error: foobar');
       const { scopeMetrics } = resourceMetrics;
       const { metrics } = scopeMetrics[0];
-      assert.strictEqual(metrics.length, 2);
 
-      /** counter1 data points are collected */
+      /** counter1 data points are collected; observer1's callback did throw, so data points are not collected */
+      assert.strictEqual(metrics.length, 1);
       assertMetricData(metrics[0], DataPointType.SUM, {
         name: 'counter1',
       });
       assert.strictEqual(metrics[0].dataPoints.length, 1);
-
-      /** observer1 data points are not collected */
-      assertMetricData(metrics[1], DataPointType.SUM, {
-        name: 'observer1',
-      });
-      assert.strictEqual(metrics[1].dataPoints.length, 0);
     });
   });
 });

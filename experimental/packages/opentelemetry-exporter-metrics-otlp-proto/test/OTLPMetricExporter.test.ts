@@ -38,14 +38,13 @@ import {
   setUp,
   shutdown,
 } from './metricsHelper';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
-  AggregationTemporality,
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics';
-import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+  AggregationTemporalityPreference,
+  OTLPMetricExporterOptions,
+} from '@opentelemetry/exporter-metrics-otlp-http';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../src/version';
 
 let fakeRequest: PassThrough;
@@ -176,7 +175,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        temporalityPreference: AggregationTemporality.CUMULATIVE,
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       setUp();
@@ -260,7 +259,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
           ServiceClientType.METRICS
         );
         const data = ExportTraceServiceRequestProto.decode(buff);
-        const json = data?.toJSON() as IExportMetricsServiceRequest;
+        const json = data?.toJSON() as any;
 
         // The order of the metrics is not guaranteed.
         const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
@@ -283,8 +282,8 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureExportedCounterIsCorrect(
           metric1,
-          metric1.sum?.dataPoints[0].timeUnixNano,
-          metric1.sum?.dataPoints[0].startTimeUnixNano
+          metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+          metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime
         );
         assert.ok(
           typeof metric2 !== 'undefined',
@@ -292,8 +291,10 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         );
         ensureExportedObservableGaugeIsCorrect(
           metric2,
-          metric2.gauge?.dataPoints[0].timeUnixNano,
-          metric2.gauge?.dataPoints[0].startTimeUnixNano
+          metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+            .endTime,
+          metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+            .startTime
         );
         assert.ok(
           typeof metric3 !== 'undefined',
@@ -301,8 +302,9 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         );
         ensureExportedHistogramIsCorrect(
           metric3,
-          metric3.histogram?.dataPoints[0].timeUnixNano,
-          metric3.histogram?.dataPoints[0].startTimeUnixNano,
+          metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime,
+          metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+            .startTime,
           [0, 100],
           ['0', '2', '0']
         );

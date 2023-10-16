@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-import { GrpcJsInstrumentation } from './';
-import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
-import {
-  Span,
-  SpanStatusCode,
-  SpanStatus,
-  propagation,
-  context,
-} from '@opentelemetry/api';
+import type { EventEmitter } from 'events';
+import type { Span, SpanStatus } from '@opentelemetry/api';
+import type { Client, Metadata, ServiceError } from '@grpc/grpc-js';
 import type * as grpcJs from '@grpc/grpc-js';
+import type { GrpcJsInstrumentation } from './';
+import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
+import type { metadataCaptureType } from '../internal-types';
+
+import { propagation, context } from '@opentelemetry/api';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { AttributeNames } from '../enums/AttributeNames';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
 } from '../utils';
-import { CALL_SPAN_ENDED } from './serverUtils';
-import { EventEmitter } from 'events';
-import { AttributeNames } from '../enums/AttributeNames';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { metadataCaptureType } from '../internal-types';
-import { GRPC_STATUS_CODE_OK } from '../status-code';
+import { errorMonitor } from 'events';
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -42,7 +39,7 @@ import { GRPC_STATUS_CODE_OK } from '../status-code';
  */
 export function getMethodsToWrap(
   this: GrpcJsInstrumentation,
-  client: typeof grpcJs.Client,
+  client: typeof Client,
   methods: { [key: string]: { originalName?: string } }
 ): string[] {
   const methodList: string[] = [];
@@ -67,6 +64,91 @@ export function getMethodsToWrap(
 }
 
 /**
+ * Patches a callback so that the current span for this trace is also ended
+ * when the callback is invoked.
+ */
+export function patchedCallback(
+  span: Span,
+  callback: SendUnaryDataCallback<ResponseType>
+) {
+  const wrappedFn: SendUnaryDataCallback<ResponseType> = (
+    err: grpcJs.ServiceError | null,
+    res?: ResponseType
+  ) => {
+    if (err) {
+      if (err.code) {
+        span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
+        span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
+      }
+      span.setAttributes({
+        [AttributeNames.GRPC_ERROR_NAME]: err.name,
+        [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+      });
+    } else {
+      span.setAttribute(
+        SemanticAttributes.RPC_GRPC_STATUS_CODE,
+        GRPC_STATUS_CODE_OK
+      );
+    }
+
+    span.end();
+    callback(err, res);
+  };
+  return context.bind(context.active(), wrappedFn);
+}
+
+export function patchResponseMetadataEvent(
+  span: Span,
+  call: EventEmitter,
+  metadataCapture: metadataCaptureType
+) {
+  call.on('metadata', (responseMetadata: any) => {
+    metadataCapture.client.captureResponseMetadata(span, responseMetadata);
+  });
+}
+
+export function patchResponseStreamEvents(span: Span, call: EventEmitter) {
+  // Both error and status events can be emitted
+  // the first one emitted set spanEnded to true
+  let spanEnded = false;
+  const endSpan = () => {
+    if (!spanEnded) {
+      span.end();
+      spanEnded = true;
+    }
+  };
+  context.bind(context.active(), call);
+  call.on(errorMonitor, (err: ServiceError) => {
+    if (spanEnded) {
+      return;
+    }
+
+    span.setStatus({
+      code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
+      message: err.message,
+    });
+    span.setAttributes({
+      [AttributeNames.GRPC_ERROR_NAME]: err.name,
+      [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+      [SemanticAttributes.RPC_GRPC_STATUS_CODE]: err.code,
+    });
+
+    endSpan();
+  });
+
+  call.on('status', (status: SpanStatus) => {
+    if (spanEnded) {
+      return;
+    }
+
+    span.setStatus(_grpcStatusCodeToSpanStatus(status.code));
+    span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, status.code);
+
+    endSpan();
+  });
+}
+
+/**
  * Execute grpc client call. Apply completitionspan properties and end the
  * span on callback or receiving an emitted event.
  */
@@ -77,41 +159,6 @@ export function makeGrpcClientRemoteCall(
   metadata: grpcJs.Metadata,
   self: grpcJs.Client
 ): (span: Span) => EventEmitter {
-  /**
-   * Patches a callback so that the current span for this trace is also ended
-   * when the callback is invoked.
-   */
-  function patchedCallback(
-    span: Span,
-    callback: SendUnaryDataCallback<ResponseType>
-  ) {
-    const wrappedFn: SendUnaryDataCallback<ResponseType> = (
-      err: grpcJs.ServiceError | null,
-      res: any
-    ) => {
-      if (err) {
-        if (err.code) {
-          span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
-          span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
-        }
-        span.setAttributes({
-          [AttributeNames.GRPC_ERROR_NAME]: err.name,
-          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
-        });
-      } else {
-        span.setStatus({ code: SpanStatusCode.UNSET });
-        span.setAttribute(
-          SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          GRPC_STATUS_CODE_OK
-        );
-      }
-
-      span.end();
-      callback(err, res);
-    };
-    return context.bind(context.active(), wrappedFn);
-  }
-
   return (span: Span) => {
     // if unary or clientStream
     if (!original.responseStream) {
@@ -135,88 +182,62 @@ export function makeGrpcClientRemoteCall(
 
     // if server stream or bidi
     if (original.responseStream) {
-      // Both error and status events can be emitted
-      // the first one emitted set spanEnded to true
-      let spanEnded = false;
-      const endSpan = () => {
-        if (!spanEnded) {
-          span.end();
-          spanEnded = true;
-        }
-      };
-      context.bind(context.active(), call);
-      call.on('error', (err: grpcJs.ServiceError) => {
-        if (call[CALL_SPAN_ENDED]) {
-          return;
-        }
-        call[CALL_SPAN_ENDED] = true;
-
-        span.setStatus({
-          code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
-          message: err.message,
-        });
-        span.setAttributes({
-          [AttributeNames.GRPC_ERROR_NAME]: err.name,
-          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
-          [SemanticAttributes.RPC_GRPC_STATUS_CODE]: err.code,
-        });
-
-        endSpan();
-      });
-
-      call.on('status', (status: SpanStatus) => {
-        if (call[CALL_SPAN_ENDED]) {
-          return;
-        }
-        call[CALL_SPAN_ENDED] = true;
-
-        span.setStatus(_grpcStatusCodeToSpanStatus(status.code));
-        span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, status.code);
-
-        endSpan();
-      });
+      patchResponseStreamEvents(span, call);
     }
     return call;
   };
 }
 
-/**
- * Returns the metadata argument from user provided arguments (`args`)
- */
-export function getMetadata(
-  this: GrpcJsInstrumentation,
-  grpcClient: typeof grpcJs,
-  original: GrpcClientFunc,
-  args: Array<unknown | grpcJs.Metadata>
-): grpcJs.Metadata {
-  let metadata: grpcJs.Metadata;
-
+export function getMetadataIndex(args: Array<unknown | Metadata>): number {
   // This finds an instance of Metadata among the arguments.
   // A possible issue that could occur is if the 'options' parameter from
   // the user contains an '_internal_repr' as well as a 'getMap' function,
   // but this is an extremely rare case.
-  let metadataIndex = args.findIndex((arg: unknown | grpcJs.Metadata) => {
+  return args.findIndex((arg: unknown | Metadata) => {
     return (
       arg &&
       typeof arg === 'object' &&
-      (arg as grpcJs.Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
-      typeof (arg as grpcJs.Metadata).getMap === 'function'
+      (arg as Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
+      typeof (arg as Metadata).getMap === 'function'
     );
   });
+}
+
+/**
+ * Returns the metadata argument from user provided arguments (`args`)
+ * If no metadata is provided in `args`: adds empty metadata to `args` and returns that empty metadata
+ */
+export function extractMetadataOrSplice(
+  grpcLib: typeof grpcJs,
+  args: Array<unknown | grpcJs.Metadata>,
+  spliceIndex: number
+) {
+  let metadata: grpcJs.Metadata;
+  const metadataIndex = getMetadataIndex(args);
   if (metadataIndex === -1) {
-    metadata = new grpcClient.Metadata();
-    if (!original.requestStream) {
-      // unary or server stream
-      metadataIndex = 1;
-    } else {
-      // client stream or bidi
-      metadataIndex = 0;
-    }
-    args.splice(metadataIndex, 0, metadata);
+    // Create metadata if it does not exist
+    metadata = new grpcLib.Metadata();
+    args.splice(spliceIndex, 0, metadata);
   } else {
-    metadata = args[metadataIndex] as grpcJs.Metadata;
+    metadata = args[metadataIndex] as Metadata;
   }
   return metadata;
+}
+
+/**
+ * Returns the metadata argument from user provided arguments (`args`)
+ * Adds empty metadata to arguments if the default is used.
+ */
+export function extractMetadataOrSpliceDefault(
+  grpcClient: typeof grpcJs,
+  original: GrpcClientFunc,
+  args: Array<unknown | grpcJs.Metadata>
+): grpcJs.Metadata {
+  return extractMetadataOrSplice(
+    grpcClient,
+    args,
+    original.requestStream ? 0 : 1
+  );
 }
 
 /**
@@ -224,8 +245,8 @@ export function getMetadata(
  * grpc receiver
  * @param metadata
  */
-export function setSpanContext(metadata: grpcJs.Metadata): void {
+export function setSpanContext(metadata: Metadata): void {
   propagation.inject(context.active(), metadata, {
-    set: (metadata, k, v) => metadata.set(k, v as grpcJs.MetadataValue),
+    set: (meta, k, v) => meta.set(k, v),
   });
 }

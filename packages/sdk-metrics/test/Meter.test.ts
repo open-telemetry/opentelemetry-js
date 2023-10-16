@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { Observable } from '@opentelemetry/api';
+import { Observable, diag } from '@opentelemetry/api';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import {
   CounterInstrument,
   HistogramInstrument,
@@ -27,78 +28,86 @@ import {
 import { Meter } from '../src/Meter';
 import { MeterProviderSharedState } from '../src/state/MeterProviderSharedState';
 import { MeterSharedState } from '../src/state/MeterSharedState';
-import { defaultInstrumentationScope, defaultResource } from './util';
+import {
+  defaultInstrumentationScope,
+  defaultResource,
+  invalidNames,
+  validNames,
+} from './util';
 
 describe('Meter', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('createCounter', () => {
-    it('should create counter', () => {
+    testWithNames('counter', name => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
-      const counter = meter.createCounter('foobar');
+      const counter = meter.createCounter(name);
       assert(counter instanceof CounterInstrument);
     });
   });
 
   describe('createUpDownCounter', () => {
-    it('should create up down counter', () => {
+    testWithNames('UpDownCounter', name => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
-      const upDownCounter = meter.createUpDownCounter('foobar');
+      const upDownCounter = meter.createUpDownCounter(name);
       assert(upDownCounter instanceof UpDownCounterInstrument);
     });
   });
 
   describe('createHistogram', () => {
-    it('should create histogram', () => {
+    testWithNames('Histogram', name => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
-      const histogram = meter.createHistogram('foobar');
+      const histogram = meter.createHistogram(name);
       assert(histogram instanceof HistogramInstrument);
     });
   });
 
   describe('createObservableGauge', () => {
-    it('should create observable gauge', () => {
+    testWithNames('ObservableGauge', name => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
-      const observableGauge = meter.createObservableGauge('foobar');
+      const observableGauge = meter.createObservableGauge(name);
       assert(observableGauge instanceof ObservableGaugeInstrument);
     });
   });
 
   describe('createObservableCounter', () => {
-    it('should create observable counter', () => {
+    testWithNames('ObservableCounter', name => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
-      const observableCounter = meter.createObservableCounter('foobar');
+      const observableCounter = meter.createObservableCounter(name);
       assert(observableCounter instanceof ObservableCounterInstrument);
     });
   });
 
   describe('createObservableUpDownCounter', () => {
-    it('should create observable up-down-counter', () => {
+    testWithNames('ObservableUpDownCounter', name => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope
       );
       const meter = new Meter(meterSharedState);
-      const observableUpDownCounter =
-        meter.createObservableUpDownCounter('foobar');
+      const observableUpDownCounter = meter.createObservableUpDownCounter(name);
       assert(
         observableUpDownCounter instanceof ObservableUpDownCounterInstrument
       );
@@ -167,3 +176,22 @@ describe('Meter', () => {
     });
   });
 });
+
+function testWithNames(type: string, tester: (name: string) => void) {
+  for (const invalidName of invalidNames) {
+    it(`should warn with invalid name ${invalidName} for ${type}`, () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      tester(invalidName);
+      assert.strictEqual(warnStub.callCount, 1);
+      assert.ok(warnStub.calledWithMatch('Invalid metric name'));
+    });
+  }
+
+  for (const validName of validNames) {
+    it(`should not warn with valid name ${validName} for ${type}`, () => {
+      const warnStub = sinon.spy(diag, 'warn');
+      tester(validName);
+      assert.strictEqual(warnStub.callCount, 0);
+    });
+  }
+}

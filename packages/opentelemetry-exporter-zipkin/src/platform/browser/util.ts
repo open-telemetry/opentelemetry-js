@@ -34,6 +34,7 @@ export function prepareSend(
 ): zipkinTypes.SendFn {
   let xhrHeaders: Record<string, string>;
   const useBeacon = typeof navigator.sendBeacon === 'function' && !headers;
+  const xhr = typeof XMLHttpRequest  === 'function';
   if (headers) {
     xhrHeaders = {
       Accept: 'application/json',
@@ -56,8 +57,10 @@ export function prepareSend(
     const payload = JSON.stringify(zipkinSpans);
     if (useBeacon) {
       sendWithBeacon(payload, done, urlStr);
-    } else {
+    } else if (xhr) {
       sendWithXhr(payload, done, urlStr, xhrHeaders);
+    } else {
+      sendWithFetch(payload, done, urlStr, xhrHeaders);
     }
   };
 }
@@ -129,4 +132,39 @@ function sendWithXhr(
   // Issue request to remote service
   diag.debug(`Zipkin request payload: ${data}`);
   xhr.send(data);
+}
+
+/**
+ * Sends data using fetch
+ * @param data
+ * @param done
+ * @param urlStr
+ * @param headers
+ */
+function sendWithFetch(
+  data: string,
+  done: (result: ExportResult) => void,
+  urlStr: string,
+  headers: Record<string, string> = {}
+) {
+  diag.debug(`Zipkin request payload: ${data}`);
+  fetch(urlStr, {method: 'POST', body: data, headers}).then(
+    (response) =>  {
+      diag.debug(`Zipkin response status code: ${response.status}, body: ${data}`);
+      if (response.status >= 200 && response.status < 400) {
+        return done({ code: ExportResultCode.SUCCESS });
+      } else {
+        return done({
+          code: ExportResultCode.FAILED,
+          error: new Error(
+            `Got unexpected status code from zipkin: ${response.status}`
+          ),
+        });
+      }
+    },
+    (error) => {
+      globalErrorHandler(new Error(`Zipkin request error: ${error.message}`));
+      return done({ code: ExportResultCode.FAILED });
+    }
+  )
 }

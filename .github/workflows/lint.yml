@@ -14,9 +14,9 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '16'
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Lint changelog file
         uses: avto-dev/markdown-lint@v1

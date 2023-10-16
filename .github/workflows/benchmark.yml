@@ -1,0 +1,63 @@
+name: Benchmark Tests
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  benchmark-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version:
+          - "18"
+    runs-on: self-hosted
+    timeout-minutes: 10
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - run: npm install -g npm@latest
+
+      - name: restore lerna
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            package-lock.json
+            packages/*/node_modules
+            packages/*/package-lock.json
+            experimental/packages/*/node_modules
+            experimental/packages/*/package-lock.json
+          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
+
+      - name: Bootstrap
+        run: |
+          npm install --ignore-scripts
+          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+
+      - name: Build 🔧
+        run: |
+          npm run compile
+
+      - name: Benchmark tests
+        run: |
+          npm run test:bench
+          find . -name .benchmark-results.txt -exec cat {} + > combined_benchmarks.txt
+
+      - name: Store benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'benchmarkjs'
+          output-file-path: combined_benchmarks.txt
+          gh-pages-branch: gh-pages
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          benchmark-data-dir-path: "benchmarks"
+          auto-push: true

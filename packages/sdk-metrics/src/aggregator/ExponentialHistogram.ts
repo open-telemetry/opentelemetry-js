@@ -24,9 +24,10 @@ import {
 import {
   DataPointType,
   ExponentialHistogramMetricData,
+  MetricDescriptor,
 } from '../export/MetricData';
 import { diag, HrTime } from '@opentelemetry/api';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Buckets } from './exponential-histogram/Buckets';
@@ -52,7 +53,10 @@ class HighLow {
   static combine(h1: HighLow, h2: HighLow): HighLow {
     return new HighLow(Math.min(h1.low, h2.low), Math.max(h1.high, h2.high));
   }
-  constructor(public low: number, public high: number) {}
+  constructor(
+    public low: number,
+    public high: number
+  ) {}
 }
 
 const MAX_SCALE = 20;
@@ -213,32 +217,33 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   /**
-   * merge combines data from other into self
-   * @param {ExponentialHistogramAccumulation} other
+   * merge combines data from previous value into self
+   * @param {ExponentialHistogramAccumulation} previous
    */
-  merge(other: ExponentialHistogramAccumulation) {
+  merge(previous: ExponentialHistogramAccumulation) {
     if (this._count === 0) {
-      this._min = other.min;
-      this._max = other.max;
-    } else if (other.count !== 0) {
-      if (other.min < this.min) {
-        this._min = other.min;
+      this._min = previous.min;
+      this._max = previous.max;
+    } else if (previous.count !== 0) {
+      if (previous.min < this.min) {
+        this._min = previous.min;
       }
-      if (other.max > this.max) {
-        this._max = other.max;
+      if (previous.max > this.max) {
+        this._max = previous.max;
       }
     }
 
-    this._sum += other.sum;
-    this._count += other.count;
-    this._zeroCount += other.zeroCount;
+    this.startTime = previous.startTime;
+    this._sum += previous.sum;
+    this._count += previous.count;
+    this._zeroCount += previous.zeroCount;
 
-    const minScale = this._minScale(other);
+    const minScale = this._minScale(previous);
 
     this._downscale(this.scale - minScale);
 
-    this._mergeBuckets(this.positive, other, other.positive, minScale);
-    this._mergeBuckets(this.negative, other, other.negative, minScale);
+    this._mergeBuckets(this.positive, previous, previous.positive, minScale);
+    this._mergeBuckets(this.negative, previous, previous.negative, minScale);
   }
 
   /**
@@ -551,7 +556,7 @@ export class ExponentialHistogramAggregator
   }
 
   toMetricData(
-    descriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<ExponentialHistogramAccumulation>[],
     endTime: HrTime

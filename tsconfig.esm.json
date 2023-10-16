@@ -30,6 +30,9 @@
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-http/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-proto/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/opentelemetry-instrumentation/tsconfig.esm.json"
     },
     {
