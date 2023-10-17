@@ -65,11 +65,11 @@
   "devDependencies": {
     "@opentelemetry/api": "1.6.0",
     "@opentelemetry/context-async-hooks": "1.17.1",
-    "@opentelemetry/exporter-jaeger": "1.17.0",
+    "@opentelemetry/exporter-jaeger": "1.17.1",
     "@types/mocha": "10.0.2",
     "@types/node": "18.6.5",
     "@types/semver": "7.5.3",
-    "@types/sinon": "10.0.18",
+    "@types/sinon": "10.0.19",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
     "lerna": "7.1.5",
