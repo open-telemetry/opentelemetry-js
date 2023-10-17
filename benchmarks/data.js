@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1697011580076,
+  "lastUpdate": 1697539062901,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -310,6 +310,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "00e78efd840d3f49d9d4b025a9965e8d3f2913ad",
+          "message": "chore(deps): update all patch versions (#4194)",
+          "timestamp": "2023-10-17T12:36:24+02:00",
+          "tree_id": "8129b9daefce9e57ab364786406e0aa4d8b5ebb0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/00e78efd840d3f49d9d4b025a9965e8d3f2913ad"
+        },
+        "date": 1697539061986,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 735352,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
