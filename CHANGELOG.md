@@ -15,6 +15,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace): Allow fetch instrumentation to be used with native NodeJS fetch [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
