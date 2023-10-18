@@ -46,7 +46,6 @@
   "dependencies": {
     "@opentelemetry/api-logs": "0.44.0",
     "@opentelemetry/core": "1.17.1",
-    "@opentelemetry/exporter-jaeger": "1.17.1",
     "@opentelemetry/exporter-trace-otlp-grpc": "0.44.0",
     "@opentelemetry/exporter-trace-otlp-http": "0.44.0",
     "@opentelemetry/exporter-trace-otlp-proto": "0.44.0",
