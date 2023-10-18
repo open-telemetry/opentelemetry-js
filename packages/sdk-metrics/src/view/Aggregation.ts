@@ -184,6 +184,11 @@ export class DefaultAggregation extends Aggregation {
         return LAST_VALUE_AGGREGATION;
       }
       case InstrumentType.HISTOGRAM: {
+        if (instrument.advice.explicitBucketBoundaries) {
+          return new ExplicitBucketHistogramAggregation(
+            instrument.advice.explicitBucketBoundaries
+          );
+        }
         return HISTOGRAM_AGGREGATION;
       }
     }

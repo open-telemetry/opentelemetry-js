@@ -144,7 +144,10 @@ export class ObservableRegistry {
 
   private _observeCallbacks(observationTime: HrTime, timeoutMillis?: number) {
     return this._callbacks.map(async ({ callback, instrument }) => {
-      const observableResult = new ObservableResultImpl(instrument._descriptor);
+      const observableResult = new ObservableResultImpl(
+        instrument._descriptor.name,
+        instrument._descriptor.valueType
+      );
       let callPromise: Promise<void> = Promise.resolve(
         callback(observableResult)
       );

@@ -24,7 +24,6 @@ import {
 } from '@opentelemetry/api';
 import { AttributeHashMap } from './state/HashMap';
 import { isObservableInstrument, ObservableInstrument } from './Instruments';
-import { InstrumentDescriptor } from '.';
 
 /**
  * The class implements {@link ObservableResult} interface.
@@ -35,7 +34,10 @@ export class ObservableResultImpl implements ObservableResult {
    */
   _buffer = new AttributeHashMap<number>();
 
-  constructor(private _descriptor: InstrumentDescriptor) {}
+  constructor(
+    private _instrumentName: string,
+    private _valueType: ValueType
+  ) {}
 
   /**
    * Observe a measurement of the value associated with the given attributes.
@@ -43,16 +45,13 @@ export class ObservableResultImpl implements ObservableResult {
   observe(value: number, attributes: MetricAttributes = {}): void {
     if (typeof value !== 'number') {
       diag.warn(
-        `non-number value provided to metric ${this._descriptor.name}: ${value}`
+        `non-number value provided to metric ${this._instrumentName}: ${value}`
       );
       return;
     }
-    if (
-      this._descriptor.valueType === ValueType.INT &&
-      !Number.isInteger(value)
-    ) {
+    if (this._valueType === ValueType.INT && !Number.isInteger(value)) {
       diag.warn(
-        `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
+        `INT value type cannot accept a floating-point value for ${this._instrumentName}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
       // ignore non-finite values.

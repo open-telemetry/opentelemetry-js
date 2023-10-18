@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { MetricOptions, ValueType, diag } from '@opentelemetry/api';
+import {
+  MetricAdvice,
+  MetricOptions,
+  ValueType,
+  diag,
+} from '@opentelemetry/api';
 import { View } from './view/View';
 import { equalsCaseInsensitive } from './utils';
 
@@ -31,7 +36,10 @@ export enum InstrumentType {
 }
 
 /**
- * An interface describing the instrument.
+ * An internal interface describing the instrument.
+ *
+ * This is intentionally distinguished from the public MetricDescriptor (a.k.a. InstrumentDescriptor)
+ * which may not contains internal fields like metric advice.
  */
 export interface InstrumentDescriptor {
   readonly name: string;
@@ -39,6 +47,10 @@ export interface InstrumentDescriptor {
   readonly unit: string;
   readonly type: InstrumentType;
   readonly valueType: ValueType;
+  /**
+   * @experimental
+   */
+  readonly advice: MetricAdvice;
 }
 
 export function createInstrumentDescriptor(
@@ -57,6 +69,7 @@ export function createInstrumentDescriptor(
     description: options?.description ?? '',
     unit: options?.unit ?? '',
     valueType: options?.valueType ?? ValueType.DOUBLE,
+    advice: options?.advice ?? {},
   };
 }
 
@@ -70,6 +83,7 @@ export function createInstrumentDescriptorWithView(
     type: instrument.type,
     unit: instrument.unit,
     valueType: instrument.valueType,
+    advice: instrument.advice,
   };
 }
 
