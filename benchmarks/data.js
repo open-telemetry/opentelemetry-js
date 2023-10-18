@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1697539062901,
+  "lastUpdate": 1697630310833,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -341,6 +341,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.14%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7f52f70d22ab1b1a4411b4a6b1a2528f182b2b7b",
+          "message": "fix: bump deploy docs workflow to node 18 (#4199)",
+          "timestamp": "2023-10-18T13:57:07+02:00",
+          "tree_id": "45e925a5a4aa48c095bfba50e2dd2cf21d6b4b62",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7f52f70d22ab1b1a4411b4a6b1a2528f182b2b7b"
+        },
+        "date": 1697630309965,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 758651,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
