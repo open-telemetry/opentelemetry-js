@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1697630310833,
+  "lastUpdate": 1697697333286,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -372,6 +372,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "luismi.ramirez@protonmail.com",
+            "name": "Luismi Ramírez",
+            "username": "luismiramirez"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1c7d7a354281c720e7229d3d5498bbec8d3b2b8d",
+          "message": "fix(sdk-node) Remove @opentelemetry/exporter-jaeger explicit dependency (#4214)",
+          "timestamp": "2023-10-19T08:14:18+02:00",
+          "tree_id": "1aa3ebe84bd53cf07d95641b4f6cd8b9f62bdb4d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1c7d7a354281c720e7229d3d5498bbec8d3b2b8d"
+        },
+        "date": 1697697332434,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 778971,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
