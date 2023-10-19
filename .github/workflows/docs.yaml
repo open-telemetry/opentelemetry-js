@@ -13,7 +13,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18'
 
       - name: restore lock files
         uses: actions/cache@master # must use unreleased master to cache multiple paths
