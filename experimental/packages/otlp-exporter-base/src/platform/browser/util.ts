@@ -200,13 +200,9 @@ export function sendWithFetch(
       body,
     }).then(
       response => {
-        if (response.ok) {
-          response.text().then(
-            t => diag.debug('Request Success', t),
-            () => {}
-          );
+        if (response.status >= 200 && response.status <= 299) {
           return;
-        } else if (isExportRetryable(response.status) && retries > 0) {
+        } else if (response.status && isExportRetryable(response.status) && retries > 0) {
           let retryTime: number;
           minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
 
