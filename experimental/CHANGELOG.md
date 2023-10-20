@@ -10,6 +10,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-node): remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
+  * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

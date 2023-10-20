@@ -71,7 +71,7 @@
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-prettier": "5.0.1",
     "gh-pages": "6.0.0",
     "lerna": "7.1.5",
     "@lerna/legacy-package-management": "7.1.5",
