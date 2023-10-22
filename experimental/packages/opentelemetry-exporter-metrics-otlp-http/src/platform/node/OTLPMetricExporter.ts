@@ -52,7 +52,7 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
   }
 
   convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return createExportMetricsServiceRequest(metrics);
+    return createExportMetricsServiceRequest(metrics, { useLongBits: false });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
