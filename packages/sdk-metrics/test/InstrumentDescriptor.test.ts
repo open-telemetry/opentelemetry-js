@@ -57,6 +57,7 @@ describe('InstrumentDescriptor', () => {
           unit: 'kB',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
         {
           name: 'foo',
@@ -64,6 +65,7 @@ describe('InstrumentDescriptor', () => {
           unit: 'kB',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       ],
       [
@@ -75,6 +77,7 @@ describe('InstrumentDescriptor', () => {
           unit: '',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
         {
           name: 'FoO',
@@ -82,6 +85,53 @@ describe('InstrumentDescriptor', () => {
           unit: '',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
+        },
+      ],
+      [
+        'Compatible with different advice options',
+        true,
+        {
+          name: 'foo',
+          description: '',
+          unit: '',
+          type: InstrumentType.COUNTER,
+          valueType: ValueType.DOUBLE,
+          advice: {
+            explicitBucketBoundaries: [4, 5, 6],
+          },
+        },
+        {
+          name: 'FoO',
+          description: '',
+          unit: '',
+          type: InstrumentType.COUNTER,
+          valueType: ValueType.DOUBLE,
+          advice: {
+            explicitBucketBoundaries: [1, 2, 3],
+          },
+        },
+      ],
+      [
+        'Compatible with empty advice options',
+        true,
+        {
+          name: 'foo',
+          description: '',
+          unit: '',
+          type: InstrumentType.COUNTER,
+          valueType: ValueType.DOUBLE,
+          advice: {},
+        },
+        {
+          name: 'FoO',
+          description: '',
+          unit: '',
+          type: InstrumentType.COUNTER,
+          valueType: ValueType.DOUBLE,
+          advice: {
+            explicitBucketBoundaries: [1, 2, 3],
+          },
         },
       ],
       [
@@ -93,6 +143,7 @@ describe('InstrumentDescriptor', () => {
           unit: '',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
         {
           name: 'foobar',
@@ -100,6 +151,7 @@ describe('InstrumentDescriptor', () => {
           unit: '',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       ],
       [
@@ -111,6 +163,7 @@ describe('InstrumentDescriptor', () => {
           unit: 'kB',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
         {
           name: 'foo',
@@ -118,6 +171,7 @@ describe('InstrumentDescriptor', () => {
           unit: 'kb',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       ],
     ];

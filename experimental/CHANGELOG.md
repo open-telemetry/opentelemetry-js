@@ -4,7 +4,21 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
+### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+* fix(sdk-node): remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
+  * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+
 ### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.44.0
 
 ### :boom: Breaking Change
 
@@ -22,10 +36,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(otlp-exporter-base): replaced usage of window with _globalThis [#4157](https://github.com/open-telemetry/opentelemetry-js/pull/4157) @cristianmadularu
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(otlp-transformer): Avoid precision loss when converting from HrTime to unix nanoseconds. [#4062](https://github.com/open-telemetry/opentelemetry-js/pull/4062)
 
 ## 0.43.0
 
@@ -56,7 +67,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(otlp-transformer): Avoid precision loss when converting from HrTime to unix nanoseconds. [#4062](https://github.com/open-telemetry/opentelemetry-js/pull/4062)
 * fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
 
 ## 0.41.2

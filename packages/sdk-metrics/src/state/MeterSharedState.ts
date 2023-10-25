@@ -96,11 +96,7 @@ export class MeterSharedState {
 
     const metricDataList = storages
       .map(metricStorage => {
-        return metricStorage.collect(
-          collector,
-          this._meterProviderSharedState.metricCollectors,
-          collectionTime
-        );
+        return metricStorage.collect(collector, collectionTime);
       })
       .filter(isNotNullish);
 
@@ -145,7 +141,8 @@ export class MeterSharedState {
       const viewStorage = new MetricStorageType(
         viewDescriptor,
         aggregator,
-        view.attributesProcessor
+        view.attributesProcessor,
+        this._meterProviderSharedState.metricCollectors
       ) as R;
       this.metricStorageRegistry.register(viewStorage);
       return viewStorage;
@@ -169,7 +166,8 @@ export class MeterSharedState {
           const storage = new MetricStorageType(
             descriptor,
             aggregator,
-            AttributesProcessor.Noop()
+            AttributesProcessor.Noop(),
+            [collector]
           ) as R;
           this.metricStorageRegistry.registerForCollector(collector, storage);
           return storage;
@@ -191,6 +189,7 @@ interface MetricStorageConstructor {
   new (
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<Maybe<Accumulation>>,
-    attributesProcessor: AttributesProcessor
+    attributesProcessor: AttributesProcessor,
+    collectors: MetricCollectorHandle[]
   ): MetricStorage;
 }
