@@ -45,12 +45,15 @@ jobs:
           key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
       # temporary fix for https://github.com/nrwl/nx/issues/19022
-      - run: npm install --save-dev nx@16.7.4 @nx/devkit@16.7.4
+      # See compatibility table https://nx.dev/nx-api/workspace/documents/nx-nodejs-typescript-version-matrix
+      # Lerna 7+ requires nx 16 so we also pin that to an old version
+      - run: npm install --save-dev nx@^15 lerna@^6
         if: ${{ matrix.node_version == '14' }}
 
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
+          npx lerna add --dev --exact --no-bootstrap lerna@6
           npx lerna bootstrap --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
 
       - name: Build 🔧
