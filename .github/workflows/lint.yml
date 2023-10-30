@@ -40,18 +40,16 @@ jobs:
         with:
           path: |
             node_modules
-            package-lock.json
+            api/node_modules
             packages/*/node_modules
-            packages/*/package-lock.json
             experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04142022
+          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
       # On a cache miss, install dependencies
       - name: Bootstrap
         run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
+          npm ci --ignore-scripts
+          npx lerna bootstrap --hoist --nohoist='zone.js'
 
       - name: Lint
         run: |
