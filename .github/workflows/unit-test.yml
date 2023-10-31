@@ -55,13 +55,13 @@ jobs:
           fi
           npx lerna run test --scope @opentelemetry/api \
             --scope @opentelemetry/api-events \
-            --scope @opentelemetry/api-logs
+            --scope @opentelemetry/api-logs \
             # --scope @opentelemetry/exporter-logs-otlp-grpc \
             # --scope @opentelemetry/exporter-logs-otlp-http \
             # --scope @opentelemetry/exporter-logs-otlp-proto \
-            # --scope @opentelemetry/exporter-trace-otlp-grpc \
-            # --scope @opentelemetry/exporter-trace-otlp-http \
-            # --scope @opentelemetry/exporter-trace-otlp-proto
+            --scope @opentelemetry/exporter-trace-otlp-grpc \
+            --scope @opentelemetry/exporter-trace-otlp-http \
+            --scope @opentelemetry/exporter-trace-otlp-proto
             # --scope @opentelemetry/opentelemetry-browser-detector \
             # --scope @opentelemetry/exporter-metrics-otlp-grpc \
             # --scope @opentelemetry/exporter-metrics-otlp-http \
