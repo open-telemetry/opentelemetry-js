@@ -53,7 +53,7 @@ jobs:
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
-          npx lerna add --dev --exact --no-bootstrap lerna@6
+          npx lerna add --dev --exact --no-bootstrap lerna@^6
           npx lerna bootstrap --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
 
       - name: Build 🔧
