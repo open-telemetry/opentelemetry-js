@@ -56,44 +56,44 @@ jobs:
           npx lerna run test --scope @opentelemetry/api \
             --scope @opentelemetry/api-events \
             --scope @opentelemetry/api-logs \
-            --scope @opentelemetry/exporter-trace-otlp-grpc \
-            --scope @opentelemetry/exporter-trace-otlp-http \
-            --scope @opentelemetry/exporter-trace-otlp-proto
+            --scope @opentelemetry/opentelemetry-browser-detector \
+            --scope @opentelemetry/exporter-prometheus \
+            --scope @opentelemetry/instrumentation-fetch \
+            --scope @opentelemetry/instrumentation-grpc \
+            --scope @opentelemetry/instrumentation-http \
+            --scope @opentelemetry/instrumentation-xml-http-request \
+            --scope @opentelemetry/instrumentation \
+            --scope @opentelemetry/sdk-node \
+            --scope @opentelemetry/otlp-exporter-base \
+            --scope @opentelemetry/otlp-grpc-exporter-base \
+            --scope @opentelemetry/otlp-proto-exporter-base \
+            --scope @opentelemetry/otlp-transformer \
+            --scope @opentelemetry/sdk-logs \
+            --scope @opentelemetry/shim-opencensus \
+            --scope @opentelemetry/context-async-hooks \
+            --scope @opentelemetry/context-zone-peer-dep \
+            --scope @opentelemetry/context-zone \
+            --scope @opentelemetry/core \
+            --scope @opentelemetry/exporter-jaeger \
+            --scope @opentelemetry/exporter-zipkin \
+            --scope @opentelemetry/propagator-b3 \
+            --scope @opentelemetry/propagator-jaeger \
+            --scope @opentelemetry/resources \
+            --scope @opentelemetry/sdk-trace-base \
+            --scope @opentelemetry/sdk-trace-node \
+            --scope @opentelemetry/sdk-trace-web \
+            --scope @opentelemetry/semantic-conventions \
+            --scope @opentelemetry/shim-opentracing \
+            --scope @opentelemetry/sdk-metrics
+            # --scope @opentelemetry/exporter-trace-otlp-grpc \
+            # --scope @opentelemetry/exporter-trace-otlp-http \
+            # --scope @opentelemetry/exporter-trace-otlp-proto
             # --scope @opentelemetry/exporter-logs-otlp-grpc \
             # --scope @opentelemetry/exporter-logs-otlp-http \
             # --scope @opentelemetry/exporter-logs-otlp-proto \
-            # --scope @opentelemetry/opentelemetry-browser-detector \
             # --scope @opentelemetry/exporter-metrics-otlp-grpc \
             # --scope @opentelemetry/exporter-metrics-otlp-http \
             # --scope @opentelemetry/exporter-metrics-otlp-proto \
-            # --scope @opentelemetry/exporter-prometheus \
-            # --scope @opentelemetry/instrumentation-fetch \
-            # --scope @opentelemetry/instrumentation-grpc \
-            # --scope @opentelemetry/instrumentation-http \
-            # --scope @opentelemetry/instrumentation-xml-http-request \
-            # --scope @opentelemetry/instrumentation \
-            # --scope @opentelemetry/sdk-node \
-            # --scope @opentelemetry/otlp-exporter-base \
-            # --scope @opentelemetry/otlp-grpc-exporter-base \
-            # --scope @opentelemetry/otlp-proto-exporter-base \
-            # --scope @opentelemetry/otlp-transformer \
-            # --scope @opentelemetry/sdk-logs \
-            # --scope @opentelemetry/shim-opencensus \
-            # --scope @opentelemetry/context-async-hooks \
-            # --scope @opentelemetry/context-zone-peer-dep \
-            # --scope @opentelemetry/context-zone \
-            # --scope @opentelemetry/core \
-            # --scope @opentelemetry/exporter-jaeger \
-            # --scope @opentelemetry/exporter-zipkin \
-            # --scope @opentelemetry/propagator-b3 \
-            # --scope @opentelemetry/propagator-jaeger \
-            # --scope @opentelemetry/resources \
-            # --scope @opentelemetry/sdk-trace-base \
-            # --scope @opentelemetry/sdk-trace-node \
-            # --scope @opentelemetry/sdk-trace-web \
-            # --scope @opentelemetry/semantic-conventions \
-            # --scope @opentelemetry/shim-opentracing \
-            # --scope @opentelemetry/sdk-metrics
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '16' }}
