@@ -34,13 +34,13 @@ jobs:
       # temporary fix for https://github.com/nrwl/nx/issues/19022
       # See compatibility table https://nx.dev/nx-api/workspace/documents/nx-nodejs-typescript-version-matrix
       # Lerna 7+ requires nx 16 so we also pin that to an old version
-      - run: npm install --save-dev nx@^15 lerna@^6
+      - run: npm install --save-dev lerna@6.6.2
         if: ${{ matrix.node_version == '14' }}
 
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
-          npx lerna add --dev --exact --no-bootstrap lerna@^6
+          npx lerna add --dev --exact --no-bootstrap lerna@6.6.2
           npx lerna bootstrap --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
 
       - name: Build 🔧
@@ -53,7 +53,7 @@ jobs:
           if [ "${{ matrix.node_version }}" = "18" ]; then
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
-          npm run test
+          npx lerna run test --scope @opentelemetry/api
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '16' }}
