@@ -85,8 +85,8 @@ jobs:
             --scope @opentelemetry/semantic-conventions \
             --scope @opentelemetry/shim-opentracing \
             --scope @opentelemetry/sdk-metrics \
-            --scope @opentelemetry/exporter-trace-otlp-http
-            # --scope @opentelemetry/exporter-trace-otlp-proto
+            --scope @opentelemetry/exporter-trace-otlp-http \
+            --scope @opentelemetry/exporter-trace-otlp-proto
             # --scope @opentelemetry/exporter-trace-otlp-grpc \
             # --scope @opentelemetry/exporter-logs-otlp-grpc \
             # --scope @opentelemetry/exporter-logs-otlp-http \
