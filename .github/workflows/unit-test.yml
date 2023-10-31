@@ -33,17 +33,6 @@ jobs:
       - run: npm install -g npm@"<10.0.0"
         if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/packages/*/node_modules
-          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}-10302023
-
       # temporary fix for https://github.com/nrwl/nx/issues/19022
       # See compatibility table https://nx.dev/nx-api/workspace/documents/nx-nodejs-typescript-version-matrix
       # Lerna 7+ requires nx 16 so we also pin that to an old version
@@ -84,17 +73,6 @@ jobs:
 
       - run: npm install -g npm@latest
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/packages/*/node_modules
-          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-10302023
-
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
@@ -121,17 +99,6 @@ jobs:
         with:
           node-version: 16
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/packages/*/node_modules
-          key: browser-tests-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-10302023
-
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
@@ -155,17 +122,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/packages/*/node_modules
-          key: webworker-tests-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
       - name: Bootstrap
         run: |
