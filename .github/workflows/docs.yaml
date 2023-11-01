@@ -23,7 +23,10 @@ jobs:
             node_modules
             api/node_modules
             packages/*/node_modules
-            experimental/packages/*/node_modules
+            experimental/*/*/node_modules
+            integration-tests/*/node_modules
+            selenium-tests/node_modules
+            examples/*/node_modules
           key: ${{ runner.os }}-unit_test-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
       - name: Install and Build 🔧
