@@ -30,7 +30,7 @@ jobs:
             integration-tests/*/node_modules
             selenium-tests/node_modules
             examples/*/node_modules
-          key: ${{ runner.os }}-w3c_integration-${{ hashFiles('package-lock.json') }}-10302023
+          key: ${{ runner.os }}-w3c_integration-${{ hashFiles('package-lock.json') }}-11012023
 
       - name: Install and Bootstrap 🔧
         run: |
