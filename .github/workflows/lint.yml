@@ -46,7 +46,7 @@ jobs:
             integration-tests/*/node_modules
             selenium-tests/node_modules
             examples/*/node_modules
-          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}-10302023
+          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package-lock.json') }}-10302023
 
       # On a cache miss, install dependencies
       - name: Bootstrap
