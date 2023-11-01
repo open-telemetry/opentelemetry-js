@@ -37,7 +37,7 @@ jobs:
           npm ci
 
       - name: Generate version.ts files
-        run: lerna run version
+        run: npm run version:update
 
       - name: Build 🔧
         run: npm run compile
