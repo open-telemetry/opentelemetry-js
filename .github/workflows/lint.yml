@@ -35,8 +35,7 @@ jobs:
           ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
       - name: Bootstrap
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Lint
         run: |

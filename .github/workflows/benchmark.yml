@@ -26,12 +26,10 @@ jobs:
       - run: npm install -g npm@latest
 
       - name: Bootstrap
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Benchmark tests
         run: |

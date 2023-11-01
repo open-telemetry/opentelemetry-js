@@ -19,8 +19,7 @@ jobs:
           node-version: '16'
 
       - name: Install and Bootstrap 🔧
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Generate version.ts files
         run: npm run version:update

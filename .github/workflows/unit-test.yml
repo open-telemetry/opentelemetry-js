@@ -34,12 +34,10 @@ jobs:
         if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
       - name: Bootstrap
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: |
@@ -66,8 +64,7 @@ jobs:
       - run: npm install -g npm@latest
 
       - name: Bootstrap
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Build 🔧
         run: |
@@ -91,12 +88,10 @@ jobs:
           node-version: 16
 
       - name: Bootstrap
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: npm run test:browser
@@ -114,12 +109,10 @@ jobs:
           node-version: 16
 
       - name: Bootstrap
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: npm run test:webworker
