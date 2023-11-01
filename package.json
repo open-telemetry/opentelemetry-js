@@ -8,7 +8,7 @@
     "prewatch": "npm run precompile",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "postinstall": "npm run update-ts-configs && npm run bootstrap",
+    "postinstall": "npm run update-ts-configs",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "version:update": "lerna run version:update",
     "test": "lerna run test",
@@ -16,7 +16,6 @@
     "test:webworker": "lerna run test:webworker",
     "test:backcompat": "lerna run test:backcompat",
     "test:bench": "lerna run test:bench",
-    "bootstrap": "lerna bootstrap --hoist --nohoist='zone.js'",
     "changelog": "lerna-changelog",
     "codecov": "lerna run codecov",
     "codecov:browser": "lerna run codecov:browser",
@@ -73,8 +72,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "5.0.1",
     "gh-pages": "6.0.0",
-    "lerna": "7.1.5",
-    "@lerna/legacy-package-management": "7.1.5",
+    "lerna": "6.6.2",
     "linkinator": "5.0.2",
     "markdownlint-cli": "0.36.0",
     "prettier": "3.0.3",
@@ -96,5 +94,20 @@
       "internal": ":house: (Internal)"
     },
     "cacheDir": ".changelog"
-  }
+  },
+  "// workspaces": "Please sync with lerna.json#packages",
+  "workspaces": [
+    "api",
+    "packages/*",
+    "experimental/packages/*",
+    "experimental/examples/*",
+    "experimental/backwards-compatibility/*",
+    "integration-tests/*",
+    "selenium-tests",
+    "examples/otlp-exporter-node",
+    "examples/opentelemetry-web",
+    "examples/http",
+    "examples/https",
+    "examples/esm-http-ts"
+  ]
 }

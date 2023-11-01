@@ -1,6 +1,7 @@
 {
   "version": "independent",
   "npmClient": "npm",
+  "// packages": "Please sync with package.json#workspaces",
   "packages": [
     "api",
     "packages/*",
