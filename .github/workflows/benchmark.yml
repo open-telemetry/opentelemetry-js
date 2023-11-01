@@ -39,7 +39,6 @@ jobs:
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
 
       - name: Build 🔧
         run: |

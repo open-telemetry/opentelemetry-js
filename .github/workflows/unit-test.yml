@@ -13,6 +13,8 @@ jobs:
       matrix:
         node_version:
           - "14"
+          - "16"
+          - "18"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -31,17 +33,20 @@ jobs:
       - run: npm install -g npm@"<10.0.0"
         if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
-      # temporary fix for https://github.com/nrwl/nx/issues/19022
-      # See compatibility table https://nx.dev/nx-api/workspace/documents/nx-nodejs-typescript-version-matrix
-      # Lerna 7+ requires nx 16 so we also pin that to an old version
-      - run: npm install --save-dev lerna@6.6.2
-        if: ${{ matrix.node_version == '14' }}
+      - name: restore node_modules
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            api/node_modules
+            packages/*/node_modules
+            experimental/packages/*/node_modules
+          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
-          npx lerna add --dev --exact --no-bootstrap lerna@6.6.2
-          npx lerna bootstrap --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
 
       - name: Build 🔧
         run: |
@@ -53,157 +58,147 @@ jobs:
           if [ "${{ matrix.node_version }}" = "18" ]; then
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
-          npx lerna run test --scope @opentelemetry/api \
-            --scope @opentelemetry/api-events \
-            --scope @opentelemetry/api-logs \
-            --scope @opentelemetry/opentelemetry-browser-detector \
-            --scope @opentelemetry/exporter-prometheus \
-            --scope @opentelemetry/instrumentation-fetch \
-            --scope @opentelemetry/instrumentation-grpc \
-            --scope @opentelemetry/instrumentation-http \
-            --scope @opentelemetry/instrumentation-xml-http-request \
-            --scope @opentelemetry/instrumentation \
-            --scope @opentelemetry/sdk-node \
-            --scope @opentelemetry/otlp-exporter-base \
-            --scope @opentelemetry/otlp-grpc-exporter-base \
-            --scope @opentelemetry/otlp-proto-exporter-base \
-            --scope @opentelemetry/otlp-transformer \
-            --scope @opentelemetry/sdk-logs \
-            --scope @opentelemetry/shim-opencensus \
-            --scope @opentelemetry/context-async-hooks \
-            --scope @opentelemetry/context-zone-peer-dep \
-            --scope @opentelemetry/context-zone \
-            --scope @opentelemetry/core \
-            --scope @opentelemetry/exporter-jaeger \
-            --scope @opentelemetry/exporter-zipkin \
-            --scope @opentelemetry/propagator-b3 \
-            --scope @opentelemetry/propagator-jaeger \
-            --scope @opentelemetry/resources \
-            --scope @opentelemetry/sdk-trace-base \
-            --scope @opentelemetry/sdk-trace-node \
-            --scope @opentelemetry/sdk-trace-web \
-            --scope @opentelemetry/semantic-conventions \
-            --scope @opentelemetry/shim-opentracing \
-            --scope @opentelemetry/sdk-metrics \
-            --scope @opentelemetry/exporter-trace-otlp-http \
-            --scope @opentelemetry/exporter-trace-otlp-proto \
-            --scope @opentelemetry/exporter-logs-otlp-http \
-            --scope @opentelemetry/exporter-logs-otlp-proto \
-            --scope @opentelemetry/exporter-metrics-otlp-http \
-            --scope @opentelemetry/exporter-metrics-otlp-proto
-            # --scope @opentelemetry/exporter-trace-otlp-grpc \
-            # --scope @opentelemetry/exporter-metrics-otlp-grpc \
-            # --scope @opentelemetry/exporter-logs-otlp-grpc \
+          npm run test
       - name: Report Coverage
         run: npm run codecov
-        if: ${{ matrix.node_version == '16' }}
-  # node-windows-tests:
-  #   runs-on: windows-latest
-  #   env:
-  #     NPM_CONFIG_UNSAFE_PERM: true
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+        if: ${{ matrix.node_version == '14' }}
+  node-windows-tests:
+    runs-on: windows-latest
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '18'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-  #     - run: npm install -g npm@latest
+      - run: npm install -g npm@latest
 
-  #     - name: Bootstrap
-  #       run: |
-  #         npm ci --ignore-scripts
-  #         npx lerna bootstrap --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+      - name: restore node_modules
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            api/node_modules
+            packages/*/node_modules
+            experimental/packages/*/node_modules
+          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
-  #     - name: Build 🔧
-  #       run: |
-  #         npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
-  #         npm run compile
+      - name: Bootstrap
+        run: |
+          npm ci --ignore-scripts
 
-  #     - name: Unit tests
-  #       env:
-  #        NODE_OPTIONS: --openssl-legacy-provider
-  #       run: npm run test
-  # browser-tests:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     NPM_CONFIG_UNSAFE_PERM: true
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+      - name: Build 🔧
+        run: |
+          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
+          npm run compile
 
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 16
+      - name: Unit tests
+        env:
+         NODE_OPTIONS: --openssl-legacy-provider
+        run: npm run test
+  browser-tests:
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Bootstrap
-  #       run: |
-  #         npm ci --ignore-scripts
-  #         npx lerna bootstrap --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-  #     - name: Build 🔧
-  #       run: |
-  #         npm run compile
+      - name: restore node_modules
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            api/node_modules
+            packages/*/node_modules
+            experimental/packages/*/node_modules
+          key: browser-tests-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
-  #     - name: Unit tests
-  #       run: npm run test:browser
-  #     - name: Report Coverage
-  #       run: npm run codecov:browser
-  # webworker-tests:
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     NPM_CONFIG_UNSAFE_PERM: true
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4.0.0
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 16
+      - name: Bootstrap
+        run: |
+          npm ci --ignore-scripts
 
-  #     - name: Bootstrap
-  #       run: |
-  #         npm ci --ignore-scripts
-  #         npx lerna bootstrap --hoist --nohoist='zone.js'
+      - name: Build 🔧
+        run: |
+          npm run compile
 
-  #     - name: Build 🔧
-  #       run: |
-  #         npm run compile
+      - name: Unit tests
+        run: npm run test:browser
+      - name: Report Coverage
+        run: npm run codecov:browser
+  webworker-tests:
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.0.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-  #     - name: Unit tests
-  #       run: npm run test:webworker
-  #     - name: Report Coverage
-  #       run: npm run codecov:webworker
-  # api-eol-node-test:
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       node_version:
-  #         - "8"
-  #         - "10"
-  #         - "12"
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+      - name: restore node_modules
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            api/node_modules
+            packages/*/node_modules
+            experimental/packages/*/node_modules
+          key: webworker-tests-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-10302023
 
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: ${{ matrix.node_version }}
+      - name: Bootstrap
+        run: |
+          npm ci --ignore-scripts
 
-  #     - name: Build
-  #       working-directory: ./api
-  #       run: |
-  #         npm install --ignore-scripts
-  #         npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
-  #         node ../scripts/version-update.js
-  #         npx tsc --build tsconfig.json tsconfig.esm.json
+      - name: Build 🔧
+        run: |
+          npm run compile
 
-  #     - name: Test
-  #       working-directory: ./api
-  #       # running test:eol as node 8 is not supported anymore by the version of nyc we use, as we don't report coverage
-  #       # for this step we leave it out.
-  #       # Details: nyc requires istanbul-lib-report, which silently dropped support for Node.js v8 when going from
-  #       # 3.0.0 to 3.0.1 by requiring make-dir@^4.0.0 to fix https://github.com/advisories/GHSA-c2qf-rxjj-qqgw.
-  #       # make-dir does not support Node.js v8 anymore.
-  #       run: npm run test:eol
+      - name: Unit tests
+        run: npm run test:webworker
+      - name: Report Coverage
+        run: npm run codecov:webworker
+  api-eol-node-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version:
+          - "8"
+          - "10"
+          - "12"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: Build
+        working-directory: ./api
+        run: |
+          npm install --ignore-scripts
+          npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
+          node ../scripts/version-update.js
+          npx tsc --build tsconfig.json tsconfig.esm.json
+
+      - name: Test
+        working-directory: ./api
+        # running test:eol as node 8 is not supported anymore by the version of nyc we use, as we don't report coverage
+        # for this step we leave it out.
+        # Details: nyc requires istanbul-lib-report, which silently dropped support for Node.js v8 when going from
+        # 3.0.0 to 3.0.1 by requiring make-dir@^4.0.0 to fix https://github.com/advisories/GHSA-c2qf-rxjj-qqgw.
+        # make-dir does not support Node.js v8 anymore.
+        run: npm run test:eol

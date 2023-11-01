@@ -34,7 +34,7 @@ jobs:
           args: "./**/*.md"
           ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
-      - name: restore lerna
+      - name: restore node_modules
         id: cache
         uses: actions/cache@v3
         with:
@@ -49,7 +49,6 @@ jobs:
       - name: Bootstrap
         run: |
           npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --nohoist='zone.js'
 
       - name: Lint
         run: |

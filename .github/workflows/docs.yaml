@@ -29,7 +29,6 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --nohoist='zone.js'
           npm run compile
 
       - name: Build Docs

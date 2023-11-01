@@ -33,7 +33,6 @@ jobs:
       - name: Install and Bootstrap 🔧
         run: |
           npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --scope=propagation-validation-server --include-dependencies
 
       - name: Generate version.ts files
         run: lerna run version
