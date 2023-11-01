@@ -33,20 +33,6 @@ jobs:
       - run: npm install -g npm@"<10.0.0"
         if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
-      - name: restore node_modules
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/*/*/node_modules
-            integration-tests/*/node_modules
-            selenium-tests/node_modules
-            examples/*/node_modules
-          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package-lock.json') }}-11012023
-
       - name: Bootstrap
         run: |
           npm ci
@@ -79,20 +65,6 @@ jobs:
 
       - run: npm install -g npm@latest
 
-      - name: restore node_modules
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/*/*/node_modules
-            integration-tests/*/node_modules
-            selenium-tests/node_modules
-            examples/*/node_modules
-          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-11012023
-
       - name: Bootstrap
         run: |
           npm ci
@@ -118,20 +90,6 @@ jobs:
         with:
           node-version: 16
 
-      - name: restore node_modules
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/*/*/node_modules
-            integration-tests/*/node_modules
-            selenium-tests/node_modules
-            examples/*/node_modules
-          key: browser-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-11012023
-
       - name: Bootstrap
         run: |
           npm ci
@@ -154,20 +112,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-
-      - name: restore node_modules
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/*/*/node_modules
-            integration-tests/*/node_modules
-            selenium-tests/node_modules
-            examples/*/node_modules
-          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-11012023
 
       - name: Bootstrap
         run: |

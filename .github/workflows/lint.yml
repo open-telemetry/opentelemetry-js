@@ -34,21 +34,6 @@ jobs:
           args: "./**/*.md"
           ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
-      - name: restore node_modules
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            api/node_modules
-            packages/*/node_modules
-            experimental/*/*/node_modules
-            integration-tests/*/node_modules
-            selenium-tests/node_modules
-            examples/*/node_modules
-          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package-lock.json') }}-11012023
-
-      # On a cache miss, install dependencies
       - name: Bootstrap
         run: |
           npm ci
