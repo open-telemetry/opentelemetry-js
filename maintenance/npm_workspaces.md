@@ -11,4 +11,4 @@ a condition that `karma` can not find the plugins necessary to run the tests.
 To alleviate this, karma and its plugins are listed as root dependencies as
 well.
 
-Relevant issue: https://github.com/npm/rfcs/issues/287
+Relevant issue: [[RFC] Add nohoist option for workspaces](https://github.com/npm/rfcs/issues/287)
