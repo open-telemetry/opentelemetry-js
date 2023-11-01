@@ -45,7 +45,7 @@ jobs:
             integration-tests/*/node_modules
             selenium-tests/node_modules
             examples/*/node_modules
-          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package-lock.json') }}-10302023
+          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package-lock.json') }}-11012023
 
       - name: Bootstrap
         run: |
@@ -91,7 +91,7 @@ jobs:
             integration-tests/*/node_modules
             selenium-tests/node_modules
             examples/*/node_modules
-          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-10302023
+          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-11012023
 
       - name: Bootstrap
         run: |
@@ -130,7 +130,7 @@ jobs:
             integration-tests/*/node_modules
             selenium-tests/node_modules
             examples/*/node_modules
-          key: browser-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-10302023
+          key: browser-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-11012023
 
       - name: Bootstrap
         run: |
@@ -167,7 +167,7 @@ jobs:
             integration-tests/*/node_modules
             selenium-tests/node_modules
             examples/*/node_modules
-          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-10302023
+          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-11012023
 
       - name: Bootstrap
         run: |
