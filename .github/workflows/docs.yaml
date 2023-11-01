@@ -28,7 +28,7 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
-          npm ci --ignore-scripts
+          npm ci
           npm run compile
 
       - name: Build Docs

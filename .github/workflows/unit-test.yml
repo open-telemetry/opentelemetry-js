@@ -46,7 +46,7 @@ jobs:
 
       - name: Bootstrap
         run: |
-          npm ci --ignore-scripts
+          npm ci
 
       - name: Build 🔧
         run: |
@@ -89,7 +89,7 @@ jobs:
 
       - name: Bootstrap
         run: |
-          npm ci --ignore-scripts
+          npm ci
 
       - name: Build 🔧
         run: |
@@ -125,7 +125,7 @@ jobs:
 
       - name: Bootstrap
         run: |
-          npm ci --ignore-scripts
+          npm ci
 
       - name: Build 🔧
         run: |
@@ -159,7 +159,7 @@ jobs:
 
       - name: Bootstrap
         run: |
-          npm ci --ignore-scripts
+          npm ci
 
       - name: Build 🔧
         run: |

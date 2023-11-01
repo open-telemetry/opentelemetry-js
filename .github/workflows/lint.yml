@@ -48,7 +48,7 @@ jobs:
       # On a cache miss, install dependencies
       - name: Bootstrap
         run: |
-          npm ci --ignore-scripts
+        npm ci
 
       - name: Lint
         run: |
