@@ -25,27 +25,11 @@ jobs:
 
       - run: npm install -g npm@latest
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
-
       - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Benchmark tests
         run: |
