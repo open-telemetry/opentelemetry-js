@@ -33,31 +33,11 @@ jobs:
       - run: npm install -g npm@"<10.0.0"
         if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: node-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
-
-      # temporary fix for https://github.com/nrwl/nx/issues/19022
-      - run: npm install --save-dev nx@16.7.4 @nx/devkit@16.7.4
-        if: ${{ matrix.node_version == '14' }}
-
       - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: |
@@ -83,23 +63,8 @@ jobs:
 
       - run: npm install -g npm@latest
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
-
       - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+        run: npm ci
 
       - name: Build 🔧
         run: |
@@ -122,27 +87,11 @@ jobs:
         with:
           node-version: 16
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: browser-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
-
       - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: npm run test:browser
@@ -159,27 +108,11 @@ jobs:
         with:
           node-version: 16
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04292022
-
       - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
+        run: npm ci
 
       - name: Build 🔧
-        run: |
-          npm run compile
+        run: npm run compile
 
       - name: Unit tests
         run: npm run test:webworker
