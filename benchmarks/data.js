@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1697697333286,
+  "lastUpdate": 1698884177685,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -403,6 +403,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.32%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "legendecas@gmail.com",
+            "name": "Chengzhong Wu",
+            "username": "legendecas"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e9328abb689f48b81731c653036f1637a1320a7f",
+          "message": "chore: track package-lock.json (#4238)\n\n* chore: track package-lock.json\r\n\r\n* Pin to old versions for node 14\r\n\r\n* Use version range\r\n\r\n* Remove unused cached directories\r\n\r\n* Temporarily disable other tests\r\n\r\n* Temporarily enable only api test\r\n\r\n* Enable only some packages\r\n\r\n* Test only api packages\r\n\r\n* Test trace exporters\r\n\r\n* Fix line ordering\r\n\r\n* Test all packages except otlp exporters\r\n\r\n* Add trace http exporter\r\n\r\n* Add trace proto exporter\r\n\r\n* Test all but grpc exporters\r\n\r\n* chore: use npm workspaces and degrade lerna to v6\r\n\r\n* chore: get rid of lerna bootstrap\r\n\r\n* chore: use npx\r\n\r\n* chore: allow install scripts to setup buf\r\n\r\n* chore: fix w3c-integration-test cache key\r\n\r\n* chore: fix cache key\r\n\r\n* chore: disable resource compat test\r\n\r\n* chore: fix node_modules assumptions\r\n\r\n* chore: fix hoisted karma issue\r\n\r\n* chore: fix markdown linter complaints\r\n\r\n* chore: lock @grpc/grpc-js to v1.8.21\r\n\r\n* Break caches\r\n\r\n* chore: remove cache\r\n\r\n* chore: fixup inline commands\r\n\r\n---------\r\n\r\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>",
+          "timestamp": "2023-11-01T19:51:24-04:00",
+          "tree_id": "c0ca10a5cae1169581d05005a32685c41ab5007c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e9328abb689f48b81731c653036f1637a1320a7f"
+        },
+        "date": 1698884176622,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 759253,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
