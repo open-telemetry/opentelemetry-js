@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1698884177685,
+  "lastUpdate": 1698894559044,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -434,6 +434,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.30%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "95471d1cce457bf3880caef56fe6f960336217cd",
+          "message": "docs: fixed link to benchmark results (#4233)\n\nCo-authored-by: Chengzhong Wu <legendecas@gmail.com>",
+          "timestamp": "2023-11-02T11:08:17+08:00",
+          "tree_id": "9aa54c64c5e9760a1dde73c348ff8fc8e4ea9fe9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/95471d1cce457bf3880caef56fe6f960336217cd"
+        },
+        "date": 1698894558212,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 749805,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
