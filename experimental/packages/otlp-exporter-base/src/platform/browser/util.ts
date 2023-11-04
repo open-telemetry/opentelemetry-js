@@ -201,6 +201,7 @@ export function sendWithFetch(
     }).then(
       response => {
         if (response.status >= 200 && response.status <= 299) {
+          diag.debug('Request Success');
           return;
         } else if (response.status && isExportRetryable(response.status) && retries > 0) {
           let retryTime: number;
