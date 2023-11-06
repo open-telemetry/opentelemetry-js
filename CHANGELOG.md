@@ -15,6 +15,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(core): remove re-export of `version.ts` [#4225](https://github.com/open-telemetry/opentelemetry-js/pull/4225) @david-luna
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
