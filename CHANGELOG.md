@@ -11,6 +11,18 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.18.0
+
+### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
 * feat(metrics): prototype experimental advice support [#3876](https://github.com/open-telemetry/opentelemetry-js/pull/3876) @legendecas
 
 ### :bug: (Bug Fix)
