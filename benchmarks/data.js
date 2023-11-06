@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699283528128,
+  "lastUpdate": 1699283666594,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -558,6 +558,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dinko.osrecki@emarsys.com",
+            "name": "Dinko Osrecki",
+            "username": "edosrecki"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d434f8425334049d668ab69aaf369b6896f990c3",
+          "message": "docs: fix sdk-node config instructions (#4249)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-11-06T16:13:09+01:00",
+          "tree_id": "b2216e9c063e72173bbed6ce470f61abf6537746",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/d434f8425334049d668ab69aaf369b6896f990c3"
+        },
+        "date": 1699283663603,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 746078,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
