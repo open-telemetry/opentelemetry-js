@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699266493185,
+  "lastUpdate": 1699283454771,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -496,6 +496,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "siimkallas@gmail.com",
+            "name": "Siim Kallas",
+            "username": "seemk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9db6352d305d207b96f55d41095a41a34711405d",
+          "message": "fix: otlp json encoding (#4220)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-11-06T16:09:52+01:00",
+          "tree_id": "0e341b8ac5e01147e76e9635b5274283ca549d42",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9db6352d305d207b96f55d41095a41a34711405d"
+        },
+        "date": 1699283453759,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 759369,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
