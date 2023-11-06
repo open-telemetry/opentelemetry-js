@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699283454771,
+  "lastUpdate": 1699283528128,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -527,6 +527,37 @@ window.BENCHMARK_DATA = {
             "range": "±0.51%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "david.luna@elastic.co",
+            "name": "David Luna",
+            "username": "david-luna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cd232cde144ca31126db33b44e9041277f579f66",
+          "message": "fix: remove duplicate export star from version.ts (#4225)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-11-06T16:11:05+01:00",
+          "tree_id": "fccd2e26f796ac6a86ea54421a29a6ee2af677fb",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/cd232cde144ca31126db33b44e9041277f579f66"
+        },
+        "date": 1699283526201,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 732065,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
