@@ -20,7 +20,6 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { VERSION } from '@opentelemetry/core';
 import {
-  hrTimeToFixed64Nanos,
   IAnyValue,
   IExportLogsServiceRequest,
   IKeyValue,
@@ -77,22 +76,17 @@ export function ensureExportedBodyIsCorrect(body?: IAnyValue) {
   );
 }
 
-function hrTimeToFixed64(hrTime: HrTime) {
-  const { low, high } = hrTimeToFixed64Nanos(hrTime);
-  return { low, high };
-}
-
 export function ensureExportedLogRecordIsCorrect(logRecord: ILogRecord) {
   ensureExportedBodyIsCorrect(logRecord.body);
   ensureExportedAttributesAreCorrect(logRecord.attributes);
   assert.deepStrictEqual(
     logRecord.timeUnixNano,
-    hrTimeToFixed64(mockedReadableLogRecord.hrTime),
+    '1680253513123241635',
     'timeUnixNano is wrong'
   );
   assert.deepStrictEqual(
     logRecord.observedTimeUnixNano,
-    hrTimeToFixed64(mockedReadableLogRecord.hrTimeObserved),
+    '1680253513123241635',
     'observedTimeUnixNano is wrong'
   );
   assert.strictEqual(

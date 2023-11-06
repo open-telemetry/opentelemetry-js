@@ -15,64 +15,57 @@
  */
 import type { Link } from '@opentelemetry/api';
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
-import { hrTimeToFixed64Nanos } from '../common';
+import type { Encoder } from '../common';
 import { toAttributes } from '../common/internal';
 import { EStatusCode, IEvent, ILink, ISpan } from './types';
-import * as core from '@opentelemetry/core';
 
-export function sdkSpanToOtlpSpan(span: ReadableSpan, useHex?: boolean): ISpan {
+export function sdkSpanToOtlpSpan(span: ReadableSpan, encoder: Encoder): ISpan {
   const ctx = span.spanContext();
   const status = span.status;
-  const parentSpanId = useHex
-    ? span.parentSpanId
-    : span.parentSpanId != null
-    ? core.hexToBase64(span.parentSpanId)
-    : undefined;
   return {
-    traceId: useHex ? ctx.traceId : core.hexToBase64(ctx.traceId),
-    spanId: useHex ? ctx.spanId : core.hexToBase64(ctx.spanId),
-    parentSpanId: parentSpanId,
+    traceId: encoder.encodeSpanContext(ctx.traceId),
+    spanId: encoder.encodeSpanContext(ctx.spanId),
+    parentSpanId: encoder.encodeOptionalSpanContext(span.parentSpanId),
     traceState: ctx.traceState?.serialize(),
     name: span.name,
     // Span kind is offset by 1 because the API does not define a value for unset
     kind: span.kind == null ? 0 : span.kind + 1,
-    startTimeUnixNano: hrTimeToFixed64Nanos(span.startTime),
-    endTimeUnixNano: hrTimeToFixed64Nanos(span.endTime),
+    startTimeUnixNano: encoder.encodeHrTime(span.startTime),
+    endTimeUnixNano: encoder.encodeHrTime(span.endTime),
     attributes: toAttributes(span.attributes),
     droppedAttributesCount: span.droppedAttributesCount,
-    events: span.events.map(toOtlpSpanEvent),
+    events: span.events.map(event => toOtlpSpanEvent(event, encoder)),
     droppedEventsCount: span.droppedEventsCount,
     status: {
       // API and proto enums share the same values
       code: status.code as unknown as EStatusCode,
       message: status.message,
     },
-    links: span.links.map(link => toOtlpLink(link, useHex)),
+    links: span.links.map(link => toOtlpLink(link, encoder)),
     droppedLinksCount: span.droppedLinksCount,
   };
 }
 
-export function toOtlpLink(link: Link, useHex?: boolean): ILink {
+export function toOtlpLink(link: Link, encoder: Encoder): ILink {
   return {
     attributes: link.attributes ? toAttributes(link.attributes) : [],
-    spanId: useHex
-      ? link.context.spanId
-      : core.hexToBase64(link.context.spanId),
-    traceId: useHex
-      ? link.context.traceId
-      : core.hexToBase64(link.context.traceId),
+    spanId: encoder.encodeSpanContext(link.context.spanId),
+    traceId: encoder.encodeSpanContext(link.context.traceId),
     traceState: link.context.traceState?.serialize(),
     droppedAttributesCount: link.droppedAttributesCount || 0,
   };
 }
 
-export function toOtlpSpanEvent(timedEvent: TimedEvent): IEvent {
+export function toOtlpSpanEvent(
+  timedEvent: TimedEvent,
+  encoder: Encoder
+): IEvent {
   return {
     attributes: timedEvent.attributes
       ? toAttributes(timedEvent.attributes)
       : [],
     name: timedEvent.name,
-    timeUnixNano: hrTimeToFixed64Nanos(timedEvent.time),
+    timeUnixNano: encoder.encodeHrTime(timedEvent.time),
     droppedAttributesCount: timedEvent.droppedAttributesCount || 0,
   };
 }
