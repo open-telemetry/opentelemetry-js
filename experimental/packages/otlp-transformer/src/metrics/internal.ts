@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { OtlpEncodingOptions } from '../common/types';
 import { ValueType } from '@opentelemetry/api';
 import {
   AggregationTemporality,
@@ -24,7 +25,6 @@ import {
   ResourceMetrics,
   ScopeMetrics,
 } from '@opentelemetry/sdk-metrics';
-import { hrTimeToFixed64Nanos } from '../common';
 import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
@@ -35,34 +35,40 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './types';
+import { Encoder, getOtlpEncoder } from '../common';
 
 export function toResourceMetrics(
-  resourceMetrics: ResourceMetrics
+  resourceMetrics: ResourceMetrics,
+  options?: OtlpEncodingOptions
 ): IResourceMetrics {
+  const encoder = getOtlpEncoder(options);
   return {
     resource: {
       attributes: toAttributes(resourceMetrics.resource.attributes),
       droppedAttributesCount: 0,
     },
     schemaUrl: undefined,
-    scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics),
+    scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics, encoder),
   };
 }
 
-export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[] {
+export function toScopeMetrics(
+  scopeMetrics: ScopeMetrics[],
+  encoder: Encoder
+): IScopeMetrics[] {
   return Array.from(
     scopeMetrics.map(metrics => ({
       scope: {
         name: metrics.scope.name,
         version: metrics.scope.version,
       },
-      metrics: metrics.metrics.map(metricData => toMetric(metricData)),
+      metrics: metrics.metrics.map(metricData => toMetric(metricData, encoder)),
       schemaUrl: metrics.scope.schemaUrl,
     }))
   );
 }
 
-export function toMetric(metricData: MetricData): IMetric {
+export function toMetric(metricData: MetricData, encoder: Encoder): IMetric {
   const out: IMetric = {
     name: metricData.descriptor.name,
     description: metricData.descriptor.description,
@@ -78,24 +84,24 @@ export function toMetric(metricData: MetricData): IMetric {
       out.sum = {
         aggregationTemporality,
         isMonotonic: metricData.isMonotonic,
-        dataPoints: toSingularDataPoints(metricData),
+        dataPoints: toSingularDataPoints(metricData, encoder),
       };
       break;
     case DataPointType.GAUGE:
       out.gauge = {
-        dataPoints: toSingularDataPoints(metricData),
+        dataPoints: toSingularDataPoints(metricData, encoder),
       };
       break;
     case DataPointType.HISTOGRAM:
       out.histogram = {
         aggregationTemporality,
-        dataPoints: toHistogramDataPoints(metricData),
+        dataPoints: toHistogramDataPoints(metricData, encoder),
       };
       break;
     case DataPointType.EXPONENTIAL_HISTOGRAM:
       out.exponentialHistogram = {
         aggregationTemporality,
-        dataPoints: toExponentialHistogramDataPoints(metricData),
+        dataPoints: toExponentialHistogramDataPoints(metricData, encoder),
       };
       break;
   }
@@ -108,12 +114,13 @@ function toSingularDataPoint(
     | DataPoint<number>
     | DataPoint<Histogram>
     | DataPoint<ExponentialHistogram>,
-  valueType: ValueType
+  valueType: ValueType,
+  encoder: Encoder
 ) {
   const out: INumberDataPoint = {
     attributes: toAttributes(dataPoint.attributes),
-    startTimeUnixNano: hrTimeToFixed64Nanos(dataPoint.startTime),
-    timeUnixNano: hrTimeToFixed64Nanos(dataPoint.endTime),
+    startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
+    timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
   };
 
   switch (valueType) {
@@ -128,13 +135,23 @@ function toSingularDataPoint(
   return out;
 }
 
-function toSingularDataPoints(metricData: MetricData): INumberDataPoint[] {
+function toSingularDataPoints(
+  metricData: MetricData,
+  encoder: Encoder
+): INumberDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
-    return toSingularDataPoint(dataPoint, metricData.descriptor.valueType);
+    return toSingularDataPoint(
+      dataPoint,
+      metricData.descriptor.valueType,
+      encoder
+    );
   });
 }
 
-function toHistogramDataPoints(metricData: MetricData): IHistogramDataPoint[] {
+function toHistogramDataPoints(
+  metricData: MetricData,
+  encoder: Encoder
+): IHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
     return {
@@ -145,14 +162,15 @@ function toHistogramDataPoints(metricData: MetricData): IHistogramDataPoint[] {
       sum: histogram.sum,
       min: histogram.min,
       max: histogram.max,
-      startTimeUnixNano: hrTimeToFixed64Nanos(dataPoint.startTime),
-      timeUnixNano: hrTimeToFixed64Nanos(dataPoint.endTime),
+      startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
+      timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
     };
   });
 }
 
 function toExponentialHistogramDataPoints(
-  metricData: MetricData
+  metricData: MetricData,
+  encoder: Encoder
 ): IExponentialHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as ExponentialHistogram;
@@ -172,8 +190,8 @@ function toExponentialHistogramDataPoints(
       },
       scale: histogram.scale,
       zeroCount: histogram.zeroCount,
-      startTimeUnixNano: hrTimeToFixed64Nanos(dataPoint.startTime),
-      timeUnixNano: hrTimeToFixed64Nanos(dataPoint.endTime),
+      startTimeUnixNano: encoder.encodeHrTime(dataPoint.startTime),
+      timeUnixNano: encoder.encodeHrTime(dataPoint.endTime),
     };
   });
 }

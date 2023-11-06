@@ -15,9 +15,14 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(core): remove re-export of `version.ts` [#4225](https://github.com/open-telemetry/opentelemetry-js/pull/4225) @david-luna
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* chore: track package-lock.json [#4238](https://github.com/open-telemetry/opentelemetry-js/pull/4238) @legendecas
+  * Switched to npm workspaces to bootstrap dependencies.
 
 ## 1.17.1
 
