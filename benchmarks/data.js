@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699283666594,
+  "lastUpdate": 1699349194151,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -587,6 +587,37 @@ window.BENCHMARK_DATA = {
             "name": "create spans (10 attributes)",
             "value": 746078,
             "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "legendecas@gmail.com",
+            "name": "Chengzhong Wu",
+            "username": "legendecas"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9fd1948e0d0b073ea6183987fd06e256f5a36220",
+          "message": "feat(api): publish api esnext target (#4231)",
+          "timestamp": "2023-11-07T10:25:33+01:00",
+          "tree_id": "ab91f26f7705b3fb28d2633028271ce10fc592c3",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9fd1948e0d0b073ea6183987fd06e256f5a36220"
+        },
+        "date": 1699349193260,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 759839,
+            "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
