@@ -27,7 +27,7 @@ import { Context } from '../context/types';
  * usually implemented via library-specific request interceptors, where the
  * client-side injects values and the server-side extracts them.
  */
-export interface TextMapPropagator<Carrier = any> {
+export interface TextMapPropagator<Carrier> {
   /**
    * Injects values from a given `Context` into a carrier.
    *
@@ -75,7 +75,7 @@ export interface TextMapPropagator<Carrier = any> {
  * A setter is specified by the caller to define a specific method
  * to set key/value pairs on the carrier within a propagator.
  */
-export interface TextMapSetter<Carrier = any> {
+export interface TextMapSetter<Carrier> {
   /**
    * Callback used to set a key/value pair on an object.
    *
@@ -93,7 +93,7 @@ export interface TextMapSetter<Carrier = any> {
  * A getter is specified by the caller to define a specific method
  * to get the value of a key from a carrier.
  */
-export interface TextMapGetter<Carrier = any> {
+export interface TextMapGetter<Carrier> {
   /**
    * Get a list of all keys available on the carrier.
    *
