@@ -19,6 +19,8 @@ fix(sdk-metrics): hand-roll MetricAdvice type as older API versions do not inclu
 
 ### :house: (Internal)
 
+* chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
+
 ## 1.18.0
 
 ### :rocket: (Enhancement)
