@@ -99,7 +99,7 @@ export class NoopTracer implements Tracer {
   }
 }
 
-function isSpanContext(spanContext: any): spanContext is SpanContext {
+function isSpanContext(spanContext: SpanContext): spanContext is SpanContext {
   return (
     typeof spanContext === 'object' &&
     typeof spanContext['spanId'] === 'string' &&
