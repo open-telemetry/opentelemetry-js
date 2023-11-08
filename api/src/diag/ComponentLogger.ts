@@ -33,23 +33,23 @@ export class DiagComponentLogger implements DiagLogger {
     this._namespace = props.namespace || 'DiagComponentLogger';
   }
 
-  public debug(...args: any[]): void {
+  public debug(...args: Parameters<DiagLogFunction>): void {
     return logProxy('debug', this._namespace, args);
   }
 
-  public error(...args: any[]): void {
+  public error(...args: Parameters<DiagLogFunction>): void {
     return logProxy('error', this._namespace, args);
   }
 
-  public info(...args: any[]): void {
+  public info(...args: Parameters<DiagLogFunction>): void {
     return logProxy('info', this._namespace, args);
   }
 
-  public warn(...args: any[]): void {
+  public warn(...args: Parameters<DiagLogFunction>): void {
     return logProxy('warn', this._namespace, args);
   }
 
-  public verbose(...args: any[]): void {
+  public verbose(...args: Parameters<DiagLogFunction>): void {
     return logProxy('verbose', this._namespace, args);
   }
 }
@@ -57,7 +57,7 @@ export class DiagComponentLogger implements DiagLogger {
 function logProxy(
   funcName: keyof DiagLogger,
   namespace: string,
-  args: any
+  args: Parameters<DiagLogFunction>
 ): void {
   const logger = getGlobal('diag');
   // shortcut if logger not set
@@ -66,5 +66,5 @@ function logProxy(
   }
 
   args.unshift(namespace);
-  return logger[funcName](...(args as Parameters<DiagLogFunction>));
+  return logger[funcName](...args);
 }
