@@ -14,6 +14,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+## 0.45.1
+
+### :bug: (Bug Fix)
+
+* Bumps all dependencies to explicitly include Stable v1.18.1 packages
+
 ## 0.45.0
 
 ### :boom: Breaking Change
