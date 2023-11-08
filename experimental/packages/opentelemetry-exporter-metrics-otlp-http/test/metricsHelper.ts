@@ -159,7 +159,7 @@ export const mockedResources: Resource[] = [
   new Resource({ name: 'resource 2' }),
 ];
 
-export const mockedInstrumentationLibraries: InstrumentationScope[] = [
+export const mockedInstrumentationScopes: InstrumentationScope[] = [
   {
     name: 'lib1',
     version: '0.0.1',

@@ -870,8 +870,8 @@ describe('Span', () => {
     assert.deepStrictEqual(span.links, []);
     assert.deepStrictEqual(span.events, []);
 
-    assert.ok(span.instrumentationLibrary);
-    const { name, version } = span.instrumentationLibrary;
+    assert.ok(span.instrumentationScope);
+    const { name, version } = span.instrumentationScope;
     assert.strictEqual(name, 'default');
     assert.strictEqual(version, undefined);
   });

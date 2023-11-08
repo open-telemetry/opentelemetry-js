@@ -35,7 +35,7 @@ import {
   getTimeOrigin,
   hrTime,
   hrTimeDuration,
-  InstrumentationLibrary,
+  InstrumentationScope,
   isAttributeValue,
   isTimeInput,
   isTimeInputHrTime,
@@ -65,7 +65,7 @@ export class Span implements APISpan, ReadableSpan {
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
   readonly resource: IResource;
-  readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly instrumentationScope: InstrumentationScope;
 
   private _droppedAttributesCount = 0;
   private _droppedEventsCount: number = 0;
@@ -117,7 +117,7 @@ export class Span implements APISpan, ReadableSpan {
     this.startTime = this._getTime(startTime ?? now);
 
     this.resource = parentTracer.resource;
-    this.instrumentationLibrary = parentTracer.instrumentationLibrary;
+    this.instrumentationScope = parentTracer.instrumentationScope;
     this._spanLimits = parentTracer.getSpanLimits();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
