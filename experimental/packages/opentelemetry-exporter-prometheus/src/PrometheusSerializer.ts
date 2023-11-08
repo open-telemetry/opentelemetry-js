@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  diag,
-  MetricAttributes,
-  MetricAttributeValue,
-} from '@opentelemetry/api';
+import { diag, Attributes, AttributeValue } from '@opentelemetry/api';
 import {
   ResourceMetrics,
   InstrumentType,
@@ -48,7 +44,7 @@ function escapeString(str: string) {
  *
  * `undefined` is converted to an empty string.
  */
-function escapeAttributeValue(str: MetricAttributeValue = '') {
+function escapeAttributeValue(str: AttributeValue = '') {
   if (typeof str !== 'string') {
     str = JSON.stringify(str);
   }
@@ -136,10 +132,10 @@ function toPrometheusType(metricData: MetricData): PrometheusDataTypeLiteral {
 
 function stringify(
   metricName: string,
-  attributes: MetricAttributes,
+  attributes: Attributes,
   value: number,
   timestamp?: number,
-  additionalAttributes?: MetricAttributes
+  additionalAttributes?: Attributes
 ) {
   let hasAttribute = false;
   let attributesStr = '';
