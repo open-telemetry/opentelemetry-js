@@ -14,6 +14,9 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: '16'
 
       - uses: actions/checkout@v4
