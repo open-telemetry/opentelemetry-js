@@ -31,11 +31,10 @@ import {
   View,
 } from '@opentelemetry/sdk-metrics';
 import {
-  hrTimeToFixed64Nanos,
+  encodeAsString,
   IExportMetricsServiceRequest,
   IKeyValue,
   IMetric,
-  UnsignedLong,
 } from '@opentelemetry/otlp-transformer';
 import { Stream } from 'stream';
 
@@ -147,14 +146,8 @@ export function ensureExportedCounterIsCorrect(
 
   const [dp] = metric.sum.dataPoints;
   assert.strictEqual(dp.asInt, '1');
-  assert.deepStrictEqual(
-    UnsignedLong.fromString(dp.startTimeUnixNano as string),
-    hrTimeToFixed64Nanos(startTime)
-  );
-  assert.deepStrictEqual(
-    UnsignedLong.fromString(dp.timeUnixNano as string),
-    hrTimeToFixed64Nanos(time)
-  );
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportedObservableGaugeIsCorrect(
@@ -169,14 +162,8 @@ export function ensureExportedObservableGaugeIsCorrect(
 
   const [dp] = metric.gauge.dataPoints;
   assert.strictEqual(dp.asDouble, 6);
-  assert.deepStrictEqual(
-    UnsignedLong.fromString(dp.startTimeUnixNano as string),
-    hrTimeToFixed64Nanos(startTime)
-  );
-  assert.deepStrictEqual(
-    UnsignedLong.fromString(dp.timeUnixNano as string),
-    hrTimeToFixed64Nanos(time)
-  );
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportedHistogramIsCorrect(
@@ -204,14 +191,8 @@ export function ensureExportedHistogramIsCorrect(
   assert.strictEqual(dp.max, 14);
   assert.deepStrictEqual(dp.explicitBounds, explicitBounds);
   assert.deepStrictEqual(dp.bucketCounts, bucketCounts);
-  assert.deepStrictEqual(
-    UnsignedLong.fromString(dp.startTimeUnixNano as string),
-    hrTimeToFixed64Nanos(startTime)
-  );
-  assert.deepStrictEqual(
-    UnsignedLong.fromString(dp.timeUnixNano as string),
-    hrTimeToFixed64Nanos(time)
-  );
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportMetricsServiceRequestIsSet(

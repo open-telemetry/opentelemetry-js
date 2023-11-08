@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install lerna
-        run: npm install -g lerna
+        run: npm install -g lerna@6.6.2
 
       - name: Install semver
         run: npm install semver

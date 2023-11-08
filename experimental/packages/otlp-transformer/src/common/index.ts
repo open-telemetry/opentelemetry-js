@@ -14,16 +14,72 @@
  * limitations under the License.
  */
 
-import type { IFixed64 } from './types';
+import type { OtlpEncodingOptions, Fixed64, LongBits } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { UnsignedLong } from './unsigned_long';
+import { hexToBase64, hrTimeToNanoseconds } from '@opentelemetry/core';
 
-export * from './unsigned_long';
+const NANOSECONDS = BigInt(1_000_000_000);
 
-const NANOSECONDS = UnsignedLong.fromU32(1_000_000_000);
+export function hrTimeToNanos(hrTime: HrTime): bigint {
+  return BigInt(hrTime[0]) * NANOSECONDS + BigInt(hrTime[1]);
+}
 
-export function hrTimeToFixed64Nanos(hrTime: HrTime): IFixed64 {
-  return UnsignedLong.fromU32(hrTime[0])
-    .multiply(NANOSECONDS)
-    .add(UnsignedLong.fromU32(hrTime[1]));
+export function toLongBits(value: bigint): LongBits {
+  const low = Number(BigInt.asUintN(32, value));
+  const high = Number(BigInt.asUintN(32, value >> BigInt(32)));
+  return { low, high };
+}
+
+export function encodeAsLongBits(hrTime: HrTime): LongBits {
+  const nanos = hrTimeToNanos(hrTime);
+  return toLongBits(nanos);
+}
+
+export function encodeAsString(hrTime: HrTime): string {
+  const nanos = hrTimeToNanos(hrTime);
+  return nanos.toString();
+}
+
+const encodeTimestamp =
+  typeof BigInt !== 'undefined' ? encodeAsString : hrTimeToNanoseconds;
+
+export type HrTimeEncodeFunction = (hrTime: HrTime) => Fixed64;
+export type SpanContextEncodeFunction = (spanContext: string) => string;
+export type OptionalSpanContextEncodeFunction = (
+  spanContext: string | undefined
+) => string | undefined;
+
+export interface Encoder {
+  encodeHrTime: HrTimeEncodeFunction;
+  encodeSpanContext: SpanContextEncodeFunction;
+  encodeOptionalSpanContext: OptionalSpanContextEncodeFunction;
+}
+
+function identity<T>(value: T): T {
+  return value;
+}
+
+function optionalHexToBase64(str: string | undefined): string | undefined {
+  if (str === undefined) return undefined;
+  return hexToBase64(str);
+}
+
+const DEFAULT_ENCODER: Encoder = {
+  encodeHrTime: encodeAsLongBits,
+  encodeSpanContext: hexToBase64,
+  encodeOptionalSpanContext: optionalHexToBase64,
+};
+
+export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
+  if (options === undefined) {
+    return DEFAULT_ENCODER;
+  }
+
+  const useLongBits = options.useLongBits ?? true;
+  const useHex = options.useHex ?? false;
+  return {
+    encodeHrTime: useLongBits ? encodeAsLongBits : encodeTimestamp,
+    encodeSpanContext: useHex ? identity : hexToBase64,
+    encodeOptionalSpanContext: useHex ? identity : optionalHexToBase64,
+  };
 }
