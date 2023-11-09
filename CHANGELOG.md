@@ -17,6 +17,11 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
 
+### :bug: (Bug Fix)
+
+* fix(otlp-exporter-base): decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
+  * fixes a memory leak on prolonged collector unavailability
+
 ## 1.18.1
 
 ### :bug: (Bug Fix)
