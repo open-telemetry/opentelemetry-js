@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-logs): avoid map attribute set when count limit exceeded
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
