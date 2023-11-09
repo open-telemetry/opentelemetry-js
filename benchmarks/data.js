@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699539989407,
+  "lastUpdate": 1699546742723,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -166,6 +166,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.69%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "32224751+Lp-Francois@users.noreply.github.com",
+            "name": "François",
+            "username": "Lp-Francois"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "40fde0f69f6c7e1917ed0809e05ef5b865c6fd8b",
+          "message": "docs: add docker-compose to run prometheus for the experimental example (#4268)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-11-09T17:17:44+01:00",
+          "tree_id": "549f7b5130247e4c9850a18abb9b14086bedbc4e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/40fde0f69f6c7e1917ed0809e05ef5b865c6fd8b"
+        },
+        "date": 1699546741751,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 707349,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8285,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 644186,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 640885,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
