@@ -95,7 +95,7 @@ describe('tree-shaking', () => {
           if (err) {
             return reject(err);
           }
-          resolve(stats);
+          resolve(stats!);
         });
       });
       assert.deepStrictEqual(stats.compilation.errors, []);
