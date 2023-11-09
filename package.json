@@ -102,7 +102,6 @@
     },
     "cacheDir": ".changelog"
   },
-  "// workspaces": "Please sync with lerna.json#packages",
   "workspaces": [
     "api",
     "packages/*",
