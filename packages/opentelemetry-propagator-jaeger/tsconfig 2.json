@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "rootDir": "."
+  },
+  "files": [],
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../api"
+    },
+    {
+      "path": "../opentelemetry-core"
+    }
+  ]
+}

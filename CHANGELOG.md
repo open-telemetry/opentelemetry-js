@@ -15,6 +15,12 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+## 1.18.2
+
+### :bug: (Bug Fix)
+
+* chore(opentelemetry-core): Rename InstrumentationLibrary -> InstrumentationScope #2937 @bryantkale
+
 ## 1.18.1
 
 ### :bug: (Bug Fix)
