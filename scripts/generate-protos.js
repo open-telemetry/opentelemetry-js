@@ -37,15 +37,13 @@ function exec(command, argv) {
 }
 
 function pbts(pbjsOutFile) {
-  const pbtsPath = path.resolve(appRoot, './node_modules/.bin/pbts');
   const pbtsOptions = [
     '-o', path.join(generatedPath, 'root.d.ts'),
   ];
-  return exec(pbtsPath, [...pbtsOptions, pbjsOutFile]);
+  return exec('npx', ['--package=protobufjs-cli', 'pbts', ...pbtsOptions, pbjsOutFile]);
 }
 
 async function pbjs(files) {
-  const pbjsPath = path.resolve(appRoot, './node_modules/.bin/pbjs');
   const outFile = path.join(generatedPath, 'root.js');
   const pbjsOptions = [
     '-t', 'static-module',
@@ -54,7 +52,7 @@ async function pbjs(files) {
     '--null-defaults',
     '-o', outFile,
   ];
-  await exec(pbjsPath, [...pbjsOptions, ...files]);
+  await exec('npx', ['--package=protobufjs-cli', 'pbjs', ...pbjsOptions, ...files]);
   return outFile;
 }
 

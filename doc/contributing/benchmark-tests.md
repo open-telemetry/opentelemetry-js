@@ -5,7 +5,7 @@ Benchmark tests are intended to measure performance of small units of code.
 
 It is recommended that operations that have a high impact on the performance of the SDK (or potential for) are accompanied by a benchmark test. This helps end-users understand the performance trend over time, and it also helps maintainers catch performance regressions.
 
-Benchmark tests are run automatically with every merge to main, and the results are available at <https://open-telemetry.github.io/opentelemetry-js/benchmark>.
+Benchmark tests are run automatically with every merge to main, and the results are available at <https://open-telemetry.github.io/opentelemetry-js/benchmarks>.
 
 ## Running benchmark tests
 
