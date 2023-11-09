@@ -33,7 +33,6 @@ docker compose up
 
 Setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/)
 
-
 - Replace the `prometheus.yml` provided by the Prometheus installation with the following:
 
 ```yaml
