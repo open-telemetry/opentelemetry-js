@@ -34,7 +34,7 @@ import {
   View,
 } from '@opentelemetry/sdk-metrics';
 import {
-  hrTimeToFixed64Nanos,
+  encodeAsString,
   IExportMetricsServiceRequest,
   IKeyValue,
   IMetric,
@@ -207,11 +207,6 @@ export function ensureWebResourceIsCorrect(resource: IResource) {
   assert.strictEqual(resource.droppedAttributesCount, 0);
 }
 
-function hrTimeToFixed64(hrTime: HrTime) {
-  const { low, high } = hrTimeToFixed64Nanos(hrTime);
-  return { low, high };
-}
-
 export function ensureCounterIsCorrect(
   metric: IMetric,
   time: HrTime,
@@ -228,8 +223,8 @@ export function ensureCounterIsCorrect(
 
   assert.deepStrictEqual(dp.attributes, []);
   assert.strictEqual(dp.asInt, 1);
-  assert.deepStrictEqual(dp.startTimeUnixNano, hrTimeToFixed64(startTime));
-  assert.deepStrictEqual(dp.timeUnixNano, hrTimeToFixed64(time));
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureDoubleCounterIsCorrect(
@@ -273,8 +268,8 @@ export function ensureObservableGaugeIsCorrect(
   assert.deepStrictEqual(dp.attributes, []);
   assert.strictEqual(dp.asDouble, value);
 
-  assert.deepStrictEqual(dp.startTimeUnixNano, hrTimeToFixed64(startTime));
-  assert.deepStrictEqual(dp.timeUnixNano, hrTimeToFixed64(time));
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureHistogramIsCorrect(
@@ -300,8 +295,8 @@ export function ensureHistogramIsCorrect(
   assert.deepStrictEqual(dp.bucketCounts, bucketCounts);
   assert.deepStrictEqual(dp.explicitBounds, explicitBounds);
 
-  assert.deepStrictEqual(dp.startTimeUnixNano, hrTimeToFixed64(startTime));
-  assert.deepStrictEqual(dp.timeUnixNano, hrTimeToFixed64(time));
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportMetricsServiceRequestIsSet(

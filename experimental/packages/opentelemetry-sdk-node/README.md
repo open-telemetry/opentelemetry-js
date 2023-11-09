@@ -50,7 +50,7 @@ const jaegerExporter = new JaegerExporter();
 const prometheusExporter = new PrometheusExporter({ startServer: true });
 
 const sdk = new opentelemetry.NodeSDK({
-  // Optional - if omitted, the tracing SDK will not be initialized
+  // Optional - if omitted, the tracing SDK will be initialized from environment variables
   traceExporter: jaegerExporter,
   // Optional - If omitted, the metrics SDK will not be initialized
   metricReader: prometheusExporter,

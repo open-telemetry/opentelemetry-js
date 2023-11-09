@@ -21,7 +21,6 @@ import {
   createExportLogsServiceRequest,
   ESeverityNumber,
   IExportLogsServiceRequest,
-  UnsignedLong,
 } from '../src';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
@@ -50,8 +49,8 @@ function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
             scope: { name: 'scope_name_1', version: '0.1.0' },
             logRecords: [
               {
-                timeUnixNano: new UnsignedLong(-162521437, 391214506),
-                observedTimeUnixNano: new UnsignedLong(584929536, 391976663),
+                timeUnixNano: { low: 4132445859, high: 391214506 },
+                observedTimeUnixNano: { low: 584929536, high: 391976663 },
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
@@ -147,19 +146,26 @@ describe('Logs', () => {
     });
 
     it('returns null on an empty list', () => {
-      assert.deepStrictEqual(createExportLogsServiceRequest([], true), {
-        resourceLogs: [],
-      });
+      assert.deepStrictEqual(
+        createExportLogsServiceRequest([], { useHex: true }),
+        {
+          resourceLogs: [],
+        }
+      );
     });
 
     it('serializes a log record with useHex = true', () => {
-      const exportRequest = createExportLogsServiceRequest([log_1_1_1], true);
+      const exportRequest = createExportLogsServiceRequest([log_1_1_1], {
+        useHex: true,
+      });
       assert.ok(exportRequest);
       assert.deepStrictEqual(exportRequest, createExpectedLogJson(true));
     });
 
     it('serializes a log record with useHex = false', () => {
-      const exportRequest = createExportLogsServiceRequest([log_1_1_1], false);
+      const exportRequest = createExportLogsServiceRequest([log_1_1_1], {
+        useHex: false,
+      });
       assert.ok(exportRequest);
       assert.deepStrictEqual(exportRequest, createExpectedLogJson(false));
     });
@@ -167,7 +173,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with same resource and same scope', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_1_1_2],
-        false
+        { useHex: false }
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 1);
@@ -181,7 +187,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with same resource and different scopes', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_1_2_1],
-        false
+        { useHex: false }
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 1);
@@ -191,7 +197,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with different resources', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_2_1_1],
-        false
+        { useHex: false }
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 2);
