@@ -15,18 +15,24 @@
  */
 
 const Benchmark = require('benchmark');
-const { BasicTracerProvider } = require('../../../build/src');
+const { BasicTracerProvider, BatchSpanProcessor } = require('../../../build/src');
+const { ExportResultCode } = require('@opentelemetry/core');
 
-const tracerProvider = new BasicTracerProvider();
-const tracer = tracerProvider.getTracer('test')
+class NoopExporter  {
+  export(spans, resultCallback) {
+    setTimeout(() => resultCallback({ code: ExportResultCode.SUCCESS }), 0);
+  }
 
-const suite = new Benchmark.Suite();
+  shutdown() {
+    return this.forceFlush();
+  }
 
-suite.on('cycle', event => {
-  console.log(String(event.target));
-});
+  forceFlush() {
+    return Promise.resolve();
+  }
+}
 
-suite.add('create spans (10 attributes)', function() {
+function createSpan() {
   const span = tracer.startSpan('span');
   span.setAttribute('aaaaaaaaaaaaaaaaaaaa', 'aaaaaaaaaaaaaaaaaaaa');
   span.setAttribute('bbbbbbbbbbbbbbbbbbbb', 'aaaaaaaaaaaaaaaaaaaa');
@@ -39,6 +45,20 @@ suite.add('create spans (10 attributes)', function() {
   span.setAttribute('iiiiiiiiiiiiiiiiiiii', 'aaaaaaaaaaaaaaaaaaaa');
   span.setAttribute('jjjjjjjjjjjjjjjjjjjj', 'aaaaaaaaaaaaaaaaaaaa');
   span.end();
+}
+
+const tracerProvider = new BasicTracerProvider();
+tracerProvider.addSpanProcessor(new BatchSpanProcessor(new NoopExporter()));
+const tracer = tracerProvider.getTracer('test')
+
+const suite = new Benchmark.Suite('BatchSpanProcessor');
+
+suite.on('cycle', event => {
+  console.log(String(event.target));
+});
+
+suite.add('BatchSpanProcessor process span', function() {
+  createSpan();
 });
 
 suite.run();
