@@ -1054,7 +1054,7 @@ describe('Span', () => {
       assert.ok(started);
     });
 
-    it('should call onStart synchronously when span is started with initial attributes', () => {
+    it('include initial attributes in onStart', () => {
       let initAttributes;
       const processor: SpanProcessor = {
         onStart: span => {
