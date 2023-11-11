@@ -95,7 +95,12 @@ describe('Global Utils', () => {
     _globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)].version = '0.0.1';
 
     assert.equal(false, api1.diag.setLogger(logger2)); // won't happen
-    sinon.assert.calledWith(logger2.error, sinon.match(/Registration of version .*? does not match previously registered API v0.0.1/));
+    sinon.assert.calledWith(
+      logger2.error,
+      sinon.match(
+        /Registration of version .*? does not match previously registered API v0.0.1/
+      )
+    );
 
     api1.diag.info('message');
     sinon.assert.notCalled(logger2.info);
