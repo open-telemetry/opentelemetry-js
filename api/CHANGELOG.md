@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### :bug: (Bug Fix)
+
+* fix(api): make failed diag.setLogger not be silent; correct versions in incompat error message [#4288](https://github.com/open-telemetry/opentelemetry-js/pull/4288) @trentm
+
 ## 1.7.0
 
 ### :rocket: (Enhancement)
