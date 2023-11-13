@@ -1054,7 +1054,7 @@ describe('Span', () => {
       assert.ok(started);
     });
 
-    it('include attributes in onStart', () => {
+    it('should include attributes in onStart', () => {
       let attributes;
       const processor: SpanProcessor = {
         onStart: span => {
