@@ -1054,11 +1054,11 @@ describe('Span', () => {
       assert.ok(started);
     });
 
-    it('include initial attributes in onStart', () => {
-      let initAttributes;
+    it('include attributes in onStart', () => {
+      let attributes;
       const processor: SpanProcessor = {
         onStart: span => {
-          initAttributes = { ...span.attributes };
+          attributes = { ...span.attributes };
         },
         forceFlush: () => Promise.resolve(),
         onEnd() {},
@@ -1072,7 +1072,7 @@ describe('Span', () => {
       provider
         .getTracer('default')
         .startSpan('test', { attributes: { foo: 'bar' } });
-      assert.deepStrictEqual(initAttributes, { foo: 'bar' });
+      assert.deepStrictEqual(attributes, { foo: 'bar' });
     });
 
     it('should call onEnd synchronously when span is ended', () => {
@@ -1244,7 +1244,7 @@ describe('Span', () => {
       });
     });
 
-    describe('when initial attributes are specified', () => {
+    describe('when attributes are specified', () => {
       it('should store specified attributes', () => {
         const span = new Span(
           tracer,
