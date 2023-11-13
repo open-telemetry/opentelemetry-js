@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699546864463,
+  "lastUpdate": 1699883794456,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -270,6 +270,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.28%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b41cada2d2e17034fc7db058eda34ca3df76213d",
+          "message": "chore(deps): update dependency chromedriver to v119 [security] (#4280)",
+          "timestamp": "2023-11-13T14:55:15+01:00",
+          "tree_id": "e4660f4ad9a645812b62dbedc28562c105a4616a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b41cada2d2e17034fc7db058eda34ca3df76213d"
+        },
+        "date": 1699883793569,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 704404,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8123,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 657066,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 657511,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
