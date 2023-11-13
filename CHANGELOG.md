@@ -19,6 +19,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
 
 ### :bug: (Bug Fix)
+
 * fix(sdk-trace-web): only access location if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
 
 ## 1.18.1
