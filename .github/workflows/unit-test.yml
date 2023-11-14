@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
 
@@ -57,7 +57,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
 
@@ -83,7 +83,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 16
 
@@ -104,7 +104,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.0.0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 16
 
@@ -131,7 +131,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
 
