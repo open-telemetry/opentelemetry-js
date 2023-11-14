@@ -401,7 +401,8 @@ describe('OTLPMetricExporter - web', () => {
             assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
             ensureCounterIsCorrect(
               metric1,
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+                .endTime,
               metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
                 .startTime
             );

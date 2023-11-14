@@ -34,7 +34,7 @@ export function prepareSend(
 ): zipkinTypes.SendFn {
   let xhrHeaders: Record<string, string>;
   const useBeacon = typeof navigator.sendBeacon === 'function' && !headers;
-  const xhr = typeof XMLHttpRequest  === 'function';
+  const xhr = typeof XMLHttpRequest === 'function';
   if (headers) {
     xhrHeaders = {
       Accept: 'application/json',
@@ -148,9 +148,11 @@ function sendWithFetch(
   headers: Record<string, string> = {}
 ) {
   diag.debug(`Zipkin request payload: ${data}`);
-  fetch(urlStr, {method: 'POST', body: data, headers}).then(
-    (response) =>  {
-      diag.debug(`Zipkin response status code: ${response.status}, body: ${data}`);
+  fetch(urlStr, { method: 'POST', body: data, headers }).then(
+    response => {
+      diag.debug(
+        `Zipkin response status code: ${response.status}, body: ${data}`
+      );
       if (response.status >= 200 && response.status < 400) {
         return done({ code: ExportResultCode.SUCCESS });
       } else {
@@ -162,9 +164,9 @@ function sendWithFetch(
         });
       }
     },
-    (error) => {
+    error => {
       globalErrorHandler(new Error(`Zipkin request error: ${error.message}`));
       return done({ code: ExportResultCode.FAILED });
     }
-  )
+  );
 }
