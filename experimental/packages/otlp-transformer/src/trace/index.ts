@@ -15,6 +15,7 @@
  */
 import type { IResource } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import type { OtlpEncodingOptions } from '../common/types';
 import { toAttributes } from '../common/internal';
 import { sdkSpanToOtlpSpan } from './internal';
 import {
@@ -22,13 +23,15 @@ import {
   IResourceSpans,
   IScopeSpans,
 } from './types';
+import { Encoder, getOtlpEncoder } from '../common';
 
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
-  useHex?: boolean
+  options?: OtlpEncodingOptions
 ): IExportTraceServiceRequest {
+  const encoder = getOtlpEncoder(options);
   return {
-    resourceSpans: spanRecordsToResourceSpans(spans, useHex),
+    resourceSpans: spanRecordsToResourceSpans(spans, encoder),
   };
 }
 
@@ -61,7 +64,7 @@ function createResourceMap(readableSpans: ReadableSpan[]) {
 
 function spanRecordsToResourceSpans(
   readableSpans: ReadableSpan[],
-  useHex?: boolean
+  encoder: Encoder
 ): IResourceSpans[] {
   const resourceMap = createResourceMap(readableSpans);
   const out: IResourceSpans[] = [];
@@ -79,7 +82,7 @@ function spanRecordsToResourceSpans(
         const { name, version, schemaUrl } =
           scopeSpans[0].instrumentationLibrary;
         const spans = scopeSpans.map(readableSpan =>
-          sdkSpanToOtlpSpan(readableSpan, useHex)
+          sdkSpanToOtlpSpan(readableSpan, encoder)
         );
 
         scopeResourceSpans.push({
