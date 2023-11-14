@@ -179,14 +179,36 @@ describe('LogRecord', () => {
       describe('when "attributeCountLimit" option defined', () => {
         const { logRecord } = setup({ attributeCountLimit: 100 });
         for (let i = 0; i < 150; i++) {
-          logRecord.setAttribute(`foo${i}`, `bar${i}`);
+          let attributeValue;
+          switch (i % 3) {
+            case 0: {
+              attributeValue = `bar${i}`;
+              break;
+            }
+            case 1: {
+              attributeValue = [`bar${i}`];
+              break;
+            }
+            case 2: {
+              attributeValue = {
+                bar: `bar${i}`,
+              };
+              break;
+            }
+            default: {
+              attributeValue = `bar${i}`;
+            }
+          }
+          logRecord.setAttribute(`foo${i}`, attributeValue);
         }
 
         it('should remove / drop all remaining values after the number of values exceeds this limit', () => {
           const { attributes } = logRecord;
           assert.strictEqual(Object.keys(attributes).length, 100);
           assert.strictEqual(attributes.foo0, 'bar0');
-          assert.strictEqual(attributes.foo99, 'bar99');
+          assert.deepStrictEqual(attributes.foo98, { bar: 'bar98' });
+          assert.strictEqual(attributes.foo147, undefined);
+          assert.strictEqual(attributes.foo148, undefined);
           assert.strictEqual(attributes.foo149, undefined);
         });
       });

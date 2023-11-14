@@ -9,18 +9,20 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* fix(otlp-exporter-base)!: decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
+  * fixes a memory leak on prolonged collector unavailability
+  * this change is marked as breaking as it changes defaults
+
 ### :rocket: (Enhancement)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
 
+* chore: type reference on zone.js [#4257](https://github.com/open-telemetry/opentelemetry-js/pull/4257) @legendecas
 * chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
 
 ### :bug: (Bug Fix)
-
-* fix(otlp-exporter-base): decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
-  * fixes a memory leak on prolonged collector unavailability
 
 ## 1.18.1
 
