@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700058608035,
+  "lastUpdate": 1700064634002,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -426,6 +426,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "82601620+drewcorlin1@users.noreply.github.com",
+            "name": "drewcorlin1",
+            "username": "drewcorlin1"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5ed54c8a0964fd685d722770dcbe7fae61a12937",
+          "message": "Update fetch instrumentation to be runtime agnostic (#4063)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-11-15T17:09:15+01:00",
+          "tree_id": "6c0c5a583e4014f15909bcc0f9e6ed0eeac8bd3b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5ed54c8a0964fd685d722770dcbe7fae61a12937"
+        },
+        "date": 1700064633082,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 705553,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8767,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 678319,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 659087,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
