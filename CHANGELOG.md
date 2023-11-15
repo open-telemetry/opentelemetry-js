@@ -11,13 +11,38 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+* chore: type reference on zone.js [#4257](https://github.com/open-telemetry/opentelemetry-js/pull/4257) @legendecas
+* chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-web): only access location if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
+* fix(sdk-trace-base): processor onStart called with a span having empty attributes
+
+## 1.18.1
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): hand-roll MetricAdvice type as older API versions do not include it #4260
+
+## 1.18.0
+
+### :rocket: (Enhancement)
+
 * feat(metrics): prototype experimental advice support [#3876](https://github.com/open-telemetry/opentelemetry-js/pull/3876) @legendecas
 
 ### :bug: (Bug Fix)
 
-### :books: (Refine Doc)
+* fix(core): remove re-export of `version.ts` [#4225](https://github.com/open-telemetry/opentelemetry-js/pull/4225) @david-luna
 
 ### :house: (Internal)
+
+* chore: track package-lock.json [#4238](https://github.com/open-telemetry/opentelemetry-js/pull/4238) @legendecas
+  * Switched to npm workspaces to bootstrap dependencies.
 
 ## 1.17.1
 

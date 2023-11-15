@@ -15,3 +15,4 @@
  */
 
 require('./span');
+require('./BatchSpanProcessor');

@@ -4,9 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.7.0
+
 ### :rocket: (Enhancement)
 
 * feat(metrics): prototype experimental advice support [#3876](https://github.com/open-telemetry/opentelemetry-js/pull/3876) @legendecas
+* feat(api): publish api esnext target [#4231](https://github.com/open-telemetry/opentelemetry-js/pull/4231) @legendecas
 
 ## 1.6.0
 

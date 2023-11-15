@@ -10,13 +10,30 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-node): remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
-  * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
-    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+* fix(sdk-logs): avoid map attribute set when count limit exceeded
+* fix(instrumentation-fetch): only access navigator if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
+  * allows for experimental usage of this instrumentation with non-browser runtimes
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.45.1
+
+### :bug: (Bug Fix)
+
+* Bumps all dependencies to explicitly include Stable v1.18.1 packages
+
+## 0.45.0
+
+### :boom: Breaking Change
+
+* fix(sdk-node)!: remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
+  * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+* fix(otlp-transformer)!: OTLP json encoding [#4220](https://github.com/open-telemetry/opentelemetry-js/pull/4220) @seemk
+  * Fixes a bug in the OTLP (http/json) exporters where timestamps were not encoded as strings, causing the export to
+    be rejected by OTLP endpoints
 
 ## 0.44.0
 
