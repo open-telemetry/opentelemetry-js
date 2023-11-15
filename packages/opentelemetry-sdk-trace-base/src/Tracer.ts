@@ -132,6 +132,12 @@ export class Tracer implements api.Tracer {
       return nonRecordingSpan;
     }
 
+    // Set initial span attributes. The attributes object may have been mutated
+    // by the sampler, so we sanitize the merged attributes before setting them.
+    const initAttributes = sanitizeAttributes(
+      Object.assign(attributes, samplingResult.attributes)
+    );
+
     const span = new Span(
       this,
       context,
@@ -140,14 +146,10 @@ export class Tracer implements api.Tracer {
       spanKind,
       parentSpanId,
       links,
-      options.startTime
+      options.startTime,
+      undefined,
+      initAttributes
     );
-    // Set initial span attributes. The attributes object may have been mutated
-    // by the sampler, so we sanitize the merged attributes before setting them.
-    const initAttributes = sanitizeAttributes(
-      Object.assign(attributes, samplingResult.attributes)
-    );
-    span.setAttributes(initAttributes);
     return span;
   }
 
