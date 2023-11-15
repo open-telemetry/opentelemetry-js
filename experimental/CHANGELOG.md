@@ -11,6 +11,8 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(sdk-logs): avoid map attribute set when count limit exceeded
+* fix(instrumentation-fetch): only access navigator if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
+  * allows for experimental usage of this instrumentation with non-browser runtimes
 
 ### :books: (Refine Doc)
 
