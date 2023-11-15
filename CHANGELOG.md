@@ -20,6 +20,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): processor onStart called with a span having empty attributes
+
 ## 1.18.1
 
 ### :bug: (Bug Fix)
