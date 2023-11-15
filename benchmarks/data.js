@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1699949163198,
+  "lastUpdate": 1700058608035,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -374,6 +374,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.65%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "andremiguelcruz@msn.com",
+            "name": "André Cruz",
+            "username": "satazor"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "10f6c46057b2aa43f756d6d26fb7c960d9476365",
+          "message": "fix(sdk-trace-base): processor onStart called with a span having empty attributes (#4277)\n\nCo-authored-by: artahmetaj <artahmetaj@yahoo.com>",
+          "timestamp": "2023-11-15T15:28:45+01:00",
+          "tree_id": "5884a6ca809a99f4e1a130ae4dbc648b21d085f3",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/10f6c46057b2aa43f756d6d26fb7c960d9476365"
+        },
+        "date": 1700058607162,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 698551,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7787,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 648809,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 641332,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
