@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700064634002,
+  "lastUpdate": 1700070374510,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -476,6 +476,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 659087,
             "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2c7d5c427fa01ed3b8d46d801eb282ca4b648ef1",
+          "message": "chore: fix npm release preparation scripts, add .npmrc and release script (#4275)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2023-11-15T18:44:57+01:00",
+          "tree_id": "0066df768ec9ac3973ac9a4bd25e2c4fa0d31862",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/2c7d5c427fa01ed3b8d46d801eb282ca4b648ef1"
+        },
+        "date": 1700070373651,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 688950,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8140,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 669378,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 642194,
+            "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
