@@ -1054,6 +1054,27 @@ describe('Span', () => {
       assert.ok(started);
     });
 
+    it('should include attributes in onStart', () => {
+      let attributes;
+      const processor: SpanProcessor = {
+        onStart: span => {
+          attributes = { ...span.attributes };
+        },
+        forceFlush: () => Promise.resolve(),
+        onEnd() {},
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider();
+
+      provider.addSpanProcessor(processor);
+
+      provider
+        .getTracer('default')
+        .startSpan('test', { attributes: { foo: 'bar' } });
+      assert.deepStrictEqual(attributes, { foo: 'bar' });
+    });
+
     it('should call onEnd synchronously when span is ended', () => {
       let ended = false;
       const processor: SpanProcessor = {
@@ -1220,6 +1241,24 @@ describe('Span', () => {
         assert.deepStrictEqual(event.attributes, {
           [SemanticAttributes.EXCEPTION_TYPE]: '12',
         });
+      });
+    });
+
+    describe('when attributes are specified', () => {
+      it('should store specified attributes', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          { foo: 'bar' }
+        );
+        assert.deepStrictEqual(span.attributes, { foo: 'bar' });
       });
     });
   });
