@@ -12,9 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - "14"
-          - "16"
           - "18"
+          - "20"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -27,11 +26,6 @@ jobs:
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest
-        if: ${{ matrix.node_version == '18' || matrix.node_version == '20' }}
-
-      # npm@10.0.0 drops support for Node.js v14 and v16
-      - run: npm install -g npm@"<10.0.0"
-        if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
       - name: Bootstrap
         run: npm ci
@@ -42,13 +36,11 @@ jobs:
       - name: Unit tests
         run: |
           # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
-          if [ "${{ matrix.node_version }}" = "18" ]; then
-            export NODE_OPTIONS=--openssl-legacy-provider
-          fi
+          export NODE_OPTIONS=--openssl-legacy-provider
           npm run test
       - name: Report Coverage
         run: npm run codecov
-        if: ${{ matrix.node_version == '14' }}
+        if: ${{ matrix.node_version == '20' }}
   node-windows-tests:
     runs-on: windows-latest
     env:
@@ -126,6 +118,8 @@ jobs:
           - "8"
           - "10"
           - "12"
+          - "14"
+          - "16"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

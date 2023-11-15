@@ -24,7 +24,7 @@
     "web"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",

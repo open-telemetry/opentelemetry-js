@@ -23,7 +23,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
