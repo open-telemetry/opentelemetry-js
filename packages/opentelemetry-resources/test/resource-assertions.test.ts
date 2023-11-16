@@ -15,7 +15,12 @@
  */
 
 import { SDK_INFO } from '@opentelemetry/core';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
+  SEMRESATTRS_TELEMETRY_SDK_NAME,
+  SEMRESATTRS_TELEMETRY_SDK_VERSION,
+  SemanticResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 import { Resource } from '../src/Resource';
 import {
   assertCloudResource,
@@ -132,9 +137,12 @@ describe('assertK8sResource', () => {
 describe('assertTelemetrySDKResource', () => {
   it('uses default validations', () => {
     const resource = new Resource({
-      [SemanticResourceAttributes.TELEMETRY_SDK_NAME]: SDK_INFO.NAME,
-      [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]: SDK_INFO.LANGUAGE,
-      [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]: SDK_INFO.VERSION,
+      [SemanticResourceAttributes.TELEMETRY_SDK_NAME]:
+        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
+      [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
+        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
+      [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]:
+        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
     });
     assertTelemetrySDKResource(resource, {});
   });

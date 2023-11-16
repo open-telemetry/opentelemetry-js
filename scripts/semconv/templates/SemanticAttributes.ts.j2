@@ -13,7 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+{#- Coding the constants in the template instead of passing via cmd line as the maximum length got exceeded #}
+{%- set strings = namespace(dotConstants="", constants="") %}
+{%- if class == "SemanticAttributes" %}
+{%- set strings.dotConstants= "db,carrier,cassandra,code,coordinator,document,dynamodb,enduser,exception,faas,http,jsonrpc,kafka,lambda,messaging,mongodb,mssql,net,peer,rpc,thread" %}
+{%- set strings.constants= "aws,azure,content,collection,compressed,connection,global,host,id,index,instance,invoked,length,local,message,name,port,protocol,provisioned,read,request,response,secondary,space,type,un,version,write" %}
+{%- else %}
+{%- set strings.dotConstants= "account,cloud,container,cluster,deployment,device,ecs,eks,executable,faas,group,k8s,log,image,model,node,os,process,runtime,sdk,service,set,stream,task,telemetry,webengine" %}
+{%- set strings.constants= "arn,aws,azure,command,cron,daemon,description,host,id,instance,job,name,replica,space,stateful,type,uid,version" %}
+{% endif %}
+{%- set dotConstants = strings.dotConstants.split(",")|sort(reverse=true, attribute=len) %}
+{%- set constants = strings.constants.split(",")|sort(reverse=true, attribute=len) %}
 
+import { createConstMap } from '../internal/utils';
+import { DOT, UNDERSCORE, {% for val in dotConstants %}{{val|upper}}_DOT, {% endfor %}{% for val in constants %}{{val|upper}}, {% endfor %} } from '../internal/constants';
 
 {%- macro print_value(type, value) -%}
   {{ "'" if type == "string"}}{{value}}{{ "'" if type == "string"}}
@@ -24,9 +37,74 @@
 {%- macro lowerFirst(text) -%}
   {{ text[0]|lower}}{{text[1:] }}
 {%- endmacro %}
+{%- macro format_value(type, value, depth = 0, orgValue = value) -%}
+  {%- if type == "string" %}
+    {%- set ns = namespace(done=false) %}
+    {%- for val in dotConstants %}
+      {%- if value.startswith(val ~ ".") %}
+        {{val|upper}}_DOT + {{ format_value(type, value[((val|length)+1):], depth + 1, orgValue) }}
+        {%- set ns.done = true %}
+      {%- endif %}
+    {%- endfor %}
+    {%- if not ns.done %}
+      {%- for val in constants %}
+        {%- if value == val %}
+          {{val|upper}} as '{{orgValue}}'
+          {%- set ns.done = true %}
+        {%- elif value.startswith(val) %}
+          {{val|upper}} + {{ format_value(type, value[(val|length):], depth + 1, orgValue) }}
+          {%- set ns.done = true %}
+        {%- endif %}
+      {%- endfor %}
+    {%- endif %}
+    {%- if not ns.done %}
+      {%- if value.startswith("_") %}
+        UNDERSCORE + {{ format_value(type, value[1:], depth + 1, orgValue) }}
+        {%- set ns.done = true %}
+      {%- elif value.startswith(".") %}
+        DOT + {{ format_value(type, value[1:], depth + 1, orgValue) }}
+        {%- set ns.done = true %}
+      {%- endif %}
+    {%- endif %}
+    {%- if not ns.done %}
+      '{{value}}'{% if depth > 0 %} as '{{orgValue}}'{% endif %}
+    {%- endif %}
+  {%- else %}{{value}}{%- endif %}
+{%- endmacro %}
 
+//----------------------------------------------------------------------------------------------------------
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/{{template}}
-export const {{class}} = {
+//----------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------
+// Constant values for {{class}}
+//----------------------------------------------------------------------------------------------------------
+
+{%- for attribute in attributes if attribute.is_local and not attribute.ref %}
+
+/**
+* {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
+  {%- if attribute.note %}
+*
+* Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
+  {%- endif %}
+  {%- if attribute.deprecated %}
+*
+* @deprecated {{attribute.deprecated | to_doc_brief}}.
+  {%- endif %}
+*/
+export const {{cls_prefix}}_{{attribute.fqn | to_const_name}} = {{ format_value ("string", attribute.fqn) }};
+
+{%- endfor %}
+
+/**
+ * Definition of available values for {{class}}
+ * This type is used for backward compatibility, you should use the individual exported
+ * constants {{class}}_XXXXX rather than the exported constant map. As any single reference
+ * to a constant map value will result in all strings being included into your bundle.
+ * @deprecated Use the {{cls_prefix}}_XXXXX constants rather than the {{class}}.XXXXX for bundle minification.
+ */
+export type {{class}} = {
   {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
 
   /**
@@ -42,21 +120,87 @@ export const {{class}} = {
   */
   {{attribute.fqn | to_const_name}}: '{{attribute.fqn}}',
   {%- endfor %}
-}
+};
+
+/**
+ * Create exported Value Map for {{class}} values
+ * @deprecated Use the {{cls_prefix}}_XXXXX constants rather than the {{class}}.XXXXX for bundle minification
+ */
+export const {{class}}:{{class}} = createConstMap<{{class}}>([
+  {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
+  {{cls_prefix}}_{{attribute.fqn | to_const_name}},
+  {%- endfor %}
+]);
 
 {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
 {%- if attribute.is_enum %}
 {%- set class_name = attribute.fqn | to_camelcase(True) ~ "Values" %}
 {%- set type = attribute.attr_type.enum_type %}
 
-{% if attribute.attr_type.members is defined and attribute.attr_type.members|length > 0 %}
-export const {{class_name}} = {
+{%- if attribute.attr_type.members is defined and attribute.attr_type.members|length > 0 %}
+
+/* ----------------------------------------------------------------------------------------------------------
+ * Constant values for {{class_name}} enum definition
+ *
+ * {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
+  {%- if attribute.note %}
+ *
+ * Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
+  {%- endif %}
+  {%- if attribute.deprecated %}
+ *
+ * @deprecated {{attribute.deprecated | to_doc_brief}}.
+  {%- endif %}
+ * ---------------------------------------------------------------------------------------------------------- */
+
+{%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+
+/**
+ * {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
+  {%- if attribute.note %}
+ *
+ * Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
+  {%- endif %}
+  {%- if attribute.deprecated %}
+ *
+ * @deprecated {{attribute.deprecated | to_doc_brief}}.
+  {%- endif %}
+ */
+export const {{class_name|upper}}_{{ member.member_id | to_const_name }} = {{ format_value(type, member.value) }};
+
+{%- endfor %}
+
+/**
+ * Identifies the Values for {{class_name}} enum definition
+ *
+ * {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
+ {%- if attribute.note %}
+ *
+ * Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
+ {%- endif %}
+ {%- if attribute.deprecated %}
+ *
+ * @deprecated {{attribute.deprecated | to_doc_brief}}.  Use the {{class_name | upper}}_XXXXX constants rather than the {{class_name}}.XXXXX for bundle minification.
+ {%- else %}
+ * @deprecated Use the {{class_name | upper}}_XXXXX constants rather than the {{class_name}}.XXXXX for bundle minification.
+ {%- endif %}
+ */
+export type {{class_name}} = {
   {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
   /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
   {{ member.member_id | to_const_name }}: {{ print_value(type, member.value) }},
   {%- endfor %}
-} as const
-export type {{class_name}} = typeof {{class_name}}[keyof typeof {{class_name}}]
+}
+
+/**
+ * The constant map of values for {{class_name}}.
+ * @deprecated Use the {{class_name | upper}}_XXXXX constants rather than the {{class_name}}.XXXXX for bundle minification.
+ */
+export const {{class_name}}:{{class_name}} = {
+  {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+  {{ member.member_id | to_const_name }}: {{class_name|upper}}_{{ member.member_id | to_const_name }},
+  {%- endfor %}
+ };
 {% endif %}
 {% endif %}
 
