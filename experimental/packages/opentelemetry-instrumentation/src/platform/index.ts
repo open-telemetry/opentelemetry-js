@@ -14,4 +14,10 @@
  * limitations under the License.
  */
 
-export * from './node';
+export {
+    InstrumentationBase,
+    InstrumentationModuleDefinition,
+    InstrumentationModuleFile,
+    InstrumentationNodeModuleDefinition,
+    InstrumentationNodeModuleFile
+} from './node';
