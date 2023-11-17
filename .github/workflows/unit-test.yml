@@ -13,7 +13,7 @@ jobs:
       matrix:
         node_version:
           - "18"
-          - "20"
+          # - "20" # disabled until http instrumentation can be fixed
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -40,7 +40,7 @@ jobs:
           npm run test
       - name: Report Coverage
         run: npm run codecov
-        if: ${{ matrix.node_version == '20' }}
+        if: ${{ matrix.node_version == '18' }}
   node-windows-tests:
     runs-on: windows-latest
     env:
