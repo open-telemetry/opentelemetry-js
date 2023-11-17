@@ -17,6 +17,6 @@ export { InstrumentationBase } from './instrumentation';
 export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
 export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
 export {
-    InstrumentationModuleDefinition,
-    InstrumentationModuleFile
+  InstrumentationModuleDefinition,
+  InstrumentationModuleFile,
 } from './types';

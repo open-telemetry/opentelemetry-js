@@ -16,11 +16,11 @@
 
 export * from './autoLoader';
 export {
-    InstrumentationBase,
-    InstrumentationModuleDefinition,
-    InstrumentationModuleFile,
-    InstrumentationNodeModuleDefinition,
-    InstrumentationNodeModuleFile
+  InstrumentationBase,
+  InstrumentationModuleDefinition,
+  InstrumentationModuleFile,
+  InstrumentationNodeModuleDefinition,
+  InstrumentationNodeModuleFile,
 } from './platform/index';
 export * from './types';
 export * from './types_internal';

@@ -15,9 +15,9 @@
  */
 
 export {
-    InstrumentationBase,
-    InstrumentationModuleDefinition,
-    InstrumentationModuleFile,
-    InstrumentationNodeModuleDefinition,
-    InstrumentationNodeModuleFile
+  InstrumentationBase,
+  InstrumentationModuleDefinition,
+  InstrumentationModuleFile,
+  InstrumentationNodeModuleDefinition,
+  InstrumentationNodeModuleFile,
 } from './node';
