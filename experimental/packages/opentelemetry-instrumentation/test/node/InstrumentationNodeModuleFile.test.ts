@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { normalize } from 'path';
-import { InstrumentationNodeModuleFile } from '../../src/instrumentationNodeModuleFile';
+import { InstrumentationNodeModuleFile } from '../../src';
 
 describe('InstrumentationNodeModuleFile', () => {
   it('should convert path', () => {
