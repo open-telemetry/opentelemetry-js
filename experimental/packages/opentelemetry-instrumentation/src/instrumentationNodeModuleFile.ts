@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { InstrumentationModuleFile } from '../../types';
+import { InstrumentationModuleFile } from './types';
 import { normalize } from 'path';
 
 export class InstrumentationNodeModuleFile<T>

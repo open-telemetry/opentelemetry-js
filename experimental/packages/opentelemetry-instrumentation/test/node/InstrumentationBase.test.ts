@@ -19,7 +19,7 @@ import * as sinon from 'sinon';
 import * as path from 'path';
 import { InstrumentationBase } from '../../src';
 import { InstrumentationNodeModuleDefinition } from '../../src/instrumentationNodeModuleDefinition';
-import { InstrumentationNodeModuleFile } from '../../src/platform/node/instrumentationNodeModuleFile';
+import { InstrumentationNodeModuleFile } from '../../src/instrumentationNodeModuleFile';
 import { InstrumentationModuleDefinition } from '../../src/types';
 
 const MODULE_NAME = 'test-module';
