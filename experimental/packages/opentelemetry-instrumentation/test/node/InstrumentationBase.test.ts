@@ -17,12 +17,10 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
-import {
-  InstrumentationBase,
-  InstrumentationModuleDefinition,
-  InstrumentationNodeModuleDefinition,
-  InstrumentationNodeModuleFile,
-} from '../../src';
+import { InstrumentationBase } from '../../src';
+import { InstrumentationNodeModuleDefinition } from '../../src/instrumentationNodeModuleDefinition';
+import { InstrumentationNodeModuleFile } from '../../src/platform/node/instrumentationNodeModuleFile';
+import { InstrumentationModuleDefinition } from '../../src/types';
 
 const MODULE_NAME = 'test-module';
 const MODULE_FILE_NAME = 'test-module-file';

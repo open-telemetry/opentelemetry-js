@@ -15,13 +15,8 @@
  */
 
 export * from './autoLoader';
-export {
-  InstrumentationBase,
-  InstrumentationModuleDefinition,
-  InstrumentationModuleFile,
-  InstrumentationNodeModuleDefinition,
-  InstrumentationNodeModuleFile,
-} from './platform/index';
+export { InstrumentationBase } from './platform/index';
+export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
 export * from './types';
 export * from './types_internal';
 export * from './utils';
