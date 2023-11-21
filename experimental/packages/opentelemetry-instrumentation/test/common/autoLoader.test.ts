@@ -24,6 +24,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
+import { Logger, LoggerOptions, LoggerProvider } from '@opentelemetry/api-logs';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
@@ -33,6 +34,12 @@ class DummyTracerProvider implements TracerProvider {
 
 class DummyMeterProvider implements MeterProvider {
   getMeter(name: string, version?: string, options?: MeterOptions): Meter {
+    throw new Error('not implemented');
+  }
+}
+
+class DummyLoggerProvider implements LoggerProvider {
+  getLogger(name: string, version?: string, options?: LoggerOptions): Logger {
     throw new Error('not implemented');
   }
 }
@@ -63,17 +70,21 @@ describe('autoLoader', () => {
       let enableSpy: sinon.SinonSpy;
       let setTracerProviderSpy: sinon.SinonSpy;
       let setMeterProviderSpy: sinon.SinonSpy;
+      let setLoggerProviderSpy: sinon.SinonSpy;
       const tracerProvider = new DummyTracerProvider();
       const meterProvider = new DummyMeterProvider();
+      const loggerProvider = new DummyLoggerProvider();
       beforeEach(() => {
         instrumentation = new FooInstrumentation('foo', '1', {});
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
         setMeterProviderSpy = sinon.stub(instrumentation, 'setMeterProvider');
+        setLoggerProviderSpy = sinon.stub(instrumentation, 'setLoggerProvider');
         unload = registerInstrumentations({
           instrumentations: [instrumentation],
           tracerProvider,
           meterProvider,
+          loggerProvider,
         });
       });
 
@@ -96,10 +107,12 @@ describe('autoLoader', () => {
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
         setMeterProviderSpy = sinon.stub(instrumentation, 'setMeterProvider');
+        setLoggerProviderSpy = sinon.stub(instrumentation, 'setLoggerProvider');
         unload = registerInstrumentations({
           instrumentations: [instrumentation],
           tracerProvider,
           meterProvider,
+          loggerProvider,
         });
         assert.strictEqual(enableSpy.callCount, 1);
       });
@@ -118,6 +131,12 @@ describe('autoLoader', () => {
         assert.strictEqual(setMeterProviderSpy.callCount, 1);
         assert.ok(setMeterProviderSpy.lastCall.args[0] === meterProvider);
         assert.strictEqual(setMeterProviderSpy.lastCall.args.length, 1);
+      });
+
+      it('should set LoggerProvider', () => {
+        assert.strictEqual(setLoggerProviderSpy.callCount, 1);
+        assert.ok(setLoggerProviderSpy.lastCall.args[0] === loggerProvider);
+        assert.strictEqual(setLoggerProviderSpy.lastCall.args.length, 1);
       });
     });
   });

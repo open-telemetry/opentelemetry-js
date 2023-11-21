@@ -17,6 +17,7 @@
 import { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import { Instrumentation } from './types';
 import { AutoLoaderResult, InstrumentationOption } from './types_internal';
+import { LoggerProvider } from '@opentelemetry/api-logs';
 
 /**
  * Parses the options and returns instrumentations, node plugins and
@@ -52,7 +53,8 @@ export function parseInstrumentationOptions(
 export function enableInstrumentations(
   instrumentations: Instrumentation[],
   tracerProvider?: TracerProvider,
-  meterProvider?: MeterProvider
+  meterProvider?: MeterProvider,
+  loggerProvider?: LoggerProvider
 ): void {
   for (let i = 0, j = instrumentations.length; i < j; i++) {
     const instrumentation = instrumentations[i];
@@ -61,6 +63,9 @@ export function enableInstrumentations(
     }
     if (meterProvider) {
       instrumentation.setMeterProvider(meterProvider);
+    }
+    if (loggerProvider) {
+      instrumentation.setLoggerProvider(loggerProvider);
     }
     // instrumentations have been already enabled during creation
     // so enable only if user prevented that by setting enabled to false

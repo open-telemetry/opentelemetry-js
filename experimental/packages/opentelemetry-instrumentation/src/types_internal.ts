@@ -17,6 +17,7 @@
 import { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import { InstrumentationBase } from './platform';
 import { Instrumentation } from './types';
+import { LoggerProvider } from '@opentelemetry/api-logs';
 
 export type InstrumentationOption =
   | typeof InstrumentationBase
@@ -32,4 +33,5 @@ export interface AutoLoaderOptions {
   instrumentations?: InstrumentationOption[];
   tracerProvider?: TracerProvider;
   meterProvider?: MeterProvider;
+  loggerProvider?: LoggerProvider;
 }

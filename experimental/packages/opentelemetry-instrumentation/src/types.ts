@@ -15,6 +15,7 @@
  */
 
 import { TracerProvider, MeterProvider } from '@opentelemetry/api';
+import { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation {
@@ -42,6 +43,9 @@ export interface Instrumentation {
 
   /** Method to set meter provider  */
   setMeterProvider(meterProvider: MeterProvider): void;
+
+  /** Method to set logger provider  */
+  setLoggerProvider(loggerProvider: LoggerProvider): void;
 
   /** Method to set instrumentation config  */
   setConfig(config: InstrumentationConfig): void;
