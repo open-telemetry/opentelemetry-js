@@ -4,19 +4,94 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
-### :books: (Refine Doc)
-
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
-### :bug: (Bug Fix)
+* fix(sdk-logs): avoid map attribute set when count limit exceeded
+* fix(instrumentation-fetch): only access navigator if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
+  * allows for experimental usage of this instrumentation with non-browser runtimes
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.45.1
+
+### :bug: (Bug Fix)
+
+* Bumps all dependencies to explicitly include Stable v1.18.1 packages
+
+## 0.45.0
+
+### :boom: Breaking Change
+
+* fix(sdk-node)!: remove the explicit dependency on @opentelemetry/exporter-jaeger that was kept on the previous release
+  * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+* fix(otlp-transformer)!: OTLP json encoding [#4220](https://github.com/open-telemetry/opentelemetry-js/pull/4220) @seemk
+  * Fixes a bug in the OTLP (http/json) exporters where timestamps were not encoded as strings, causing the export to
+    be rejected by OTLP endpoints
+
+## 0.44.0
+
+### :boom: Breaking Change
+
+* fix(exporter-logs-otlp-proto): change OTLPLogExporter to OTLPLogExporter [#4140](https://github.com/open-telemetry/opentelemetry-js/pull/4140) @Vunovati
+* fix(sdk-node): remove explicit dependency on @opentelemetry/exporter-jaeger
+  * '@opentelemetry/exporter-jaeger' is no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+* fix(sdk-logs): hide internal methods with internal shared state [#3865](https://github.com/open-telemetry/opentelemetry-js/pull/3865) @legendecas
+
+### :rocket: (Enhancement)
+
+* feat(exporter-metrics-otlp-proto): add esm build [#4099](https://github.com/open-telemetry/opentelemetry-js/pull/4099) @pichlermarc
+* feat(opencensus-shim): implement OpenCensus metric producer [#4066](https://github.com/open-telemetry/opentelemetry-js/pull/4066) @aabmass
+
+### :bug: (Bug Fix)
+
+* fix(otlp-exporter-base): replaced usage of window with _globalThis [#4157](https://github.com/open-telemetry/opentelemetry-js/pull/4157) @cristianmadularu
+* fix(otlp-transformer): Avoid precision loss when converting from HrTime to unix nanoseconds. [#4062](https://github.com/open-telemetry/opentelemetry-js/pull/4062)
+
+## 0.43.0
+
+### :bug: (Bug Fix)
+
+* Revert "feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)"
+  * This feature was an unintentional breaking change introduced with API 1.5.0
+  * This PR updates all experimental packages to allow API 1.6.0, where this change has been reverted.
+
+## 0.42.0
+
+### :boom: Breaking Change
+
+* chore(sdk-node): deprecate methods in favor of constructor options [#3996](https://github.com/open-telemetry/opentelemetry-js/pull/3996) @pichlermarc
+  * The following methods are now deprecated and will be removed in `0.43.0`
+    * `NodeSDK.configureTracerProvider()`, please use constructor options instead
+    * `NodeSDK.configureMeterProvider()`, please use constructor options instead
+    * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
+    * `NodeSDK.addResource()`, please use constructor options instead
+    * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on startup.
+* chore(sdk-node): add notice that '@opentelemetry/exporter-jaeger' has to be installed manually in the next version [#4068](https://github.com/open-telemetry/opentelemetry-js/pull/4068) @pichlermarc
+  * Starting with 0.43.0 '@opentelemetry/exporter-jaeger' will no longer be a dependency of this package. To continue using '@opentelemetry/exporter-jaeger', please install it manually.
+    * NOTE: `@opentelemetry/exporter-jaeger` is deprecated, consider switching to one of the alternatives described [here](https://www.npmjs.com/package/@opentelemetry/exporter-jaeger)
+
+### :rocket: (Enhancement)
+
+* feat: update PeriodicExportingMetricReader and PrometheusExporter to accept optional metric producers [#4077](https://github.com/open-telemetry/opentelemetry-js/pull/4077) @aabmass
+
+### :bug: (Bug Fix)
+
+* fix(exporter-logs-otlp-http): add @opentelemetry/api-logs as dependency
+
+## 0.41.2
+
+### :bug: (Bug Fix)
+
+* fix(opentelemetry-exporter-logs-otlp-http): Add otel-api as dev dep for tests as they are directly importing the api and which is breaking the web-sandbox tests which is using rollup
+* fix(instrumentation-grpc): instrument @grpc/grpc-js Client methods [#3804](https://github.com/open-telemetry/opentelemetry-js/pull/3804) @pichlermarc
 
 ## 0.41.1
 
@@ -82,7 +157,6 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix(sdk-node): use resource interface instead of concrete class [#3803](https://github.com/open-telemetry/opentelemetry-js/pull/3803) @blumamir
 * fix(sdk-logs): remove includeTraceContext configuration and use LogRecord context when available  [#3817](https://github.com/open-telemetry/opentelemetry-js/pull/3817) @hectorhdzg
-* fix(instrumentation-grpc): instrument @grpc/grpc-js Client methods [#3804](https://github.com/open-telemetry/opentelemetry-js/pull/3804) @pichlermarc
 
 ## 0.39.1
 

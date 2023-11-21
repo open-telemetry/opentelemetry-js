@@ -77,23 +77,29 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
 
-      // Create meter and instrument.
+      // Create meter and instrument, needs observation on instrument, otherwise the scope will not be reported.
       // name+version pair 1
-      meterProvider.getMeter('meter1', 'v1.0.0');
-      meterProvider.getMeter('meter1', 'v1.0.0');
+      meterProvider.getMeter('meter1', 'v1.0.0').createCounter('test').add(1);
+      meterProvider.getMeter('meter1', 'v1.0.0').createCounter('test').add(1);
       // name+version pair 2
-      meterProvider.getMeter('meter2', 'v1.0.0');
-      meterProvider.getMeter('meter2', 'v1.0.0');
+      meterProvider.getMeter('meter2', 'v1.0.0').createCounter('test').add(1);
+      meterProvider.getMeter('meter2', 'v1.0.0').createCounter('test').add(1);
       // name+version pair 3
-      meterProvider.getMeter('meter1', 'v1.0.1');
-      meterProvider.getMeter('meter1', 'v1.0.1');
+      meterProvider.getMeter('meter1', 'v1.0.1').createCounter('test').add(1);
+      meterProvider.getMeter('meter1', 'v1.0.1').createCounter('test').add(1);
       // name+version+schemaUrl pair 4
-      meterProvider.getMeter('meter1', 'v1.0.1', {
-        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
-      });
-      meterProvider.getMeter('meter1', 'v1.0.1', {
-        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
-      });
+      meterProvider
+        .getMeter('meter1', 'v1.0.1', {
+          schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+        })
+        .createCounter('test')
+        .add(1);
+      meterProvider
+        .getMeter('meter1', 'v1.0.1', {
+          schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+        })
+        .createCounter('test')
+        .add(1);
 
       // Perform collection.
       const { resourceMetrics, errors } = await reader.collect();

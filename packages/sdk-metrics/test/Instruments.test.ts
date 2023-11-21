@@ -19,13 +19,13 @@ import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import {
-  InstrumentDescriptor,
   InstrumentType,
   MeterProvider,
   MetricReader,
   DataPoint,
   DataPointType,
   Histogram,
+  MetricDescriptor,
 } from '../src';
 import {
   TestDeltaMetricReader,
@@ -352,6 +352,60 @@ describe('Instruments', () => {
       });
     });
 
+    it('should recognize metric advice', async () => {
+      const { meter, deltaReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.INT,
+        advice: {
+          // Set explicit boundaries that are different from the default one.
+          explicitBucketBoundaries: [1, 9, 100],
+        },
+      });
+
+      histogram.record(10);
+      histogram.record(0);
+      histogram.record(100, { foo: 'bar' });
+      histogram.record(0, { foo: 'bar' });
+      await validateExport(deltaReader, {
+        descriptor: {
+          name: 'test',
+          description: '',
+          unit: '',
+          type: InstrumentType.HISTOGRAM,
+          valueType: ValueType.INT,
+        },
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            value: {
+              buckets: {
+                boundaries: [1, 9, 100],
+                counts: [1, 0, 1, 0],
+              },
+              count: 2,
+              sum: 10,
+              max: 10,
+              min: 0,
+            },
+          },
+          {
+            attributes: { foo: 'bar' },
+            value: {
+              buckets: {
+                boundaries: [1, 9, 100],
+                counts: [1, 0, 0, 1],
+              },
+              count: 2,
+              sum: 100,
+              max: 100,
+              min: 0,
+            },
+          },
+        ],
+      });
+    });
+
     it('should collect min and max', async () => {
       const { meter, deltaReader, cumulativeReader } = setup();
       const histogram = meter.createHistogram('test', {
@@ -434,10 +488,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(-1, { foo: 'bar' });
-      await validateExport(deltaReader, {
-        dataPointType: DataPointType.HISTOGRAM,
-        dataPoints: [],
-      });
+      const result = await deltaReader.collect();
+
+      // nothing observed
+      assert.equal(result.resourceMetrics.scopeMetrics.length, 0);
     });
 
     it('should record DOUBLE values', async () => {
@@ -499,10 +553,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(-0.5, { foo: 'bar' });
-      await validateExport(deltaReader, {
-        dataPointType: DataPointType.HISTOGRAM,
-        dataPoints: [],
-      });
+      const result = await deltaReader.collect();
+
+      // nothing observed
+      assert.equal(result.resourceMetrics.scopeMetrics.length, 0);
     });
   });
 
@@ -721,7 +775,7 @@ function setup() {
 interface ValidateMetricData {
   resource?: Resource;
   instrumentationScope?: InstrumentationScope;
-  descriptor?: InstrumentDescriptor;
+  descriptor?: MetricDescriptor;
   dataPointType?: DataPointType;
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
   isMonotonic?: boolean;

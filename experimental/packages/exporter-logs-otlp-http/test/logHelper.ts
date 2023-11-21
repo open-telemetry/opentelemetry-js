@@ -79,14 +79,14 @@ export function ensureExportedBodyIsCorrect(body?: IAnyValue) {
 export function ensureExportedLogRecordIsCorrect(logRecord: ILogRecord) {
   ensureExportedBodyIsCorrect(logRecord.body);
   ensureExportedAttributesAreCorrect(logRecord.attributes);
-  assert.strictEqual(
+  assert.deepStrictEqual(
     logRecord.timeUnixNano,
-    1680253513123241700,
+    '1680253513123241635',
     'timeUnixNano is wrong'
   );
-  assert.strictEqual(
+  assert.deepStrictEqual(
     logRecord.observedTimeUnixNano,
-    1680253513123241700,
+    '1680253513123241635',
     'observedTimeUnixNano is wrong'
   );
   assert.strictEqual(

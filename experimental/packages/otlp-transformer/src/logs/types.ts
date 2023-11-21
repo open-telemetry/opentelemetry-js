@@ -15,6 +15,7 @@
  */
 
 import type {
+  Fixed64,
   IAnyValue,
   IInstrumentationScope,
   IKeyValue,
@@ -67,10 +68,10 @@ export interface IScopeLogs {
 /** Properties of a LogRecord. */
 export interface ILogRecord {
   /** LogRecord timeUnixNano */
-  timeUnixNano: number;
+  timeUnixNano: Fixed64;
 
   /** LogRecord observedTimeUnixNano */
-  observedTimeUnixNano: number;
+  observedTimeUnixNano: Fixed64;
 
   /** LogRecord severityNumber */
   severityNumber?: ESeverityNumber;

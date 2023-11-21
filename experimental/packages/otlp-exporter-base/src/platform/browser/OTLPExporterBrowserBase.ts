@@ -20,14 +20,14 @@ import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { getEnv, baggageUtils, _globalThis } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class
  */
 export abstract class OTLPExporterBrowserBase<
   ExportItem,
-  ServiceRequest
+  ServiceRequest,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
@@ -53,11 +53,11 @@ export abstract class OTLPExporterBrowserBase<
   }
 
   onInit(): void {
-    window.addEventListener('unload', this.shutdown);
+    _globalThis.addEventListener('unload', this.shutdown);
   }
 
   onShutdown(): void {
-    window.removeEventListener('unload', this.shutdown);
+    _globalThis.removeEventListener('unload', this.shutdown);
   }
 
   send(

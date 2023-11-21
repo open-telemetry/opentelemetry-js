@@ -4,6 +4,7 @@ const cp = require('child_process');
 const path = require('path');
 
 const appRoot = process.cwd();
+const rootBinDir = path.resolve(__dirname, '..', 'node_modules', '.bin');
 
 const generatedPath = path.resolve(appRoot, './src/generated');
 const protosPath = path.resolve(appRoot, './protos');
@@ -37,15 +38,13 @@ function exec(command, argv) {
 }
 
 function pbts(pbjsOutFile) {
-  const pbtsPath = path.resolve(appRoot, './node_modules/.bin/pbts');
   const pbtsOptions = [
     '-o', path.join(generatedPath, 'root.d.ts'),
   ];
-  return exec(pbtsPath, [...pbtsOptions, pbjsOutFile]);
+  return exec(path.resolve(rootBinDir, 'pbts'), [...pbtsOptions, pbjsOutFile]);
 }
 
 async function pbjs(files) {
-  const pbjsPath = path.resolve(appRoot, './node_modules/.bin/pbjs');
   const outFile = path.join(generatedPath, 'root.js');
   const pbjsOptions = [
     '-t', 'static-module',
@@ -54,7 +53,7 @@ async function pbjs(files) {
     '--null-defaults',
     '-o', outFile,
   ];
-  await exec(pbjsPath, [...pbjsOptions, ...files]);
+  await exec(path.resolve(rootBinDir, 'pbjs'), [...pbjsOptions, ...files]);
   return outFile;
 }
 

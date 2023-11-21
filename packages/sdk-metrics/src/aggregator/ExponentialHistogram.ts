@@ -24,9 +24,10 @@ import {
 import {
   DataPointType,
   ExponentialHistogramMetricData,
+  MetricDescriptor,
 } from '../export/MetricData';
 import { diag, HrTime } from '@opentelemetry/api';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Buckets } from './exponential-histogram/Buckets';
@@ -52,7 +53,10 @@ class HighLow {
   static combine(h1: HighLow, h2: HighLow): HighLow {
     return new HighLow(Math.min(h1.low, h2.low), Math.max(h1.high, h2.high));
   }
-  constructor(public low: number, public high: number) {}
+  constructor(
+    public low: number,
+    public high: number
+  ) {}
 }
 
 const MAX_SCALE = 20;
@@ -552,7 +556,7 @@ export class ExponentialHistogramAggregator
   }
 
   toMetricData(
-    descriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<ExponentialHistogramAccumulation>[],
     endTime: HrTime
