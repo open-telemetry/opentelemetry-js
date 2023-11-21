@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.7.0",
-    "@types/mocha": "10.0.3",
+    "@types/mocha": "10.0.4",
     "@types/webpack-env": "1.16.3",
     "babel-plugin-istanbul": "6.1.1",
     "codecov": "3.8.3",
