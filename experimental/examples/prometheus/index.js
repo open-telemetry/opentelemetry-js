@@ -50,7 +50,7 @@ const observableGauge = meter.createObservableGauge(
     description: 'Example of an ObservableGauge',
   }
 );
-// Callbacks are run when the endpoint is called
+// Callbacks are run when metrics are scraped
 observableGauge.addCallback(async observableResult => {
   const value = await randomMetricPromise();
   observableResult.observe(value, attributes);
