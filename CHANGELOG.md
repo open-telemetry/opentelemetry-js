@@ -20,6 +20,9 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-web): only access location if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
+* fix(sdk-trace-base): processor onStart called with a span having empty attributes
+
 ## 1.18.1
 
 ### :bug: (Bug Fix)
