@@ -13,7 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './instrumentation';
-export * from './instrumentationNodeModuleDefinition';
-export * from './instrumentationNodeModuleFile';
-export * from './types';
+export { InstrumentationBase } from './instrumentation';

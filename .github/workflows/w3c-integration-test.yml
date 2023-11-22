@@ -16,7 +16,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: 18
 
       - name: Install and Bootstrap 🔧
         run: npm ci
