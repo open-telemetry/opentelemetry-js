@@ -1,3 +1,16 @@
+/**
+ * This script updates changelogs after lerna has updated versions in the respective areas (packages/*, experimental/packages/*)
+ * - removes all empty subsections (bugs, enhancements, etc.) in the changelog.
+ * - replaces the "Unreleased"-header with the version from the first non-private package in the directory (versions are expected to be uniform across a changelog)
+ * - adds a new "Unreleased"-header with empty subsections at the top
+ *
+ * Usage (from project root):
+ * - node scripts/update-changelog.js [PATH TO CHANGELOG] [DIRECTORY CONTAINING ASSOCIATED PACKAGES]
+ * Examples:
+ * - node scripts/update-changelog.js ./CHANGELOG.md ./packages
+ * - node scripts/update-changelog.js ./experimental/CHANGELOG.md ./experimental/packages
+ */
+
 const fs = require('fs');
 const path = require("path");
 
@@ -20,10 +33,14 @@ function findFirstPackageVersion(basePath){
   for(const packageDir of packageDirs){
     const packageJsonPath = path.join(basePath, packageDir, 'package.json');
     try {
-      const packageJson = fs.readFileSync(packageJsonPath, 'utf-8');
-      const version = JSON.parse(packageJson).version;
+      const packageJson =  JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
-      if(version != null){
+      if(packageJson.private === true || packageJson.private === 'true'){
+        console.log('Skipping version from private package at', packageJsonPath);
+        continue;
+      }
+
+      if(packageJson.version != null){
         return version;
       }
 
