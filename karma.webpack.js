@@ -20,7 +20,10 @@ const webpackNodePolyfills = require('./webpack.node-polyfills.js');
 module.exports = {
   mode: 'development',
   target: 'web',
-  output: { filename: 'bundle.js' },
+  output: {
+    filename: 'bundle.js',
+    hashFunction: 'xxhash64',
+  },
   resolve: { extensions: ['.ts', '.js'] },
   devtool: 'eval-source-map',
   module: {
