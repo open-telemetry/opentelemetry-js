@@ -21,6 +21,7 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:browser": "karma start --single-run",
+    "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
     "prewatch": "node ../../../scripts/version-update.js",
     "watch": "tsc --build -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
@@ -58,7 +59,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.7.0",
-    "@types/mocha": "10.0.3",
+    "@types/mocha": "10.0.4",
     "@types/webpack-env": "1.16.3",
     "babel-plugin-istanbul": "6.1.1",
     "codecov": "3.8.3",
