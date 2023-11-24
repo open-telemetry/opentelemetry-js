@@ -108,7 +108,7 @@ export class Span implements APISpan, ReadableSpan {
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
-    if(initAttributes){
+    if (initAttributes != null) {
       this.setAttributes(initAttributes);
     }
 
