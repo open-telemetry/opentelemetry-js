@@ -101,7 +101,7 @@ export class Span implements APISpan, ReadableSpan {
     links: Link[] = [],
     startTime?: TimeInput,
     _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
-    initAttributes?:SpanAttributes
+    initAttributes?: SpanAttributes
   ) {
     this.name = spanName;
     this._spanContext = spanContext;
