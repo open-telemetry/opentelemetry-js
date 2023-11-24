@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700632579079,
+  "lastUpdate": 1700785955037,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -738,6 +738,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "133362191+strivly@users.noreply.github.com",
+            "name": "strivly",
+            "username": "strivly"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8067d9721021cb25f94534a27cd2e6298ef7f6a2",
+          "message": "chore(ci): install semver globally to speed up \"peer-api\" workflow (#4270)\n\nCloses: #4242",
+          "timestamp": "2023-11-23T15:54:44-08:00",
+          "tree_id": "ebf014a05df6da8bd46b2e152f9949cbc7ffb072",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8067d9721021cb25f94534a27cd2e6298ef7f6a2"
+        },
+        "date": 1700785954148,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 709321,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8496,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 701095,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 643699,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
