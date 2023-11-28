@@ -65,7 +65,7 @@ export class WebSDK {
   private _disabled?: boolean;
 
   /**
-   * Create a new NodeJS SDK instance
+   * Create a new Web SDK instance
    */
   public constructor(configuration: Partial<WebSDKConfiguration> = {}) {
     this._resource = configuration.resource ?? new Resource({});
