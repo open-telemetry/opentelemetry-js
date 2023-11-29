@@ -42,9 +42,18 @@ export interface ExportServiceError {
 }
 
 /**
+ * Shutdown of the exporter is bound to a configurable browser event typed here.
+ * https://developer.chrome.com/articles/deprecating-unload/
+ * https://github.com/open-telemetry/opentelemetry-js/issues/2205
+ * Using 'unload' currently blocks OTEL implementing site from bfcache.
+ */
+export type ShutdownEvent = 'unload' | 'onhide' | 'pagehide' | 'beforeunload';
+
+/**
  * Collector Exporter base config
  */
 export interface OTLPExporterConfigBase {
+  shutDownEvent?: ShutdownEvent;
   headers?: Partial<Record<string, unknown>>;
   hostname?: string;
   url?: string;

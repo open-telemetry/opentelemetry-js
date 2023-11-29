@@ -24,6 +24,7 @@ import {
   OTLPExporterError,
   OTLPExporterConfigBase,
   ExportServiceError,
+  ShutdownEvent,
 } from './types';
 import { configureExporterTimeout } from './util';
 
@@ -36,6 +37,7 @@ export abstract class OTLPExporterBase<
   ServiceRequest,
 > {
   public readonly url: string;
+  public readonly shutDownEvent: ShutdownEvent;
   public readonly hostname: string | undefined;
   public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
@@ -47,6 +49,7 @@ export abstract class OTLPExporterBase<
    */
   constructor(config: T = {} as T) {
     this.url = this.getDefaultUrl(config);
+    this.shutDownEvent = config.shutDownEvent ?? 'unload';
     if (typeof config.hostname === 'string') {
       this.hostname = config.hostname;
     }
