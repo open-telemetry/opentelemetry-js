@@ -41,7 +41,7 @@ function findFirstPackageVersion(basePath){
       }
 
       if(packageJson.version != null){
-        return version;
+        return packageJson.version;
       }
 
       console.log('Version in', packageJsonPath, 'was null or undefined, skipping');
