@@ -1,12 +1,12 @@
 {
-  "name": "@opentelemetry/context-zone-peer-dep",
-  "version": "1.18.1",
+  "name": "@rbrennan-dev/context-zone-peer-dep",
+  "version": "1.18.2-alpha.a0421723",
   "description": "OpenTelemetry Context Zone with peer dependency for zone.js",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "repository": "open-telemetry/opentelemetry-js",
+  "repository": "rodgerbrennan/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
@@ -50,7 +50,8 @@
     "README.md"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "@babel/core": "7.23.3",
@@ -86,5 +87,5 @@
     "zone.js": "^0.10.2 || ^0.11.0 || ^0.13.0"
   },
   "sideEffects": false,
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"
+  "homepage": "https://github.com/rodgerbrennan/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"
 }
