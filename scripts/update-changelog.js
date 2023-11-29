@@ -52,26 +52,14 @@ function findFirstPackageVersion(basePath){
   throw new Error('Unable to extract version from packages in ' + basePath);
 }
 
-function replaceEmptySection(changelog){
-  // Only match ## at the end in case the last header does not have any entries and the next one is '## version',
-  // this makes it safe to replace with only '##'
-  return changelog.replace(RegExp('###.*\n*##', 'gm'), '##');
-}
-
 // no special handling for bad args as this is only intended for use via predefined npm scripts.
 const changelogPath = path.resolve(process.argv[2]);
 const version = findFirstPackageVersion(path.resolve(process.argv[3]));
 
-let changelog = fs.readFileSync(changelogPath, 'utf8').toString();
-let previousChangelog = replaceEmptySection(changelog);
-
-// keep replacing until there's nothing to replace anymore
-while(changelog !== previousChangelog){
-  previousChangelog = changelog;
-  changelog = replaceEmptySection(changelog);
-}
-
-// replace unreleased header with new unreleased section and a version header for the former unreleased section
-changelog = changelog.replace(RegExp('## Unreleased'), EMPTY_UNRELEASED_SECTION + '## ' + version);
+const changelog = fs.readFileSync(changelogPath, 'utf8').toString()
+  // replace all empty sections
+  .replace(new RegExp('^###.*\n*(?=^##)', 'gm'), '')
+  // replace unreleased header with new unreleased section and a version header for the former unreleased section
+  .replace(RegExp('## Unreleased'), EMPTY_UNRELEASED_SECTION + '## ' + version);
 
 fs.writeFileSync(changelogPath, changelog);
