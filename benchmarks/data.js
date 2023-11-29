@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700785955037,
+  "lastUpdate": 1701275377631,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -790,6 +790,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "38db748685ed8745438b3b8ba99ec5e38ef551e5",
+          "message": "fix(ci): remove token setup via environment variable from .npmrc (#4329)",
+          "timestamp": "2023-11-29T17:28:21+01:00",
+          "tree_id": "7187910a71415aeb207c84f28e92c673e0d06ca2",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/38db748685ed8745438b3b8ba99ec5e38ef551e5"
+        },
+        "date": 1701275376772,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 718653,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8747,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 667255,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 651003,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
