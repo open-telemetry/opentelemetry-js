@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1701330705337,
+  "lastUpdate": 1701353527838,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -894,6 +894,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.66%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cc4ff2d15897ec3315aaf59728b0247864ed494a",
+          "message": "Merge pull request #4332 from dyladan/node-20-leak\n\nfix(instrumentation-http): resume responses when there is no response…",
+          "timestamp": "2023-11-30T09:10:53-05:00",
+          "tree_id": "dc35be4b6250cc6372c2cf8a2fefb09e8b9ba48f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/cc4ff2d15897ec3315aaf59728b0247864ed494a"
+        },
+        "date": 1701353526937,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 696544,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7771,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 669047,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 649577,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
