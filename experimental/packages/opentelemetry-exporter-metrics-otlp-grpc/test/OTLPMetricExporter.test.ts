@@ -328,10 +328,7 @@ describe('when configuring via environment', () => {
     const collectorExporter = new OTLPMetricExporter({
       url: constructorDefinedEndpoint,
     });
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      constructorDefinedEndpoint
-    );
+    assert.strictEqual(collectorExporter._otlpExporter.url, 'constructor');
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should use headers defined via env', () => {
