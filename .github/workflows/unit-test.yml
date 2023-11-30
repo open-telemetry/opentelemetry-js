@@ -15,6 +15,7 @@ jobs:
           - "14"
           - "16"
           - "18"
+          - "20"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
