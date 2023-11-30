@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-export * from './autoLoader';
-export { InstrumentationBase } from './platform/index';
-export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
-export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
-export * from './types';
-export * from './types_internal';
-export * from './utils';
+import {
+  InstrumentationModuleDefinition,
+  InstrumentationModuleFile,
+} from './types';
+
+export class InstrumentationNodeModuleDefinition<T>
+  implements InstrumentationModuleDefinition<T>
+{
+  files: InstrumentationModuleFile<T>[];
+  constructor(
+    public name: string,
+    public supportedVersions: string[],
+    public patch?: (exports: T, moduleVersion?: string) => T,
+    public unpatch?: (exports: T, moduleVersion?: string) => void,
+    files?: InstrumentationModuleFile<any>[]
+  ) {
+    this.files = files || [];
+  }
+}
