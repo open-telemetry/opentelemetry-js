@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1701275377631,
+  "lastUpdate": 1701330705337,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -842,6 +842,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.30%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f6546365029a8f700a0096af396914d6b703c824",
+          "message": "feat: add script to update changelogs on release preparation (#4315)\n\n* feat: add script to update changelogs on releases\r\n\r\n* fix: address comments\r\n\r\n* Apply suggestions from code review\r\n\r\nCo-authored-by: Trent Mick <trentm@gmail.com>\r\n\r\n* fix: apply suggestions from code review\r\n\r\n* fix: use packageJson.version instead of version\r\n\r\n---------\r\n\r\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2023-11-30T08:50:29+01:00",
+          "tree_id": "be041aa01b7770f987903350eacba1871cc5f1f4",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f6546365029a8f700a0096af396914d6b703c824"
+        },
+        "date": 1701330704438,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 705678,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8504,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 659180,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 628902,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
