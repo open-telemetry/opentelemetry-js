@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1701353527838,
+  "lastUpdate": 1701354239265,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -946,6 +946,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "593d220465c92393a7be9d099f27488c11ea42d6",
+          "message": "Merge pull request #4335 from dyladan/node-20-test\n\ntest: make rawRequest HTTP-compliant",
+          "timestamp": "2023-11-30T09:22:44-05:00",
+          "tree_id": "3e710b24d5d0a12bfc639a3fde53b8dec03023df",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/593d220465c92393a7be9d099f27488c11ea42d6"
+        },
+        "date": 1701354238378,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 709302,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8680,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 673661,
+            "range": "±1.61%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 649926,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
