@@ -13,11 +13,7 @@ jobs:
       matrix:
         node_version:
           - "18"
-<<<<<<< HEAD
           - "20"
-=======
-          # - "20" # disabled until http instrumentation can be fixed
->>>>>>> origin/next
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
