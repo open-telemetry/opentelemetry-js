@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import {
-  AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { B3Propagator, B3InjectEncoding } from '@opentelemetry/propagator-b3';
@@ -23,7 +22,6 @@ import {
   PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
 } from '@opentelemetry/sdk-trace-base';
-import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 
@@ -58,10 +56,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
   override register(config: SDKRegistrationConfig = {}): void {
     if (config.contextManager === undefined) {
-      const ContextManager = semver.gte(process.version, '14.8.0')
-        ? AsyncLocalStorageContextManager
-        : AsyncHooksContextManager;
-      config.contextManager = new ContextManager();
+      config.contextManager = new AsyncLocalStorageContextManager();
       config.contextManager.enable();
     }
 

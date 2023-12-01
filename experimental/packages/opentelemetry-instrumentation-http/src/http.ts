@@ -395,10 +395,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         };
 
         response.on('end', endHandler);
-        // See https://github.com/open-telemetry/opentelemetry-js/pull/3625#issuecomment-1475673533
-        if (semver.lt(process.version, '16.0.0')) {
-          response.on('close', endHandler);
-        }
         response.on(errorMonitor, (error: Err) => {
           this._diag.debug('outgoingRequest on error()', error);
           if (responseFinished) {
@@ -606,18 +602,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         options,
         extraOptions
       );
-      /**
-       * Node 8's https module directly call the http one so to avoid creating
-       * 2 span for the same request we need to check that the protocol is correct
-       * See: https://github.com/nodejs/node/blob/v8.17.0/lib/https.js#L245
-       */
-      if (
-        component === 'http' &&
-        semver.lt(process.version, '9.0.0') &&
-        optionsParsed.protocol === 'https:'
-      ) {
-        return original.apply(this, [optionsParsed, ...args]);
-      }
 
       if (
         utils.isIgnored(

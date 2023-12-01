@@ -72,8 +72,7 @@
     "@opentelemetry/core": "1.18.1",
     "@opentelemetry/resources": "1.18.1",
     "@opentelemetry/sdk-metrics": "1.18.1",
-    "require-in-the-middle": "^7.1.1",
-    "semver": "^7.5.2"
+    "require-in-the-middle": "^7.1.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/shim-opencensus",
   "sideEffects": false

@@ -22,9 +22,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { ShimTracer } from '../src/ShimTracer';
-import * as semver from 'semver';
 import {
-  AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { Tracer, TracerProvider, context } from '@opentelemetry/api';
@@ -61,10 +59,7 @@ export function setupNodeContextManager(
   before: Mocha.HookFunction,
   after: Mocha.HookFunction
 ) {
-  const ContextManager = semver.gte(process.version, '14.8.0')
-    ? AsyncLocalStorageContextManager
-    : AsyncHooksContextManager;
-  const instance = new ContextManager();
+  const instance = new AsyncLocalStorageContextManager();
   instance.enable();
   before(() => context.setGlobalContextManager(instance));
   after(() => context.disable());
