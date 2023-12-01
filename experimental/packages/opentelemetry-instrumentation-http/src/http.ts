@@ -38,7 +38,6 @@ import {
 import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
-import * as semver from 'semver';
 import * as url from 'url';
 import {
   Err,
