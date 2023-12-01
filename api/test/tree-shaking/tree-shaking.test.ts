@@ -24,7 +24,7 @@ import * as realFs from 'fs';
 /**
  * Verify that tree-shaking can be properly applied on the @opentelemetry/api package.
  * Unused optional apis should be able to be removed from the final bundle.
- * 
+ *
  * Webpack doesn't run in node 8 because it requires BigInt. Since we are testing
  * build tooling here, we can safely skip tooling we know can't run anyway.
  */
@@ -46,11 +46,11 @@ if (parseInt(process.version.split('.')[0], 10) >= 10) {
       },
     ];
     const APIMatcher = /(?:class|function) (\w+API)/g;
-  
+
     const sourceCodePath = path.join(__dirname, 'test.js');
     const outputPath = path.join(__dirname, 'output');
     const outputFilename = path.join(outputPath, 'bundle.js');
-  
+
     afterEach(() => {
       try {
         mfs.unlinkSync(outputFilename);
@@ -58,7 +58,7 @@ if (parseInt(process.version.split('.')[0], 10) >= 10) {
         /** ignore */
       }
     });
-  
+
     for (const testAPI of testAPIs) {
       it(`verify ${testAPI.name}`, async () => {
         const sourceCode = `
@@ -67,7 +67,7 @@ if (parseInt(process.version.split('.')[0], 10) >= 10) {
         `;
         mfs.mkdirpSync(path.dirname(sourceCodePath));
         mfs.writeFileSync(sourceCodePath, sourceCode, { encoding: 'utf8' });
-  
+
         const compiler = webpack({
           entry: sourceCodePath,
           output: {
@@ -82,10 +82,10 @@ if (parseInt(process.version.split('.')[0], 10) >= 10) {
             concatenateModules: false,
           },
         });
-  
+
         const fs = new Union();
         fs.use(mfs as any).use(realFs);
-  
+
         //direct webpack to use unionfs for file input
         compiler.inputFileSystem = fs;
         //direct webpack to output to memoryfs rather than to disk
@@ -93,7 +93,7 @@ if (parseInt(process.version.split('.')[0], 10) >= 10) {
           ...mfs,
           join: path.join,
         } as any;
-  
+
         const stats = await new Promise<webpack.Stats>((resolve, reject) => {
           compiler.run((err, stats) => {
             if (err) {
@@ -104,7 +104,7 @@ if (parseInt(process.version.split('.')[0], 10) >= 10) {
         });
         assert.deepStrictEqual(stats.compilation.errors, []);
         assert.deepStrictEqual(stats.compilation.warnings, []);
-  
+
         const outputFile = mfs.readFileSync(outputFilename, 'utf8') as string;
         const matches = new Set();
         let match;
@@ -114,12 +114,12 @@ if (parseInt(process.version.split('.')[0], 10) >= 10) {
             matches.add(match[1]);
           }
         } while (match);
-  
+
         // Remove allowed apis from checking list.
         allowedAPIs.forEach(it => matches.delete(it));
-  
+
         assert.deepStrictEqual(Array.from(matches), [testAPI.name]);
       });
     }
-  })
+  });
 }
