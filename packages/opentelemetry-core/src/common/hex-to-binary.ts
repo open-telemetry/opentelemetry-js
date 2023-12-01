@@ -13,8 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { hexToBinary } from '../../common/hex-to-binary';
 
-export function hexToBase64(hexStr: string): string {
-  return Buffer.from(hexToBinary(hexStr)).toString('base64');
+function intValue(charCode: number): number {
+  // 0-9
+  if (charCode >= 48 && charCode <= 57) {
+    return charCode - 48;
+  }
+
+  // a-f
+  if (charCode >= 97 && charCode <= 102) {
+    return charCode - 87;
+  }
+
+  // A-F
+  return charCode - 55;
+}
+
+export function hexToBinary(hexStr: string): Uint8Array {
+  const buf = new Uint8Array(hexStr.length / 2);
+  let offset = 0;
+
+  for (let i = 0; i < hexStr.length; i += 2) {
+    const hi = intValue(hexStr.charCodeAt(i));
+    const lo = intValue(hexStr.charCodeAt(i + 1));
+    buf[offset++] = (hi << 4) | lo;
+  }
+
+  return buf;
 }
