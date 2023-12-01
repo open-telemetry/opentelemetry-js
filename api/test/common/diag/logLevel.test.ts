@@ -81,7 +81,11 @@ describe('LogLevelFilter DiagLogger', () => {
     ignoreFuncs: Array<keyof DiagLogger>;
   }> = [
     { message: 'ALL', level: DiagLogLevel.ALL, ignoreFuncs: [] },
-    { message: 'greater than ALL', level: 32768 as unknown as DiagLogLevel, ignoreFuncs: [] },
+    {
+      message: 'greater than ALL',
+      level: 32768 as unknown as DiagLogLevel,
+      ignoreFuncs: [],
+    },
     { message: 'VERBOSE', level: DiagLogLevel.VERBOSE, ignoreFuncs: [] },
     { message: 'DEBUG', level: DiagLogLevel.DEBUG, ignoreFuncs: ['verbose'] },
     {
