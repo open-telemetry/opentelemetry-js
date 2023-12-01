@@ -25,6 +25,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest
@@ -60,6 +63,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: '18'
 
       - run: npm install -g npm@latest
@@ -86,6 +92,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: 16
 
       - name: Bootstrap
@@ -107,6 +116,9 @@ jobs:
         uses: actions/checkout@v4.0.0
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: 16
 
       - name: Bootstrap
@@ -134,6 +146,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: ${{ matrix.node_version }}
 
       - name: Build
