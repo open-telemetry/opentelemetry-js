@@ -15,6 +15,7 @@ jobs:
           - "14"
           - "16"
           - "18"
+          - "20"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -42,7 +43,7 @@ jobs:
       - name: Unit tests
         run: |
           # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
-          if [ "${{ matrix.node_version }}" = "18" ]; then
+          if [ "${{ matrix.node_version }}" = "18" ] || [ "${{ matrix.node_version }}" == "20" ]; then
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
           npm run test
