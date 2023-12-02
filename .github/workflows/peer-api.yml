@@ -20,7 +20,7 @@ jobs:
         run: npm install -g lerna@6.6.2
 
       - name: Install semver
-        run: npm install semver
+        run: npm install -g semver
 
       - name: Check API dependency semantics
         working-directory: packages

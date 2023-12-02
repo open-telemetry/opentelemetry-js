@@ -330,6 +330,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         this._diag.debug('outgoingRequest on response()');
+        if (request.listenerCount('response') <= 1) {
+          response.resume();
+        }
         const responseAttributes =
           utils.getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);

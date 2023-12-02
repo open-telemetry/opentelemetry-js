@@ -26,16 +26,19 @@ import {
 } from '@opentelemetry/api';
 import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
 import * as shimmer from 'shimmer';
-import { InstrumentationModuleDefinition } from './platform/node';
-import * as types from './types';
+import {
+  InstrumentationModuleDefinition,
+  Instrumentation,
+  InstrumentationConfig,
+} from './types';
 
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
 export abstract class InstrumentationAbstract<T = any>
-  implements types.Instrumentation
+  implements Instrumentation
 {
-  protected _config: types.InstrumentationConfig;
+  protected _config: InstrumentationConfig;
 
   private _tracer: Tracer;
   private _meter: Meter;
@@ -45,7 +48,7 @@ export abstract class InstrumentationAbstract<T = any>
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: types.InstrumentationConfig = {}
+    config: InstrumentationConfig = {}
   ) {
     this._config = {
       enabled: true,
@@ -113,7 +116,7 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /* Returns InstrumentationConfig */
-  public getConfig(): types.InstrumentationConfig {
+  public getConfig(): InstrumentationConfig {
     return this._config;
   }
 
@@ -121,7 +124,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: types.InstrumentationConfig = {}): void {
+  public setConfig(config: InstrumentationConfig = {}): void {
     this._config = Object.assign({}, config);
   }
 

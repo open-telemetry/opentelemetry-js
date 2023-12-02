@@ -17,6 +17,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * chore: type reference on zone.js [#4257](https://github.com/open-telemetry/opentelemetry-js/pull/4257) @legendecas
 * chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
+* test: add node 20 to test matrix [#4336](https://github.com/open-telemetry/opentelemetry-js/pull/4336) @dyladan
 
 ### :bug: (Bug Fix)
 
@@ -365,15 +366,7 @@ There are no changes between 1.0.0 and the previous 0.33.0 version.
 
 * fix(sdk-web): parse url with relative url string [#2972](https://github.com/open-telemetry/opentelemetry-js/pull/2972) @legendecas
 
-### :books: (Refine Doc)
-
-### :house: (Internal)
-
 ## 1.2.0
-
-### :boom: Breaking Change
-
-### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
@@ -2290,7 +2283,9 @@ Released 2020-03-19
 
 Released 2020-03-16
 
-### This is a first official beta release, which provides almost fully complete metrics, tracing, and context propagation functionality but makes no promises around breaking changes
+### First official beta release
+
+* provides almost fully complete metrics, tracing, and context propagation functionality but makes **no promises** around breaking changes
 
 ### :boom: Breaking Change
 
