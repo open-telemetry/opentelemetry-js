@@ -22,7 +22,7 @@ export async function sendRequestTwice(
   port: number
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const request = 'GET /raw HTTP/1.1\n\n';
+    const request = `GET /raw HTTP/1.1\r\nHost: ${host}:${port}\r\n\r\n`;
     const socket = net.createConnection({ host, port }, () => {
       socket.write(`${request}${request}`, err => {
         if (err) reject(err);

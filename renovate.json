@@ -17,7 +17,7 @@
       "schedule": ["before 3am on Monday"]
     },
     {
-      "matchPackageNames": ["typescript", "webpack", "webpack-cli"],
+      "matchPackageNames": ["typescript", "webpack", "webpack-cli", "lerna"],
       "dependencyDashboardApproval": true
     }
   ],

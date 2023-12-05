@@ -15,6 +15,7 @@ jobs:
           - "14"
           - "16"
           - "18"
+          - "20"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -22,8 +23,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest
@@ -42,7 +46,7 @@ jobs:
       - name: Unit tests
         run: |
           # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
-          if [ "${{ matrix.node_version }}" = "18" ]; then
+          if [ "${{ matrix.node_version }}" = "18" ] || [ "${{ matrix.node_version }}" == "20" ]; then
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
           npm run test
@@ -57,8 +61,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: '18'
 
       - run: npm install -g npm@latest
@@ -83,8 +90,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: 16
 
       - name: Bootstrap
@@ -104,8 +114,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.0.0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: 16
 
       - name: Bootstrap
@@ -131,8 +144,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: ${{ matrix.node_version }}
 
       - name: Build
