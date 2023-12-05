@@ -111,6 +111,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version    | Supported                                     |
 |---------------------|-----------------------------------------------|
+| Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
 | Node.JS `v16`       | :heavy_check_mark:                            |
 | Node.JS `v14`       | :heavy_check_mark:                            |

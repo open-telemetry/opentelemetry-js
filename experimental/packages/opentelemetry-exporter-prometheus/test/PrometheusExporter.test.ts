@@ -360,8 +360,8 @@ describe('PrometheusExporter', () => {
           .get('http://localhost:9464/metrics', res => {
             errorHandler(done)(new Error('unreachable'));
           })
-          .on('error', err => {
-            assert(`${err}`.match('ECONNREFUSED'));
+          .on('error', (err: any) => {
+            assert.equal(err.code, 'ECONNREFUSED');
             done();
           });
       });
