@@ -8,6 +8,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-logs): add droppedAttributesCount field to ReadableLogRecord
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-logs): avoid map attribute set when count limit exceeded

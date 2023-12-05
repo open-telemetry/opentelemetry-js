@@ -49,6 +49,7 @@ export const mockedReadableLogRecord: ReadableLogRecord = {
   attributes: {
     'some-attribute': 'some attribute value',
   },
+  droppedAttributesCount: 0,
   severityNumber: SeverityNumber.ERROR,
   severityText: 'error',
   body: 'some_log_body',

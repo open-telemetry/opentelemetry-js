@@ -107,6 +107,7 @@ describe('Logs', () => {
         attributes: {
           'some-attribute': 'some attribute value',
         },
+        droppedAttributesCount: 0,
         severityNumber: SeverityNumber.ERROR,
         severityText: 'error',
         body: 'some_log_body',
@@ -122,6 +123,7 @@ describe('Logs', () => {
         attributes: {
           'another-attribute': 'another attribute value',
         },
+        droppedAttributesCount: 0,
       };
       log_1_1_1 = {
         ...log_fragment_1,
