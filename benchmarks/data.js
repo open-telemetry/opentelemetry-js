@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1701455526644,
+  "lastUpdate": 1701787580599,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -1102,6 +1102,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.86%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "hyunnoh01@gmail.com",
+            "name": "Hyun Oh",
+            "username": "HyunnoH"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "dcf93e85065a2cb2d255278421d39a7b57941b72",
+          "message": "feat(sdk-logs): add droppedAttributesCount field to ReadableLogRecord (#4289)\n\n* feat(sdk-logs): add droppedAttributesCount field to ReadableLogRecord\r\n\r\n* chore: check droppedAttributesCount value in test case\r\n\r\n* feat(otlp-transformer): make toLogRecord() use ReadableLogRecord.droppedAttributesCount\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2023-12-05T08:48:21-05:00",
+          "tree_id": "5171e97169b8460b78430d8196e538b73c9ec8ef",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/dcf93e85065a2cb2d255278421d39a7b57941b72"
+        },
+        "date": 1701787579679,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 698146,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7585,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 693755,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 645495,
+            "range": "±0.65%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
