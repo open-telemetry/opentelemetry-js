@@ -675,6 +675,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
+      } else {
+        // Make a copy of the headers object to avoid mutating an object the
+        // caller might have a reference to.
+        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
       }
       propagation.inject(requestContext, optionsParsed.headers);
 
