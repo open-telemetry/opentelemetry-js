@@ -20,6 +20,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation-fetch): only access navigator if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
   * allows for experimental usage of this instrumentation with non-browser runtimes
 * fix(instrumentation-http): memory leak when responses are not resumed
+* fix(instrumentation-http): Do not mutate given headers object for outgoing http requests. Fixes aws-sdk signing error on retries. [#4346](https://github.com/open-telemetry/opentelemetry-js/pull/4346)
 
 ## 0.45.1
 
