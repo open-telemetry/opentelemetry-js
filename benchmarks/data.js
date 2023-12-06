@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1701854150001,
+  "lastUpdate": 1701859959692,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -1204,6 +1204,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 640835,
             "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "441333+Vunovati@users.noreply.github.com",
+            "name": "Vladimir Adamić",
+            "username": "Vunovati"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4daa2640d2e2312974f6b1cfdebb44f6d02cf046",
+          "message": "fix: programmatic url and headers take precedence in metric exporters… (#4334)\n\n* fix: programmatic url and headers take precedence in metric exporters (#2370)\r\n\r\n* chore: adjust grpc exporter metrics test\r\n\r\n* chore(changelog): update changelog",
+          "timestamp": "2023-12-06T11:51:17+01:00",
+          "tree_id": "4f5b30c0d4d08f582ddf67cc6de9e05508e06984",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4daa2640d2e2312974f6b1cfdebb44f6d02cf046"
+        },
+        "date": 1701859958854,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 706031,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8671,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 683143,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 671636,
+            "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
