@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1701859959692,
+  "lastUpdate": 1701879336875,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -1258,6 +1258,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5b0fb7b40dd6809dc9c362378b90e0ee8fa45f62",
+          "message": "fix(instrumentation-http): do not mutate given headers object for outgoing http requests (#4346)\n\nFixes: https://github.com/open-telemetry/opentelemetry-js-contrib/issues/1609",
+          "timestamp": "2023-12-06T08:08:18-08:00",
+          "tree_id": "f6f7ee7711c94c2c0fb5391769264c2ca07a0126",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5b0fb7b40dd6809dc9c362378b90e0ee8fa45f62"
+        },
+        "date": 1701879335983,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 692361,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7614,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 666590,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 645402,
+            "range": "±0.71%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
