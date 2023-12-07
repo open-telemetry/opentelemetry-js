@@ -21,8 +21,9 @@ import {
   getEnv,
   globalErrorHandler,
   unrefTimer,
-  callWithTimeout,
   BindOnceFuture,
+  internal,
+  callWithTimeout,
 } from '@opentelemetry/core';
 
 import type { BufferConfig } from '../types';
@@ -165,18 +166,39 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
 
   private _export(logRecords: LogRecord[]): Promise<ExportResult> {
     return new Promise((resolve, reject) => {
-      this._exporter.export(logRecords, (res: ExportResult) => {
-        if (res.code !== ExportResultCode.SUCCESS) {
-          reject(
-            res.error ??
-              new Error(
-                `BatchLogRecordProcessorBase: log record export failed (status ${res})`
-              )
-          );
-          return;
-        }
-        resolve(res);
-      });
+      const doExport = () =>
+        internal
+          ._export(this._exporter, logRecords)
+          .then((result: ExportResult) => {
+            if (result.code !== ExportResultCode.SUCCESS) {
+              globalErrorHandler(
+                result.error ??
+                  new Error(
+                    `BatchLogRecordProcessor: log record export failed (status ${result})`
+                  )
+              );
+            }
+            resolve(result);
+          })
+          .catch(error => {
+            globalErrorHandler(error);
+          });
+
+      const pendingResources = logRecords
+        .map(logRecord => logRecord.resource)
+        .filter(resource => resource.asyncAttributesPending);
+
+      // Avoid scheduling a promise to make the behavior more predictable and easier to test
+      if (pendingResources.length === 0) {
+        doExport().catch(reject);
+      } else {
+        Promise.all(
+          pendingResources.map(resource => resource.waitForAsyncAttributes?.())
+        ).then(doExport, err => {
+          globalErrorHandler(err);
+          reject(err);
+        });
+      }
     });
   }
 

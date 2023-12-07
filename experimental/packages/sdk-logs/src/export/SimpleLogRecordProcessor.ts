@@ -19,17 +19,20 @@ import {
   BindOnceFuture,
   ExportResultCode,
   globalErrorHandler,
+  internal,
 } from '@opentelemetry/core';
-
+import { Resource } from '@opentelemetry/resources';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { LogRecord } from './../LogRecord';
 
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
+  private _unresolvedExports: Set<Promise<void>>;
 
   constructor(private readonly _exporter: LogRecordExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+    this._unresolvedExports = new Set<Promise<void>>();
   }
 
   public onEmit(logRecord: LogRecord): void {
@@ -37,22 +40,49 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
       return;
     }
 
-    this._exporter.export([logRecord], (res: ExportResult) => {
-      if (res.code !== ExportResultCode.SUCCESS) {
-        globalErrorHandler(
-          res.error ??
-            new Error(
-              `SimpleLogRecordProcessor: log record export failed (status ${res})`
-            )
+    const doExport = () =>
+      internal
+        ._export(this._exporter, [logRecord])
+        .then((result: ExportResult) => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              result.error ??
+                new Error(
+                  `SimpleLogRecordProcessor: log record export failed (status ${result})`
+                )
+            );
+          }
+        })
+        .catch(error => {
+          globalErrorHandler(error);
+        });
+
+    // Avoid scheduling a promise to make the behavior more predictable and easier to test
+    if (logRecord.resource.asyncAttributesPending) {
+      const exportPromise = (logRecord.resource as Resource)
+        .waitForAsyncAttributes?.()
+        .then(
+          () => {
+            if (exportPromise != null) {
+              this._unresolvedExports.delete(exportPromise);
+            }
+            return doExport();
+          },
+          err => globalErrorHandler(err)
         );
-        return;
+
+      // store the unresolved exports
+      if (exportPromise != null) {
+        this._unresolvedExports.add(exportPromise);
       }
-    });
+    } else {
+      void doExport();
+    }
   }
 
-  public forceFlush(): Promise<void> {
-    // do nothing as all log records are being exported without waiting
-    return Promise.resolve();
+  public async forceFlush(): Promise<void> {
+    // await unresolved resources before resolving
+    await Promise.all(Array.from(this._unresolvedExports));
   }
 
   public shutdown(): Promise<void> {
