@@ -9,8 +9,11 @@ All notable changes to experimental packages in this project will be documented 
 * fix(exporter-metrics-otlp-grpc): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
 * fix(exporter-metrics-otlp-http): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
 * fix(exporter-metrics-otlp-proto): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
-
+* fix(exporter-logs-otlp-http): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
 * fix(exporter-logs-otlp-proto): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
+* fix(exporter-trace-otlp-http): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
+* fix(exporter-trace-otlp-proto): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
+
 ### :rocket: (Enhancement)
 
 * feat(sdk-logs): add droppedAttributesCount field to ReadableLogRecord
