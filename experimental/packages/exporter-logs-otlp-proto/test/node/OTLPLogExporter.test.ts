@@ -99,7 +99,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
         url: constructorDefinedEndpoint,
       });
       assert.strictEqual(collectorExporter.url, constructorDefinedEndpoint);
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     });
     it('should add root path when signal url defined in env contains no path and no root path', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar';
