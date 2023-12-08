@@ -21,6 +21,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(api-logs): allow for TimeInput type for LogRecord timestamps [#4345](https://github.com/open-telemetry/opentelemetry-js/pull/4345)
 * fix(sdk-trace-web): only access location if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
 * fix(sdk-trace-base): processor onStart called with a span having empty attributes
 
