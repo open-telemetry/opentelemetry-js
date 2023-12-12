@@ -6,9 +6,21 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* fix(exporter-metrics-otlp-grpc): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
-* fix(exporter-metrics-otlp-http): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
-* fix(exporter-metrics-otlp-proto): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.46.0
+
+### :boom: Breaking Change
+
+* fix(exporter-metrics-otlp-grpc): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
+* fix(exporter-metrics-otlp-http): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
+* fix(exporter-metrics-otlp-proto): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
 
 ### :rocket: (Enhancement)
 
@@ -21,6 +33,7 @@ All notable changes to experimental packages in this project will be documented 
   * allows for experimental usage of this instrumentation with non-browser runtimes
 * fix(instrumentation-http): memory leak when responses are not resumed
 * fix(instrumentation-http): Do not mutate given headers object for outgoing http requests. Fixes aws-sdk signing error on retries. [#4346](https://github.com/open-telemetry/opentelemetry-js/pull/4346)
+* fix(instrumentation): support Node.js v18.19.0 by using import-in-the-middle@1.6.0
 
 ## 0.45.1
 
