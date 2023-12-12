@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@types/shimmer": "^1.0.2",
-    "import-in-the-middle": "1.4.2",
+    "import-in-the-middle": "1.6.0",
     "require-in-the-middle": "^7.1.1",
     "semver": "^7.5.2",
     "shimmer": "^1.2.1"
