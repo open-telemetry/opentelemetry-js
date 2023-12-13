@@ -28,98 +28,99 @@ import * as realFs from 'fs';
  * Webpack doesn't run in node 8 because it requires BigInt. Since we are testing
  * build tooling here, we can safely skip tooling we know can't run anyway.
  */
-if (parseInt(process.version.split('.')[0], 10) >= 10) {
-  describe('tree-shaking', () => {
-    const allowedAPIs = ['ContextAPI', 'DiagAPI'];
-    const testAPIs = [
-      {
-        name: 'MetricsAPI',
-        export: 'metrics',
-      },
-      {
-        name: 'PropagationAPI',
-        export: 'propagation',
-      },
-      {
-        name: 'TraceAPI',
-        export: 'trace',
-      },
-    ];
-    const APIMatcher = /(?:class|function) (\w+API)/g;
+describe('tree-shaking', () => {
+  const allowedAPIs = ['ContextAPI', 'DiagAPI'];
+  const testAPIs = [
+    {
+      name: 'MetricsAPI',
+      export: 'metrics',
+    },
+    {
+      name: 'PropagationAPI',
+      export: 'propagation',
+    },
+    {
+      name: 'TraceAPI',
+      export: 'trace',
+    },
+  ];
+  const APIMatcher = /(?:class|function) (\w+API)/g;
 
-    const sourceCodePath = path.join(__dirname, 'test.js');
-    const outputPath = path.join(__dirname, 'output');
-    const outputFilename = path.join(outputPath, 'bundle.js');
+  const sourceCodePath = path.join(__dirname, 'test.js');
+  const outputPath = path.join(__dirname, 'output');
+  const outputFilename = path.join(outputPath, 'bundle.js');
 
-    afterEach(() => {
-      try {
-        mfs.unlinkSync(outputFilename);
-      } catch {
-        /** ignore */
+  afterEach(() => {
+    try {
+      mfs.unlinkSync(outputFilename);
+    } catch {
+      /** ignore */
+    }
+  });
+
+  for (const testAPI of testAPIs) {
+    it(`verify ${testAPI.name}`, async function () {
+      if (parseInt(process.version.split('.')[0], 10) >= 10) {
+        this.skip();
       }
-    });
-
-    for (const testAPI of testAPIs) {
-      it(`verify ${testAPI.name}`, async () => {
-        const sourceCode = `
+      const sourceCode = `
           import { ${testAPI.export} } from '../../';
           console.log(${testAPI.export});
         `;
-        mfs.mkdirpSync(path.dirname(sourceCodePath));
-        mfs.writeFileSync(sourceCodePath, sourceCode, { encoding: 'utf8' });
+      mfs.mkdirpSync(path.dirname(sourceCodePath));
+      mfs.writeFileSync(sourceCodePath, sourceCode, { encoding: 'utf8' });
 
-        const compiler = webpack({
-          entry: sourceCodePath,
-          output: {
-            filename: 'bundle.js',
-            path: outputPath,
-          },
-          mode: 'production',
-          optimization: {
-            // disable minimization so that we can inspect the output easily.
-            minimize: false,
-            // disable module concatenation so that variable names will not be mangled.
-            concatenateModules: false,
-          },
-        });
-
-        const fs = new Union();
-        fs.use(mfs as any).use(realFs);
-
-        //direct webpack to use unionfs for file input
-        compiler.inputFileSystem = fs;
-        //direct webpack to output to memoryfs rather than to disk
-        compiler.outputFileSystem = {
-          ...mfs,
-          join: path.join,
-        } as any;
-
-        const stats = await new Promise<webpack.Stats>((resolve, reject) => {
-          compiler.run((err, stats) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(stats!);
-          });
-        });
-        assert.deepStrictEqual(stats.compilation.errors, []);
-        assert.deepStrictEqual(stats.compilation.warnings, []);
-
-        const outputFile = mfs.readFileSync(outputFilename, 'utf8') as string;
-        const matches = new Set();
-        let match;
-        do {
-          match = APIMatcher.exec(outputFile);
-          if (match) {
-            matches.add(match[1]);
-          }
-        } while (match);
-
-        // Remove allowed apis from checking list.
-        allowedAPIs.forEach(it => matches.delete(it));
-
-        assert.deepStrictEqual(Array.from(matches), [testAPI.name]);
+      const compiler = webpack({
+        entry: sourceCodePath,
+        output: {
+          filename: 'bundle.js',
+          path: outputPath,
+        },
+        mode: 'production',
+        optimization: {
+          // disable minimization so that we can inspect the output easily.
+          minimize: false,
+          // disable module concatenation so that variable names will not be mangled.
+          concatenateModules: false,
+        },
       });
-    }
-  });
-}
+
+      const fs = new Union();
+      fs.use(mfs as any).use(realFs);
+
+      //direct webpack to use unionfs for file input
+      compiler.inputFileSystem = fs;
+      //direct webpack to output to memoryfs rather than to disk
+      compiler.outputFileSystem = {
+        ...mfs,
+        join: path.join,
+      } as any;
+
+      const stats = await new Promise<webpack.Stats>((resolve, reject) => {
+        compiler.run((err, stats) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(stats!);
+        });
+      });
+      assert.deepStrictEqual(stats.compilation.errors, []);
+      assert.deepStrictEqual(stats.compilation.warnings, []);
+
+      const outputFile = mfs.readFileSync(outputFilename, 'utf8') as string;
+      const matches = new Set();
+      let match;
+      do {
+        match = APIMatcher.exec(outputFile);
+        if (match) {
+          matches.add(match[1]);
+        }
+      } while (match);
+
+      // Remove allowed apis from checking list.
+      allowedAPIs.forEach(it => matches.delete(it));
+
+      assert.deepStrictEqual(Array.from(matches), [testAPI.name]);
+    });
+  }
+});
