@@ -90,7 +90,9 @@ describe('Packages', () => {
       it(`should create a span for GET requests and add propagation headers by using ${name} package`, async () => {
         nock.load(path.join(__dirname, '../', '/fixtures/google-https.json'));
 
-        const urlparsed = url.parse('https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8');
+        const urlparsed = url.parse(
+          'https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8'
+        );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
           const res = result as AxiosResponse<unknown>;

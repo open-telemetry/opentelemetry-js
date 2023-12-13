@@ -24,9 +24,7 @@ import {
   metrics,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
-import {
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
   AggregationTemporality,
