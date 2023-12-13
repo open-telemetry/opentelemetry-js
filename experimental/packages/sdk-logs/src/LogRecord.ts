@@ -140,6 +140,9 @@ export class LogRecord implements ReadableLogRecord {
         this._logRecordLimits.attributeCountLimit &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
+      if (this.droppedAttributesCount === 1) {
+        api.diag.warn('Dropping extra attributes.');
+      }
       return this;
     }
     if (isAttributeValue(value)) {
