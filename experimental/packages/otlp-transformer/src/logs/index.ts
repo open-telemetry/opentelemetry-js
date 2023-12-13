@@ -101,7 +101,7 @@ function toLogRecord(log: ReadableLogRecord, encoder: Encoder): ILogRecord {
     severityText: log.severityText,
     body: toAnyValue(log.body),
     attributes: toLogAttributes(log.attributes),
-    droppedAttributesCount: 0,
+    droppedAttributesCount: log.droppedAttributesCount,
     flags: log.spanContext?.traceFlags,
     traceId: encoder.encodeOptionalSpanContext(log.spanContext?.traceId),
     spanId: encoder.encodeOptionalSpanContext(log.spanContext?.spanId),
