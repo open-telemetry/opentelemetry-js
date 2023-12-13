@@ -21,6 +21,9 @@ All notable changes to experimental packages in this project will be documented 
 * fix(exporter-metrics-otlp-grpc): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
 * fix(exporter-metrics-otlp-http): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
 * fix(exporter-metrics-otlp-proto): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
+* fix(otlp-exporter-base)!: decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
+  * fixes a memory leak on prolonged collector unavailability
+  * this change is marked as breaking as it changes defaults
 
 ### :rocket: (Enhancement)
 
