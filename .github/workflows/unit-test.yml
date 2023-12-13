@@ -13,7 +13,7 @@ jobs:
       matrix:
         node_version:
           - "18"
-          # - "20" # disabled until http instrumentation can be fixed
+          - "20"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -23,6 +23,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest
@@ -51,6 +54,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: '18'
 
       - run: npm install -g npm@latest
@@ -77,6 +83,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: 18
 
       - name: Bootstrap
@@ -95,9 +104,12 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.0.0
+        uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: 18
 
       - name: Bootstrap
@@ -127,6 +139,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: ${{ matrix.node_version }}
 
       - name: Build
