@@ -50,7 +50,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 ): void {
   const exporterTimeout = collector.timeoutMillis;
   const parsedUrl = new url.URL(collector.url);
-  const nodeVersion = Number(process.versions.node.split('.')[0]);
   let retryTimer: ReturnType<typeof setTimeout>;
   let req: http.ClientRequest;
   let reqIsDestroyed = false;
@@ -63,8 +62,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       const err = new OTLPExporterError('Request Timeout');
       onError(err);
     } else {
-      // req.abort() was deprecated since v14
-      nodeVersion >= 14 ? req.destroy() : req.abort();
+      req.destroy();
     }
   }, exporterTimeout);
 

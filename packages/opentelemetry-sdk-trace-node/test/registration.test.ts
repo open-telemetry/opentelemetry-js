@@ -23,13 +23,9 @@ import {
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '../src';
-import * as semver from 'semver';
 
 const assertInstanceOf = (actual: object, ExpectedInstance: Function) => {
   assert.ok(
@@ -37,10 +33,6 @@ const assertInstanceOf = (actual: object, ExpectedInstance: Function) => {
     `Expected ${inspect(actual)} to be instance of ${ExpectedInstance.name}`
   );
 };
-
-const DefaultContextManager = semver.gte(process.version, '14.8.0')
-  ? AsyncLocalStorageContextManager
-  : AsyncHooksContextManager;
 
 describe('API registration', () => {
   beforeEach(() => {
@@ -53,7 +45,10 @@ describe('API registration', () => {
     const tracerProvider = new NodeTracerProvider();
     tracerProvider.register();
 
-    assertInstanceOf(context['_getContextManager'](), DefaultContextManager);
+    assertInstanceOf(
+      context['_getContextManager'](),
+      AsyncLocalStorageContextManager
+    );
     assertInstanceOf(
       propagation['_getGlobalPropagator'](),
       CompositePropagator
@@ -113,7 +108,10 @@ describe('API registration', () => {
 
     assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
 
-    assertInstanceOf(context['_getContextManager'](), DefaultContextManager);
+    assertInstanceOf(
+      context['_getContextManager'](),
+      AsyncLocalStorageContextManager
+    );
 
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
