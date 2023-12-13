@@ -9,6 +9,10 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* fix(otlp-exporter-base)!: decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
+  * fixes a memory leak on prolonged collector unavailability
+  * this change is marked as breaking as it changes defaults
+
 ### :rocket: (Enhancement)
 
 * perf(otlp-transformer): skip unnecessary base64 encode of span contexts [#4343](https://github.com/open-telemetry/opentelemetry-js/pull/4343) @seemk
