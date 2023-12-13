@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1702397305617,
+  "lastUpdate": 1702480312655,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -1570,6 +1570,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.55%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "af4f7a9daf07c738193daf5eaa921398b4b2b952",
+          "message": "fix(otlp-exporter-base): decrease default concurrency limit to 30 (#4211)\n\n* fix(otlp-exporter-base): decrease concurrency limit to 30\r\n\r\n* fix(changelog): add changelog entry",
+          "timestamp": "2023-12-13T16:47:52+08:00",
+          "tree_id": "33c48c3499e7aa374d36e24c6fce5438d13e6547",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/af4f7a9daf07c738193daf5eaa921398b4b2b952"
+        },
+        "date": 1702480311735,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 697141,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7943,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 683283,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 640095,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
