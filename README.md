@@ -111,6 +111,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version    | Supported                                     |
 |---------------------|-----------------------------------------------|
+| Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
 | Node.JS `v16`       | :heavy_check_mark:                            |
 | Node.JS `v14`       | :heavy_check_mark:                            |
@@ -210,6 +211,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
+- [Trent Mick](https://github.com/trentm), Elastic
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
