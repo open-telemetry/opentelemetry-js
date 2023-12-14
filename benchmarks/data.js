@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1702480398314,
+  "lastUpdate": 1702519666096,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -1674,6 +1674,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1cbaaf08b2dd0c2a9721bdd552e94f874a3f13f3",
+          "message": "chore(deps): update webpack to latest (#4340)\n\n* Update webpack to latest\r\n\r\n* Skip tree shake test on node 8\r\n\r\n* Update webpack utility modules\r\n\r\n* lint\r\n\r\n* Apply review comments\r\n\r\n* Invert test skip\r\n\r\n* Use process.versions.node\r\n\r\n* Remove approval requirement for webpack",
+          "timestamp": "2023-12-13T14:36:54-05:00",
+          "tree_id": "e8dd329d7d4eed88e244803d0649a23fd2fff391",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1cbaaf08b2dd0c2a9721bdd552e94f874a3f13f3"
+        },
+        "date": 1702519665146,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 688249,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 7795,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 668454,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 652574,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
