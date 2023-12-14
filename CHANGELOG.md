@@ -9,13 +9,19 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
-* fix(otlp-exporter-base)!: decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
-  * fixes a memory leak on prolonged collector unavailability
-  * this change is marked as breaking as it changes defaults
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.19.0
 
 ### :rocket: (Enhancement)
 
-### :books: (Refine Doc)
+* feat: add node 20 support [#4336](https://github.com/open-telemetry/opentelemetry-js/pull/4336) @dyladan
 
 ### :house: (Internal)
 
