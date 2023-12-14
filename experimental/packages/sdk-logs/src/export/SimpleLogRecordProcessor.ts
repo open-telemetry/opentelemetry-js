@@ -52,22 +52,19 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
             );
           }
         })
-        .catch(error => {
-          globalErrorHandler(error);
-        });
+        .catch(globalErrorHandler);
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (logRecord.resource.asyncAttributesPending) {
-      const exportPromise = logRecord.resource.waitForAsyncAttributes?.().then(
-        () => {
+      const exportPromise = logRecord.resource
+        .waitForAsyncAttributes?.()
+        .then(() => {
           // Using TS Non-null assertion operator because exportPromise could not be null in here
           // if waitForAsyncAttributes is not present this code will never be reached
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this._unresolvedExports.delete(exportPromise!);
           return doExport();
-        },
-        err => globalErrorHandler(err)
-      );
+        }, globalErrorHandler);
 
       // store the unresolved exports
       if (exportPromise != null) {

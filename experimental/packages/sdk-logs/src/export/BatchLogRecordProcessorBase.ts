@@ -178,9 +178,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
             );
           }
         })
-        .catch(error => {
-          globalErrorHandler(error);
-        });
+        .catch(globalErrorHandler);
 
     const pendingResources = logRecords
       .map(logRecord => logRecord.resource)
@@ -192,9 +190,7 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     } else {
       return Promise.all(
         pendingResources.map(resource => resource.waitForAsyncAttributes?.())
-      ).then(doExport, err => {
-        globalErrorHandler(err);
-      });
+      ).then(doExport, globalErrorHandler);
     }
   }
 
