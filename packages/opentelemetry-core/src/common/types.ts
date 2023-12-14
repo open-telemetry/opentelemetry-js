@@ -40,18 +40,6 @@ export interface ShimWrapped extends Function {
 }
 
 /**
- * An instrumentation library consists of the name and optional version
- * used to obtain a tracer or meter from a provider. This metadata is made
- * available on ReadableSpan and MetricRecord for use by the export pipeline.
- * @deprecated Use {@link InstrumentationScope} instead.
- */
-export interface InstrumentationLibrary {
-  readonly name: string;
-  readonly version?: string;
-  readonly schemaUrl?: string;
-}
-
-/**
  * An instrumentation scope consists of the name and optional version
  * used to obtain a tracer or meter from a provider. This metadata is made
  * available on ReadableSpan and MetricRecord for use by the export pipeline.
