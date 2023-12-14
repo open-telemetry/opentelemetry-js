@@ -62,6 +62,7 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
         () => {
           // Using TS Non-null assertion operator because exportPromise could not be null in here
           // if waitForAsyncAttributes is not present this code will never be reached
+           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this._unresolvedExports.delete(exportPromise!);
           return doExport();
         },
