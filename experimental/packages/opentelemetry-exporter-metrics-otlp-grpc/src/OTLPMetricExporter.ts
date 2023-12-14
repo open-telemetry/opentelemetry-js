@@ -49,6 +49,7 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
+      ...config?.headers,
     };
 
     this.metadata ||= new Metadata();
