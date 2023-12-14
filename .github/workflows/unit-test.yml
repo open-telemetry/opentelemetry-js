@@ -113,7 +113,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.0.0
+        uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           cache: 'npm'
