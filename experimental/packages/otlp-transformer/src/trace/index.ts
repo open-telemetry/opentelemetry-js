@@ -79,8 +79,7 @@ function spanRecordsToResourceSpans(
     while (!ilmEntry.done) {
       const scopeSpans = ilmEntry.value;
       if (scopeSpans.length > 0) {
-        const { name, version, schemaUrl } =
-          scopeSpans[0].instrumentationScope;
+        const { name, version, schemaUrl } = scopeSpans[0].instrumentationScope;
         const spans = scopeSpans.map(readableSpan =>
           sdkSpanToOtlpSpan(readableSpan, encoder)
         );
