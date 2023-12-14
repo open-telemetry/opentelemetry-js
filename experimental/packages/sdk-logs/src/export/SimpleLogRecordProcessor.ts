@@ -21,7 +21,6 @@ import {
   globalErrorHandler,
   internal,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { LogRecord } from './../LogRecord';
@@ -59,17 +58,15 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
 
     // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (logRecord.resource.asyncAttributesPending) {
-      const exportPromise = (logRecord.resource as Resource)
-        .waitForAsyncAttributes?.()
-        .then(
-          () => {
-            if (exportPromise != null) {
-              this._unresolvedExports.delete(exportPromise);
-            }
-            return doExport();
-          },
-          err => globalErrorHandler(err)
-        );
+      const exportPromise = logRecord.resource.waitForAsyncAttributes?.().then(
+        () => {
+          // Using TS Non-null assertion operator because exportPromise could not be null in here
+          // if waitForAsyncAttributes is not present this code will never be reached
+          this._unresolvedExports.delete(exportPromise!);
+          return doExport();
+        },
+        err => globalErrorHandler(err)
+      );
 
       // store the unresolved exports
       if (exportPromise != null) {

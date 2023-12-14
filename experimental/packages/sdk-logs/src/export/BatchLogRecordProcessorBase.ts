@@ -164,42 +164,38 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     }
   }
 
-  private _export(logRecords: LogRecord[]): Promise<ExportResult> {
-    return new Promise((resolve, reject) => {
-      const doExport = () =>
-        internal
-          ._export(this._exporter, logRecords)
-          .then((result: ExportResult) => {
-            if (result.code !== ExportResultCode.SUCCESS) {
-              globalErrorHandler(
-                result.error ??
-                  new Error(
-                    `BatchLogRecordProcessor: log record export failed (status ${result})`
-                  )
-              );
-            }
-            resolve(result);
-          })
-          .catch(error => {
-            globalErrorHandler(error);
-          });
-
-      const pendingResources = logRecords
-        .map(logRecord => logRecord.resource)
-        .filter(resource => resource.asyncAttributesPending);
-
-      // Avoid scheduling a promise to make the behavior more predictable and easier to test
-      if (pendingResources.length === 0) {
-        doExport().catch(reject);
-      } else {
-        Promise.all(
-          pendingResources.map(resource => resource.waitForAsyncAttributes?.())
-        ).then(doExport, err => {
-          globalErrorHandler(err);
-          reject(err);
+  private _export(logRecords: LogRecord[]): Promise<void> {
+    const doExport = () =>
+      internal
+        ._export(this._exporter, logRecords)
+        .then((result: ExportResult) => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              result.error ??
+                new Error(
+                  `BatchLogRecordProcessor: log record export failed (status ${result})`
+                )
+            );
+          }
+        })
+        .catch(error => {
+          globalErrorHandler(error);
         });
-      }
-    });
+
+    const pendingResources = logRecords
+      .map(logRecord => logRecord.resource)
+      .filter(resource => resource.asyncAttributesPending);
+
+    // Avoid scheduling a promise to make the behavior more predictable and easier to test
+    if (pendingResources.length === 0) {
+      return doExport();
+    } else {
+      return Promise.all(
+        pendingResources.map(resource => resource.waitForAsyncAttributes?.())
+      ).then(doExport, err => {
+        globalErrorHandler(err);
+      });
+    }
   }
 
   protected abstract onShutdown(): void;
