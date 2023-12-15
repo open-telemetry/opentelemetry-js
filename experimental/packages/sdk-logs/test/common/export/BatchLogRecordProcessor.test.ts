@@ -32,16 +32,19 @@ import {
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 import { reconfigureLimits } from '../../../src/config';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
-import { Resource } from '@opentelemetry/resources';
+import { Resource, ResourceAttributes } from '@opentelemetry/resources';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onInit() {}
   onShutdown() {}
 }
 
-const createLogRecord = (limits?: LogRecordLimits): LogRecord => {
+const createLogRecord = (
+  limits?: LogRecordLimits,
+  resource?: Resource
+): LogRecord => {
   const sharedState = new LoggerProviderSharedState(
-    Resource.default(),
+    resource || Resource.default(),
     Infinity,
     reconfigureLimits(limits ?? {})
   );
@@ -307,6 +310,25 @@ describe('BatchLogRecordProcessorBase', () => {
       processor.onEmit(logRecord);
       await processor.forceFlush();
       assert.strictEqual(exporter.getFinishedLogRecords().length, 1);
+    });
+
+    it('should wait for pending resource on flush', async () => {
+      const processor = new BatchLogRecordProcessor(exporter);
+      const asyncResource = new Resource(
+        {},
+        new Promise<ResourceAttributes>(resolve => {
+          setTimeout(() => resolve({ async: 'fromasync' }), 1);
+        })
+      );
+      const logRecord = createLogRecord(undefined, asyncResource);
+      processor.onEmit(logRecord);
+      await processor.forceFlush();
+      const exportedLogs = exporter.getFinishedLogRecords();
+      assert.strictEqual(exportedLogs.length, 1);
+      assert.strictEqual(
+        exportedLogs[0].resource.attributes['async'],
+        'fromasync'
+      );
     });
   });
 

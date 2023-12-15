@@ -19,17 +19,19 @@ import {
   BindOnceFuture,
   ExportResultCode,
   globalErrorHandler,
+  internal,
 } from '@opentelemetry/core';
-
 import type { LogRecordExporter } from './LogRecordExporter';
 import type { LogRecordProcessor } from '../LogRecordProcessor';
 import type { LogRecord } from './../LogRecord';
 
 export class SimpleLogRecordProcessor implements LogRecordProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
+  private _unresolvedExports: Set<Promise<void>>;
 
   constructor(private readonly _exporter: LogRecordExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+    this._unresolvedExports = new Set<Promise<void>>();
   }
 
   public onEmit(logRecord: LogRecord): void {
@@ -37,22 +39,45 @@ export class SimpleLogRecordProcessor implements LogRecordProcessor {
       return;
     }
 
-    this._exporter.export([logRecord], (res: ExportResult) => {
-      if (res.code !== ExportResultCode.SUCCESS) {
-        globalErrorHandler(
-          res.error ??
-            new Error(
-              `SimpleLogRecordProcessor: log record export failed (status ${res})`
-            )
-        );
-        return;
+    const doExport = () =>
+      internal
+        ._export(this._exporter, [logRecord])
+        .then((result: ExportResult) => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              result.error ??
+                new Error(
+                  `SimpleLogRecordProcessor: log record export failed (status ${result})`
+                )
+            );
+          }
+        })
+        .catch(globalErrorHandler);
+
+    // Avoid scheduling a promise to make the behavior more predictable and easier to test
+    if (logRecord.resource.asyncAttributesPending) {
+      const exportPromise = logRecord.resource
+        .waitForAsyncAttributes?.()
+        .then(() => {
+          // Using TS Non-null assertion operator because exportPromise could not be null in here
+          // if waitForAsyncAttributes is not present this code will never be reached
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          this._unresolvedExports.delete(exportPromise!);
+          return doExport();
+        }, globalErrorHandler);
+
+      // store the unresolved exports
+      if (exportPromise != null) {
+        this._unresolvedExports.add(exportPromise);
       }
-    });
+    } else {
+      void doExport();
+    }
   }
 
-  public forceFlush(): Promise<void> {
-    // do nothing as all log records are being exported without waiting
-    return Promise.resolve();
+  public async forceFlush(): Promise<void> {
+    // await unresolved resources before resolving
+    await Promise.all(Array.from(this._unresolvedExports));
   }
 
   public shutdown(): Promise<void> {
