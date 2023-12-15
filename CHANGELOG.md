@@ -11,7 +11,19 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-trace-base): improve log messages when dropping span events [#4223](https://github.com/open-telemetry/opentelemetry-js/pull/4223) @mkubliniak
+
+### :bug: (Bug Fix)
+
 ### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.19.0
+
+### :rocket: (Enhancement)
+
+* feat: add node 20 support [#4336](https://github.com/open-telemetry/opentelemetry-js/pull/4336) @dyladan
 
 ### :house: (Internal)
 
@@ -21,6 +33,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(api-logs): allow for TimeInput type for LogRecord timestamps [#4345](https://github.com/open-telemetry/opentelemetry-js/pull/4345)
 * fix(sdk-trace-web): only access location if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
 * fix(sdk-trace-base): processor onStart called with a span having empty attributes
 
