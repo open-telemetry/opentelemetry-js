@@ -161,7 +161,7 @@ Most of the commands needed for development are accessed as [npm scripts](https:
 
 ### Install dependencies
 
-This will install all dependencies for the root project and all modules managed by `lerna`. By default, a `postinstall` script will run `lerna bootstrap` automatically after an install. This can be avoided using the `--ignore-scripts` option if desired.
+This will install all dependencies for the root project and all modules managed by `npm workspaces`.
 
 ```sh
 npm install
