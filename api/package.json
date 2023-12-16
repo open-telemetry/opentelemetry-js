@@ -2,7 +2,6 @@
   "name": "@opentelemetry/api",
   "version": "1.7.0",
   "description": "Public API for OpenTelemetry",
-  "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
@@ -11,6 +10,10 @@
     "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
     "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
+  "exports": {
+    ".": "./build/src/index.js",
+    "./experimental": "./build/src/experimental"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {

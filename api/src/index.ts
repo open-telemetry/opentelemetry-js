@@ -90,6 +90,8 @@ export { createTraceState } from './trace/internal/utils';
 export { TracerProvider } from './trace/tracer_provider';
 export { Tracer } from './trace/tracer';
 export { TracerOptions } from './trace/tracer_options';
+export { wrapTracer, SugaredTracer } from './experimental/trace/SugaredTracer';
+export { SugaredSpanOptions } from './experimental/trace/SugaredOptions';
 export {
   isSpanContextValid,
   isValidTraceId,
