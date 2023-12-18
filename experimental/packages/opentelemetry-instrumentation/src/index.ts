@@ -15,9 +15,8 @@
  */
 
 export * from './autoLoader';
-export { InstrumentationBase } from './platform/index';
-export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
-export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
+// Exports for Node.js and Browser are different, therefore exporting *
+export * from './platform/index';
 export * from './types';
 export * from './types_internal';
 export * from './utils';

@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-import {
-  InstrumentationModuleDefinition,
-  InstrumentationModuleFile,
-} from './types';
+import { InstrumentationModuleFile } from '../../types';
+import { normalize } from 'path';
 
-export class InstrumentationNodeModuleDefinition<T>
-  implements InstrumentationModuleDefinition<T>
+export class InstrumentationNodeModuleFile<T>
+  implements InstrumentationModuleFile<T>
 {
-  files: InstrumentationModuleFile<T>[];
+  public name: string;
   constructor(
-    public name: string,
+    name: string,
     public supportedVersions: string[],
-    public patch?: (exports: T, moduleVersion?: string) => T,
-    public unpatch?: (exports: T, moduleVersion?: string) => void,
-    files?: InstrumentationModuleFile<any>[]
+    public patch: (moduleExports: T, moduleVersion?: string) => T,
+    public unpatch: (moduleExports?: T, moduleVersion?: string) => void
   ) {
-    this.files = files || [];
+    this.name = normalize(name);
   }
 }

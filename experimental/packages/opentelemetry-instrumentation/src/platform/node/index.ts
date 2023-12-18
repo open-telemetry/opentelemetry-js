@@ -14,3 +14,5 @@
  * limitations under the License.
  */
 export { InstrumentationBase } from './instrumentation';
+export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
+export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
