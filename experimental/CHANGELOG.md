@@ -10,6 +10,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation): do not export Node.js-specific types for Browser users [#4378](https://github.com/open-telemetry/opentelemetry-js/pull/4378) @pichlermarc
+  * Fixes a bug where `InstrumentationNodeModuleFile` and `InstrumentationNodeModuleDefinition` were exported even if using the package in a browser context
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
