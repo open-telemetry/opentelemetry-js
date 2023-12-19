@@ -57,7 +57,10 @@ export abstract class OTLPExporterBrowserBase<
   }
 
   onShutdown(): void {
-    _globalThis.removeEventListener(this.shutDownEvent ?? 'unload', this.shutdown);
+    _globalThis.removeEventListener(
+      this.shutDownEvent ?? 'unload',
+      this.shutdown
+    );
   }
 
   send(
