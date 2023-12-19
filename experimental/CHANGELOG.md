@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+fix(instrumentation): use caret range on import-in-the-middle [#4380](https://github.com/open-telemetry/opentelemetry-js/pull/4380) @pichlermarc
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
