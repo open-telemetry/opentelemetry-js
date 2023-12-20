@@ -287,10 +287,10 @@ export interface IExemplar {
   asInt?: number;
 
   /** Exemplar spanId */
-  spanId?: string;
+  spanId?: string | Uint8Array;
 
   /** Exemplar traceId */
-  traceId?: string;
+  traceId?: string | Uint8Array;
 }
 
 /**
