@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { wrapTracer } from '../../../../src';
+import { wrapTracer } from '../../../../src/experimental';
 import * as assert from 'assert';
 import { NoopTracerProvider } from '../../../../src/trace/NoopTracerProvider';
 import { NoopTracer } from '../../../../src/trace/NoopTracer';
