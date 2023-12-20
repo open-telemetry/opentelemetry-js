@@ -26,10 +26,12 @@ describe('SugaredTracer', () => {
 
     override startActiveSpan<F extends (span: Span) => ReturnType<F>>(
       name: string,
-      fn: F
-    ): ReturnType<F> {
+      arg2?: SpanOptions,
+      arg3?: Context,
+      arg4?: F
+    ): ReturnType<F> | undefined {
       this.calls.push(arguments);
-      return super.startActiveSpan(name, fn);
+      return super.startActiveSpan(name, arg2, arg3, arg4 as F);
     }
 
     override startSpan(
