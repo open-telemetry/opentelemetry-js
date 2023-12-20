@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1703062739962,
+  "lastUpdate": 1703070268895,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -2770,6 +2770,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 644359,
             "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "42aaae0270aec344d22e8a0b7b3c595700fcae97",
+          "message": "chore(deps): update dependency chromedriver to v120 (#4374)",
+          "timestamp": "2023-12-19T14:59:34-05:00",
+          "tree_id": "c59364302b44b6783b5eeeda4b0aedfc73dd45c0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/42aaae0270aec344d22e8a0b7b3c595700fcae97"
+        },
+        "date": 1703070268042,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 698607,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 8098,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 663561,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 637072,
+            "range": "±0.14%",
             "unit": "ops/sec",
             "extra": "101 samples"
           }
