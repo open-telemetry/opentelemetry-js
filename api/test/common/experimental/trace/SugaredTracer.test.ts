@@ -71,12 +71,43 @@ describe('SugaredTracer', () => {
   });
 
   describe('withActiveSpan()', () => {
-    it('proxies value', () => {
+    it('proxies value with minimal args', () => {
       const result = sugaredTracer.withActiveSpan('test', span => {
         return 'result';
       });
 
       assert.strictEqual(result, 'result', 'Unexpected result');
+
+      assert.strictEqual(tracer.calls.length, 2); // ensure that startActiveSpan and startSpan is called
+    });
+
+    it('proxies value with context', () => {
+      const result = sugaredTracer.withActiveSpan(
+        'test',
+        { onException: e => e },
+        span => {
+          return 'result';
+        }
+      );
+
+      assert.strictEqual(result, 'result', 'Unexpected result');
+
+      assert.strictEqual(tracer.calls.length, 2); // ensure that startActiveSpan and startSpan is called
+    });
+
+    it('proxies value with context', () => {
+      const result = sugaredTracer.withActiveSpan(
+        'test',
+        { onException: e => e },
+        context.active(),
+        span => {
+          return 'result';
+        }
+      );
+
+      assert.strictEqual(result, 'result', 'Unexpected result');
+
+      assert.strictEqual(tracer.calls.length, 2); // ensure that startActiveSpan and startSpan is called
     });
 
     it('returns promise if wrapped function returns promise', async () => {
@@ -90,6 +121,33 @@ describe('SugaredTracer', () => {
 
     it('returns void', () => {
       const result = sugaredTracer.withActiveSpan('test', (span: Span) => {
+        return;
+      });
+
+      assert.strictEqual(result, undefined);
+    });
+  });
+
+  describe('withSpan()', () => {
+    it('proxies value', () => {
+      const result = sugaredTracer.withSpan('test', span => {
+        return 'result';
+      });
+
+      assert.strictEqual(result, 'result', 'Unexpected result');
+    });
+
+    it('returns promise if wrapped function returns promise', async () => {
+      const result = sugaredTracer.withSpan('test', span => {
+        return Promise.resolve('result');
+      });
+
+      assert.ok(typeof result.then == 'function');
+      assert.strictEqual(await result, 'result', 'Unexpected result');
+    });
+
+    it('returns void', () => {
+      const result = sugaredTracer.withSpan('test', (span: Span) => {
         return;
       });
 
