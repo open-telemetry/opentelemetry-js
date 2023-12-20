@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1703070268895,
+  "lastUpdate": 1703070889101,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -2824,6 +2824,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.14%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "siimkallas@gmail.com",
+            "name": "Siim Kallas",
+            "username": "seemk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a512494ba2a7248823fc79e2aa85e9163f0fbdb8",
+          "message": "perf: remove unnecessary base64 encode+decode from OTLP export (#4343)\n\n* fix: remove unnecessary base64 encoding for span contexts\r\n\r\n* chore: add changelog\r\n\r\n---------\r\n\r\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>",
+          "timestamp": "2023-12-19T16:05:32-05:00",
+          "tree_id": "510e8ea811d2761a9fc525a02343186f2d4a71bf",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a512494ba2a7248823fc79e2aa85e9163f0fbdb8"
+        },
+        "date": 1703070888246,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1018637,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12193,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 642869,
+            "range": "±0.96%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 655091,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
