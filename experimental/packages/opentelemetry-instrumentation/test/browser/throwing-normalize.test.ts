@@ -13,5 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { InstrumentationBase } from './instrumentation';
-export { normalize } from './normalize';
+
+import * as assert from 'assert';
+import { normalize } from '../../src/platform/browser';
+
+describe('throwing-normalize', () => {
+  assert.throws(() => {
+    normalize('foo');
+  });
+});

@@ -13,5 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { InstrumentationBase } from './instrumentation';
-export { normalize } from './normalize';
+
+/**
+ * Placeholder normalize function to replace the node variant in browser runtimes,
+ * this should never be called and will throw if it is called.
+ *
+ * This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/4373 until the instrumentation
+ * package can be made node-only.
+ *
+ * @param _path unused input path
+ * @internal
+ */
+export function normalize(_path: string): string {
+  throw new Error('Not implemented');
+}
