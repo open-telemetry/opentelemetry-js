@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1703070889101,
+  "lastUpdate": 1703148890160,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -2876,6 +2876,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.56%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f4b681d4f388ecedaecff03b7c95f460c97a8f6c",
+          "message": "fix(instrumentation): use caret range on import-in-the-middle (#4380)\n\n* fix(instrumentation): use caret on import-in-the-middle\r\n\r\n* fix: add chanelog entry\r\n\r\n---------\r\n\r\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>",
+          "timestamp": "2023-12-20T14:32:52+01:00",
+          "tree_id": "4ec7dbb3d25f215af9f1e444c5b75b4ca8a30dc5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f4b681d4f388ecedaecff03b7c95f460c97a8f6c"
+        },
+        "date": 1703148889295,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 976211,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11854,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 719117,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662313,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
