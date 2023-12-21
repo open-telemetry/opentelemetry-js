@@ -191,23 +191,25 @@ function handleFn<F extends (span: Span) => ReturnType<F>>(
   fn: F
 ): ReturnType<F> {
   const onException = opts.onException ?? defaultOnException;
+  const errorHandler = (e: Error) => {
+    onException(e, span);
+    span.end();
+    throw e;
+  };
 
   try {
     const ret = fn(span) as Promise<ReturnType<F>>;
     // if fn is an async function, attach a recordException and spanEnd callback to the promise
-    if (typeof ret?.then === 'function' && typeof ret?.catch === 'function') {
-      return ret
-        .catch((e: Error) => {
-          onException(e, span);
-          throw e;
-        })
-        .finally(() => span.end()) as ReturnType<F>;
+    if (typeof ret?.then === 'function') {
+      return ret.then(val => {
+        span.end();
+        return val;
+      }, errorHandler) as ReturnType<F>;
     }
     span.end();
     return ret as ReturnType<F>;
   } catch (e) {
-    onException(e, span);
-    span.end();
-    throw e;
+    // add throw to signal the compiler that this will throw in the inner scope
+    throw errorHandler(e);
   }
 }
