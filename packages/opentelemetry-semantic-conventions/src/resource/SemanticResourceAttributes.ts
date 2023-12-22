@@ -15,54 +15,6 @@
  */
 
 import { createConstMap } from '../internal/utils';
-import {
-  DOT,
-  UNDERSCORE,
-  ACCOUNT_DOT,
-  CLOUD_DOT,
-  CONTAINER_DOT,
-  CLUSTER_DOT,
-  DEPLOYMENT_DOT,
-  DEVICE_DOT,
-  ECS_DOT,
-  EKS_DOT,
-  EXECUTABLE_DOT,
-  FAAS_DOT,
-  GROUP_DOT,
-  K8S_DOT,
-  LOG_DOT,
-  IMAGE_DOT,
-  MODEL_DOT,
-  NODE_DOT,
-  OS_DOT,
-  PROCESS_DOT,
-  RUNTIME_DOT,
-  SDK_DOT,
-  SERVICE_DOT,
-  SET_DOT,
-  STREAM_DOT,
-  TASK_DOT,
-  TELEMETRY_DOT,
-  WEBENGINE_DOT,
-  ARN,
-  AWS,
-  AZURE,
-  COMMAND,
-  CRON,
-  DAEMON,
-  DESCRIPTION,
-  HOST,
-  ID,
-  INSTANCE,
-  JOB,
-  NAME,
-  REPLICA,
-  SPACE,
-  STATEFUL,
-  TYPE,
-  UID,
-  VERSION,
-} from '../internal/constants';
 
 //----------------------------------------------------------------------------------------------------------
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
@@ -72,218 +24,237 @@ import {
 // Constant values for SemanticResourceAttributes
 //----------------------------------------------------------------------------------------------------------
 
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifable export names for some package types
+const TMP_CLOUD_PROVIDER = 'cloud.provider';
+const TMP_CLOUD_ACCOUNT_ID = 'cloud.account.id';
+const TMP_CLOUD_REGION = 'cloud.region';
+const TMP_CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
+const TMP_CLOUD_PLATFORM = 'cloud.platform';
+const TMP_AWS_ECS_CONTAINER_ARN = 'aws.ecs.container.arn';
+const TMP_AWS_ECS_CLUSTER_ARN = 'aws.ecs.cluster.arn';
+const TMP_AWS_ECS_LAUNCHTYPE = 'aws.ecs.launchtype';
+const TMP_AWS_ECS_TASK_ARN = 'aws.ecs.task.arn';
+const TMP_AWS_ECS_TASK_FAMILY = 'aws.ecs.task.family';
+const TMP_AWS_ECS_TASK_REVISION = 'aws.ecs.task.revision';
+const TMP_AWS_EKS_CLUSTER_ARN = 'aws.eks.cluster.arn';
+const TMP_AWS_LOG_GROUP_NAMES = 'aws.log.group.names';
+const TMP_AWS_LOG_GROUP_ARNS = 'aws.log.group.arns';
+const TMP_AWS_LOG_STREAM_NAMES = 'aws.log.stream.names';
+const TMP_AWS_LOG_STREAM_ARNS = 'aws.log.stream.arns';
+const TMP_CONTAINER_NAME = 'container.name';
+const TMP_CONTAINER_ID = 'container.id';
+const TMP_CONTAINER_RUNTIME = 'container.runtime';
+const TMP_CONTAINER_IMAGE_NAME = 'container.image.name';
+const TMP_CONTAINER_IMAGE_TAG = 'container.image.tag';
+const TMP_DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
+const TMP_DEVICE_ID = 'device.id';
+const TMP_DEVICE_MODEL_IDENTIFIER = 'device.model.identifier';
+const TMP_DEVICE_MODEL_NAME = 'device.model.name';
+const TMP_FAAS_NAME = 'faas.name';
+const TMP_FAAS_ID = 'faas.id';
+const TMP_FAAS_VERSION = 'faas.version';
+const TMP_FAAS_INSTANCE = 'faas.instance';
+const TMP_FAAS_MAX_MEMORY = 'faas.max_memory';
+const TMP_HOST_ID = 'host.id';
+const TMP_HOST_NAME = 'host.name';
+const TMP_HOST_TYPE = 'host.type';
+const TMP_HOST_ARCH = 'host.arch';
+const TMP_HOST_IMAGE_NAME = 'host.image.name';
+const TMP_HOST_IMAGE_ID = 'host.image.id';
+const TMP_HOST_IMAGE_VERSION = 'host.image.version';
+const TMP_K8S_CLUSTER_NAME = 'k8s.cluster.name';
+const TMP_K8S_NODE_NAME = 'k8s.node.name';
+const TMP_K8S_NODE_UID = 'k8s.node.uid';
+const TMP_K8S_NAMESPACE_NAME = 'k8s.namespace.name';
+const TMP_K8S_POD_UID = 'k8s.pod.uid';
+const TMP_K8S_POD_NAME = 'k8s.pod.name';
+const TMP_K8S_CONTAINER_NAME = 'k8s.container.name';
+const TMP_K8S_REPLICASET_UID = 'k8s.replicaset.uid';
+const TMP_K8S_REPLICASET_NAME = 'k8s.replicaset.name';
+const TMP_K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
+const TMP_K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
+const TMP_K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
+const TMP_K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
+const TMP_K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
+const TMP_K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
+const TMP_K8S_JOB_UID = 'k8s.job.uid';
+const TMP_K8S_JOB_NAME = 'k8s.job.name';
+const TMP_K8S_CRONJOB_UID = 'k8s.cronjob.uid';
+const TMP_K8S_CRONJOB_NAME = 'k8s.cronjob.name';
+const TMP_OS_TYPE = 'os.type';
+const TMP_OS_DESCRIPTION = 'os.description';
+const TMP_OS_NAME = 'os.name';
+const TMP_OS_VERSION = 'os.version';
+const TMP_PROCESS_PID = 'process.pid';
+const TMP_PROCESS_EXECUTABLE_NAME = 'process.executable.name';
+const TMP_PROCESS_EXECUTABLE_PATH = 'process.executable.path';
+const TMP_PROCESS_COMMAND = 'process.command';
+const TMP_PROCESS_COMMAND_LINE = 'process.command_line';
+const TMP_PROCESS_COMMAND_ARGS = 'process.command_args';
+const TMP_PROCESS_OWNER = 'process.owner';
+const TMP_PROCESS_RUNTIME_NAME = 'process.runtime.name';
+const TMP_PROCESS_RUNTIME_VERSION = 'process.runtime.version';
+const TMP_PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
+const TMP_SERVICE_NAME = 'service.name';
+const TMP_SERVICE_NAMESPACE = 'service.namespace';
+const TMP_SERVICE_INSTANCE_ID = 'service.instance.id';
+const TMP_SERVICE_VERSION = 'service.version';
+const TMP_TELEMETRY_SDK_NAME = 'telemetry.sdk.name';
+const TMP_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
+const TMP_TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
+const TMP_TELEMETRY_AUTO_VERSION = 'telemetry.auto.version';
+const TMP_WEBENGINE_NAME = 'webengine.name';
+const TMP_WEBENGINE_VERSION = 'webengine.version';
+const TMP_WEBENGINE_DESCRIPTION = 'webengine.description';
+
 /**
  * Name of the cloud provider.
  */
-export const SEMRESATTRS_CLOUD_PROVIDER = (CLOUD_DOT +
-  'provider') as 'cloud.provider';
+export const SEMRESATTRS_CLOUD_PROVIDER = TMP_CLOUD_PROVIDER;
 
 /**
  * The cloud account ID the resource is assigned to.
  */
-export const SEMRESATTRS_CLOUD_ACCOUNT_ID = (CLOUD_DOT +
-  ACCOUNT_DOT +
-  ID) as 'cloud.account.id';
+export const SEMRESATTRS_CLOUD_ACCOUNT_ID = TMP_CLOUD_ACCOUNT_ID;
 
 /**
  * The geographical region the resource is running. Refer to your provider&#39;s docs to see the available regions, for example [Alibaba Cloud regions](https://www.alibabacloud.com/help/doc-detail/40654.htm), [AWS regions](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/), [Azure regions](https://azure.microsoft.com/en-us/global-infrastructure/geographies/), or [Google Cloud regions](https://cloud.google.com/about/locations).
  */
-export const SEMRESATTRS_CLOUD_REGION = (CLOUD_DOT +
-  'region') as 'cloud.region';
+export const SEMRESATTRS_CLOUD_REGION = TMP_CLOUD_REGION;
 
 /**
  * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
  *
  * Note: Availability zones are called &#34;zones&#34; on Alibaba Cloud and Google Cloud.
  */
-export const SEMRESATTRS_CLOUD_AVAILABILITY_ZONE = (CLOUD_DOT +
-  'availability_zone') as 'cloud.availability_zone';
+export const SEMRESATTRS_CLOUD_AVAILABILITY_ZONE = TMP_CLOUD_AVAILABILITY_ZONE;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const SEMRESATTRS_CLOUD_PLATFORM = (CLOUD_DOT +
-  'platform') as 'cloud.platform';
+export const SEMRESATTRS_CLOUD_PLATFORM = TMP_CLOUD_PLATFORM;
 
 /**
  * The Amazon Resource Name (ARN) of an [ECS container instance](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html).
  */
-export const SEMRESATTRS_AWS_ECS_CONTAINER_ARN = (AWS +
-  DOT +
-  ECS_DOT +
-  CONTAINER_DOT +
-  ARN) as 'aws.ecs.container.arn';
+export const SEMRESATTRS_AWS_ECS_CONTAINER_ARN = TMP_AWS_ECS_CONTAINER_ARN;
 
 /**
  * The ARN of an [ECS cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html).
  */
-export const SEMRESATTRS_AWS_ECS_CLUSTER_ARN = (AWS +
-  DOT +
-  ECS_DOT +
-  CLUSTER_DOT +
-  ARN) as 'aws.ecs.cluster.arn';
+export const SEMRESATTRS_AWS_ECS_CLUSTER_ARN = TMP_AWS_ECS_CLUSTER_ARN;
 
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
  */
-export const SEMRESATTRS_AWS_ECS_LAUNCHTYPE = (AWS +
-  DOT +
-  ECS_DOT +
-  'launchtype') as 'aws.ecs.launchtype';
+export const SEMRESATTRS_AWS_ECS_LAUNCHTYPE = TMP_AWS_ECS_LAUNCHTYPE;
 
 /**
  * The ARN of an [ECS task definition](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html).
  */
-export const SEMRESATTRS_AWS_ECS_TASK_ARN = (AWS +
-  DOT +
-  ECS_DOT +
-  TASK_DOT +
-  ARN) as 'aws.ecs.task.arn';
+export const SEMRESATTRS_AWS_ECS_TASK_ARN = TMP_AWS_ECS_TASK_ARN;
 
 /**
  * The task definition family this task definition is a member of.
  */
-export const SEMRESATTRS_AWS_ECS_TASK_FAMILY = (AWS +
-  DOT +
-  ECS_DOT +
-  TASK_DOT +
-  'family') as 'aws.ecs.task.family';
+export const SEMRESATTRS_AWS_ECS_TASK_FAMILY = TMP_AWS_ECS_TASK_FAMILY;
 
 /**
  * The revision for this task definition.
  */
-export const SEMRESATTRS_AWS_ECS_TASK_REVISION = (AWS +
-  DOT +
-  ECS_DOT +
-  TASK_DOT +
-  'revision') as 'aws.ecs.task.revision';
+export const SEMRESATTRS_AWS_ECS_TASK_REVISION = TMP_AWS_ECS_TASK_REVISION;
 
 /**
  * The ARN of an EKS cluster.
  */
-export const SEMRESATTRS_AWS_EKS_CLUSTER_ARN = (AWS +
-  DOT +
-  EKS_DOT +
-  CLUSTER_DOT +
-  ARN) as 'aws.eks.cluster.arn';
+export const SEMRESATTRS_AWS_EKS_CLUSTER_ARN = TMP_AWS_EKS_CLUSTER_ARN;
 
 /**
  * The name(s) of the AWS log group(s) an application is writing to.
  *
  * Note: Multiple log groups must be supported for cases like multi-container applications, where a single application has sidecar containers, and each write to their own log group.
  */
-export const SEMRESATTRS_AWS_LOG_GROUP_NAMES = (AWS +
-  DOT +
-  LOG_DOT +
-  GROUP_DOT +
-  NAME +
-  's') as 'aws.log.group.names';
+export const SEMRESATTRS_AWS_LOG_GROUP_NAMES = TMP_AWS_LOG_GROUP_NAMES;
 
 /**
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
  *
  * Note: See the [log group ARN format documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format).
  */
-export const SEMRESATTRS_AWS_LOG_GROUP_ARNS = (AWS +
-  DOT +
-  LOG_DOT +
-  GROUP_DOT +
-  ARN +
-  's') as 'aws.log.group.arns';
+export const SEMRESATTRS_AWS_LOG_GROUP_ARNS = TMP_AWS_LOG_GROUP_ARNS;
 
 /**
  * The name(s) of the AWS log stream(s) an application is writing to.
  */
-export const SEMRESATTRS_AWS_LOG_STREAM_NAMES = (AWS +
-  DOT +
-  LOG_DOT +
-  STREAM_DOT +
-  NAME +
-  's') as 'aws.log.stream.names';
+export const SEMRESATTRS_AWS_LOG_STREAM_NAMES = TMP_AWS_LOG_STREAM_NAMES;
 
 /**
  * The ARN(s) of the AWS log stream(s).
  *
  * Note: See the [log stream ARN format documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format). One log group can contain several log streams, so these ARNs necessarily identify both a log group and a log stream.
  */
-export const SEMRESATTRS_AWS_LOG_STREAM_ARNS = (AWS +
-  DOT +
-  LOG_DOT +
-  STREAM_DOT +
-  ARN +
-  's') as 'aws.log.stream.arns';
+export const SEMRESATTRS_AWS_LOG_STREAM_ARNS = TMP_AWS_LOG_STREAM_ARNS;
 
 /**
  * Container name.
  */
-export const SEMRESATTRS_CONTAINER_NAME = (CONTAINER_DOT +
-  NAME) as 'container.name';
+export const SEMRESATTRS_CONTAINER_NAME = TMP_CONTAINER_NAME;
 
 /**
  * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/reference/run/#container-identification). The UUID might be abbreviated.
  */
-export const SEMRESATTRS_CONTAINER_ID = (CONTAINER_DOT + ID) as 'container.id';
+export const SEMRESATTRS_CONTAINER_ID = TMP_CONTAINER_ID;
 
 /**
  * The container runtime managing this container.
  */
-export const SEMRESATTRS_CONTAINER_RUNTIME = (CONTAINER_DOT +
-  'runtime') as 'container.runtime';
+export const SEMRESATTRS_CONTAINER_RUNTIME = TMP_CONTAINER_RUNTIME;
 
 /**
  * Name of the image the container was built on.
  */
-export const SEMRESATTRS_CONTAINER_IMAGE_NAME = (CONTAINER_DOT +
-  IMAGE_DOT +
-  NAME) as 'container.image.name';
+export const SEMRESATTRS_CONTAINER_IMAGE_NAME = TMP_CONTAINER_IMAGE_NAME;
 
 /**
  * Container image tag.
  */
-export const SEMRESATTRS_CONTAINER_IMAGE_TAG = (CONTAINER_DOT +
-  IMAGE_DOT +
-  'tag') as 'container.image.tag';
+export const SEMRESATTRS_CONTAINER_IMAGE_TAG = TMP_CONTAINER_IMAGE_TAG;
 
 /**
  * Name of the [deployment environment](https://en.wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
  */
-export const SEMRESATTRS_DEPLOYMENT_ENVIRONMENT = (DEPLOYMENT_DOT +
-  'environment') as 'deployment.environment';
+export const SEMRESATTRS_DEPLOYMENT_ENVIRONMENT = TMP_DEPLOYMENT_ENVIRONMENT;
 
 /**
  * A unique identifier representing the device.
  *
  * Note: The device identifier MUST only be defined using the values outlined below. This value is not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this value MUST be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
  */
-export const SEMRESATTRS_DEVICE_ID = (DEVICE_DOT + ID) as 'device.id';
+export const SEMRESATTRS_DEVICE_ID = TMP_DEVICE_ID;
 
 /**
  * The model identifier for the device.
  *
  * Note: It&#39;s recommended this value represents a machine readable version of the model identifier rather than the market or consumer-friendly name of the device.
  */
-export const SEMRESATTRS_DEVICE_MODEL_IDENTIFIER = (DEVICE_DOT +
-  MODEL_DOT +
-  ID +
-  'entifier') as 'device.model.identifier';
+export const SEMRESATTRS_DEVICE_MODEL_IDENTIFIER = TMP_DEVICE_MODEL_IDENTIFIER;
 
 /**
  * The marketing name for the device model.
  *
  * Note: It&#39;s recommended this value represents a human readable version of the device model rather than a machine readable alternative.
  */
-export const SEMRESATTRS_DEVICE_MODEL_NAME = (DEVICE_DOT +
-  MODEL_DOT +
-  NAME) as 'device.model.name';
+export const SEMRESATTRS_DEVICE_MODEL_NAME = TMP_DEVICE_MODEL_NAME;
 
 /**
  * The name of the single function that this runtime instance executes.
  *
  * Note: This is the name of the function as configured/deployed on the FaaS platform and is usually different from the name of the callback function (which may be stored in the [`code.namespace`/`code.function`](../../trace/semantic_conventions/span-general.md#source-code-attributes) span attributes).
  */
-export const SEMRESATTRS_FAAS_NAME = (FAAS_DOT + NAME) as 'faas.name';
+export const SEMRESATTRS_FAAS_NAME = TMP_FAAS_NAME;
 
 /**
 * The unique ID of the single function that this runtime instance executes.
@@ -303,7 +274,7 @@ part of the ARN is not available without calling another AWS API
 which may be deemed too slow for a short-running lambda function.
 As an alternative, consider setting `faas.id` as a span attribute instead.
 */
-export const SEMRESATTRS_FAAS_ID = (FAAS_DOT + ID) as 'faas.id';
+export const SEMRESATTRS_FAAS_ID = TMP_FAAS_ID;
 
 /**
 * The immutable version of the function being executed.
@@ -318,377 +289,283 @@ export const SEMRESATTRS_FAAS_ID = (FAAS_DOT + ID) as 'faas.id';
   [`K_REVISION` environment variable](https://cloud.google.com/functions/docs/env-var#runtime_environment_variables_set_automatically).
 * **Azure Functions:** Not applicable. Do not set this attribute.
 */
-export const SEMRESATTRS_FAAS_VERSION = (FAAS_DOT + VERSION) as 'faas.version';
+export const SEMRESATTRS_FAAS_VERSION = TMP_FAAS_VERSION;
 
 /**
  * The execution environment ID as a string, that will be potentially reused for other invocations to the same function/function version.
  *
  * Note: * **AWS Lambda:** Use the (full) log stream name.
  */
-export const SEMRESATTRS_FAAS_INSTANCE = (FAAS_DOT +
-  INSTANCE) as 'faas.instance';
+export const SEMRESATTRS_FAAS_INSTANCE = TMP_FAAS_INSTANCE;
 
 /**
  * The amount of memory available to the serverless function in MiB.
  *
  * Note: It&#39;s recommended to set this attribute since e.g. too little memory can easily stop a Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable `AWS_LAMBDA_FUNCTION_MEMORY_SIZE` provides this information.
  */
-export const SEMRESATTRS_FAAS_MAX_MEMORY = (FAAS_DOT +
-  'max_memory') as 'faas.max_memory';
+export const SEMRESATTRS_FAAS_MAX_MEMORY = TMP_FAAS_MAX_MEMORY;
 
 /**
  * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider.
  */
-export const SEMRESATTRS_HOST_ID = (HOST + DOT + ID) as 'host.id';
+export const SEMRESATTRS_HOST_ID = TMP_HOST_ID;
 
 /**
  * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
  */
-export const SEMRESATTRS_HOST_NAME = (HOST + DOT + NAME) as 'host.name';
+export const SEMRESATTRS_HOST_NAME = TMP_HOST_NAME;
 
 /**
  * Type of host. For Cloud, this must be the machine type.
  */
-export const SEMRESATTRS_HOST_TYPE = (HOST + DOT + TYPE) as 'host.type';
+export const SEMRESATTRS_HOST_TYPE = TMP_HOST_TYPE;
 
 /**
  * The CPU architecture the host system is running on.
  */
-export const SEMRESATTRS_HOST_ARCH = (HOST + DOT + 'arch') as 'host.arch';
+export const SEMRESATTRS_HOST_ARCH = TMP_HOST_ARCH;
 
 /**
  * Name of the VM image or OS install the host was instantiated from.
  */
-export const SEMRESATTRS_HOST_IMAGE_NAME = (HOST +
-  DOT +
-  IMAGE_DOT +
-  NAME) as 'host.image.name';
+export const SEMRESATTRS_HOST_IMAGE_NAME = TMP_HOST_IMAGE_NAME;
 
 /**
  * VM image ID. For Cloud, this value is from the provider.
  */
-export const SEMRESATTRS_HOST_IMAGE_ID = (HOST +
-  DOT +
-  IMAGE_DOT +
-  ID) as 'host.image.id';
+export const SEMRESATTRS_HOST_IMAGE_ID = TMP_HOST_IMAGE_ID;
 
 /**
  * The version string of the VM image as defined in [Version Attributes](README.md#version-attributes).
  */
-export const SEMRESATTRS_HOST_IMAGE_VERSION = (HOST +
-  DOT +
-  IMAGE_DOT +
-  VERSION) as 'host.image.version';
+export const SEMRESATTRS_HOST_IMAGE_VERSION = TMP_HOST_IMAGE_VERSION;
 
 /**
  * The name of the cluster.
  */
-export const SEMRESATTRS_K8S_CLUSTER_NAME = (K8S_DOT +
-  CLUSTER_DOT +
-  NAME) as 'k8s.cluster.name';
+export const SEMRESATTRS_K8S_CLUSTER_NAME = TMP_K8S_CLUSTER_NAME;
 
 /**
  * The name of the Node.
  */
-export const SEMRESATTRS_K8S_NODE_NAME = (K8S_DOT +
-  NODE_DOT +
-  NAME) as 'k8s.node.name';
+export const SEMRESATTRS_K8S_NODE_NAME = TMP_K8S_NODE_NAME;
 
 /**
  * The UID of the Node.
  */
-export const SEMRESATTRS_K8S_NODE_UID = (K8S_DOT +
-  NODE_DOT +
-  UID) as 'k8s.node.uid';
+export const SEMRESATTRS_K8S_NODE_UID = TMP_K8S_NODE_UID;
 
 /**
  * The name of the namespace that the pod is running in.
  */
-export const SEMRESATTRS_K8S_NAMESPACE_NAME = (K8S_DOT +
-  NAME +
-  SPACE +
-  DOT +
-  NAME) as 'k8s.namespace.name';
+export const SEMRESATTRS_K8S_NAMESPACE_NAME = TMP_K8S_NAMESPACE_NAME;
 
 /**
  * The UID of the Pod.
  */
-export const SEMRESATTRS_K8S_POD_UID = (K8S_DOT + 'pod.uid') as 'k8s.pod.uid';
+export const SEMRESATTRS_K8S_POD_UID = TMP_K8S_POD_UID;
 
 /**
  * The name of the Pod.
  */
-export const SEMRESATTRS_K8S_POD_NAME = (K8S_DOT +
-  'pod.name') as 'k8s.pod.name';
+export const SEMRESATTRS_K8S_POD_NAME = TMP_K8S_POD_NAME;
 
 /**
  * The name of the Container in a Pod template.
  */
-export const SEMRESATTRS_K8S_CONTAINER_NAME = (K8S_DOT +
-  CONTAINER_DOT +
-  NAME) as 'k8s.container.name';
+export const SEMRESATTRS_K8S_CONTAINER_NAME = TMP_K8S_CONTAINER_NAME;
 
 /**
  * The UID of the ReplicaSet.
  */
-export const SEMRESATTRS_K8S_REPLICASET_UID = (K8S_DOT +
-  REPLICA +
-  SET_DOT +
-  UID) as 'k8s.replicaset.uid';
+export const SEMRESATTRS_K8S_REPLICASET_UID = TMP_K8S_REPLICASET_UID;
 
 /**
  * The name of the ReplicaSet.
  */
-export const SEMRESATTRS_K8S_REPLICASET_NAME = (K8S_DOT +
-  REPLICA +
-  SET_DOT +
-  NAME) as 'k8s.replicaset.name';
+export const SEMRESATTRS_K8S_REPLICASET_NAME = TMP_K8S_REPLICASET_NAME;
 
 /**
  * The UID of the Deployment.
  */
-export const SEMRESATTRS_K8S_DEPLOYMENT_UID = (K8S_DOT +
-  DEPLOYMENT_DOT +
-  UID) as 'k8s.deployment.uid';
+export const SEMRESATTRS_K8S_DEPLOYMENT_UID = TMP_K8S_DEPLOYMENT_UID;
 
 /**
  * The name of the Deployment.
  */
-export const SEMRESATTRS_K8S_DEPLOYMENT_NAME = (K8S_DOT +
-  DEPLOYMENT_DOT +
-  NAME) as 'k8s.deployment.name';
+export const SEMRESATTRS_K8S_DEPLOYMENT_NAME = TMP_K8S_DEPLOYMENT_NAME;
 
 /**
  * The UID of the StatefulSet.
  */
-export const SEMRESATTRS_K8S_STATEFULSET_UID = (K8S_DOT +
-  STATEFUL +
-  SET_DOT +
-  UID) as 'k8s.statefulset.uid';
+export const SEMRESATTRS_K8S_STATEFULSET_UID = TMP_K8S_STATEFULSET_UID;
 
 /**
  * The name of the StatefulSet.
  */
-export const SEMRESATTRS_K8S_STATEFULSET_NAME = (K8S_DOT +
-  STATEFUL +
-  SET_DOT +
-  NAME) as 'k8s.statefulset.name';
+export const SEMRESATTRS_K8S_STATEFULSET_NAME = TMP_K8S_STATEFULSET_NAME;
 
 /**
  * The UID of the DaemonSet.
  */
-export const SEMRESATTRS_K8S_DAEMONSET_UID = (K8S_DOT +
-  DAEMON +
-  SET_DOT +
-  UID) as 'k8s.daemonset.uid';
+export const SEMRESATTRS_K8S_DAEMONSET_UID = TMP_K8S_DAEMONSET_UID;
 
 /**
  * The name of the DaemonSet.
  */
-export const SEMRESATTRS_K8S_DAEMONSET_NAME = (K8S_DOT +
-  DAEMON +
-  SET_DOT +
-  NAME) as 'k8s.daemonset.name';
+export const SEMRESATTRS_K8S_DAEMONSET_NAME = TMP_K8S_DAEMONSET_NAME;
 
 /**
  * The UID of the Job.
  */
-export const SEMRESATTRS_K8S_JOB_UID = (K8S_DOT +
-  JOB +
-  DOT +
-  UID) as 'k8s.job.uid';
+export const SEMRESATTRS_K8S_JOB_UID = TMP_K8S_JOB_UID;
 
 /**
  * The name of the Job.
  */
-export const SEMRESATTRS_K8S_JOB_NAME = (K8S_DOT +
-  JOB +
-  DOT +
-  NAME) as 'k8s.job.name';
+export const SEMRESATTRS_K8S_JOB_NAME = TMP_K8S_JOB_NAME;
 
 /**
  * The UID of the CronJob.
  */
-export const SEMRESATTRS_K8S_CRONJOB_UID = (K8S_DOT +
-  CRON +
-  JOB +
-  DOT +
-  UID) as 'k8s.cronjob.uid';
+export const SEMRESATTRS_K8S_CRONJOB_UID = TMP_K8S_CRONJOB_UID;
 
 /**
  * The name of the CronJob.
  */
-export const SEMRESATTRS_K8S_CRONJOB_NAME = (K8S_DOT +
-  CRON +
-  JOB +
-  DOT +
-  NAME) as 'k8s.cronjob.name';
+export const SEMRESATTRS_K8S_CRONJOB_NAME = TMP_K8S_CRONJOB_NAME;
 
 /**
  * The operating system type.
  */
-export const SEMRESATTRS_OS_TYPE = (OS_DOT + TYPE) as 'os.type';
+export const SEMRESATTRS_OS_TYPE = TMP_OS_TYPE;
 
 /**
  * Human readable (not intended to be parsed) OS version information, like e.g. reported by `ver` or `lsb_release -a` commands.
  */
-export const SEMRESATTRS_OS_DESCRIPTION = (OS_DOT +
-  DESCRIPTION) as 'os.description';
+export const SEMRESATTRS_OS_DESCRIPTION = TMP_OS_DESCRIPTION;
 
 /**
  * Human readable operating system name.
  */
-export const SEMRESATTRS_OS_NAME = (OS_DOT + NAME) as 'os.name';
+export const SEMRESATTRS_OS_NAME = TMP_OS_NAME;
 
 /**
  * The version string of the operating system as defined in [Version Attributes](../../resource/semantic_conventions/README.md#version-attributes).
  */
-export const SEMRESATTRS_OS_VERSION = (OS_DOT + VERSION) as 'os.version';
+export const SEMRESATTRS_OS_VERSION = TMP_OS_VERSION;
 
 /**
  * Process identifier (PID).
  */
-export const SEMRESATTRS_PROCESS_PID = (PROCESS_DOT + 'pid') as 'process.pid';
+export const SEMRESATTRS_PROCESS_PID = TMP_PROCESS_PID;
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
  */
-export const SEMRESATTRS_PROCESS_EXECUTABLE_NAME = (PROCESS_DOT +
-  EXECUTABLE_DOT +
-  NAME) as 'process.executable.name';
+export const SEMRESATTRS_PROCESS_EXECUTABLE_NAME = TMP_PROCESS_EXECUTABLE_NAME;
 
 /**
  * The full path to the process executable. On Linux based systems, can be set to the target of `proc/[pid]/exe`. On Windows, can be set to the result of `GetProcessImageFileNameW`.
  */
-export const SEMRESATTRS_PROCESS_EXECUTABLE_PATH = (PROCESS_DOT +
-  EXECUTABLE_DOT +
-  'path') as 'process.executable.path';
+export const SEMRESATTRS_PROCESS_EXECUTABLE_PATH = TMP_PROCESS_EXECUTABLE_PATH;
 
 /**
  * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
  */
-export const SEMRESATTRS_PROCESS_COMMAND = (PROCESS_DOT +
-  COMMAND) as 'process.command';
+export const SEMRESATTRS_PROCESS_COMMAND = TMP_PROCESS_COMMAND;
 
 /**
  * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
  */
-export const SEMRESATTRS_PROCESS_COMMAND_LINE = (PROCESS_DOT +
-  COMMAND +
-  UNDERSCORE +
-  'line') as 'process.command_line';
+export const SEMRESATTRS_PROCESS_COMMAND_LINE = TMP_PROCESS_COMMAND_LINE;
 
 /**
  * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
  */
-export const SEMRESATTRS_PROCESS_COMMAND_ARGS = (PROCESS_DOT +
-  COMMAND +
-  UNDERSCORE +
-  'args') as 'process.command_args';
+export const SEMRESATTRS_PROCESS_COMMAND_ARGS = TMP_PROCESS_COMMAND_ARGS;
 
 /**
  * The username of the user that owns the process.
  */
-export const SEMRESATTRS_PROCESS_OWNER = (PROCESS_DOT +
-  'owner') as 'process.owner';
+export const SEMRESATTRS_PROCESS_OWNER = TMP_PROCESS_OWNER;
 
 /**
  * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of the compiler.
  */
-export const SEMRESATTRS_PROCESS_RUNTIME_NAME = (PROCESS_DOT +
-  RUNTIME_DOT +
-  NAME) as 'process.runtime.name';
+export const SEMRESATTRS_PROCESS_RUNTIME_NAME = TMP_PROCESS_RUNTIME_NAME;
 
 /**
  * The version of the runtime of this process, as returned by the runtime without modification.
  */
-export const SEMRESATTRS_PROCESS_RUNTIME_VERSION = (PROCESS_DOT +
-  RUNTIME_DOT +
-  VERSION) as 'process.runtime.version';
+export const SEMRESATTRS_PROCESS_RUNTIME_VERSION = TMP_PROCESS_RUNTIME_VERSION;
 
 /**
  * An additional description about the runtime of the process, for example a specific vendor customization of the runtime environment.
  */
-export const SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION = (PROCESS_DOT +
-  RUNTIME_DOT +
-  DESCRIPTION) as 'process.runtime.description';
+export const SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION =
+  TMP_PROCESS_RUNTIME_DESCRIPTION;
 
 /**
  * Logical name of the service.
  *
  * Note: MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md#process), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
  */
-export const SEMRESATTRS_SERVICE_NAME = (SERVICE_DOT + NAME) as 'service.name';
+export const SEMRESATTRS_SERVICE_NAME = TMP_SERVICE_NAME;
 
 /**
  * A namespace for `service.name`.
  *
  * Note: A string value having a meaning that helps to distinguish a group of services, for example the team name that owns a group of services. `service.name` is expected to be unique within the same namespace. If `service.namespace` is not specified in the Resource then `service.name` is expected to be unique for all services that have no explicit namespace defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length namespace string is assumed equal to unspecified namespace.
  */
-export const SEMRESATTRS_SERVICE_NAMESPACE = (SERVICE_DOT +
-  NAME +
-  SPACE) as 'service.namespace';
+export const SEMRESATTRS_SERVICE_NAMESPACE = TMP_SERVICE_NAMESPACE;
 
 /**
  * The string ID of the service instance.
  *
  * Note: MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled service). It is preferable for the ID to be persistent and stay the same for the lifetime of the service instance, however it is acceptable that the ID is ephemeral and changes during important lifetime events for the service (e.g. service restarts). If the service has no inherent unique ID that can be used as the value of this attribute it is recommended to generate a random Version 1 or Version 4 RFC 4122 UUID (services aiming for reproducible UUIDs may also use Version 5, see RFC 4122 for more recommendations).
  */
-export const SEMRESATTRS_SERVICE_INSTANCE_ID = (SERVICE_DOT +
-  INSTANCE +
-  DOT +
-  ID) as 'service.instance.id';
+export const SEMRESATTRS_SERVICE_INSTANCE_ID = TMP_SERVICE_INSTANCE_ID;
 
 /**
  * The version string of the service API or implementation.
  */
-export const SEMRESATTRS_SERVICE_VERSION = (SERVICE_DOT +
-  VERSION) as 'service.version';
+export const SEMRESATTRS_SERVICE_VERSION = TMP_SERVICE_VERSION;
 
 /**
  * The name of the telemetry SDK as defined above.
  */
-export const SEMRESATTRS_TELEMETRY_SDK_NAME = (TELEMETRY_DOT +
-  SDK_DOT +
-  NAME) as 'telemetry.sdk.name';
+export const SEMRESATTRS_TELEMETRY_SDK_NAME = TMP_TELEMETRY_SDK_NAME;
 
 /**
  * The language of the telemetry SDK.
  */
-export const SEMRESATTRS_TELEMETRY_SDK_LANGUAGE = (TELEMETRY_DOT +
-  SDK_DOT +
-  'language') as 'telemetry.sdk.language';
+export const SEMRESATTRS_TELEMETRY_SDK_LANGUAGE = TMP_TELEMETRY_SDK_LANGUAGE;
 
 /**
  * The version string of the telemetry SDK.
  */
-export const SEMRESATTRS_TELEMETRY_SDK_VERSION = (TELEMETRY_DOT +
-  SDK_DOT +
-  VERSION) as 'telemetry.sdk.version';
+export const SEMRESATTRS_TELEMETRY_SDK_VERSION = TMP_TELEMETRY_SDK_VERSION;
 
 /**
  * The version string of the auto instrumentation agent, if used.
  */
-export const SEMRESATTRS_TELEMETRY_AUTO_VERSION = (TELEMETRY_DOT +
-  'auto.version') as 'telemetry.auto.version';
+export const SEMRESATTRS_TELEMETRY_AUTO_VERSION = TMP_TELEMETRY_AUTO_VERSION;
 
 /**
  * The name of the web engine.
  */
-export const SEMRESATTRS_WEBENGINE_NAME = (WEBENGINE_DOT +
-  NAME) as 'webengine.name';
+export const SEMRESATTRS_WEBENGINE_NAME = TMP_WEBENGINE_NAME;
 
 /**
  * The version of the web engine.
  */
-export const SEMRESATTRS_WEBENGINE_VERSION = (WEBENGINE_DOT +
-  VERSION) as 'webengine.version';
+export const SEMRESATTRS_WEBENGINE_VERSION = TMP_WEBENGINE_VERSION;
 
 /**
  * Additional description of the web engine (e.g. detailed version and edition information).
  */
-export const SEMRESATTRS_WEBENGINE_DESCRIPTION = (WEBENGINE_DOT +
-  DESCRIPTION) as 'webengine.description';
+export const SEMRESATTRS_WEBENGINE_DESCRIPTION = TMP_WEBENGINE_DESCRIPTION;
 
 /**
  * Definition of available values for SemanticResourceAttributes
@@ -1162,88 +1039,88 @@ As an alternative, consider setting `faas.id` as a span attribute instead.
  * @deprecated Use the SEMRESATTRS_XXXXX constants rather than the SemanticResourceAttributes.XXXXX for bundle minification
  */
 export const SemanticResourceAttributes: SemanticResourceAttributes =
-  createConstMap<SemanticResourceAttributes>([
-    SEMRESATTRS_CLOUD_PROVIDER,
-    SEMRESATTRS_CLOUD_ACCOUNT_ID,
-    SEMRESATTRS_CLOUD_REGION,
-    SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
-    SEMRESATTRS_CLOUD_PLATFORM,
-    SEMRESATTRS_AWS_ECS_CONTAINER_ARN,
-    SEMRESATTRS_AWS_ECS_CLUSTER_ARN,
-    SEMRESATTRS_AWS_ECS_LAUNCHTYPE,
-    SEMRESATTRS_AWS_ECS_TASK_ARN,
-    SEMRESATTRS_AWS_ECS_TASK_FAMILY,
-    SEMRESATTRS_AWS_ECS_TASK_REVISION,
-    SEMRESATTRS_AWS_EKS_CLUSTER_ARN,
-    SEMRESATTRS_AWS_LOG_GROUP_NAMES,
-    SEMRESATTRS_AWS_LOG_GROUP_ARNS,
-    SEMRESATTRS_AWS_LOG_STREAM_NAMES,
-    SEMRESATTRS_AWS_LOG_STREAM_ARNS,
-    SEMRESATTRS_CONTAINER_NAME,
-    SEMRESATTRS_CONTAINER_ID,
-    SEMRESATTRS_CONTAINER_RUNTIME,
-    SEMRESATTRS_CONTAINER_IMAGE_NAME,
-    SEMRESATTRS_CONTAINER_IMAGE_TAG,
-    SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
-    SEMRESATTRS_DEVICE_ID,
-    SEMRESATTRS_DEVICE_MODEL_IDENTIFIER,
-    SEMRESATTRS_DEVICE_MODEL_NAME,
-    SEMRESATTRS_FAAS_NAME,
-    SEMRESATTRS_FAAS_ID,
-    SEMRESATTRS_FAAS_VERSION,
-    SEMRESATTRS_FAAS_INSTANCE,
-    SEMRESATTRS_FAAS_MAX_MEMORY,
-    SEMRESATTRS_HOST_ID,
-    SEMRESATTRS_HOST_NAME,
-    SEMRESATTRS_HOST_TYPE,
-    SEMRESATTRS_HOST_ARCH,
-    SEMRESATTRS_HOST_IMAGE_NAME,
-    SEMRESATTRS_HOST_IMAGE_ID,
-    SEMRESATTRS_HOST_IMAGE_VERSION,
-    SEMRESATTRS_K8S_CLUSTER_NAME,
-    SEMRESATTRS_K8S_NODE_NAME,
-    SEMRESATTRS_K8S_NODE_UID,
-    SEMRESATTRS_K8S_NAMESPACE_NAME,
-    SEMRESATTRS_K8S_POD_UID,
-    SEMRESATTRS_K8S_POD_NAME,
-    SEMRESATTRS_K8S_CONTAINER_NAME,
-    SEMRESATTRS_K8S_REPLICASET_UID,
-    SEMRESATTRS_K8S_REPLICASET_NAME,
-    SEMRESATTRS_K8S_DEPLOYMENT_UID,
-    SEMRESATTRS_K8S_DEPLOYMENT_NAME,
-    SEMRESATTRS_K8S_STATEFULSET_UID,
-    SEMRESATTRS_K8S_STATEFULSET_NAME,
-    SEMRESATTRS_K8S_DAEMONSET_UID,
-    SEMRESATTRS_K8S_DAEMONSET_NAME,
-    SEMRESATTRS_K8S_JOB_UID,
-    SEMRESATTRS_K8S_JOB_NAME,
-    SEMRESATTRS_K8S_CRONJOB_UID,
-    SEMRESATTRS_K8S_CRONJOB_NAME,
-    SEMRESATTRS_OS_TYPE,
-    SEMRESATTRS_OS_DESCRIPTION,
-    SEMRESATTRS_OS_NAME,
-    SEMRESATTRS_OS_VERSION,
-    SEMRESATTRS_PROCESS_PID,
-    SEMRESATTRS_PROCESS_EXECUTABLE_NAME,
-    SEMRESATTRS_PROCESS_EXECUTABLE_PATH,
-    SEMRESATTRS_PROCESS_COMMAND,
-    SEMRESATTRS_PROCESS_COMMAND_LINE,
-    SEMRESATTRS_PROCESS_COMMAND_ARGS,
-    SEMRESATTRS_PROCESS_OWNER,
-    SEMRESATTRS_PROCESS_RUNTIME_NAME,
-    SEMRESATTRS_PROCESS_RUNTIME_VERSION,
-    SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION,
-    SEMRESATTRS_SERVICE_NAME,
-    SEMRESATTRS_SERVICE_NAMESPACE,
-    SEMRESATTRS_SERVICE_INSTANCE_ID,
-    SEMRESATTRS_SERVICE_VERSION,
-    SEMRESATTRS_TELEMETRY_SDK_NAME,
-    SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-    SEMRESATTRS_TELEMETRY_SDK_VERSION,
-    SEMRESATTRS_TELEMETRY_AUTO_VERSION,
-    SEMRESATTRS_WEBENGINE_NAME,
-    SEMRESATTRS_WEBENGINE_VERSION,
-    SEMRESATTRS_WEBENGINE_DESCRIPTION,
+  /*#__PURE__*/ createConstMap<SemanticResourceAttributes>([
+    TMP_CLOUD_PROVIDER,
+    TMP_CLOUD_ACCOUNT_ID,
+    TMP_CLOUD_REGION,
+    TMP_CLOUD_AVAILABILITY_ZONE,
+    TMP_CLOUD_PLATFORM,
+    TMP_AWS_ECS_CONTAINER_ARN,
+    TMP_AWS_ECS_CLUSTER_ARN,
+    TMP_AWS_ECS_LAUNCHTYPE,
+    TMP_AWS_ECS_TASK_ARN,
+    TMP_AWS_ECS_TASK_FAMILY,
+    TMP_AWS_ECS_TASK_REVISION,
+    TMP_AWS_EKS_CLUSTER_ARN,
+    TMP_AWS_LOG_GROUP_NAMES,
+    TMP_AWS_LOG_GROUP_ARNS,
+    TMP_AWS_LOG_STREAM_NAMES,
+    TMP_AWS_LOG_STREAM_ARNS,
+    TMP_CONTAINER_NAME,
+    TMP_CONTAINER_ID,
+    TMP_CONTAINER_RUNTIME,
+    TMP_CONTAINER_IMAGE_NAME,
+    TMP_CONTAINER_IMAGE_TAG,
+    TMP_DEPLOYMENT_ENVIRONMENT,
+    TMP_DEVICE_ID,
+    TMP_DEVICE_MODEL_IDENTIFIER,
+    TMP_DEVICE_MODEL_NAME,
+    TMP_FAAS_NAME,
+    TMP_FAAS_ID,
+    TMP_FAAS_VERSION,
+    TMP_FAAS_INSTANCE,
+    TMP_FAAS_MAX_MEMORY,
+    TMP_HOST_ID,
+    TMP_HOST_NAME,
+    TMP_HOST_TYPE,
+    TMP_HOST_ARCH,
+    TMP_HOST_IMAGE_NAME,
+    TMP_HOST_IMAGE_ID,
+    TMP_HOST_IMAGE_VERSION,
+    TMP_K8S_CLUSTER_NAME,
+    TMP_K8S_NODE_NAME,
+    TMP_K8S_NODE_UID,
+    TMP_K8S_NAMESPACE_NAME,
+    TMP_K8S_POD_UID,
+    TMP_K8S_POD_NAME,
+    TMP_K8S_CONTAINER_NAME,
+    TMP_K8S_REPLICASET_UID,
+    TMP_K8S_REPLICASET_NAME,
+    TMP_K8S_DEPLOYMENT_UID,
+    TMP_K8S_DEPLOYMENT_NAME,
+    TMP_K8S_STATEFULSET_UID,
+    TMP_K8S_STATEFULSET_NAME,
+    TMP_K8S_DAEMONSET_UID,
+    TMP_K8S_DAEMONSET_NAME,
+    TMP_K8S_JOB_UID,
+    TMP_K8S_JOB_NAME,
+    TMP_K8S_CRONJOB_UID,
+    TMP_K8S_CRONJOB_NAME,
+    TMP_OS_TYPE,
+    TMP_OS_DESCRIPTION,
+    TMP_OS_NAME,
+    TMP_OS_VERSION,
+    TMP_PROCESS_PID,
+    TMP_PROCESS_EXECUTABLE_NAME,
+    TMP_PROCESS_EXECUTABLE_PATH,
+    TMP_PROCESS_COMMAND,
+    TMP_PROCESS_COMMAND_LINE,
+    TMP_PROCESS_COMMAND_ARGS,
+    TMP_PROCESS_OWNER,
+    TMP_PROCESS_RUNTIME_NAME,
+    TMP_PROCESS_RUNTIME_VERSION,
+    TMP_PROCESS_RUNTIME_DESCRIPTION,
+    TMP_SERVICE_NAME,
+    TMP_SERVICE_NAMESPACE,
+    TMP_SERVICE_INSTANCE_ID,
+    TMP_SERVICE_VERSION,
+    TMP_TELEMETRY_SDK_NAME,
+    TMP_TELEMETRY_SDK_LANGUAGE,
+    TMP_TELEMETRY_SDK_VERSION,
+    TMP_TELEMETRY_AUTO_VERSION,
+    TMP_WEBENGINE_NAME,
+    TMP_WEBENGINE_VERSION,
+    TMP_WEBENGINE_DESCRIPTION,
   ]);
 
 /* ----------------------------------------------------------------------------------------------------------
@@ -1252,25 +1129,33 @@ export const SemanticResourceAttributes: SemanticResourceAttributes =
  * Name of the cloud provider.
  * ---------------------------------------------------------------------------------------------------------- */
 
-/**
- * Name of the cloud provider.
- */
-export const CLOUDPROVIDERVALUES_ALIBABA_CLOUD = 'alibaba_cloud';
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifable export names for some package types
+const TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD = 'alibaba_cloud';
+const TMP_CLOUDPROVIDERVALUES_AWS = 'aws';
+const TMP_CLOUDPROVIDERVALUES_AZURE = 'azure';
+const TMP_CLOUDPROVIDERVALUES_GCP = 'gcp';
 
 /**
  * Name of the cloud provider.
  */
-export const CLOUDPROVIDERVALUES_AWS = AWS as 'aws';
+export const CLOUDPROVIDERVALUES_ALIBABA_CLOUD =
+  TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD;
 
 /**
  * Name of the cloud provider.
  */
-export const CLOUDPROVIDERVALUES_AZURE = AZURE as 'azure';
+export const CLOUDPROVIDERVALUES_AWS = TMP_CLOUDPROVIDERVALUES_AWS;
 
 /**
  * Name of the cloud provider.
  */
-export const CLOUDPROVIDERVALUES_GCP = 'gcp';
+export const CLOUDPROVIDERVALUES_AZURE = TMP_CLOUDPROVIDERVALUES_AZURE;
+
+/**
+ * Name of the cloud provider.
+ */
+export const CLOUDPROVIDERVALUES_GCP = TMP_CLOUDPROVIDERVALUES_GCP;
 
 /**
  * Identifies the Values for CloudProviderValues enum definition
@@ -1281,10 +1166,13 @@ export const CLOUDPROVIDERVALUES_GCP = 'gcp';
 export type CloudProviderValues = {
   /** Alibaba Cloud. */
   ALIBABA_CLOUD: 'alibaba_cloud';
+
   /** Amazon Web Services. */
   AWS: 'aws';
+
   /** Microsoft Azure. */
   AZURE: 'azure';
+
   /** Google Cloud Platform. */
   GCP: 'gcp';
 };
@@ -1294,10 +1182,10 @@ export type CloudProviderValues = {
  * @deprecated Use the CLOUDPROVIDERVALUES_XXXXX constants rather than the CloudProviderValues.XXXXX for bundle minification.
  */
 export const CloudProviderValues: CloudProviderValues = {
-  ALIBABA_CLOUD: CLOUDPROVIDERVALUES_ALIBABA_CLOUD,
-  AWS: CLOUDPROVIDERVALUES_AWS,
-  AZURE: CLOUDPROVIDERVALUES_AZURE,
-  GCP: CLOUDPROVIDERVALUES_GCP,
+  ALIBABA_CLOUD: TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD,
+  AWS: TMP_CLOUDPROVIDERVALUES_AWS,
+  AZURE: TMP_CLOUDPROVIDERVALUES_AZURE,
+  GCP: TMP_CLOUDPROVIDERVALUES_GCP,
 };
 
 /* ----------------------------------------------------------------------------------------------------------
@@ -1308,123 +1196,133 @@ export const CloudProviderValues: CloudProviderValues = {
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  * ---------------------------------------------------------------------------------------------------------- */
 
-/**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
- */
-export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifable export names for some package types
+const TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
+const TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
+const TMP_CLOUDPLATFORMVALUES_AWS_EC2 = 'aws_ec2';
+const TMP_CLOUDPLATFORMVALUES_AWS_ECS = 'aws_ecs';
+const TMP_CLOUDPLATFORMVALUES_AWS_EKS = 'aws_eks';
+const TMP_CLOUDPLATFORMVALUES_AWS_LAMBDA = 'aws_lambda';
+const TMP_CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK = 'aws_elastic_beanstalk';
+const TMP_CLOUDPLATFORMVALUES_AZURE_VM = 'azure_vm';
+const TMP_CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES =
+  'azure_container_instances';
+const TMP_CLOUDPLATFORMVALUES_AZURE_AKS = 'azure_aks';
+const TMP_CLOUDPLATFORMVALUES_AZURE_FUNCTIONS = 'azure_functions';
+const TMP_CLOUDPLATFORMVALUES_AZURE_APP_SERVICE = 'azure_app_service';
+const TMP_CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
+const TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_RUN = 'gcp_cloud_run';
+const TMP_CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE = 'gcp_kubernetes_engine';
+const TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions';
+const TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE = 'gcp_app_engine';
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
+export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS =
+  TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AWS_EC2 = (AWS +
-  UNDERSCORE +
-  'ec2') as 'aws_ec2';
+export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC =
+  TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AWS_ECS = (AWS +
-  UNDERSCORE +
-  'ecs') as 'aws_ecs';
+export const CLOUDPLATFORMVALUES_AWS_EC2 = TMP_CLOUDPLATFORMVALUES_AWS_EC2;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AWS_EKS = (AWS +
-  UNDERSCORE +
-  'eks') as 'aws_eks';
+export const CLOUDPLATFORMVALUES_AWS_ECS = TMP_CLOUDPLATFORMVALUES_AWS_ECS;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AWS_LAMBDA = (AWS +
-  UNDERSCORE +
-  'lambda') as 'aws_lambda';
+export const CLOUDPLATFORMVALUES_AWS_EKS = TMP_CLOUDPLATFORMVALUES_AWS_EKS;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK = (AWS +
-  UNDERSCORE +
-  'elastic_beanstalk') as 'aws_elastic_beanstalk';
+export const CLOUDPLATFORMVALUES_AWS_LAMBDA =
+  TMP_CLOUDPLATFORMVALUES_AWS_LAMBDA;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AZURE_VM = (AZURE +
-  UNDERSCORE +
-  'vm') as 'azure_vm';
+export const CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK =
+  TMP_CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES = (AZURE +
-  UNDERSCORE +
-  'container_instances') as 'azure_container_instances';
+export const CLOUDPLATFORMVALUES_AZURE_VM = TMP_CLOUDPLATFORMVALUES_AZURE_VM;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AZURE_AKS = (AZURE +
-  UNDERSCORE +
-  'aks') as 'azure_aks';
+export const CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES =
+  TMP_CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AZURE_FUNCTIONS = (AZURE +
-  UNDERSCORE +
-  'functions') as 'azure_functions';
+export const CLOUDPLATFORMVALUES_AZURE_AKS = TMP_CLOUDPLATFORMVALUES_AZURE_AKS;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_AZURE_APP_SERVICE = (AZURE +
-  UNDERSCORE +
-  'app_service') as 'azure_app_service';
+export const CLOUDPLATFORMVALUES_AZURE_FUNCTIONS =
+  TMP_CLOUDPLATFORMVALUES_AZURE_FUNCTIONS;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
+export const CLOUDPLATFORMVALUES_AZURE_APP_SERVICE =
+  TMP_CLOUDPLATFORMVALUES_AZURE_APP_SERVICE;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_GCP_CLOUD_RUN = 'gcp_cloud_run';
+export const CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE =
+  TMP_CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE;
+
+/**
+ * The cloud platform in use.
+ *
+ * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ */
+export const CLOUDPLATFORMVALUES_GCP_CLOUD_RUN =
+  TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_RUN;
 
 /**
  * The cloud platform in use.
@@ -1432,21 +1330,23 @@ export const CLOUDPLATFORMVALUES_GCP_CLOUD_RUN = 'gcp_cloud_run';
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
 export const CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE =
-  'gcp_kubernetes_engine';
+  TMP_CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions';
+export const CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS =
+  TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS;
 
 /**
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  */
-export const CLOUDPLATFORMVALUES_GCP_APP_ENGINE = 'gcp_app_engine';
+export const CLOUDPLATFORMVALUES_GCP_APP_ENGINE =
+  TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE;
 
 /**
  * Identifies the Values for CloudPlatformValues enum definition
@@ -1459,36 +1359,52 @@ export const CLOUDPLATFORMVALUES_GCP_APP_ENGINE = 'gcp_app_engine';
 export type CloudPlatformValues = {
   /** Alibaba Cloud Elastic Compute Service. */
   ALIBABA_CLOUD_ECS: 'alibaba_cloud_ecs';
+
   /** Alibaba Cloud Function Compute. */
   ALIBABA_CLOUD_FC: 'alibaba_cloud_fc';
+
   /** AWS Elastic Compute Cloud. */
   AWS_EC2: 'aws_ec2';
+
   /** AWS Elastic Container Service. */
   AWS_ECS: 'aws_ecs';
+
   /** AWS Elastic Kubernetes Service. */
   AWS_EKS: 'aws_eks';
+
   /** AWS Lambda. */
   AWS_LAMBDA: 'aws_lambda';
+
   /** AWS Elastic Beanstalk. */
   AWS_ELASTIC_BEANSTALK: 'aws_elastic_beanstalk';
+
   /** Azure Virtual Machines. */
   AZURE_VM: 'azure_vm';
+
   /** Azure Container Instances. */
   AZURE_CONTAINER_INSTANCES: 'azure_container_instances';
+
   /** Azure Kubernetes Service. */
   AZURE_AKS: 'azure_aks';
+
   /** Azure Functions. */
   AZURE_FUNCTIONS: 'azure_functions';
+
   /** Azure App Service. */
   AZURE_APP_SERVICE: 'azure_app_service';
+
   /** Google Cloud Compute Engine (GCE). */
   GCP_COMPUTE_ENGINE: 'gcp_compute_engine';
+
   /** Google Cloud Run. */
   GCP_CLOUD_RUN: 'gcp_cloud_run';
+
   /** Google Cloud Kubernetes Engine (GKE). */
   GCP_KUBERNETES_ENGINE: 'gcp_kubernetes_engine';
+
   /** Google Cloud Functions (GCF). */
   GCP_CLOUD_FUNCTIONS: 'gcp_cloud_functions';
+
   /** Google Cloud App Engine (GAE). */
   GCP_APP_ENGINE: 'gcp_app_engine';
 };
@@ -1498,23 +1414,23 @@ export type CloudPlatformValues = {
  * @deprecated Use the CLOUDPLATFORMVALUES_XXXXX constants rather than the CloudPlatformValues.XXXXX for bundle minification.
  */
 export const CloudPlatformValues: CloudPlatformValues = {
-  ALIBABA_CLOUD_ECS: CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS,
-  ALIBABA_CLOUD_FC: CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC,
-  AWS_EC2: CLOUDPLATFORMVALUES_AWS_EC2,
-  AWS_ECS: CLOUDPLATFORMVALUES_AWS_ECS,
-  AWS_EKS: CLOUDPLATFORMVALUES_AWS_EKS,
-  AWS_LAMBDA: CLOUDPLATFORMVALUES_AWS_LAMBDA,
-  AWS_ELASTIC_BEANSTALK: CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK,
-  AZURE_VM: CLOUDPLATFORMVALUES_AZURE_VM,
-  AZURE_CONTAINER_INSTANCES: CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES,
-  AZURE_AKS: CLOUDPLATFORMVALUES_AZURE_AKS,
-  AZURE_FUNCTIONS: CLOUDPLATFORMVALUES_AZURE_FUNCTIONS,
-  AZURE_APP_SERVICE: CLOUDPLATFORMVALUES_AZURE_APP_SERVICE,
-  GCP_COMPUTE_ENGINE: CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE,
-  GCP_CLOUD_RUN: CLOUDPLATFORMVALUES_GCP_CLOUD_RUN,
-  GCP_KUBERNETES_ENGINE: CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE,
-  GCP_CLOUD_FUNCTIONS: CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS,
-  GCP_APP_ENGINE: CLOUDPLATFORMVALUES_GCP_APP_ENGINE,
+  ALIBABA_CLOUD_ECS: TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS,
+  ALIBABA_CLOUD_FC: TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC,
+  AWS_EC2: TMP_CLOUDPLATFORMVALUES_AWS_EC2,
+  AWS_ECS: TMP_CLOUDPLATFORMVALUES_AWS_ECS,
+  AWS_EKS: TMP_CLOUDPLATFORMVALUES_AWS_EKS,
+  AWS_LAMBDA: TMP_CLOUDPLATFORMVALUES_AWS_LAMBDA,
+  AWS_ELASTIC_BEANSTALK: TMP_CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK,
+  AZURE_VM: TMP_CLOUDPLATFORMVALUES_AZURE_VM,
+  AZURE_CONTAINER_INSTANCES: TMP_CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES,
+  AZURE_AKS: TMP_CLOUDPLATFORMVALUES_AZURE_AKS,
+  AZURE_FUNCTIONS: TMP_CLOUDPLATFORMVALUES_AZURE_FUNCTIONS,
+  AZURE_APP_SERVICE: TMP_CLOUDPLATFORMVALUES_AZURE_APP_SERVICE,
+  GCP_COMPUTE_ENGINE: TMP_CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE,
+  GCP_CLOUD_RUN: TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_RUN,
+  GCP_KUBERNETES_ENGINE: TMP_CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE,
+  GCP_CLOUD_FUNCTIONS: TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS,
+  GCP_APP_ENGINE: TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE,
 };
 
 /* ----------------------------------------------------------------------------------------------------------
@@ -1523,15 +1439,21 @@ export const CloudPlatformValues: CloudPlatformValues = {
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
  * ---------------------------------------------------------------------------------------------------------- */
 
-/**
- * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
- */
-export const AWSECSLAUNCHTYPEVALUES_EC2 = 'ec2';
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifable export names for some package types
+const TMP_AWSECSLAUNCHTYPEVALUES_EC2 = 'ec2';
+const TMP_AWSECSLAUNCHTYPEVALUES_FARGATE = 'fargate';
 
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
  */
-export const AWSECSLAUNCHTYPEVALUES_FARGATE = 'fargate';
+export const AWSECSLAUNCHTYPEVALUES_EC2 = TMP_AWSECSLAUNCHTYPEVALUES_EC2;
+
+/**
+ * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
+ */
+export const AWSECSLAUNCHTYPEVALUES_FARGATE =
+  TMP_AWSECSLAUNCHTYPEVALUES_FARGATE;
 
 /**
  * Identifies the Values for AwsEcsLaunchtypeValues enum definition
@@ -1542,6 +1464,7 @@ export const AWSECSLAUNCHTYPEVALUES_FARGATE = 'fargate';
 export type AwsEcsLaunchtypeValues = {
   /** ec2. */
   EC2: 'ec2';
+
   /** fargate. */
   FARGATE: 'fargate';
 };
@@ -1551,8 +1474,8 @@ export type AwsEcsLaunchtypeValues = {
  * @deprecated Use the AWSECSLAUNCHTYPEVALUES_XXXXX constants rather than the AwsEcsLaunchtypeValues.XXXXX for bundle minification.
  */
 export const AwsEcsLaunchtypeValues: AwsEcsLaunchtypeValues = {
-  EC2: AWSECSLAUNCHTYPEVALUES_EC2,
-  FARGATE: AWSECSLAUNCHTYPEVALUES_FARGATE,
+  EC2: TMP_AWSECSLAUNCHTYPEVALUES_EC2,
+  FARGATE: TMP_AWSECSLAUNCHTYPEVALUES_FARGATE,
 };
 
 /* ----------------------------------------------------------------------------------------------------------
@@ -1561,40 +1484,50 @@ export const AwsEcsLaunchtypeValues: AwsEcsLaunchtypeValues = {
  * The CPU architecture the host system is running on.
  * ---------------------------------------------------------------------------------------------------------- */
 
-/**
- * The CPU architecture the host system is running on.
- */
-export const HOSTARCHVALUES_AMD64 = 'amd64';
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifable export names for some package types
+const TMP_HOSTARCHVALUES_AMD64 = 'amd64';
+const TMP_HOSTARCHVALUES_ARM32 = 'arm32';
+const TMP_HOSTARCHVALUES_ARM64 = 'arm64';
+const TMP_HOSTARCHVALUES_IA64 = 'ia64';
+const TMP_HOSTARCHVALUES_PPC32 = 'ppc32';
+const TMP_HOSTARCHVALUES_PPC64 = 'ppc64';
+const TMP_HOSTARCHVALUES_X86 = 'x86';
 
 /**
  * The CPU architecture the host system is running on.
  */
-export const HOSTARCHVALUES_ARM32 = 'arm32';
+export const HOSTARCHVALUES_AMD64 = TMP_HOSTARCHVALUES_AMD64;
 
 /**
  * The CPU architecture the host system is running on.
  */
-export const HOSTARCHVALUES_ARM64 = 'arm64';
+export const HOSTARCHVALUES_ARM32 = TMP_HOSTARCHVALUES_ARM32;
 
 /**
  * The CPU architecture the host system is running on.
  */
-export const HOSTARCHVALUES_IA64 = 'ia64';
+export const HOSTARCHVALUES_ARM64 = TMP_HOSTARCHVALUES_ARM64;
 
 /**
  * The CPU architecture the host system is running on.
  */
-export const HOSTARCHVALUES_PPC32 = 'ppc32';
+export const HOSTARCHVALUES_IA64 = TMP_HOSTARCHVALUES_IA64;
 
 /**
  * The CPU architecture the host system is running on.
  */
-export const HOSTARCHVALUES_PPC64 = 'ppc64';
+export const HOSTARCHVALUES_PPC32 = TMP_HOSTARCHVALUES_PPC32;
 
 /**
  * The CPU architecture the host system is running on.
  */
-export const HOSTARCHVALUES_X86 = 'x86';
+export const HOSTARCHVALUES_PPC64 = TMP_HOSTARCHVALUES_PPC64;
+
+/**
+ * The CPU architecture the host system is running on.
+ */
+export const HOSTARCHVALUES_X86 = TMP_HOSTARCHVALUES_X86;
 
 /**
  * Identifies the Values for HostArchValues enum definition
@@ -1605,16 +1538,22 @@ export const HOSTARCHVALUES_X86 = 'x86';
 export type HostArchValues = {
   /** AMD64. */
   AMD64: 'amd64';
+
   /** ARM32. */
   ARM32: 'arm32';
+
   /** ARM64. */
   ARM64: 'arm64';
+
   /** Itanium. */
   IA64: 'ia64';
+
   /** 32-bit PowerPC. */
   PPC32: 'ppc32';
+
   /** 64-bit PowerPC. */
   PPC64: 'ppc64';
+
   /** 32-bit x86. */
   X86: 'x86';
 };
@@ -1624,13 +1563,13 @@ export type HostArchValues = {
  * @deprecated Use the HOSTARCHVALUES_XXXXX constants rather than the HostArchValues.XXXXX for bundle minification.
  */
 export const HostArchValues: HostArchValues = {
-  AMD64: HOSTARCHVALUES_AMD64,
-  ARM32: HOSTARCHVALUES_ARM32,
-  ARM64: HOSTARCHVALUES_ARM64,
-  IA64: HOSTARCHVALUES_IA64,
-  PPC32: HOSTARCHVALUES_PPC32,
-  PPC64: HOSTARCHVALUES_PPC64,
-  X86: HOSTARCHVALUES_X86,
+  AMD64: TMP_HOSTARCHVALUES_AMD64,
+  ARM32: TMP_HOSTARCHVALUES_ARM32,
+  ARM64: TMP_HOSTARCHVALUES_ARM64,
+  IA64: TMP_HOSTARCHVALUES_IA64,
+  PPC32: TMP_HOSTARCHVALUES_PPC32,
+  PPC64: TMP_HOSTARCHVALUES_PPC64,
+  X86: TMP_HOSTARCHVALUES_X86,
 };
 
 /* ----------------------------------------------------------------------------------------------------------
@@ -1639,60 +1578,74 @@ export const HostArchValues: HostArchValues = {
  * The operating system type.
  * ---------------------------------------------------------------------------------------------------------- */
 
-/**
- * The operating system type.
- */
-export const OSTYPEVALUES_WINDOWS = 'windows';
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifable export names for some package types
+const TMP_OSTYPEVALUES_WINDOWS = 'windows';
+const TMP_OSTYPEVALUES_LINUX = 'linux';
+const TMP_OSTYPEVALUES_DARWIN = 'darwin';
+const TMP_OSTYPEVALUES_FREEBSD = 'freebsd';
+const TMP_OSTYPEVALUES_NETBSD = 'netbsd';
+const TMP_OSTYPEVALUES_OPENBSD = 'openbsd';
+const TMP_OSTYPEVALUES_DRAGONFLYBSD = 'dragonflybsd';
+const TMP_OSTYPEVALUES_HPUX = 'hpux';
+const TMP_OSTYPEVALUES_AIX = 'aix';
+const TMP_OSTYPEVALUES_SOLARIS = 'solaris';
+const TMP_OSTYPEVALUES_Z_OS = 'z_os';
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_LINUX = 'linux';
+export const OSTYPEVALUES_WINDOWS = TMP_OSTYPEVALUES_WINDOWS;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_DARWIN = 'darwin';
+export const OSTYPEVALUES_LINUX = TMP_OSTYPEVALUES_LINUX;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_FREEBSD = 'freebsd';
+export const OSTYPEVALUES_DARWIN = TMP_OSTYPEVALUES_DARWIN;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_NETBSD = 'netbsd';
+export const OSTYPEVALUES_FREEBSD = TMP_OSTYPEVALUES_FREEBSD;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_OPENBSD = 'openbsd';
+export const OSTYPEVALUES_NETBSD = TMP_OSTYPEVALUES_NETBSD;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_DRAGONFLYBSD = 'dragonflybsd';
+export const OSTYPEVALUES_OPENBSD = TMP_OSTYPEVALUES_OPENBSD;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_HPUX = 'hpux';
+export const OSTYPEVALUES_DRAGONFLYBSD = TMP_OSTYPEVALUES_DRAGONFLYBSD;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_AIX = 'aix';
+export const OSTYPEVALUES_HPUX = TMP_OSTYPEVALUES_HPUX;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_SOLARIS = 'solaris';
+export const OSTYPEVALUES_AIX = TMP_OSTYPEVALUES_AIX;
 
 /**
  * The operating system type.
  */
-export const OSTYPEVALUES_Z_OS = 'z_os';
+export const OSTYPEVALUES_SOLARIS = TMP_OSTYPEVALUES_SOLARIS;
+
+/**
+ * The operating system type.
+ */
+export const OSTYPEVALUES_Z_OS = TMP_OSTYPEVALUES_Z_OS;
 
 /**
  * Identifies the Values for OsTypeValues enum definition
@@ -1703,24 +1656,34 @@ export const OSTYPEVALUES_Z_OS = 'z_os';
 export type OsTypeValues = {
   /** Microsoft Windows. */
   WINDOWS: 'windows';
+
   /** Linux. */
   LINUX: 'linux';
+
   /** Apple Darwin. */
   DARWIN: 'darwin';
+
   /** FreeBSD. */
   FREEBSD: 'freebsd';
+
   /** NetBSD. */
   NETBSD: 'netbsd';
+
   /** OpenBSD. */
   OPENBSD: 'openbsd';
+
   /** DragonFly BSD. */
   DRAGONFLYBSD: 'dragonflybsd';
+
   /** HP-UX (Hewlett Packard Unix). */
   HPUX: 'hpux';
+
   /** AIX (Advanced Interactive eXecutive). */
   AIX: 'aix';
+
   /** Oracle Solaris. */
   SOLARIS: 'solaris';
+
   /** IBM z/OS. */
   Z_OS: 'z_os';
 };
@@ -1730,17 +1693,17 @@ export type OsTypeValues = {
  * @deprecated Use the OSTYPEVALUES_XXXXX constants rather than the OsTypeValues.XXXXX for bundle minification.
  */
 export const OsTypeValues: OsTypeValues = {
-  WINDOWS: OSTYPEVALUES_WINDOWS,
-  LINUX: OSTYPEVALUES_LINUX,
-  DARWIN: OSTYPEVALUES_DARWIN,
-  FREEBSD: OSTYPEVALUES_FREEBSD,
-  NETBSD: OSTYPEVALUES_NETBSD,
-  OPENBSD: OSTYPEVALUES_OPENBSD,
-  DRAGONFLYBSD: OSTYPEVALUES_DRAGONFLYBSD,
-  HPUX: OSTYPEVALUES_HPUX,
-  AIX: OSTYPEVALUES_AIX,
-  SOLARIS: OSTYPEVALUES_SOLARIS,
-  Z_OS: OSTYPEVALUES_Z_OS,
+  WINDOWS: TMP_OSTYPEVALUES_WINDOWS,
+  LINUX: TMP_OSTYPEVALUES_LINUX,
+  DARWIN: TMP_OSTYPEVALUES_DARWIN,
+  FREEBSD: TMP_OSTYPEVALUES_FREEBSD,
+  NETBSD: TMP_OSTYPEVALUES_NETBSD,
+  OPENBSD: TMP_OSTYPEVALUES_OPENBSD,
+  DRAGONFLYBSD: TMP_OSTYPEVALUES_DRAGONFLYBSD,
+  HPUX: TMP_OSTYPEVALUES_HPUX,
+  AIX: TMP_OSTYPEVALUES_AIX,
+  SOLARIS: TMP_OSTYPEVALUES_SOLARIS,
+  Z_OS: TMP_OSTYPEVALUES_Z_OS,
 };
 
 /* ----------------------------------------------------------------------------------------------------------
@@ -1749,55 +1712,77 @@ export const OsTypeValues: OsTypeValues = {
  * The language of the telemetry SDK.
  * ---------------------------------------------------------------------------------------------------------- */
 
-/**
- * The language of the telemetry SDK.
- */
-export const TELEMETRYSDKLANGUAGEVALUES_CPP = 'cpp';
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifable export names for some package types
+const TMP_TELEMETRYSDKLANGUAGEVALUES_CPP = 'cpp';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET = 'dotnet';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG = 'erlang';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_GO = 'go';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_JAVA = 'java';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_NODEJS = 'nodejs';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_PHP = 'php';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_PYTHON = 'python';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_RUBY = 'ruby';
+const TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS = 'webjs';
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_DOTNET = 'dotnet';
+export const TELEMETRYSDKLANGUAGEVALUES_CPP =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_CPP;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_ERLANG = 'erlang';
+export const TELEMETRYSDKLANGUAGEVALUES_DOTNET =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_GO = 'go';
+export const TELEMETRYSDKLANGUAGEVALUES_ERLANG =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_JAVA = 'java';
+export const TELEMETRYSDKLANGUAGEVALUES_GO = TMP_TELEMETRYSDKLANGUAGEVALUES_GO;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_NODEJS = 'nodejs';
+export const TELEMETRYSDKLANGUAGEVALUES_JAVA =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_JAVA;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_PHP = 'php';
+export const TELEMETRYSDKLANGUAGEVALUES_NODEJS =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_NODEJS;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_PYTHON = 'python';
+export const TELEMETRYSDKLANGUAGEVALUES_PHP =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_PHP;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_RUBY = 'ruby';
+export const TELEMETRYSDKLANGUAGEVALUES_PYTHON =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_PYTHON;
 
 /**
  * The language of the telemetry SDK.
  */
-export const TELEMETRYSDKLANGUAGEVALUES_WEBJS = 'webjs';
+export const TELEMETRYSDKLANGUAGEVALUES_RUBY =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_RUBY;
+
+/**
+ * The language of the telemetry SDK.
+ */
+export const TELEMETRYSDKLANGUAGEVALUES_WEBJS =
+  TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS;
 
 /**
  * Identifies the Values for TelemetrySdkLanguageValues enum definition
@@ -1808,22 +1793,31 @@ export const TELEMETRYSDKLANGUAGEVALUES_WEBJS = 'webjs';
 export type TelemetrySdkLanguageValues = {
   /** cpp. */
   CPP: 'cpp';
+
   /** dotnet. */
   DOTNET: 'dotnet';
+
   /** erlang. */
   ERLANG: 'erlang';
+
   /** go. */
   GO: 'go';
+
   /** java. */
   JAVA: 'java';
+
   /** nodejs. */
   NODEJS: 'nodejs';
+
   /** php. */
   PHP: 'php';
+
   /** python. */
   PYTHON: 'python';
+
   /** ruby. */
   RUBY: 'ruby';
+
   /** webjs. */
   WEBJS: 'webjs';
 };
@@ -1833,14 +1827,14 @@ export type TelemetrySdkLanguageValues = {
  * @deprecated Use the TELEMETRYSDKLANGUAGEVALUES_XXXXX constants rather than the TelemetrySdkLanguageValues.XXXXX for bundle minification.
  */
 export const TelemetrySdkLanguageValues: TelemetrySdkLanguageValues = {
-  CPP: TELEMETRYSDKLANGUAGEVALUES_CPP,
-  DOTNET: TELEMETRYSDKLANGUAGEVALUES_DOTNET,
-  ERLANG: TELEMETRYSDKLANGUAGEVALUES_ERLANG,
-  GO: TELEMETRYSDKLANGUAGEVALUES_GO,
-  JAVA: TELEMETRYSDKLANGUAGEVALUES_JAVA,
-  NODEJS: TELEMETRYSDKLANGUAGEVALUES_NODEJS,
-  PHP: TELEMETRYSDKLANGUAGEVALUES_PHP,
-  PYTHON: TELEMETRYSDKLANGUAGEVALUES_PYTHON,
-  RUBY: TELEMETRYSDKLANGUAGEVALUES_RUBY,
-  WEBJS: TELEMETRYSDKLANGUAGEVALUES_WEBJS,
+  CPP: TMP_TELEMETRYSDKLANGUAGEVALUES_CPP,
+  DOTNET: TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET,
+  ERLANG: TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG,
+  GO: TMP_TELEMETRYSDKLANGUAGEVALUES_GO,
+  JAVA: TMP_TELEMETRYSDKLANGUAGEVALUES_JAVA,
+  NODEJS: TMP_TELEMETRYSDKLANGUAGEVALUES_NODEJS,
+  PHP: TMP_TELEMETRYSDKLANGUAGEVALUES_PHP,
+  PYTHON: TMP_TELEMETRYSDKLANGUAGEVALUES_PYTHON,
+  RUBY: TMP_TELEMETRYSDKLANGUAGEVALUES_RUBY,
+  WEBJS: TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS,
 };

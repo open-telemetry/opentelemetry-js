@@ -19,7 +19,8 @@
  * @param values - An array of values to be used as keys and values in the map.
  * @returns A populated version of the map with the values and keys derived from the values.
  */
-export const createConstMap = <T>(values: Array<T[keyof T]>): T => {
+/*#__NO_SIDE_EFFECTS__*/
+export function createConstMap<T>(values: Array<T[keyof T]>): T {
   // eslint-disable-next-line prefer-const, @typescript-eslint/no-explicit-any
   let res: any = {};
   const len = values.length;
@@ -31,4 +32,4 @@ export const createConstMap = <T>(values: Array<T[keyof T]>): T => {
   }
 
   return res as T;
-};
+}
