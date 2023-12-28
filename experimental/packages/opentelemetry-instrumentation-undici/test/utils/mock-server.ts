@@ -62,6 +62,8 @@ export class MockServer {
   }
 
   stop(cb: (err?: Error) => void) {
-    this._httpServer.close(cb);
+    if (this._httpServer) {
+      this._httpServer.close(cb);
+    }
   }
 }

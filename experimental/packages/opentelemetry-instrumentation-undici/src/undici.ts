@@ -20,7 +20,7 @@ import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import {
   Attributes,
   context,
-  Meter,
+  diag,
   propagation,
   Span,
   SpanKind,
@@ -62,13 +62,18 @@ export class UndiciInstrumentation extends InstrumentationBase {
 
   private _requestHook: UndiciInstrumentationConfig['onRequest'];
 
-  // @ts-expect-error -- we are no reading its value in this
-  override meter: Meter;
-
   constructor(config?: UndiciInstrumentationConfig) {
     super('@opentelemetry/instrumentation-undici', VERSION, config);
     // Force load fetch API (since it's lazy loaded in Node 18)
-    fetch('').catch(() => {});
+    // `fetch` Added in: v17.5.0, v16.15.0 (with flag) and we suport lower verisons
+    // https://nodejs.org/api/globals.html#fetch
+    try {
+      fetch('').catch(() => {});
+    } catch (err) {
+      // TODO: nicer message
+      diag.info(`fetch API not available`);
+    }
+    
     this.setConfig(config);
   }
 

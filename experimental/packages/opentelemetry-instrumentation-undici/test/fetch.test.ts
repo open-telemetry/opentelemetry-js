@@ -41,7 +41,12 @@ const provider = new NodeTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 instrumentation.setTracerProvider(provider);
 
-describe('UndiciInstrumentation `fetch` tests', () => {
+// Simpler way to skip the while suite
+// also `this` is not providing the skpi method inside tests
+const shouldTest = typeof globalThis.fetch === 'function'
+const describeFn = shouldTest ? describe : describe.skip;
+
+describeFn('UndiciInstrumentation `fetch` tests', () => {
   before(done => {
     mockServer.start(done);
   });
