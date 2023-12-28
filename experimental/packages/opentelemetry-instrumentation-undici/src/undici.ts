@@ -78,7 +78,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
   }
 
   override disable(): void {
-    this._channelSubs.forEach((sub) => sub.channel.unsubscribe(sub.onMessage));
+    this._channelSubs.forEach(sub => sub.channel.unsubscribe(sub.onMessage));
     this._channelSubs.length = 0;
   }
 
@@ -90,7 +90,10 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // ours is called. So we need to ensure the property is initalized
     this._channelSubs = this._channelSubs || [];
     this.subscribeToChannel('undici:request:create', this.onRequest.bind(this));
-    this.subscribeToChannel('undici:request:headers', this.onHeaders.bind(this));
+    this.subscribeToChannel(
+      'undici:request:headers',
+      this.onHeaders.bind(this)
+    );
     this.subscribeToChannel('undici:request:trailers', this.onDone.bind(this));
     this.subscribeToChannel('undici:request:error', this.onError.bind(this));
   }
@@ -102,7 +105,10 @@ export class UndiciInstrumentation extends InstrumentationBase {
     }
   }
 
-  private subscribeToChannel(diagnosticChannel: string, onMessage: ListenerRecord['onMessage']) {
+  private subscribeToChannel(
+    diagnosticChannel: string,
+    onMessage: ListenerRecord['onMessage']
+  ) {
     const channel = diagch.channel(diagnosticChannel);
     channel.subscribe(onMessage);
     this._channelSubs.push({
@@ -157,7 +163,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
       }
       span.setAttributes(attrs);
       span.setStatus({
-        code: response.statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.OK,
+        code:
+          response.statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.OK,
         message: String(response.statusCode),
       });
     }

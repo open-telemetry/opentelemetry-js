@@ -27,7 +27,7 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
 import { UndiciInstrumentation } from '../src/undici';
 
-import { MockServer } from './utils/mock-server'
+import { MockServer } from './utils/mock-server';
 
 const instrumentation = new UndiciInstrumentation();
 instrumentation.enable();
@@ -76,10 +76,10 @@ describe('UndiciInstrumentation `fetch` tests', () => {
     it('should create a rootSpan for GET requests and add propagation headers', async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
-  
+
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const response = await fetch(fetchUrl);
-  
+
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
 
@@ -98,18 +98,21 @@ describe('UndiciInstrumentation `fetch` tests', () => {
   });
 });
 
-
-function assertSpanAttribs(span: ReadableSpan, name: string, attribs: Record<string, any>) {
+function assertSpanAttribs(
+  span: ReadableSpan,
+  name: string,
+  attribs: Record<string, any>
+) {
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
   assert.strictEqual(span.kind, SpanKind.CLIENT);
   assert.strictEqual(span.name, name);
-  
+
   for (const [key, value] of Object.entries(attribs)) {
     assert.strictEqual(
       span.attributes[key],
       value,
-      `expected value "${value}" but got "${span.attributes[key]}" for attribute "${key}" `,
+      `expected value "${value}" but got "${span.attributes[key]}" for attribute "${key}" `
     );
   }
 }

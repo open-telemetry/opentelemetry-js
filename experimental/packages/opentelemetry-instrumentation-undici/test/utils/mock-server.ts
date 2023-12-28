@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as url from 'url';
 
-
 export class MockServer {
   private _port: number;
   private _httpServer: http.Server;
@@ -43,19 +42,19 @@ export class MockServer {
       );
       res.end();
     });
-    
+
     this._httpServer.listen(0, () => {
       const addr = this._httpServer.address();
       if (addr == null) {
         cb(new Error('unexpected addr null'));
         return;
       }
-    
+
       if (typeof addr === 'string') {
         cb(new Error(`unexpected addr ${addr}`));
         return;
       }
-    
+
       if (addr.port <= 0) {
         cb(new Error('Could not get port'));
         return;

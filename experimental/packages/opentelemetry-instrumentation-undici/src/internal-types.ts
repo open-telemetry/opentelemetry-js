@@ -28,7 +28,7 @@ export interface ListenerRecord {
 
 // TODO: the actual `request` object at runtime have subtle differences
 // from the `Request` type declared in `undici`. Type properly
-// 
+//
 // Types declared in the lib
 // - have some properties declared as `readonly` but we are changing them
 // - omits some properties we need to inspect for the instrumentation
