@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as assert from 'assert';
 import * as http from 'http';
-import * as url from 'url';
 
 export class MockServer {
-  private _port: number;
-  private _httpServer: http.Server;
+  private _port: number | undefined;
+  private _httpServer: http.Server | undefined;
 
   get port(): number {
-    return this._port;
+    return this._port || 0;
   }
 
   start(cb: (err?: Error) => void) {
@@ -44,7 +41,7 @@ export class MockServer {
     });
 
     this._httpServer.listen(0, () => {
-      const addr = this._httpServer.address();
+      const addr = this._httpServer!.address();
       if (addr == null) {
         cb(new Error('unexpected addr null'));
         return;
