@@ -40,18 +40,18 @@ registerInstrumentations({
 
 ```
 
-TODO:
+<!-- TODO: -->
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/fetch) for a short example.
 
 ### Fetch instrumentation Options
 
-TODO:
+<!-- TODO: check PR description about config -->
 
 Undici instrumentation has few options available to choose from. You can set the following:
 
 | Options | Type | Description |
 | ------- | ---- | ----------- |
-| [`onRequest`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-undici/src/types.ts#93) | `HttpRequestCustomAttributeFunction` | Function for adding custom attributes before request is handled |
+| [`onRequest`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-undici/src/types.ts#19) | `UndiciRequestHook` | Function for adding custom attributes before request is handled |
 
 
 ## Useful links
