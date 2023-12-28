@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import * as diagch from 'diagnostics_channel';
+
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import {
@@ -123,7 +124,6 @@ export class UndiciInstrumentation extends InstrumentationBase {
         [SemanticAttributes.HTTP_URL]: String(request.origin),
         [SemanticAttributes.HTTP_METHOD]: request.method,
         [SemanticAttributes.HTTP_TARGET]: request.path,
-        'http.client': 'fetch',
       },
     });
     const requestContext = trace.setSpan(context.active(), span);
@@ -134,11 +134,9 @@ export class UndiciInstrumentation extends InstrumentationBase {
       this._requestHook({ request, span, additionalHeaders: addedHeaders });
     }
 
-    console.log('request', request)
     request.headers += Object.entries(addedHeaders)
       .map(([k, v]) => `${k}: ${v}\r\n`)
       .join('');
-    console.log('headers', request.headers)
     this._spanFromReq.set(request, span);
   }
 

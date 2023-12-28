@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as assert from 'assert';
-import * as http from 'http';
-import * as url from 'url';
 
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import { SpanKind, context, propagation } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   InMemorySpanExporter,
+  ReadableSpan,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -30,14 +29,11 @@ import { UndiciInstrumentation } from '../src/undici';
 
 import { MockServer } from './utils/mock-server'
 
-
 const instrumentation = new UndiciInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-
 const protocol = 'http';
-const serverPort = 32345;
 const hostname = 'localhost';
 const mockServer = new MockServer();
 const memoryExporter = new InMemorySpanExporter();
@@ -59,6 +55,7 @@ describe('UndiciInstrumentation `fetch` tests', () => {
   });
 
   before(() => {
+    // TODO: mock propagation and test it
     // propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
   });
@@ -80,29 +77,39 @@ describe('UndiciInstrumentation `fetch` tests', () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
   
-      const response = await fetch(
-        `${protocol}://localhost:${mockServer.port}/?query=test`
-      );
+      const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
+      const response = await fetch(fetchUrl);
   
       spans = memoryExporter.getFinishedSpans();
-      // const span = spans.find(s => s.kind === SpanKind.CLIENT);
       const span = spans[0];
+
       assert.ok(span);
-      const validations = {
-        hostname: 'localhost',
-        httpStatusCode: response.status,
-        httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
-        resHeaders: response.headers,
-        reqHeaders: {},
-        component: 'http',
-      };
-  
       assert.strictEqual(spans.length, 1);
-      assert.strictEqual(span.name, 'HTTP GET');
-      // console.log(span)
-      // assertSpan(span, SpanKind.CLIENT, validations);
+      assertSpanAttribs(span, 'HTTP GET', {
+        // TODO: I guess we want to have parity with HTTP insturmentation
+        // - there are missing attributes
+        // - also check if these current values make sense
+        [SemanticAttributes.HTTP_URL]: `${protocol}://${hostname}:${mockServer.port}`,
+        [SemanticAttributes.HTTP_METHOD]: 'GET',
+        [SemanticAttributes.HTTP_STATUS_CODE]: response.status,
+        [SemanticAttributes.HTTP_TARGET]: '/?query=test',
+      });
     });
   });
 });
+
+
+function assertSpanAttribs(span: ReadableSpan, name: string, attribs: Record<string, any>) {
+  assert.strictEqual(span.spanContext().traceId.length, 32);
+  assert.strictEqual(span.spanContext().spanId.length, 16);
+  assert.strictEqual(span.kind, SpanKind.CLIENT);
+  assert.strictEqual(span.name, name);
+  
+  for (const [key, value] of Object.entries(attribs)) {
+    assert.strictEqual(
+      span.attributes[key],
+      value,
+      `expected value "${value}" but got "${span.attributes[key]}" for attribute "${key}" `,
+    );
+  }
+}
