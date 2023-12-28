@@ -7,7 +7,6 @@
 
 This module provides automatic instrumentation for [`undici`](https://undici.nodejs.org/) and [`fetch`](https://nodejs.org/docs/latest/api/globals.html#fetch).
 
-
 ## Installation
 
 ```bash
@@ -52,7 +51,6 @@ Undici instrumentation has few options available to choose from. You can set the
 | Options | Type | Description |
 | ------- | ---- | ----------- |
 | [`onRequest`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-undici/src/types.ts#19) | `UndiciRequestHook` | Function for adding custom attributes before request is handled |
-
 
 ## Useful links
 
