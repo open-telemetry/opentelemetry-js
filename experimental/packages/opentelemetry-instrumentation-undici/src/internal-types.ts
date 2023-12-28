@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { Channel } from 'diagnostics_channel';
 
 import type { Request, RequestInfo, Response } from 'undici';
+
+export interface ListenerRecord {
+  name: string;
+  channel: Channel;
+  onMessage: (message: any, name: string) => void;
+}
 
 // type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 // type WriteableRequest = Writeable<Request>;
 
+// TODO: the actual `request` object at runtime have subtle differences
+// from the `Request` type declared in `undici`. Type properly
+// 
 // Types declared in the lib
 // - have some properties declared as `readonly` but we are changing them
-// - imts some properties we need to inspect for the instrumentation
+// - omits some properties we need to inspect for the instrumentation
 type UndiciRequest = Request & {
   origin: RequestInfo;
   path: string;

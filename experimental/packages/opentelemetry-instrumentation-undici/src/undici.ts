@@ -15,29 +15,22 @@
  */
 import * as diagch from 'diagnostics_channel';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { Instrumentation, InstrumentationConfig } from '@opentelemetry/instrumentation';
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import {
   Attributes,
   context,
   Meter,
-  MeterProvider,
-  metrics,
   propagation,
   Span,
   SpanKind,
   SpanStatusCode,
   trace,
-  Tracer,
-  TracerProvider,
 } from '@opentelemetry/api';
 
-import { UndiciInstrumentationConfig } from './types';
+import { VERSION } from './version';
 
-interface ListenerRecord {
-  name: string;
-  channel: diagch.Channel;
-  onMessage: diagch.ChannelListener;
-}
+import { ListenerRecord } from './internal-types';
+import { UndiciInstrumentationConfig } from './types';
 
 // Get the content-length from undici response headers.
 // `headers` is an Array of buffers: [k, v, k, v, ...].
@@ -59,82 +52,71 @@ function contentLengthFromResponseHeaders(headers: Buffer[]) {
 
 // A combination of https://github.com/elastic/apm-agent-nodejs and
 // https://github.com/gadget-inc/opentelemetry-instrumentations/blob/main/packages/opentelemetry-instrumentation-undici/src/index.ts
-export class UndiciInstrumentation implements Instrumentation {
+export class UndiciInstrumentation extends InstrumentationBase {
   // Keep ref to avoid https://github.com/nodejs/node/issues/42170 bug and for
   // unsubscribing.
-  private channelSubs: Array<ListenerRecord> | undefined;
+  private _channelSubs!: Array<ListenerRecord>;
 
-  private spanFromReq = new WeakMap<any, Span>();
+  private _spanFromReq = new WeakMap<any, Span>();
 
-  private tracer: Tracer;
+  private _requestHook: UndiciInstrumentationConfig['onRequest'];
 
-  private config: UndiciInstrumentationConfig;
+  // @ts-expect-error -- we are no reading its value in this
+  override meter: Meter;
 
-  private meter: Meter;
+  constructor(config?: UndiciInstrumentationConfig) {
+    super('@opentelemetry/instrumentation-undici', VERSION, config);
+    // Force load fetch API (since it's lazy loaded in Node 18)
+    fetch('').catch(() => {});
+    this.setConfig(config);
+  }
 
-  public readonly instrumentationName = 'opentelemetry-instrumentation-node-18-fetch';
+  // No need to instrument files/modules
+  protected override init() {
+    return undefined;
+  }
 
-  public readonly instrumentationVersion = '1.0.0';
+  override disable(): void {
+    this._channelSubs.forEach((sub) => sub.channel.unsubscribe(sub.onMessage));
+    this._channelSubs.length = 0;
+  }
 
-  public readonly instrumentationDescription = 'Instrumentation for Node 18 fetch via diagnostics_channel';
+  override enable(): void {
+    if (this._config.enabled) {
+      return;
+    }
+    // This methos is called by the `InstrumentationAbstract` constructor before
+    // ours is called. So we need to ensure the property is initalized
+    this._channelSubs = this._channelSubs || [];
+    this.subscribeToChannel('undici:request:create', this.onRequest.bind(this));
+    this.subscribeToChannel('undici:request:headers', this.onHeaders.bind(this));
+    this.subscribeToChannel('undici:request:trailers', this.onDone.bind(this));
+    this.subscribeToChannel('undici:request:error', this.onError.bind(this));
+  }
 
-  private subscribeToChannel(diagnosticChannel: string, onMessage: diagch.ChannelListener) {
+  override setConfig(config?: UndiciInstrumentationConfig): void {
+    super.setConfig(config);
+    if (typeof config?.onRequest === 'function') {
+      this._requestHook = config.onRequest;
+    }
+  }
+
+  private subscribeToChannel(diagnosticChannel: string, onMessage: ListenerRecord['onMessage']) {
     const channel = diagch.channel(diagnosticChannel);
     channel.subscribe(onMessage);
-    this.channelSubs!.push({
+    this._channelSubs.push({
       name: diagnosticChannel,
       channel,
       onMessage,
     });
   }
 
-  constructor(config: UndiciInstrumentationConfig) {
-    // Force load fetch API (since it's lazy loaded in Node 18)
-    fetch('').catch(() => {});
-    this.channelSubs = [];
-    this.meter = metrics.getMeter(this.instrumentationName, this.instrumentationVersion);
-    this.tracer = trace.getTracer(this.instrumentationName, this.instrumentationVersion);
-    this.config = { ...config };
-  }
-
-  disable(): void {
-    this.channelSubs?.forEach((sub) => sub.channel.unsubscribe(sub.onMessage));
-  }
-
-  enable(): void {
-    this.subscribeToChannel('undici:request:create', (args) => this.onRequest(args));
-    this.subscribeToChannel('undici:request:headers', (args) => this.onHeaders(args));
-    this.subscribeToChannel('undici:request:trailers', (args) => this.onDone(args));
-    this.subscribeToChannel('undici:request:error', (args) => this.onError(args));
-  }
-
-  setTracerProvider(tracerProvider: TracerProvider): void {
-    this.tracer = tracerProvider.getTracer(
-      this.instrumentationName,
-      this.instrumentationVersion,
-    );
-  }
-
-  public setMeterProvider(meterProvider: MeterProvider): void {
-    this.meter = meterProvider.getMeter(
-      this.instrumentationName,
-      this.instrumentationVersion,
-    );
-  }
-
-  setConfig(config: InstrumentationConfig): void {
-    this.config = { ...config };
-  }
-
-  getConfig(): InstrumentationConfig {
-    return this.config;
-  }
-
-  onRequest({ request }: any): void {
+  private onRequest({ request }: any): void {
     // We do not handle instrumenting HTTP CONNECT. See limitation notes above.
     if (request.method === 'CONNECT') {
       return;
     }
+
     const span = this.tracer.startSpan(`HTTP ${request.method}`, {
       kind: SpanKind.CLIENT,
       attributes: {
@@ -148,18 +130,20 @@ export class UndiciInstrumentation implements Instrumentation {
     const addedHeaders: Record<string, string> = {};
     propagation.inject(requestContext, addedHeaders);
 
-    if (this.config.onRequest) {
-      this.config.onRequest({ request, span, additionalHeaders: addedHeaders });
+    if (this._requestHook) {
+      this._requestHook({ request, span, additionalHeaders: addedHeaders });
     }
 
+    console.log('request', request)
     request.headers += Object.entries(addedHeaders)
       .map(([k, v]) => `${k}: ${v}\r\n`)
       .join('');
-    this.spanFromReq.set(request, span);
+    console.log('headers', request.headers)
+    this._spanFromReq.set(request, span);
   }
 
-  onHeaders({ request, response }: any): void {
-    const span = this.spanFromReq.get(request);
+  private onHeaders({ request, response }: any): void {
+    const span = this._spanFromReq.get(request);
 
     if (span !== undefined) {
       // We are currently *not* capturing response headers, even though the
@@ -181,16 +165,16 @@ export class UndiciInstrumentation implements Instrumentation {
     }
   }
 
-  onDone({ request }: any): void {
-    const span = this.spanFromReq.get(request);
+  private onDone({ request }: any): void {
+    const span = this._spanFromReq.get(request);
     if (span !== undefined) {
       span.end();
-      this.spanFromReq.delete(request);
+      this._spanFromReq.delete(request);
     }
   }
 
-  onError({ request, error }: any): void {
-    const span = this.spanFromReq.get(request);
+  private onError({ request, error }: any): void {
+    const span = this._spanFromReq.get(request);
     if (span !== undefined) {
       span.recordException(error);
       span.setStatus({

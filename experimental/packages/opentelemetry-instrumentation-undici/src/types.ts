@@ -19,6 +19,8 @@ import type { Span } from '@opentelemetry/api';
 export type UndiciRequestHook<RequestType = any> =
   (args: { request: RequestType; span: Span; additionalHeaders: Record<string, any>; }) => void;
 
+// TODO: This package will instrument HTTP requests made through Undici
+// so it seems logical to have similar options than the HTTP instrumentation
 export interface UndiciInstrumentationConfig extends InstrumentationConfig {
   onRequest?: UndiciRequestHook;
 }
