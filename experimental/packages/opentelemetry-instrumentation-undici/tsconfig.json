@@ -1,0 +1,34 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "rootDir": "."
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../../api"
+    },
+    {
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../../../packages/opentelemetry-sdk-trace-node"
+    },
+    {
+      "path": "../../../packages/opentelemetry-semantic-conventions"
+    },
+    {
+      "path": "../../../packages/sdk-metrics"
+    },
+    {
+      "path": "../opentelemetry-instrumentation"
+    }
+  ]
+}
