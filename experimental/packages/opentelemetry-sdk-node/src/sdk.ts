@@ -126,7 +126,11 @@ export class NodeSDK {
 
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
-    if (configuration.spanProcessor || configuration.traceExporter) {
+    if (
+      configuration.spanProcessor ||
+      configuration.traceExporter ||
+      env.OTEL_TRACES_EXPORTER
+    ) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
       if (configuration.sampler) {
