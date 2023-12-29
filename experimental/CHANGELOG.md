@@ -207,8 +207,6 @@ fix(instrumentation): use caret range on import-in-the-middle [#4380](https://gi
 
 * doc(instrumentation): add limitiations section to readme [#3786](https://github.com/open-telemetry/opentelemetry-js/pull/3786) @flarna
 
-### :house: (Internal)
-
 ## 0.38.0
 
 ### :boom: Breaking Change
@@ -425,10 +423,6 @@ fix(instrumentation): use caret range on import-in-the-middle [#4380](https://gi
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
 * fix(instrumentation-grpc): always set grpc semcov status code attribute with numeric value [#3076](https://github.com/open-telemetry/opentelemetry-js/pull/3076) @blumamir
 
-### :books: (Refine Doc)
-
-### :house: (Internal)
-
 ## 0.30.0
 
 ### :boom: Breaking Change
@@ -502,10 +496,6 @@ fix(instrumentation): use caret range on import-in-the-middle [#4380](https://gi
 * fix(otlp-transformer): include esm and esnext in package files and update README [#2992](https://github.com/open-telemetry/opentelemetry-js/pull/2992) @pichlermarc
 * fix(metrics): specification compliant default metric unit [#2983](https://github.com/open-telemetry/opentelemetry-js/pull/2983) @andyfleming
 * fix(opentelemetry-instrumentation): use all provided patches for the same file [#2963](https://github.com/open-telemetry/opentelemetry-js/pull/2963) @Ugzuzg
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 0.28.0
 
