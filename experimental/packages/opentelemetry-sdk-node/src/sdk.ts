@@ -101,6 +101,7 @@ export class NodeSDK {
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     const env = getEnv();
     const envWithoutDefaults = getEnvWithoutDefaults();
+    const envExporterWithConfiguration = env.OTEL_TRACES_EXPORTER && (configuration.sampler || configuration.spanLimits || configuration.idGenerator);
 
     if (env.OTEL_SDK_DISABLED) {
       this._disabled = true;
@@ -126,11 +127,8 @@ export class NodeSDK {
 
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
-    if (
-      configuration.spanProcessor ||
-      configuration.traceExporter ||
-      (env.OTEL_TRACES_EXPORTER && env.OTEL_TRACES_EXPORTER !== 'none')
-    ) {
+    // If there are configuration options to read, we need to create a new TracerProvider even if the exporter is configured in the environment
+    if ((configuration.traceExporter || configuration.spanProcessor) || envExporterWithConfiguration) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
       if (configuration.sampler) {
