@@ -129,7 +129,7 @@ export class NodeSDK {
     if (
       configuration.spanProcessor ||
       configuration.traceExporter ||
-      env.OTEL_TRACES_EXPORTER
+      (env.OTEL_TRACES_EXPORTER && env.OTEL_TRACES_EXPORTER !== 'none')
     ) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
