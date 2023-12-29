@@ -10,36 +10,11 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-fix(instrumentation): use caret range on import-in-the-middle [#4380](https://github.com/open-telemetry/opentelemetry-js/pull/4380) @pichlermarc
+* fix(sdk-node): allow using samplers when the exporter is defined in the environment [#4394](https://github.com/open-telemetry/opentelemetry-js/pull/4394) @JacksonWeber
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
-
-## 0.46.0
-
-### :boom: Breaking Change
-
-* fix(exporter-metrics-otlp-grpc): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
-* fix(exporter-metrics-otlp-http): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
-* fix(exporter-metrics-otlp-proto): programmatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4334) @Vunovati
-* fix(otlp-exporter-base)!: decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
-  * fixes a memory leak on prolonged collector unavailability
-  * this change is marked as breaking as it changes defaults
-
-### :rocket: (Enhancement)
-
-* feat(sdk-logs): add droppedAttributesCount field to ReadableLogRecord
-
-### :bug: (Bug Fix)
-
-* fix(sdk-logs): await async resources in log processors
-* fix(sdk-logs): avoid map attribute set when count limit exceeded
-* fix(instrumentation-fetch): only access navigator if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
-  * allows for experimental usage of this instrumentation with non-browser runtimes
-* fix(instrumentation-http): memory leak when responses are not resumed
-* fix(instrumentation-http): Do not mutate given headers object for outgoing http requests. Fixes aws-sdk signing error on retries. [#4346](https://github.com/open-telemetry/opentelemetry-js/pull/4346)
-* fix(instrumentation): support Node.js v18.19.0 by using import-in-the-middle@1.6.0
 
 ## 0.45.1
 
@@ -205,6 +180,8 @@ fix(instrumentation): use caret range on import-in-the-middle [#4380](https://gi
 ### :books: (Refine Doc)
 
 * doc(instrumentation): add limitiations section to readme [#3786](https://github.com/open-telemetry/opentelemetry-js/pull/3786) @flarna
+
+### :house: (Internal)
 
 ## 0.38.0
 
@@ -422,6 +399,10 @@ fix(instrumentation): use caret range on import-in-the-middle [#4380](https://gi
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
 * fix(instrumentation-grpc): always set grpc semcov status code attribute with numeric value [#3076](https://github.com/open-telemetry/opentelemetry-js/pull/3076) @blumamir
 
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
 ## 0.30.0
 
 ### :boom: Breaking Change
@@ -495,6 +476,10 @@ fix(instrumentation): use caret range on import-in-the-middle [#4380](https://gi
 * fix(otlp-transformer): include esm and esnext in package files and update README [#2992](https://github.com/open-telemetry/opentelemetry-js/pull/2992) @pichlermarc
 * fix(metrics): specification compliant default metric unit [#2983](https://github.com/open-telemetry/opentelemetry-js/pull/2983) @andyfleming
 * fix(opentelemetry-instrumentation): use all provided patches for the same file [#2963](https://github.com/open-telemetry/opentelemetry-js/pull/2963) @Ugzuzg
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
 
 ## 0.28.0
 
