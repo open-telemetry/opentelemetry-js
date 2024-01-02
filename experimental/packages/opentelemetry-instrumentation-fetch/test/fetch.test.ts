@@ -526,8 +526,7 @@ describe('fetch', () => {
       const init = {
         headers: new Map().set('foo', 'bar'),
       };
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      /** @ts-ignore */
+      /** @ts-ignore variable init not of RequestInit type*/
       window.fetch(url, init).catch(() => {});
       assert.ok(init.headers.get('foo') === 'bar');
     });
