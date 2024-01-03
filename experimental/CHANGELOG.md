@@ -6,6 +6,11 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(exporter-logs-otlp-http): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
+* fix(exporter-logs-otlp-proto): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
+* fix(exporter-trace-otlp-http): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
+* fix(exporter-trace-otlp-proto): programatic headers take precedence over environment variables [#2370](https://github.com/open-telemetry/opentelemetry-js/pull/4351) @Vunovati
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
