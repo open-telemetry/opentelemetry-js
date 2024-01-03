@@ -31,6 +31,7 @@ import {
 import { PassThrough, Stream } from 'stream';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
+import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -77,6 +78,14 @@ describe('OTLPLogExporter', () => {
     it('should create an instance', () => {
       const exporter = new OTLPLogExporter();
       assert.ok(exporter instanceof OTLPLogExporter);
+    });
+
+    it('should include user-agent header by default', () => {
+      const exporter = new OTLPLogExporter();
+      assert.strictEqual(
+        exporter.headers['User-Agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
     });
 
     it('should use headers defined via env', () => {
