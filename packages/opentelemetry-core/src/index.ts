@@ -21,6 +21,7 @@ export * from './common/global-error-handler';
 export * from './common/logging-error-handler';
 export * from './common/time';
 export * from './common/types';
+export * from './common/hex-to-binary';
 export * from './ExportResult';
 export * as baggageUtils from './baggage/utils';
 export * from './platform';
