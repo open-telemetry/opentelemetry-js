@@ -30,6 +30,11 @@ import {
 } from '@opentelemetry/otlp-transformer';
 
 import { ReadableLogRecord, LogRecordExporter } from '@opentelemetry/sdk-logs';
+import { VERSION } from '../../version';
+
+const USER_AGENT = {
+  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+};
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/logs';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
@@ -46,13 +51,14 @@ export class OTLPLogExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-    this.headers = Object.assign(
-      this.headers,
-      baggageUtils.parseKeyPairsIntoRecord(
+    this.headers = {
+      ...this.headers,
+      ...USER_AGENT,
+      ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
       ),
-      config.headers
-    );
+      ...config.headers,
+    };
   }
   convert(logs: ReadableLogRecord[]): IExportLogsServiceRequest {
     return createExportLogsServiceRequest(logs);
