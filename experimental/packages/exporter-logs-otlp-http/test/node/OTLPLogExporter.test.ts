@@ -94,6 +94,18 @@ describe('OTLPLogExporter', () => {
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT;
     });
+
+    it('should override headers defined via env with headers defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+      const collectorExporter = new OTLPLogExporter({
+        headers: {
+          foo: 'constructor',
+        },
+      });
+      assert.strictEqual(collectorExporter.headers.foo, 'constructor');
+      assert.strictEqual(collectorExporter.headers.bar, 'foo');
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
   });
 
   describe('getDefaultUrl', () => {
