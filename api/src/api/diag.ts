@@ -101,7 +101,7 @@ export class DiagAPI implements DiagLogger, DiagLoggerApi {
         );
       }
 
-      return registerGlobal('diag', newLogger, self, true);
+      return registerGlobal('diag', newLogger, newLogger, true);
     };
 
     self.setLogger = setLogger;
