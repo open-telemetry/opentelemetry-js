@@ -17,8 +17,8 @@
 import * as assert from 'assert';
 import { normalize } from '../../src/platform/browser';
 
-describe('throwing-normalize', () => {
-  assert.throws(() => {
-    normalize('foo');
+describe('noop-normalize', function () {
+  it('should not normalize input', function () {
+    assert.strictEqual(normalize('/tmp/foo/../bar'), '/tmp/foo/../bar');
   });
 });

@@ -15,4 +15,4 @@
  */
 
 export { InstrumentationBase } from './instrumentation';
-export { normalize } from './throwing-normalize';
+export { normalize } from './noop-normalize';
