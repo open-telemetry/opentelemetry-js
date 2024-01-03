@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704304236914,
+  "lastUpdate": 1704304335737,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -3032,6 +3032,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "441333+Vunovati@users.noreply.github.com",
+            "name": "Vladimir Adamić",
+            "username": "Vunovati"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ae0a3c522d0b802de264e4d8b9566d3677a36ee6",
+          "message": "fix(exporter-logs-otlp-proto): programatic headers take precedence ov… (#4351)\n\n* fix(exporter-logs-otlp-proto): programatic headers take precedence over environment variables\r\n\r\n* chore: update PR url in changelog\r\n\r\n* chore: fix deletion of env var\r\n\r\n* fix(exporter-logs-otlp-http): programatic headers take precedence over environment variables\r\n\r\n* fix(exporter-trace-otlp-http): programatic headers take precedence over environment variables\r\n\r\n* fix(exporter-trace-otlp-proto): programatic headers take precedence over environment variable\r\n\r\n* chore: update CHANGELOG\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-01-03T17:42:17+01:00",
+          "tree_id": "1ecf34af770f9490c5889a2e114bc5a8e057e48b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/ae0a3c522d0b802de264e4d8b9566d3677a36ee6"
+        },
+        "date": 1704304334876,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 940214,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12027,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 675479,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 657107,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
