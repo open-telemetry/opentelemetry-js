@@ -28,6 +28,7 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { UndiciInstrumentation } from '../src/undici';
 
 import { MockServer } from './utils/mock-server';
+import { assertSpan } from './utils/assertSpan';
 
 const instrumentation = new UndiciInstrumentation();
 instrumentation.enable();
@@ -41,44 +42,41 @@ const provider = new NodeTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 instrumentation.setTracerProvider(provider);
 
-// Simpler way to skip the while suite
-// also `this` is not providing the skpi method inside tests
-const shouldTest = typeof globalThis.fetch === 'function'
-const describeFn = shouldTest ? describe : describe.skip;
-
-describeFn('UndiciInstrumentation `fetch` tests', () => {
-  before(done => {
-    mockServer.start(done);
-  });
-
-  after(done => {
-    mockServer.stop(done);
-  });
-
-  beforeEach(() => {
-    memoryExporter.reset();
-  });
-
-  before(() => {
+describe('UndiciInstrumentation `fetch` tests', function () {
+  before(function (done) {
+    // Do not test if the `fetch` global API is not available
+    // This applies to nodejs < v18 or nodejs < v16.15 wihtout the flag
+    // `--experimental-global-fetch` set
+    // https://nodejs.org/api/globals.html#fetch
+    if (typeof globalThis.fetch !== 'function') {
+      this.skip();
+    }
+    
     // TODO: mock propagation and test it
     // propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    mockServer.start(done);
   });
 
-  after(() => {
+  after(function(done) {
     context.disable();
     propagation.disable();
+    mockServer.stop(done);
   });
 
-  describe('enable()', () => {
-    before(() => {
+  beforeEach(function () {
+    memoryExporter.reset();
+  });
+
+  describe('enable()', function () {
+    before(function () {
       instrumentation.enable();
     });
-    after(() => {
+    after(function () {
       instrumentation.disable();
     });
 
-    it('should create a rootSpan for GET requests and add propagation headers', async () => {
+    it('should create a rootSpan for GET requests and add propagation headers', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -98,6 +96,14 @@ describeFn('UndiciInstrumentation `fetch` tests', () => {
         [SemanticAttributes.HTTP_METHOD]: 'GET',
         [SemanticAttributes.HTTP_STATUS_CODE]: response.status,
         [SemanticAttributes.HTTP_TARGET]: '/?query=test',
+      });
+      assertSpan(span, {
+        hostname: 'localhost',
+        httpStatusCode: response.status,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: response.headers,
       });
     });
   });

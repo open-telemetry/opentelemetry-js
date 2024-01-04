@@ -91,14 +91,11 @@ export class UndiciInstrumentation extends InstrumentationBase {
     if (this._config.enabled) {
       return;
     }
-    // This methos is called by the `InstrumentationAbstract` constructor before
+    // This method is called by the `InstrumentationAbstract` constructor before
     // ours is called. So we need to ensure the property is initalized
     this._channelSubs = this._channelSubs || [];
     this.subscribeToChannel('undici:request:create', this.onRequest.bind(this));
-    this.subscribeToChannel(
-      'undici:request:headers',
-      this.onHeaders.bind(this)
-    );
+    this.subscribeToChannel('undici:request:headers',this.onHeaders.bind(this));
     this.subscribeToChannel('undici:request:trailers', this.onDone.bind(this));
     this.subscribeToChannel('undici:request:error', this.onError.bind(this));
   }
