@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-export * from './environment';
-export * from './globalThis';
-export * from './hex-to-base64';
-export * from './RandomIdGenerator';
-export * from './performance';
-export * from './sdk-info';
-export * from './timer-util';
+export * from './environment.js';
+export * from './globalThis.js';
+export * from './hex-to-base64.js';
+export * from './RandomIdGenerator.js';
+export * from './performance.js';
+export * from './sdk-info.js';
+export * from './timer-util.js';

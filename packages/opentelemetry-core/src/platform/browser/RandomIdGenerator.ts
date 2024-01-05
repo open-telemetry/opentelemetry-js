@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IdGenerator } from '../../trace/IdGenerator';
+import { IdGenerator } from '../../trace/IdGenerator.js';
 
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;

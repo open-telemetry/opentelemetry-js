@@ -24,6 +24,7 @@ export * from './common/types.js';
 export * from './common/hex-to-binary.js';
 export * from './ExportResult.js';
 export * as baggageUtils from './baggage/utils.js';
+export * from './platform';
 export * from './propagation/composite.js';
 export * from './trace/W3CTraceContextPropagator.js';
 export * from './trace/IdGenerator.js';

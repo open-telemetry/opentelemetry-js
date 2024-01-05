@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hexToBinary } from '../../common/hex-to-binary';
+import { hexToBinary } from '../../common/hex-to-binary.js';
 
 export function hexToBase64(hexStr: string): string {
   return btoa(String.fromCharCode(...hexToBinary(hexStr)));

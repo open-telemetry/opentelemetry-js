@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { hexToBinary } from '../../common/hex-to-binary';
+import { hexToBinary } from '../../common/hex-to-binary.js';
 
 export function hexToBase64(hexStr: string): string {
   return Buffer.from(hexToBinary(hexStr)).toString('base64');

@@ -19,8 +19,8 @@ import {
   ENVIRONMENT,
   RAW_ENVIRONMENT,
   parseEnvironment,
-} from '../../utils/environment';
-import { _globalThis } from './globalThis';
+} from '../../utils/environment.js';
+import { _globalThis } from './globalThis.js';
 
 /**
  * Gets the environment variables
