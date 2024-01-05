@@ -15,7 +15,7 @@
  */
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
-import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
+import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler.js';
 
 describe('AlwaysOnSampler', () => {
   it('should reflect sampler name', () => {

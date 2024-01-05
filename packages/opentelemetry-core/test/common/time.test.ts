@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { otperformance as performance } from '../../src/platform';
+import { otperformance as performance } from '../../src/platform/node/performance.js';
 import * as sinon from 'sinon';
 import * as api from '@opentelemetry/api';
 import {

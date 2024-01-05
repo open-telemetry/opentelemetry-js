@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
-import { TraceIdRatioBasedSampler } from '../../src/trace/sampler/TraceIdRatioBasedSampler';
+import { TraceIdRatioBasedSampler } from '../../src/trace/sampler/TraceIdRatioBasedSampler.js';
 
 const spanContext = (traceId = '1') => ({
   traceId,

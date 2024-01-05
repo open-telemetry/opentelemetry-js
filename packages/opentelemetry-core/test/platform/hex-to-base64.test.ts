@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { hexToBase64 } from '../../src/platform';
+import { hexToBase64 } from '../../src/platform/node/hex-to-base64.js';
 
 describe('hexToBase64', () => {
   it('convert hex to base64', () => {

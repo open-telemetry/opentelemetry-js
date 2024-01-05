@@ -15,11 +15,11 @@
  */
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
-import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
-import { ParentBasedSampler } from '../../src/trace/sampler/ParentBasedSampler';
+import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler.js';
+import { ParentBasedSampler } from '../../src/trace/sampler/ParentBasedSampler.js';
 import { TraceFlags, SpanKind, trace } from '@opentelemetry/api';
-import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler';
-import { TraceIdRatioBasedSampler } from '../../src';
+import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler.js';
+import { TraceIdRatioBasedSampler } from '../../src/trace/sampler/TraceIdRatioBasedSampler.js';
 
 const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
 const spanId = '6e0c63257de34c92';

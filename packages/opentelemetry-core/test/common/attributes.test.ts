@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import {
   isAttributeValue,
   sanitizeAttributes,
-} from '../../src/common/attributes';
+} from '../../src/common/attributes.js';
 
 describe('attributes', () => {
   describe('#isAttributeValue', () => {

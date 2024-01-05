@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import assert = require('assert');
+import * as assert from 'assert';
 import { AnchoredClock } from '../../src/common/anchored-clock.js';
 import { otperformance } from '../../src/platform/node/performance.js';
 

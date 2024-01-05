@@ -16,9 +16,9 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ExportResult, ExportResultCode } from '../../src';
-import * as suppress from '../../src/trace/suppress-tracing';
-import { _export } from '../../src/internal/exporter';
+import { ExportResult, ExportResultCode } from '../../src/ExportResult.js';
+import * as suppress from '../../src/trace/suppress-tracing.js';
+import { _export } from '../../src/internal/exporter.js';
 
 describe('exporter', () => {
   const sandbox = sinon.createSandbox();
