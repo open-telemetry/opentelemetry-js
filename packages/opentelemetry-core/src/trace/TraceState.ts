@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { validateKey, validateValue } from '../internal/validators';
+import { validateKey, validateValue } from '../internal/validators.js';
 
 const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;

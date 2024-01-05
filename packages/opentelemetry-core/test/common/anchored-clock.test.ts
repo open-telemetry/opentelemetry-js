@@ -15,7 +15,8 @@
  */
 
 import assert = require('assert');
-import { AnchoredClock, otperformance } from '../../src';
+import { AnchoredClock } from '../../src/common/anchored-clock.js';
+import { otperformance } from '../../src/platform/node/performance.js';
 
 describe('AnchoredClock', () => {
   it('should keep time', done => {

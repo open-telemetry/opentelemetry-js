@@ -14,36 +14,35 @@
  * limitations under the License.
  */
 
-export * from './baggage/propagation/W3CBaggagePropagator';
-export * from './common/anchored-clock';
-export * from './common/attributes';
-export * from './common/global-error-handler';
-export * from './common/logging-error-handler';
-export * from './common/time';
-export * from './common/types';
-export * from './common/hex-to-binary';
-export * from './ExportResult';
-export * as baggageUtils from './baggage/utils';
-export * from './platform';
-export * from './propagation/composite';
-export * from './trace/W3CTraceContextPropagator';
-export * from './trace/IdGenerator';
-export * from './trace/rpc-metadata';
-export * from './trace/sampler/AlwaysOffSampler';
-export * from './trace/sampler/AlwaysOnSampler';
-export * from './trace/sampler/ParentBasedSampler';
-export * from './trace/sampler/TraceIdRatioBasedSampler';
-export * from './trace/suppress-tracing';
-export * from './trace/TraceState';
-export * from './utils/environment';
-export * from './utils/merge';
-export * from './utils/sampling';
-export * from './utils/timeout';
-export * from './utils/url';
-export * from './utils/wrap';
-export * from './utils/callback';
-export * from './version';
-import { _export } from './internal/exporter';
+export { W3CBaggagePropagator } from './baggage/propagation/W3CBaggagePropagator.js';
+export * from './common/anchored-clock.js';
+export * from './common/attributes.js';
+export * from './common/global-error-handler.js';
+export * from './common/logging-error-handler.js';
+export * from './common/time.js';
+export * from './common/types.js';
+export * from './common/hex-to-binary.js';
+export * from './ExportResult.js';
+export * as baggageUtils from './baggage/utils.js';
+export * from './propagation/composite.js';
+export * from './trace/W3CTraceContextPropagator.js';
+export * from './trace/IdGenerator.js';
+export * from './trace/rpc-metadata.js';
+export * from './trace/sampler/AlwaysOffSampler.js';
+export * from './trace/sampler/AlwaysOnSampler.js';
+export * from './trace/sampler/ParentBasedSampler.js';
+export * from './trace/sampler/TraceIdRatioBasedSampler.js';
+export * from './trace/suppress-tracing.js';
+export * from './trace/TraceState.js';
+export * from './utils/environment.js';
+export * from './utils/merge.js';
+export * from './utils/sampling.js';
+export * from './utils/timeout.js';
+export * from './utils/url.js';
+export * from './utils/wrap.js';
+export * from './utils/callback.js';
+export * from './version.js';
+import { _export } from './internal/exporter.js';
 export const internal = {
   _export,
 };

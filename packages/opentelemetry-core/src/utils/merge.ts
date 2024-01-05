@@ -16,7 +16,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { isPlainObject } from './lodash.merge';
+import { isPlainObject } from './lodash.merge.js';
 
 const MAX_LEVEL = 20;
 

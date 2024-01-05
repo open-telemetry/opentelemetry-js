@@ -15,7 +15,10 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile:cjs": "tsc --build && echo '{ \"type\": \"commonjs\" }' > build/src/package.json",
+    "compile:esm": "tsc --build tsconfig.esm.json && echo '{ \"type\": \"module\" }' > build/esm/package.json",
+    "compile:esnext": "tsc --build tsconfig.esnext.json && echo '{ \"type\": \"module\" }' > build/esnext/package.json",
+    "compile": "npm run compile:cjs && npm run compile:esm && npm run compile:esnext",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts --exclude 'test/platform/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
@@ -45,6 +48,29 @@
   "license": "Apache-2.0",
   "engines": {
     "node": ">=14"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./build/src/index.d.ts",
+        "default": "./build/src/index.js"
+      },
+      "import": {
+        "types": "./build/esm/index.d.ts",
+        "default": "./build/esm/index.js"
+      }
+    },
+    "./platform": {
+      "require": {
+        "types": "./build/src/platform/index.d.ts",
+        "default": "./build/src/platform/index.js"
+      },
+      "import": {
+        "types": "./build/esm/platform/index.d.ts",
+        "default": "./build/esm/platform/index.js"
+      }
+    }
   },
   "files": [
     "build/esm/**/*.js",

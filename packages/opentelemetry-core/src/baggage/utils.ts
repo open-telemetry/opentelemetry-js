@@ -23,7 +23,7 @@ import {
   BAGGAGE_PROPERTIES_SEPARATOR,
   BAGGAGE_KEY_PAIR_SEPARATOR,
   BAGGAGE_MAX_TOTAL_LENGTH,
-} from './constants';
+} from './constants.js';
 
 type ParsedBaggageKeyValue = {
   key: string;
