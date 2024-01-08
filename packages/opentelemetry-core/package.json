@@ -20,7 +20,7 @@
     "compile:esnext": "tsc --build tsconfig.esnext.json && echo '{ \"type\": \"module\" }' > build/esnext/package.json",
     "compile": "npm run compile:cjs && npm run compile:esm && npm run compile:esnext",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts --exclude 'test/platform/browser/**/*.ts'",
+    "test": "nyc ts-mocha -p tsconfig.esm.json test/**/*.test.ts --exclude 'test/platform/browser/**/*.ts'",
     "test:browser": "karma start --single-run",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
@@ -110,6 +110,7 @@
     "sinon": "15.1.2",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "4.4.4",
     "webpack": "5.89.0"
   },
@@ -120,5 +121,15 @@
     "@opentelemetry/semantic-conventions": "1.19.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core",
-  "sideEffects": false
+  "sideEffects": false,
+  "mocha": {
+    "loader": [
+      "ts-node/esm"
+    ],
+    "recursive": true,
+    "extension": [
+      "ts",
+      "js"
+    ]
+  }
 }
