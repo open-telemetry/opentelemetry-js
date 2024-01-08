@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BindOnceFuture } from '../../src/utils/callback.js';
-import { assertRejects } from '../test-utils.js';
 
 describe('callback', () => {
   describe('BindOnceFuture', () => {
@@ -34,7 +33,7 @@ describe('callback', () => {
       assert.deepStrictEqual(stub.firstCall.args, [1]);
       assert.deepStrictEqual(stub.firstCall.thisValue, that);
 
-      assert(future.isCalled);
+      assert.ok(future.isCalled);
     });
 
     it('should handle thrown errors', async () => {
@@ -42,9 +41,9 @@ describe('callback', () => {
       stub.throws(new Error('foo'));
       const future = new BindOnceFuture(stub, undefined);
 
-      await assertRejects(future.call(), /foo/);
-      await assertRejects(future.call(), /foo/);
-      await assertRejects(future.promise, /foo/);
+      await assert.rejects(future.call(), /foo/);
+      await assert.rejects(future.call(), /foo/);
+      await assert.rejects(future.promise, /foo/);
     });
 
     it('should handle rejections', async () => {
@@ -52,9 +51,9 @@ describe('callback', () => {
       stub.rejects(new Error('foo'));
       const future = new BindOnceFuture(stub, undefined);
 
-      await assertRejects(future.call(), /foo/);
-      await assertRejects(future.call(), /foo/);
-      await assertRejects(future.promise, /foo/);
+      await assert.rejects(future.call(), /foo/);
+      await assert.rejects(future.call(), /foo/);
+      await assert.rejects(future.promise, /foo/);
     });
   });
 });
