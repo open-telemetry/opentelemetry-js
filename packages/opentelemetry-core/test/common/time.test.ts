@@ -28,7 +28,7 @@ import {
   hrTimeToTimeStamp,
   isTimeInput,
   addHrTimes,
-} from '../../src/common/time';
+} from '../../src/common/time.js';
 
 describe('time', () => {
   afterEach(() => {
