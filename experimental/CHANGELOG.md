@@ -26,7 +26,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation): use caret range on import-in-the-middle [#4380](https://github.com/open-telemetry/opentelemetry-js/pull/4380) @pichlermarc
-* fix(instrumentation): do not import 'path' in browser runtimes [#4378](https://github.com/open-telemetry/opentelemetry-js/pull/4378) @pichlermarc
+* fix(instrumentation): do not import 'path' in browser runtimes [#4386](https://github.com/open-telemetry/opentelemetry-js/pull/4386) @pichlermarc
   * Fixes a bug where bundling for web would fail due to `InstrumentationNodeModuleDefinition` importing `path`
 
 ## 0.46.0
