@@ -19,6 +19,7 @@ import {
   isAttributeValue,
   sanitizeAttributes,
 } from '../../src/common/attributes';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 describe('attributes', () => {
   describe('#isAttributeValue', () => {
@@ -101,6 +102,23 @@ describe('attributes', () => {
       assert.strictEqual(attributes.str, 'unmodified');
       assert.ok(Array.isArray(attributes.arr));
       assert.strictEqual(attributes.arr[0], 'unmodified');
+    });
+    it('should remove username and password from http.url', () => {
+      const out = sanitizeAttributes({
+        [SemanticAttributes.HTTP_URL]:
+          'http://user:pass@host:80/path?query#fragment',
+      });
+      assert.strictEqual(out, {
+        [SemanticAttributes.HTTP_URL]: 'http://host:80/path?query#fragment',
+      });
+    });
+    it('should return input string when invalid http.url is given', () => {
+      const out = sanitizeAttributes({
+        [SemanticAttributes.HTTP_URL]: 'hello!world',
+      });
+      assert.strictEqual(out, {
+        [SemanticAttributes.HTTP_URL]: 'hello!world',
+      });
     });
   });
 });

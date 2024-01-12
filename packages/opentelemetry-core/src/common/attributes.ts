@@ -15,6 +15,7 @@
  */
 
 import { diag, SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export function sanitizeAttributes(attributes: unknown): SpanAttributes {
   const out: SpanAttributes = {};
@@ -30,6 +31,10 @@ export function sanitizeAttributes(attributes: unknown): SpanAttributes {
     }
     if (!isAttributeValue(val)) {
       diag.warn(`Invalid attribute value set for key: ${key}`);
+      continue;
+    }
+    if (key === SemanticAttributes.HTTP_URL && typeof val === 'string') {
+      out[key] = sanitizeAttributesUsingUrl(val);
       continue;
     }
     if (Array.isArray(val)) {
@@ -93,4 +98,18 @@ function isValidPrimitiveAttributeValue(val: unknown): boolean {
   }
 
   return false;
+}
+
+function sanitizeAttributesUsingUrl(val: string): string {
+  try {
+    const url = new URL(val);
+    url.username = '';
+    url.password = '';
+    return url.toString();
+  } catch (e) {
+    diag.warn(
+      `Invalid attribute value set for key: ${SemanticAttributes.HTTP_URL}. Unable to sanitize invalid URL.`
+    );
+    return val;
+  }
 }
