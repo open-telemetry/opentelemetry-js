@@ -305,6 +305,7 @@ export class NodeSDK {
    * Call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public start(): void {
+    const env = getEnv();
     if (this._disabled) {
       return;
     }
@@ -326,9 +327,14 @@ export class NodeSDK {
             })
           );
 
-    const Provider = this._tracerProviderConfig
-      ? NodeTracerProvider
-      : TracerProviderWithEnvExporters;
+    // if there is a defined tracerProviderConfig, the traces exporter is defined and not none and there is no traceExporter defined in manual config
+    const Provider =
+      this._tracerProviderConfig &&
+      !env.OTEL_TRACES_EXPORTER &&
+      env.OTEL_TRACES_EXPORTER !== 'none' &&
+      !this._tracerProviderConfig.spanProcessor
+        ? NodeTracerProvider
+        : TracerProviderWithEnvExporters;
 
     const tracerProvider = new Provider({
       ...this._tracerProviderConfig?.tracerConfig,
