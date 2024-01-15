@@ -120,6 +120,8 @@ export class Span implements APISpan, ReadableSpan {
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._spanLimits = parentTracer.getSpanLimits();
+    this._attributeValueLengthLimit =
+      this._spanLimits.attributeValueLengthLimit || 0;
 
     if (attributes != null) {
       this.setAttributes(attributes);
@@ -127,8 +129,6 @@ export class Span implements APISpan, ReadableSpan {
 
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
-    this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit || 0;
   }
 
   spanContext(): SpanContext {
