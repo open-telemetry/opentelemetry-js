@@ -101,7 +101,9 @@ describe('BaseInstrumentation', () => {
         }
       }
       instrumentation = new TestInstrumentation();
-      instrumentation.setLoggerProvider(new TestLoggerProvider());
+      if (instrumentation.setLoggerProvider) {
+        instrumentation.setLoggerProvider(new TestLoggerProvider());
+      }
       assert.strictEqual(called, true);
     });
   });

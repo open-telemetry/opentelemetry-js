@@ -64,7 +64,7 @@ export function enableInstrumentations(
     if (meterProvider) {
       instrumentation.setMeterProvider(meterProvider);
     }
-    if (loggerProvider) {
+    if (loggerProvider && instrumentation.setLoggerProvider) {
       instrumentation.setLoggerProvider(loggerProvider);
     }
     // instrumentations have been already enabled during creation
