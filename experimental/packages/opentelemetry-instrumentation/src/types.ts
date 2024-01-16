@@ -45,7 +45,7 @@ export interface Instrumentation {
   setMeterProvider(meterProvider: MeterProvider): void;
 
   /** Method to set logger provider  */
-  setLoggerProvider(loggerProvider: LoggerProvider): void;
+  setLoggerProvider?(loggerProvider: LoggerProvider): void;
 
   /** Method to set instrumentation config  */
   setConfig(config: InstrumentationConfig): void;
