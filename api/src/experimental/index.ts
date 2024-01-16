@@ -13,6 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export { InstrumentationBase } from './instrumentation';
-export { normalize } from './noop-normalize';
+export { wrapTracer, SugaredTracer } from './trace/SugaredTracer';
+export { SugaredSpanOptions } from './trace/SugaredOptions';
