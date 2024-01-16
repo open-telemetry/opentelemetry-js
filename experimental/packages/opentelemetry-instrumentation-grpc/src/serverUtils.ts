@@ -34,8 +34,8 @@ import type {
   SendUnaryDataCallback,
   GrpcEmitter,
   HandleCall,
-} from './types';
-import type { IgnoreMatcher } from '../types';
+} from './internal-types';
+import type { IgnoreMatcher } from './types';
 
 import { context, SpanStatusCode } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -43,9 +43,9 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
-} from '../utils';
-import { AttributeNames } from '../enums/AttributeNames';
-import { GRPC_STATUS_CODE_OK } from '../status-code';
+} from './utils';
+import { AttributeNames } from './enums/AttributeNames';
+import { GRPC_STATUS_CODE_OK } from './status-code';
 
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 

@@ -18,19 +18,22 @@ import type { EventEmitter } from 'events';
 import type { Span, SpanStatus } from '@opentelemetry/api';
 import type { Client, Metadata, ServiceError } from '@grpc/grpc-js';
 import type * as grpcJs from '@grpc/grpc-js';
-import type { GrpcJsInstrumentation } from './';
-import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
-import type { metadataCaptureType } from '../internal-types';
+import type { GrpcInstrumentation } from './';
+import type {
+  GrpcClientFunc,
+  SendUnaryDataCallback,
+  metadataCaptureType,
+} from './internal-types';
 
 import { propagation, context } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { AttributeNames } from '../enums/AttributeNames';
-import { GRPC_STATUS_CODE_OK } from '../status-code';
+import { AttributeNames } from './enums/AttributeNames';
+import { GRPC_STATUS_CODE_OK } from './status-code';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
-} from '../utils';
+} from './utils';
 import { errorMonitor } from 'events';
 
 /**
@@ -38,7 +41,7 @@ import { errorMonitor } from 'events';
  * with both possible casings e.g. "TestMethod" & "testMethod"
  */
 export function getMethodsToWrap(
-  this: GrpcJsInstrumentation,
+  this: GrpcInstrumentation,
   client: typeof Client,
   methods: { [key: string]: { originalName?: string } }
 ): string[] {
