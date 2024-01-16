@@ -8,6 +8,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* refactor(instrumentation-grpc): clean up remnants of 'grpc' package instrumentation [#4420](https://github.com/open-telemetry/opentelemetry-js/pull/4420) @pichlermarc
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
