@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1705330539918,
+  "lastUpdate": 1705397219738,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -3240,6 +3240,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.60%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "secustor@users.noreply.github.com",
+            "name": "Sebastian Poxhofer",
+            "username": "secustor"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "71ef1b1f2cc73a48d27310925ce1109fd8d6712b",
+          "message": "feat(SugaredTracer): add draft of sugaredTracer (#3317)\n\n* feat(api): add experimental package and SugaredTracer\r\n\r\n* tests(api/experimental): add tests\r\n\r\n* fix: packages.json exports\r\n\r\n* move export into experimental package\r\n\r\n* add additional tests\r\n\r\n* fix: do not use catch and finally for compatibility with Node 8\r\n\r\n---------\r\n\r\nCo-authored-by: Chengzhong Wu <legendecas@gmail.com>",
+          "timestamp": "2024-01-16T17:25:17+08:00",
+          "tree_id": "fe0d76f920e04d5d151d1f4400421a87f72b4754",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/71ef1b1f2cc73a48d27310925ce1109fd8d6712b"
+        },
+        "date": 1705397218802,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1011741,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12548,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 660496,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 642503,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
