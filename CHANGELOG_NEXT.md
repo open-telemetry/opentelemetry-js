@@ -2,6 +2,8 @@
 
 ### :boom: Breaking Change
 
+* feat(sdk-metrics)!: remove MeterProvider.addMetricReader() in favor of constructor option [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419) @pichlermarc
+
 ### :rocket: (Enhancement)
 
 ### :books: (Refine Doc)
