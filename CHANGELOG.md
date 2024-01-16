@@ -14,6 +14,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :bug: (Bug Fix)
 
 * fix(sdk-trace-base): ensure attribute value length limit is enforced on span creation [#4417](https://github.com/open-telemetry/opentelemetry-js/pull/4417) @pichlermarc
+* fix(core): drop unnecessary assignment of HOSTNAME [#4421](https://github.com/open-telemetry/opentelemetry-js/pull/4421) @pichlermarc
 
 ### :books: (Refine Doc)
 
