@@ -46,6 +46,7 @@ import {
   BatchSpanProcessor,
   NoopSpanProcessor,
   IdGenerator,
+  AlwaysOffSampler,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as semver from 'semver';
@@ -894,6 +895,23 @@ describe('setup exporter from env', () => {
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    delete env.OTEL_TRACES_EXPORTER;
+  });
+  it('should only create one span processor when configured using env vars and config', async () => {
+    env.OTEL_TRACES_EXPORTER = 'console';
+    const sdk = new NodeSDK({
+      sampler: new AlwaysOffSampler(),
+    });
+    sdk.start();
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+    assert(
+      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === true
+    );
+    assert(
+      sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
+    )
+    assert(listOfProcessors.length === 1);
     delete env.OTEL_TRACES_EXPORTER;
   });
   it('use otlp exporter and defined exporter protocol env value', async () => {

@@ -40,7 +40,6 @@ import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
-  SpanExporter,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
@@ -93,7 +92,7 @@ export class NodeSDK {
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
-  private _traceExporter?: SpanExporter;
+  private _configuration?: Partial<NodeSDKConfiguration>;
 
   private _disabled?: boolean;
 
@@ -103,11 +102,6 @@ export class NodeSDK {
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     const env = getEnv();
     const envWithoutDefaults = getEnvWithoutDefaults();
-    const envExporterWithConfiguration =
-      env.OTEL_TRACES_EXPORTER &&
-      (configuration.sampler ||
-        configuration.spanLimits ||
-        configuration.idGenerator);
 
     if (env.OTEL_SDK_DISABLED) {
       this._disabled = true;
@@ -123,7 +117,8 @@ export class NodeSDK {
       });
     }
 
-    this._traceExporter = configuration.traceExporter;
+    this._configuration = configuration;
+
     this._resource = configuration.resource ?? new Resource({});
     this._resourceDetectors = configuration.resourceDetectors ?? [
       envDetector,
@@ -134,12 +129,8 @@ export class NodeSDK {
 
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
-    // If there are configuration options to read, we need to create a new TracerProvider even if the exporter is configured in the environment
-    if (
-      configuration.traceExporter ||
-      configuration.spanProcessor ||
-      envExporterWithConfiguration
-    ) {
+    // If a tracer provider can be created from manual configuration, create it
+    if (configuration.traceExporter || configuration.spanProcessor) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
       if (configuration.sampler) {
@@ -308,7 +299,6 @@ export class NodeSDK {
    * Call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public start(): void {
-    const env = getEnv();
     if (this._disabled) {
       return;
     }
@@ -330,18 +320,28 @@ export class NodeSDK {
             })
           );
 
-    // if there is a defined tracerProviderConfig, the traces exporter is defined and not none and there is no traceExporter defined in manual config
-    const Provider =
-      (this._tracerProviderConfig &&
-        (!env.OTEL_TRACES_EXPORTER || env.OTEL_TRACES_EXPORTER === 'none')) ||
-      this._traceExporter
-        ? NodeTracerProvider
-        : TracerProviderWithEnvExporters;
+    // if there is a tracerProviderConfig (traceExporter/spanProcessor was set manually) or the traceExporter is set manually, use NodeTracerProvider
+    const Provider = this._tracerProviderConfig
+      ? NodeTracerProvider
+      : TracerProviderWithEnvExporters;
 
-    const tracerProvider = new Provider({
-      ...this._tracerProviderConfig?.tracerConfig,
-      resource: this._resource,
-    });
+    let tracerProvider;
+
+    // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations, else configure normally
+    if (
+      typeof Provider === typeof TracerProviderWithEnvExporters &&
+      this._configuration
+    ) {
+      tracerProvider = new Provider({
+        ...this._configuration,
+        resource: this._resource,
+      });
+    } else {
+      tracerProvider = new Provider({
+        ...this._tracerProviderConfig?.tracerConfig,
+        resource: this._resource,
+      });
+    }
 
     this._tracerProvider = tracerProvider;
 
