@@ -910,7 +910,7 @@ describe('setup exporter from env', () => {
     );
     assert(
       sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
-    )
+    );
     assert(listOfProcessors.length === 1);
     delete env.OTEL_TRACES_EXPORTER;
   });
