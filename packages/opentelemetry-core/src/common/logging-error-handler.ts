@@ -15,7 +15,7 @@
  */
 
 import { diag, Exception } from '@opentelemetry/api';
-import { ErrorHandler } from './types';
+import { ErrorHandler } from './types.js';
 
 /**
  * Returns a function that logs an error using the provided logger, or a

@@ -23,14 +23,14 @@ import {
   TextMapSetter,
 } from '@opentelemetry/api';
 
-import { isTracingSuppressed } from '../../trace/suppress-tracing';
+import { isTracingSuppressed } from '../../trace/suppress-tracing.js';
 import {
   BAGGAGE_HEADER,
   BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_MAX_NAME_VALUE_PAIRS,
   BAGGAGE_MAX_PER_NAME_VALUE_PAIRS,
-} from '../constants';
-import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils';
+} from '../constants.js';
+import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils.js';
 
 /**
  * Propagates {@link Baggage} through Context format propagation.

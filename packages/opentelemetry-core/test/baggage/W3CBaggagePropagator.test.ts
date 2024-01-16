@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   Baggage,
   BaggageEntry,
@@ -22,10 +21,10 @@ import {
   propagation,
   baggageEntryMetadataFromString,
 } from '@opentelemetry/api';
+import { W3CBaggagePropagator } from '../../src/baggage/propagation/W3CBaggagePropagator.js';
+import { BAGGAGE_HEADER } from '../../src/baggage/constants.js';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { W3CBaggagePropagator } from '../../src/baggage/propagation/W3CBaggagePropagator';
-import { BAGGAGE_HEADER } from '../../src/baggage/constants';
 
 describe('W3CBaggagePropagator', () => {
   const httpBaggagePropagator = new W3CBaggagePropagator();

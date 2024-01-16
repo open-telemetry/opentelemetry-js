@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ShimWrapped } from '../common/types';
+import { ShimWrapped } from '../common/types.js';
 
 /**
  * Checks if certain function has been already wrapped

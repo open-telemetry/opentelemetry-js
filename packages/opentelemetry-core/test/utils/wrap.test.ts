@@ -16,7 +16,8 @@
 
 import * as assert from 'assert';
 
-import { isWrapped, ShimWrapped } from '../../src';
+import { isWrapped } from '../../src/utils/wrap.js';
+import { ShimWrapped } from '../../src/common/types.js';
 
 function makeWrapped(
   wrapped: unknown,

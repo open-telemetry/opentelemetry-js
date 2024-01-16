@@ -25,16 +25,14 @@ import {
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
-import {
-  CompositePropagator,
-  W3CTraceContextPropagator,
-  RandomIdGenerator,
-} from '../../src';
+import { CompositePropagator } from '../../src/propagation/composite.js';
+import { W3CTraceContextPropagator } from '../../src/trace/W3CTraceContextPropagator.js';
+import { RandomIdGenerator } from '../../src/platform/node/RandomIdGenerator.js';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
-} from '../../src/trace/W3CTraceContextPropagator';
-import { TraceState } from '../../src/trace/TraceState';
+} from '../../src/trace/W3CTraceContextPropagator.js';
+import { TraceState } from '../../src/trace/TraceState.js';
 
 class DummyPropagator implements TextMapPropagator {
   inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {

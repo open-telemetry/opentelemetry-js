@@ -25,9 +25,9 @@ import {
   TraceFlags,
   trace,
 } from '@opentelemetry/api';
-import { globalErrorHandler } from '../../common/global-error-handler';
-import { AlwaysOffSampler } from './AlwaysOffSampler';
-import { AlwaysOnSampler } from './AlwaysOnSampler';
+import { globalErrorHandler } from '../../common/global-error-handler.js';
+import { AlwaysOffSampler } from './AlwaysOffSampler.js';
+import { AlwaysOnSampler } from './AlwaysOnSampler.js';
 
 /**
  * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.

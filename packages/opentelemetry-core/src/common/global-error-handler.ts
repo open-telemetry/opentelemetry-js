@@ -15,8 +15,8 @@
  */
 
 import { Exception } from '@opentelemetry/api';
-import { loggingErrorHandler } from './logging-error-handler';
-import { ErrorHandler } from './types';
+import { loggingErrorHandler } from './logging-error-handler.js';
+import { ErrorHandler } from './types.js';
 
 /** The global error handler delegate */
 let delegateHandler = loggingErrorHandler();

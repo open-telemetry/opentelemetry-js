@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Deferred } from './promise';
+import { Deferred } from './promise.js';
 
 /**
  * Bind the callback and only invoke the callback once regardless how many times `BindOnceFuture.call` is invoked.

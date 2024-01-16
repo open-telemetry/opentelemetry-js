@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { getEnv } from '../../src/platform';
+import { getEnv } from '../../src/platform/node/environment.js';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
   RAW_ENVIRONMENT,
-} from '../../src/utils/environment';
+} from '../../src/utils/environment.js';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { DiagLogLevel } from '@opentelemetry/api';
-import { TracesSamplerValues } from '../../src';
+import { TracesSamplerValues } from '../../src/utils/sampling.js';
 
 let lastMock: RAW_ENVIRONMENT = {};
 

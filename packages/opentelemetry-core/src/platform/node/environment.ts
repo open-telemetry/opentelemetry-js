@@ -20,7 +20,7 @@ import {
   ENVIRONMENT,
   RAW_ENVIRONMENT,
   parseEnvironment,
-} from '../../utils/environment';
+} from '../../utils/environment.js';
 
 /**
  * Gets the environment variables

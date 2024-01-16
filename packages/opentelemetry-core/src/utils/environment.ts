@@ -15,8 +15,8 @@
  */
 
 import { DiagLogLevel } from '@opentelemetry/api';
-import { TracesSamplerValues } from './sampling';
-import { _globalThis } from '../platform/browser/globalThis';
+import { TracesSamplerValues } from './sampling.js';
+import { _globalThis } from '../platform/browser/globalThis.js';
 
 const DEFAULT_LIST_SEPARATOR = ',';
 

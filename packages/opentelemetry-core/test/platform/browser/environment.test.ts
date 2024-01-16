@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { getEnv } from '../../../src/platform/browser/environment';
+import { getEnv } from '../../../src/platform/browser/environment.js';
 
 describe('getEnv', () => {
   it('get environments variables in a browser', () => {
