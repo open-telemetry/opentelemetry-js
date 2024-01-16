@@ -333,7 +333,7 @@ export class NodeSDK {
     // if there is a defined tracerProviderConfig, the traces exporter is defined and not none and there is no traceExporter defined in manual config
     const Provider =
       (this._tracerProviderConfig &&
-        (!env.OTEL_TRACES_EXPORTER || env.OTEL_TRACES_EXPORTER == 'none')) ||
+        (!env.OTEL_TRACES_EXPORTER || env.OTEL_TRACES_EXPORTER === 'none')) ||
       this._traceExporter
         ? NodeTracerProvider
         : TracerProviderWithEnvExporters;
