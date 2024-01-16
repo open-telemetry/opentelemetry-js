@@ -325,23 +325,11 @@ export class NodeSDK {
       ? NodeTracerProvider
       : TracerProviderWithEnvExporters;
 
-    let tracerProvider;
-
-    // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations, else configure normally
-    if (
-      typeof Provider === typeof TracerProviderWithEnvExporters &&
-      this._configuration
-    ) {
-      tracerProvider = new Provider({
-        ...this._configuration,
-        resource: this._resource,
-      });
-    } else {
-      tracerProvider = new Provider({
-        ...this._tracerProviderConfig?.tracerConfig,
-        resource: this._resource,
-      });
-    }
+    // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations and set them here
+    const tracerProvider = new Provider({
+      ...this._configuration,
+      resource: this._resource,
+    });
 
     this._tracerProvider = tracerProvider;
 
