@@ -50,7 +50,8 @@ export class OTLPLogExporter
       this.headers,
       baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-      )
+      ),
+      config.headers
     );
   }
   convert(logs: ReadableLogRecord[]): IExportLogsServiceRequest {

@@ -92,6 +92,15 @@ describe('OTLPLogExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
     });
+    it('should override url defined in env with url defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+      const constructorDefinedEndpoint = 'http://constructor/v1/logs';
+      const collectorExporter = new OTLPLogExporter({
+        url: constructorDefinedEndpoint,
+      });
+      assert.strictEqual(collectorExporter.url, constructorDefinedEndpoint);
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    });
     it('should add root path when signal url defined in env contains no path and no root path', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar';
       const collectorExporter = new OTLPLogExporter();
@@ -141,6 +150,17 @@ describe('OTLPLogExporter - node with proto over http', () => {
       assert.strictEqual(collectorExporter.headers.foo, 'boo');
       assert.strictEqual(collectorExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = '';
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
+    it('should override headers defined via env with headers defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+      const collectorExporter = new OTLPLogExporter({
+        headers: {
+          foo: 'constructor',
+        },
+      });
+      assert.strictEqual(collectorExporter.headers.foo, 'constructor');
+      assert.strictEqual(collectorExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
   });
