@@ -40,6 +40,7 @@ import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
+  SpanExporter,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
@@ -92,6 +93,7 @@ export class NodeSDK {
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
+  private _traceExporter?: SpanExporter;
 
   private _disabled?: boolean;
 
@@ -121,6 +123,7 @@ export class NodeSDK {
       });
     }
 
+    this._traceExporter = configuration.traceExporter;
     this._resource = configuration.resource ?? new Resource({});
     this._resourceDetectors = configuration.resourceDetectors ?? [
       envDetector,
@@ -329,10 +332,9 @@ export class NodeSDK {
 
     // if there is a defined tracerProviderConfig, the traces exporter is defined and not none and there is no traceExporter defined in manual config
     const Provider =
-      this._tracerProviderConfig &&
-      !env.OTEL_TRACES_EXPORTER &&
-      env.OTEL_TRACES_EXPORTER !== 'none' &&
-      !this._tracerProviderConfig.spanProcessor
+      (this._tracerProviderConfig &&
+        (!env.OTEL_TRACES_EXPORTER || env.OTEL_TRACES_EXPORTER == 'none')) ||
+      this._traceExporter
         ? NodeTracerProvider
         : TracerProviderWithEnvExporters;
 
