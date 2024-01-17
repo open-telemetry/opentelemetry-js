@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1705397219738,
+  "lastUpdate": 1705478426630,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -3292,6 +3292,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.41%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "4884521+rodgerbrennan@users.noreply.github.com",
+            "name": "Rodger Brennan",
+            "username": "rodgerbrennan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bf8714edcba8a2384db857696a1608215548d182",
+          "message": "chore(opentelemetry-context-zone-peer-dep): support zone.js ^v0.13.0 (#4320)\n\n* chore(opentelemetry-context-zone-peer-dep):\r\nupdate deps to support angular 16\r\ncloses issue #4245\r\n\r\nSigned-off-by: rbrennan <4884521+rodgerbrennan@users.noreply.github.com>\r\n\r\n* update packages\r\n\r\n* Revert \"update packages\"\r\n\r\nThis reverts commit 624df4ea2e3dcd235f0dfd72da66cbf427aaccd2.\r\n\r\n* chore: sync package-lock.json\r\n\r\n* chore: sync package-lock.json\r\n\r\n* chore: sync package-lock.json\r\n\r\n* Update ZoneContextManager.test to use ES5 UMD bundle\r\n\r\n* add changelog\r\n\r\n* remove trailing space from changelog\r\n\r\n---------\r\n\r\nSigned-off-by: rbrennan <4884521+rodgerbrennan@users.noreply.github.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-01-17T11:45:56+08:00",
+          "tree_id": "e19541f27c03421698e487e4b4b1e41ac759e903",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bf8714edcba8a2384db857696a1608215548d182"
+        },
+        "date": 1705478425754,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 968444,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12111,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 675840,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 651806,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
