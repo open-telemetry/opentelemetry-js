@@ -15,7 +15,7 @@
  */
 import type { Channel } from 'diagnostics_channel';
 
-import type { Request, RequestInfo, Response } from 'undici';
+import { UndiciRequest, UnidiciResponse }from './types';
 
 export interface ListenerRecord {
   name: string;
@@ -23,27 +23,13 @@ export interface ListenerRecord {
   onMessage: (message: any, name: string) => void;
 }
 
-// type Writeable<T> = { -readonly [P in keyof T]: T[P] };
-// type WriteableRequest = Writeable<Request>;
-
-// TODO: the actual `request` object at runtime have subtle differences
-// from the `Request` type declared in `undici`. Type properly
-//
-// Types declared in the lib
-// - have some properties declared as `readonly` but we are changing them
-// - omits some properties we need to inspect for the instrumentation
-type UndiciRequest = Request & {
-  origin: RequestInfo;
-  path: string;
-};
-
 export interface RequestMessage {
   request: UndiciRequest;
 }
 
-export interface RequestResponseMessage {
+export interface HeadersMessage {
   request: UndiciRequest;
-  response: Response;
+  response: UnidiciResponse;
 }
 
 export interface RequestErrorMessage {

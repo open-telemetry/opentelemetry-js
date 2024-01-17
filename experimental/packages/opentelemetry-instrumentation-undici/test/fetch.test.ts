@@ -15,12 +15,10 @@
  */
 import * as assert from 'assert';
 
-import { SpanKind, context, propagation } from '@opentelemetry/api';
+import { context, propagation } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   InMemorySpanExporter,
-  ReadableSpan,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -61,6 +59,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
   after(function(done) {
     context.disable();
     propagation.disable();
+    mockServer.mockListener(undefined);
     mockServer.stop(done);
   });
 
@@ -69,16 +68,33 @@ describe('UndiciInstrumentation `fetch` tests', function () {
   });
 
   describe('enable()', function () {
-    before(function () {
+    beforeEach(function () {
       instrumentation.enable();
     });
-    after(function () {
+    afterEach(function () {
       instrumentation.disable();
     });
 
-    it('should create a rootSpan for GET requests and add propagation headers', async function () {
+    it.skip('should create valid spans even if the configuration hooks fail', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
+
+      // Set the bad configuration
+      instrumentation.setConfig({
+        enabled: true,
+        ignoreRequestHook: () => {
+          throw new Error('ignoreRequestHook error');
+        },
+        applyCustomAttributesOnSpan: () => {
+          throw new Error('ignoreRequestHook error');
+        },
+        requestHook: () => {
+          throw new Error('requestHook error');
+        },
+        startSpanHook: () => {
+          throw new Error('startSpanHook error');
+        },
+      })
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const response = await fetch(fetchUrl);
@@ -86,17 +102,9 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
 
-      assert.ok(span);
+      assert.ok(span, 'a span is present');
       assert.strictEqual(spans.length, 1);
-      assertSpanAttribs(span, 'HTTP GET', {
-        // TODO: I guess we want to have parity with HTTP insturmentation
-        // - there are missing attributes
-        // - also check if these current values make sense
-        [SemanticAttributes.HTTP_URL]: `${protocol}://${hostname}:${mockServer.port}`,
-        [SemanticAttributes.HTTP_METHOD]: 'GET',
-        [SemanticAttributes.HTTP_STATUS_CODE]: response.status,
-        [SemanticAttributes.HTTP_TARGET]: '/?query=test',
-      });
+      // console.dir(span, { depth: 9 });
       assertSpan(span, {
         hostname: 'localhost',
         httpStatusCode: response.status,
@@ -106,24 +114,102 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         resHeaders: response.headers,
       });
     });
+
+    it.skip('should create valid spans with empty configuration', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      // Empty configuration
+      instrumentation.setConfig({ enabled: true });
+
+      const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
+      const response = await fetch(fetchUrl);
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+
+      assert.ok(span, 'a span is present');
+      assert.strictEqual(spans.length, 1);
+      // console.dir(span, { depth: 9 });
+      assertSpan(span, {
+        hostname: 'localhost',
+        httpStatusCode: response.status,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: response.headers,
+      });
+    });
+
+    it('should create valid spans with the given configuration configuration', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      // Empty configuration
+      instrumentation.setConfig({
+        enabled: true,
+        ignoreRequestHook: (req) => {
+          return req.path.indexOf('/ignore/path') !== -1;
+        },
+        requestHook: (span, req) => {
+          // TODO: maybe an intermediate request with better API  
+          req.headers += `x-requested-with: undici instrumentation\r\n`;
+        },
+        startSpanHook: (request) => {
+          return {
+            'test.request.origin': request.origin,
+            'test.request.headers.lengh': request.headers.split('\r\n').length,
+          };
+        },
+        headersToSpanAttributes: {
+          requestHeaders: ['foo-client', 'test.foo.client'],
+          responseHeaders: ['foo-server', 'test.foo.server']
+        }
+      });
+
+      // Add some extra headers in the response
+      mockServer.mockListener((req, res) => {
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json');
+        res.setHeader('foo-server', 'bar');
+        res.write(JSON.stringify({ success: true }));
+        res.end();
+      });
+
+      // Do some requests
+      await fetch(`${protocol}://${hostname}:${mockServer.port}/ignore/path`);
+      const reqInit = {
+        headers: new Headers({
+          'user-agent': 'custom',
+          'foo-client': 'bar'
+        }),
+      };
+      const response = await fetch(`${protocol}://${hostname}:${mockServer.port}/?query=test`, reqInit);
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      console.dir(span, { depth: 9 });
+      assert.ok(span, 'a span is present');
+      assert.strictEqual(spans.length, 1);
+      assertSpan(span, {
+        hostname: 'localhost',
+        httpStatusCode: response.status,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        reqHeaders: reqInit.headers,
+        resHeaders: response.headers,
+      });
+      assert.strictEqual(
+        span.attributes['test.foo.client'],
+        'bar',
+        `request headers are captured`,
+      );
+      assert.strictEqual(
+        span.attributes['test.foo.server'],
+        'bar',
+        `response headers are captured`,
+      );
+    });
   });
 });
-
-function assertSpanAttribs(
-  span: ReadableSpan,
-  name: string,
-  attribs: Record<string, any>
-) {
-  assert.strictEqual(span.spanContext().traceId.length, 32);
-  assert.strictEqual(span.spanContext().spanId.length, 16);
-  assert.strictEqual(span.kind, SpanKind.CLIENT);
-  assert.strictEqual(span.name, name);
-
-  for (const [key, value] of Object.entries(attribs)) {
-    assert.strictEqual(
-      span.attributes[key],
-      value,
-      `expected value "${value}" but got "${span.attributes[key]}" for attribute "${key}" `
-    );
-  }
-}

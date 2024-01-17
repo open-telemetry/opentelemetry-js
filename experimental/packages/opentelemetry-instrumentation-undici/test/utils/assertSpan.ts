@@ -37,7 +37,6 @@ export const assertSpan = (
     reqHeaders?: Headers;
     path?: string | null;
     forceStatus?: SpanStatus;
-    serverName?: string;
     noNetPeer?: boolean; // we don't expect net peer info when request throw before being sent
     error?: Exception;
   }
@@ -63,24 +62,25 @@ export const assertSpan = (
   );
   assert.strictEqual(
     span.attributes[SemanticAttributes.HTTP_STATUS_CODE],
-    validations.httpStatusCode
+    validations.httpStatusCode,
+    `attributes['${SemanticAttributes.HTTP_STATUS_CODE}'] is correct`,
   );
 
-  assert.strictEqual(span.links.length, 0);
+  assert.strictEqual(span.links.length, 0, 'there are no links');
 
   if (validations.error) {
-    assert.strictEqual(span.events.length, 1);
-    assert.strictEqual(span.events[0].name, 'exception');
+    assert.strictEqual(span.events.length, 1, 'span contains one error event');
+    assert.strictEqual(span.events[0].name, 'exception', 'error event name is correct');
 
     const eventAttributes = span.events[0].attributes;
-    assert.ok(eventAttributes != null);
+    assert.ok(eventAttributes != null, 'event has attributes');
     assert.deepStrictEqual(Object.keys(eventAttributes), [
       'exception.type',
       'exception.message',
       'exception.stacktrace',
-    ]);
+    ], 'the event attribute names are correct');
   } else {
-    assert.strictEqual(span.events.length, 0);
+    assert.strictEqual(span.events.length, 0, 'span contains no events');
   }
 
   const { httpStatusCode } = validations;
@@ -91,6 +91,7 @@ export const assertSpan = (
     validations.forceStatus || {
       code: isStatusUnset ? SpanStatusCode.UNSET : SpanStatusCode.ERROR
     },
+    'span status is correct'
   );
 
   assert.ok(span.endTime, 'must be finished');

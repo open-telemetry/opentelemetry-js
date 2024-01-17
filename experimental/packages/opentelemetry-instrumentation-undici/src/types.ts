@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
-import type { Span } from '@opentelemetry/api';
+import type { Attributes, Span } from '@opentelemetry/api';
 
 export type UndiciRequestHook<RequestType = any> = (args: {
   request: RequestType;
@@ -22,8 +22,56 @@ export type UndiciRequestHook<RequestType = any> = (args: {
   additionalHeaders: Record<string, any>;
 }) => void;
 
-// TODO: This package will instrument HTTP requests made through Undici
+// TODO: notes about support
+// - `fetch` API is added in node v16.15.0
+// - `undici` supports node >=18
+
+
+// TODO: `Request` class was added in node v16.15.0, make it work with v14
+// also we do not get that object from the diagnostics channel message but the
+// core request from https://github.com/nodejs/undici/blob/main/lib/core/request.js
+// which is not typed
+
+
+export interface UndiciRequest {
+  origin: string;
+  method: string;
+  path: string;
+  /**
+   * Serialized string of headers in the form `name: value\r\n`
+   */
+  headers: string;
+  throwOnError: boolean;
+  completed: boolean;
+  aborted: boolean;
+  idempotent: boolean;
+  contentLength: number | null;
+  contentType: string | null;
+  body: any;
+}
+
+export interface UnidiciResponse {
+  headers: Buffer[];
+  statusCode: number;
+}
+
+
+// This package will instrument HTTP requests made through `undici` or  `fetch` global API
 // so it seems logical to have similar options than the HTTP instrumentation
-export interface UndiciInstrumentationConfig extends InstrumentationConfig {
-  onRequest?: UndiciRequestHook;
+export interface UndiciInstrumentationConfig<RequestType = UndiciRequest> extends InstrumentationConfig {
+  /** Not trace all outgoing requests that matched with custom function */
+  ignoreRequestHook?: (request: RequestType) => boolean;
+  /** Function for adding custom attributes after response is handled */
+  applyCustomAttributesOnSpan?: (span: Span, request: RequestType, response: Response) => void;
+  /** Function for adding custom attributes before request is handled */
+  requestHook?: (span: Span, request: RequestType) => void;
+  /** Function for adding custom attributes before a span is started in outgoingRequest */
+  startSpanHook?: (request: RequestType) => Attributes;
+  /** Require parent to create span for outgoing requests */
+  requireParentforSpans?: boolean;
+  /** Map the following HTTP headers to span attributes. */
+  headersToSpanAttributes?: {
+    requestHeaders?: string[];
+    responseHeaders?: string[];
+  };
 }

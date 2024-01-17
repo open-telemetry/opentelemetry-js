@@ -15,28 +15,31 @@
  */
 import * as http from 'http';
 
+
 export class MockServer {
   private _port: number | undefined;
   private _httpServer: http.Server | undefined;
+  private _reqListener: http.RequestListener | undefined;
 
   get port(): number {
     return this._port || 0;
   }
 
+  mockListener(handler: http.RequestListener | undefined): void {
+    this._reqListener = handler;
+  }
+
   start(cb: (err?: Error) => void) {
     this._httpServer = http.createServer((req, res) => {
-      if (req.url === '/timeout') {
-        setTimeout(() => {
-          res.end();
-        }, 1000);
+      // Use the mock listener if defined
+      if (typeof this._reqListener === 'function') {
+        return this._reqListener(req, res);
       }
+
+      // If no mock function is provided fallback to a basic response
       res.statusCode = 200;
       res.setHeader('content-type', 'application/json');
-      res.write(
-        JSON.stringify({
-          success: true,
-        })
-      );
+      res.write(JSON.stringify({ success: true }));
       res.end();
     });
 
@@ -63,6 +66,7 @@ export class MockServer {
 
   stop(cb: (err?: Error) => void) {
     if (this._httpServer) {
+      this._reqListener = undefined;
       this._httpServer.close();
       cb();
     }
