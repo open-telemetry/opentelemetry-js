@@ -19,6 +19,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* chore(opentelemetry-context-zone-peer-dep): support zone.js ^v0.13.0 [#4320](https://github.com/open-telemetry/opentelemetry-js/pull/4320)
+
 ## 1.20.0
 
 ### :rocket: (Enhancement)
