@@ -85,7 +85,7 @@
     "lerna": "6.6.2",
     "linkinator": "6.0.2",
     "markdownlint-cli": "0.36.0",
-    "prettier": "3.0.3",
+    "prettier": "3.2.4",
     "semver": "7.5.4",
     "typedoc": "0.22.18",
     "typedoc-plugin-missing-exports": "1.0.0",
