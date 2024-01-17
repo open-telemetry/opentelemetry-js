@@ -2,6 +2,8 @@
 
 ### :boom: Breaking Change
 
+* chore(otel-core): replace deprecated SpanAttributes [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408) @JamieDanielson
+
 ### :rocket: (Enhancement)
 
 ### :books: (Refine Doc)
