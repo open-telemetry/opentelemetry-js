@@ -331,7 +331,7 @@ export class NodeSDK {
       resource: this._resource,
     });
 
-    this._tracerProvider = tracerProvider;
+    // this._tracerProvider = tracerProvider;
 
     if (this._tracerProviderConfig) {
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
