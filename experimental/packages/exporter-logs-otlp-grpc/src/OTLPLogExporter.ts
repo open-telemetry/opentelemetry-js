@@ -16,35 +16,41 @@
 
 import { LogRecordExporter, ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
-import { Metadata } from '@grpc/grpc-js';
 import {
   OTLPGRPCExporterConfigNode,
   OTLPGRPCExporterNodeBase,
-  ServiceClientType,
   validateAndNormalizeUrl,
   DEFAULT_COLLECTOR_URL,
+  LogsSerializer,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   createExportLogsServiceRequest,
   IExportLogsServiceRequest,
+  IExportLogsServiceResponse,
 } from '@opentelemetry/otlp-transformer';
 
 /**
  * OTLP Logs Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPGRPCExporterNodeBase<ReadableLogRecord, IExportLogsServiceRequest>
+  extends OTLPGRPCExporterNodeBase<
+    ReadableLogRecord,
+    IExportLogsServiceRequest,
+    IExportLogsServiceResponse
+  >
   implements LogRecordExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
-    super(config);
-    const headers = baggageUtils.parseKeyPairsIntoRecord(
+    const signalSpecificMetadata = baggageUtils.parseKeyPairsIntoRecord(
       getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
     );
-    this.metadata ||= new Metadata();
-    for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v);
-    }
+    super(
+      config,
+      signalSpecificMetadata,
+      'LogsExportService',
+      '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
+      LogsSerializer
+    );
   }
 
   convert(logRecords: ReadableLogRecord[]): IExportLogsServiceRequest {
@@ -53,14 +59,6 @@ export class OTLPLogExporter
 
   getDefaultUrl(config: OTLPGRPCExporterConfigNode) {
     return validateAndNormalizeUrl(this.getUrlFromConfig(config));
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.LOGS;
-  }
-
-  getServiceProtoPath(): string {
-    return 'opentelemetry/proto/collector/logs/v1/logs_service.proto';
   }
 
   getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {

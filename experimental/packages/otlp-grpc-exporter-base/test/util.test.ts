@@ -22,9 +22,8 @@ import * as grpc from '@grpc/grpc-js';
 import {
   validateAndNormalizeUrl,
   configureCompression,
-  GrpcCompressionAlgorithm,
-  configureSecurity,
-  useSecureConnection,
+  configureCredentials,
+  getCredentialsFromEnvironment,
   DEFAULT_COLLECTOR_URL,
 } from '../src/util';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
@@ -94,15 +93,15 @@ describe('validateAndNormalizeUrl()', () => {
   });
 });
 
-describe('utils - configureSecurity', () => {
+describe('utils - configureCredentials', () => {
   const envSource = process.env;
   it('should return insecure channel when using all defaults', () => {
-    const credentials = configureSecurity(undefined, DEFAULT_COLLECTOR_URL);
+    const credentials = configureCredentials(undefined, DEFAULT_COLLECTOR_URL);
     assert.ok(credentials._isSecure() === false);
   });
   it('should return user defined channel credentials', () => {
     const userDefinedCredentials = grpc.credentials.createSsl();
-    const credentials = configureSecurity(
+    const credentials = configureCredentials(
       userDefinedCredentials,
       'http://foo.bar'
     );
@@ -112,40 +111,40 @@ describe('utils - configureSecurity', () => {
   });
   it('should return secure channel when endpoint contains https scheme - no matter insecure env settings,', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE = 'true';
-    const credentials = configureSecurity(undefined, 'https://foo.bar');
+    const credentials = configureCredentials(undefined, 'https://foo.bar');
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
 
   it('should return insecure channel when endpoint contains http scheme and no insecure env settings', () => {
-    const credentials = configureSecurity(undefined, 'http://foo.bar');
+    const credentials = configureCredentials(undefined, 'http://foo.bar');
     assert.ok(credentials._isSecure() === false);
   });
   it('should return secure channel when endpoint does not contain scheme and no insecure env settings', () => {
-    const credentials = configureSecurity(undefined, 'foo.bar');
+    const credentials = configureCredentials(undefined, 'foo.bar');
     assert.ok(credentials._isSecure() === true);
   });
   it('should return insecure channel when endpoint contains http scheme and insecure env set to false', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE = 'false';
-    const credentials = configureSecurity(undefined, 'http://foo.bar');
+    const credentials = configureCredentials(undefined, 'http://foo.bar');
     assert.ok(credentials._isSecure() === false);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
   it('should return insecure channel when endpoint contains http scheme and insecure env set to true', () => {
     envSource.OTEL_EXPORTER_OTLP_INSECURE = 'true';
-    const credentials = configureSecurity(undefined, 'http://localhost');
+    const credentials = configureCredentials(undefined, 'http://localhost');
     assert.ok(credentials._isSecure() === false);
     delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
   });
   it('should return secure channel when endpoint does not contain scheme and insecure env set to false', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE = 'false';
-    const credentials = configureSecurity(undefined, 'foo.bar');
+    const credentials = configureCredentials(undefined, 'foo.bar');
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
   it('should return insecure channel when endpoint does not contain scheme and insecure env set to true', () => {
     envSource.OTEL_EXPORTER_OTLP_INSECURE = 'true';
-    const credentials = configureSecurity(undefined, 'foo.bar');
+    const credentials = configureCredentials(undefined, 'foo.bar');
     assert.ok(credentials._isSecure() === false);
     delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
   });
@@ -159,7 +158,7 @@ describe('useSecureConnection', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE =
       './test/certs/client.crt';
 
-    const credentials = useSecureConnection();
+    const credentials = getCredentialsFromEnvironment();
     assert.ok(credentials._isSecure() === true);
 
     delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
@@ -168,14 +167,14 @@ describe('useSecureConnection', () => {
   });
   it('should return secure connection using only root certificate', () => {
     envSource.OTEL_EXPORTER_OTLP_CERTIFICATE = './test/certs/ca.crt';
-    const credentials = useSecureConnection();
+    const credentials = getCredentialsFromEnvironment();
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
   });
   it('should warn user when file cannot be read and use default root certificate', () => {
     envSource.OTEL_EXPORTER_OTLP_CERTIFICATE = './wrongpath/test/certs/ca.crt';
     const diagWarn = sinon.stub(diag, 'warn');
-    const credentials = useSecureConnection();
+    const credentials = getCredentialsFromEnvironment();
     const args = diagWarn.args[0];
 
     assert.strictEqual(args[0], 'Failed to read root certificate file');
@@ -193,14 +192,14 @@ describe('configureCompression', () => {
     const compression = CompressionAlgorithm.NONE;
     assert.strictEqual(
       configureCompression(compression),
-      GrpcCompressionAlgorithm.NONE
+      CompressionAlgorithm.NONE
     );
   });
   it('should return gzip compression defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
     assert.strictEqual(
       configureCompression(undefined),
-      GrpcCompressionAlgorithm.GZIP
+      CompressionAlgorithm.GZIP
     );
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
   });
@@ -208,14 +207,14 @@ describe('configureCompression', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'none';
     assert.strictEqual(
       configureCompression(undefined),
-      GrpcCompressionAlgorithm.NONE
+      CompressionAlgorithm.NONE
     );
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
   });
   it('should return none for compression when no compression is set', () => {
     assert.strictEqual(
       configureCompression(undefined),
-      GrpcCompressionAlgorithm.NONE
+      CompressionAlgorithm.NONE
     );
   });
 });

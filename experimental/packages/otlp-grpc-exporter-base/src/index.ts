@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-export * from './OTLPGRPCExporterNodeBase';
-export { ServiceClientType, OTLPGRPCExporterConfigNode } from './types';
+export { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
+export { OTLPGRPCExporterConfigNode } from './types';
+export { DEFAULT_COLLECTOR_URL, validateAndNormalizeUrl } from './util';
 export {
-  DEFAULT_COLLECTOR_URL,
-  validateAndNormalizeUrl,
-  GrpcCompressionAlgorithm,
-} from './util';
+  MetricsSerializer,
+  TraceSerializer,
+  LogsSerializer,
+  ISerializer,
+} from './serializers';
