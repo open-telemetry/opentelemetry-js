@@ -25,7 +25,6 @@ import {
   ResourceMetrics,
   ScopeMetrics,
 } from '@opentelemetry/sdk-metrics';
-import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
   IExponentialHistogramDataPoint,
@@ -35,7 +34,9 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './types';
-import { Encoder, getOtlpEncoder } from '../common';
+import {Encoder, getOtlpEncoder} from '../common';
+import { createInstrumentationScope, toAttributes } from '../common/internal';
+import { createResource } from "../resource/internal";
 
 export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,
@@ -43,10 +44,7 @@ export function toResourceMetrics(
 ): IResourceMetrics {
   const encoder = getOtlpEncoder(options);
   return {
-    resource: {
-      attributes: toAttributes(resourceMetrics.resource.attributes),
-      droppedAttributesCount: 0,
-    },
+    resource: createResource(resourceMetrics.resource),
     schemaUrl: undefined,
     scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics, encoder),
   };
@@ -58,10 +56,7 @@ export function toScopeMetrics(
 ): IScopeMetrics[] {
   return Array.from(
     scopeMetrics.map(metrics => ({
-      scope: {
-        name: metrics.scope.name,
-        version: metrics.scope.version,
-      },
+      scope: createInstrumentationScope(metrics.scope),
       metrics: metrics.metrics.map(metricData => toMetric(metricData, encoder)),
       schemaUrl: metrics.scope.schemaUrl,
     }))
