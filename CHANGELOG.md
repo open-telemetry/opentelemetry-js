@@ -21,6 +21,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * chore(opentelemetry-context-zone-peer-dep): support zone.js ^v0.13.0 [#4320](https://github.com/open-telemetry/opentelemetry-js/pull/4320)
 * refactor(core): drop unnecessary assignment of HOSTNAME [#4421](https://github.com/open-telemetry/opentelemetry-js/pull/4421) @pichlermarc
+* test(opentelemetry-context-zone-peer-dep): transpile zone.js in tests [#4423](https://github.com/open-telemetry/opentelemetry-js/pull/4423) @legendecas
 
 ## 1.20.0
 
