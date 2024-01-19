@@ -10,9 +10,13 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(exporter-prometheus): avoid invoking callback synchronously [#4431](https://github.com/open-telemetry/opentelemetry-js/pull/4431) @legendecas
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* refactor(exporter-prometheus): promisify prometheus tests [#4431](https://github.com/open-telemetry/opentelemetry-js/pull/4431) @legendecas
 
 ## 0.47.0
 
