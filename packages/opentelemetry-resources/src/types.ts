@@ -21,6 +21,7 @@ import { IResource } from './IResource';
 /**
  * Interface for Resource attributes.
  */
+// TODO: replace ResourceAttributes with Attributes
 export type ResourceAttributes = Attributes;
 
 /**
