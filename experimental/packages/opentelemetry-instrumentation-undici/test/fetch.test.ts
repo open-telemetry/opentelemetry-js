@@ -75,7 +75,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       instrumentation.disable();
     });
 
-    it.skip('should create valid spans even if the configuration hooks fail', async function () {
+    it('should create valid spans even if the configuration hooks fail', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -115,7 +115,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       });
     });
 
-    it.skip('should create valid spans with empty configuration', async function () {
+    it('should create valid spans with empty configuration', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -162,8 +162,8 @@ describe('UndiciInstrumentation `fetch` tests', function () {
           };
         },
         headersToSpanAttributes: {
-          requestHeaders: ['foo-client', 'test.foo.client'],
-          responseHeaders: ['foo-server', 'test.foo.server']
+          requestHeaders: ['foo-client'],
+          responseHeaders: ['foo-server'],
         }
       });
 
@@ -188,6 +188,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
+      // TODO: remove this when test finished
       console.dir(span, { depth: 9 });
       assert.ok(span, 'a span is present');
       assert.strictEqual(spans.length, 1);
@@ -201,12 +202,12 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         resHeaders: response.headers,
       });
       assert.strictEqual(
-        span.attributes['test.foo.client'],
+        span.attributes['http.request.header.foo_client'],
         'bar',
         `request headers are captured`,
       );
       assert.strictEqual(
-        span.attributes['test.foo.server'],
+        span.attributes['http.response.header.foo_server'],
         'bar',
         `response headers are captured`,
       );

@@ -152,9 +152,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
       const val = h.substring(sepIndex + 1).trim();
       return [name, val];
     }));
-    
-    let hostAttribute = reqHeaders.get('host');
 
+    let hostAttribute = reqHeaders.get('host');
     if (!hostAttribute) {
       const protocolPorts: Record<string, string> = { https: '443', http: '80' };
       const defaultPort = protocolPorts[requestUrl.protocol] || '';
@@ -172,12 +171,23 @@ export class UndiciInstrumentation extends InstrumentationBase {
       spanAttributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
     }
 
+    // Put headers as attributes based on config
+    if (config.headersToSpanAttributes?.requestHeaders) {
+      config.headersToSpanAttributes.requestHeaders.forEach((name) => {
+        const headerName = name.toLowerCase();
+        const headerValue = reqHeaders.get(headerName);
+
+        if (headerValue) {
+          const normalizedName = headerName.replace(/-/g, '_');
+          spanAttributes[`http.request.header.${normalizedName}`] = headerValue;
+        }
+      });
+    }
+
     const span = this.tracer.startSpan(`HTTP ${request.method}`, {
       kind: SpanKind.CLIENT,
       attributes: spanAttributes,
     });
-
-    // TODO: add headers based on config
 
     // Context propagation
     const requestContext = trace.setSpan(context.active(), span);
@@ -186,7 +196,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
 
     // Execute the request hook if defined
     safeExecuteInTheMiddle(
-      () => this._getConfig().requestHook?.(span, request),
+      () => config.requestHook?.(span, request),
       (e) => e && this._diag.error('caught requestHook error: ', e),
       true,
     );
@@ -198,8 +208,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
   }
 
   // This is the 2nd message we recevie for each request. It is fired when connection with
-  // the remote is stablished and abut to send the first byte. Here do have info about the
-  // remote addres an port sowe can poupulate some `net.*` attributes into the span
+  // the remote is stablished and about to send the first byte. Here do have info about the
+  // remote addres an port so we can poupulate some `net.*` attributes into the span
   private onRequestHeaders({ request, socket }: any): void {
     console.log('onRequestHeaders')
     const span = this._spanFromReq.get(request as UndiciRequest);
@@ -207,6 +217,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     if (span) {
       const { remoteAddress, remotePort } = socket;
 
+      // TODO: this may be affected by HTTP semconv breaking changes
       span.setAttributes({
         [SemanticAttributes.NET_PEER_IP]: remoteAddress,
         [SemanticAttributes.NET_PEER_PORT]: remotePort,
@@ -230,17 +241,29 @@ export class UndiciInstrumentation extends InstrumentationBase {
       };
 
       // Get headers with names lowercased but values intact
-      const resHeaders = response.headers.map((h, idx) => {
-        const isName = idx % 2 === 0;
-        const result = h.toString();
-        
-        return isName ? result.toLowerCase() : result;
-      });
+      const resHeaders = new Map<string, string>();
+      for (let idx = 0; idx < response.headers.length; idx = idx + 2) {
+        resHeaders.set(
+          response.headers[idx].toString().toLowerCase(),
+          response.headers[idx + 1].toString(),
+        );
+      }
 
-      // TODO: capture headers based on config
+      // Put response headers as attributes based on config
+      const config = this._getConfig();
+      if (config.headersToSpanAttributes?.responseHeaders) {
+        config.headersToSpanAttributes.responseHeaders.forEach((name) => {
+          const headerName = name.toLowerCase();
+          const headerValue = resHeaders.get(headerName);
 
-      const contentLengthIndex = resHeaders.findIndex(h => h === 'content-length');
-      const contentLength = Number(contentLengthIndex === -1 ? undefined : resHeaders[contentLengthIndex + 1]);
+          if (headerValue) {
+            const normalizedName = headerName.replace(/-/g, '_');
+            attrs[`http.response.header.${normalizedName}`] = headerValue;
+          }
+        });
+      }
+
+      const contentLength = Number(resHeaders.get('content-length'));
       if (!isNaN(contentLength)) {
         attrs[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = contentLength;
       }
