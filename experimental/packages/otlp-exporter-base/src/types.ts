@@ -52,4 +52,10 @@ export interface OTLPExporterConfigBase {
   /** Maximum time the OTLP exporter will wait for each batch export.
    * The default value is 10000ms. */
   timeoutMillis?: number;
+  compression?: CompressionAlgorithm;
+}
+
+export enum CompressionAlgorithm {
+  NONE = 'none',
+  GZIP = 'gzip',
 }

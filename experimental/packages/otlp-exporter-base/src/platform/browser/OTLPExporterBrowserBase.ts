@@ -15,7 +15,7 @@
  */
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterConfigBase } from '../../types';
+import { OTLPExporterConfigBase, CompressionAlgorithm } from '../../types';
 import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
@@ -31,6 +31,8 @@ export abstract class OTLPExporterBrowserBase<
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
+
+  compression: CompressionAlgorithm;
 
   /**
    * @param config
@@ -50,6 +52,8 @@ export abstract class OTLPExporterBrowserBase<
     } else {
       this._headers = {};
     }
+    this.compression =  config.compression || CompressionAlgorithm.NONE;
+
   }
 
   onInit(): void {
@@ -79,6 +83,7 @@ export abstract class OTLPExporterBrowserBase<
           this.url,
           this._headers,
           this.timeoutMillis,
+          this.compression,
           resolve,
           reject
         );

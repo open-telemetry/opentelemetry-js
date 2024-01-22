@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 import { diag } from '@opentelemetry/api';
-import { OTLPExporterError } from '../../types';
+import {
+  CompressionAlgorithm,
+  OTLPExporterError,
+} from '../../types';
+import { CompressionStream } from 'whatwg-streams';
+
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
   DEFAULT_EXPORT_INITIAL_BACKOFF,
@@ -54,14 +59,17 @@ export function sendWithBeacon(
  * @param body
  * @param url
  * @param headers
+ * @param exporterTimeout
  * @param onSuccess
  * @param onError
+ * @param compressionAlgorithm
  */
 export function sendWithXhr(
   body: string | Blob,
   url: string,
   headers: Record<string, string>,
   exporterTimeout: number,
+  compressionAlgorithm: CompressionAlgorithm,
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
 ): void {
@@ -99,8 +107,6 @@ export function sendWithXhr(
     }).forEach(([k, v]) => {
       xhr.setRequestHeader(k, v);
     });
-
-    xhr.send(body);
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === false) {
@@ -149,15 +155,94 @@ export function sendWithXhr(
       clearTimeout(retryTimer);
     };
 
-    xhr.onerror = () => {
-      if (reqIsDestroyed) {
-        const err = new OTLPExporterError('Request Timeout');
-        onError(err);
-      }
-      clearTimeout(exporterTimer);
-      clearTimeout(retryTimer);
-    };
+    if (compressionAlgorithm === CompressionAlgorithm.GZIP) {
+      const sendRequest = (requestBody: string | Blob) => {
+
+        const send = (body: string | Blob) => {
+          xhr.send(body);
+        };
+
+        const sendCompressed = (body: string | Blob) => {
+          xhr.setRequestHeader('Content-Encoding', 'gzip'); // Set the Content-Encoding header to 'gzip' for compressed requests
+          xhr.send(body);
+        };
+
+        compressContent(requestBody)
+          .then(sendCompressed)
+          .catch(() => {
+            send(requestBody); // Send the original body when compression fails
+          });
+      };
+
+      sendRequest(body);
+    } else {
+      xhr.send(body);
+    }
   };
 
   sendWithRetry();
+}
+
+// src/compressionUtils.ts
+export function compressContent(input: string | Blob): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    let contentBytes: Uint8Array;
+
+    if (typeof input === 'string') {
+      // Convert the string to a Uint8Array
+      contentBytes = new TextEncoder().encode(input);
+    } else if (input instanceof Blob) {
+      // Read the Blob content into a Uint8Array
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        contentBytes = new Uint8Array(arrayBuffer);
+        compressBytes(contentBytes)
+          .then(resolve)
+          .catch(reject);
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(input);
+      return;
+    } else {
+      reject(new Error('Unsupported input type. Expected string or Blob.'));
+      return;
+    }
+
+    compressBytes(contentBytes)
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
+function compressBytes(contentBytes: Uint8Array): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const writableStream = new WritableStream<Uint8Array>({
+      write(chunk: Uint8Array, controller: WritableStreamDefaultController) {
+        const compressedChunk = new CompressionStream('gzip').writable.getWriter();
+        compressedChunk.write(chunk)
+          .then(() => {
+            compressedChunk.close();
+            controller.write(chunk);
+          })
+          .catch(reject);
+      },
+      close() {
+        resolve(new Blob([contentBytes], { type: 'application/octet-stream' }));
+      },
+      abort() {
+        reject(new Error('Compression aborted.'));
+      },
+    });
+
+    const readableStream = new ReadableStream<Uint8Array>({
+      start(controller: ReadableStreamDefaultController) {
+        controller.enqueue(contentBytes);
+        controller.close();
+      },
+    });
+
+    readableStream.pipeTo(writableStream)
+      .catch(reject);
+  });
 }
