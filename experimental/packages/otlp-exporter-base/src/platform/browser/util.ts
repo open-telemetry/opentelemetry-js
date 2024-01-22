@@ -18,7 +18,6 @@ import {
   CompressionAlgorithm,
   OTLPExporterError,
 } from '../../types';
-import { CompressionStream } from 'whatwg-streams';
 
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
