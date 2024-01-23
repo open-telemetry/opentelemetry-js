@@ -22,6 +22,7 @@ import {
   Attributes,
   context,
   diag,
+  INVALID_SPAN_CONTEXT,
   propagation,
   Span,
   SpanKind,
@@ -184,7 +185,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
       });
     }
 
-    // Get attributes from the hook
+    // Get attributes from the hook if present
+
     const hookAttributes = safeExecuteInTheMiddle(
       () => config.startSpanHook?.(request),
       (e) => e && this._diag.error('caught startSpanHook error: ', e),
@@ -193,13 +195,31 @@ export class UndiciInstrumentation extends InstrumentationBase {
     if (hookAttributes) {
       Object.entries(hookAttributes).forEach(([key, val]) => {
         spanAttributes[key] = val;
-      })
+      });
     }
 
-    const span = this.tracer.startSpan(`HTTP ${request.method}`, {
-      kind: SpanKind.CLIENT,
-      attributes: spanAttributes,
-    });
+    // TODO: check parent if added in config and:
+    // - create a span if confgi false
+    // - create a noop span if parent not present and config true
+    // If a parent is required but not present, we use a `NoopSpan` to still
+    // propagate context without recording it.
+    const activeCtx = context.active();
+    const currentSpan = trace.getSpan(activeCtx);
+    let span: Span;
+
+    
+    if (config.requireParentforSpans && !currentSpan) {
+      span = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
+    } else {
+      span = this.tracer.startSpan(
+        `HTTP ${request.method}`,
+        {
+          kind: SpanKind.CLIENT,
+          attributes: spanAttributes,
+        },
+        activeCtx
+      );
+    }
 
     // Context propagation
     const requestContext = trace.setSpan(context.active(), span);

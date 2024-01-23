@@ -74,6 +74,22 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     memoryExporter.reset();
   });
 
+  describe('disable()', function () {
+    it('should not create spans when disabled', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      // Disable via config
+      instrumentation.setConfig({ enabled: false });
+
+      const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
+      await fetch(fetchUrl);
+
+      spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0, 'no spans are created');
+    });
+  });
+
   describe('enable()', function () {
     beforeEach(function () {
       instrumentation.enable();
@@ -217,6 +233,22 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         'hook-value',
         'startSpanHook is called',
       );
+    });
+
+    it('should not create spans without parent if configured', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      instrumentation.setConfig({
+        enabled: true,
+        requireParentforSpans: true,
+      });
+
+      const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
+      await fetch(fetchUrl);
+
+      spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0, 'no spans are created');
     });
   });
 });
