@@ -30,7 +30,7 @@ export function toKeyValue(key: string, value: unknown): IKeyValue {
 export function toAnyValue(value: unknown): IAnyValue {
   const t = typeof value;
   if (t === 'string') return { stringValue: value as string };
-  if (t === 'number') {
+  if (t === 'number' && Number.isFinite(t)) {
     if (!Number.isInteger(value)) return { doubleValue: value as number };
     return { intValue: value as number };
   }
