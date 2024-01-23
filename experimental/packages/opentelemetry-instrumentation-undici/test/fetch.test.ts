@@ -54,6 +54,13 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     // propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
     mockServer.start(done);
+    mockServer.mockListener((req, res) => {
+      res.statusCode = 200;
+      res.setHeader('content-type', 'application/json');
+      res.setHeader('foo-server', 'bar');
+      res.write(JSON.stringify({ success: true }));
+      res.end();
+    });
   });
 
   after(function(done) {
@@ -130,7 +137,6 @@ describe('UndiciInstrumentation `fetch` tests', function () {
 
       assert.ok(span, 'a span is present');
       assert.strictEqual(spans.length, 1);
-      // console.dir(span, { depth: 9 });
       assertSpan(span, {
         hostname: 'localhost',
         httpStatusCode: response.status,
@@ -141,11 +147,11 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       });
     });
 
-    it('should create valid spans with the given configuration configuration', async function () {
+    it('should create valid spans with the given configuration', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      // Empty configuration
+      // Set configuration
       instrumentation.setConfig({
         enabled: true,
         ignoreRequestHook: (req) => {
@@ -153,27 +159,17 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         },
         requestHook: (span, req) => {
           // TODO: maybe an intermediate request with better API  
-          req.headers += `x-requested-with: undici instrumentation\r\n`;
+          req.headers += 'x-requested-with: undici\r\n';
         },
         startSpanHook: (request) => {
           return {
-            'test.request.origin': request.origin,
-            'test.request.headers.lengh': request.headers.split('\r\n').length,
+            'test.hook.attribute': 'hook-value',
           };
         },
         headersToSpanAttributes: {
-          requestHeaders: ['foo-client'],
+          requestHeaders: ['foo-client', 'x-requested-with'],
           responseHeaders: ['foo-server'],
         }
-      });
-
-      // Add some extra headers in the response
-      mockServer.mockListener((req, res) => {
-        res.statusCode = 200;
-        res.setHeader('content-type', 'application/json');
-        res.setHeader('foo-server', 'bar');
-        res.write(JSON.stringify({ success: true }));
-        res.end();
       });
 
       // Do some requests
@@ -189,7 +185,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       // TODO: remove this when test finished
-      console.dir(span, { depth: 9 });
+      // console.dir(span, { depth: 9 });
       assert.ok(span, 'a span is present');
       assert.strictEqual(spans.length, 1);
       assertSpan(span, {
@@ -204,12 +200,22 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       assert.strictEqual(
         span.attributes['http.request.header.foo_client'],
         'bar',
-        `request headers are captured`,
+        'request headers are captured',
+      );
+      assert.strictEqual(
+        span.attributes['http.request.header.foo_client'],
+        'bar',
+        'request headers from requestHook are captured',
       );
       assert.strictEqual(
         span.attributes['http.response.header.foo_server'],
         'bar',
-        `response headers are captured`,
+        'response headers are captured',
+      );
+      assert.strictEqual(
+        span.attributes['test.hook.attribute'],
+        'hook-value',
+        'startSpanHook is called',
       );
     });
   });

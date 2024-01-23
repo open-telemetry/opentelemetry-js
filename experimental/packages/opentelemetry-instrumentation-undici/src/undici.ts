@@ -137,14 +137,6 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return;
     }
 
-    const requestUrl = new URL(request.origin);
-    const spanAttributes = {
-      [SemanticAttributes.HTTP_URL]: request.origin,
-      [SemanticAttributes.HTTP_METHOD]: request.method,
-      [SemanticAttributes.HTTP_TARGET]: request.path || '/',
-      [SemanticAttributes.NET_PEER_NAME]: requestUrl.hostname,
-    };
-
     const rawHeaders = request.headers.split('\r\n');
     const reqHeaders = new Map(rawHeaders.map(h => {
       const sepIndex = h.indexOf(':');
@@ -152,6 +144,14 @@ export class UndiciInstrumentation extends InstrumentationBase {
       const val = h.substring(sepIndex + 1).trim();
       return [name, val];
     }));
+
+    const requestUrl = new URL(request.origin);
+    const spanAttributes: Attributes = {
+      [SemanticAttributes.HTTP_URL]: request.origin,
+      [SemanticAttributes.HTTP_METHOD]: request.method,
+      [SemanticAttributes.HTTP_TARGET]: request.path || '/',
+      [SemanticAttributes.NET_PEER_NAME]: requestUrl.hostname,
+    };
 
     let hostAttribute = reqHeaders.get('host');
     if (!hostAttribute) {
@@ -184,6 +184,18 @@ export class UndiciInstrumentation extends InstrumentationBase {
       });
     }
 
+    // Get attributes from the hook
+    const hookAttributes = safeExecuteInTheMiddle(
+      () => config.startSpanHook?.(request),
+      (e) => e && this._diag.error('caught startSpanHook error: ', e),
+      true,
+    );
+    if (hookAttributes) {
+      Object.entries(hookAttributes).forEach(([key, val]) => {
+        spanAttributes[key] = val;
+      })
+    }
+
     const span = this.tracer.startSpan(`HTTP ${request.method}`, {
       kind: SpanKind.CLIENT,
       attributes: spanAttributes,
@@ -214,15 +226,17 @@ export class UndiciInstrumentation extends InstrumentationBase {
     console.log('onRequestHeaders')
     const span = this._spanFromReq.get(request as UndiciRequest);
 
-    if (span) {
-      const { remoteAddress, remotePort } = socket;
-
-      // TODO: this may be affected by HTTP semconv breaking changes
-      span.setAttributes({
-        [SemanticAttributes.NET_PEER_IP]: remoteAddress,
-        [SemanticAttributes.NET_PEER_PORT]: remotePort,
-      });
+    if (!span) {
+      return
     }
+
+    const { remoteAddress, remotePort } = socket;
+
+    // TODO: this may be affected by HTTP semconv breaking changes
+    span.setAttributes({
+      [SemanticAttributes.NET_PEER_IP]: remoteAddress,
+      [SemanticAttributes.NET_PEER_PORT]: remotePort,
+    });
   }
 
   // This is the 3rd message we get for each request and it's fired when the server
@@ -232,47 +246,49 @@ export class UndiciInstrumentation extends InstrumentationBase {
     console.log('onResponseHeaders')
     const span = this._spanFromReq.get(request);
 
-    if (span !== undefined) {
-      // We are currently *not* capturing response headers, even though the
-      // intake API does allow it, because none of the other `setHttpContext`
-      // uses currently do
-      const attrs: Attributes = {
-        [SemanticAttributes.HTTP_STATUS_CODE]: response.statusCode,
-      };
+    if (!span) {
+      return;
+    }
 
-      // Get headers with names lowercased but values intact
-      const resHeaders = new Map<string, string>();
-      for (let idx = 0; idx < response.headers.length; idx = idx + 2) {
-        resHeaders.set(
-          response.headers[idx].toString().toLowerCase(),
-          response.headers[idx + 1].toString(),
-        );
-      }
+    // We are currently *not* capturing response headers, even though the
+    // intake API does allow it, because none of the other `setHttpContext`
+    // uses currently do
+    const attrs: Attributes = {
+      [SemanticAttributes.HTTP_STATUS_CODE]: response.statusCode,
+    };
 
-      // Put response headers as attributes based on config
-      const config = this._getConfig();
-      if (config.headersToSpanAttributes?.responseHeaders) {
-        config.headersToSpanAttributes.responseHeaders.forEach((name) => {
-          const headerName = name.toLowerCase();
-          const headerValue = resHeaders.get(headerName);
+    // Get headers with names lowercased but values intact
+    const resHeaders = new Map<string, string>();
+    for (let idx = 0; idx < response.headers.length; idx = idx + 2) {
+      resHeaders.set(
+        response.headers[idx].toString().toLowerCase(),
+        response.headers[idx + 1].toString(),
+      );
+    }
 
-          if (headerValue) {
-            const normalizedName = headerName.replace(/-/g, '_');
-            attrs[`http.response.header.${normalizedName}`] = headerValue;
-          }
-        });
-      }
+    // Put response headers as attributes based on config
+    const config = this._getConfig();
+    if (config.headersToSpanAttributes?.responseHeaders) {
+      config.headersToSpanAttributes.responseHeaders.forEach((name) => {
+        const headerName = name.toLowerCase();
+        const headerValue = resHeaders.get(headerName);
 
-      const contentLength = Number(resHeaders.get('content-length'));
-      if (!isNaN(contentLength)) {
-        attrs[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = contentLength;
-      }
-
-      span.setAttributes(attrs);
-      span.setStatus({
-        code: response.statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.UNSET,
+        if (headerValue) {
+          const normalizedName = headerName.replace(/-/g, '_');
+          attrs[`http.response.header.${normalizedName}`] = headerValue;
+        }
       });
     }
+
+    const contentLength = Number(resHeaders.get('content-length'));
+    if (!isNaN(contentLength)) {
+      attrs[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = contentLength;
+    }
+
+    span.setAttributes(attrs);
+    span.setStatus({
+      code: response.statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.UNSET,
+    });
   }
 
 
@@ -280,14 +296,17 @@ export class UndiciInstrumentation extends InstrumentationBase {
   private onDone({ request }: any): void {
     console.log('onDone')
     const span = this._spanFromReq.get(request);
-    if (span !== undefined) {
-      span.end();
-      this._spanFromReq.delete(request);
+
+    if (!span) {
+      return;
     }
+
+    span.end();
+    this._spanFromReq.delete(request);
   }
 
   // TODO: check this
-  // This messge si triggered if there is any error in the request
+  // This messge is triggered if there is any error in the request
   // TODO: in `undici@6.3.0` when request aborted the error type changes from
   // a custom error (`RequestAbortedError`) to a built-in `DOMException` so
   // - `code` is from DOMEXception (ABORT_ERR: 20)
@@ -295,13 +314,16 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // - stacktrace is smaller and contains node internal frames
   private onError({ request, error }: any): void {
     const span = this._spanFromReq.get(request);
-    if (span !== undefined) {
-      span.recordException(error);
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: error.message,
-      });
-      span.end();
+
+    if (!span) {
+      return;
     }
+
+    span.recordException(error);
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error.message,
+    });
+    span.end();
   }
 }

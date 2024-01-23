@@ -16,11 +16,6 @@
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import type { Attributes, Span } from '@opentelemetry/api';
 
-export type UndiciRequestHook<RequestType = any> = (args: {
-  request: RequestType;
-  span: Span;
-  additionalHeaders: Record<string, any>;
-}) => void;
 
 // TODO: notes about support
 // - `fetch` API is added in node v16.15.0
