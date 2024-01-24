@@ -387,6 +387,57 @@ describe('BatchSpanProcessorBase', () => {
         });
       });
 
+      it('should still export when previously failed', async () => {
+        // The scenario is made of several parts:
+        // 1. The exporter tries to export some spans
+        // 2. While it does so, more spans are processed
+        // 3. The exporter fails
+        // 4. Spans arriving during step 2 should be exported
+
+        let firstCall = true;
+        const fillingExportStub = sinon
+          .stub(exporter, 'export')
+          .callsFake((spans, cb) => {
+            // The first time export is called, add some spans to the processor.
+            // Any other time, call through. We don't simply restore the stub
+            // so we can count the calls with `sinon.assert`
+            if (!firstCall) {
+              return fillingExportStub.wrappedMethod.call(exporter, spans, cb);
+            }
+
+            // Step 2: During export, add another span
+            firstCall = false;
+            processSpan();
+
+            return fillingExportStub.wrappedMethod.call(exporter, spans, () => {
+              // Step 3: Mock failure
+              cb({
+                code: ExportResultCode.FAILED,
+              });
+            });
+          });
+
+        const clock = sinon.useFakeTimers();
+
+        // Step 1: Export a span
+        processSpan();
+        await clock.runAllAsync();
+
+        clock.restore();
+        fillingExportStub.restore();
+
+        // Step 4: Make sure all spans were processed
+        assert.equal(exporter['_finishedSpans'].length, 2);
+        assert.equal(processor['_finishedSpans'].length, 0);
+        sinon.assert.calledTwice(fillingExportStub);
+
+        function processSpan() {
+          const span = createSampledSpan('test');
+          processor.onStart(span, ROOT_CONTEXT);
+          processor.onEnd(span);
+        }
+      });
+
       it('should wait for pending resource on flush', async () => {
         const tracer = new BasicTracerProvider({
           resource: new Resource(
