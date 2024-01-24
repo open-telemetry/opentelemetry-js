@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706111878720,
+  "lastUpdate": 1706115656292,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -3500,6 +3500,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "zirakertan@gmail.com",
+            "name": "Zirak",
+            "username": "Zirak"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0635ab1c6c21ab7308bf75d399002eedf416b23b",
+          "message": "fix(sdk-trace-base): Export processed spans while exporter failed (#4287)\n\n* fix(sdk-trace-base): Export processed spans while exporter failed\r\n\r\nWhile the exporter deals with a batch of spans, new spans may come in and wait\r\nto be exported. As previously implemented, a successful export would notice\r\nthese waiting spans, triggering a renewed timer check, but not so for an\r\nunsuccessful export.\r\n\r\nThe result was that, prior to this commit, a failing export may end up in a\r\nsituation where no further spans will be exported. This is due to the behaviour\r\nof `_addToBuffer` when the queue is full: Imagine an export which fails after a\r\nlong timeout (because of, for instance, network troubles). While the connection\r\nwaits to be timed out, the span queue fills up. Once completely full, no new\r\ncalls to recheck the timer will be done. On its own, this behaviour is\r\nfine. When combined with the patched bug, this leads to a rather confusing case\r\nwhere the exporter never tries exporting.\r\n\r\n* fix(changelog): add entry\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-01-24T15:57:13+01:00",
+          "tree_id": "2af3610103f8aef7f54080180af35dd26d304050",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0635ab1c6c21ab7308bf75d399002eedf416b23b"
+        },
+        "date": 1706115655329,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 963284,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11986,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 684519,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 661115,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
