@@ -23,12 +23,11 @@ import { assertDataPoint, assertMetricData } from '../util';
 
 describe('two-metric-readers-async-instrument', () => {
   it('both metric readers should collect metrics', async () => {
-    const meterProvider = new MeterProvider();
     const reader1 = new TestDeltaMetricReader();
     const reader2 = new TestDeltaMetricReader();
-
-    meterProvider.addMetricReader(reader1);
-    meterProvider.addMetricReader(reader2);
+    const meterProvider = new MeterProvider({
+      readers: [reader1, reader2],
+    });
 
     const meter = meterProvider.getMeter('my-meter');
 
