@@ -350,14 +350,15 @@ export class NodeSDK {
     }
 
     if (this._meterProviderConfig) {
+      const readers: MetricReader[] = [];
+      if (this._meterProviderConfig.reader) {
+        readers.push(this._meterProviderConfig.reader);
+      }
       const meterProvider = new MeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
+        readers: readers,
       });
-
-      if (this._meterProviderConfig.reader) {
-        meterProvider.addMetricReader(this._meterProviderConfig.reader);
-      }
 
       this._meterProvider = meterProvider;
 
