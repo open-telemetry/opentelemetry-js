@@ -73,16 +73,18 @@ describe('MetricReader', () => {
   describe('setMetricProducer', () => {
     it('The SDK MUST NOT allow a MetricReader instance to be registered on more than one MeterProvider instance', () => {
       const reader = new TestMetricReader();
-      const meterProvider1 = new MeterProvider();
-      const meterProvider2 = new MeterProvider();
-
-      meterProvider1.addMetricReader(reader);
       assert.throws(
-        () => meterProvider1.addMetricReader(reader),
+        () =>
+          new MeterProvider({
+            readers: [reader, reader],
+          }),
         /MetricReader can not be bound to a MeterProvider again/
       );
       assert.throws(
-        () => meterProvider2.addMetricReader(reader),
+        () =>
+          new MeterProvider({
+            readers: [reader],
+          }),
         /MetricReader can not be bound to a MeterProvider again/
       );
     });
@@ -138,7 +140,6 @@ describe('MetricReader', () => {
     });
 
     it('should collect metrics from the SDK and the additional metricProducers', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
       const additionalProducer = new TestMetricProducer({
         resourceMetrics: {
           resource: new Resource({
@@ -150,7 +151,10 @@ describe('MetricReader', () => {
       const reader = new TestMetricReader({
         metricProducers: [additionalProducer],
       });
-      meterProvider.addMetricReader(reader);
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+      });
 
       // Make a measurement
       meterProvider
@@ -182,14 +186,15 @@ describe('MetricReader', () => {
     });
 
     it('should merge the errors from the SDK and all metricProducers', async () => {
-      const meterProvider = new MeterProvider();
       const reader = new TestMetricReader({
         metricProducers: [
           new TestMetricProducer({ errors: ['err1'] }),
           new TestMetricProducer({ errors: ['err2'] }),
         ],
       });
-      meterProvider.addMetricReader(reader);
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+      });
 
       // Provide a callback throwing an error too
       meterProvider
