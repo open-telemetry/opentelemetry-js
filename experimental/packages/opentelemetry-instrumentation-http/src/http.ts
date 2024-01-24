@@ -330,6 +330,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         this._diag.debug('outgoingRequest on response()');
+        if (request.listenerCount('response') <= 1) {
+          response.resume();
+        }
         const responseAttributes =
           utils.getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
@@ -672,6 +675,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
+      } else {
+        // Make a copy of the headers object to avoid mutating an object the
+        // caller might have a reference to.
+        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
       }
       propagation.inject(requestContext, optionsParsed.headers);
 

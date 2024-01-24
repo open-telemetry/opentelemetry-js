@@ -63,16 +63,16 @@ export interface IScopeSpans {
 /** Properties of a Span. */
 export interface ISpan {
   /** Span traceId */
-  traceId: string;
+  traceId: string | Uint8Array;
 
   /** Span spanId */
-  spanId: string;
+  spanId: string | Uint8Array;
 
   /** Span traceState */
   traceState?: string | null;
 
   /** Span parentSpanId */
-  parentSpanId?: string;
+  parentSpanId?: string | Uint8Array;
 
   /** Span name */
   name: string;
@@ -181,10 +181,10 @@ export interface IEvent {
 /** Properties of a Link. */
 export interface ILink {
   /** Link traceId */
-  traceId: string;
+  traceId: string | Uint8Array;
 
   /** Link spanId */
-  spanId: string;
+  spanId: string | Uint8Array;
 
   /** Link traceState */
   traceState?: string;

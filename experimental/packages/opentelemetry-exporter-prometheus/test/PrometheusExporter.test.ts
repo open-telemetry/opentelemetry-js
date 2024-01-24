@@ -261,8 +261,9 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter({}, () => {
-        meterProvider = new MeterProvider();
-        meterProvider.addMetricReader(exporter);
+        meterProvider = new MeterProvider({
+          readers: [exporter],
+        });
         meter = meterProvider.getMeter('test-prometheus', '1');
         done();
       });
@@ -360,8 +361,8 @@ describe('PrometheusExporter', () => {
           .get('http://localhost:9464/metrics', res => {
             errorHandler(done)(new Error('unreachable'));
           })
-          .on('error', err => {
-            assert(`${err}`.match('ECONNREFUSED'));
+          .on('error', (err: any) => {
+            assert.equal(err.code, 'ECONNREFUSED');
             done();
           });
       });
@@ -533,8 +534,9 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter;
 
     function setup(reader: PrometheusExporter) {
-      meterProvider = new MeterProvider();
-      meterProvider.addMetricReader(reader);
+      meterProvider = new MeterProvider({
+        readers: [exporter],
+      });
 
       meter = meterProvider.getMeter('test-prometheus');
       counter = meter.createCounter('counter');
