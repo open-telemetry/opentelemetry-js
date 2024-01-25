@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@types/shimmer": "^1.0.2",
-    "import-in-the-middle": "^1.7.2",
+    "import-in-the-middle": "1.7.1",
     "require-in-the-middle": "^7.1.1",
     "semver": "^7.5.2",
     "shimmer": "^1.2.1"
@@ -82,6 +82,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.23.6",
+    "@babel/preset-env": "7.22.20",
     "@opentelemetry/api": "1.7.0",
     "@opentelemetry/sdk-metrics": "1.20.0",
     "@types/mocha": "10.0.6",
