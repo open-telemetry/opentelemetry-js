@@ -342,7 +342,9 @@ describe('when configuring via environment', () => {
   });
   it('should include user-agent header by default', () => {
     const collectorExporter = new OTLPLogExporter();
-    assert.deepStrictEqual(collectorExporter.metadata?.get('User-Agent'), [
+    const actualMetadata =
+      collectorExporter['_transport']['_parameters'].metadata();
+    assert.deepStrictEqual(actualMetadata.get('User-Agent'), [
       `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
     ]);
   });
