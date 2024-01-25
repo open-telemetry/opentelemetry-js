@@ -6,6 +6,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(instrumentation)!: pin import-in-the-middle@1.7.1 [#4441](https://github.com/open-telemetry/opentelemetry-js/pull/4441)
+  * Fixes a bug where, in some circumstances, ESM instrumentation packages would try to instrument CJS exports on ESM, causing the end-user application to crash.
+  * This breaking change only affects users that are using the *experimental* `@opentelemetry/instrumentation/hook.mjs` loader hook AND Node.js 18.19 or later:
+    * This reverts back to an older version of `import-in-the-middle` due to <https://github.com/DataDog/import-in-the-middle/issues/57>
+    * This version does not support Node.js 18.19 or later
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
