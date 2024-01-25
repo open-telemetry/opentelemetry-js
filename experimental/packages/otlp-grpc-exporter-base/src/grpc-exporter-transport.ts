@@ -17,13 +17,8 @@
 // NOTE: do not change these type imports to actual imports. Doing so WILL break `@opentelemetry/instrumentation-http`,
 // as they'd be imported before the http/https modules can be wrapped.
 import type { Metadata, ServiceError, ChannelCredentials } from '@grpc/grpc-js';
-
-export interface ExportResponse {
-  status: 'success' | 'failure';
-  data?: Uint8Array;
-  retryInMillis?: number;
-  error?: Error;
-}
+import { ExportResponse } from './export-response';
+import {IExporterTransport} from "./exporter-transport";
 
 const GRPC_COMPRESSION_NONE = 0;
 const GRPC_COMPRESSION_GZIP = 2;
@@ -65,7 +60,7 @@ export function createEmptyMetadata(): Metadata {
   return new Metadata();
 }
 
-export class GrpcExporterTransport {
+export class GrpcExporterTransport implements IExporterTransport {
   private _client?: any;
   private _metadata?: Metadata;
 

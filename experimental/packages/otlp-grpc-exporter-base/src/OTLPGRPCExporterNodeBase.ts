@@ -28,6 +28,7 @@ import {
 } from './grpc-exporter-transport';
 import { configureCompression, configureCredentials } from './util';
 import { ISerializer } from './serializers';
+import { IExporterTransport } from './exporter-transport';
 
 /**
  * OTLP Exporter abstract base class
@@ -43,7 +44,7 @@ export abstract class OTLPGRPCExporterNodeBase<
 > {
   grpcQueue: GRPCQueueItem<ExportItem>[] = [];
   compression: CompressionAlgorithm;
-  private _transport: GrpcExporterTransport;
+  private _transport: IExporterTransport;
   private _serializer: ISerializer<ServiceRequest, ServiceResponse>;
 
   constructor(
