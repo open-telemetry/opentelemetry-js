@@ -751,7 +751,12 @@ describe('Instruments', () => {
 });
 
 function setup() {
-  const meterProvider = new MeterProvider({ resource: defaultResource });
+  const deltaReader = new TestDeltaMetricReader();
+  const cumulativeReader = new TestMetricReader();
+  const meterProvider = new MeterProvider({
+    resource: defaultResource,
+    readers: [deltaReader, cumulativeReader],
+  });
   const meter = meterProvider.getMeter(
     defaultInstrumentationScope.name,
     defaultInstrumentationScope.version,
@@ -759,10 +764,6 @@ function setup() {
       schemaUrl: defaultInstrumentationScope.schemaUrl,
     }
   );
-  const deltaReader = new TestDeltaMetricReader();
-  meterProvider.addMetricReader(deltaReader);
-  const cumulativeReader = new TestMetricReader();
-  meterProvider.addMetricReader(cumulativeReader);
 
   return {
     meterProvider,

@@ -28,6 +28,11 @@ import {
   IExportLogsServiceRequest,
   IExportLogsServiceResponse,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from './version';
+
+const USER_AGENT = {
+  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+};
 
 /**
  * OTLP Logs Exporter for Node
@@ -41,9 +46,12 @@ export class OTLPLogExporter
   implements LogRecordExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
-    const signalSpecificMetadata = baggageUtils.parseKeyPairsIntoRecord(
-      getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-    );
+    const signalSpecificMetadata = {
+      ...USER_AGENT,
+      ...baggageUtils.parseKeyPairsIntoRecord(
+        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
+      ),
+    };
     super(
       config,
       signalSpecificMetadata,
