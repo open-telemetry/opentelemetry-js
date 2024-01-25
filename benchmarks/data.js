@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706169234207,
+  "lastUpdate": 1706169337300,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -3708,6 +3708,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.14%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "32224751+Lp-Francois@users.noreply.github.com",
+            "name": "François",
+            "username": "Lp-Francois"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5afbcdbe0ad7d9248d47d7000b304b6ac751e7c8",
+          "message": "docs: add observableGauge to the prometheus experimental example (#4267)\n\n* docs: add observableGauge to the prometheus experimental example\r\n\r\nSigned-off-by: Francois LP <francois.le.pape@gmail.com>\r\n\r\n* docs: add gauge image to README\r\n\r\nSigned-off-by: Francois LP <francois.le.pape@gmail.com>\r\n\r\n* refactor: change comment wording\r\n\r\nfrom @pichlermarc\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n---------\r\n\r\nSigned-off-by: Francois LP <francois.le.pape@gmail.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>",
+          "timestamp": "2024-01-25T08:52:41+01:00",
+          "tree_id": "d5a3ef5c3c4beb4ac5861aba5725b62912bc45e0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5afbcdbe0ad7d9248d47d7000b304b6ac751e7c8"
+        },
+        "date": 1706169336403,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 955717,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12037,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 680985,
+            "range": "±0.97%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 674243,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
