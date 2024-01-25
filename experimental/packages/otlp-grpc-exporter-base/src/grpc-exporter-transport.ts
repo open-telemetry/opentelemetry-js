@@ -60,39 +60,39 @@ export function createEmptyMetadata(): Metadata {
   return new Metadata();
 }
 
+export interface GrpcExporterTransportParameters {
+  grpcPath: string;
+  grpcName: string;
+  address: string;
+  /**
+   * NOTE: Ensure that you're only importing/requiring gRPC inside the function providing the channel credentials,
+   * otherwise, gRPC and http/https instrumentations may break.
+   *
+   * For common cases, you can avoid to import/require gRPC your function by using
+   *   - {@link createSslCredentials}
+   *   - {@link createInsecureCredentials}
+   */
+  credentials: () => ChannelCredentials;
+  /**
+   * NOTE: Ensure that you're only importing/requiring gRPC inside the function providing the metadata,
+   * otherwise, gRPC and http/https instrumentations may break.
+   *
+   * To avoid having to import/require gRPC from your function to create a new Metadata object,
+   * use {@link createEmptyMetadata}
+   */
+  metadata: () => Metadata;
+  compression: 'gzip' | 'none';
+  timeoutMillis: number;
+}
+
 export class GrpcExporterTransport implements IExporterTransport {
   private _client?: any;
   private _metadata?: Metadata;
 
-  constructor(
-    private _parameters: {
-      grpcPath: string;
-      grpcName: string;
-      address: string;
-      /**
-       * NOTE: Ensure that you're only importing/requiring gRPC inside the function providing the channel credentials,
-       * otherwise, gRPC and http/https instrumentations may break.
-       *
-       * For common cases, you can avoid to import/require gRPC your function by using
-       *   - {@link createSslCredentials}
-       *   - {@link createInsecureCredentials}
-       */
-      credentials: () => ChannelCredentials;
-      /**
-       * NOTE: Ensure that you're only importing/requiring gRPC inside the function providing the metadata,
-       * otherwise, gRPC and http/https instrumentations may break.
-       *
-       * To avoid having to import/require gRPC from your function to create a new Metadata object,
-       * use {@link createEmptyMetadata}
-       */
-      metadata: () => Metadata;
-      compression: 'gzip' | 'none';
-      timeoutMillis: number;
-    }
-  ) {}
+  constructor(private _parameters: GrpcExporterTransportParameters) {}
 
   shutdown() {
-    this._client.shutdown();
+    this._client?.shutdown();
   }
 
   send(data: Uint8Array): Promise<ExportResponse> {
@@ -106,23 +106,36 @@ export class GrpcExporterTransport implements IExporterTransport {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
       } = require('./create-service-client-constructor');
 
-      const channelCredentials = this._parameters.credentials();
-      this._metadata = this._parameters.metadata();
+      try {
+        this._metadata = this._parameters.metadata();
+      } catch (error) {
+        return Promise.resolve({
+          status: 'failure',
+          error: error,
+        });
+      }
 
       const clientConstructor = createServiceClientConstructor(
         this._parameters.grpcPath,
         this._parameters.grpcName
       );
 
-      this._client = new clientConstructor(
-        this._parameters.address,
-        channelCredentials,
-        {
-          'grpc.default_compression_algorithm': toGrpcCompression(
-            this._parameters.compression
-          ),
-        }
-      );
+      try {
+        this._client = new clientConstructor(
+          this._parameters.address,
+          this._parameters.credentials(),
+          {
+            'grpc.default_compression_algorithm': toGrpcCompression(
+              this._parameters.compression
+            ),
+          }
+        );
+      } catch (error) {
+        return Promise.resolve({
+          status: 'failure',
+          error: error,
+        });
+      }
     }
 
     return new Promise<ExportResponse>(resolve => {
@@ -133,7 +146,7 @@ export class GrpcExporterTransport implements IExporterTransport {
       // this should never happen
       if (this._metadata == null) {
         return resolve({
-          error: new Error('could not get metadata'),
+          error: new Error('metadata was null'),
           status: 'failure',
         });
       }
