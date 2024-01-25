@@ -205,8 +205,9 @@ describe('PrometheusExporter', () => {
 
     beforeEach(async () => {
       exporter = new PrometheusExporter();
-      meterProvider = new MeterProvider();
-      meterProvider.addMetricReader(exporter);
+      meterProvider = new MeterProvider({
+          readers: [exporter],
+      });
       meter = meterProvider.getMeter('test-prometheus', '1');
       await exporter.startServer();
     });
@@ -470,8 +471,9 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter;
 
     function setup(reader: PrometheusExporter) {
-      meterProvider = new MeterProvider();
-      meterProvider.addMetricReader(reader);
+      meterProvider = new MeterProvider({
+        readers: [exporter],
+      });
 
       meter = meterProvider.getMeter('test-prometheus');
       counter = meter.createCounter('counter');

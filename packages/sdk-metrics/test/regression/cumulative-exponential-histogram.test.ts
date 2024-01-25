@@ -46,7 +46,6 @@ describe('cumulative-exponential-histogram', () => {
   });
 
   const doTest = async (histogramAggregation: Aggregation) => {
-    const meterProvider = new MeterProvider();
     const reader = new TestMetricReader({
       aggregationTemporalitySelector() {
         return AggregationTemporality.CUMULATIVE;
@@ -57,8 +56,10 @@ describe('cumulative-exponential-histogram', () => {
           : Aggregation.Default();
       },
     });
+    const meterProvider = new MeterProvider({
+      readers: [reader],
+    });
 
-    meterProvider.addMetricReader(reader);
     const meter = meterProvider.getMeter('my-meter');
     const hist = meter.createHistogram('testhist');
 
