@@ -18,7 +18,7 @@
 // as they'd be imported before the http/https modules can be wrapped.
 import type { Metadata, ServiceError, ChannelCredentials } from '@grpc/grpc-js';
 import { ExportResponse } from './export-response';
-import {IExporterTransport} from "./exporter-transport";
+import { IExporterTransport } from './exporter-transport';
 
 const GRPC_COMPRESSION_NONE = 0;
 const GRPC_COMPRESSION_GZIP = 2;
