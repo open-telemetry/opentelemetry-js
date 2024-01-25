@@ -72,9 +72,11 @@ const defaultResource = Resource.default().merge(
   })
 );
 
-let meterProvider = new MeterProvider({ resource: defaultResource });
 let reader = new TestMetricReader();
-meterProvider.addMetricReader(reader);
+let meterProvider = new MeterProvider({
+  resource: defaultResource,
+  readers: [reader],
+});
 let meter = meterProvider.getMeter('default', '0.0.1');
 
 export async function collect() {
@@ -82,9 +84,12 @@ export async function collect() {
 }
 
 export function setUp(views?: View[]) {
-  meterProvider = new MeterProvider({ resource: defaultResource, views });
   reader = new TestMetricReader();
-  meterProvider.addMetricReader(reader);
+  meterProvider = new MeterProvider({
+    resource: defaultResource,
+    views,
+    readers: [reader],
+  });
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 

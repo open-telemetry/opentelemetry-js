@@ -119,7 +119,7 @@ export class Resource implements IResource {
   merge(other: IResource | null): IResource {
     if (!other) return this;
 
-    // SpanAttributes from other resource overwrite attributes from this resource.
+    // Attributes from other resource overwrite attributes from this resource.
     const mergedSyncAttributes = {
       ...this._syncAttributes,
       //Support for old resource implementation where _syncAttributes is not defined

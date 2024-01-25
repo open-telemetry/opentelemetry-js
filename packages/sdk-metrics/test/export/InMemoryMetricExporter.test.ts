@@ -45,24 +45,26 @@ async function waitForNumberOfExports(
 describe('InMemoryMetricExporter', () => {
   let exporter: InMemoryMetricExporter;
   let meterProvider: MeterProvider;
-  let meterReader: PeriodicExportingMetricReader;
+  let metricReader: PeriodicExportingMetricReader;
   let meter: metrics.Meter;
 
   beforeEach(() => {
     exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
-    meterProvider = new MeterProvider({ resource: defaultResource });
-    meter = meterProvider.getMeter('InMemoryMetricExporter', '1.0.0');
-    meterReader = new PeriodicExportingMetricReader({
+    metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
       exportTimeoutMillis: 100,
     });
-    meterProvider.addMetricReader(meterReader);
+    meterProvider = new MeterProvider({
+      resource: defaultResource,
+      readers: [metricReader],
+    });
+    meter = meterProvider.getMeter('InMemoryMetricExporter', '1.0.0');
   });
 
   afterEach(async () => {
     await exporter.shutdown();
-    await meterReader.shutdown();
+    await metricReader.shutdown();
   });
 
   it('should return failed result code', done => {
@@ -85,7 +87,7 @@ describe('InMemoryMetricExporter', () => {
       };
       exporter.export(resourceMetrics, result => {
         assert.ok(result.code === ExportResultCode.FAILED);
-        meterReader.shutdown().then(() => {
+        metricReader.shutdown().then(() => {
           done();
         });
       });
@@ -108,7 +110,7 @@ describe('InMemoryMetricExporter', () => {
     assert.ok(otherMetrics.length === 0);
 
     await exporter.shutdown();
-    await meterReader.shutdown();
+    await metricReader.shutdown();
   });
 
   it('should be able to access metric', async () => {
@@ -146,6 +148,6 @@ describe('InMemoryMetricExporter', () => {
     const histogramDataPoint = histogramMetric.dataPoints.shift();
     assert.ok(histogramDataPoint);
 
-    await meterReader.shutdown();
+    await metricReader.shutdown();
   });
 });

@@ -55,10 +55,11 @@ const testResource = new Resource({
   cost: 112.12,
 });
 
-let meterProvider = new MeterProvider({ resource: testResource });
-
 let reader = new TestMetricReader();
-meterProvider.addMetricReader(reader);
+let meterProvider = new MeterProvider({
+  resource: testResource,
+  readers: [reader],
+});
 
 let meter = meterProvider.getMeter('default', '0.0.1');
 
@@ -67,6 +68,7 @@ export async function collect() {
 }
 
 export function setUp() {
+  reader = new TestMetricReader();
   meterProvider = new MeterProvider({
     resource: testResource,
     views: [
@@ -75,9 +77,8 @@ export function setUp() {
         instrumentName: 'int-histogram',
       }),
     ],
+    readers: [reader],
   });
-  reader = new TestMetricReader();
-  meterProvider.addMetricReader(reader);
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 

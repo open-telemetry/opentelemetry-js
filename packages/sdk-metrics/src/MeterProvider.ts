@@ -35,6 +35,7 @@ export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: IResource;
   views?: View[];
+  readers?: MetricReader[];
 }
 
 /**
@@ -54,6 +55,14 @@ export class MeterProvider implements IMeterProvider {
         this._sharedState.viewRegistry.addView(view);
       }
     }
+
+    if (options?.readers != null && options.readers.length > 0) {
+      for (const metricReader of options.readers) {
+        const collector = new MetricCollector(this._sharedState, metricReader);
+        metricReader.setMetricProducer(collector);
+        this._sharedState.metricCollectors.push(collector);
+      }
+    }
   }
 
   /**
@@ -71,18 +80,6 @@ export class MeterProvider implements IMeterProvider {
       version,
       schemaUrl: options.schemaUrl,
     }).meter;
-  }
-
-  /**
-   * Register a {@link MetricReader} to the meter provider. After the
-   * registration, the MetricReader can start metrics collection.
-   *
-   * @param metricReader the metric reader to be registered.
-   */
-  addMetricReader(metricReader: MetricReader) {
-    const collector = new MetricCollector(this._sharedState, metricReader);
-    metricReader.setMetricProducer(collector);
-    this._sharedState.metricCollectors.push(collector);
   }
 
   /**
