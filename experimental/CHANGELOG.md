@@ -6,9 +6,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
- * fix(instrumentation)!: pin import-in-the-middle@1.7.1 [#4441](https://github.com/open-telemetry/opentelemetry-js/pull/4441)
+* fix(instrumentation)!: pin import-in-the-middle@1.7.1 [#4441](https://github.com/open-telemetry/opentelemetry-js/pull/4441)
   * Only affects users that are using the experimental `@opentelemetry/instrumentation/hook.mjs` loder hook AND Node.js 18.19 or later:
-    * This reverts back to an older version of import-in-the-middle due to https://github.com/DataDog/import-in-the-middle/issues/57
+    * This reverts back to an older version of import-in-the-middle due to <https://github.com/DataDog/import-in-the-middle/issues/57>
 
 ### :rocket: (Enhancement)
 
