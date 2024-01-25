@@ -38,13 +38,12 @@ const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
 const tracerProvider = new NodeTracerProvider();
-const meterProvider = new MeterProvider();
 const metricsMemoryExporter = new InMemoryMetricExporter(
   AggregationTemporality.DELTA
 );
 const metricReader = new TestMetricReader(metricsMemoryExporter);
+const meterProvider = new MeterProvider({ readers: [metricReader] });
 
-meterProvider.addMetricReader(metricReader);
 instrumentation.setTracerProvider(tracerProvider);
 instrumentation.setMeterProvider(meterProvider);
 
