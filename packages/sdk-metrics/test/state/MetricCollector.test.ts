@@ -55,10 +55,12 @@ describe('MetricCollector', () => {
 
   describe('collect', () => {
     function setupInstruments() {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-
       const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+      });
+
       const metricCollector = reader.getMetricCollector();
 
       const meter = meterProvider.getMeter(

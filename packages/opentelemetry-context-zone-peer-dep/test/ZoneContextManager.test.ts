@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import 'zone.js/dist/zone';
+import 'zone.js';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { ZoneContextManager } from '../src';
