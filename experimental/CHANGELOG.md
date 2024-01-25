@@ -20,6 +20,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(exporter-logs-otlp-grpc): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
 * fix(exporter-logs-otlp-http): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
 * fix(exporter-logs-otlp-proto): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
+* fix(instrumentation-fetch): compatibility with Map types for fetch headers
 
 ### :books: (Refine Doc)
 
@@ -64,7 +65,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation-fetch): only access navigator if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
   * allows for experimental usage of this instrumentation with non-browser runtimes
 * fix(instrumentation-http): memory leak when responses are not resumed
-* fix(instrumentation-fetch): compatibility with Map types for fetch headers
 * fix(instrumentation-http): Do not mutate given headers object for outgoing http requests. Fixes aws-sdk signing error on retries. [#4346](https://github.com/open-telemetry/opentelemetry-js/pull/4346)
 * fix(instrumentation): support Node.js v18.19.0 by using import-in-the-middle@1.6.0
 
