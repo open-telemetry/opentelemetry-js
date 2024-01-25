@@ -144,6 +144,8 @@ The below table describes which versions of each set of packages are expected to
 
 | Stable Packages                                                 | Experimental Packages |
 |-----------------------------------------------------------------|-----------------------|
+| 1.20.x                                                          | 0.47.x                |
+| 1.19.x                                                          | 0.46.x                |
 | 1.18.x                                                          | 0.45.x                |
 | 1.17.x                                                          | 0.44.x                |
 | 1.16.x                                                          | 0.42.x                |

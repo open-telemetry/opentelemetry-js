@@ -60,6 +60,7 @@ If you are using the default configurations, the prometheus client will be avail
 
 <p align="center"><img src="images/prom-counter.png?raw=true"/></p>
 <p align="center"><img src="images/prom-updowncounter.png?raw=true"/></p>
+<p align="center"><img src="images/prom-gauge.png?raw=true"/></p>
 
 ## Useful links
 
