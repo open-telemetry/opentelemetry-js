@@ -25,6 +25,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * chore(opentelemetry-context-zone-peer-dep): support zone.js ^v0.13.0 [#4320](https://github.com/open-telemetry/opentelemetry-js/pull/4320)
 * refactor(core): drop unnecessary assignment of HOSTNAME [#4421](https://github.com/open-telemetry/opentelemetry-js/pull/4421) @pichlermarc
 * test(opentelemetry-context-zone-peer-dep): transpile zone.js in tests [#4423](https://github.com/open-telemetry/opentelemetry-js/pull/4423) @legendecas
+* chore: remove unload event from OTLPExporterBrowserBase [#4438](https://github.com/open-telemetry/opentelemetry-js/pull/4438)
+  * The 'unload' event prevents sites from taking advantage of Google's [backward/forward cache](https://web.dev/articles/bfcache#never_use_the_unload_event) and will be [deprecated](https://developer.chrome.com/articles/deprecating-unload/).  It is now up to the consuming site to implement these shutdown events.
 
 ## 1.20.0
 

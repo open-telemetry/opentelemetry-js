@@ -52,6 +52,10 @@ export abstract class OTLPExporterBrowserBase<
     }
   }
 
+  onInit(): void {}
+
+  onShutdown(): void {}
+
   send(
     items: ExportItem[],
     onSuccess: () => void,
