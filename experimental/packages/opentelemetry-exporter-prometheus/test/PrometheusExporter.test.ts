@@ -206,7 +206,7 @@ describe('PrometheusExporter', () => {
     beforeEach(async () => {
       exporter = new PrometheusExporter();
       meterProvider = new MeterProvider({
-          readers: [exporter],
+        readers: [exporter],
       });
       meter = meterProvider.getMeter('test-prometheus', '1');
       await exporter.startServer();
