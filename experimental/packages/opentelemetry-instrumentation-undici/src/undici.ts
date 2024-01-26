@@ -31,7 +31,7 @@ import {
 
 import { VERSION } from './version';
 
-import { HeadersMessage, ListenerRecord, RequestMessage } from './internal-types';
+import { HeadersMessage, ListenerRecord, RequestHeadersMessage, RequestMessage, ResponseHeadersMessage } from './internal-types';
 import { UndiciInstrumentationConfig, UndiciRequest } from './types';
 import { SemanticAttributes } from './enums/SemanticAttributes';
 
@@ -168,18 +168,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
       spanAttributes[SemanticAttributes.USER_AGENT_ORIGINAL] = userAgent;
     }
 
-    // Put headers as attributes based on config
-    if (config.headersToSpanAttributes?.requestHeaders) {
-      config.headersToSpanAttributes.requestHeaders
-        .map((name) => name.toLowerCase())
-        .filter((name) => reqHeaders.has(name))
-        .forEach((name) => {
-          spanAttributes[`http.request.header.${name}`] = reqHeaders.get(name);
-        });
-    }
-
     // Get attributes from the hook if present
-
     const hookAttributes = safeExecuteInTheMiddle(
       () => config.startSpanHook?.(request),
       (e) => e && this._diag.error('caught startSpanHook error: ', e),
@@ -235,7 +224,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // This is the 2nd message we recevie for each request. It is fired when connection with
   // the remote is stablished and about to send the first byte. Here do have info about the
   // remote addres an port so we can poupulate some `net.*` attributes into the span
-  private onRequestHeaders({ request, socket }: any): void {
+  private onRequestHeaders({ request, socket }: RequestHeadersMessage): void {
     console.log('onRequestHeaders')
     const span = this._spanFromReq.get(request as UndiciRequest);
 
@@ -243,17 +232,39 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return
     }
 
+    const config = this._getConfig();
     const { remoteAddress, remotePort } = socket;
-    span.setAttributes({
+    const spanAttributes: Attributes = {
       [SemanticAttributes.NETWORK_PEER_ADDRESS]: remoteAddress,
       [SemanticAttributes.NETWORK_PEER_PORT]: remotePort,
-    });
+    };
+
+    // After hooks have been processed (which may modify request headers)
+    // we can collect the headers based on the configuration
+    const rawHeaders = request.headers.split('\r\n');
+    const reqHeaders = new Map(rawHeaders.map(h => {
+      const sepIndex = h.indexOf(':');
+      const name = h.substring(0, sepIndex).toLowerCase();
+      const val = h.substring(sepIndex + 1).trim();
+      return [name, val];
+    }));
+
+    if (config.headersToSpanAttributes?.requestHeaders) {
+      config.headersToSpanAttributes.requestHeaders
+        .map((name) => name.toLowerCase())
+        .filter((name) => reqHeaders.has(name))
+        .forEach((name) => {
+          spanAttributes[`http.request.header.${name}`] = reqHeaders.get(name);
+        });
+    }
+
+    span.setAttributes(spanAttributes);
   }
 
   // This is the 3rd message we get for each request and it's fired when the server
   // headers are received, body may not be accessible yet (TODO: check this).
   // From the response headers we can set the status and content length
-  private onResponseHeaders({ request, response }: HeadersMessage): void {
+  private onResponseHeaders({ request, response }: ResponseHeadersMessage): void {
     console.log('onResponseHeaders')
     const span = this._spanFromReq.get(request);
 

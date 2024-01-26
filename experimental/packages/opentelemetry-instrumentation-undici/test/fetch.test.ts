@@ -174,7 +174,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
           return req.path.indexOf('/ignore/path') !== -1;
         },
         requestHook: (span, req) => {
-          // TODO: maybe an intermediate request with better API  
+          // TODO: maybe an intermediate request with better API
           req.headers += 'x-requested-with: undici\r\n';
         },
         startSpanHook: (request) => {
@@ -213,7 +213,6 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         reqHeaders: reqInit.headers,
         resHeaders: response.headers,
       });
-      console.log(span.attributes)
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
         'bar',
@@ -221,7 +220,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       );
       assert.strictEqual(
         span.attributes['http.request.header.x-requested-with'],
-        'bar',
+        'undici',
         'request headers from requestHook are captured',
       );
       assert.strictEqual(

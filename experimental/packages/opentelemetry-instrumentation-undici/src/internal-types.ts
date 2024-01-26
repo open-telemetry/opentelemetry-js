@@ -27,7 +27,12 @@ export interface RequestMessage {
   request: UndiciRequest;
 }
 
-export interface HeadersMessage {
+export interface RequestHeadersMessage {
+  request: UndiciRequest;
+  socket: any;
+}
+
+export interface ResponseHeadersMessage {
   request: UndiciRequest;
   response: UnidiciResponse;
 }
