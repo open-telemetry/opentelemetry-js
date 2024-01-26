@@ -12,6 +12,20 @@
     "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
+  "exports": {
+    ".": {
+      "module": "./build/esm/index.js",
+      "esnext": "./build/esnext/index.js",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
+    },
+    "./experimental": {
+      "module": "./build/esm/experimental.js",
+      "esnext": "./build/esnext/experimental.js",
+      "types": "./build/src/experimental.d.ts",
+      "default": "./build/src/experimental.js"
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",

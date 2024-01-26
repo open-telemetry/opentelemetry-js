@@ -13,18 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {
-  DEFAULT_ENVIRONMENT,
-  ENVIRONMENT,
-  RAW_ENVIRONMENT,
-  parseEnvironment,
-} from '../../utils/environment';
-
-/**
- * Gets the environment variables
- */
-export function getEnv(): Required<ENVIRONMENT> {
-  const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
-  return Object.assign({}, DEFAULT_ENVIRONMENT, processEnv);
-}
+export { wrapTracer, SugaredTracer } from './trace/SugaredTracer';
+export { SugaredSpanOptions } from './trace/SugaredOptions';

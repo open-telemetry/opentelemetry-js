@@ -37,6 +37,7 @@ import {
   IExportLogsServiceRequest,
   IResourceLogs,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../src/version';
 
 const logsServiceProtoPath =
   'opentelemetry/proto/collector/logs/v1/logs_service.proto';
@@ -332,6 +333,12 @@ describe('when configuring via environment', () => {
     assert.strictEqual(collectorExporter.url, 'foo.logs');
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
+  });
+  it('should include user-agent header by default', () => {
+    const collectorExporter = new OTLPLogExporter();
+    assert.deepStrictEqual(collectorExporter.metadata?.get('User-Agent'), [
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+    ]);
   });
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';

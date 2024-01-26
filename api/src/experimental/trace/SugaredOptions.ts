@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-import {
-  DEFAULT_ENVIRONMENT,
-  ENVIRONMENT,
-  RAW_ENVIRONMENT,
-  parseEnvironment,
-} from '../../utils/environment';
+import { Span, SpanOptions } from '../../';
 
 /**
- * Gets the environment variables
+ * Options needed for span creation
  */
-export function getEnv(): Required<ENVIRONMENT> {
-  const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
-  return Object.assign({}, DEFAULT_ENVIRONMENT, processEnv);
+export interface SugaredSpanOptions extends SpanOptions {
+  /**
+   * function to overwrite default exception behavior to record the exception. No exceptions should be thrown in the function.
+   * @param e Error which triggered this exception
+   * @param span current span from context
+   */
+  onException?: (e: Error, span: Span) => void;
 }

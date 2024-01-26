@@ -50,7 +50,7 @@ describe('ConsoleMetricExporter', () => {
     let previousConsoleDir: any;
     let exporter: ConsoleMetricExporter;
     let meterProvider: MeterProvider;
-    let meterReader: PeriodicExportingMetricReader;
+    let metricReader: PeriodicExportingMetricReader;
     let meter: metrics.Meter;
 
     beforeEach(() => {
@@ -58,20 +58,22 @@ describe('ConsoleMetricExporter', () => {
       console.dir = () => {};
 
       exporter = new ConsoleMetricExporter();
-      meterProvider = new MeterProvider({ resource: defaultResource });
-      meter = meterProvider.getMeter('ConsoleMetricExporter', '1.0.0');
-      meterReader = new PeriodicExportingMetricReader({
+      metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 100,
         exportTimeoutMillis: 100,
       });
-      meterProvider.addMetricReader(meterReader);
+      meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [metricReader],
+      });
+      meter = meterProvider.getMeter('ConsoleMetricExporter', '1.0.0');
     });
 
     afterEach(async () => {
       console.dir = previousConsoleDir;
 
-      await meterReader.shutdown();
+      await metricReader.shutdown();
     });
 
     it('should export information about metric', async () => {
