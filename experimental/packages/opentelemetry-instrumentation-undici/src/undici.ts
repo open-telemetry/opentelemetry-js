@@ -16,7 +16,6 @@
 import * as diagch from 'diagnostics_channel';
 import { URL } from 'url';
 
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { InstrumentationBase, safeExecuteInTheMiddle } from '@opentelemetry/instrumentation';
 import {
   Attributes,
@@ -34,6 +33,7 @@ import { VERSION } from './version';
 
 import { HeadersMessage, ListenerRecord, RequestMessage } from './internal-types';
 import { UndiciInstrumentationConfig, UndiciRequest } from './types';
+import { SemanticAttributes } from './enums/SemanticAttributes';
 
 
 // A combination of https://github.com/elastic/apm-agent-nodejs and
@@ -148,41 +148,33 @@ export class UndiciInstrumentation extends InstrumentationBase {
 
     const requestUrl = new URL(request.origin);
     const spanAttributes: Attributes = {
-      [SemanticAttributes.HTTP_URL]: request.origin,
-      [SemanticAttributes.HTTP_METHOD]: request.method,
-      [SemanticAttributes.HTTP_TARGET]: request.path || '/',
-      [SemanticAttributes.NET_PEER_NAME]: requestUrl.hostname,
+      [SemanticAttributes.URL_FULL]: request.origin,
+      [SemanticAttributes.URL_PATH]: requestUrl.pathname,
+      [SemanticAttributes.URL_QUERY]: requestUrl.search,
     };
 
-    let hostAttribute = reqHeaders.get('host');
-    if (!hostAttribute) {
-      const protocolPorts: Record<string, string> = { https: '443', http: '80' };
-      const defaultPort = protocolPorts[requestUrl.protocol] || '';
-      const port = requestUrl.port || defaultPort;
-
-      hostAttribute = requestUrl.hostname;
-      if (port) {
-        hostAttribute += `:${port}`;
-      }
+    const protocolPorts: Record<string, string> = { https: '443', http: '80' };
+    const serverAddress = reqHeaders.get('host') || requestUrl.hostname;
+    const serverPort = requestUrl.port || protocolPorts[requestUrl.protocol];
+    
+    spanAttributes[SemanticAttributes.SERVER_ADDRESS] = serverAddress;
+    if (serverPort) {
+      spanAttributes[SemanticAttributes.SERVER_PORT] = serverPort;
     }
-    spanAttributes[SemanticAttributes.HTTP_HOST] = hostAttribute;
 
     const userAgent = reqHeaders.get('user-agent');
     if (userAgent) {
-      spanAttributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
+      spanAttributes[SemanticAttributes.USER_AGENT_ORIGINAL] = userAgent;
     }
 
     // Put headers as attributes based on config
     if (config.headersToSpanAttributes?.requestHeaders) {
-      config.headersToSpanAttributes.requestHeaders.forEach((name) => {
-        const headerName = name.toLowerCase();
-        const headerValue = reqHeaders.get(headerName);
-
-        if (headerValue) {
-          const normalizedName = headerName.replace(/-/g, '_');
-          spanAttributes[`http.request.header.${normalizedName}`] = headerValue;
-        }
-      });
+      config.headersToSpanAttributes.requestHeaders
+        .map((name) => name.toLowerCase())
+        .filter((name) => reqHeaders.has(name))
+        .forEach((name) => {
+          spanAttributes[`http.request.header.${name}`] = reqHeaders.get(name);
+        });
     }
 
     // Get attributes from the hook if present
@@ -251,11 +243,9 @@ export class UndiciInstrumentation extends InstrumentationBase {
     }
 
     const { remoteAddress, remotePort } = socket;
-
-    // TODO: this may be affected by HTTP semconv breaking changes
     span.setAttributes({
-      [SemanticAttributes.NET_PEER_IP]: remoteAddress,
-      [SemanticAttributes.NET_PEER_PORT]: remotePort,
+      [SemanticAttributes.NETWORK_PEER_ADDRESS]: remoteAddress,
+      [SemanticAttributes.NETWORK_PEER_PORT]: remotePort,
     });
   }
 
@@ -273,8 +263,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // We are currently *not* capturing response headers, even though the
     // intake API does allow it, because none of the other `setHttpContext`
     // uses currently do
-    const attrs: Attributes = {
-      [SemanticAttributes.HTTP_STATUS_CODE]: response.statusCode,
+    const spanAttributes: Attributes = {
+      [SemanticAttributes.HTTP_RESPONSE_STATUS_CODE]: response.statusCode,
     };
 
     // Get headers with names lowercased but values intact
@@ -289,23 +279,22 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // Put response headers as attributes based on config
     const config = this._getConfig();
     if (config.headersToSpanAttributes?.responseHeaders) {
-      config.headersToSpanAttributes.responseHeaders.forEach((name) => {
-        const headerName = name.toLowerCase();
-        const headerValue = resHeaders.get(headerName);
+      config.headersToSpanAttributes.responseHeaders
+        .map((name) => name.toLowerCase())
+        .filter((name) => resHeaders.has(name))
+        .forEach((name) => {
+          const key = `http.request.header.${name}`;
+          const value = resHeaders.get(name);
 
-        if (headerValue) {
-          const normalizedName = headerName.replace(/-/g, '_');
-          attrs[`http.response.header.${normalizedName}`] = headerValue;
-        }
-      });
+          if (name === 'content-length' && !isNaN(Number(value))) {
+            spanAttributes[key] = Number(value);
+          } else {
+            spanAttributes[key] = value;
+          }
+        });
     }
 
-    const contentLength = Number(resHeaders.get('content-length'));
-    if (!isNaN(contentLength)) {
-      attrs[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = contentLength;
-    }
-
-    span.setAttributes(attrs);
+    span.setAttributes(spanAttributes);
     span.setStatus({
       code: response.statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.UNSET,
     });
