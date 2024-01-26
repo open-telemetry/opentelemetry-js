@@ -26,6 +26,7 @@ export {
 export {
   AggregationSelector,
   AggregationTemporalitySelector,
+  DEFAULT_AGGREGATION_SELECTOR as DefaultAggregationSelector,
 } from './export/AggregationSelector';
 
 export { AggregationTemporality } from './export/AggregationTemporality';

@@ -21,10 +21,17 @@ export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
   temporalityPreference?:
     | AggregationTemporalityPreference
     | AggregationTemporality;
+
+  histogramPreference?: HistogramAggregationPreference;
 }
 
 export enum AggregationTemporalityPreference {
   DELTA,
   CUMULATIVE,
   LOWMEMORY,
+}
+
+export enum HistogramAggregationPreference {
+  EXPLICIT_BUCKET_HISTOGRAM,
+  EXPONENTIAL_BUCKET_HISTOGRAM,
 }
