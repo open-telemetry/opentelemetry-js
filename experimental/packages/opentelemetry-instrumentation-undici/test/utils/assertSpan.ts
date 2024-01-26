@@ -30,7 +30,7 @@ export const assertSpan = (
   validations: {
     httpStatusCode?: number;
     httpMethod: string;
-    resHeaders: Headers;
+    resHeaders?: Headers;
     hostname: string;
     reqHeaders?: Headers;
     path?: string | null;
@@ -101,7 +101,7 @@ export const assertSpan = (
   assert.deepStrictEqual(
     span.status,
     validations.forceStatus || {
-      code: isStatusUnset ? SpanStatusCode.UNSET : SpanStatusCode.ERROR
+      code: isStatusUnset ? SpanStatusCode.UNSET : SpanStatusCode.ERROR,
     },
     'span status is correct'
   );
@@ -109,7 +109,7 @@ export const assertSpan = (
   assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration) > 0, 'must have positive duration');
 
-  const contentLengthHeader = validations.resHeaders.get('content-length');
+  const contentLengthHeader = validations.resHeaders?.get('content-length');
   if (contentLengthHeader) {
     const contentLength = Number(contentLengthHeader);
 

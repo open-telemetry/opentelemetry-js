@@ -15,7 +15,7 @@
  */
 import * as assert from 'assert';
 
-import { context, propagation } from '@opentelemetry/api';
+import { SpanStatusCode, context, propagation } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
@@ -55,11 +55,18 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
     mockServer.start(done);
     mockServer.mockListener((req, res) => {
-      res.statusCode = 200;
-      res.setHeader('content-type', 'application/json');
-      res.setHeader('foo-server', 'bar');
-      res.write(JSON.stringify({ success: true }));
-      res.end();
+      if (req.url === '/throw') {
+        res.statusCode = 500;
+        res.setHeader('content-type', 'text/plain');
+        res.write('Intenal server error :(');
+        res.end();
+      } else {
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json');
+        res.setHeader('foo-server', 'bar');
+        res.write(JSON.stringify({ success: true }));
+        res.end();
+      }
     });
   });
 
@@ -95,7 +102,8 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       instrumentation.enable();
     });
     afterEach(function () {
-      instrumentation.disable();
+      // Empty configuration & disable
+      instrumentation.setConfig({ enabled: false });
     });
 
     it('should create valid spans even if the configuration hooks fail', async function () {
@@ -141,9 +149,6 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     it('should create valid spans with empty configuration', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
-
-      // Empty configuration
-      instrumentation.setConfig({ enabled: true });
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const response = await fetch(fetchUrl);
@@ -235,6 +240,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       );
     });
 
+    // TODO: another test with a parent span. Check HTTP tests
     it('should not create spans without parent if configured', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
@@ -249,6 +255,41 @@ describe('UndiciInstrumentation `fetch` tests', function () {
 
       spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0, 'no spans are created');
+    });
+
+
+    it('should capture erros from the server', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      // const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/throw`;
+      let fetchError;
+      try {
+        const fetchUrl = `http://unexistent-host-name/path`;
+        await fetch(fetchUrl);
+      } catch (err) {
+        // Expected error since webdav schema is not supported
+        fetchError = err;
+      }
+
+      await new Promise((r) => setTimeout(r, 10));
+      
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      assert.ok(span, 'a span is present');
+      assert.strictEqual(spans.length, 1);
+      assertSpan(span, {
+        hostname: 'unexistent-host-name',
+        httpMethod: 'GET',
+        path: '/path',
+        error: fetchError,
+        noNetPeer: true, // do not check network attribs
+        forceStatus: {
+          code: SpanStatusCode.ERROR,
+          message: 'getaddrinfo ENOTFOUND unexistent-host-name'
+        }
+      });
     });
   });
 });
