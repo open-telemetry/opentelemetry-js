@@ -146,9 +146,10 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return [name, val];
     }));
 
-    const requestUrl = new URL(request.origin);
+    const requestUrl = new URL(request.origin + request.path);
     const spanAttributes: Attributes = {
-      [SemanticAttributes.URL_FULL]: request.origin,
+      [SemanticAttributes.HTTP_REQUEST_METHOD]: request.method,
+      [SemanticAttributes.URL_FULL]: requestUrl.toString(),
       [SemanticAttributes.URL_PATH]: requestUrl.pathname,
       [SemanticAttributes.URL_QUERY]: requestUrl.search,
     };
@@ -283,15 +284,14 @@ export class UndiciInstrumentation extends InstrumentationBase {
         .map((name) => name.toLowerCase())
         .filter((name) => resHeaders.has(name))
         .forEach((name) => {
-          const key = `http.request.header.${name}`;
-          const value = resHeaders.get(name);
-
-          if (name === 'content-length' && !isNaN(Number(value))) {
-            spanAttributes[key] = Number(value);
-          } else {
-            spanAttributes[key] = value;
-          }
+          spanAttributes[`http.response.header.${name}`] = resHeaders.get(name);
         });
+    }
+
+    // `content-length` header is a special case
+    const contentLength = Number(resHeaders.get('content-length'));
+    if (!isNaN(contentLength)) {
+      spanAttributes['http.response.header.content-length'] = contentLength;
     }
 
     span.setAttributes(spanAttributes);

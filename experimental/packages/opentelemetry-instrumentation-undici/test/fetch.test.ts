@@ -132,8 +132,8 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         hostname: 'localhost',
         httpStatusCode: response.status,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
+        path: '/',
+        query:'?query=test',
         resHeaders: response.headers,
       });
     });
@@ -157,8 +157,8 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         hostname: 'localhost',
         httpStatusCode: response.status,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
+        path: '/',
+        query:'?query=test',
         resHeaders: response.headers,
       });
     });
@@ -208,25 +208,26 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         hostname: 'localhost',
         httpStatusCode: response.status,
         httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
+        path: '/',
+        query:'?query=test',
         reqHeaders: reqInit.headers,
         resHeaders: response.headers,
       });
+      console.log(span.attributes)
       assert.strictEqual(
-        span.attributes['http.request.header.foo_client'],
+        span.attributes['http.request.header.foo-client'],
         'bar',
-        'request headers are captured',
+        'request headers from fetch options are captured',
       );
       assert.strictEqual(
-        span.attributes['http.request.header.foo_client'],
+        span.attributes['http.request.header.x-requested-with'],
         'bar',
         'request headers from requestHook are captured',
       );
       assert.strictEqual(
-        span.attributes['http.response.header.foo_server'],
+        span.attributes['http.response.header.foo-server'],
         'bar',
-        'response headers are captured',
+        'response headers from the server are captured',
       );
       assert.strictEqual(
         span.attributes['test.hook.attribute'],
