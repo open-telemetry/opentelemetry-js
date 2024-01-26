@@ -31,7 +31,7 @@ All notable changes to experimental packages in this project will be documented 
     * `getServiceProtoPath()`
       * this returned a static enum value that would correspond to the gRPC service path
     * `metadata`
-      *  was used internally to access metadata, but as a side effect allowed end-users to modify metadata on runtime.
+      * was used internally to access metadata, but as a side effect allowed end-users to modify metadata on runtime.
     * `serviceClient`
       * was used internally to keep track of the service client used by the exporter, as a side effect it allowed end-users to modify the gRPC service client that was used
     * `compression`
