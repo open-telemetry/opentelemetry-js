@@ -167,7 +167,5 @@ export const assertSpan = (
         userAgent
       );
     }
-    // assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
-    // assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
   }
 };

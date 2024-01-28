@@ -189,7 +189,6 @@ export class UndiciInstrumentation extends InstrumentationBase {
     const currentSpan = trace.getSpan(activeCtx);
     let span: Span;
 
-    
     if (config.requireParentforSpans && !currentSpan) {
       span = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
     } else {
@@ -203,17 +202,18 @@ export class UndiciInstrumentation extends InstrumentationBase {
       );
     }
 
-    // Context propagation
-    const requestContext = trace.setSpan(context.active(), span);
-    const addedHeaders: Record<string, string> = {};
-    propagation.inject(requestContext, addedHeaders);
-
     // Execute the request hook if defined
     safeExecuteInTheMiddle(
       () => config.requestHook?.(span, request),
       (e) => e && this._diag.error('caught requestHook error: ', e),
       true,
     );
+
+    // Context propagation goes last so no hook can tamper
+    // the propagation headers
+    const requestContext = trace.setSpan(context.active(), span);
+    const addedHeaders: Record<string, string> = {};
+    propagation.inject(requestContext, addedHeaders);
 
     request.headers += Object.entries(addedHeaders)
       .map(([k, v]) => `${k}: ${v}\r\n`)

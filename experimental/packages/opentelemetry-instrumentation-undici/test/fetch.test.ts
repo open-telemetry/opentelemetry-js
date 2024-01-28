@@ -25,6 +25,7 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 
 import { UndiciInstrumentation } from '../src/undici';
 
+import { MockPropagation } from './utils/mock-propagation';
 import { MockServer } from './utils/mock-server';
 import { assertSpan } from './utils/assertSpan';
 
@@ -51,22 +52,35 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     }
     
     // TODO: mock propagation and test it
-    // propagation.setGlobalPropagator(new DummyPropagation());
+    propagation.setGlobalPropagator(new MockPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
     mockServer.start(done);
     mockServer.mockListener((req, res) => {
-      if (req.url === '/throw') {
-        res.statusCode = 500;
-        res.setHeader('content-type', 'text/plain');
-        res.write('Intenal server error :(');
-        res.end();
-      } else {
-        res.statusCode = 200;
-        res.setHeader('content-type', 'application/json');
-        res.setHeader('foo-server', 'bar');
-        res.write(JSON.stringify({ success: true }));
-        res.end();
+      // There are some situations where there is no way to access headers
+      // for trace propagation asserts like:
+      // const resp = await fetch('http://host:port')
+      // so we need to do the assertion here
+      try {
+        assert.ok(
+          req.headers[MockPropagation.TRACE_CONTEXT_KEY],
+          `trace propagation for ${MockPropagation.TRACE_CONTEXT_KEY} works`,
+        );
+        assert.ok(
+          req.headers[MockPropagation.SPAN_CONTEXT_KEY],
+          `trace propagation for ${MockPropagation.SPAN_CONTEXT_KEY} works`,  
+        );
+      } catch (assertErr) {
+        // The exception will hang the server and the test so we set a header
+        // back to the test to make an assertion
+        res.setHeader('propagation-error', assertErr.message);
       }
+
+      // Retur a valid response always
+      res.statusCode = 200;
+      res.setHeader('content-type', 'application/json');
+      res.setHeader('foo-server', 'bar');
+      res.write(JSON.stringify({ success: true }));
+      res.end();
     });
   });
 
@@ -90,7 +104,11 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       instrumentation.setConfig({ enabled: false });
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
-      await fetch(fetchUrl);
+      const response = await fetch(fetchUrl);
+      assert.ok(
+        response.headers.get('propagation-error') != null,
+        'propagation is not set if instrumentation disabled'
+      );
 
       spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0, 'no spans are created');
@@ -129,13 +147,16 @@ describe('UndiciInstrumentation `fetch` tests', function () {
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const response = await fetch(fetchUrl);
+      assert.ok(
+        response.headers.get('propagation-error') == null,
+        'propagation is set for instrumented requests'
+      );
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
 
       assert.ok(span, 'a span is present');
       assert.strictEqual(spans.length, 1);
-      // console.dir(span, { depth: 9 });
       assertSpan(span, {
         hostname: 'localhost',
         httpStatusCode: response.status,
@@ -152,6 +173,10 @@ describe('UndiciInstrumentation `fetch` tests', function () {
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const response = await fetch(fetchUrl);
+      assert.ok(
+        response.headers.get('propagation-error') == null,
+        'propagation is set for instrumented requests'
+      );
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -194,29 +219,36 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       });
 
       // Do some requests
-      await fetch(`${protocol}://${hostname}:${mockServer.port}/ignore/path`);
+      const ignoreResponse = await fetch(`${protocol}://${hostname}:${mockServer.port}/ignore/path`);
       const reqInit = {
         headers: new Headers({
           'user-agent': 'custom',
           'foo-client': 'bar'
         }),
       };
-      const response = await fetch(`${protocol}://${hostname}:${mockServer.port}/?query=test`, reqInit);
+      assert.ok(
+        ignoreResponse.headers.get('propagation-error'),
+        'propagation is not set for ignored requests'
+      );
+
+      const queryResponse = await fetch(`${protocol}://${hostname}:${mockServer.port}/?query=test`, reqInit);
+      assert.ok(
+        queryResponse.headers.get('propagation-error') == null,
+        'propagation is set for instrumented requests'
+      );
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
-      // TODO: remove this when test finished
-      // console.dir(span, { depth: 9 });
       assert.ok(span, 'a span is present');
       assert.strictEqual(spans.length, 1);
       assertSpan(span, {
         hostname: 'localhost',
-        httpStatusCode: response.status,
+        httpStatusCode: queryResponse.status,
         httpMethod: 'GET',
         path: '/',
         query:'?query=test',
         reqHeaders: reqInit.headers,
-        resHeaders: response.headers,
+        resHeaders: queryResponse.headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
@@ -251,29 +283,30 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       });
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
-      await fetch(fetchUrl);
+      const response = await fetch(fetchUrl);
+      // TODO: should we propagate here????
+      // assert.ok(
+      //   response.headers.get('propagation-error') == null,
+      //   'propagation is set for instrumented requests'
+      // );
 
       spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0, 'no spans are created');
     });
 
 
-    it('should capture erros from the server', async function () {
+    it('should capture errors using fetch API', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      // const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/throw`;
       let fetchError;
       try {
         const fetchUrl = `http://unexistent-host-name/path`;
         await fetch(fetchUrl);
       } catch (err) {
-        // Expected error since webdav schema is not supported
+        // Expected error
         fetchError = err;
       }
-
-      await new Promise((r) => setTimeout(r, 10));
-      
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
