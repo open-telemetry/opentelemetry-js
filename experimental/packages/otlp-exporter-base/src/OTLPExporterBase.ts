@@ -38,6 +38,7 @@ export abstract class OTLPExporterBase<
 > {
   public readonly url: string;
   public readonly shutDownEvent: ShutdownEvent;
+  public readonly isShutdownEventDisabled: boolean;
   public readonly hostname: string | undefined;
   public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
@@ -49,7 +50,10 @@ export abstract class OTLPExporterBase<
    */
   constructor(config: T = {} as T) {
     this.url = this.getDefaultUrl(config);
-    this.shutDownEvent = config.shutDownEvent ?? 'unload';
+    this.isShutdownEventDisabled = config.isShutdownEventDisabled;
+    if (!config.isShutdownEventDisabled) {
+      this.shutDownEvent = config.shutDownEvent ?? 'unload';
+    }
     if (typeof config.hostname === 'string') {
       this.hostname = config.hostname;
     }
