@@ -52,6 +52,7 @@ export class OTLPTraceExporter
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
       ),
+      ...config.headers,
     };
   }
 

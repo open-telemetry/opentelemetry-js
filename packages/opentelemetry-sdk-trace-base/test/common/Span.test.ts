@@ -369,6 +369,22 @@ describe('Span', () => {
           span.setAttribute('attr-non-string', true);
           assert.strictEqual(span.attributes['attr-non-string'], true);
         });
+
+        it('should truncate value when attributes are passed to the constructor', () => {
+          const span = new Span(
+            tracer,
+            ROOT_CONTEXT,
+            name,
+            spanContext,
+            SpanKind.CLIENT,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            { 'attr-with-more-length': 'abcdefgh' }
+          );
+          assert.strictEqual(span.attributes['attr-with-more-length'], 'abcde');
+        });
       });
 
       describe('when "attributeValueLengthLimit" option is invalid', () => {
