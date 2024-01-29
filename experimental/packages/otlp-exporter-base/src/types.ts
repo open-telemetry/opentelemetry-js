@@ -53,8 +53,7 @@ export type ShutdownEvent = 'unload' | 'onhide' | 'pagehide' | 'beforeunload';
  * Collector Exporter base config
  */
 export interface OTLPExporterConfigBase {
-  isShutdownEventDisabled?: boolean;
-  shutDownEvent?: ShutdownEvent;
+  shutDownEvents?: ShutdownEvent[];
   headers?: Partial<Record<string, unknown>>;
   hostname?: string;
   url?: string;

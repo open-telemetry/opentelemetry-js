@@ -53,21 +53,15 @@ export abstract class OTLPExporterBrowserBase<
   }
 
   onInit(): void {
-    if (this.shutDownEvent) {
-      _globalThis.addEventListener(
-        this.shutDownEvent ?? 'unload',
-        this.shutdown
-      );
-    }
+    this.shutDownEvents?.forEach(browserEvent => {
+      _globalThis.addEventListener(browserEvent, this.shutdown);
+    });
   }
 
   onShutdown(): void {
-    if (this.shutDownEvent) {
-      _globalThis.removeEventListener(
-        this.shutDownEvent ?? 'unload',
-        this.shutdown
-      );
-    }
+    this.shutDownEvents?.forEach(browserEvent => {
+      _globalThis.removeEventListener(browserEvent, this.shutdown);
+    });
   }
 
   send(
