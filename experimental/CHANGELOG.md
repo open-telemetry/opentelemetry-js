@@ -8,11 +8,35 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(exporter-metrics-otlp-http): add option to set the exporter aggregation preference  [#4409](https://github.com/open-telemetry/opentelemetry-js/pull/4409) @AkselAllas
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.48.0
+
+### :boom: Breaking Change
+
+* fix(instrumentation)!: pin import-in-the-middle@1.7.1 [#4441](https://github.com/open-telemetry/opentelemetry-js/pull/4441)
+  * Fixes a bug where, in some circumstances, ESM instrumentation packages would try to instrument CJS exports on ESM, causing the end-user application to crash.
+  * This breaking change only affects users that are using the *experimental* `@opentelemetry/instrumentation/hook.mjs` loader hook AND Node.js 18.19 or later:
+    * This reverts back to an older version of `import-in-the-middle` due to <https://github.com/DataDog/import-in-the-middle/issues/57>
+    * This version does not support Node.js 18.19 or later
+
+### :bug: (Bug Fix)
+
+* fix(exporter-prometheus): avoid invoking callback synchronously [#4431](https://github.com/open-telemetry/opentelemetry-js/pull/4431) @legendecas
+* fix(exporter-logs-otlp-grpc): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
+* fix(exporter-logs-otlp-http): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
+* fix(exporter-logs-otlp-proto): set User-Agent header [#4398](https://github.com/open-telemetry/opentelemetry-js/pull/4398) @Vunovati
+* fix(instrumentation-fetch): compatibility with Map types for fetch headers
+
+### :house: (Internal)
+
+* refactor(exporter-prometheus): promisify prometheus tests [#4431](https://github.com/open-telemetry/opentelemetry-js/pull/4431) @legendecas
 
 ## 0.47.0
 

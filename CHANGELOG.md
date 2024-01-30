@@ -13,9 +13,21 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-trace-base): ensure attribute value length limit is enforced on span creation [#4417](https://github.com/open-telemetry/opentelemetry-js/pull/4417) @pichlermarc
-
 ### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.21.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): add constructor option to add metric readers [#4427](https://github.com/open-telemetry/opentelemetry-js/pull/4427) @pichlermarc
+  * deprecates `MeterProvider.addMetricReader()` please use the constructor option `readers` instead.
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): ensure attribute value length limit is enforced on span creation [#4417](https://github.com/open-telemetry/opentelemetry-js/pull/4417) @pichlermarc
+* fix(sdk-trace-base): Export processed spans while exporter failed [#4287](https://github.com/open-telemetry/opentelemetry-js/pull/4287) @Zirak
 
 ### :house: (Internal)
 
