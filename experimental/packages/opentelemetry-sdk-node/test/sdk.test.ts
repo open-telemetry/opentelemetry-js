@@ -909,7 +909,7 @@ describe('setup exporter from env', () => {
     assert.ok(
       sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
     );
-    assert(listOfProcessors.length === 1);
+    assert.strictEqual(listOfProcessors.length, 1);
     delete env.OTEL_TRACES_EXPORTER;
   });
   it('use otlp exporter and defined exporter protocol env value', async () => {
