@@ -22,7 +22,7 @@ import {
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
   parseRetryAfterToMills,
-} from '../../src/util';
+} from '../../../src/legacy/util';
 
 describe('utils', () => {
   afterEach(() => {

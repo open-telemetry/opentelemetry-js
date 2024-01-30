@@ -17,10 +17,10 @@
 import { ExportResultCode } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPExporterBase } from '../../src/OTLPExporterBase';
-import { OTLPExporterConfigBase } from '../../src/types';
-import { ComplexTestObject, mockedComplexTestObject } from '../testHelper';
-import * as otlpTypes from '../../src/types';
+import { OTLPExporterBase } from '../../../src';
+import { OTLPExporterConfigBase } from '../../../src';
+import { ComplexTestObject, mockedComplexTestObject } from './testHelper';
+import * as otlpTypes from '../../../src/legacy/types';
 
 interface ExportRequest {
   resourceSpans: object[];

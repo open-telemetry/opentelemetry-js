@@ -31,7 +31,7 @@ import {
   createExportMetricsServiceRequest,
   IExportMetricsServiceRequest,
 } from '@opentelemetry/otlp-transformer';
-import { VERSION } from './version';
+import { VERSION } from '../version';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;

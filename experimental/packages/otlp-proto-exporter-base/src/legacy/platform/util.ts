@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as root from '../generated/root';
+import * as root from '../../generated/root';
 import { ServiceClientType } from './types';
 import type * as protobuf from 'protobufjs';
 

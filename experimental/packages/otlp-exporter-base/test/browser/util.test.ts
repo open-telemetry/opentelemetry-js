@@ -15,9 +15,9 @@
  */
 
 import * as sinon from 'sinon';
-import { sendWithXhr } from '../../src/platform/browser/util';
+import { sendWithXhr } from '../../src';
 import { nextTick } from 'process';
-import { ensureHeadersContain } from '../testHelper';
+import { ensureHeadersContain } from '../common/legacy/testHelper';
 
 describe('util - browser', () => {
   let server: any;

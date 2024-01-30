@@ -13,4 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './legacy/platform';
+
+// Legacy
+export * from './platform';
+export { OTLPExporterBase } from './OTLPExporterBase';
+export {
+  OTLPExporterError,
+  OTLPExporterConfigBase,
+  ExportServiceError,
+} from './types';
+export {
+  parseHeaders,
+  appendResourcePathToUrl,
+  appendRootPathToUrlIfNeeded,
+  configureExporterTimeout,
+  invalidTimeout,
+} from './util';
