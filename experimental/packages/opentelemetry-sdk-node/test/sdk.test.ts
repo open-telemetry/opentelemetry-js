@@ -906,7 +906,7 @@ describe('setup exporter from env', () => {
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
     assert.ok(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
-    assert(
+    assert.ok(
       sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
     );
     assert(listOfProcessors.length === 1);
