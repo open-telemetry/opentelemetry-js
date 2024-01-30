@@ -43,6 +43,12 @@ const content = `/*
 export const VERSION = '${pjson.version}';
 `;
 
-const fileUrl = path.join(appRoot, "src", "version.ts")
+const fileUrl = path.join(appRoot, "src", "version.ts");
+const fileDir = path.dirname(fileUrl);
 
+if (!fs.existsSync(fileDir)) {
+  fs.mkdirSync(fileDir, {
+    recursive: true,
+  });
+}
 fs.writeFileSync(fileUrl, content);

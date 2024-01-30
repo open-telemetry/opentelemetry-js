@@ -45,6 +45,18 @@
       "path": "experimental/packages/otlp-exporter-base/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/otlp-http-exporter-base/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/otlp-http-exporter-browser-base/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/otlp-http-exporter-node-base/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/otlp-metrics-exporter-base/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/otlp-proto-exporter-base/tsconfig.esm.json"
     },
     {

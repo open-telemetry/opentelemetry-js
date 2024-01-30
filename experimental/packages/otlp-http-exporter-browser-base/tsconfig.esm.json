@@ -1,0 +1,31 @@
+{
+  "extends": "../../../tsconfig.base.esm.json",
+  "compilerOptions": {
+    "outDir": "build/esm",
+    "rootDir": "src",
+    "tsBuildInfoFile": "build/esm/tsconfig.esm.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../../api"
+    },
+    {
+      "path": "../../../packages/opentelemetry-resources"
+    },
+    {
+      "path": "../../../packages/sdk-metrics"
+    },
+    {
+      "path": "../otlp-exporter-base"
+    },
+    {
+      "path": "../otlp-http-exporter-base"
+    },
+    {
+      "path": "../otlp-transformer"
+    }
+  ]
+}
