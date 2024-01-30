@@ -47,7 +47,7 @@ export interface ExportServiceError {
  * https://github.com/open-telemetry/opentelemetry-js/issues/2205
  * Using 'unload' currently blocks OTEL implementing site from bfcache.
  */
-export type ShutdownEvent = 'unload' | 'onhide' | 'pagehide' | 'beforeunload';
+export type ShutdownEvent = 'unload' | 'onhide' | 'pagehide' | 'beforeunload' | 'visibilitychange';
 
 /**
  * Collector Exporter base config
