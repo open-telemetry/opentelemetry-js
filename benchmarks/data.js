@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706673539026,
+  "lastUpdate": 1706727708126,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4020,6 +4020,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "47067795+JacksonWeber@users.noreply.github.com",
+            "name": "Jackson Weber",
+            "username": "JacksonWeber"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "efa630731923f3ded59aa34ec5b0f5da2fadbde2",
+          "message": "fix(sdk-node): Allow Defining Sampler with Exporter in Env (#4394)\n\n* fix(sdk-node): Allow tracerProvider to be created when exporter is defined in the env.\r\n\r\n* fix(node-sdk): Update to not accept when exporter is set to none.\r\n\r\n* fix(sdk-node): Update Changelog.\r\n\r\n* fix(sdk-node): Fix Changelog.\r\n\r\n* fix(sdk-node): cleanup changelog.\r\n\r\n* fix(sdk-node): lint fix\r\n\r\n* fix(sdk-node): Fix logic for creating tracerProviders.\r\n\r\n* Fix lint.\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* Fix manual sampler and environment exporter case.\r\n\r\n* Update logic to check for a defined traceExporter on the config before using the NodeTracerProvider.\r\n\r\n* Fix equality check.\r\n\r\n* Update env exporter configuration logic and add tests.\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* Fix changelog issues.\r\n\r\n* Clean up tracerProvider logic.\r\n\r\n* Update sdk.ts\r\n\r\n* Update sdk.ts\r\n\r\n* Update experimental/packages/opentelemetry-sdk-node/test/sdk.test.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* Update experimental/packages/opentelemetry-sdk-node/test/sdk.test.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* Update experimental/packages/opentelemetry-sdk-node/test/sdk.test.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-01-31T09:11:45-05:00",
+          "tree_id": "2485208d1b41ae8e4fb61f8c44b45e126b7314b4",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/efa630731923f3ded59aa34ec5b0f5da2fadbde2"
+        },
+        "date": 1706727707298,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1007305,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12402,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 668725,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 636000,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
