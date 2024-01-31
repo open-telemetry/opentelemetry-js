@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706525802828,
+  "lastUpdate": 1706669573580,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -3916,6 +3916,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c98a5d31ea8584fb879cb18cc002a8c556e2456a",
+          "message": "chore: remove checked in auto-generated version.js files (#4448)",
+          "timestamp": "2024-01-31T10:50:54+08:00",
+          "tree_id": "316e608c2c1fc5d96811ec0a7a5343688f1c1152",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c98a5d31ea8584fb879cb18cc002a8c556e2456a"
+        },
+        "date": 1706669572735,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 975339,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12205,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 673034,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 647311,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
