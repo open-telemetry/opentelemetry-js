@@ -59,7 +59,7 @@ const {
   getNodeAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-node");
 
-const prometheusExporter = new PrometheusExporter({ startServer: true });
+const prometheusExporter = new PrometheusExporter();
 
 const sdk = new opentelemetry.NodeSDK({
   // Optional - If omitted, the metrics SDK will not be initialized
@@ -147,7 +147,7 @@ const {
   getNodeAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-node");
 
-const prometheusExporter = new PrometheusExporter({ startServer: true });
+const prometheusExporter = new PrometheusExporter();
 
 const sdk = new opentelemetry.NodeSDK({
   // Optional - If omitted, the metrics SDK will not be initialized
@@ -499,8 +499,8 @@ to use the Prometheus exporter `PrometheusExporter` which is included in the
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const { MeterProvider }  = require('@opentelemetry/sdk-metrics');
 
-// Add your port and startServer to the Prometheus options
-const options = { port: 9464, startServer: true };
+// Add your port to the Prometheus options
+const options = { port: 9464 };
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader

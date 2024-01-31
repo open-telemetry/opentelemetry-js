@@ -503,7 +503,7 @@ describe('fetch', () => {
       assert.ok(r.headers.get('foo') === 'bar');
     });
 
-    it('should keep custom headers with url, untyped request object and typed headers object', () => {
+    it('should keep custom headers with url, untyped request object and typed (Headers) headers object', () => {
       const url = 'url';
       const init = {
         headers: new Headers({ foo: 'bar' }),
@@ -519,6 +519,17 @@ describe('fetch', () => {
       };
       window.fetch(url, init).catch(() => {});
       assert.ok(init.headers['foo'] === 'bar');
+    });
+
+    it('should keep custom headers with url, untyped request object and typed (Map) headers object', () => {
+      const url = 'url';
+      const init = {
+        headers: new Map().set('foo', 'bar'),
+      };
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore variable init not of RequestInit type
+      window.fetch(url, init).catch(() => {});
+      assert.ok(init.headers.get('foo') === 'bar');
     });
 
     it('should pass request object as first parameter to the original function (#2411)', () => {
