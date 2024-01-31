@@ -20,10 +20,10 @@
       "default": "./build/src/index.js"
     },
     "./experimental": {
-      "module": "./build/esm/experimental.js",
-      "esnext": "./build/esnext/experimental.js",
-      "types": "./build/src/experimental.d.ts",
-      "default": "./build/src/experimental.js"
+      "module": "./build/esm/experimental/index.js",
+      "esnext": "./build/esnext/experimental/index.js",
+      "types": "./build/src/experimental/index.d.ts",
+      "default": "./build/src/experimental/index.js"
     }
   },
   "repository": "open-telemetry/opentelemetry-js",
