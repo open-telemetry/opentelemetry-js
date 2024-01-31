@@ -92,6 +92,7 @@ export class NodeSDK {
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
+  private _configuration?: Partial<NodeSDKConfiguration>;
 
   private _disabled?: boolean;
 
@@ -116,6 +117,8 @@ export class NodeSDK {
       });
     }
 
+    this._configuration = configuration;
+
     this._resource = configuration.resource ?? new Resource({});
     this._resourceDetectors = configuration.resourceDetectors ?? [
       envDetector,
@@ -126,7 +129,8 @@ export class NodeSDK {
 
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
-    if (configuration.spanProcessor || configuration.traceExporter) {
+    // If a tracer provider can be created from manual configuration, create it
+    if (configuration.traceExporter || configuration.spanProcessor) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
       if (configuration.sampler) {
@@ -316,12 +320,14 @@ export class NodeSDK {
             })
           );
 
+    // if there is a tracerProviderConfig (traceExporter/spanProcessor was set manually) or the traceExporter is set manually, use NodeTracerProvider
     const Provider = this._tracerProviderConfig
       ? NodeTracerProvider
       : TracerProviderWithEnvExporters;
 
+    // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations and set them here
     const tracerProvider = new Provider({
-      ...this._tracerProviderConfig?.tracerConfig,
+      ...this._configuration,
       resource: this._resource,
     });
 
