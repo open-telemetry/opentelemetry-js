@@ -8,6 +8,7 @@ const common = {
   mode: 'development',
   entry: {
     metrics: 'examples/metrics/index.js',
+    'metrics-proto': 'examples/metrics-proto/index.js',
     fetch: 'examples/fetch/index.js',
     'xml-http-request': 'examples/xml-http-request/index.js',
     fetchXhr: 'examples/fetchXhr/index.js',

@@ -7,12 +7,18 @@ receivers:
           allowed_origins:
             - http://*
             - https://*
+          allowed_headers: ["*"]
 
 exporters:
   zipkin:
     endpoint: "http://zipkin-all-in-one:9411/api/v2/spans"
   prometheus:
     endpoint: "0.0.0.0:9464"
+  debug:
+    verbosity: detailed
+    sampling_initial: 1
+    sampling_thereafter: 1
+
 
 processors:
   batch:
@@ -28,5 +34,5 @@ service:
       processors: [batch]
     metrics:
       receivers: [otlp]
-      exporters: [prometheus]
+      exporters: [prometheus, debug]
       processors: [batch]
