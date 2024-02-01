@@ -54,12 +54,6 @@ export class SyncInstrument {
       );
       return;
     }
-    if (Number.isNaN(value)) {
-      diag.warn(
-        `NaN provided to metric ${this._descriptor.name}, ignoring to preserve the integrity of the metrics stream`
-      );
-      return;
-    }
     if (
       this._descriptor.valueType === ValueType.INT &&
       !Number.isInteger(value)
