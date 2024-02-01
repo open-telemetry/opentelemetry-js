@@ -18,6 +18,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* refactor(instrumentation-grpc): clean up remnants of 'grpc' package instrumentation [#4420](https://github.com/open-telemetry/opentelemetry-js/pull/4420) @pichlermarc
+
 ## 0.48.0
 
 ### :boom: Breaking Change
