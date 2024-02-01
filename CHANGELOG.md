@@ -13,7 +13,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-metrics): ignore `NaN` value recordings [#4455](https://github.com/open-telemetry/opentelemetry-js/pull/4455) @pichlermarc
+* fix(sdk-metrics): ignore `NaN` value recordings in Histograms [#4455](https://github.com/open-telemetry/opentelemetry-js/pull/4455) @pichlermarc
   * fixes a bug where recording `NaN` on a histogram would result in the sum of bucket count values not matching the overall count
 
 ### :books: (Refine Doc)
