@@ -14,73 +14,100 @@
  * limitations under the License.
  */
 
-import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import {
-  ServiceClientType,
-  OTLPProtoExporterNodeBase,
-} from '@opentelemetry/otlp-proto-exporter-base';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
-import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
-import {
-  OTLPExporterNodeConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
-} from '@opentelemetry/otlp-exporter-base';
-import {
-  createExportMetricsServiceRequest,
-  IExportMetricsServiceRequest,
-} from '@opentelemetry/otlp-transformer';
-import { VERSION } from '../version';
-
-const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
-
-class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
+  PushMetricExporter,
+  AggregationTemporality,
   ResourceMetrics,
-  IExportMetricsServiceRequest
-> {
-  constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config);
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      ),
-      ...config?.headers,
-    };
+  AggregationTemporalitySelector,
+  InstrumentType,
+} from '@opentelemetry/sdk-metrics';
+import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
+import {
+  DeltaTemporalitySelector,
+  CumulativeTemporalitySelector,
+  LowMemoryTemporalitySelector,
+} from '@opentelemetry/otlp-metrics-exporter-base';
+import { ExportResult } from '@opentelemetry/core';
+
+import { LegacyConfig, createMetricsExporter } from '../platform';
+
+/**
+ * Legacy OTLPMetricExporter.
+ *  - This method of constructing an exporter will continue to be supported in 1.0 of this
+ * package, but no new features will be added.
+ *  - This method of constructing the exporter will be dropped with 2.0.
+ *
+ * Please use {@link createMetricsExporter} instead.
+ */
+export class OTLPMetricExporter implements PushMetricExporter {
+  private _exporter: PushMetricExporter;
+
+  constructor(config?: LegacyConfig) {
+    let selector: AggregationTemporalitySelector | undefined;
+    if (
+      config?.temporalityPreference ===
+        AggregationTemporalityPreference.DELTA ||
+      config?.temporalityPreference === AggregationTemporality.DELTA
+    ) {
+      selector = DeltaTemporalitySelector;
+    } else if (
+      config?.temporalityPreference ===
+        AggregationTemporalityPreference.CUMULATIVE ||
+      config?.temporalityPreference === AggregationTemporality.CUMULATIVE
+    ) {
+      selector = CumulativeTemporalitySelector;
+    } else if (
+      config?.temporalityPreference ===
+      AggregationTemporalityPreference.LOWMEMORY
+    ) {
+      selector = LowMemoryTemporalitySelector;
+    }
+
+    // populate keepAlive for use with new settings
+    if (config?.keepAlive != null) {
+      if (config.httpAgentOptions != null) {
+        if (config.httpAgentOptions.keepAlive == null) {
+          // specific setting is not set, populate with non-specific setting.
+          config.httpAgentOptions.keepAlive = config.keepAlive;
+        }
+        // do nothing, use specific setting otherwise
+      } else {
+        // populate specific option if AgentOptions does not exist.
+        config.httpAgentOptions = {
+          keepAlive: config.keepAlive,
+        };
+      }
+    }
+
+    this._exporter = createMetricsExporter({
+      url: config?.url,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore headers will be the correct format
+      headers: config?.headers,
+      compression: config?.compression,
+      concurrencyLimit: config?.concurrencyLimit,
+      timeoutMillis: config?.timeoutMillis,
+      temporalitySelector: selector,
+      agentOptions: config?.httpAgentOptions,
+    });
   }
 
-  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return createExportMetricsServiceRequest(metrics);
+  selectAggregationTemporality(
+    instrumentType: InstrumentType
+  ): AggregationTemporality {
+    return this._exporter.selectAggregationTemporality!(instrumentType);
   }
 
-  getDefaultUrl(config: OTLPExporterNodeConfigBase) {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(
-          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-        )
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
+  export(
+    metrics: ResourceMetrics,
+    resultCallback: (result: ExportResult) => void
+  ): void {
+    this._exporter.export(metrics, resultCallback);
   }
-
-  getServiceClientType() {
-    return ServiceClientType.METRICS;
+  forceFlush(): Promise<void> {
+    return this._exporter.forceFlush();
   }
-}
-
-export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterNodeProxy> {
-  constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(new OTLPMetricExporterNodeProxy(config), config);
+  shutdown(): Promise<void> {
+    return this._exporter.shutdown();
   }
 }

@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-// Legacy exporter kept for compatibility, scheduled for removal in 2.0
-export { OTLPMetricExporter } from './legacy/OTLPMetricExporter';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
+import { ITransformer } from '@opentelemetry/otlp-exporter-base';
+import {
+  createExportMetricsServiceRequest,
+  IExportMetricsServiceRequest,
+} from '@opentelemetry/otlp-transformer';
 
-export {
-  // New exporter factory function and config.
-  createMetricsExporter,
-  OtlpHttpProtoMetricsConfiguration,
-  // Scheduled for removal in 2.0
-  LegacyConfig,
-} from './platform';
+export function createProtobufMetricsTransformer(): ITransformer<
+  ResourceMetrics,
+  IExportMetricsServiceRequest
+> {
+  return {
+    transform: (metrics: ResourceMetrics) => {
+      return createExportMetricsServiceRequest([metrics]);
+    },
+  };
+}

@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-// Legacy exporter kept for compatibility, scheduled for removal in 2.0
-export { OTLPMetricExporter } from './legacy/OTLPMetricExporter';
+import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 
-export {
-  // New exporter factory function and config.
-  createMetricsExporter,
-  OtlpHttpProtoMetricsConfiguration,
-  // Scheduled for removal in 2.0
-  LegacyConfig,
-} from './platform';
+export type LegacyConfig = OTLPExporterNodeConfigBase &
+  OTLPMetricExporterOptions;
