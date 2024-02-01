@@ -158,6 +158,13 @@ describe('ExplicitBucketHistogramAggregation', () => {
     }
   });
 
+  it('construct with empty boundaries', function () {
+    const boundaries: number[] = [];
+    const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
+    assert.ok(aggregation instanceof ExplicitBucketHistogramAggregation);
+    assert.deepStrictEqual(aggregation['_boundaries'], []);
+  });
+
   it('constructor should not modify inputs', () => {
     const boundaries = [100, 10, 1];
     const aggregation = new ExplicitBucketHistogramAggregation(boundaries);

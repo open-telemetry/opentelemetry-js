@@ -81,6 +81,27 @@ describe('HistogramAggregator', () => {
         sum: -65,
       });
     });
+
+    it('with single bucket', function () {
+      const aggregator = new HistogramAggregator([0], true);
+      const prev = aggregator.createAccumulation([0, 0]);
+      prev.record(0);
+      prev.record(1);
+
+      const delta = aggregator.createAccumulation([1, 1]);
+      delta.record(2);
+      delta.record(11);
+
+      const expected = aggregator.createAccumulation([0, 0]);
+      // replay actions on prev
+      expected.record(0);
+      expected.record(1);
+      // replay actions on delta
+      expected.record(2);
+      expected.record(11);
+
+      assert.deepStrictEqual(aggregator.merge(prev, delta), expected);
+    });
   });
 
   describe('diff', () => {
@@ -102,6 +123,35 @@ describe('HistogramAggregator', () => {
         buckets: {
           boundaries: [1, 10, 100],
           counts: [0, 1, 1, 0],
+        },
+        count: 2,
+        sum: 13,
+        hasMinMax: false,
+        min: Infinity,
+        max: -Infinity,
+      });
+
+      assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
+    });
+
+    it('with single bucket', function () {
+      const aggregator = new HistogramAggregator([], true);
+      const prev = aggregator.createAccumulation([0, 0]);
+      prev.record(0);
+      prev.record(1);
+
+      const curr = aggregator.createAccumulation([1, 1]);
+      // replay actions on prev
+      curr.record(0);
+      curr.record(1);
+      // perform new actions
+      curr.record(2);
+      curr.record(11);
+
+      const expected = new HistogramAccumulation([1, 1], [], true, {
+        buckets: {
+          boundaries: [],
+          counts: [2],
         },
         count: 2,
         sum: 13,
@@ -179,6 +229,48 @@ describe('HistogramAggregator', () => {
               buckets: {
                 boundaries: [1, 10, 100],
                 counts: [1, 1, 0, 0],
+              },
+              count: 2,
+              sum: 1,
+              min: undefined,
+              max: undefined,
+            },
+          },
+        ],
+      };
+      assert.deepStrictEqual(
+        aggregator.toMetricData(
+          defaultInstrumentDescriptor,
+          AggregationTemporality.CUMULATIVE,
+          [[{}, accumulation]],
+          endTime
+        ),
+        expected
+      );
+    });
+
+    it('should transform to expected data with empty boundaries', () => {
+      const aggregator = new HistogramAggregator([], false);
+
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
+      const accumulation = aggregator.createAccumulation(startTime);
+      accumulation.record(0);
+      accumulation.record(1);
+
+      const expected: MetricData = {
+        descriptor: defaultInstrumentDescriptor,
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            startTime,
+            endTime,
+            value: {
+              buckets: {
+                boundaries: [],
+                counts: [2],
               },
               count: 2,
               sum: 1,
