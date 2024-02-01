@@ -9,9 +9,9 @@
     "start-nc": "webpack serve --progress --color --port 8090 --config webpack.dev.config.js --hot --host 0.0.0.0 --no-compress",
     "start-prod": "webpack serve --progress --color --port 8090 --config webpack.prod.config.js --hot --host 0.0.0.0 --compress",
     "start-prodnc": "webpack serve --progress --color --port 8090 --config webpack.prod.config.js --hot --host 0.0.0.0 --no-compress",
-    "docker:start": "cd ./docker && docker-compose down && docker-compose up",
-    "docker:startd": "cd ./docker && docker-compose down && docker-compose up -d",
-    "docker:stop": "cd ./docker && docker-compose down"
+    "docker:start": "cd ./docker && docker compose down && docker compose up",
+    "docker:startd": "cd ./docker && docker compose down && docker compose up -d",
+    "docker:stop": "cd ./docker && docker compose down"
   },
   "repository": {
     "type": "git",
@@ -47,6 +47,7 @@
     "@opentelemetry/context-zone": "1.21.0",
     "@opentelemetry/core": "1.21.0",
     "@opentelemetry/exporter-metrics-otlp-http": "0.48.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "0.48.0",
     "@opentelemetry/exporter-trace-otlp-http": "0.48.0",
     "@opentelemetry/exporter-trace-otlp-proto": "0.48.0",
     "@opentelemetry/exporter-zipkin": "1.21.0",

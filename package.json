@@ -90,7 +90,8 @@
     "typedoc": "0.22.18",
     "typedoc-plugin-missing-exports": "1.0.0",
     "typedoc-plugin-resolve-crossmodule-references": "0.2.2",
-    "typescript": "4.4.4"
+    "typescript": "4.4.4",
+    "nise": "5.1.5"
   },
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",

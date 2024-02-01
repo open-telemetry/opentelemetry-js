@@ -8,10 +8,10 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+    "./src/legacy/platform/index.ts": "./src/legacy/platform/browser/index.ts",
+    "./build/esm/legacy/platform/index.js": "./build/esm/legacy/platform/browser/index.js",
+    "./build/esnext/legacy/platform/index.js": "./build/esnext/legacy/platform/browser/index.js",
+    "./build/src/legacy/platform/index.js": "./build/src/legacy/platform/browser/index.js"
   },
   "scripts": {
     "prepublishOnly": "npm run compile",
