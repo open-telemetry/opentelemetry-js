@@ -16,3 +16,21 @@
 
 // Legacy exports scheduled for removal.
 export * from './legacy';
+
+// Re-implemented shared exporter code, signal- and platform-agnostic
+export {
+  IExportPromiseQueue,
+  createExportPromiseQueue,
+} from './common/export-promise-queue';
+
+export { ExportResponse } from './common/export-response';
+export { IExporterTransport } from './common/exporter-transport';
+export {
+  IOLTPExportDelegate,
+  createOtlpExportDelegate,
+} from './common/otlp-export-delegate';
+export { IOTLPResponseHandler } from './common/response-handler';
+export { createRetryingTransport } from './common/retrying-transport';
+export { ISerializer } from './common/serializer';
+export { ITransformer } from './common/transformer';
+export { IConfigurationProvider } from './common/configuration/provider';
