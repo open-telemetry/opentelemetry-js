@@ -135,6 +135,7 @@ describe('Instruments', () => {
       counter.add(1.2, { foo: 'bar' });
       // non-number values should be ignored.
       counter.add('1' as any);
+      counter.add(NaN);
 
       await validateExport(cumulativeReader, {
         dataPointType: DataPointType.SUM,
@@ -247,6 +248,8 @@ describe('Instruments', () => {
       upDownCounter.add(1.1, { foo: 'bar' });
       // non-number values should be ignored.
       upDownCounter.add('1' as any);
+      upDownCounter.add(NaN);
+
       await validateExport(deltaReader, {
         dataPointType: DataPointType.SUM,
         isMonotonic: false,
@@ -506,6 +509,7 @@ describe('Instruments', () => {
       histogram.record(0.1, { foo: 'bar' });
       // non-number values should be ignored.
       histogram.record('1' as any);
+      histogram.record(NaN);
 
       await validateExport(deltaReader, {
         dataPointType: DataPointType.HISTOGRAM,
