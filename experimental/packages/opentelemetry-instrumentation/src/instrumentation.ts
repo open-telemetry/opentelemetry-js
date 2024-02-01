@@ -134,7 +134,10 @@ export abstract class InstrumentationAbstract<T = any>
 
   /**
    * Init method in which plugin should define _modules and patches for
-   * methods
+   * methods.
+   * Use `enable()` if you are trying to turn on this plugin. This method
+   * will return objects to patch specific modules with the appropriate
+   * instrumentation (or not return anything).
    */
   abstract init():
     | InstrumentationModuleDefinition<T>
