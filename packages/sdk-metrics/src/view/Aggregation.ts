@@ -130,7 +130,7 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
     private readonly _recordMinMax = true
   ) {
     super();
-    if (boundaries === undefined) {
+    if (boundaries == null) {
       throw new Error(
         'ExplicitBucketHistogramAggregation should be created with explicit boundaries, if a single bucket histogram is required, please pass an empty array'
       );
