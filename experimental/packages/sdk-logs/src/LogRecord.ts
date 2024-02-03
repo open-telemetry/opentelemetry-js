@@ -39,6 +39,7 @@ export class LogRecord implements ReadableLogRecord {
   private _severityText?: string;
   private _severityNumber?: logsAPI.SeverityNumber;
   private _body?: string;
+  private totalAttributesCount: number = 0;
 
   private _isReadonly: boolean = false;
   private readonly _logRecordLimits: Required<LogRecordLimits>;
@@ -71,6 +72,10 @@ export class LogRecord implements ReadableLogRecord {
   }
   get body(): string | undefined {
     return this._body;
+  }
+
+  get droppedAttributesCount(): number {
+    return this.totalAttributesCount - Object.keys(this.attributes).length;
   }
 
   constructor(
@@ -129,6 +134,7 @@ export class LogRecord implements ReadableLogRecord {
       api.diag.warn(`Invalid attribute value set for key: ${key}`);
       return this;
     }
+    this.totalAttributesCount += 1;
     if (
       Object.keys(this.attributes).length >=
         this._logRecordLimits.attributeCountLimit &&

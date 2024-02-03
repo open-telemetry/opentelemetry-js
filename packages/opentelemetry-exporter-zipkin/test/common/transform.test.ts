@@ -236,6 +236,40 @@ describe('transform', () => {
         version: '1',
       });
     });
+    it('should map OpenTelemetry constructor attributes to a Zipkin tag', () => {
+      const span = new Span(
+        tracer,
+        api.ROOT_CONTEXT,
+        'my-span',
+        spanContext,
+        api.SpanKind.SERVER,
+        parentId,
+        [],
+        undefined,
+        undefined,
+        {
+          key1: 'value1',
+          key2: 'value2',
+        }
+      );
+      const tags: zipkinTypes.Tags = _toZipkinTags(
+        span,
+        defaultStatusCodeTagName,
+        defaultStatusErrorTagName
+      );
+
+      assert.deepStrictEqual(tags, {
+        key1: 'value1',
+        key2: 'value2',
+        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        'telemetry.sdk.language': language,
+        'telemetry.sdk.name': 'opentelemetry',
+        'telemetry.sdk.version': VERSION,
+        cost: '112.12',
+        service: 'ui',
+        version: '1',
+      });
+    });
     it('should map OpenTelemetry SpanStatus.code to a Zipkin tag', () => {
       const span = new Span(
         tracer,

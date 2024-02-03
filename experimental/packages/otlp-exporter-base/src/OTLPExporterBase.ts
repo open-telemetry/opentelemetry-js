@@ -57,7 +57,7 @@ export abstract class OTLPExporterBase<
     this._concurrencyLimit =
       typeof config.concurrencyLimit === 'number'
         ? config.concurrencyLimit
-        : Infinity;
+        : 30;
 
     this.timeoutMillis = configureExporterTimeout(config.timeoutMillis);
 

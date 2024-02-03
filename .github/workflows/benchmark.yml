@@ -17,10 +17,13 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest

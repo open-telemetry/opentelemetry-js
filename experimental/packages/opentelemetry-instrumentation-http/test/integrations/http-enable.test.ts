@@ -269,6 +269,20 @@ describe('HttpInstrumentation Integration tests', () => {
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
+    it('should not mutate given headers object when adding propagation headers', async () => {
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const headers = { 'x-foo': 'foo' };
+      const result = await httpRequest.get(
+        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        { headers }
+      );
+      assert.deepStrictEqual(headers, { 'x-foo': 'foo' });
+      assert.ok(result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
+      assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
+    });
+
     it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);

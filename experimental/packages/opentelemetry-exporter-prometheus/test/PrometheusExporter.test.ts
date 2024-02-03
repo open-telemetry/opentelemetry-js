@@ -53,46 +53,37 @@ describe('PrometheusExporter', () => {
   });
 
   describe('constructor', () => {
-    it('should construct an exporter', done => {
+    it('should construct an exporter', async () => {
       const exporter = new PrometheusExporter();
       assert.ok(typeof exporter.startServer === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
-      exporter.shutdown().then(done);
+      await exporter.shutdown();
     });
 
-    it('should start the server by default and call the callback', done => {
+    it('should start the server by default and call the callback', async () => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
-      const exporter = new PrometheusExporter({}, () => {
-        const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, (res: any) => {
-          assert.strictEqual(res.statusCode, 200);
-          exporter.shutdown().then(() => {
-            return done();
-          });
-        });
-      });
+      const exporter = new PrometheusExporter();
+      await exporter.startServer();
+      const url = `http://localhost:${port}${endpoint}`;
+      await request(url);
+      await exporter.shutdown();
     });
 
-    it('should pass server error to callback when port is already in use', done => {
-      const firstExporter = new PrometheusExporter({}, error => {
-        if (error) {
-          // This should not happen as the port should not be already in use when the test starts.
-          done(error);
-        }
-      });
-      const secondExporter = new PrometheusExporter({}, error => {
-        firstExporter
-          .shutdown()
-          .then(() => secondExporter.shutdown())
-          .then(() =>
-            done(
-              error
-                ? undefined
-                : 'Second exporter should respond with EADDRINUSE but did not pass it to callback'
-            )
-          );
-      });
+    it('should pass server error to callback when port is already in use', async () => {
+      const firstExporter = new PrometheusExporter();
+      await firstExporter.startServer();
+
+      const secondExporter = new PrometheusExporter();
+      await assert.rejects(
+        secondExporter.startServer(),
+        { code: 'EADDRINUSE' },
+        'Second exporter should respond with EADDRINUSE but did not pass it to callback'
+      );
+
+      await Promise.all(
+        [firstExporter, secondExporter].map(it => it.shutdown())
+      );
     });
 
     it('should not start the server if preventServerStart is passed as an option', () => {
@@ -102,51 +93,35 @@ describe('PrometheusExporter', () => {
   });
 
   describe('server', () => {
-    it('should start on startServer() and call the callback', done => {
+    it('should start on startServer() and call the callback', async () => {
       const exporter = new PrometheusExporter({
         port: 9722,
         preventServerStart: true,
       });
-      exporter.startServer().then(() => {
-        exporter.shutdown().then(() => {
-          return done();
-        });
-      });
+      await exporter.startServer();
+      await exporter.shutdown();
     });
 
-    it('should listen on the default port and default endpoint', done => {
+    it('should listen on the default port and default endpoint', async () => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
-      const exporter = new PrometheusExporter({}, () => {
-        const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, (res: any) => {
-          assert.strictEqual(res.statusCode, 200);
-          exporter.shutdown().then(() => {
-            return done();
-          });
-        });
-      });
+      const exporter = new PrometheusExporter();
+      const url = `http://localhost:${port}${endpoint}`;
+      await request(url);
+      await exporter.shutdown();
     });
 
-    it('should listen on a custom port and endpoint if provided', done => {
+    it('should listen on a custom port and endpoint if provided', async () => {
       const port = 9991;
       const endpoint = '/metric';
 
-      const exporter = new PrometheusExporter(
-        {
-          port,
-          endpoint,
-        },
-        () => {
-          const url = `http://localhost:${port}${endpoint}`;
-          http.get(url, (res: any) => {
-            assert.strictEqual(res.statusCode, 200);
-            exporter.shutdown().then(() => {
-              return done();
-            });
-          });
-        }
-      );
+      const exporter = new PrometheusExporter({
+        port,
+        endpoint,
+      });
+      const url = `http://localhost:${port}${endpoint}`;
+      await request(url);
+      await exporter.shutdown();
     });
 
     it('should unref the server to allow graceful termination', () => {
@@ -169,67 +144,36 @@ describe('PrometheusExporter', () => {
       assert.strictEqual(exporter['_port'], 1234);
     });
 
-    it('should not require endpoints to start with a slash', done => {
+    it('should not require endpoints to start with a slash', async () => {
       const port = 9991;
       const endpoint = 'metric';
+      const url = `http://localhost:${port}/metric`;
 
-      const exporter = new PrometheusExporter(
-        {
-          port,
-          endpoint,
-        },
-        () => {
-          const url = `http://localhost:${port}/metric`;
-          http.get(url, (res: any) => {
-            assert.strictEqual(res.statusCode, 200);
-            exporter.shutdown().then(() => {
-              const exporter2 = new PrometheusExporter(
-                {
-                  port,
-                  endpoint: `/${endpoint}`,
-                },
-                () => {
-                  const url = `http://localhost:${port}/metric`;
-                  http.get(url, (res: any) => {
-                    assert.strictEqual(res.statusCode, 200);
-                    exporter2.stopServer().then(() => {
-                      return done();
-                    });
-                  });
-                }
-              );
-            });
-          });
-        }
-      );
+      const exporter = new PrometheusExporter({
+        port,
+        endpoint,
+      });
+      await exporter.startServer();
+      await request(url);
+      await exporter.stopServer();
     });
 
-    it('should return a HTTP status 404 if the endpoint does not match', done => {
+    it('should return a HTTP status 404 if the endpoint does not match', async () => {
       const port = 9912;
       const endpoint = '/metrics';
-      const exporter = new PrometheusExporter(
-        {
-          port,
-          endpoint,
-        },
-        () => {
-          const url = `http://localhost:${port}/invalid`;
+      const exporter = new PrometheusExporter({
+        port,
+        endpoint,
+      });
+      const url = `http://localhost:${port}/invalid`;
 
-          http.get(url, (res: any) => {
-            assert.strictEqual(res.statusCode, 404);
-            exporter.shutdown().then(() => {
-              return done();
-            });
-          });
-        }
-      );
+      await assert.rejects(request(url), { statusCode: 404 });
+      await exporter.shutdown();
     });
 
-    it('should call a provided callback on shutdown regardless of if the server is running', done => {
+    it('should call a provided callback on shutdown regardless of if the server is running', async () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
-      exporter.shutdown().then(() => {
-        return done();
-      });
+      await exporter.shutdown();
     });
 
     it('should able to call getMetricsRequestHandler function to generate response with metrics', async () => {
@@ -259,17 +203,17 @@ describe('PrometheusExporter', () => {
     let meterProvider: MeterProvider;
     let meter: Meter;
 
-    beforeEach(done => {
-      exporter = new PrometheusExporter({}, () => {
-        meterProvider = new MeterProvider();
-        meterProvider.addMetricReader(exporter);
-        meter = meterProvider.getMeter('test-prometheus', '1');
-        done();
+    beforeEach(async () => {
+      exporter = new PrometheusExporter();
+      meterProvider = new MeterProvider({
+        readers: [exporter],
       });
+      meter = meterProvider.getMeter('test-prometheus', '1');
+      await exporter.startServer();
     });
 
-    afterEach(done => {
-      exporter.shutdown().then(done);
+    afterEach(async () => {
+      await exporter.shutdown();
     });
 
     it('should export a count aggregation', async () => {
@@ -346,7 +290,7 @@ describe('PrometheusExporter', () => {
       ]);
     });
 
-    it('should export multiple attributes on manual shutdown', done => {
+    it('should export multiple attributes on manual shutdown', async () => {
       const counter = meter.createCounter('counter_total', {
         description: 'a test description',
       });
@@ -354,16 +298,10 @@ describe('PrometheusExporter', () => {
       counter.add(10, { counterKey1: 'attributeValue1' });
       counter.add(20, { counterKey1: 'attributeValue2' });
       counter.add(30, { counterKey1: 'attributeValue3' });
-      meterProvider.shutdown().then(() => {
-        // exporter has been shut down along with meter provider.
-        http
-          .get('http://localhost:9464/metrics', res => {
-            errorHandler(done)(new Error('unreachable'));
-          })
-          .on('error', err => {
-            assert(`${err}`.match('ECONNREFUSED'));
-            done();
-          });
+      await meterProvider.shutdown();
+      // exporter has been shut down along with meter provider.
+      await assert.rejects(request('http://localhost:9464/metrics'), {
+        code: 'ECONNREFUSED',
       });
     });
 
@@ -533,8 +471,9 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter;
 
     function setup(reader: PrometheusExporter) {
-      meterProvider = new MeterProvider();
-      meterProvider.addMetricReader(reader);
+      meterProvider = new MeterProvider({
+        readers: [exporter],
+      });
 
       meter = meterProvider.getMeter('test-prometheus');
       counter = meter.createCounter('counter');
@@ -545,123 +484,83 @@ describe('PrometheusExporter', () => {
       await exporter.shutdown();
     });
 
-    it('should use a configured name prefix', done => {
-      exporter = new PrometheusExporter(
-        {
-          prefix: 'test_prefix',
-        },
-        async () => {
-          setup(exporter);
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+    it('should use a configured name prefix', async () => {
+      exporter = new PrometheusExporter({
+        prefix: 'test_prefix',
+      });
+      setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  ...serializedDefaultResourceLines,
-                  '# HELP test_prefix_counter_total description missing',
-                  '# TYPE test_prefix_counter_total counter',
-                  'test_prefix_counter_total{key1="attributeValue1"} 10',
-                  '',
-                ]);
-
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        }
-      );
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP test_prefix_counter_total description missing',
+        '# TYPE test_prefix_counter_total counter',
+        'test_prefix_counter_total{key1="attributeValue1"} 10',
+        '',
+      ]);
     });
 
-    it('should use a configured port', done => {
-      exporter = new PrometheusExporter(
-        {
-          port: 8080,
-        },
-        async () => {
-          setup(exporter);
-          http
-            .get('http://localhost:8080/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+    it('should use a configured port', async () => {
+      exporter = new PrometheusExporter({
+        port: 8080,
+      });
 
-                assert.deepStrictEqual(lines, [
-                  ...serializedDefaultResourceLines,
-                  '# HELP counter_total description missing',
-                  '# TYPE counter_total counter',
-                  'counter_total{key1="attributeValue1"} 10',
-                  '',
-                ]);
+      setup(exporter);
+      const body = await request('http://localhost:8080/metrics');
+      const lines = body.split('\n');
 
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        }
-      );
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        'counter_total{key1="attributeValue1"} 10',
+        '',
+      ]);
     });
 
-    it('should use a configured endpoint', done => {
-      exporter = new PrometheusExporter(
-        {
-          endpoint: '/test',
-        },
-        async () => {
-          setup(exporter);
-          http
-            .get('http://localhost:9464/test', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+    it('should use a configured endpoint', async () => {
+      exporter = new PrometheusExporter({
+        endpoint: '/test',
+      });
 
-                assert.deepStrictEqual(lines, [
-                  ...serializedDefaultResourceLines,
-                  '# HELP counter_total description missing',
-                  '# TYPE counter_total counter',
-                  'counter_total{key1="attributeValue1"} 10',
-                  '',
-                ]);
+      setup(exporter);
+      const body = await request('http://localhost:9464/test');
+      const lines = body.split('\n');
 
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        }
-      );
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        'counter_total{key1="attributeValue1"} 10',
+        '',
+      ]);
     });
 
-    it('should export a metric with timestamp', done => {
-      exporter = new PrometheusExporter(
-        {
-          appendTimestamp: true,
-        },
-        async () => {
-          setup(exporter);
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+    it('should export a metric with timestamp', async () => {
+      exporter = new PrometheusExporter({
+        appendTimestamp: true,
+      });
+      setup(exporter);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  ...serializedDefaultResourceLines,
-                  '# HELP counter_total description missing',
-                  '# TYPE counter_total counter',
-                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-                  '',
-                ]);
-
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        }
-      );
+      assert.deepStrictEqual(lines, [
+        ...serializedDefaultResourceLines,
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
   });
 });
+
+class RequestStatusError extends Error {
+  constructor(public statusCode: number | undefined) {
+    super('request failed with non-200 code');
+  }
+}
 
 function request(url: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
@@ -675,7 +574,7 @@ function request(url: string): Promise<string> {
         });
         res.on('end', () => {
           if (res.statusCode !== 200) {
-            reject(new Error('request failed with non-200 code'));
+            reject(new RequestStatusError(res.statusCode));
             return;
           }
           resolve(result);
@@ -683,8 +582,4 @@ function request(url: string): Promise<string> {
       })
       .on('error', reject);
   });
-}
-
-function errorHandler(done: Mocha.Done): (err: Error) => void {
-  return err => done(err);
 }

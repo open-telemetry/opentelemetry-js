@@ -48,6 +48,7 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
+      ...config?.headers,
     };
   }
 

@@ -132,7 +132,12 @@ export class FetchInstrumentation extends InstrumentationBase<
       SemanticAttributes.HTTP_SCHEME,
       parsedUrl.protocol.replace(':', '')
     );
-    span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, navigator.userAgent);
+    if (typeof navigator !== 'undefined') {
+      span.setAttribute(
+        SemanticAttributes.HTTP_USER_AGENT,
+        navigator.userAgent
+      );
+    }
   }
 
   /**
@@ -160,6 +165,10 @@ export class FetchInstrumentation extends InstrumentationBase<
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else if (options.headers instanceof Headers) {
+      api.propagation.inject(api.context.active(), options.headers, {
+        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
+      });
+    } else if (options.headers instanceof Map) {
       api.propagation.inject(api.context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });

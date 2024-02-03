@@ -203,13 +203,14 @@ describe('LogRecord', () => {
         }
 
         it('should remove / drop all remaining values after the number of values exceeds this limit', () => {
-          const { attributes } = logRecord;
+          const { attributes, droppedAttributesCount } = logRecord;
           assert.strictEqual(Object.keys(attributes).length, 100);
           assert.strictEqual(attributes.foo0, 'bar0');
           assert.deepStrictEqual(attributes.foo98, { bar: 'bar98' });
           assert.strictEqual(attributes.foo147, undefined);
           assert.strictEqual(attributes.foo148, undefined);
           assert.strictEqual(attributes.foo149, undefined);
+          assert.strictEqual(droppedAttributesCount, 50);
         });
       });
 

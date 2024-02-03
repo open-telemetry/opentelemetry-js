@@ -92,10 +92,10 @@ export interface ILogRecord {
   flags?: number;
 
   /** LogRecord traceId */
-  traceId?: string;
+  traceId?: string | Uint8Array;
 
   /** LogRecord spanId */
-  spanId?: string;
+  spanId?: string | Uint8Array;
 }
 
 /**

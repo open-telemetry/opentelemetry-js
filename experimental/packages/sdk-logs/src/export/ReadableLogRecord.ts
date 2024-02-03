@@ -29,4 +29,5 @@ export interface ReadableLogRecord {
   readonly resource: IResource;
   readonly instrumentationScope: InstrumentationScope;
   readonly attributes: LogAttributes;
+  readonly droppedAttributesCount: number;
 }

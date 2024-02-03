@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hexToBase64 } from '@opentelemetry/core';
+import { hexToBinary } from '@opentelemetry/core';
 import { getOtlpEncoder } from '../src';
 import { toAnyValue } from '../src/common/internal';
 import * as assert from 'assert';
@@ -70,7 +70,7 @@ describe('common', () => {
   });
 
   describe('otlp encoder', () => {
-    it('defaults to long timestamps and base64 encoding given no options', () => {
+    it('defaults to long timestamps and binary encoding given no options', () => {
       const encoder = getOtlpEncoder();
       assert.deepStrictEqual(encoder.encodeHrTime([1697978649, 99870675]), {
         low: 3352011219,
@@ -78,11 +78,11 @@ describe('common', () => {
       });
       assert.deepStrictEqual(
         encoder.encodeSpanContext(traceId),
-        hexToBase64(traceId)
+        hexToBinary(traceId)
       );
       assert.deepStrictEqual(
         encoder.encodeOptionalSpanContext(spanId),
-        hexToBase64(spanId)
+        hexToBinary(spanId)
       );
       assert.deepStrictEqual(
         encoder.encodeOptionalSpanContext(undefined),
@@ -98,11 +98,11 @@ describe('common', () => {
       });
       assert.deepStrictEqual(
         encoder.encodeSpanContext(traceId),
-        hexToBase64(traceId)
+        hexToBinary(traceId)
       );
       assert.deepStrictEqual(
         encoder.encodeOptionalSpanContext(spanId),
-        hexToBase64(spanId)
+        hexToBinary(spanId)
       );
       assert.deepStrictEqual(
         encoder.encodeOptionalSpanContext(undefined),

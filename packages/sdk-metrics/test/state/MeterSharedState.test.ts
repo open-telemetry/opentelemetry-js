@@ -48,8 +48,8 @@ describe('MeterSharedState', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views,
+        readers: readers,
       });
-      readers?.forEach(reader => meterProvider.addMetricReader(reader));
 
       const meter = meterProvider.getMeter('test-meter');
 
@@ -185,19 +185,17 @@ describe('MeterSharedState', () => {
 
   describe('collect', () => {
     function setupInstruments(views?: View[]) {
+      const cumulativeReader = new TestMetricReader();
+      const deltaReader = new TestDeltaMetricReader();
+
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: views,
+        readers: [cumulativeReader, deltaReader],
       });
 
-      const cumulativeReader = new TestMetricReader();
-      meterProvider.addMetricReader(cumulativeReader);
       const cumulativeCollector = cumulativeReader.getMetricCollector();
-
-      const deltaReader = new TestDeltaMetricReader();
-      meterProvider.addMetricReader(deltaReader);
       const deltaCollector = deltaReader.getMetricCollector();
-
       const metricCollectors = [cumulativeCollector, deltaCollector];
 
       const meter = meterProvider.getMeter(
