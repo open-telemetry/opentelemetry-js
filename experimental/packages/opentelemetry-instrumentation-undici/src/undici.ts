@@ -31,7 +31,7 @@ import {
 
 import { VERSION } from './version';
 
-import { HeadersMessage, ListenerRecord, RequestHeadersMessage, RequestMessage, ResponseHeadersMessage } from './internal-types';
+import { ListenerRecord, RequestHeadersMessage, RequestMessage, ResponseHeadersMessage } from './internal-types';
 import { UndiciInstrumentationConfig, UndiciRequest } from './types';
 import { SemanticAttributes } from './enums/SemanticAttributes';
 
@@ -125,7 +125,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // Ignore if:
     // - instrumentation is disabled
     // - ignored by config
-    // - method is 'CONNECT' (TODO: check for limitations)
+    // - method is 'CONNECT'
     const config = this._getConfig();
     const shouldIgnoreReq = safeExecuteInTheMiddle(
       () => !config.enabled || request.method === 'CONNECT' || config.ignoreRequestHook?.(request),
@@ -179,11 +179,10 @@ export class UndiciInstrumentation extends InstrumentationBase {
       });
     }
 
-    // TODO: check parent if added in config and:
-    // - create a span if confgi false
-    // - create a noop span if parent not present and config true
-    // If a parent is required but not present, we use a `NoopSpan` to still
-    // propagate context without recording it.
+    // Check if parent span is required via config and:
+    // - ff a parent is required but not present, we use a `NoopSpan` to still
+    //   propagate context without recording it.
+    // - create a span otherwise
     const activeCtx = context.active();
     const currentSpan = trace.getSpan(activeCtx);
     let span: Span;
@@ -260,7 +259,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
   }
 
   // This is the 3rd message we get for each request and it's fired when the server
-  // headers are received, body may not be accessible yet (TODO: check this).
+  // headers are received, body may not be accessible yet.
   // From the response headers we can set the status and content length
   private onResponseHeaders({ request, response }: ResponseHeadersMessage): void {
     const span = this._spanFromReq.get(request);
@@ -309,7 +308,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
   }
 
 
-  // This is the last event we receive if the request went without any errors (TODO: check this)
+  // This is the last event we receive if the request went without any errors
   private onDone({ request }: any): void {
     const span = this._spanFromReq.get(request);
 
@@ -321,13 +320,12 @@ export class UndiciInstrumentation extends InstrumentationBase {
     this._spanFromReq.delete(request);
   }
 
-  // TODO: check this
-  // This messge is triggered if there is any error in the request
-  // TODO: in `undici@6.3.0` when request aborted the error type changes from
-  // a custom error (`RequestAbortedError`) to a built-in `DOMException` so
-  // - `code` is from DOMEXception (ABORT_ERR: 20)
-  // - `message` changes
-  // - stacktrace is smaller and contains node internal frames
+  // This is the event we get when something is wrong in the request like
+  // - invalid options
+  // - connectivity errors such as unreachable host
+  // - requests aborted through a signal
+  // NOTE: server errors are considered valid responses and it's the lib consumer
+  // whi should deal with that.
   private onError({ request, error }: any): void {
     const span = this._spanFromReq.get(request);
 
@@ -335,6 +333,12 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return;
     }
 
+    // NOTE: in `undici@6.3.0` when request aborted the error type changes from
+    // a custom error (`RequestAbortedError`) to a built-in `DOMException` carrying
+    // some differences:
+    // - `code` is from DOMEXception (ABORT_ERR: 20)
+    // - `message` changes
+    // - stacktrace is smaller and contains node internal frames
     span.recordException(error);
     span.setStatus({
       code: SpanStatusCode.ERROR,

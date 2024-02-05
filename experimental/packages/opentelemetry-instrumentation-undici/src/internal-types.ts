@@ -15,7 +15,7 @@
  */
 import type { Channel } from 'diagnostics_channel';
 
-import { UndiciRequest, UnidiciResponse }from './types';
+import { UndiciRequest, UnidiciResponse } from './types';
 
 export interface ListenerRecord {
   name: string;

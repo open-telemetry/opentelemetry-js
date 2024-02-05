@@ -76,7 +76,7 @@ export const assertSpan = (
   assert.strictEqual(
     span.attributes[SemanticAttributes.HTTP_RESPONSE_STATUS_CODE],
     validations.httpStatusCode,
-    `attributes['${SemanticAttributes.HTTP_RESPONSE_STATUS_CODE}'] is correct`,
+    `attributes['${SemanticAttributes.HTTP_RESPONSE_STATUS_CODE}'] is correct ${span.attributes[SemanticAttributes.HTTP_RESPONSE_STATUS_CODE]}`,
   );
 
   assert.strictEqual(span.links.length, 0, 'there are no links');

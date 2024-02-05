@@ -272,7 +272,6 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       );
     });
 
-    // TODO: another test with a parent span. Check HTTP tests
     it('should not create spans without parent if required in configuration', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
@@ -365,6 +364,43 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         forceStatus: {
           code: SpanStatusCode.ERROR,
           message: 'getaddrinfo ENOTFOUND unexistent-host-name'
+        }
+      });
+    });
+
+    it('should capture error if fetch request is aborted', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      let fetchError;
+      const controller = new AbortController();
+      const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
+      const fetchPromise = fetch(fetchUrl, { signal: controller.signal });
+      controller.abort();
+      try {
+        await fetchPromise;
+      } catch (err) {
+        // Expected error
+        fetchError = err;
+      }
+
+      // Let the error be published to diagnostics channel
+      await new Promise((r) => setTimeout(r,5));
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      assert.ok(span, 'a span is present');
+      assert.strictEqual(spans.length, 1);
+      assertSpan(span, {
+        hostname: 'localhost',
+        httpMethod: 'GET',
+        path: '/',
+        query:'?query=test',
+        error: fetchError,
+        noNetPeer: true, // do not check network attribs
+        forceStatus: {
+          code: SpanStatusCode.ERROR,
+          message: 'The operation was aborted.'
         }
       });
     });

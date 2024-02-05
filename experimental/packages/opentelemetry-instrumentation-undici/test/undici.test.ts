@@ -365,5 +365,42 @@ describe('UndiciInstrumentation `undici` tests', function () {
         }
       });
     });
+
+    it('should capture error if fetch request is aborted', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      let requestError;
+      const controller = new AbortController();
+      const requestUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
+      const requestPromise = request(requestUrl, { signal: controller.signal });
+      controller.abort();
+      try {
+        await requestPromise;
+      } catch (err) {
+        // Expected error
+        requestError = err;
+      }
+
+      // Let the error be published to diagnostics channel
+      await new Promise((r) => setTimeout(r,5));
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      assert.ok(span, 'a span is present');
+      assert.strictEqual(spans.length, 1);
+      assertSpan(span, {
+        hostname: 'localhost',
+        httpMethod: 'GET',
+        path: '/',
+        query:'?query=test',
+        error: requestError,
+        noNetPeer: true, // do not check network attribs
+        forceStatus: {
+          code: SpanStatusCode.ERROR,
+          message: requestError.message
+        }
+      });
+    });
   });
 });
