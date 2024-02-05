@@ -200,12 +200,15 @@ describe('Node SDK', () => {
       delete env.OTEL_TRACES_EXPORTER;
     });
 
-    it('should register a tracer provider if a span processor is provided', async () => {
+    it('should register a tracer provider if span processors are provided', async () => {
       const exporter = new ConsoleSpanExporter();
-      const spanProcessor = new SimpleSpanProcessor(exporter);
 
       const sdk = new NodeSDK({
-        spanProcessor,
+        spanProcessors: [
+          new NoopSpanProcessor(),
+          new SimpleSpanProcessor(exporter),
+          new BatchSpanProcessor(exporter),
+        ],
         autoDetectResources: false,
       });
 
@@ -223,6 +226,15 @@ describe('Node SDK', () => {
       const apiTracerProvider =
         trace.getTracerProvider() as ProxyTracerProvider;
       assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
+
+      const listOfProcessors =
+        sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+
+      assert(sdk['_tracerProvider'] instanceof NodeTracerProvider);
+      assert(listOfProcessors.length === 3);
+      assert(listOfProcessors[0] instanceof NoopSpanProcessor);
+      assert(listOfProcessors[1] instanceof SimpleSpanProcessor);
+      assert(listOfProcessors[2] instanceof BatchSpanProcessor);
     });
 
     it('should register a meter provider if a reader is provided', async () => {
