@@ -15,7 +15,7 @@
  */
 import * as assert from 'assert';
 
-import { SpanStatusCode, context, propagation } from '@opentelemetry/api';
+import { SpanKind, SpanStatusCode, context, propagation, trace } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
@@ -273,7 +273,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     });
 
     // TODO: another test with a parent span. Check HTTP tests
-    it('should not create spans without parent if configured', async function () {
+    it('should not create spans without parent if required in configuration', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -284,14 +284,58 @@ describe('UndiciInstrumentation `fetch` tests', function () {
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const response = await fetch(fetchUrl);
-      // TODO: should we propagate here????
-      // assert.ok(
-      //   response.headers.get('propagation-error') == null,
-      //   'propagation is set for instrumented requests'
-      // );
+      // TODO: here we're checking the propagation works even if the instrumentation
+      // is not starting any span. Not 100% sure this is the behaviour we want
+      assert.ok(
+        response.headers.get('propagation-error') == null,
+        'propagation is set for instrumented requests'
+      );
 
       spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0, 'no spans are created');
+    });
+
+    it('should not create spans with parent if required in configuration', function (done) {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      instrumentation.setConfig({
+        enabled: true,
+        requireParentforSpans: true,
+      });
+
+      const tracer = provider.getTracer('default');
+      const span = tracer.startSpan('parentSpan', {
+        kind: SpanKind.INTERNAL,
+      });
+
+      context.with(trace.setSpan(context.active(), span), async () => {
+        const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
+        const response = await fetch(fetchUrl);
+
+        span.end();
+        // TODO: here we're checking the propagation works even if the instrumentation
+        // is not starting any span. Not 100% sure this is the behaviour we want
+        assert.ok(
+          response.headers.get('propagation-error') == null,
+          'propagation is set for instrumented requests'
+        );
+
+        spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2, 'child span is created');
+        assert.strictEqual(
+          spans.filter(span => span.kind === SpanKind.CLIENT).length,
+          1,
+          'child span is created'
+        );
+        assert.strictEqual(
+          spans.filter(span => span.kind === SpanKind.INTERNAL).length,
+          1,
+          'parent span is present'
+        );
+
+        done();
+      });
     });
 
 
