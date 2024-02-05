@@ -83,7 +83,7 @@ describe('HistogramAggregator', () => {
     });
 
     it('with single bucket', function () {
-      const aggregator = new HistogramAggregator([0], true);
+      const aggregator = new HistogramAggregator([], true);
       const prev = aggregator.createAccumulation([0, 0]);
       prev.record(0);
       prev.record(1);
@@ -92,14 +92,17 @@ describe('HistogramAggregator', () => {
       delta.record(2);
       delta.record(11);
 
-      const expected = aggregator.createAccumulation([0, 0]);
-      // replay actions on prev
-      expected.record(0);
-      expected.record(1);
-      // replay actions on delta
-      expected.record(2);
-      expected.record(11);
-
+      const expected = new HistogramAccumulation([0, 0], [], true, {
+        buckets: {
+          boundaries: [],
+          counts: [4],
+        },
+        count: 4,
+        sum: 14,
+        hasMinMax: true,
+        min: 0,
+        max: 11,
+      });
       assert.deepStrictEqual(aggregator.merge(prev, delta), expected);
     });
   });
