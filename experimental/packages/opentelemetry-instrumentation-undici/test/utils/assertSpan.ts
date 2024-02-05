@@ -24,15 +24,16 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 // import { DummyPropagation } from './DummyPropagation';
 import { SemanticAttributes } from '../../src/enums/SemanticAttributes';
+import type { IncomingHttpHeaders } from 'undici/types/header';
 
 export const assertSpan = (
   span: ReadableSpan,
   validations: {
     httpStatusCode?: number;
     httpMethod: string;
-    resHeaders?: Headers;
+    resHeaders?: Headers | IncomingHttpHeaders;
     hostname: string;
-    reqHeaders?: Headers;
+    reqHeaders?: Headers | IncomingHttpHeaders;
     path?: string | null;
     query?: string | null;
     forceStatus?: SpanStatus;
@@ -109,33 +110,39 @@ export const assertSpan = (
   assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration) > 0, 'must have positive duration');
 
-  const contentLengthHeader = validations.resHeaders?.get('content-length');
-  if (contentLengthHeader) {
-    const contentLength = Number(contentLengthHeader);
-
-    assert.strictEqual(
-      span.attributes['http.response.header.content-length'],
-      contentLength
-    );
-    // TODO: check compresssed/uncompressed in semantic conventions
-    // const contentEncodingHeader = validations.resHeaders.get('content-encoding');
-    // if (
-    //   contentEncodingHeader &&
-    //   contentEncodingHeader !== 'identity'
-    // ) {
-    //   assert.strictEqual(
-    //     span.attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH],
-    //     contentLength
-    //   );
-    // } else {
-    //   assert.strictEqual(
-    //     span.attributes[
-    //       SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
-    //     ],
-    //     contentLength
-    //   );
-    // }
+  if (validations.resHeaders) {
+    const contentLengthHeader = validations.resHeaders instanceof Headers ?
+      validations.resHeaders.get('content-length') :
+      validations.resHeaders['content-length'];
+    
+    if (contentLengthHeader) {
+      const contentLength = Number(contentLengthHeader);
+  
+      assert.strictEqual(
+        span.attributes['http.response.header.content-length'],
+        contentLength
+      );
+      // TODO: check compresssed/uncompressed in semantic conventions
+      // const contentEncodingHeader = validations.resHeaders.get('content-encoding');
+      // if (
+      //   contentEncodingHeader &&
+      //   contentEncodingHeader !== 'identity'
+      // ) {
+      //   assert.strictEqual(
+      //     span.attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH],
+      //     contentLength
+      //   );
+      // } else {
+      //   assert.strictEqual(
+      //     span.attributes[
+      //       SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+      //     ],
+      //     contentLength
+      //   );
+      // }
+    }
   }
+  
   assert.strictEqual(
     span.attributes[SemanticAttributes.SERVER_ADDRESS],
     validations.hostname,
@@ -160,7 +167,9 @@ export const assertSpan = (
 
 
   if (validations.reqHeaders) {
-    const userAgent = validations.reqHeaders.get('user-agent');
+    const userAgent = validations.reqHeaders instanceof Headers ?
+      validations.reqHeaders.get('user-agent') :
+      validations.reqHeaders['user-agent'];
     if (userAgent) {
       assert.strictEqual(
         span.attributes[SemanticAttributes.USER_AGENT_ORIGINAL],

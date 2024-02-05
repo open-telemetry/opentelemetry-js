@@ -122,7 +122,6 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // create the span and populate some atttributes, then link the span to the request for further
   // span processing
   private onRequestCreated({ request }: RequestMessage): void {
-    console.log('onRequestCreated')
     // Ignore if:
     // - instrumentation is disabled
     // - ignored by config
@@ -225,7 +224,6 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // the remote is stablished and about to send the first byte. Here do have info about the
   // remote addres an port so we can poupulate some `net.*` attributes into the span
   private onRequestHeaders({ request, socket }: RequestHeadersMessage): void {
-    console.log('onRequestHeaders')
     const span = this._spanFromReq.get(request as UndiciRequest);
 
     if (!span) {
@@ -265,7 +263,6 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // headers are received, body may not be accessible yet (TODO: check this).
   // From the response headers we can set the status and content length
   private onResponseHeaders({ request, response }: ResponseHeadersMessage): void {
-    console.log('onResponseHeaders')
     const span = this._spanFromReq.get(request);
 
     if (!span) {
@@ -314,7 +311,6 @@ export class UndiciInstrumentation extends InstrumentationBase {
 
   // This is the last event we receive if the request went without any errors (TODO: check this)
   private onDone({ request }: any): void {
-    console.log('onDone')
     const span = this._spanFromReq.get(request);
 
     if (!span) {
