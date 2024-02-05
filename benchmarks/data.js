@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1706728837802,
+  "lastUpdate": 1707134838450,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4124,6 +4124,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.24%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "24660299+naseemkullah@users.noreply.github.com",
+            "name": "Naseem",
+            "username": "naseemkullah"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "72c60f17ef5307a4b495cc5ad814ab549eba14f0",
+          "message": "feat(node-sdk): add spanProcessors option (#4454)",
+          "timestamp": "2024-02-05T07:05:31-05:00",
+          "tree_id": "9678ced2299391b5b5e3e45edce7b43197988b78",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/72c60f17ef5307a4b495cc5ad814ab549eba14f0"
+        },
+        "date": 1707134837585,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 945458,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11914,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 653983,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 654431,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
