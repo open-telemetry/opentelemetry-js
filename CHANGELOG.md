@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): ignore `NaN` value recordings in Histograms [#4455](https://github.com/open-telemetry/opentelemetry-js/pull/4455) @pichlermarc
