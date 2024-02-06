@@ -674,6 +674,23 @@ describe('fetch', () => {
       assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
     });
 
+    it('applies custom attributes when the function is async', async () => {
+      await prepare(badUrl, async span => {
+        const p = () =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              resolve(true);
+            }, 1000);
+          });
+        await p();
+        span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+      });
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const attributes = span.attributes;
+
+      assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+    });
+
     it('has request and response objects in callback arguments', async () => {
       let request: any;
       let response: any;

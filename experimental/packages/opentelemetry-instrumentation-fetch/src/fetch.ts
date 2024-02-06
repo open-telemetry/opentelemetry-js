@@ -345,7 +345,7 @@ export class FetchInstrumentation extends InstrumentationBase<
         ) {
           await plugin._applyAttributesAfterFetch(span, options, response);
           if (response.status >= 200 && response.status < 400) {
-            plugin._endSpan(span, spanData, response);
+            plugin._endSpan(span, spanData, response, endTime);
           } else {
             plugin._endSpan(
               span,
