@@ -68,7 +68,7 @@ Fetch instrumentation plugin has few options available to choose from. You can s
 
 | Options                                                                                                                                                                  | Type                          | Description                                                                             |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------------------------------|
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L64) | `HttpCustomAttributeFunction` | Function for adding custom attributes                                                   |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L64) | `FetchCustomAttributeFunction` | Function for adding custom attributes                                                   |
 | [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L67)                      | `boolean`                     | Disable network events being added as span events (network events are added by default) |
 
 ## Useful links
