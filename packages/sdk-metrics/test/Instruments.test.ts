@@ -407,6 +407,20 @@ describe('Instruments', () => {
       });
     });
 
+    it('should allow metric advice with empty explicit boundaries', function () {
+      const meter = new MeterProvider({
+        readers: [new TestMetricReader()],
+      }).getMeter('meter');
+
+      assert.doesNotThrow(() => {
+        meter.createHistogram('histogram', {
+          advice: {
+            explicitBucketBoundaries: [],
+          },
+        });
+      });
+    });
+
     it('should collect min and max', async () => {
       const { meter, deltaReader, cumulativeReader } = setup();
       const histogram = meter.createHistogram('test', {
