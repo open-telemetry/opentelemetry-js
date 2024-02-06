@@ -24,6 +24,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :books: (Refine Doc)
 
+* docs: shorten readme sections [#4460](https://github.com/open-telemetry/opentelemetry-js/pull/4460) @legendecas
+
 ### :house: (Internal)
 
 ## 1.21.0
