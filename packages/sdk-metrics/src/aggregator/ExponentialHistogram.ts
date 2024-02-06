@@ -344,6 +344,10 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       return;
     }
 
+    if (buckets.length === 0) {
+      buckets.indexStart = buckets.indexEnd = buckets.indexBase = index;
+    }
+
     if (index < buckets.indexStart) {
       const span = buckets.indexEnd - index;
       if (span >= buckets.backing.length) {
