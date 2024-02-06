@@ -215,6 +215,20 @@ describe('ExponentialHistogramAccumulation', () => {
         }
       });
     });
+
+    it('ignores NaN', () => {
+      const accumulation = new ExponentialHistogramAccumulation([0, 0], 1);
+
+      accumulation.record(NaN);
+
+      assert.strictEqual(accumulation.scale, 0);
+      assert.strictEqual(accumulation.max, -Infinity);
+      assert.strictEqual(accumulation.min, Infinity);
+      assert.strictEqual(accumulation.sum, 0);
+      assert.strictEqual(accumulation.count, 0);
+      assert.deepStrictEqual(getCounts(accumulation.positive), []);
+      assert.deepStrictEqual(getCounts(accumulation.negative), []);
+    });
   });
   describe('merge', () => {
     it('handles simple (even) case', () => {

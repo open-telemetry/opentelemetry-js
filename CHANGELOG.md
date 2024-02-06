@@ -15,8 +15,9 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-metrics): handle zero bucket counts in exponential histogram merge
-[#4459](https://github.com/open-telemetry/opentelemetry-js/pull/4459) @mwear
+* fix(sdk-metrics): handle zero bucket counts in exponential histogram merge [#4459](https://github.com/open-telemetry/opentelemetry-js/pull/4459) @mwear
+* fix(sdk-metrics): ignore `NaN` value recordings in Histograms [#4455](https://github.com/open-telemetry/opentelemetry-js/pull/4455) @pichlermarc
+  * fixes a bug where recording `NaN` on a histogram would result in the sum of bucket count values not matching the overall count
 
 ### :books: (Refine Doc)
 

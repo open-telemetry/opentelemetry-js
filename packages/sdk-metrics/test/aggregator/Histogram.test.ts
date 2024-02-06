@@ -257,6 +257,19 @@ describe('HistogramAccumulation', () => {
         accumulation.record(value);
       }
     });
+
+    it('ignores NaN', () => {
+      const accumulation = new HistogramAccumulation([0, 0], [1, 10, 100]);
+
+      accumulation.record(NaN);
+
+      const pointValue = accumulation.toPointValue();
+      assert.strictEqual(pointValue.max, -Infinity);
+      assert.strictEqual(pointValue.min, Infinity);
+      assert.strictEqual(pointValue.sum, 0);
+      assert.strictEqual(pointValue.count, 0);
+      assert.deepStrictEqual(pointValue.buckets.counts, [0, 0, 0, 0]);
+    });
   });
 
   describe('setStartTime', () => {
