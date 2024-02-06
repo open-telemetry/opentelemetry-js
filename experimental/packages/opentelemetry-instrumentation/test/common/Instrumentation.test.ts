@@ -22,6 +22,7 @@ import {
 } from '../../src';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { LoggerProvider } from '@opentelemetry/sdk-logs';
 
 interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
@@ -86,6 +87,23 @@ describe('BaseInstrumentation', () => {
       }
       instrumentation = new TestInstrumentation2();
       instrumentation.setMeterProvider(otelTestingMeterProvider);
+      assert.strictEqual(called, true);
+    });
+  });
+
+  describe('setLoggerProvider', () => {
+    it('should get a logger from provider', () => {
+      let called = true;
+      class TestLoggerProvider extends LoggerProvider {
+        override getLogger(name: any, version?: any, options?: any) {
+          called = true;
+          return super.getLogger(name, version, options);
+        }
+      }
+      instrumentation = new TestInstrumentation();
+      if (instrumentation.setLoggerProvider) {
+        instrumentation.setLoggerProvider(new TestLoggerProvider());
+      }
       assert.strictEqual(called, true);
     });
   });
