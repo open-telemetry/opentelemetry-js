@@ -40,7 +40,7 @@ export interface FetchCustomAttributeFunction {
     span: api.Span,
     request: Request | RequestInit,
     result: Response | FetchError
-  ): void;
+  ): void | Promise<void>;
 }
 
 /**
@@ -283,9 +283,9 @@ export class FetchInstrumentation extends InstrumentationBase<
   private _endSpan(
     span: api.Span,
     spanData: SpanData,
-    response: FetchResponse
+    response: FetchResponse,
+    endTime: api.HrTime
   ) {
-    const endTime = core.millisToHrTime(Date.now());
     const performanceEndTime = core.hrTime();
     this._addFinalSpanAttributes(span, response);
 
@@ -320,25 +320,43 @@ export class FetchInstrumentation extends InstrumentationBase<
         }
         const spanData = plugin._prepareSpanData(url);
 
-        function endSpanOnError(span: api.Span, error: FetchError) {
-          plugin._applyAttributesAfterFetch(span, options, error);
-          plugin._endSpan(span, spanData, {
-            status: error.status || 0,
-            statusText: error.message,
-            url,
-          });
+        async function endSpanOnError(
+          span: api.Span,
+          error: FetchError,
+          endTime: api.HrTime
+        ) {
+          await plugin._applyAttributesAfterFetch(span, options, error);
+          plugin._endSpan(
+            span,
+            spanData,
+            {
+              status: error.status || 0,
+              statusText: error.message,
+              url,
+            },
+            endTime
+          );
         }
 
-        function endSpanOnSuccess(span: api.Span, response: Response) {
-          plugin._applyAttributesAfterFetch(span, options, response);
+        async function endSpanOnSuccess(
+          span: api.Span,
+          response: Response,
+          endTime: api.HrTime
+        ) {
+          await plugin._applyAttributesAfterFetch(span, options, response);
           if (response.status >= 200 && response.status < 400) {
             plugin._endSpan(span, spanData, response);
           } else {
-            plugin._endSpan(span, spanData, {
-              status: response.status,
-              statusText: response.statusText,
-              url,
-            });
+            plugin._endSpan(
+              span,
+              spanData,
+              {
+                status: response.status,
+                statusText: response.statusText,
+                url,
+              },
+              endTime
+            );
           }
         }
 
@@ -348,6 +366,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           response: Response
         ): void {
           try {
+            const endTime = core.millisToHrTime(Date.now());
             const resClone = response.clone();
             const resClone4Hook = response.clone();
             const body = resClone.body;
@@ -357,20 +376,22 @@ export class FetchInstrumentation extends InstrumentationBase<
                 reader.read().then(
                   ({ done }) => {
                     if (done) {
-                      endSpanOnSuccess(span, resClone4Hook);
+                      endSpanOnSuccess(span, resClone4Hook, endTime).catch(
+                        () => {}
+                      );
                     } else {
                       read();
                     }
                   },
                   error => {
-                    endSpanOnError(span, error);
+                    endSpanOnError(span, error, endTime).catch(() => {});
                   }
                 );
               };
               read();
             } else {
               // some older browsers don't have .body implemented
-              endSpanOnSuccess(span, response);
+              endSpanOnSuccess(span, response, endTime).catch(() => {});
             }
           } finally {
             resolve(response);
@@ -383,7 +404,8 @@ export class FetchInstrumentation extends InstrumentationBase<
           error: FetchError
         ) {
           try {
-            endSpanOnError(span, error);
+            const endTime = core.millisToHrTime(Date.now());
+            endSpanOnError(span, error, endTime).catch(() => {});
           } finally {
             reject(error);
           }
@@ -421,7 +443,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     const applyCustomAttributesOnSpan =
       this._getConfig().applyCustomAttributesOnSpan;
     if (applyCustomAttributesOnSpan) {
-      safeExecuteInTheMiddle(
+      return safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, request, result),
         error => {
           if (!error) {
