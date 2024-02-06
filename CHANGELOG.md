@@ -18,6 +18,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * fix(sdk-metrics): allow single bucket histograms [#4456](https://github.com/open-telemetry/opentelemetry-js/pull/4456) @pichlermarc
   * fixes a bug where `Meter.createHistogram()` with the advice `explicitBucketBoundaries: []` would throw
+* fix(sdk-metrics): handle zero bucket counts in exponential histogram merge [#4459](https://github.com/open-telemetry/opentelemetry-js/pull/4459) @mwear
 
 ### :books: (Refine Doc)
 
