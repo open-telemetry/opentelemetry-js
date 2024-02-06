@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707137506991,
+  "lastUpdate": 1707215415005,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4228,6 +4228,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "39923391+hectorhdzg@users.noreply.github.com",
+            "name": "Hector Hernandez",
+            "username": "hectorhdzg"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "588d8ad14dbdc84f9f7619d5fd4b30c720d083c4",
+          "message": "Allow LoggerProvider to be specified in Instrumentations (#4314)\n\n* Allow LoggerProvider to be specified in Instrumentations\r\n\r\n* Update\r\n\r\n* Lint\r\n\r\n* Add test\r\n\r\n* npm i\r\n\r\n* Update changelog\r\n\r\n* npm i\r\n\r\n* marking setLoggerProvider as optional\r\n\r\n* Add check for possible undefined method\r\n\r\n* npm i",
+          "timestamp": "2024-02-06T11:19:51+01:00",
+          "tree_id": "230466c1b4f9ec4efd4651afbcfe31e53d206fe0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/588d8ad14dbdc84f9f7619d5fd4b30c720d083c4"
+        },
+        "date": 1707215414235,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1019057,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12465,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 659172,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 646768,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
