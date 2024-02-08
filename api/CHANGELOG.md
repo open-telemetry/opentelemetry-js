@@ -5,8 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 * feat(api): add SugaredTracer for functions not defined in the spec
-
-## Unreleased
+* fix(api): fix unreachable @opentelemetry/api/experimental entry [#4446](https://github.com/open-telemetry/opentelemetry-js/pull/4446) @legendecas
 
 ## 1.7.0
 
