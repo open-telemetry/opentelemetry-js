@@ -77,7 +77,7 @@ export class RequireInTheMiddleSingleton {
         });
 
         for (const { onRequire } of matches) {
-          exports = onRequire(exports, path.normalize(name), basedir);
+          exports = onRequire(exports, name, basedir);
         }
 
         return exports;

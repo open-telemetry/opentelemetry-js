@@ -205,7 +205,7 @@ export abstract class InstrumentationBase<T = any>
     // internal file
     const files = module.files ?? [];
     const supportedFileInstrumentations = files
-      .filter(f => f.name === name)
+      .filter(f => f.name === path.normalize(name))
       .filter(f =>
         isSupported(f.supportedVersions, version, module.includePrerelease)
       );
