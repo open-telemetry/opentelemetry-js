@@ -204,7 +204,7 @@ export abstract class InstrumentationBase<T = any>
     }
     // internal file
     const files = module.files ?? [];
-    const normalizedName = path.normalize(name)
+    const normalizedName = path.normalize(name);
     const supportedFileInstrumentations = files
       .filter(f => f.name === normalizedName)
       .filter(f =>
