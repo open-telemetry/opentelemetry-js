@@ -162,15 +162,39 @@ export type {{class_name}} = {
   {%- endfor %}
 }
 
+{%- set enumMap = namespace(useCreateConst = false) %}
+{%- if type == "string" %}
+  {%- set enumMap.useCreateConst = true %}
+  {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+    {%- if (member.member_id | to_const_name) != ( member.value | to_const_name) %}
+      {%- set enumMap.useCreateConst = false %}
+    {%- endif %}
+  {%- endfor %}
+{%- endif %}
+
 /**
  * The constant map of values for {{class_name}}.
  * @deprecated Use the {{class_name | upper}}_XXXXX constants rather than the {{class_name}}.XXXXX for bundle minification.
  */
-export const {{class_name}}:{{class_name}} = {
-  {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+{%- if enumMap.useCreateConst == true %}
+export const {{class_name}}:{{class_name}} = /*#__PURE__*/createConstMap<{{class_name}}>([
+{%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+  {%- if (member.member_id | to_const_name) == ( member.value | to_const_name) %}
+  TMP_{{class_name|upper}}_{{ member.member_id | to_const_name }},
+  {%- else %}
+  {#- Cause some invalid content to be generated to force a build error #}
+  !! Invalid mapping for {{class_name}}.{{ member.member_id }}:{{ member.value }}.  The value is not a valid string.
   {{ member.member_id | to_const_name }}: TMP_{{class_name|upper}}_{{ member.member_id | to_const_name }},
-  {%- endfor %}
- };
+  {%- endif %}
+{%- endfor %}
+]);
+{%- else %}
+export const {{class_name}}:{{class_name}} = {
+{%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+  {{ member.member_id | to_const_name }}: TMP_{{class_name|upper}}_{{ member.member_id | to_const_name }},
+{%- endfor %}
+};
+{%- endif %}
 {% endif %}
 {% endif %}
 

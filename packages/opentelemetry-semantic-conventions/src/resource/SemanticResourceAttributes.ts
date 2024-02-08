@@ -1181,12 +1181,13 @@ export type CloudProviderValues = {
  * The constant map of values for CloudProviderValues.
  * @deprecated Use the CLOUDPROVIDERVALUES_XXXXX constants rather than the CloudProviderValues.XXXXX for bundle minification.
  */
-export const CloudProviderValues: CloudProviderValues = {
-  ALIBABA_CLOUD: TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD,
-  AWS: TMP_CLOUDPROVIDERVALUES_AWS,
-  AZURE: TMP_CLOUDPROVIDERVALUES_AZURE,
-  GCP: TMP_CLOUDPROVIDERVALUES_GCP,
-};
+export const CloudProviderValues: CloudProviderValues =
+  /*#__PURE__*/ createConstMap<CloudProviderValues>([
+    TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD,
+    TMP_CLOUDPROVIDERVALUES_AWS,
+    TMP_CLOUDPROVIDERVALUES_AZURE,
+    TMP_CLOUDPROVIDERVALUES_GCP,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for CloudPlatformValues enum definition
@@ -1413,25 +1414,26 @@ export type CloudPlatformValues = {
  * The constant map of values for CloudPlatformValues.
  * @deprecated Use the CLOUDPLATFORMVALUES_XXXXX constants rather than the CloudPlatformValues.XXXXX for bundle minification.
  */
-export const CloudPlatformValues: CloudPlatformValues = {
-  ALIBABA_CLOUD_ECS: TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS,
-  ALIBABA_CLOUD_FC: TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC,
-  AWS_EC2: TMP_CLOUDPLATFORMVALUES_AWS_EC2,
-  AWS_ECS: TMP_CLOUDPLATFORMVALUES_AWS_ECS,
-  AWS_EKS: TMP_CLOUDPLATFORMVALUES_AWS_EKS,
-  AWS_LAMBDA: TMP_CLOUDPLATFORMVALUES_AWS_LAMBDA,
-  AWS_ELASTIC_BEANSTALK: TMP_CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK,
-  AZURE_VM: TMP_CLOUDPLATFORMVALUES_AZURE_VM,
-  AZURE_CONTAINER_INSTANCES: TMP_CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES,
-  AZURE_AKS: TMP_CLOUDPLATFORMVALUES_AZURE_AKS,
-  AZURE_FUNCTIONS: TMP_CLOUDPLATFORMVALUES_AZURE_FUNCTIONS,
-  AZURE_APP_SERVICE: TMP_CLOUDPLATFORMVALUES_AZURE_APP_SERVICE,
-  GCP_COMPUTE_ENGINE: TMP_CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE,
-  GCP_CLOUD_RUN: TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_RUN,
-  GCP_KUBERNETES_ENGINE: TMP_CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE,
-  GCP_CLOUD_FUNCTIONS: TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS,
-  GCP_APP_ENGINE: TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE,
-};
+export const CloudPlatformValues: CloudPlatformValues =
+  /*#__PURE__*/ createConstMap<CloudPlatformValues>([
+    TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS,
+    TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC,
+    TMP_CLOUDPLATFORMVALUES_AWS_EC2,
+    TMP_CLOUDPLATFORMVALUES_AWS_ECS,
+    TMP_CLOUDPLATFORMVALUES_AWS_EKS,
+    TMP_CLOUDPLATFORMVALUES_AWS_LAMBDA,
+    TMP_CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK,
+    TMP_CLOUDPLATFORMVALUES_AZURE_VM,
+    TMP_CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES,
+    TMP_CLOUDPLATFORMVALUES_AZURE_AKS,
+    TMP_CLOUDPLATFORMVALUES_AZURE_FUNCTIONS,
+    TMP_CLOUDPLATFORMVALUES_AZURE_APP_SERVICE,
+    TMP_CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE,
+    TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_RUN,
+    TMP_CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE,
+    TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS,
+    TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for AwsEcsLaunchtypeValues enum definition
@@ -1473,10 +1475,11 @@ export type AwsEcsLaunchtypeValues = {
  * The constant map of values for AwsEcsLaunchtypeValues.
  * @deprecated Use the AWSECSLAUNCHTYPEVALUES_XXXXX constants rather than the AwsEcsLaunchtypeValues.XXXXX for bundle minification.
  */
-export const AwsEcsLaunchtypeValues: AwsEcsLaunchtypeValues = {
-  EC2: TMP_AWSECSLAUNCHTYPEVALUES_EC2,
-  FARGATE: TMP_AWSECSLAUNCHTYPEVALUES_FARGATE,
-};
+export const AwsEcsLaunchtypeValues: AwsEcsLaunchtypeValues =
+  /*#__PURE__*/ createConstMap<AwsEcsLaunchtypeValues>([
+    TMP_AWSECSLAUNCHTYPEVALUES_EC2,
+    TMP_AWSECSLAUNCHTYPEVALUES_FARGATE,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for HostArchValues enum definition
@@ -1562,15 +1565,16 @@ export type HostArchValues = {
  * The constant map of values for HostArchValues.
  * @deprecated Use the HOSTARCHVALUES_XXXXX constants rather than the HostArchValues.XXXXX for bundle minification.
  */
-export const HostArchValues: HostArchValues = {
-  AMD64: TMP_HOSTARCHVALUES_AMD64,
-  ARM32: TMP_HOSTARCHVALUES_ARM32,
-  ARM64: TMP_HOSTARCHVALUES_ARM64,
-  IA64: TMP_HOSTARCHVALUES_IA64,
-  PPC32: TMP_HOSTARCHVALUES_PPC32,
-  PPC64: TMP_HOSTARCHVALUES_PPC64,
-  X86: TMP_HOSTARCHVALUES_X86,
-};
+export const HostArchValues: HostArchValues =
+  /*#__PURE__*/ createConstMap<HostArchValues>([
+    TMP_HOSTARCHVALUES_AMD64,
+    TMP_HOSTARCHVALUES_ARM32,
+    TMP_HOSTARCHVALUES_ARM64,
+    TMP_HOSTARCHVALUES_IA64,
+    TMP_HOSTARCHVALUES_PPC32,
+    TMP_HOSTARCHVALUES_PPC64,
+    TMP_HOSTARCHVALUES_X86,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for OsTypeValues enum definition
@@ -1692,19 +1696,20 @@ export type OsTypeValues = {
  * The constant map of values for OsTypeValues.
  * @deprecated Use the OSTYPEVALUES_XXXXX constants rather than the OsTypeValues.XXXXX for bundle minification.
  */
-export const OsTypeValues: OsTypeValues = {
-  WINDOWS: TMP_OSTYPEVALUES_WINDOWS,
-  LINUX: TMP_OSTYPEVALUES_LINUX,
-  DARWIN: TMP_OSTYPEVALUES_DARWIN,
-  FREEBSD: TMP_OSTYPEVALUES_FREEBSD,
-  NETBSD: TMP_OSTYPEVALUES_NETBSD,
-  OPENBSD: TMP_OSTYPEVALUES_OPENBSD,
-  DRAGONFLYBSD: TMP_OSTYPEVALUES_DRAGONFLYBSD,
-  HPUX: TMP_OSTYPEVALUES_HPUX,
-  AIX: TMP_OSTYPEVALUES_AIX,
-  SOLARIS: TMP_OSTYPEVALUES_SOLARIS,
-  Z_OS: TMP_OSTYPEVALUES_Z_OS,
-};
+export const OsTypeValues: OsTypeValues =
+  /*#__PURE__*/ createConstMap<OsTypeValues>([
+    TMP_OSTYPEVALUES_WINDOWS,
+    TMP_OSTYPEVALUES_LINUX,
+    TMP_OSTYPEVALUES_DARWIN,
+    TMP_OSTYPEVALUES_FREEBSD,
+    TMP_OSTYPEVALUES_NETBSD,
+    TMP_OSTYPEVALUES_OPENBSD,
+    TMP_OSTYPEVALUES_DRAGONFLYBSD,
+    TMP_OSTYPEVALUES_HPUX,
+    TMP_OSTYPEVALUES_AIX,
+    TMP_OSTYPEVALUES_SOLARIS,
+    TMP_OSTYPEVALUES_Z_OS,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for TelemetrySdkLanguageValues enum definition
@@ -1826,15 +1831,16 @@ export type TelemetrySdkLanguageValues = {
  * The constant map of values for TelemetrySdkLanguageValues.
  * @deprecated Use the TELEMETRYSDKLANGUAGEVALUES_XXXXX constants rather than the TelemetrySdkLanguageValues.XXXXX for bundle minification.
  */
-export const TelemetrySdkLanguageValues: TelemetrySdkLanguageValues = {
-  CPP: TMP_TELEMETRYSDKLANGUAGEVALUES_CPP,
-  DOTNET: TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET,
-  ERLANG: TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG,
-  GO: TMP_TELEMETRYSDKLANGUAGEVALUES_GO,
-  JAVA: TMP_TELEMETRYSDKLANGUAGEVALUES_JAVA,
-  NODEJS: TMP_TELEMETRYSDKLANGUAGEVALUES_NODEJS,
-  PHP: TMP_TELEMETRYSDKLANGUAGEVALUES_PHP,
-  PYTHON: TMP_TELEMETRYSDKLANGUAGEVALUES_PYTHON,
-  RUBY: TMP_TELEMETRYSDKLANGUAGEVALUES_RUBY,
-  WEBJS: TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS,
-};
+export const TelemetrySdkLanguageValues: TelemetrySdkLanguageValues =
+  /*#__PURE__*/ createConstMap<TelemetrySdkLanguageValues>([
+    TMP_TELEMETRYSDKLANGUAGEVALUES_CPP,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_GO,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_JAVA,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_NODEJS,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_PHP,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_PYTHON,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_RUBY,
+    TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS,
+  ]);
