@@ -40,7 +40,9 @@ export interface NodeSDKConfiguration {
   resourceDetectors: Array<Detector | DetectorSync>;
   sampler: Sampler;
   serviceName?: string;
-  spanProcessor: SpanProcessor;
+  /** @deprecated use spanProcessors instead*/
+  spanProcessor?: SpanProcessor;
+  spanProcessors?: SpanProcessor[];
   traceExporter: SpanExporter;
   spanLimits: SpanLimits;
   idGenerator: IdGenerator;

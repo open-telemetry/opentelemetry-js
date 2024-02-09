@@ -1,14 +1,10 @@
-# OpenTelemetry JS Code Contribution Guide
-
-This document outlines the essential guidelines for contributing code to the OpenTelemetry JS repository. These guidelines are designed to ensure consistency, stability, and the highest quality of code across the project.
-
-## Dependencies
+# OpenTelemetry Dependencies
 
 This section refers to `"dependencies"` and `"devDependencies"` entries in `package.json` file.
 > [!IMPORTANT]
 > Not all libraries follow [Semantic Versioning](https://semver.org/). Even those who do might occasionally introduce breaking changes due to human errors. Exceptions to the guidelines in this document MAY be granted by Approvers or Maintainers to work around this.
 
-### Development Dependencies
+## Development Dependencies
 
 `"devDependencies"` SHOULD be pinned to reduce the risk of autobreaking the build. Since we cannot use the `package-lock.json` file (because the libraries are distributed without it), control over the version our contributors will get is limited. By using pinned versions, we prevent potential disruptions caused by unpinned versions.
 
@@ -17,7 +13,7 @@ This section refers to `"dependencies"` and `"devDependencies"` entries in `pack
 > [!NOTE]
 > As this approach might leave our project with outdated tooling, we adopt `renovate-bot`. This automated dependency update tool proactively opens pull requests upon the release of new patch/minor/major versions. The complete configuration for renovate-bot can be found in [renovate.json](../renovate.json) file.
 
-### @opentelemetry/* dependencies
+## @opentelemetry/* dependencies
 
 All packages from the `@opentelemetry/` namespace MUST have the same pinned version, as these dependencies are automatically updated on each release by lerna.
 
@@ -25,7 +21,7 @@ All packages from the `@opentelemetry/` namespace MUST have the same pinned vers
 
 An exception is granted for dependencies on `@opentelemetry/api`, which, if used by the package SHOULD NOT be included as a `dependency`. `@opentelemetry/api` SHOULD be included as a `peerDependency` instead. The version range of the `peerDependency` SHOULD reflect the minimum supported, and SHOULD NOT allow versions greater than the latest released minor version.
 
-### Third-Party Library Dependencies
+## Third-Party Library Dependencies
 
 Packages categorized as third-party and listed under the `"dependencies"` section (e.g., @grpc/grpc-js, @grpc/proto-loader, shimmer, etc.) should remain unpinned and utilize the caret (`^`) symbol. This approach offers several advantages:
 
