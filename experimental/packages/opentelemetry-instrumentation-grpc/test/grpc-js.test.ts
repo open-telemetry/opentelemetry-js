@@ -15,7 +15,7 @@
  */
 
 import { runTests } from './helper';
-import { GrpcInstrumentation } from '../src/instrumentation';
+import { GrpcInstrumentation } from '../src';
 
 const instrumentation = new GrpcInstrumentation();
 instrumentation.enable();

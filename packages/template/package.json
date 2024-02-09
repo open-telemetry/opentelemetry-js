@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.18.1",
+  "version": "1.21.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -102,6 +102,6 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
     "ts-loader": "8.4.0",
-    "webpack": "4.46.0"
+    "webpack": "5.89.0"
   }
 }

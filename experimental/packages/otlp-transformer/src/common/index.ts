@@ -16,7 +16,7 @@
 
 import type { OtlpEncodingOptions, Fixed64, LongBits } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { hexToBase64, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { hexToBinary, hrTimeToNanoseconds } from '@opentelemetry/core';
 
 const NANOSECONDS = BigInt(1_000_000_000);
 
@@ -44,10 +44,12 @@ const encodeTimestamp =
   typeof BigInt !== 'undefined' ? encodeAsString : hrTimeToNanoseconds;
 
 export type HrTimeEncodeFunction = (hrTime: HrTime) => Fixed64;
-export type SpanContextEncodeFunction = (spanContext: string) => string;
+export type SpanContextEncodeFunction = (
+  spanContext: string
+) => string | Uint8Array;
 export type OptionalSpanContextEncodeFunction = (
   spanContext: string | undefined
-) => string | undefined;
+) => string | Uint8Array | undefined;
 
 export interface Encoder {
   encodeHrTime: HrTimeEncodeFunction;
@@ -59,15 +61,15 @@ function identity<T>(value: T): T {
   return value;
 }
 
-function optionalHexToBase64(str: string | undefined): string | undefined {
+function optionalHexToBinary(str: string | undefined): Uint8Array | undefined {
   if (str === undefined) return undefined;
-  return hexToBase64(str);
+  return hexToBinary(str);
 }
 
 const DEFAULT_ENCODER: Encoder = {
   encodeHrTime: encodeAsLongBits,
-  encodeSpanContext: hexToBase64,
-  encodeOptionalSpanContext: optionalHexToBase64,
+  encodeSpanContext: hexToBinary,
+  encodeOptionalSpanContext: optionalHexToBinary,
 };
 
 export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
@@ -79,7 +81,7 @@ export function getOtlpEncoder(options?: OtlpEncodingOptions): Encoder {
   const useHex = options.useHex ?? false;
   return {
     encodeHrTime: useLongBits ? encodeAsLongBits : encodeTimestamp,
-    encodeSpanContext: useHex ? identity : hexToBase64,
-    encodeOptionalSpanContext: useHex ? identity : optionalHexToBase64,
+    encodeSpanContext: useHex ? identity : hexToBinary,
+    encodeOptionalSpanContext: useHex ? identity : optionalHexToBinary,
   };
 }

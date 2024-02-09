@@ -15,7 +15,7 @@
  */
 
 import { InstrumentationModuleFile } from './types';
-import { normalize } from 'path';
+import { normalize } from './platform/index';
 
 export class InstrumentationNodeModuleFile<T>
   implements InstrumentationModuleFile<T>

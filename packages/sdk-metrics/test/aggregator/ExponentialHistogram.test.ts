@@ -215,6 +215,20 @@ describe('ExponentialHistogramAccumulation', () => {
         }
       });
     });
+
+    it('ignores NaN', () => {
+      const accumulation = new ExponentialHistogramAccumulation([0, 0], 1);
+
+      accumulation.record(NaN);
+
+      assert.strictEqual(accumulation.scale, 0);
+      assert.strictEqual(accumulation.max, -Infinity);
+      assert.strictEqual(accumulation.min, Infinity);
+      assert.strictEqual(accumulation.sum, 0);
+      assert.strictEqual(accumulation.count, 0);
+      assert.deepStrictEqual(getCounts(accumulation.positive), []);
+      assert.deepStrictEqual(getCounts(accumulation.negative), []);
+    });
   });
   describe('merge', () => {
     it('handles simple (even) case', () => {
@@ -583,6 +597,49 @@ describe('ExponentialHistogramAggregation', () => {
       const result = agg.merge(acc0, acc1);
       assert.strictEqual(result.startTime, acc0.startTime);
     });
+    it('handles zero-length buckets in source histogram', () => {
+      // https://github.com/open-telemetry/opentelemetry-js/issues/4450
+      const delta = new ExponentialHistogramAccumulation([0, 0], 160);
+      delta.updateByIncrement(0.0, 2); // A histogram with zero count of two and empty buckets
+
+      const previous = new ExponentialHistogramAccumulation([0, 0], 160);
+      previous.updateByIncrement(0, 1);
+      previous.updateByIncrement(0.000979, 41); //Bucket: (0.00097656, 0.0010198], Count: 41, Index: -160
+      previous.updateByIncrement(0.001959, 17); //Bucket: (0.00195313, 0.0020396], Count: 17, Index: -144
+      previous.updateByIncrement(0.002889, 1); //Bucket: (0.00288443, 0.00301213], Count: 1, Index: -135
+      previous.updateByIncrement(0.003909, 1); //Bucket: (0.00390625, 0.00407919], Count: 1, Index: -128
+      previous.updateByIncrement(0.004859, 2); //Bucket: (0.00485101, 0.00506578], Count: 2, Index: -123
+      previous.updateByIncrement(0.008899, 1); //Bucket: (0.00889679, 0.00929068], Count: 1, Index: -109
+      previous.updateByIncrement(0.018589, 1); //Bucket: (0.01858136, 0.01940403], Count: 1, Index: -92
+      previous.updateByIncrement(0.020269, 2); //Bucket: (0.02026312, 0.02116024], Count: 2, Index: -90
+      previous.updateByIncrement(0.021169, 3); //Bucket: (0.02116024, 0.02209709], Count: 3, Index: -89
+      previous.updateByIncrement(0.023079, 2); //Bucket: (0.02307541, 0.02409704], Count: 2, Index: -87
+      previous.updateByIncrement(0.025169, 2); //Bucket: (0.02516391, 0.02627801], Count: 2, Index: -85
+      previous.updateByIncrement(0.026279, 1); //Bucket: (0.02627801, 0.02744144], Count: 1, Index: -84
+      previous.updateByIncrement(0.029929, 2); //Bucket: (0.0299251, 0.03125], Count: 2, Index: -81
+      previous.updateByIncrement(0.031259, 1); //Bucket: (0.03125, 0.03263356], Count: 1, Index: -80
+      previous.updateByIncrement(0.032639, 1); //Bucket: (0.03263356, 0.03407837], Count: 1, Index: -79
+      previous.updateByIncrement(0.037169, 1); //Bucket: (0.03716272, 0.03880806], Count: 1, Index: -76
+      previous.updateByIncrement(0.038809, 1); //Bucket: (0.03880806, 0.04052624], Count: 1, Index: -75
+      previous.updateByIncrement(0.042329, 1); //Bucket: (0.04232049, 0.04419417], Count: 1, Index: -73
+      previous.updateByIncrement(0.044199, 1); //Bucket: (0.04419417, 0.04615082], Count: 1, Index: -72
+      previous.updateByIncrement(0.048199, 1); //Bucket: (0.04819409, 0.05032782], Count: 1, Index: -70
+      previous.updateByIncrement(0.065269, 1); //Bucket: (0.06526711, 0.06815673], Count: 1, Index: -63
+      previous.updateByIncrement(0.092309, 1); //Bucket: (0.09230163, 0.09638818], Count: 1, Index: -55
+      previous.updateByIncrement(0.100659, 1); //Bucket: (0.10065565, 0.10511205], Count: 1, Index: -53
+
+      const result = delta.clone();
+      result.merge(previous);
+
+      assert.equal(result.count, delta.count + previous.count);
+      assert.equal(result.count, bucketCounts(result));
+      assert.equal(delta.count, bucketCounts(delta));
+      assert.equal(previous.count, bucketCounts(previous));
+      assert.equal(
+        bucketCounts(result),
+        bucketCounts(delta) + bucketCounts(previous)
+      );
+    });
   });
 
   describe('diff', () => {
@@ -823,4 +880,15 @@ function bucketsToString(buckets: Buckets): string {
   }
   str += ']\n';
   return str;
+}
+
+function bucketCounts(histo: ExponentialHistogramAccumulation): number {
+  // zero counts do not get a dedicated bucket, but they are part of the overall
+  // histogram count
+  return histo
+    .toPointValue()
+    .positive.bucketCounts.reduce(
+      (total, current) => (total += current),
+      histo.zeroCount
+    );
 }

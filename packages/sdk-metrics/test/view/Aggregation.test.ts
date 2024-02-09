@@ -158,6 +158,25 @@ describe('ExplicitBucketHistogramAggregation', () => {
     }
   });
 
+  it('construct with empty boundaries', function () {
+    const boundaries: number[] = [];
+    const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
+    assert.ok(aggregation instanceof ExplicitBucketHistogramAggregation);
+    assert.deepStrictEqual(aggregation['_boundaries'], []);
+  });
+
+  it('construct with undefined boundaries should throw', function () {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore simulate how a JS user could pass undefined
+    assert.throws(() => new ExplicitBucketHistogramAggregation(undefined));
+  });
+
+  it('construct with null boundaries should throw', function () {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore simulate how a JS user could pass null
+    assert.throws(() => new ExplicitBucketHistogramAggregation(null));
+  });
+
   it('constructor should not modify inputs', () => {
     const boundaries = [100, 10, 1];
     const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
