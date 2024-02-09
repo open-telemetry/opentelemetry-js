@@ -24,7 +24,10 @@ import {
   metrics,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
-import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import {
+  AsyncHooksContextManager,
+  AsyncLocalStorageContextManager,
+} from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
   AggregationTemporality,
@@ -46,6 +49,7 @@ import {
   AlwaysOffSampler,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
+import * as semver from 'semver';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
 import { env } from 'process';
@@ -62,6 +66,10 @@ import {
   InMemoryLogRecordExporter,
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
+
+const DefaultContextManager = semver.gte(process.version, '14.8.0')
+  ? AsyncLocalStorageContextManager
+  : AsyncHooksContextManager;
 
 describe('Node SDK', () => {
   let ctxManager: any;

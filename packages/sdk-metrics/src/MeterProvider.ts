@@ -55,6 +55,14 @@ export class MeterProvider implements IMeterProvider {
         this._sharedState.viewRegistry.addView(view);
       }
     }
+
+    if (options?.readers != null && options.readers.length > 0) {
+      for (const metricReader of options.readers) {
+        const collector = new MetricCollector(this._sharedState, metricReader);
+        metricReader.setMetricProducer(collector);
+        this._sharedState.metricCollectors.push(collector);
+      }
+    }
   }
 
   /**
