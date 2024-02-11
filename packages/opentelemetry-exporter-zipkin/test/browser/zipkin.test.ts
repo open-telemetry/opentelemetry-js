@@ -28,8 +28,11 @@ import {
   ensureSpanIsCorrect,
   mockedReadableSpan,
 } from '../helper';
+import { FetchMockStatic } from 'fetch-mock/esm/client';
+const fetchMock = require('fetch-mock/esm/client').default as FetchMockStatic;
 
 const sendBeacon = navigator.sendBeacon;
+const xhr = window.XMLHttpRequest;
 
 describe('Zipkin Exporter - web', () => {
   let zipkinExporter: ZipkinExporter;
@@ -94,6 +97,30 @@ describe('Zipkin Exporter - web', () => {
 
           done();
         });
+      });
+    });
+
+    describe('when both sendBeacon and XHR are NOT available', () => {
+      const url = 'http://localhos/test-' + Math.random();
+      beforeEach(() => {
+        (window.navigator as any).sendBeacon = false;
+        (window as any).XMLHttpRequest = false;
+        zipkinExporter = new ZipkinExporter({ ...zipkinConfig, url });
+      });
+      afterEach(() => {
+        fetchMock.restore();
+        (window as any).XMLHttpRequest = xhr;
+        (window.navigator as any).sendBeacon = sendBeacon;
+      });
+
+      it('should successfully send custom headers using fetch', () => {
+        fetchMock.mock(url, 200);
+        zipkinExporter.export(spans, () => {});
+        assert.strictEqual(fetchMock.calls(url).length, 1);
+        const json = JSON.parse(
+          fetchMock.lastCall(url)?.[1]?.body?.toString() || ''
+        ) as any;
+        ensureSpanIsCorrect(json[0]);
       });
     });
 
@@ -176,6 +203,39 @@ describe('Zipkin Exporter - web', () => {
 
     afterEach(() => {
       server.restore();
+    });
+
+    describe('when both sendBeacon and XHR are NOT available', () => {
+      const url = 'http://localhos/test-' + Math.random();
+      beforeEach(() => {
+        (window.navigator as any).sendBeacon = false;
+        (window as any).XMLHttpRequest = false;
+        zipkinExporter = new ZipkinExporter({ ...zipkinConfig, url });
+      });
+      afterEach(() => {
+        fetchMock.restore();
+        (window as any).XMLHttpRequest = xhr;
+        (window.navigator as any).sendBeacon = sendBeacon;
+      });
+
+      it('should successfully send custom headers using fetch', done => {
+        fetchMock.mock(url, 200);
+        new Promise(r => {
+          zipkinExporter.export(spans, r);
+        }).then(() => {
+          setTimeout(() => {
+            assert.strictEqual(spyBeacon.callCount, 0);
+            assert.strictEqual(fetchMock.calls(url).length, 1);
+
+            const request = fetchMock.lastCall(url)?.[1];
+            const sentHeadersObj = Object.fromEntries(
+              Object.entries(request?.headers || {})
+            );
+            ensureHeadersContain(sentHeadersObj, customHeaders);
+            done();
+          });
+        });
+      });
     });
 
     describe('when "sendBeacon" is available', () => {
