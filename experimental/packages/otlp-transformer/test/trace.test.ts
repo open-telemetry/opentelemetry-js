@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { SpanKind, SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import { TraceState, hexToBase64 } from '@opentelemetry/core';
+import { TraceState, hexToBinary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -41,17 +41,17 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
 
   const traceId = useHex
     ? '00000000000000000000000000000001'
-    : hexToBase64('00000000000000000000000000000001');
-  const spanId = useHex ? '0000000000000002' : hexToBase64('0000000000000002');
+    : hexToBinary('00000000000000000000000000000001');
+  const spanId = useHex ? '0000000000000002' : hexToBinary('0000000000000002');
   const parentSpanId = useHex
     ? '0000000000000001'
-    : hexToBase64('0000000000000001');
+    : hexToBinary('0000000000000001');
   const linkSpanId = useHex
     ? '0000000000000003'
-    : hexToBase64('0000000000000003');
+    : hexToBinary('0000000000000003');
   const linkTraceId = useHex
     ? '00000000000000000000000000000002'
-    : hexToBase64('00000000000000000000000000000002');
+    : hexToBinary('00000000000000000000000000000002');
 
   return {
     resourceSpans: [

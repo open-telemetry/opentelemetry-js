@@ -120,6 +120,8 @@ export class Span implements APISpan, ReadableSpan {
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._spanLimits = parentTracer.getSpanLimits();
+    this._attributeValueLengthLimit =
+      this._spanLimits.attributeValueLengthLimit || 0;
 
     if (attributes != null) {
       this.setAttributes(attributes);
@@ -127,8 +129,6 @@ export class Span implements APISpan, ReadableSpan {
 
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
-    this._attributeValueLengthLimit =
-      this._spanLimits.attributeValueLengthLimit || 0;
   }
 
   spanContext(): SpanContext {
@@ -185,7 +185,9 @@ export class Span implements APISpan, ReadableSpan {
       return this;
     }
     if (this.events.length >= this._spanLimits.eventCountLimit!) {
-      diag.warn('Dropping extra events.');
+      if (this._droppedEventsCount === 0) {
+        diag.debug('Dropping extra events.');
+      }
       this.events.shift();
       this._droppedEventsCount++;
     }
@@ -240,6 +242,12 @@ export class Span implements APISpan, ReadableSpan {
       );
       this.endTime = this.startTime.slice() as HrTime;
       this._duration = [0, 0];
+    }
+
+    if (this._droppedEventsCount > 0) {
+      diag.warn(
+        `Dropped ${this._droppedEventsCount} events because eventCountLimit reached`
+      );
     }
 
     this._spanProcessor.onEnd(this);

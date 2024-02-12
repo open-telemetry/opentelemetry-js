@@ -221,7 +221,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
     const flush = () => {
       this._isExporting = true;
       this._flushOneBatch()
-        .then(() => {
+        .finally(() => {
           this._isExporting = false;
           if (this._finishedSpans.length > 0) {
             this._clearTimer();

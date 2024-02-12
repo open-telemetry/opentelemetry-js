@@ -15,7 +15,53 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-metrics): allow single bucket histograms [#4456](https://github.com/open-telemetry/opentelemetry-js/pull/4456) @pichlermarc
+* feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): handle zero bucket counts in exponential histogram merge [#4459](https://github.com/open-telemetry/opentelemetry-js/pull/4459) @mwear
+* fix(sdk-metrics): ignore `NaN` value recordings in Histograms [#4455](https://github.com/open-telemetry/opentelemetry-js/pull/4455) @pichlermarc
+  * fixes a bug where recording `NaN` on a histogram would result in the sum of bucket count values not matching the overall count
+* fix(sdk-metrics): allow single bucket histograms [#4456](https://github.com/open-telemetry/opentelemetry-js/pull/4456) @pichlermarc
+  * fixes a bug where `Meter.createHistogram()` with the advice `explicitBucketBoundaries: []` would throw
+
 ### :books: (Refine Doc)
+
+* docs: shorten readme sections [#4460](https://github.com/open-telemetry/opentelemetry-js/pull/4460) @legendecas
+
+### :house: (Internal)
+
+## 1.21.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): add constructor option to add metric readers [#4427](https://github.com/open-telemetry/opentelemetry-js/pull/4427) @pichlermarc
+  * deprecates `MeterProvider.addMetricReader()` please use the constructor option `readers` instead.
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): ensure attribute value length limit is enforced on span creation [#4417](https://github.com/open-telemetry/opentelemetry-js/pull/4417) @pichlermarc
+* fix(sdk-trace-base): Export processed spans while exporter failed [#4287](https://github.com/open-telemetry/opentelemetry-js/pull/4287) @Zirak
+
+### :house: (Internal)
+
+* chore(opentelemetry-context-zone-peer-dep): support zone.js ^v0.13.0 [#4320](https://github.com/open-telemetry/opentelemetry-js/pull/4320)
+* refactor(core): drop unnecessary assignment of HOSTNAME [#4421](https://github.com/open-telemetry/opentelemetry-js/pull/4421) @pichlermarc
+* test(opentelemetry-context-zone-peer-dep): transpile zone.js in tests [#4423](https://github.com/open-telemetry/opentelemetry-js/pull/4423) @legendecas
+
+## 1.20.0
+
+### :rocket: (Enhancement)
+
+* perf(otlp-transformer): skip unnecessary base64 encode of span contexts [#4343](https://github.com/open-telemetry/opentelemetry-js/pull/4343) @seemk
+* feat(sdk-trace-base): improve log messages when dropping span events [#4223](https://github.com/open-telemetry/opentelemetry-js/pull/4223) @mkubliniak
+
+## 1.19.0
+
+### :rocket: (Enhancement)
+
+* feat: add node 20 support [#4336](https://github.com/open-telemetry/opentelemetry-js/pull/4336) @dyladan
 
 ### :house: (Internal)
 

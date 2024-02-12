@@ -28,7 +28,6 @@ import {
   TraceFlags,
   TraceState,
 } from '@opentelemetry/api';
-import { getSpan } from '@opentelemetry/api/build/src/trace/context-utils';
 import {
   InstrumentationLibrary,
   sanitizeAttributes,
@@ -303,7 +302,7 @@ describe('Tracer', () => {
     const samplerContext = shouldSampleSpy.firstCall.args[0];
     const processorContext = onStartSpy.firstCall.args[1];
     assert.strictEqual(samplerContext, processorContext);
-    assert.strictEqual(getSpan(samplerContext), undefined);
+    assert.strictEqual(trace.getSpan(samplerContext), undefined);
   });
 
   it('should sample a trace when OTEL_TRACES_SAMPLER_ARG is unset', () => {
@@ -361,7 +360,7 @@ describe('Tracer', () => {
       tracer.startActiveSpan('my-span', span => {
         try {
           assert(spy.calledWith('my-span'));
-          assert.strictEqual(getSpan(context.active()), span);
+          assert.strictEqual(trace.getSpan(context.active()), span);
           return 1;
         } finally {
           span.end();
@@ -387,7 +386,7 @@ describe('Tracer', () => {
         span => {
           try {
             assert(spy.calledWith('my-span', { attributes: { foo: 'bar' } }));
-            assert.strictEqual(getSpan(context.active()), span);
+            assert.strictEqual(trace.getSpan(context.active()), span);
             return 1;
           } finally {
             span.end();
@@ -421,7 +420,7 @@ describe('Tracer', () => {
             assert(
               spy.calledWith('my-span', { attributes: { foo: 'bar' } }, ctx)
             );
-            assert.strictEqual(getSpan(context.active()), span);
+            assert.strictEqual(trace.getSpan(context.active()), span);
             assert.strictEqual(ctx.getValue(ctxKey), 'bar');
             return 1;
           } finally {

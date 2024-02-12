@@ -193,6 +193,12 @@ export class ExponentialHistogramAccumulation implements Accumulation {
    * @param increment
    */
   updateByIncrement(value: number, increment: number) {
+    // NaN does not fall into any bucket, is not zero and should not be counted,
+    // NaN is never greater than max nor less than min, therefore return as there's nothing for us to do.
+    if (Number.isNaN(value)) {
+      return;
+    }
+
     if (value > this._max) {
       this._max = value;
     }
@@ -342,6 +348,10 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     if (increment === 0) {
       // nothing to do for a zero increment, can happen during a merge operation
       return;
+    }
+
+    if (buckets.length === 0) {
+      buckets.indexStart = buckets.indexEnd = buckets.indexBase = index;
     }
 
     if (index < buckets.indexStart) {

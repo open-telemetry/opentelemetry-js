@@ -47,7 +47,7 @@ const {
 } = require("@opentelemetry/auto-instrumentations-node");
 
 const jaegerExporter = new JaegerExporter();
-const prometheusExporter = new PrometheusExporter({ startServer: true });
+const prometheusExporter = new PrometheusExporter();
 
 const sdk = new opentelemetry.NodeSDK({
   // Optional - if omitted, the tracing SDK will be initialized from environment variables
@@ -123,6 +123,12 @@ NOTE: In order to enable the detection, the parameter `autoDetectResources` has 
 Configure a custom sampler. By default, all traces will be sampled.
 
 ### spanProcessor
+
+Deprecated, please use [spanProcessors](#spanprocessors) instead.
+
+### spanProcessors
+
+An array of span processors to register to the tracer provider.
 
 ### traceExporter
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope, hexToBase64 } from '@opentelemetry/core';
+import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import {
@@ -28,8 +28,8 @@ import { SeverityNumber } from '@opentelemetry/api-logs';
 function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
   const traceId = useHex
     ? '00000000000000000000000000000001'
-    : hexToBase64('00000000000000000000000000000001');
-  const spanId = useHex ? '0000000000000002' : hexToBase64('0000000000000002');
+    : hexToBinary('00000000000000000000000000000001');
+  const spanId = useHex ? '0000000000000002' : hexToBinary('0000000000000002');
 
   return {
     resourceLogs: [
