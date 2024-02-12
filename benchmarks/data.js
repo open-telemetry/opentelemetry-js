@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707740429645,
+  "lastUpdate": 1707740551931,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4540,6 +4540,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.12%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "01348e6fbc73646703c64f85c623406503692ebc",
+          "message": "fix(instrumentation): normalize paths for internal files in scoped packages (#4467)\n\n* fix(instrumentation): normalize paths for internal files in scoped packages\r\n\r\n* fix(instrumentation): normalize name passed to onRequire in RequireInTheMiddleSingleton\r\n\r\n* fix(instrumentation): apply normalization during filtering internal files\r\n\r\n* fix(changelog): add changelog entry\r\n\r\n* fix: normalize before filtering\r\n\r\n* fix: lint",
+          "timestamp": "2024-02-12T13:09:15+01:00",
+          "tree_id": "ca07b43b2e39af82ccac2ad553949dc05fb2fb5c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/01348e6fbc73646703c64f85c623406503692ebc"
+        },
+        "date": 1707740551113,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 973572,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12200,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 673773,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 652111,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
