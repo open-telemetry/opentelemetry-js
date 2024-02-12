@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1707234331632,
+  "lastUpdate": 1707740429645,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4488,6 +4488,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "25548fd9a5a130752fa378cdf5d7fd8e02d7bf5f",
+          "message": "feat(context-zone*): support zone.js 0.13.x, 0.14.x (#4469)\n\n* feat(context-zone*): support zone.js 0.13.x, 0.14.x\r\n\r\n* fix(changelog): add changelog entry\r\n\r\n* fix(changelog): formatting",
+          "timestamp": "2024-02-12T13:08:45+01:00",
+          "tree_id": "84e992384840f44946809da0bc734be8a0b3ceac",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/25548fd9a5a130752fa378cdf5d7fd8e02d7bf5f"
+        },
+        "date": 1707740428830,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 940891,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11819,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 653132,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 642285,
+            "range": "±0.12%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
