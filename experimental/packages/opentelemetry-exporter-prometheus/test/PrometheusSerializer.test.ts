@@ -622,7 +622,6 @@ describe('PrometheusSerializer', () => {
     it('should serialize non-finite values', async () => {
       const serializer = new PrometheusSerializer();
       const cases = [
-        [NaN, 'NaN'],
         [-Infinity, '-Inf'],
         [+Infinity, '+Inf'],
       ] as [number, string][];

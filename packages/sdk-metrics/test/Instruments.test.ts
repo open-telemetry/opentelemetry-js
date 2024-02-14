@@ -247,6 +247,7 @@ describe('Instruments', () => {
       upDownCounter.add(1.1, { foo: 'bar' });
       // non-number values should be ignored.
       upDownCounter.add('1' as any);
+
       await validateExport(deltaReader, {
         dataPointType: DataPointType.SUM,
         isMonotonic: false,
@@ -406,6 +407,20 @@ describe('Instruments', () => {
       });
     });
 
+    it('should allow metric advice with empty explicit boundaries', function () {
+      const meter = new MeterProvider({
+        readers: [new TestMetricReader()],
+      }).getMeter('meter');
+
+      assert.doesNotThrow(() => {
+        meter.createHistogram('histogram', {
+          advice: {
+            explicitBucketBoundaries: [],
+          },
+        });
+      });
+    });
+
     it('should collect min and max', async () => {
       const { meter, deltaReader, cumulativeReader } = setup();
       const histogram = meter.createHistogram('test', {
@@ -506,6 +521,7 @@ describe('Instruments', () => {
       histogram.record(0.1, { foo: 'bar' });
       // non-number values should be ignored.
       histogram.record('1' as any);
+      histogram.record(NaN);
 
       await validateExport(deltaReader, {
         dataPointType: DataPointType.HISTOGRAM,
