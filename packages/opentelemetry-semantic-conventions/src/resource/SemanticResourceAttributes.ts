@@ -46,6 +46,11 @@ export const SemanticResourceAttributes = {
   CLOUD_PLATFORM: 'cloud.platform',
 
   /**
+   * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an ARN on AWS, a fully qualified resource ID on Azure, a full resource name on GCP).
+   */
+  CLOUD_RESOURCE_ID: 'cloud.resource.id',
+
+  /**
    * The Amazon Resource Name (ARN) of an [ECS container instance](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html).
    */
   AWS_ECS_CONTAINER_ARN: 'aws.ecs.container.arn',
