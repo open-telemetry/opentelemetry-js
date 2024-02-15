@@ -16,7 +16,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(instrumentation): allow LoggerProvider to be specified in Instrumentations [#4314](https://github.com/open-telemetry/opentelemetry-js/pull/4314) @hectorhdzg
-* feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
+* feat(instrumentation): add getModuleDefinitions() to InstrumentationBase [#4475](https://github.com/open-telemetry/opentelemetry-js/pull/4475) @pichlermarc
 * feat(exporter-metrics-otlp-http): add option to set the exporter aggregation preference  [#4409](https://github.com/open-telemetry/opentelemetry-js/pull/4409) @AkselAllas
 * feat(node-sdk): add spanProcessors option [#4454](https://github.com/open-telemetry/opentelemetry-js/pull/4454) @naseemkullah
 
@@ -25,6 +25,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(sdk-node): allow using samplers when the exporter is defined in the environment [#4394](https://github.com/open-telemetry/opentelemetry-js/pull/4394) @JacksonWeber
 * fix(instrumentation): normalize paths for internal files in scoped packages [#4467](https://github.com/open-telemetry/opentelemetry-js/pull/4467) @pichlermarc
   * Fixes a bug where, on Windows, internal files on scoped packages would not be instrumented.
+* fix(otlp-transformer): only use BigInt inside hrTimeToNanos() [#4484](https://github.com/open-telemetry/opentelemetry-js/pull/4484) @pichlermarc
 
 ### :books: (Refine Doc)
 
