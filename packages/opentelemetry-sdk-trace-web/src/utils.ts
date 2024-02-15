@@ -60,13 +60,19 @@ export function hasKey<O extends object>(
 export function addSpanNetworkEvent(
   span: api.Span,
   performanceName: string,
-  entries: PerformanceEntries
+  entries: PerformanceEntries,
+  refPerfName?: string
 ): api.Span | undefined {
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
   ) {
-    span.addEvent(performanceName, entries[performanceName]);
+    let perfTime = entries[performanceName];
+    const refName = refPerfName || PTN.FETCH_START;
+    if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
+      perfTime = Math.max(perfTime || 0, entries[refName] || 0);
+    }
+    span.addEvent(performanceName, perfTime);
     return span;
   }
   return undefined;
