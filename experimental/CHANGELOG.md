@@ -6,6 +6,13 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(otlp-exporter-base)!: remove unload event from OTLPExporterBrowserBase [#4438](https://github.com/open-telemetry/opentelemetry-js/pull/4438) @eldavojohn
+  * Reason: The 'unload' event prevents sites from taking advantage of Google's [backward/forward cache](https://web.dev/articles/bfcache#never_use_the_unload_event) and will be [deprecated](https://developer.chrome.com/articles/deprecating-unload/).  It is now up to the consuming site to implement these shutdown events.
+  * This breaking change affects users under this scenario:
+    1. A user extends the exporter and overrides the shutdown function, and does something which is usually called by the unload listener
+    2. We remove the unload event listener
+    3. That user's overridden shutdown function no longer gets called
+
 ### :rocket: (Enhancement)
 
 * feat(instrumentation): allow LoggerProvider to be specified in Instrumentations [#4314](https://github.com/open-telemetry/opentelemetry-js/pull/4314) @hectorhdzg
