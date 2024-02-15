@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1708002381071,
+  "lastUpdate": 1708006182961,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4748,6 +4748,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eldavojohn@users.noreply.github.com",
+            "name": "eldavojohn",
+            "username": "eldavojohn"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "356ef8af4a8b329ee039b94a43a1311354f58e9b",
+          "message": "chore: remove unload event from OTLPExporterBrowserBase (#4438)\n\n* Add the ability for the implementation to provide the binding event for shutdown.\r\n\r\n* fix: whoops totally missed the linting formatting fix step\r\n\r\n* Remove any concept of a shutdown event\r\n\r\n* add change log and obey interface\r\n\r\n* no longer need globalthis\r\n\r\n* modify the correct changelog and identify this as a breaking change under the scenario in comments\r\n\r\n* markdown lint\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-02-15T15:07:54+01:00",
+          "tree_id": "d03784b0dc5e8e6bfbf125c5f072a0e21c74e823",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/356ef8af4a8b329ee039b94a43a1311354f58e9b"
+        },
+        "date": 1708006182132,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 940063,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11686,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 666274,
+            "range": "±0.85%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 653996,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
