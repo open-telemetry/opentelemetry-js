@@ -109,6 +109,23 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /**
+   * @experimental
+   *
+   * Get module definitions defined by {@link init}.
+   * This can be used for experimental compile-time instrumentation.
+   *
+   * @returns an array of {@link InstrumentationModuleDefinition}
+   */
+  public getModuleDefinitions(): InstrumentationModuleDefinition<T>[] {
+    const initResult = this.init() ?? [];
+    if (!Array.isArray(initResult)) {
+      return [initResult];
+    }
+
+    return initResult;
+  }
+
+  /**
    * Sets the new metric instruments with the current Meter.
    */
   protected _updateMetricInstruments(): void {
@@ -153,11 +170,8 @@ export abstract class InstrumentationAbstract<T = any>
   /**
    * Init method in which plugin should define _modules and patches for
    * methods.
-   * Use `enable()` if you are trying to turn on this plugin. This method
-   * will return objects to patch specific modules with the appropriate
-   * instrumentation (or not return anything).
    */
-  abstract init():
+  protected abstract init():
     | InstrumentationModuleDefinition<T>
     | InstrumentationModuleDefinition<T>[]
     | void;
