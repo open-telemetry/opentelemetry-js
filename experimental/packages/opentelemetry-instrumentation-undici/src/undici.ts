@@ -354,25 +354,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
     span.end();
     this._recordFromReq.delete(request);
 
-    // Time to record metrics
-    const metricsAttributes: Attributes = {};
-    // Get the attribs already in span attributes
-    const keysToCopy = [
-      SemanticAttributes.HTTP_RESPONSE_STATUS_CODE,
-      SemanticAttributes.HTTP_REQUEST_METHOD,
-      SemanticAttributes.SERVER_ADDRESS,
-      SemanticAttributes.SERVER_PORT,
-      SemanticAttributes.URL_SCHEME,
-    ];
-    keysToCopy.forEach((key) => {
-      if (key in attributes) {
-        metricsAttributes[key] = attributes[key];
-      }
-    });
-
-    // Take the duration and record it
-    const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
-    this._httpClientDurationHistogram.record(duration, metricsAttributes);
+    // Record metrics
+    this.recordRequestDuration(attributes, startTime);
   }
 
   // This is the event we get when something is wrong in the request like
@@ -388,10 +371,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return;
     }
 
-    const {span, attributes} = record;
-
-    // TODO: add metrics
-
+    const {span, attributes, startTime} = record;
 
     // NOTE: in `undici@6.3.0` when request aborted the error type changes from
     // a custom error (`RequestAbortedError`) to a built-in `DOMException` carrying
@@ -405,5 +385,33 @@ export class UndiciInstrumentation extends InstrumentationBase {
       message: error.message,
     });
     span.end();
+    this._recordFromReq.delete(request);
+
+    // Record metrics (with the error)
+    attributes[SemanticAttributes.ERROR_TYPE] = error.message;
+    this.recordRequestDuration(attributes, startTime);
+  }
+
+  private recordRequestDuration(attributes: Attributes, startTime: HrTime) {
+    // Time to record metrics
+    const metricsAttributes: Attributes = {};
+    // Get the attribs already in span attributes
+    const keysToCopy = [
+      SemanticAttributes.HTTP_RESPONSE_STATUS_CODE,
+      SemanticAttributes.HTTP_REQUEST_METHOD,
+      SemanticAttributes.SERVER_ADDRESS,
+      SemanticAttributes.SERVER_PORT,
+      SemanticAttributes.URL_SCHEME,
+      SemanticAttributes.ERROR_TYPE,
+    ];
+    keysToCopy.forEach((key) => {
+      if (key in attributes) {
+        metricsAttributes[key] = attributes[key];
+      }
+    });
+
+    // Take the duration and record it
+    const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
+    this._httpClientDurationHistogram.record(duration, metricsAttributes);
   }
 }

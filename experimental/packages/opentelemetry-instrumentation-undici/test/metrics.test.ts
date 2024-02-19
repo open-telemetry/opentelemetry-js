@@ -143,22 +143,20 @@ describe('UndiciInstrumentation metrics tests', function () {
       );
     });
 
-    it.only('should have error.type in "http.client.request.duration" metric', async () => {
-      const fetchUrl = 'http://unknownhost.com/';
+    it('should have error.type in "http.client.request.duration" metric', async () => {
+      const fetchUrl = 'http://unknownhost/';
 
       try {
         await fetch(fetchUrl);
       } catch (err) {
         // Expected error, do nothing
-        console.log('expected err', err)
       }
       
       await metricReader.collectAndExport();
       const resourceMetrics = metricsMemoryExporter.getMetrics();
       const scopeMetrics = resourceMetrics[0].scopeMetrics;
       const metrics = scopeMetrics[0].metrics;
-      console.dir(resourceMetrics, {depth: 9});
-      
+
       assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
       assert.strictEqual(metrics.length, 1, 'metrics count');
       assert.strictEqual(metrics[0].descriptor.name, 'http.client.request.duration');
@@ -181,17 +179,16 @@ describe('UndiciInstrumentation metrics tests', function () {
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.SERVER_ADDRESS],
-        'unknownhost.com',
+        'unknownhost',
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.SERVER_PORT],
         80,
       );
-      // TODO: check error.type
-      // assert.strictEqual(
-      //   metricAttributes[SemanticAttributes.HTTP_RESPONSE_STATUS_CODE],
-      //   200,
-      // );
+      assert.ok(
+        metricAttributes[SemanticAttributes.ERROR_TYPE],
+        `the metric contains "${SemanticAttributes.ERROR_TYPE}" attribute if request failed`,
+      );
     });
   });
 });
