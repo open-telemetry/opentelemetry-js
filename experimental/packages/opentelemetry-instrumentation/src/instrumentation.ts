@@ -24,6 +24,7 @@ import {
   Tracer,
   TracerProvider,
 } from '@opentelemetry/api';
+import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
 import * as shimmer from 'shimmer';
 import {
   InstrumentationModuleDefinition,
@@ -41,6 +42,7 @@ export abstract class InstrumentationAbstract<T = any>
 
   private _tracer: Tracer;
   private _meter: Meter;
+  private _logger: Logger;
   protected _diag: DiagLogger;
 
   constructor(
@@ -58,8 +60,8 @@ export abstract class InstrumentationAbstract<T = any>
     });
 
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
-
     this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
+    this._logger = logs.getLogger(instrumentationName, instrumentationVersion);
     this._updateMetricInstruments();
   }
 
@@ -88,6 +90,39 @@ export abstract class InstrumentationAbstract<T = any>
     );
 
     this._updateMetricInstruments();
+  }
+
+  /* Returns logger */
+  protected get logger(): Logger {
+    return this._logger;
+  }
+
+  /**
+   * Sets LoggerProvider to this plugin
+   * @param loggerProvider
+   */
+  public setLoggerProvider(loggerProvider: LoggerProvider): void {
+    this._logger = loggerProvider.getLogger(
+      this.instrumentationName,
+      this.instrumentationVersion
+    );
+  }
+
+  /**
+   * @experimental
+   *
+   * Get module definitions defined by {@link init}.
+   * This can be used for experimental compile-time instrumentation.
+   *
+   * @returns an array of {@link InstrumentationModuleDefinition}
+   */
+  public getModuleDefinitions(): InstrumentationModuleDefinition<T>[] {
+    const initResult = this.init() ?? [];
+    if (!Array.isArray(initResult)) {
+      return [initResult];
+    }
+
+    return initResult;
   }
 
   /**
@@ -134,7 +169,7 @@ export abstract class InstrumentationAbstract<T = any>
 
   /**
    * Init method in which plugin should define _modules and patches for
-   * methods
+   * methods.
    */
   protected abstract init():
     | InstrumentationModuleDefinition<T>

@@ -35,6 +35,7 @@ export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: IResource;
   views?: View[];
+  readers?: MetricReader[];
 }
 
 /**
@@ -52,6 +53,12 @@ export class MeterProvider implements IMeterProvider {
     if (options?.views != null && options.views.length > 0) {
       for (const view of options.views) {
         this._sharedState.viewRegistry.addView(view);
+      }
+    }
+
+    if (options?.readers != null && options.readers.length > 0) {
+      for (const metricReader of options.readers) {
+        this.addMetricReader(metricReader);
       }
     }
   }
@@ -77,7 +84,13 @@ export class MeterProvider implements IMeterProvider {
    * Register a {@link MetricReader} to the meter provider. After the
    * registration, the MetricReader can start metrics collection.
    *
+   * <p> NOTE: {@link MetricReader} instances MUST be added before creating any instruments.
+   * A {@link MetricReader} instance registered later may receive no or incomplete metric data.
+   *
    * @param metricReader the metric reader to be registered.
+   *
+   * @deprecated This method will be removed in SDK 2.0. Please use
+   * {@link MeterProviderOptions.readers} via the {@link MeterProvider} constructor instead
    */
   addMetricReader(metricReader: MetricReader) {
     const collector = new MetricCollector(this._sharedState, metricReader);

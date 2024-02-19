@@ -19,9 +19,11 @@ import {
   Instrumentation,
   InstrumentationBase,
   InstrumentationConfig,
+  InstrumentationModuleDefinition,
 } from '../../src';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { LoggerProvider } from '@opentelemetry/sdk-logs';
 
 interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
@@ -90,6 +92,23 @@ describe('BaseInstrumentation', () => {
     });
   });
 
+  describe('setLoggerProvider', () => {
+    it('should get a logger from provider', () => {
+      let called = true;
+      class TestLoggerProvider extends LoggerProvider {
+        override getLogger(name: any, version?: any, options?: any) {
+          called = true;
+          return super.getLogger(name, version, options);
+        }
+      }
+      instrumentation = new TestInstrumentation();
+      if (instrumentation.setLoggerProvider) {
+        instrumentation.setLoggerProvider(new TestLoggerProvider());
+      }
+      assert.strictEqual(called, true);
+    });
+  });
+
   describe('getConfig', () => {
     it('should return instrumentation config', () => {
       const instrumentation: Instrumentation = new TestInstrumentation({
@@ -112,6 +131,56 @@ describe('BaseInstrumentation', () => {
       const configuration =
         instrumentation.getConfig() as TestInstrumentationConfig;
       assert.strictEqual(configuration.isActive, true);
+    });
+  });
+
+  describe('getModuleDefinitions', () => {
+    const moduleDefinition: InstrumentationModuleDefinition<unknown> = {
+      name: 'foo',
+      patch: moduleExports => {},
+      unpatch: moduleExports => {},
+      moduleExports: {},
+      files: [],
+      supportedVersions: ['*'],
+    };
+
+    it('should return single module definition from init() as array ', () => {
+      class TestInstrumentation2 extends TestInstrumentation {
+        override init() {
+          return moduleDefinition;
+        }
+      }
+      const instrumentation = new TestInstrumentation2();
+
+      assert.deepStrictEqual(instrumentation.getModuleDefinitions(), [
+        moduleDefinition,
+      ]);
+    });
+
+    it('should return multiple module definitions from init() as array ', () => {
+      class TestInstrumentation2 extends TestInstrumentation {
+        override init() {
+          return [moduleDefinition, moduleDefinition, moduleDefinition];
+        }
+      }
+      const instrumentation = new TestInstrumentation2();
+
+      assert.deepStrictEqual(instrumentation.getModuleDefinitions(), [
+        moduleDefinition,
+        moduleDefinition,
+        moduleDefinition,
+      ]);
+    });
+
+    it('should return void from init() as empty array ', () => {
+      class TestInstrumentation2 extends TestInstrumentation {
+        override init() {
+          return;
+        }
+      }
+      const instrumentation = new TestInstrumentation2();
+
+      assert.deepStrictEqual(instrumentation.getModuleDefinitions(), []);
     });
   });
 });
