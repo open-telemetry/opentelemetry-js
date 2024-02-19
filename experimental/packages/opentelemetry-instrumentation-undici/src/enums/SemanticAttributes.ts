@@ -16,10 +16,9 @@
 
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
 export const SemanticAttributes = {
-
   /**
-  * State of the HTTP connection in the HTTP connection pool.
-  */
+   * State of the HTTP connection in the HTTP connection pool.
+   */
   HTTP_CONNECTION_STATE: 'http.connection.state',
 
   /**
@@ -44,8 +43,8 @@ it&#39;s RECOMMENDED to:
   ERROR_TYPE: 'error.type',
 
   /**
-  * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
-  */
+   * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
+   */
   HTTP_REQUEST_BODY_SIZE: 'http.request.body.size',
 
   /**
@@ -69,25 +68,25 @@ Tracing instrumentations that do so, MUST also set `http.request.method_original
   HTTP_REQUEST_METHOD: 'http.request.method',
 
   /**
-  * Original HTTP method sent by the client in the request line.
-  */
+   * Original HTTP method sent by the client in the request line.
+   */
   HTTP_REQUEST_METHOD_ORIGINAL: 'http.request.method_original',
 
   /**
-  * The ordinal number of request resending attempt (for any reason, including redirects).
-  *
-  * Note: The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
-  */
+   * The ordinal number of request resending attempt (for any reason, including redirects).
+   *
+   * Note: The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
+   */
   HTTP_REQUEST_RESEND_COUNT: 'http.request.resend_count',
 
   /**
-  * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
-  */
+   * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
+   */
   HTTP_RESPONSE_BODY_SIZE: 'http.response.body.size',
 
   /**
-  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
-  */
+   * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
+   */
   HTTP_RESPONSE_STATUS_CODE: 'http.response.status_code',
 
   /**
@@ -99,41 +98,41 @@ SHOULD include the [application root](/docs/http/http-spans.md#http-server-defin
   HTTP_ROUTE: 'http.route',
 
   /**
-  * Peer address of the network connection - IP address or Unix domain socket name.
-  */
+   * Peer address of the network connection - IP address or Unix domain socket name.
+   */
   NETWORK_PEER_ADDRESS: 'network.peer.address',
 
   /**
-  * Peer port number of the network connection.
-  */
+   * Peer port number of the network connection.
+   */
   NETWORK_PEER_PORT: 'network.peer.port',
 
   /**
-  * [OSI application layer](https://osi-model.com/application-layer/) or non-OSI equivalent.
-  *
-  * Note: The value SHOULD be normalized to lowercase.
-  */
+   * [OSI application layer](https://osi-model.com/application-layer/) or non-OSI equivalent.
+   *
+   * Note: The value SHOULD be normalized to lowercase.
+   */
   NETWORK_PROTOCOL_NAME: 'network.protocol.name',
 
   /**
-  * Version of the protocol specified in `network.protocol.name`.
-  *
-  * Note: `network.protocol.version` refers to the version of the protocol used and might be different from the protocol client&#39;s version. If the HTTP client has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
-  */
+   * Version of the protocol specified in `network.protocol.name`.
+   *
+   * Note: `network.protocol.version` refers to the version of the protocol used and might be different from the protocol client&#39;s version. If the HTTP client has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
+   */
   NETWORK_PROTOCOL_VERSION: 'network.protocol.version',
 
   /**
-  * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
-  *
-  * Note: When observed from the client side, and when communicating through an intermediary, `server.address` SHOULD represent the server address behind any intermediaries, for example proxies, if it&#39;s available.
-  */
+   * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+   *
+   * Note: When observed from the client side, and when communicating through an intermediary, `server.address` SHOULD represent the server address behind any intermediaries, for example proxies, if it&#39;s available.
+   */
   SERVER_ADDRESS: 'server.address',
 
   /**
-  * Server port number.
-  *
-  * Note: When observed from the client side, and when communicating through an intermediary, `server.port` SHOULD represent the server port behind any intermediaries, for example proxies, if it&#39;s available.
-  */
+   * Server port number.
+   *
+   * Note: When observed from the client side, and when communicating through an intermediary, `server.port` SHOULD represent the server port behind any intermediaries, for example proxies, if it&#39;s available.
+   */
   SERVER_PORT: 'server.port',
 
   /**
@@ -146,24 +145,24 @@ SHOULD include the [application root](/docs/http/http-spans.md#http-server-defin
   URL_FULL: 'url.full',
 
   /**
-  * The [URI path](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) component.
-  */
+   * The [URI path](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) component.
+   */
   URL_PATH: 'url.path',
 
   /**
-  * The [URI query](https://www.rfc-editor.org/rfc/rfc3986#section-3.4) component.
-  *
-  * Note: Sensitive content provided in query string SHOULD be scrubbed when instrumentations can identify it.
-  */
+   * The [URI query](https://www.rfc-editor.org/rfc/rfc3986#section-3.4) component.
+   *
+   * Note: Sensitive content provided in query string SHOULD be scrubbed when instrumentations can identify it.
+   */
   URL_QUERY: 'url.query',
 
   /**
-  * The [URI scheme](https://www.rfc-editor.org/rfc/rfc3986#section-3.1) component identifying the used protocol.
-  */
+   * The [URI scheme](https://www.rfc-editor.org/rfc/rfc3986#section-3.1) component identifying the used protocol.
+   */
   URL_SCHEME: 'url.scheme',
 
   /**
-  * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
-  */
+   * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
+   */
   USER_AGENT_ORIGINAL: 'user_agent.original',
-}
+};

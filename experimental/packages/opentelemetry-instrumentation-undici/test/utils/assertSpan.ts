@@ -44,7 +44,11 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext().traceId.length, 32);
   assert.strictEqual(span.spanContext().spanId.length, 16);
   assert.strictEqual(span.kind, SpanKind.CLIENT, 'span.kind is correct');
-  assert.strictEqual(span.name, `HTTP ${validations.httpMethod}`, 'span.name is correct');
+  assert.strictEqual(
+    span.name,
+    `HTTP ${validations.httpMethod}`,
+    'span.name is correct'
+  );
   // TODO: check this
   // assert.strictEqual(
   //   span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],
@@ -54,14 +58,14 @@ export const assertSpan = (
   assert.strictEqual(
     span.attributes[SemanticAttributes.HTTP_REQUEST_METHOD],
     validations.httpMethod,
-    `attributes['${SemanticAttributes.HTTP_REQUEST_METHOD}'] is correct`,
+    `attributes['${SemanticAttributes.HTTP_REQUEST_METHOD}'] is correct`
   );
 
   if (validations.path) {
     assert.strictEqual(
       span.attributes[SemanticAttributes.URL_PATH],
       validations.path,
-      `attributes['${SemanticAttributes.URL_PATH}'] is correct`,
+      `attributes['${SemanticAttributes.URL_PATH}'] is correct`
     );
   }
 
@@ -69,36 +73,43 @@ export const assertSpan = (
     assert.strictEqual(
       span.attributes[SemanticAttributes.URL_QUERY],
       validations.query,
-      `attributes['${SemanticAttributes.URL_QUERY}'] is correct`,
+      `attributes['${SemanticAttributes.URL_QUERY}'] is correct`
     );
   }
-  
+
   assert.strictEqual(
     span.attributes[SemanticAttributes.HTTP_RESPONSE_STATUS_CODE],
     validations.httpStatusCode,
-    `attributes['${SemanticAttributes.HTTP_RESPONSE_STATUS_CODE}'] is correct ${span.attributes[SemanticAttributes.HTTP_RESPONSE_STATUS_CODE]}`,
+    `attributes['${SemanticAttributes.HTTP_RESPONSE_STATUS_CODE}'] is correct ${
+      span.attributes[SemanticAttributes.HTTP_RESPONSE_STATUS_CODE]
+    }`
   );
 
   assert.strictEqual(span.links.length, 0, 'there are no links');
 
   if (validations.error) {
     assert.strictEqual(span.events.length, 1, 'span contains one error event');
-    assert.strictEqual(span.events[0].name, 'exception', 'error event name is correct');
+    assert.strictEqual(
+      span.events[0].name,
+      'exception',
+      'error event name is correct'
+    );
 
     const eventAttributes = span.events[0].attributes;
     assert.ok(eventAttributes != null, 'event has attributes');
-    assert.deepStrictEqual(Object.keys(eventAttributes), [
-      'exception.type',
-      'exception.message',
-      'exception.stacktrace',
-    ], 'the event attribute names are correct');
+    assert.deepStrictEqual(
+      Object.keys(eventAttributes),
+      ['exception.type', 'exception.message', 'exception.stacktrace'],
+      'the event attribute names are correct'
+    );
   } else {
     assert.strictEqual(span.events.length, 0, 'span contains no events');
   }
 
   const { httpStatusCode } = validations;
-  const isStatusUnset = httpStatusCode && httpStatusCode >= 100 && httpStatusCode < 400;
-  
+  const isStatusUnset =
+    httpStatusCode && httpStatusCode >= 100 && httpStatusCode < 400;
+
   assert.deepStrictEqual(
     span.status,
     validations.forceStatus || {
@@ -108,23 +119,27 @@ export const assertSpan = (
   );
 
   assert.ok(span.endTime, 'must be finished');
-  assert.ok(hrTimeToNanoseconds(span.duration) > 0, 'must have positive duration');
+  assert.ok(
+    hrTimeToNanoseconds(span.duration) > 0,
+    'must have positive duration'
+  );
 
   if (validations.resHeaders) {
-    const contentLengthHeader = validations.resHeaders instanceof Headers ?
-      validations.resHeaders.get('content-length') :
-      validations.resHeaders['content-length'];
-    
+    const contentLengthHeader =
+      validations.resHeaders instanceof Headers
+        ? validations.resHeaders.get('content-length')
+        : validations.resHeaders['content-length'];
+
     if (contentLengthHeader) {
       const contentLength = Number(contentLengthHeader);
-  
+
       assert.strictEqual(
         span.attributes['http.response.header.content-length'],
         contentLength
       );
     }
   }
-  
+
   assert.strictEqual(
     span.attributes[SemanticAttributes.SERVER_ADDRESS],
     validations.hostname,
@@ -147,11 +162,11 @@ export const assertSpan = (
     `${SemanticAttributes.URL_FULL} & ${SemanticAttributes.SERVER_ADDRESS} must be consistent`
   );
 
-
   if (validations.reqHeaders) {
-    const userAgent = validations.reqHeaders instanceof Headers ?
-      validations.reqHeaders.get('user-agent') :
-      validations.reqHeaders['user-agent'];
+    const userAgent =
+      validations.reqHeaders instanceof Headers
+        ? validations.reqHeaders.get('user-agent')
+        : validations.reqHeaders['user-agent'];
     if (userAgent) {
       assert.strictEqual(
         span.attributes[SemanticAttributes.USER_AGENT_ORIGINAL],

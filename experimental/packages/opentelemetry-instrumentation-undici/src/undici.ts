@@ -16,7 +16,10 @@
 import * as diagch from 'diagnostics_channel';
 import { URL } from 'url';
 
-import { InstrumentationBase, safeExecuteInTheMiddle } from '@opentelemetry/instrumentation';
+import {
+  InstrumentationBase,
+  safeExecuteInTheMiddle,
+} from '@opentelemetry/instrumentation';
 import {
   Attributes,
   context,
@@ -34,17 +37,25 @@ import {
 
 import { VERSION } from './version';
 
-import { ListenerRecord, RequestHeadersMessage, RequestMessage, ResponseHeadersMessage } from './internal-types';
+import {
+  ListenerRecord,
+  RequestHeadersMessage,
+  RequestMessage,
+  ResponseHeadersMessage,
+} from './internal-types';
 import { UndiciInstrumentationConfig, UndiciRequest } from './types';
 import { SemanticAttributes } from './enums/SemanticAttributes';
-import { hrTime, hrTimeDuration, hrTimeToMilliseconds } from '@opentelemetry/core';
+import {
+  hrTime,
+  hrTimeDuration,
+  hrTimeToMilliseconds,
+} from '@opentelemetry/core';
 
 interface IntrumentationRecord {
   span: Span;
   attributes: Attributes;
   startTime: HrTime;
 }
-
 
 // A combination of https://github.com/elastic/apm-agent-nodejs and
 // https://github.com/gadget-inc/opentelemetry-instrumentations/blob/main/packages/opentelemetry-instrumentation-undici/src/index.ts
@@ -53,7 +64,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // unsubscribing.
   private _channelSubs!: Array<ListenerRecord>;
   private _recordFromReq = new WeakMap<UndiciRequest, IntrumentationRecord>();
-  
+
   private _httpClientDurationHistogram!: Histogram;
   constructor(config?: UndiciInstrumentationConfig) {
     super('@opentelemetry/instrumentation-undici', VERSION, config);
@@ -64,9 +75,9 @@ export class UndiciInstrumentation extends InstrumentationBase {
       fetch('').catch(() => {});
     } catch (err) {
       // TODO: nicer message
-      diag.info(`fetch API not available`);
+      diag.info('fetch API not available');
     }
-    
+
     this.setConfig(config);
   }
 
@@ -94,16 +105,25 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // This method is called by the `InstrumentationAbstract` constructor before
     // ours is called. So we need to ensure the property is initalized
     this._channelSubs = this._channelSubs || [];
-    this.subscribeToChannel('undici:request:create', this.onRequestCreated.bind(this));
-    this.subscribeToChannel('undici:client:sendHeaders',this.onRequestHeaders.bind(this));
-    this.subscribeToChannel('undici:request:headers',this.onResponseHeaders.bind(this));
+    this.subscribeToChannel(
+      'undici:request:create',
+      this.onRequestCreated.bind(this)
+    );
+    this.subscribeToChannel(
+      'undici:client:sendHeaders',
+      this.onRequestHeaders.bind(this)
+    );
+    this.subscribeToChannel(
+      'undici:request:headers',
+      this.onResponseHeaders.bind(this)
+    );
     this.subscribeToChannel('undici:request:trailers', this.onDone.bind(this));
     this.subscribeToChannel('undici:request:error', this.onError.bind(this));
   }
 
   override setConfig(config?: UndiciInstrumentationConfig): void {
     super.setConfig(config);
-    
+
     if (config?.enabled) {
       this.enable();
     } else {
@@ -121,7 +141,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
       }
     );
   }
-  
+
   private _getConfig(): UndiciInstrumentationConfig {
     return this._config as UndiciInstrumentationConfig;
   }
@@ -149,9 +169,12 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // - method is 'CONNECT'
     const config = this._getConfig();
     const shouldIgnoreReq = safeExecuteInTheMiddle(
-      () => !config.enabled || request.method === 'CONNECT' || config.ignoreRequestHook?.(request),
-      (e) => e && this._diag.error('caught ignoreRequestHook error: ', e),
-      true,
+      () =>
+        !config.enabled ||
+        request.method === 'CONNECT' ||
+        config.ignoreRequestHook?.(request),
+      e => e && this._diag.error('caught ignoreRequestHook error: ', e),
+      true
     );
 
     if (shouldIgnoreReq) {
@@ -160,12 +183,14 @@ export class UndiciInstrumentation extends InstrumentationBase {
 
     const startTime = hrTime();
     const rawHeaders = request.headers.split('\r\n');
-    const reqHeaders = new Map(rawHeaders.map(h => {
-      const sepIndex = h.indexOf(':');
-      const name = h.substring(0, sepIndex).toLowerCase();
-      const val = h.substring(sepIndex + 1).trim();
-      return [name, val];
-    }));
+    const reqHeaders = new Map(
+      rawHeaders.map(h => {
+        const sepIndex = h.indexOf(':');
+        const name = h.substring(0, sepIndex).toLowerCase();
+        const val = h.substring(sepIndex + 1).trim();
+        return [name, val];
+      })
+    );
 
     const requestUrl = new URL(request.origin + request.path);
     const urlScheme = requestUrl.protocol.replace(':', '');
@@ -180,7 +205,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     const schemePorts: Record<string, string> = { https: '443', http: '80' };
     const serverAddress = requestUrl.hostname;
     const serverPort = requestUrl.port || schemePorts[urlScheme];
-    
+
     attributes[SemanticAttributes.SERVER_ADDRESS] = serverAddress;
     if (serverPort && !isNaN(Number(serverPort))) {
       attributes[SemanticAttributes.SERVER_PORT] = Number(serverPort);
@@ -194,8 +219,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // Get attributes from the hook if present
     const hookAttributes = safeExecuteInTheMiddle(
       () => config.startSpanHook?.(request),
-      (e) => e && this._diag.error('caught startSpanHook error: ', e),
-      true,
+      e => e && this._diag.error('caught startSpanHook error: ', e),
+      true
     );
     if (hookAttributes) {
       Object.entries(hookAttributes).forEach(([key, val]) => {
@@ -227,8 +252,8 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // Execute the request hook if defined
     safeExecuteInTheMiddle(
       () => config.requestHook?.(span, request),
-      (e) => e && this._diag.error('caught requestHook error: ', e),
-      true,
+      e => e && this._diag.error('caught requestHook error: ', e),
+      true
     );
 
     // Context propagation goes last so no hook can tamper
@@ -240,7 +265,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     request.headers += Object.entries(addedHeaders)
       .map(([k, v]) => `${k}: ${v}\r\n`)
       .join('');
-    this._recordFromReq.set(request, {span, attributes, startTime});
+    this._recordFromReq.set(request, { span, attributes, startTime });
   }
 
   // This is the 2nd message we recevie for each request. It is fired when connection with
@@ -250,7 +275,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     const record = this._recordFromReq.get(request as UndiciRequest);
 
     if (!record) {
-      return
+      return;
     }
 
     const config = this._getConfig();
@@ -264,18 +289,20 @@ export class UndiciInstrumentation extends InstrumentationBase {
     // After hooks have been processed (which may modify request headers)
     // we can collect the headers based on the configuration
     const rawHeaders = request.headers.split('\r\n');
-    const reqHeaders = new Map(rawHeaders.map(h => {
-      const sepIndex = h.indexOf(':');
-      const name = h.substring(0, sepIndex).toLowerCase();
-      const val = h.substring(sepIndex + 1).trim();
-      return [name, val];
-    }));
+    const reqHeaders = new Map(
+      rawHeaders.map(h => {
+        const sepIndex = h.indexOf(':');
+        const name = h.substring(0, sepIndex).toLowerCase();
+        const val = h.substring(sepIndex + 1).trim();
+        return [name, val];
+      })
+    );
 
     if (config.headersToSpanAttributes?.requestHeaders) {
       config.headersToSpanAttributes.requestHeaders
-        .map((name) => name.toLowerCase())
-        .filter((name) => reqHeaders.has(name))
-        .forEach((name) => {
+        .map(name => name.toLowerCase())
+        .filter(name => reqHeaders.has(name))
+        .forEach(name => {
           spanAttributes[`http.request.header.${name}`] = reqHeaders.get(name);
         });
     }
@@ -286,14 +313,17 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // This is the 3rd message we get for each request and it's fired when the server
   // headers are received, body may not be accessible yet.
   // From the response headers we can set the status and content length
-  private onResponseHeaders({ request, response }: ResponseHeadersMessage): void {
+  private onResponseHeaders({
+    request,
+    response,
+  }: ResponseHeadersMessage): void {
     const record = this._recordFromReq.get(request);
 
     if (!record) {
       return;
     }
 
-    const {span, attributes, startTime} = record;
+    const { span, attributes, startTime } = record;
     // We are currently *not* capturing response headers, even though the
     // intake API does allow it, because none of the other `setHttpContext`
     // uses currently do
@@ -306,7 +336,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     for (let idx = 0; idx < response.headers.length; idx = idx + 2) {
       resHeaders.set(
         response.headers[idx].toString().toLowerCase(),
-        response.headers[idx + 1].toString(),
+        response.headers[idx + 1].toString()
       );
     }
 
@@ -314,9 +344,9 @@ export class UndiciInstrumentation extends InstrumentationBase {
     const config = this._getConfig();
     if (config.headersToSpanAttributes?.responseHeaders) {
       config.headersToSpanAttributes.responseHeaders
-        .map((name) => name.toLowerCase())
-        .filter((name) => resHeaders.has(name))
-        .forEach((name) => {
+        .map(name => name.toLowerCase())
+        .filter(name => resHeaders.has(name))
+        .forEach(name => {
           spanAttributes[`http.response.header.${name}`] = resHeaders.get(name);
         });
     }
@@ -331,14 +361,17 @@ export class UndiciInstrumentation extends InstrumentationBase {
 
     span.setAttributes(spanAttributes);
     span.setStatus({
-      code: response.statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.UNSET,
+      code:
+        response.statusCode >= 400
+          ? SpanStatusCode.ERROR
+          : SpanStatusCode.UNSET,
     });
-    this._recordFromReq.set(
-      request,
-      {span, startTime, attributes: Object.assign(attributes, spanAttributes)}
-    );
+    this._recordFromReq.set(request, {
+      span,
+      startTime,
+      attributes: Object.assign(attributes, spanAttributes),
+    });
   }
-
 
   // This is the last event we receive if the request went without any errors
   private onDone({ request }: RequestMessage): void {
@@ -348,8 +381,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return;
     }
 
-    
-    const {span, attributes, startTime} = record;
+    const { span, attributes, startTime } = record;
     // End the span
     span.end();
     this._recordFromReq.delete(request);
@@ -371,7 +403,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return;
     }
 
-    const {span, attributes, startTime} = record;
+    const { span, attributes, startTime } = record;
 
     // NOTE: in `undici@6.3.0` when request aborted the error type changes from
     // a custom error (`RequestAbortedError`) to a built-in `DOMException` carrying
@@ -404,7 +436,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
       SemanticAttributes.URL_SCHEME,
       SemanticAttributes.ERROR_TYPE,
     ];
-    keysToCopy.forEach((key) => {
+    keysToCopy.forEach(key => {
       if (key in attributes) {
         metricsAttributes[key] = attributes[key];
       }

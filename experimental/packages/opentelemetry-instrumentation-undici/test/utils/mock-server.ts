@@ -15,7 +15,6 @@
  */
 import * as http from 'http';
 
-
 export class MockServer {
   private _port: number | undefined;
   private _httpServer: http.Server | undefined;

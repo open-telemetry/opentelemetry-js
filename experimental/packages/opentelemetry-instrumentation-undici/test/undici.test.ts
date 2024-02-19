@@ -16,7 +16,13 @@
 import * as assert from 'assert';
 import { Writable } from 'stream';
 
-import { SpanKind, SpanStatusCode, context, propagation, trace } from '@opentelemetry/api';
+import {
+  SpanKind,
+  SpanStatusCode,
+  context,
+  propagation,
+  trace,
+} from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
@@ -45,11 +51,10 @@ const provider = new NodeTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 instrumentation.setTracerProvider(provider);
 
-
 // Undici docs (https://github.com/nodejs/undici#garbage-collection) suggest
 // that an undici response body should always be consumed.
-async function consumeResponseBody(body: Dispatcher.ResponseData["body"]) {
-  return new Promise((resolve) => {
+async function consumeResponseBody(body: Dispatcher.ResponseData['body']) {
+  return new Promise(resolve => {
     const devNull = new Writable({
       write(_chunk, _encoding, cb) {
         setImmediate(cb);
@@ -73,11 +78,11 @@ describe('UndiciInstrumentation `undici` tests', function () {
       try {
         assert.ok(
           req.headers[MockPropagation.TRACE_CONTEXT_KEY],
-          `trace propagation for ${MockPropagation.TRACE_CONTEXT_KEY} works`,
+          `trace propagation for ${MockPropagation.TRACE_CONTEXT_KEY} works`
         );
         assert.ok(
           req.headers[MockPropagation.SPAN_CONTEXT_KEY],
-          `trace propagation for ${MockPropagation.SPAN_CONTEXT_KEY} works`,  
+          `trace propagation for ${MockPropagation.SPAN_CONTEXT_KEY} works`
         );
       } catch (assertErr) {
         // The exception will hang the server and the test so we set a header
@@ -94,7 +99,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
     });
   });
 
-  after(function(done) {
+  after(function (done) {
     context.disable();
     propagation.disable();
     mockServer.mockListener(undefined);
@@ -133,14 +138,14 @@ describe('UndiciInstrumentation `undici` tests', function () {
       // Set configuration
       instrumentation.setConfig({
         enabled: true,
-        ignoreRequestHook: (req) => {
+        ignoreRequestHook: req => {
           return req.path.indexOf('/ignore/path') !== -1;
         },
         requestHook: (span, req) => {
           // TODO: maybe an intermediate request with better API
           req.headers += 'x-requested-with: undici\r\n';
         },
-        startSpanHook: (request) => {
+        startSpanHook: request => {
           return {
             'test.hook.attribute': 'hook-value',
           };
@@ -148,7 +153,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
         headersToSpanAttributes: {
           requestHeaders: ['foo-client', 'x-requested-with'],
           responseHeaders: ['foo-server'],
-        }
+        },
       });
     });
     afterEach(function () {
@@ -163,11 +168,13 @@ describe('UndiciInstrumentation `undici` tests', function () {
       // Do some requests
       const headers = {
         'user-agent': 'custom',
-        'foo-client': 'bar'
+        'foo-client': 'bar',
       };
 
       const ignoreRequestUrl = `${protocol}://${hostname}:${mockServer.port}/ignore/path`;
-      const ignoreResponse = await undici.request(ignoreRequestUrl, { headers });
+      const ignoreResponse = await undici.request(ignoreRequestUrl, {
+        headers,
+      });
       await consumeResponseBody(ignoreResponse.body);
 
       assert.ok(
@@ -176,10 +183,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
       );
 
       spans = memoryExporter.getFinishedSpans();
-      assert.ok(
-        spans.length === 0,
-        'ignoreRequestHook is filtering requests'
-      );
+      assert.ok(spans.length === 0, 'ignoreRequestHook is filtering requests');
     });
 
     it('should create valid spans for "request" method', async function () {
@@ -189,11 +193,13 @@ describe('UndiciInstrumentation `undici` tests', function () {
       // Do some requests
       const headers = {
         'user-agent': 'custom',
-        'foo-client': 'bar'
+        'foo-client': 'bar',
       };
 
       const ignoreRequestUrl = `${protocol}://${hostname}:${mockServer.port}/ignore/path`;
-      const ignoreResponse = await undici.request(ignoreRequestUrl, { headers });
+      const ignoreResponse = await undici.request(ignoreRequestUrl, {
+        headers,
+      });
       await consumeResponseBody(ignoreResponse.body);
 
       assert.ok(
@@ -219,29 +225,29 @@ describe('UndiciInstrumentation `undici` tests', function () {
         httpStatusCode: queryResponse.statusCode,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         reqHeaders: headers,
         resHeaders: queryResponse.headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
         'bar',
-        'request headers from fetch options are captured',
+        'request headers from fetch options are captured'
       );
       assert.strictEqual(
         span.attributes['http.request.header.x-requested-with'],
         'undici',
-        'request headers from requestHook are captured',
+        'request headers from requestHook are captured'
       );
       assert.strictEqual(
         span.attributes['http.response.header.foo-server'],
         'bar',
-        'response headers from the server are captured',
+        'response headers from the server are captured'
       );
       assert.strictEqual(
         span.attributes['test.hook.attribute'],
         'hook-value',
-        'startSpanHook is called',
+        'startSpanHook is called'
       );
     });
 
@@ -252,7 +258,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
       // Do some requests
       const headers = {
         'user-agent': 'custom',
-        'foo-client': 'bar'
+        'foo-client': 'bar',
       };
       const queryRequestUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const queryResponse = await undici.fetch(queryRequestUrl, { headers });
@@ -272,29 +278,29 @@ describe('UndiciInstrumentation `undici` tests', function () {
         httpStatusCode: queryResponse.status,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         reqHeaders: headers,
         resHeaders: queryResponse.headers as Headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
         'bar',
-        'request headers from fetch options are captured',
+        'request headers from fetch options are captured'
       );
       assert.strictEqual(
         span.attributes['http.request.header.x-requested-with'],
         'undici',
-        'request headers from requestHook are captured',
+        'request headers from requestHook are captured'
       );
       assert.strictEqual(
         span.attributes['http.response.header.foo-server'],
         'bar',
-        'response headers from the server are captured',
+        'response headers from the server are captured'
       );
       assert.strictEqual(
         span.attributes['test.hook.attribute'],
         'hook-value',
-        'startSpanHook is called',
+        'startSpanHook is called'
       );
     });
 
@@ -305,7 +311,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
       // Do some requests
       const headers = {
         'user-agent': 'custom',
-        'foo-client': 'bar'
+        'foo-client': 'bar',
       };
       // https://undici.nodejs.org/#/docs/api/Dispatcher?id=example-1-basic-get-stream-request
       const queryRequestUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
@@ -318,10 +324,10 @@ describe('UndiciInstrumentation `undici` tests', function () {
           queryResponse.statusCode = statusCode;
           queryResponse.headers = headers;
           return new Writable({
-            write (chunk, encoding, callback) {
-              (opaque as any).bufs.push(chunk)
-              callback()
-            }
+            write(chunk, encoding, callback) {
+              (opaque as any).bufs.push(chunk);
+              callback();
+            },
           });
         }
       );
@@ -340,29 +346,29 @@ describe('UndiciInstrumentation `undici` tests', function () {
         httpStatusCode: queryResponse.statusCode,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         reqHeaders: headers,
         resHeaders: queryResponse.headers as Headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
         'bar',
-        'request headers from fetch options are captured',
+        'request headers from fetch options are captured'
       );
       assert.strictEqual(
         span.attributes['http.request.header.x-requested-with'],
         'undici',
-        'request headers from requestHook are captured',
+        'request headers from requestHook are captured'
       );
       assert.strictEqual(
         span.attributes['http.response.header.foo-server'],
         'bar',
-        'response headers from the server are captured',
+        'response headers from the server are captured'
       );
       assert.strictEqual(
         span.attributes['test.hook.attribute'],
         'hook-value',
-        'startSpanHook is called',
+        'startSpanHook is called'
       );
     });
 
@@ -373,7 +379,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
       // Do some requests
       const headers = {
         'user-agent': 'custom',
-        'foo-client': 'bar'
+        'foo-client': 'bar',
       };
 
       const queryRequestUrl = `${protocol}://${hostname}:${mockServer.port}`;
@@ -416,29 +422,29 @@ describe('UndiciInstrumentation `undici` tests', function () {
         httpStatusCode: queryResponse.statusCode,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         reqHeaders: headers,
         resHeaders: queryResponse.headers as Headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
         'bar',
-        'request headers from fetch options are captured',
+        'request headers from fetch options are captured'
       );
       assert.strictEqual(
         span.attributes['http.request.header.x-requested-with'],
         'undici',
-        'request headers from requestHook are captured',
+        'request headers from requestHook are captured'
       );
       assert.strictEqual(
         span.attributes['http.response.header.foo-server'],
         'bar',
-        'response headers from the server are captured',
+        'response headers from the server are captured'
       );
       assert.strictEqual(
         span.attributes['test.hook.attribute'],
         'hook-value',
-        'startSpanHook is called',
+        'startSpanHook is called'
       );
     });
 
@@ -461,7 +467,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
         startSpanHook: () => {
           throw new Error('startSpanHook error');
         },
-      })
+      });
 
       const requestUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const { headers, statusCode, body } = await undici.request(requestUrl);
@@ -482,7 +488,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
         httpStatusCode: statusCode,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         resHeaders: headers,
       });
     });
@@ -555,7 +561,6 @@ describe('UndiciInstrumentation `undici` tests', function () {
       });
     });
 
-
     it('should capture errors while doing request', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
@@ -581,8 +586,8 @@ describe('UndiciInstrumentation `undici` tests', function () {
         noNetPeer: true, // do not check network attribs
         forceStatus: {
           code: SpanStatusCode.ERROR,
-          message: 'getaddrinfo ENOTFOUND unexistent-host-name'
-        }
+          message: 'getaddrinfo ENOTFOUND unexistent-host-name',
+        },
       });
     });
 
@@ -593,7 +598,9 @@ describe('UndiciInstrumentation `undici` tests', function () {
       let requestError;
       const controller = new AbortController();
       const requestUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
-      const requestPromise = undici.request(requestUrl, { signal: controller.signal });
+      const requestPromise = undici.request(requestUrl, {
+        signal: controller.signal,
+      });
       controller.abort();
       try {
         await requestPromise;
@@ -603,7 +610,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
       }
 
       // Let the error be published to diagnostics channel
-      await new Promise((r) => setTimeout(r,5));
+      await new Promise(r => setTimeout(r, 5));
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -613,13 +620,13 @@ describe('UndiciInstrumentation `undici` tests', function () {
         hostname: 'localhost',
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         error: requestError,
         noNetPeer: true, // do not check network attribs
         forceStatus: {
           code: SpanStatusCode.ERROR,
-          message: requestError.message
-        }
+          message: requestError.message,
+        },
       });
     });
   });

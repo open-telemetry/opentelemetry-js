@@ -37,7 +37,7 @@ export class MockPropagation implements TextMapPropagator {
   }
   inject(context: Context, carrier: Record<string, string>): void {
     const spanContext = trace.getSpanContext(context);
-    
+
     if (spanContext) {
       carrier[MockPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
       carrier[MockPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;

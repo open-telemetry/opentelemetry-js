@@ -15,7 +15,13 @@
  */
 import * as assert from 'assert';
 
-import { SpanKind, SpanStatusCode, context, propagation, trace } from '@opentelemetry/api';
+import {
+  SpanKind,
+  SpanStatusCode,
+  context,
+  propagation,
+  trace,
+} from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
@@ -50,7 +56,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     if (typeof globalThis.fetch !== 'function') {
       this.skip();
     }
-    
+
     propagation.setGlobalPropagator(new MockPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
     mockServer.start(done);
@@ -62,11 +68,11 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       try {
         assert.ok(
           req.headers[MockPropagation.TRACE_CONTEXT_KEY],
-          `trace propagation for ${MockPropagation.TRACE_CONTEXT_KEY} works`,
+          `trace propagation for ${MockPropagation.TRACE_CONTEXT_KEY} works`
         );
         assert.ok(
           req.headers[MockPropagation.SPAN_CONTEXT_KEY],
-          `trace propagation for ${MockPropagation.SPAN_CONTEXT_KEY} works`,  
+          `trace propagation for ${MockPropagation.SPAN_CONTEXT_KEY} works`
         );
       } catch (assertErr) {
         // The exception will hang the server and the test so we set a header
@@ -83,7 +89,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
     });
   });
 
-  after(function(done) {
+  after(function (done) {
     context.disable();
     propagation.disable();
     mockServer.mockListener(undefined);
@@ -142,7 +148,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         startSpanHook: () => {
           throw new Error('startSpanHook error');
         },
-      })
+      });
 
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const response = await fetch(fetchUrl);
@@ -161,7 +167,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         httpStatusCode: response.status,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         resHeaders: response.headers,
       });
     });
@@ -187,7 +193,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         httpStatusCode: response.status,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         resHeaders: response.headers,
       });
     });
@@ -199,14 +205,14 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       // Set configuration
       instrumentation.setConfig({
         enabled: true,
-        ignoreRequestHook: (req) => {
+        ignoreRequestHook: req => {
           return req.path.indexOf('/ignore/path') !== -1;
         },
         requestHook: (span, req) => {
           // TODO: maybe an intermediate request with better API
           req.headers += 'x-requested-with: undici\r\n';
         },
-        startSpanHook: (request) => {
+        startSpanHook: request => {
           return {
             'test.hook.attribute': 'hook-value',
           };
@@ -214,15 +220,17 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         headersToSpanAttributes: {
           requestHeaders: ['foo-client', 'x-requested-with'],
           responseHeaders: ['foo-server'],
-        }
+        },
       });
 
       // Do some requests
-      const ignoreResponse = await fetch(`${protocol}://${hostname}:${mockServer.port}/ignore/path`);
+      const ignoreResponse = await fetch(
+        `${protocol}://${hostname}:${mockServer.port}/ignore/path`
+      );
       const reqInit = {
         headers: new Headers({
           'user-agent': 'custom',
-          'foo-client': 'bar'
+          'foo-client': 'bar',
         }),
       };
       assert.ok(
@@ -230,7 +238,10 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         'propagation is not set for ignored requests'
       );
 
-      const queryResponse = await fetch(`${protocol}://${hostname}:${mockServer.port}/?query=test`, reqInit);
+      const queryResponse = await fetch(
+        `${protocol}://${hostname}:${mockServer.port}/?query=test`,
+        reqInit
+      );
       assert.ok(
         queryResponse.headers.get('propagation-error') == null,
         'propagation is set for instrumented requests'
@@ -245,29 +256,29 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         httpStatusCode: queryResponse.status,
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         reqHeaders: reqInit.headers,
         resHeaders: queryResponse.headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
         'bar',
-        'request headers from fetch options are captured',
+        'request headers from fetch options are captured'
       );
       assert.strictEqual(
         span.attributes['http.request.header.x-requested-with'],
         'undici',
-        'request headers from requestHook are captured',
+        'request headers from requestHook are captured'
       );
       assert.strictEqual(
         span.attributes['http.response.header.foo-server'],
         'bar',
-        'response headers from the server are captured',
+        'response headers from the server are captured'
       );
       assert.strictEqual(
         span.attributes['test.hook.attribute'],
         'hook-value',
-        'startSpanHook is called',
+        'startSpanHook is called'
       );
     });
 
@@ -336,14 +347,13 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       });
     });
 
-
     it('should capture errors using fetch API', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
       let fetchError;
       try {
-        const fetchUrl = `http://unexistent-host-name/path`;
+        const fetchUrl = 'http://unexistent-host-name/path';
         await fetch(fetchUrl);
       } catch (err) {
         // Expected error
@@ -362,8 +372,8 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         noNetPeer: true, // do not check network attribs
         forceStatus: {
           code: SpanStatusCode.ERROR,
-          message: 'getaddrinfo ENOTFOUND unexistent-host-name'
-        }
+          message: 'getaddrinfo ENOTFOUND unexistent-host-name',
+        },
       });
     });
 
@@ -384,7 +394,7 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       }
 
       // Let the error be published to diagnostics channel
-      await new Promise((r) => setTimeout(r,5));
+      await new Promise(r => setTimeout(r, 5));
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -394,13 +404,13 @@ describe('UndiciInstrumentation `fetch` tests', function () {
         hostname: 'localhost',
         httpMethod: 'GET',
         path: '/',
-        query:'?query=test',
+        query: '?query=test',
         error: fetchError,
         noNetPeer: true, // do not check network attribs
         forceStatus: {
           code: SpanStatusCode.ERROR,
-          message: 'The operation was aborted.'
-        }
+          message: 'The operation was aborted.',
+        },
       });
     });
   });

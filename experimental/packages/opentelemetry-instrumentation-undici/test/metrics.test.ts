@@ -51,7 +51,6 @@ instrumentation.setTracerProvider(provider);
 instrumentation.setMeterProvider(meterProvider);
 
 describe('UndiciInstrumentation metrics tests', function () {
-
   before(function (done) {
     // Do not test if the `fetch` global API is not available
     // This applies to nodejs < v18 or nodejs < v16.15 wihtout the flag
@@ -60,7 +59,7 @@ describe('UndiciInstrumentation metrics tests', function () {
     if (typeof globalThis.fetch !== 'function') {
       this.skip();
     }
-    
+
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
     mockServer.start(done);
     mockServer.mockListener((req, res) => {
@@ -75,7 +74,7 @@ describe('UndiciInstrumentation metrics tests', function () {
     instrumentation.enable();
   });
 
-  after(function(done) {
+  after(function (done) {
     instrumentation.disable();
     context.disable();
     propagation.disable();
@@ -103,15 +102,18 @@ describe('UndiciInstrumentation metrics tests', function () {
     it('should report "http.client.request.duration" metric', async () => {
       const fetchUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       await fetch(fetchUrl);
-      
+
       await metricReader.collectAndExport();
       const resourceMetrics = metricsMemoryExporter.getMetrics();
       const scopeMetrics = resourceMetrics[0].scopeMetrics;
       const metrics = scopeMetrics[0].metrics;
-      
+
       assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
       assert.strictEqual(metrics.length, 1, 'metrics count');
-      assert.strictEqual(metrics[0].descriptor.name, 'http.client.request.duration');
+      assert.strictEqual(
+        metrics[0].descriptor.name,
+        'http.client.request.duration'
+      );
       assert.strictEqual(
         metrics[0].descriptor.description,
         'Measures the duration of outbound HTTP requests.'
@@ -127,19 +129,19 @@ describe('UndiciInstrumentation metrics tests', function () {
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.HTTP_REQUEST_METHOD],
-        'GET',
+        'GET'
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.SERVER_ADDRESS],
-        'localhost',
+        'localhost'
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.SERVER_PORT],
-        mockServer.port,
+        mockServer.port
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.HTTP_RESPONSE_STATUS_CODE],
-        200,
+        200
       );
     });
 
@@ -151,7 +153,7 @@ describe('UndiciInstrumentation metrics tests', function () {
       } catch (err) {
         // Expected error, do nothing
       }
-      
+
       await metricReader.collectAndExport();
       const resourceMetrics = metricsMemoryExporter.getMetrics();
       const scopeMetrics = resourceMetrics[0].scopeMetrics;
@@ -159,7 +161,10 @@ describe('UndiciInstrumentation metrics tests', function () {
 
       assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
       assert.strictEqual(metrics.length, 1, 'metrics count');
-      assert.strictEqual(metrics[0].descriptor.name, 'http.client.request.duration');
+      assert.strictEqual(
+        metrics[0].descriptor.name,
+        'http.client.request.duration'
+      );
       assert.strictEqual(
         metrics[0].descriptor.description,
         'Measures the duration of outbound HTTP requests.'
@@ -175,19 +180,16 @@ describe('UndiciInstrumentation metrics tests', function () {
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.HTTP_REQUEST_METHOD],
-        'GET',
+        'GET'
       );
       assert.strictEqual(
         metricAttributes[SemanticAttributes.SERVER_ADDRESS],
-        'unknownhost',
+        'unknownhost'
       );
-      assert.strictEqual(
-        metricAttributes[SemanticAttributes.SERVER_PORT],
-        80,
-      );
+      assert.strictEqual(metricAttributes[SemanticAttributes.SERVER_PORT], 80);
       assert.ok(
         metricAttributes[SemanticAttributes.ERROR_TYPE],
-        `the metric contains "${SemanticAttributes.ERROR_TYPE}" attribute if request failed`,
+        `the metric contains "${SemanticAttributes.ERROR_TYPE}" attribute if request failed`
       );
     });
   });
