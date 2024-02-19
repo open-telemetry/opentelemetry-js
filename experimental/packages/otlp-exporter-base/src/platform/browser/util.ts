@@ -155,18 +155,19 @@ export function sendWithXhr(
     };
 
     if (compressionAlgorithm === CompressionAlgorithm.GZIP) {
+
       const sendRequest = (requestBody: string | Blob) => {
 
         const send = (body: string | Blob) => {
           xhr.send(body);
         };
 
-        const sendCompressed = (body: string | Blob) => {
+        const sendCompressed = (body: string | Blob | Uint8Array) => {
           xhr.setRequestHeader('Content-Encoding', 'gzip'); // Set the Content-Encoding header to 'gzip' for compressed requests
           xhr.send(body);
         };
 
-        compressContent(requestBody)
+        compressContent(requestBody, compressionAlgorithm)
           .then(sendCompressed)
           .catch(() => {
             send(requestBody); // Send the original body when compression fails
@@ -182,66 +183,43 @@ export function sendWithXhr(
   sendWithRetry();
 }
 
-// src/compressionUtils.ts
-export function compressContent(input: string | Blob): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    let contentBytes: Uint8Array;
+async function compressContent(content: string | Blob, compressionAlgorithm: string): Promise<Uint8Array> {
 
-    if (typeof input === 'string') {
-      // Convert the string to a Uint8Array
-      contentBytes = new TextEncoder().encode(input);
-    } else if (input instanceof Blob) {
-      // Read the Blob content into a Uint8Array
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const arrayBuffer = reader.result as ArrayBuffer;
-        contentBytes = new Uint8Array(arrayBuffer);
-        compressBytes(contentBytes)
-          .then(resolve)
-          .catch(reject);
-      };
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(input);
-      return;
-    } else {
-      reject(new Error('Unsupported input type. Expected string or Blob.'));
-      return;
-    }
+  const compressionStream = new CompressionStream(compressionAlgorithm as CompressionFormat);
 
-    compressBytes(contentBytes)
-      .then(resolve)
-      .catch(reject);
-  });
-}
+  // Create a new readable stream from the input content
+  const reader = typeof content === 'string' ? new ReadableStream({ start(controller) {
+      controller.enqueue(new TextEncoder().encode(content));
+      controller.close();
+  }}) : content.stream();
 
-function compressBytes(contentBytes: Uint8Array): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const writableStream = new WritableStream<Uint8Array>({
-      write(chunk: Uint8Array, controller: WritableStreamDefaultController) {
-        const compressedChunk = new CompressionStream('gzip').writable.getWriter();
-        compressedChunk.write(chunk)
-          .then(() => {
-            compressedChunk.close();
-            controller.write(chunk);
-          })
-          .catch(reject);
-      },
-      close() {
-        resolve(new Blob([contentBytes], { type: 'application/octet-stream' }));
-      },
-      abort() {
-        reject(new Error('Compression aborted.'));
-      },
-    });
+  // Pipe the readable stream through the compression stream
+  const compressedStream = reader.pipeThrough(compressionStream);
 
-    const readableStream = new ReadableStream<Uint8Array>({
-      start(controller: ReadableStreamDefaultController) {
-        controller.enqueue(contentBytes);
-        controller.close();
-      },
-    });
+  // Create a new Uint8Array to hold the compressed data
+  const compressedChunks: Uint8Array[] = [];
 
-    readableStream.pipeTo(writableStream)
-      .catch(reject);
-  });
+  // Read the compressed data from the stream and collect it into chunks
+  const readerStream = compressedStream.getReader();
+  try {
+      while (true) {
+          const { done, value } = await readerStream.read();
+          if (done) break;
+          if (value instanceof Uint8Array) {
+              compressedChunks.push(value);
+          }
+      }
+  } finally {
+      readerStream.releaseLock();
+  }
+
+  // Concatenate the compressed chunks into a single Uint8Array
+  const compressedData = new Uint8Array(compressedChunks.reduce((totalLength, chunk) => totalLength + chunk.length, 0));
+  let offset = 0;
+  for (const chunk of compressedChunks) {
+      compressedData.set(chunk, offset);
+      offset += chunk.length;
+  }
+
+  return compressedData;
 }

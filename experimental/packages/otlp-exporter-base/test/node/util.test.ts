@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { configureExporterTimeout, invalidTimeout } from '../../src/util';
 import { sendWithHttp } from '../../src/platform/node/util';
-import { CompressionAlgorithm } from '../../src/platform/node/types';
+import { CompressionAlgorithm } from '../../src/types';
 import { configureCompression } from '../../src/platform/node/util';
 import { diag } from '@opentelemetry/api';
 import * as sinon from 'sinon';

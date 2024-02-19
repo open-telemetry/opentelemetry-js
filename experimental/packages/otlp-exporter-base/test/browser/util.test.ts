@@ -15,6 +15,7 @@
  */
 
 import * as sinon from 'sinon';
+import { CompressionAlgorithm } from '../../src/types';
 import { sendWithXhr } from '../../src/platform/browser/util';
 import { nextTick } from 'process';
 import { ensureHeadersContain } from '../testHelper';
@@ -63,6 +64,7 @@ describe('util - browser', () => {
           url,
           explicitContentType,
           exporterTimeout,
+          CompressionAlgorithm.NONE,
           onSuccessStub,
           onErrorStub
         );
@@ -95,6 +97,7 @@ describe('util - browser', () => {
           url,
           emptyHeaders,
           exporterTimeout,
+          CompressionAlgorithm.NONE,
           onSuccessStub,
           onErrorStub
         );
@@ -126,6 +129,7 @@ describe('util - browser', () => {
           url,
           customHeaders,
           exporterTimeout,
+          CompressionAlgorithm.NONE,
           onSuccessStub,
           onErrorStub
         );
@@ -150,6 +154,29 @@ describe('util - browser', () => {
         nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, customHeaders);
+          clock.restore();
+          done();
+        });
+      });
+    });
+    describe('and gzip compression is supported', () => {
+      beforeEach(() => {
+        const exporterTimeout = 10000;
+        sendWithXhr(
+          body,
+          url,
+          {},
+          exporterTimeout,
+          CompressionAlgorithm.GZIP,
+          onSuccessStub,
+          onErrorStub
+        );
+      });
+
+      it('should set "Content-Encoding" header to "gzip"', done => {
+        nextTick(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, { 'Content-Encoding': 'gzip' });
           clock.restore();
           done();
         });

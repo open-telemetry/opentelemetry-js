@@ -4,6 +4,7 @@ const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
 const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentation-xml-http-request');
 const { ZoneContextManager } = require( '@opentelemetry/context-zone');
 const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
+const { CompressionAlgorithm } = require('@opentelemetry/otlp-exporter-base');
 const { B3Propagator } = require( '@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
 
@@ -13,7 +14,11 @@ const providerWithZone = new WebTracerProvider();
 // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
 // exporter without delay
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
+
+const exporterOptions = {};
+// Note: test the GZIP compression, you can use the following exporterOptions
+// exporterOptions = { compression: CompressionAlgorithm.GZIP }
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter( exporterOptions)));
 
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
