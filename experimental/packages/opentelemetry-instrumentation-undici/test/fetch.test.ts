@@ -51,7 +51,6 @@ describe('UndiciInstrumentation `fetch` tests', function () {
       this.skip();
     }
     
-    // TODO: mock propagation and test it
     propagation.setGlobalPropagator(new MockPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
     mockServer.start(done);

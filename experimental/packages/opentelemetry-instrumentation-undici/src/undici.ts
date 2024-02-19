@@ -21,12 +21,15 @@ import {
   Attributes,
   context,
   diag,
+  Histogram,
+  HrTime,
   INVALID_SPAN_CONTEXT,
   propagation,
   Span,
   SpanKind,
   SpanStatusCode,
   trace,
+  ValueType,
 } from '@opentelemetry/api';
 
 import { VERSION } from './version';
@@ -34,6 +37,13 @@ import { VERSION } from './version';
 import { ListenerRecord, RequestHeadersMessage, RequestMessage, ResponseHeadersMessage } from './internal-types';
 import { UndiciInstrumentationConfig, UndiciRequest } from './types';
 import { SemanticAttributes } from './enums/SemanticAttributes';
+import { hrTime, hrTimeDuration, hrTimeToMilliseconds } from '@opentelemetry/core';
+
+interface IntrumentationRecord {
+  span: Span;
+  attributes: Attributes;
+  startTime: HrTime;
+}
 
 
 // A combination of https://github.com/elastic/apm-agent-nodejs and
@@ -42,9 +52,9 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // Keep ref to avoid https://github.com/nodejs/node/issues/42170 bug and for
   // unsubscribing.
   private _channelSubs!: Array<ListenerRecord>;
-
-  private _spanFromReq = new WeakMap<UndiciRequest, Span>();
-
+  private _recordFromReq = new WeakMap<UndiciRequest, IntrumentationRecord>();
+  
+  private _httpClientDurationHistogram!: Histogram;
   constructor(config?: UndiciInstrumentationConfig) {
     super('@opentelemetry/instrumentation-undici', VERSION, config);
     // Force load fetch API (since it's lazy loaded in Node 18)
@@ -100,6 +110,17 @@ export class UndiciInstrumentation extends InstrumentationBase {
       this.disable();
     }
   }
+
+  protected override _updateMetricInstruments() {
+    this._httpClientDurationHistogram = this.meter.createHistogram(
+      'http.client.request.duration',
+      {
+        description: 'Measures the duration of outbound HTTP requests.',
+        unit: 'ms',
+        valueType: ValueType.DOUBLE,
+      }
+    );
+  }
   
   private _getConfig(): UndiciInstrumentationConfig {
     return this._config as UndiciInstrumentationConfig;
@@ -137,6 +158,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
       return;
     }
 
+    const startTime = hrTime();
     const rawHeaders = request.headers.split('\r\n');
     const reqHeaders = new Map(rawHeaders.map(h => {
       const sepIndex = h.indexOf(':');
@@ -146,25 +168,29 @@ export class UndiciInstrumentation extends InstrumentationBase {
     }));
 
     const requestUrl = new URL(request.origin + request.path);
-    const spanAttributes: Attributes = {
+    const urlScheme = requestUrl.protocol.replace(':', '');
+    const attributes: Attributes = {
       [SemanticAttributes.HTTP_REQUEST_METHOD]: request.method,
       [SemanticAttributes.URL_FULL]: requestUrl.toString(),
       [SemanticAttributes.URL_PATH]: requestUrl.pathname,
       [SemanticAttributes.URL_QUERY]: requestUrl.search,
+      [SemanticAttributes.URL_SCHEME]: urlScheme,
     };
 
-    const protocolPorts: Record<string, string> = { https: '443', http: '80' };
+    const schemePorts: Record<string, string> = { https: '443', http: '80' };
+    // TODO: check this resolution based on headers
+    // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#setting-serveraddress-and-serverport-attributes
     const serverAddress = reqHeaders.get('host') || requestUrl.hostname;
-    const serverPort = requestUrl.port || protocolPorts[requestUrl.protocol];
+    const serverPort = requestUrl.port || schemePorts[urlScheme];
     
-    spanAttributes[SemanticAttributes.SERVER_ADDRESS] = serverAddress;
-    if (serverPort) {
-      spanAttributes[SemanticAttributes.SERVER_PORT] = serverPort;
+    attributes[SemanticAttributes.SERVER_ADDRESS] = serverAddress;
+    if (serverPort && !isNaN(Number(serverPort))) {
+      attributes[SemanticAttributes.SERVER_PORT] = Number(serverPort);
     }
 
     const userAgent = reqHeaders.get('user-agent');
     if (userAgent) {
-      spanAttributes[SemanticAttributes.USER_AGENT_ORIGINAL] = userAgent;
+      attributes[SemanticAttributes.USER_AGENT_ORIGINAL] = userAgent;
     }
 
     // Get attributes from the hook if present
@@ -175,7 +201,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     );
     if (hookAttributes) {
       Object.entries(hookAttributes).forEach(([key, val]) => {
-        spanAttributes[key] = val;
+        attributes[key] = val;
       });
     }
 
@@ -194,7 +220,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
         `HTTP ${request.method}`,
         {
           kind: SpanKind.CLIENT,
-          attributes: spanAttributes,
+          attributes: attributes,
         },
         activeCtx
       );
@@ -216,20 +242,21 @@ export class UndiciInstrumentation extends InstrumentationBase {
     request.headers += Object.entries(addedHeaders)
       .map(([k, v]) => `${k}: ${v}\r\n`)
       .join('');
-    this._spanFromReq.set(request, span);
+    this._recordFromReq.set(request, {span, attributes, startTime});
   }
 
   // This is the 2nd message we recevie for each request. It is fired when connection with
   // the remote is stablished and about to send the first byte. Here do have info about the
   // remote addres an port so we can poupulate some `net.*` attributes into the span
   private onRequestHeaders({ request, socket }: RequestHeadersMessage): void {
-    const span = this._spanFromReq.get(request as UndiciRequest);
+    const record = this._recordFromReq.get(request as UndiciRequest);
 
-    if (!span) {
+    if (!record) {
       return
     }
 
     const config = this._getConfig();
+    const { span } = record;
     const { remoteAddress, remotePort } = socket;
     const spanAttributes: Attributes = {
       [SemanticAttributes.NETWORK_PEER_ADDRESS]: remoteAddress,
@@ -262,12 +289,13 @@ export class UndiciInstrumentation extends InstrumentationBase {
   // headers are received, body may not be accessible yet.
   // From the response headers we can set the status and content length
   private onResponseHeaders({ request, response }: ResponseHeadersMessage): void {
-    const span = this._spanFromReq.get(request);
+    const record = this._recordFromReq.get(request);
 
-    if (!span) {
+    if (!record) {
       return;
     }
 
+    const {span, attributes, startTime} = record;
     // We are currently *not* capturing response headers, even though the
     // intake API does allow it, because none of the other `setHttpContext`
     // uses currently do
@@ -305,33 +333,65 @@ export class UndiciInstrumentation extends InstrumentationBase {
     span.setStatus({
       code: response.statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.UNSET,
     });
+    this._recordFromReq.set(
+      request,
+      {span, startTime, attributes: Object.assign(attributes, spanAttributes)}
+    );
   }
 
 
   // This is the last event we receive if the request went without any errors
-  private onDone({ request }: any): void {
-    const span = this._spanFromReq.get(request);
+  private onDone({ request }: RequestMessage): void {
+    const record = this._recordFromReq.get(request);
 
-    if (!span) {
+    if (!record) {
       return;
     }
 
+    
+    const {span, attributes, startTime} = record;
+    // End the span
     span.end();
-    this._spanFromReq.delete(request);
+    this._recordFromReq.delete(request);
+
+    // Time to record metrics
+    const metricsAttributes: Attributes = {};
+    // Get the attribs already in span attributes
+    const keysToCopy = [
+      SemanticAttributes.HTTP_RESPONSE_STATUS_CODE,
+      SemanticAttributes.HTTP_REQUEST_METHOD,
+      SemanticAttributes.SERVER_ADDRESS,
+      SemanticAttributes.SERVER_PORT,
+      SemanticAttributes.URL_SCHEME,
+    ];
+    keysToCopy.forEach((key) => {
+      if (key in attributes) {
+        metricsAttributes[key] = attributes[key];
+      }
+    });
+
+    // Take the duration and record it
+    const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
+    this._httpClientDurationHistogram.record(duration, metricsAttributes);
   }
 
   // This is the event we get when something is wrong in the request like
-  // - invalid options
+  // - invalid options when calling `fetch` global API or any undici method for request
   // - connectivity errors such as unreachable host
-  // - requests aborted through a signal
+  // - requests aborted through an `AbortController.signal`
   // NOTE: server errors are considered valid responses and it's the lib consumer
-  // whi should deal with that.
+  // who should deal with that.
   private onError({ request, error }: any): void {
-    const span = this._spanFromReq.get(request);
+    const record = this._recordFromReq.get(request);
 
-    if (!span) {
+    if (!record) {
       return;
     }
+
+    const {span, attributes} = record;
+
+    // TODO: add metrics
+
 
     // NOTE: in `undici@6.3.0` when request aborted the error type changes from
     // a custom error (`RequestAbortedError`) to a built-in `DOMException` carrying

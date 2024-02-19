@@ -156,6 +156,32 @@ describe('UndiciInstrumentation `undici` tests', function () {
       instrumentation.setConfig({ enabled: false });
     });
 
+    it('should ingore requests based on the result of ignoreRequestHook', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      // Do some requests
+      const headers = {
+        'user-agent': 'custom',
+        'foo-client': 'bar'
+      };
+
+      const ignoreRequestUrl = `${protocol}://${hostname}:${mockServer.port}/ignore/path`;
+      const ignoreResponse = await undici.request(ignoreRequestUrl, { headers });
+      await consumeResponseBody(ignoreResponse.body);
+
+      assert.ok(
+        ignoreResponse.headers['propagation-error'],
+        'propagation is not set for ignored requests'
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      assert.ok(
+        spans.length === 0,
+        'ignoreRequestHook is filtering requests'
+      );
+    });
+
     it('should create valid spans for "request" method', async function () {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
@@ -165,6 +191,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
         'user-agent': 'custom',
         'foo-client': 'bar'
       };
+
       const ignoreRequestUrl = `${protocol}://${hostname}:${mockServer.port}/ignore/path`;
       const ignoreResponse = await undici.request(ignoreRequestUrl, { headers });
       await consumeResponseBody(ignoreResponse.body);
@@ -227,19 +254,9 @@ describe('UndiciInstrumentation `undici` tests', function () {
         'user-agent': 'custom',
         'foo-client': 'bar'
       };
-      const ignoreRequestUrl = `${protocol}://${hostname}:${mockServer.port}/ignore/path`;
-      const ignoreResponse = await undici.fetch(ignoreRequestUrl, { headers });
-      await ignoreResponse.text();
-
-      assert.ok(
-        ignoreResponse.headers.get('propagation-error'),
-        'propagation is not set for ignored requests'
-      );
-
       const queryRequestUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const queryResponse = await undici.fetch(queryRequestUrl, { headers });
       await queryResponse.text();
-
 
       assert.ok(
         queryResponse.headers.get('propagation-error') == null,
@@ -290,33 +307,10 @@ describe('UndiciInstrumentation `undici` tests', function () {
         'user-agent': 'custom',
         'foo-client': 'bar'
       };
-      const ignoreRequestUrl = `${protocol}://${hostname}:${mockServer.port}/ignore/path`;
       // https://undici.nodejs.org/#/docs/api/Dispatcher?id=example-1-basic-get-stream-request
-      const bufs: any[] = [];
-      const ignoreResponse: Record<string, any> = {};
-      await undici.stream(
-        ignoreRequestUrl,
-        { opaque: { bufs }, headers } as any,
-        ({ statusCode, headers, opaque }) => {
-          ignoreResponse.statusCode = statusCode;
-          ignoreResponse.headers = headers;
-          return new Writable({
-            write (chunk, encoding, callback) {
-              (opaque as any).bufs.push(chunk)
-              callback()
-            }
-          });
-        }
-      );
-
-      assert.ok(
-        ignoreResponse.headers['propagation-error'],
-        'propagation is not set for ignored requests'
-      );
-
-      bufs.length = 0;
       const queryRequestUrl = `${protocol}://${hostname}:${mockServer.port}/?query=test`;
       const queryResponse: Record<string, any> = {};
+      const bufs: any[] = [];
       await undici.stream(
         queryRequestUrl,
         { opaque: { bufs }, headers } as any,
@@ -332,6 +326,81 @@ describe('UndiciInstrumentation `undici` tests', function () {
         }
       );
 
+      assert.ok(
+        queryResponse.headers['propagation-error'] == null,
+        'propagation is set for instrumented requests'
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      assert.ok(span, 'a span is present');
+      assert.strictEqual(spans.length, 1);
+      assertSpan(span, {
+        hostname: 'localhost',
+        httpStatusCode: queryResponse.statusCode,
+        httpMethod: 'GET',
+        path: '/',
+        query:'?query=test',
+        reqHeaders: headers,
+        resHeaders: queryResponse.headers as Headers,
+      });
+      assert.strictEqual(
+        span.attributes['http.request.header.foo-client'],
+        'bar',
+        'request headers from fetch options are captured',
+      );
+      assert.strictEqual(
+        span.attributes['http.request.header.x-requested-with'],
+        'undici',
+        'request headers from requestHook are captured',
+      );
+      assert.strictEqual(
+        span.attributes['http.response.header.foo-server'],
+        'bar',
+        'response headers from the server are captured',
+      );
+      assert.strictEqual(
+        span.attributes['test.hook.attribute'],
+        'hook-value',
+        'startSpanHook is called',
+      );
+    });
+
+    it('should create valid spans for "dispatch" method', async function () {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      // Do some requests
+      const headers = {
+        'user-agent': 'custom',
+        'foo-client': 'bar'
+      };
+
+      const queryRequestUrl = `${protocol}://${hostname}:${mockServer.port}`;
+      const queryResponse: Record<string, any> = {};
+      const client = new undici.Client(queryRequestUrl);
+      await new Promise((resolve, reject) => {
+        client.dispatch(
+          {
+            path: '/?query=test',
+            method: 'GET',
+            headers,
+          },
+          {
+            onHeaders: (statusCode, headers) => {
+              queryResponse.statusCode = statusCode;
+              queryResponse.headers = headers;
+              return true; // unidici types require to return boolean
+            },
+            onError: reject,
+            onComplete: resolve,
+            // Although the types say these following handlers are optional they must
+            // be defined to avoid a TypeError
+            onConnect: () => undefined,
+            onData: () => true,
+          }
+        );
+      });
 
       assert.ok(
         queryResponse.headers['propagation-error'] == null,
@@ -342,7 +411,6 @@ describe('UndiciInstrumentation `undici` tests', function () {
       const span = spans[0];
       assert.ok(span, 'a span is present');
       assert.strictEqual(spans.length, 1);
-      console.log(span)
       assertSpan(span, {
         hostname: 'localhost',
         httpStatusCode: queryResponse.statusCode,
