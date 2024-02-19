@@ -122,24 +122,6 @@ export const assertSpan = (
         span.attributes['http.response.header.content-length'],
         contentLength
       );
-      // TODO: check compresssed/uncompressed in semantic conventions
-      // const contentEncodingHeader = validations.resHeaders.get('content-encoding');
-      // if (
-      //   contentEncodingHeader &&
-      //   contentEncodingHeader !== 'identity'
-      // ) {
-      //   assert.strictEqual(
-      //     span.attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH],
-      //     contentLength
-      //   );
-      // } else {
-      //   assert.strictEqual(
-      //     span.attributes[
-      //       SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
-      //     ],
-      //     contentLength
-      //   );
-      // }
     }
   }
   

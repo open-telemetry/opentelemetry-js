@@ -178,9 +178,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     };
 
     const schemePorts: Record<string, string> = { https: '443', http: '80' };
-    // TODO: check this resolution based on headers
-    // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#setting-serveraddress-and-serverport-attributes
-    const serverAddress = reqHeaders.get('host') || requestUrl.hostname;
+    const serverAddress = requestUrl.hostname;
     const serverPort = requestUrl.port || schemePorts[urlScheme];
     
     attributes[SemanticAttributes.SERVER_ADDRESS] = serverAddress;
@@ -206,7 +204,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
     }
 
     // Check if parent span is required via config and:
-    // - ff a parent is required but not present, we use a `NoopSpan` to still
+    // - if a parent is required but not present, we use a `NoopSpan` to still
     //   propagate context without recording it.
     // - create a span otherwise
     const activeCtx = context.active();
@@ -247,7 +245,7 @@ export class UndiciInstrumentation extends InstrumentationBase {
 
   // This is the 2nd message we recevie for each request. It is fired when connection with
   // the remote is stablished and about to send the first byte. Here do have info about the
-  // remote addres an port so we can poupulate some `net.*` attributes into the span
+  // remote addres an port so we can poupulate some `network.*` attributes into the span
   private onRequestHeaders({ request, socket }: RequestHeadersMessage): void {
     const record = this._recordFromReq.get(request as UndiciRequest);
 
@@ -324,9 +322,11 @@ export class UndiciInstrumentation extends InstrumentationBase {
     }
 
     // `content-length` header is a special case
-    const contentLength = Number(resHeaders.get('content-length'));
-    if (!isNaN(contentLength)) {
-      spanAttributes['http.response.header.content-length'] = contentLength;
+    if (resHeaders.has('content-length')) {
+      const contentLength = Number(resHeaders.get('content-length'));
+      if (!isNaN(contentLength)) {
+        spanAttributes['http.response.header.content-length'] = contentLength;
+      }
     }
 
     span.setAttributes(spanAttributes);
