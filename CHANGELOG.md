@@ -65,9 +65,17 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* chore(opentelemetry-core): Rename InstrumentationLibrary -> InstrumentationScope #2937 @bryantkale
+
+## 1.18.3
+
+### :bug: (Bug Fix)
+
 * chore: type reference on zone.js [#4257](https://github.com/open-telemetry/opentelemetry-js/pull/4257) @legendecas
 * chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
 * test: add node 20 to test matrix [#4336](https://github.com/open-telemetry/opentelemetry-js/pull/4336) @dyladan
+
+## 1.18.2
 
 ### :bug: (Bug Fix)
 

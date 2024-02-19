@@ -17,7 +17,7 @@
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import {
   hexToBase64,
-  InstrumentationLibrary,
+  InstrumentationScope,
   VERSION,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -113,7 +113,7 @@ export const mockedReadableSpan: ReadableSpan = {
       cost: 112.12,
     })
   ),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  instrumentationScope: { name: 'default', version: '0.0.1' },
   droppedAttributesCount: 0,
   droppedEventsCount: 0,
   droppedLinksCount: 0,
@@ -124,7 +124,7 @@ export const mockedResources: Resource[] = [
   new Resource({ name: 'resource 2' }),
 ];
 
-export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
+export const mockedInstrumentationScopes: InstrumentationScope[] = [
   {
     name: 'lib1',
     version: '0.0.1',
@@ -156,7 +156,7 @@ export const basicTrace: ReadableSpan[] = [
     events: [],
     duration: [0, 8885000],
     resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
     droppedAttributesCount: 0,
     droppedEventsCount: 0,
     droppedLinksCount: 0,
@@ -181,7 +181,7 @@ export const basicTrace: ReadableSpan[] = [
     events: [],
     duration: [0, 8775000],
     resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
     droppedAttributesCount: 0,
     droppedEventsCount: 0,
     droppedLinksCount: 0,
@@ -206,7 +206,7 @@ export const basicTrace: ReadableSpan[] = [
     events: [],
     duration: [0, 8775000],
     resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
     droppedAttributesCount: 0,
     droppedEventsCount: 0,
     droppedLinksCount: 0,
@@ -228,18 +228,18 @@ export const multiResourceTrace: ReadableSpan[] = [
   },
 ];
 
-export const multiInstrumentationLibraryTrace: ReadableSpan[] = [
+export const multiInstrumentationScopeTrace: ReadableSpan[] = [
   {
     ...basicTrace[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
   },
   {
     ...basicTrace[1],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
   },
   {
     ...basicTrace[2],
-    instrumentationLibrary: mockedInstrumentationLibraries[1],
+    instrumentationScope: mockedInstrumentationScopes[1],
   },
 ];
 
