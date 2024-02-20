@@ -280,7 +280,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
         path: '/',
         query: '?query=test',
         reqHeaders: headers,
-        resHeaders: queryResponse.headers as Headers,
+        resHeaders: queryResponse.headers as unknown as Headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
@@ -348,7 +348,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
         path: '/',
         query: '?query=test',
         reqHeaders: headers,
-        resHeaders: queryResponse.headers as Headers,
+        resHeaders: queryResponse.headers as unknown as Headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
@@ -424,7 +424,7 @@ describe('UndiciInstrumentation `undici` tests', function () {
         path: '/',
         query: '?query=test',
         reqHeaders: headers,
-        resHeaders: queryResponse.headers as Headers,
+        resHeaders: queryResponse.headers as unknown as Headers,
       });
       assert.strictEqual(
         span.attributes['http.request.header.foo-client'],
