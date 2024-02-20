@@ -18,9 +18,8 @@ import type { OtlpEncodingOptions, Fixed64, LongBits } from './types';
 import { HrTime } from '@opentelemetry/api';
 import { hexToBinary, hrTimeToNanoseconds } from '@opentelemetry/core';
 
-const NANOSECONDS = BigInt(1_000_000_000);
-
 export function hrTimeToNanos(hrTime: HrTime): bigint {
+  const NANOSECONDS = BigInt(1_000_000_000);
   return BigInt(hrTime[0]) * NANOSECONDS + BigInt(hrTime[1]);
 }
 
