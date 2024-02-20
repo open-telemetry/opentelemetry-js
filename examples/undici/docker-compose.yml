@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    environment:
+      - LOG_LEVEL=debug
+    networks:
+      - undici-example
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+
+networks:
+  undici-example:

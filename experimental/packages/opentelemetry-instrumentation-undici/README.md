@@ -15,7 +15,7 @@ npm install --save @opentelemetry/instrumentation-undici
 
 ## Usage
 
-OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
+OpenTelemetry Undici/fetch Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
 
 To load a specific instrumentation (Undici in this case), specify it in the Node Tracer's configuration.
 
@@ -42,7 +42,7 @@ registerInstrumentations({
 <!-- TODO: -->
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/fetch) for a short example.
 
-### Fetch instrumentation Options
+### Undici/Fetch instrumentation Options
 
 <!-- TODO: check PR description about config -->
 
