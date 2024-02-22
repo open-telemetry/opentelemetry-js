@@ -19,7 +19,7 @@ import * as assert from 'assert';
 import { OTLPGRPCExporterNodeBase } from '../src/OTLPGRPCExporterNodeBase';
 import { OTLPGRPCExporterConfigNode } from '../src/types';
 import { mockedReadableSpan } from './traceHelper';
-import { ExportResponse } from '../src/export-response';
+import { ExportResponse, ExportResponseSuccess } from '../src/export-response';
 import { IExporterTransport } from '../src/exporter-transport';
 import { ISerializer } from '../src';
 import sinon = require('sinon');
@@ -42,7 +42,7 @@ class MockCollectorExporter extends OTLPGRPCExporterNodeBase<
   }
 }
 
-const successfulResponse: ExportResponse = {
+const successfulResponse: ExportResponseSuccess = {
   status: 'success',
 };
 

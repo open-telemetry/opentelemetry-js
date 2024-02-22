@@ -25,6 +25,10 @@ import * as fs from 'fs';
 import sinon = require('sinon');
 import { Metadata, Server, ServerCredentials } from '@grpc/grpc-js';
 import { types } from 'util';
+import {
+  ExportResponseFailure,
+  ExportResponseSuccess,
+} from '../src/export-response';
 
 const testServiceDefinition = {
   export: {
@@ -191,12 +195,12 @@ describe('GrpcExporterTransport', function () {
     it('sends data', async function () {
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
-      const result = await transport.send(Buffer.from([1, 2, 3]));
+      const result = (await transport.send(
+        Buffer.from([1, 2, 3])
+      )) as ExportResponseSuccess;
 
       assert.strictEqual(result.status, 'success');
-      assert.strictEqual(result.error, undefined);
       assert.deepEqual(result.data, Buffer.from([]));
-      assert.strictEqual(result.retryInMillis, undefined);
       assert.strictEqual(serverTestContext.requests.length, 1);
       assert.deepEqual(
         serverTestContext.requests[0].request,
@@ -218,12 +222,12 @@ describe('GrpcExporterTransport', function () {
       };
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
-      const result = await transport.send(Buffer.from([]));
+      const result = (await transport.send(
+        Buffer.from([])
+      )) as ExportResponseSuccess;
 
       assert.strictEqual(result.status, 'success');
-      assert.strictEqual(result.error, undefined);
       assert.deepEqual(result.data, expectedResponseData);
-      assert.strictEqual(result.retryInMillis, undefined);
     });
 
     it('forwards handled server error as failure', async function () {
@@ -235,12 +239,12 @@ describe('GrpcExporterTransport', function () {
       };
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
-      const result = await transport.send(Buffer.from([]));
+      const result = (await transport.send(
+        Buffer.from([])
+      )) as ExportResponseFailure;
 
       assert.strictEqual(result.status, 'failure');
       assert.ok(types.isNativeError(result.error));
-      assert.strictEqual(result.data, undefined);
-      assert.strictEqual(result.retryInMillis, undefined);
     });
 
     it('forwards unhandled server error as failure', async function () {
@@ -249,11 +253,11 @@ describe('GrpcExporterTransport', function () {
       };
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
-      const result = await transport.send(Buffer.from([]));
+      const result = (await transport.send(
+        Buffer.from([])
+      )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.ok(types.isNativeError(result.error));
-      assert.strictEqual(result.data, undefined);
-      assert.strictEqual(result.retryInMillis, undefined);
     });
 
     it('forwards metadataProvider error as failure', async function () {
@@ -265,11 +269,11 @@ describe('GrpcExporterTransport', function () {
 
       const transport = new GrpcExporterTransport(config);
 
-      const result = await transport.send(Buffer.from([]));
+      const result = (await transport.send(
+        Buffer.from([])
+      )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.strictEqual(result.error, expectedError);
-      assert.strictEqual(result.data, undefined);
-      assert.strictEqual(result.retryInMillis, undefined);
     });
 
     it('forwards metadataProvider returns null value as failure', async function () {
@@ -281,11 +285,11 @@ describe('GrpcExporterTransport', function () {
 
       const transport = new GrpcExporterTransport(config);
 
-      const result = await transport.send(Buffer.from([]));
+      const result = (await transport.send(
+        Buffer.from([])
+      )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.deepEqual(result.error, expectedError);
-      assert.strictEqual(result.data, undefined);
-      assert.strictEqual(result.retryInMillis, undefined);
     });
 
     it('forwards credential error as failure', async function () {
@@ -297,11 +301,11 @@ describe('GrpcExporterTransport', function () {
 
       const transport = new GrpcExporterTransport(config);
 
-      const result = await transport.send(Buffer.from([]));
+      const result = (await transport.send(
+        Buffer.from([])
+      )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.strictEqual(result.error, expectedError);
-      assert.strictEqual(result.data, undefined);
-      assert.strictEqual(result.retryInMillis, undefined);
     });
   });
 });

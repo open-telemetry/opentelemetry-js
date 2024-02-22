@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-export interface ExportResponse {
-  status: 'success' | 'failure';
+export interface ExportResponseSuccess {
+  status: 'success';
   data?: Uint8Array;
-  retryInMillis?: number;
-  error?: Error;
 }
+
+export interface ExportResponseFailure {
+  status: 'failure';
+  error: Error;
+}
+
+export type ExportResponse = ExportResponseSuccess | ExportResponseFailure;
