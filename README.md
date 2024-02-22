@@ -202,16 +202,16 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 ### Community members
 
-#### Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
+#### Maintainers ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
 
 - [Amir Blum](https://github.com/blumamir), Keyval
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 
-*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
+*Find more about the maintainer role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
 
-#### Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
+#### Approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
@@ -225,7 +225,13 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 - [Trent Mick](https://github.com/trentm), Elastic
 
-*Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
+*Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
+
+#### Triager ([@open-telemetry/javascript-triagers](https://github.com/orgs/open-telemetry/teams/javascript-triagers))
+
+- [David Luna](https://github.com/david-luna), Elastic
+
+*Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
 #### Emeriti
 
