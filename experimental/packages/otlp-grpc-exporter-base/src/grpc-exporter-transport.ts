@@ -56,6 +56,7 @@ export function createSslCredentials(
 }
 
 export function createEmptyMetadata(): Metadata {
+  // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     Metadata,
     // eslint-disable-next-line @typescript-eslint/no-var-requires
