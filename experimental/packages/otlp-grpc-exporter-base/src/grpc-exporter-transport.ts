@@ -20,6 +20,7 @@ import type { Metadata, ServiceError, ChannelCredentials } from '@grpc/grpc-js';
 import { ExportResponse } from './export-response';
 import { IExporterTransport } from './exporter-transport';
 
+// values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;
 const GRPC_COMPRESSION_GZIP = 2;
 
@@ -33,6 +34,7 @@ function toGrpcCompression(compression: 'gzip' | 'none'): number {
 }
 
 export function createInsecureCredentials(): ChannelCredentials {
+  // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     credentials,
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -45,6 +47,7 @@ export function createSslCredentials(
   privateKey?: Buffer,
   certChain?: Buffer
 ): ChannelCredentials {
+  // Lazy-load so that we don't need to require/import '@grpc/grpc-js' before it can be wrapped by instrumentation.
   const {
     credentials,
     // eslint-disable-next-line @typescript-eslint/no-var-requires
