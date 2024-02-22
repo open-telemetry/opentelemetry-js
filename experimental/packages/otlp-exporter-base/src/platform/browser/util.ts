@@ -204,14 +204,14 @@ async function compressContent(
 
   const readerStream = compressedStream.getReader();
   try {
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const { done, value } = await readerStream.read();
-      if (done) break;
+    let readResult = await readerStream.read();
+    while (!readResult.done) {
+      const value = readResult.value;
       if (value instanceof Uint8Array) {
         compressedChunks.push(value);
         totalLength += value.length;
       }
+      readResult = await readerStream.read();
     }
   } finally {
     readerStream.releaseLock();
