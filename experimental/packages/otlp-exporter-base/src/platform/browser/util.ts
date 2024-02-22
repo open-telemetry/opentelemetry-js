@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 import { diag } from '@opentelemetry/api';
-import {
-  CompressionAlgorithm,
-  OTLPExporterError,
-} from '../../types';
+import { CompressionAlgorithm, OTLPExporterError } from '../../types';
 
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
@@ -154,27 +151,26 @@ export function sendWithXhr(
       clearTimeout(retryTimer);
     };
 
+    xhr.onerror = () => {
+      if (reqIsDestroyed) {
+        const err = new OTLPExporterError('Request Timeout');
+        onError(err);
+      }
+      clearTimeout(exporterTimer);
+      clearTimeout(retryTimer);
+    };
+
     if (compressionAlgorithm === CompressionAlgorithm.GZIP) {
-
-      const sendRequest = (requestBody: string | Blob) => {
-
-        const send = (body: string | Blob) => {
-          xhr.send(body);
-        };
-
-        const sendCompressed = (body: string | Blob | Uint8Array) => {
-          xhr.setRequestHeader('Content-Encoding', 'gzip'); // Set the Content-Encoding header to 'gzip' for compressed requests
-          xhr.send(body);
-        };
-
-        compressContent(requestBody, compressionAlgorithm)
-          .then(sendCompressed)
-          .catch(() => {
-            send(requestBody); // Send the original body when compression fails
-          });
+      const sendCompressed = (body: string | Blob | Uint8Array) => {
+        xhr.setRequestHeader('Content-Encoding', 'gzip'); // Set the Content-Encoding header to 'gzip' for compressed requests
+        xhr.send(body);
       };
 
-      sendRequest(body);
+      compressContent(body, compressionAlgorithm)
+        .then(sendCompressed)
+        .catch(() => {
+          xhr.send(body); // Send the original body when compression fails
+        });
     } else {
       xhr.send(body);
     }
@@ -183,42 +179,49 @@ export function sendWithXhr(
   sendWithRetry();
 }
 
-async function compressContent(content: string | Blob, compressionAlgorithm: string): Promise<Uint8Array> {
+async function compressContent(
+  content: string | Blob,
+  compressionAlgorithm: string
+): Promise<Uint8Array> {
+  const compressionStream = new CompressionStream(
+    compressionAlgorithm as CompressionFormat
+  );
 
-  const compressionStream = new CompressionStream(compressionAlgorithm as CompressionFormat);
+  const reader =
+    typeof content === 'string'
+      ? new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode(content));
+            controller.close();
+          },
+        })
+      : content.stream();
 
-  // Create a new readable stream from the input content
-  const reader = typeof content === 'string' ? new ReadableStream({ start(controller) {
-      controller.enqueue(new TextEncoder().encode(content));
-      controller.close();
-  }}) : content.stream();
-
-  // Pipe the readable stream through the compression stream
   const compressedStream = reader.pipeThrough(compressionStream);
 
-  // Create a new Uint8Array to hold the compressed data
+  let totalLength = 0;
   const compressedChunks: Uint8Array[] = [];
 
-  // Read the compressed data from the stream and collect it into chunks
   const readerStream = compressedStream.getReader();
   try {
-      while (true) {
-          const { done, value } = await readerStream.read();
-          if (done) break;
-          if (value instanceof Uint8Array) {
-              compressedChunks.push(value);
-          }
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { done, value } = await readerStream.read();
+      if (done) break;
+      if (value instanceof Uint8Array) {
+        compressedChunks.push(value);
+        totalLength += value.length;
       }
+    }
   } finally {
-      readerStream.releaseLock();
+    readerStream.releaseLock();
   }
 
-  // Concatenate the compressed chunks into a single Uint8Array
-  const compressedData = new Uint8Array(compressedChunks.reduce((totalLength, chunk) => totalLength + chunk.length, 0));
+  const compressedData = new Uint8Array(totalLength);
   let offset = 0;
   for (const chunk of compressedChunks) {
-      compressedData.set(chunk, offset);
-      offset += chunk.length;
+    compressedData.set(chunk, offset);
+    offset += chunk.length;
   }
 
   return compressedData;

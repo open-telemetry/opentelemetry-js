@@ -20,7 +20,6 @@ import {
   OTLPExporterBrowserBase as OTLPExporterBaseMain,
   OTLPExporterError,
   OTLPExporterConfigBase,
-  CompressionAlgorithm,
   sendWithXhr,
 } from '@opentelemetry/otlp-exporter-base';
 
@@ -65,7 +64,7 @@ export abstract class OTLPProtoExporterBrowserBase<
             Accept: 'application/x-protobuf',
           },
           this.timeoutMillis,
-          CompressionAlgorithm.NONE,
+          this.compression,
           onSuccess,
           onError
         );

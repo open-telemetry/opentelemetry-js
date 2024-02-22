@@ -16,8 +16,8 @@ const providerWithZone = new WebTracerProvider();
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 const exporterOptions = {};
-// Note: test the GZIP compression, you can use the following exporterOptions
-// exporterOptions = { compression: CompressionAlgorithm.GZIP }
+// Note: to use GZIP compression during export, use the following exporterOptions
+// const exporterOptions = { compression: CompressionAlgorithm.GZIP, headers:  { 'force-xhr': 'custom header is required to force xhr use' } };
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter( exporterOptions)));
 
 providerWithZone.register({

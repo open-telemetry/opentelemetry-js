@@ -18,7 +18,6 @@ import type * as https from 'https';
 
 import { OTLPExporterConfigBase } from '../../types';
 
-
 /**
  * Collector Exporter node base config
  */

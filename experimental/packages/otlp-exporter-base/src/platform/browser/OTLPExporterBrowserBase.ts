@@ -31,8 +31,7 @@ export abstract class OTLPExporterBrowserBase<
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
-
-  compression: CompressionAlgorithm;
+  protected compression: CompressionAlgorithm;
 
   /**
    * @param config
@@ -52,8 +51,8 @@ export abstract class OTLPExporterBrowserBase<
     } else {
       this._headers = {};
     }
-    this.compression =  config.compression || CompressionAlgorithm.NONE;
 
+    this.compression = config.compression || CompressionAlgorithm.NONE;
   }
 
   onInit(): void {}
