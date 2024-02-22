@@ -25,12 +25,7 @@ const GRPC_COMPRESSION_NONE = 0;
 const GRPC_COMPRESSION_GZIP = 2;
 
 function toGrpcCompression(compression: 'gzip' | 'none'): number {
-  if (compression === 'none') {
-    return GRPC_COMPRESSION_NONE;
-  } else if (compression === 'gzip') {
-    return GRPC_COMPRESSION_GZIP;
-  }
-  return GRPC_COMPRESSION_NONE;
+  return compression === 'gzip' ? GRPC_COMPRESSION_GZIP : GRPC_COMPRESSION_NONE;
 }
 
 export function createInsecureCredentials(): ChannelCredentials {
