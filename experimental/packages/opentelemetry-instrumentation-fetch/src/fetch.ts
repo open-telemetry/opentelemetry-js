@@ -470,6 +470,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     if (isNode) {
       // Node.js v18+ *does* have a global `fetch()`, but this package does not
       // support instrumenting it.
+      this._diag.warn('this instrumentation is intended for web usage only, it does not instrument Node.js\'s fetch()')
       return;
     }
     if (isWrapped(fetch)) {
