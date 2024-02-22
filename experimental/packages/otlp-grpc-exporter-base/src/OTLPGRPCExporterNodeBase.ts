@@ -125,8 +125,6 @@ export abstract class OTLPGRPCExporterNodeBase<
     }
 
     const converted = this.convert(objects);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore TODO: no time for type stuff, it will work, trust me (TM) - that's what TM stands for lol.
     const data = this._serializer.serializeRequest(converted);
 
     if (data == null) {
