@@ -26,6 +26,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation): normalize paths for internal files in scoped packages [#4467](https://github.com/open-telemetry/opentelemetry-js/pull/4467) @pichlermarc
   * Fixes a bug where, on Windows, internal files on scoped packages would not be instrumented.
 * fix(otlp-transformer): only use BigInt inside hrTimeToNanos() [#4484](https://github.com/open-telemetry/opentelemetry-js/pull/4484) @pichlermarc
+* fix(instrumentation-fetch): do not enable in Node.js; clarify in docs this instr is for web fetch only [#4498](https://github.com/open-telemetry/opentelemetry-js/pull/4498) @trentm
 
 ### :books: (Refine Doc)
 
