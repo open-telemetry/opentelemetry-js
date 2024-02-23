@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.49.0
+
+### :boom: Breaking Change
+
 * fix(otlp-exporter-base)!: remove unload event from OTLPExporterBrowserBase [#4438](https://github.com/open-telemetry/opentelemetry-js/pull/4438) @eldavojohn
   * Reason: The 'unload' event prevents sites from taking advantage of Google's [backward/forward cache](https://web.dev/articles/bfcache#never_use_the_unload_event) and will be [deprecated](https://developer.chrome.com/articles/deprecating-unload/).  It is now up to the consuming site to implement these shutdown events.
   * This breaking change affects users under this scenario:
@@ -27,8 +39,6 @@ All notable changes to experimental packages in this project will be documented 
   * Fixes a bug where, on Windows, internal files on scoped packages would not be instrumented.
 * fix(otlp-transformer): only use BigInt inside hrTimeToNanos() [#4484](https://github.com/open-telemetry/opentelemetry-js/pull/4484) @pichlermarc
 * fix(instrumentation-fetch): do not enable in Node.js; clarify in docs this instr is for web fetch only [#4498](https://github.com/open-telemetry/opentelemetry-js/pull/4498) @trentm
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
