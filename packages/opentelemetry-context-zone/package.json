@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "@opentelemetry/context-zone-peer-dep": "1.21.0",
-    "zone.js": "^0.11.0"
+    "zone.js": "^0.11.0 || ^0.13.0 || ^0.14.0"
   },
   "sideEffects": true,
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone"
