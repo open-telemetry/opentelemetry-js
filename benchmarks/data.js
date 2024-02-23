@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1708682632801,
+  "lastUpdate": 1708689749964,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4904,6 +4904,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.23%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "54870357+MSNev@users.noreply.github.com",
+            "name": "Nev",
+            "username": "MSNev"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5637e2a91c3ddb471d65684ec30998a4774ffb1f",
+          "message": "chore: Semantic Conventions export individual strings (#4298)\n\n* chore: Semantic Conventions export individual strings\r\n\r\n* Reduce to just emit full strings and add size-limit test output to review the results\r\n\r\n* Update generation to use createConstMap for enums where possible\r\n\r\n* Move changelog back to Unreleased -- merge shifted it\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-02-23T13:00:58+01:00",
+          "tree_id": "03dc90a1fce21bccf79634e4b5725abac4645a7d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5637e2a91c3ddb471d65684ec30998a4774ffb1f"
+        },
+        "date": 1708689749084,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 952336,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12124,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 689844,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 640780,
+            "range": "±0.13%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
