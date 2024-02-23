@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1708603537079,
+  "lastUpdate": 1708682632801,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -4852,6 +4852,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.31%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "aff48a1f0045c85d0b97d15ea98d03f5909b14bc",
+          "message": "fix(instr-fetch): do not enable in Node.js; clarify in docs this instr is for web fetch only (#4498)\n\n* fix(instr-fetch): do not enable in Node.js; clarify in docs this instr is for web fetch only\r\n\r\n* add a changelog entry\r\n\r\n* add a diagnostic warning if attempting to use instr-fetch in Node.js\r\n\r\n* fixup! add a diagnostic warning if attempting to use instr-fetch in Node.js\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-02-23T11:02:06+01:00",
+          "tree_id": "d306dca3206992d38d2ae256f54b88e7e71f1981",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/aff48a1f0045c85d0b97d15ea98d03f5909b14bc"
+        },
+        "date": 1708682632022,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 959897,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12084,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 660057,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 632950,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
