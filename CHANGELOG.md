@@ -14,6 +14,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat(sdk-metrics): allow single bucket histograms [#4456](https://github.com/open-telemetry/opentelemetry-js/pull/4456) @pichlermarc
 * feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
 * feat(context-zone-peer-dep, context-zone): support zone.js 0.13.x, 0.14.x [#4469](https://github.com/open-telemetry/opentelemetry-js/pull/4469) @pichlermarc
+* chore: Semantic Conventions export individual strings [4185](https://github.com/open-telemetry/opentelemetry-js/issues/4185)
 
 ### :bug: (Bug Fix)
 
