@@ -11,6 +11,16 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.22.0
+
+### :rocket: (Enhancement)
+
 * feat(sdk-metrics): allow single bucket histograms [#4456](https://github.com/open-telemetry/opentelemetry-js/pull/4456) @pichlermarc
 * feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
 * feat(context-zone-peer-dep, context-zone): support zone.js 0.13.x, 0.14.x [#4469](https://github.com/open-telemetry/opentelemetry-js/pull/4469) @pichlermarc
@@ -29,8 +39,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :books: (Refine Doc)
 
 * docs: shorten readme sections [#4460](https://github.com/open-telemetry/opentelemetry-js/pull/4460) @legendecas
-
-### :house: (Internal)
 
 ## 1.21.0
 
