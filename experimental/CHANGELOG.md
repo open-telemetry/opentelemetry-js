@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation): don't add `@opentelemetry/api-logs` as a `peerDependency`
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
