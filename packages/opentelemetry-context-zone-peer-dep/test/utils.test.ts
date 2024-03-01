@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import * as utils from '../src/util';
 
 describe('ZoneContextManager utils', () => {

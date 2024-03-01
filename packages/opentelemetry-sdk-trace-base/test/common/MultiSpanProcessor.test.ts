@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as Sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,
@@ -166,19 +166,19 @@ describe('MultiSpanProcessor', () => {
     const processor1 = new SimpleSpanProcessor(new InMemorySpanExporter());
     const processor2 = new SimpleSpanProcessor(new InMemorySpanExporter());
 
-    const spy1 = Sinon.stub(processor1, 'forceFlush').callsFake(() => {
+    const spy1 = sinon.stub(processor1, 'forceFlush').callsFake(() => {
       flushed++;
       return Promise.resolve();
     });
-    const spy2 = Sinon.stub(processor2, 'forceFlush').callsFake(() => {
+    const spy2 = sinon.stub(processor2, 'forceFlush').callsFake(() => {
       flushed++;
       return Promise.resolve();
     });
 
     const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
     multiSpanProcessor.forceFlush().then(() => {
-      Sinon.assert.calledOnce(spy1);
-      Sinon.assert.calledOnce(spy2);
+      sinon.assert.calledOnce(spy1);
+      sinon.assert.calledOnce(spy2);
       assert.strictEqual(flushed, 2);
       done();
     });
@@ -187,11 +187,11 @@ describe('MultiSpanProcessor', () => {
   it('should call globalErrorHandler in forceFlush', async () => {
     const expectedError = new Error('whoops');
     const testProcessor = new TestProcessor();
-    const forceFlush = Sinon.stub(testProcessor, 'forceFlush');
+    const forceFlush = sinon.stub(testProcessor, 'forceFlush');
     forceFlush.rejects(expectedError);
 
     const multiSpanProcessor = new MultiSpanProcessor([testProcessor]);
-    const errorHandlerSpy = Sinon.spy();
+    const errorHandlerSpy = sinon.spy();
 
     setGlobalErrorHandler(errorHandlerSpy);
 

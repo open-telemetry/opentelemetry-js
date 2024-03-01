@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { otperformance as performance } from '../../src/platform';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import * as api from '@opentelemetry/api';
 import {
   hrTime,

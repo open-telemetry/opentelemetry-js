@@ -26,7 +26,7 @@ import {
   InstrumentType,
   SumMetricData,
 } from '@opentelemetry/sdk-metrics';
-import * as assert from 'assert';
+import assert from 'assert';
 
 describe('metric-transform', () => {
   it('should map OpenCensus CUMULATIVE_INT64 to Sum', () => {

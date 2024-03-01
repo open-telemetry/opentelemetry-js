@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 

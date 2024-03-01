@@ -33,7 +33,7 @@ import {
   sanitizeAttributes,
   suppressTracing,
 } from '@opentelemetry/core';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -45,7 +45,7 @@ import {
   Tracer,
 } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';
 
 describe('Tracer', () => {

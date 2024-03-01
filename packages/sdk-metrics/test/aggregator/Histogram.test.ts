@@ -15,7 +15,7 @@
  */
 
 import { HrTime, ValueType } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   AggregationTemporality,
   InstrumentType,

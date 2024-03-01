@@ -15,7 +15,7 @@
  */
 
 import { SDK_INFO } from '@opentelemetry/core';
-import * as assert from 'assert';
+import assert from 'assert';
 import { IResource, Resource } from '@opentelemetry/resources';
 import {
   SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { createContextKey, ROOT_CONTEXT } from '../../../src/context/context';
 import { NoopContextManager } from '../../../src/context/NoopContextManager';
 

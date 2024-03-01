@@ -20,8 +20,8 @@ import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportin
 import { ResourceMetrics } from '../../src/export/MetricData';
 import { MeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { assertAggregationTemporalitySelector } from './utils';
 import { DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR } from '../../src/export/AggregationSelector';
 import { AggregationTemporality, InstrumentType } from '../../src';

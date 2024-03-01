@@ -35,8 +35,8 @@ import {
   otperformance as performance,
 } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 import { invalidAttributes, validAttributes } from './util';
 

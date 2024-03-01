@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { DataPointType, MeterProvider, MetricReader } from '../../src';
 import { TestDeltaMetricReader } from '../export/TestMetricReader';
 import { assertDataPoint, assertMetricData } from '../util';

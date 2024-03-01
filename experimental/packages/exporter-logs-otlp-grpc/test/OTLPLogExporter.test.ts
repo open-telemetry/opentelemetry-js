@@ -17,11 +17,11 @@
 import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
 
-import * as assert from 'assert';
+import assert from 'assert';
 import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { OTLPLogExporter } from '../src';
 
 import {

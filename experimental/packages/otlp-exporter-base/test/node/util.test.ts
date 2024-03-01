@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { configureExporterTimeout, invalidTimeout } from '../../src/util';
 import { sendWithHttp } from '../../src/platform/node/util';
 import { CompressionAlgorithm } from '../../src/platform/node/types';
 import { configureCompression } from '../../src/platform/node/util';
 import { diag } from '@opentelemetry/api';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 
 import { OTLPExporterNodeBase } from '../../src/platform/node/OTLPExporterNodeBase';
 import { OTLPExporterNodeConfigBase } from '../../src/platform/node/types';
 import { OTLPExporterError } from '../../src/types';
 import { PassThrough } from 'stream';
-import * as http from 'http';
-import * as zlib from 'zlib';
+import http from 'http';
+import zlib from 'zlib';
 
 // Meant to simulate http.IncomingMessage, at least the parts that sendWithHttp cares about
 // but make it a PassThrough so we can inspect it for the test

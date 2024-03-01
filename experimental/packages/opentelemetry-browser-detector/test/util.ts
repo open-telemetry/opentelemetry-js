@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Suite } from 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import { BROWSER_ATTRIBUTES } from '../src/types';
 import { IResource } from '@opentelemetry/resources';
 

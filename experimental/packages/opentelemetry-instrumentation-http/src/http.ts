@@ -35,8 +35,8 @@ import {
   hrTimeToMilliseconds,
   suppressTracing,
 } from '@opentelemetry/core';
-import type * as http from 'http';
-import type * as https from 'https';
+import type http from 'http';
+import type https from 'https';
 import { Socket } from 'net';
 import * as semver from 'semver';
 import * as url from 'url';

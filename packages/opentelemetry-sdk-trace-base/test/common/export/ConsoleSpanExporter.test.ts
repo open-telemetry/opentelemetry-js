@@ -16,8 +16,8 @@
 
 import { SpanContext, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import {
   AlwaysOnSampler,
   BasicTracerProvider,

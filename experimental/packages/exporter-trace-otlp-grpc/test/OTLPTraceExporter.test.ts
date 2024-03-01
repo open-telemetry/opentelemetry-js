@@ -21,10 +21,10 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 
-import * as assert from 'assert';
-import * as fs from 'fs';
+import assert from 'assert';
+import fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
-import * as path from 'path';
+import path from 'path';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../src';
 import { VERSION } from '../src/version';

@@ -20,8 +20,8 @@ import {
   SimpleSpanProcessor,
   BatchSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
-import * as Sinon from 'sinon';
+import assert from 'assert';
+import Sinon from 'sinon';
 import { env } from 'process';
 import {
   OTLPTraceExporter as OTLPProtoTraceExporter,

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { processDetector, IResource } from '../../../src';
 import { assertResource } from '../../util/resource-assertions';
 import { describeNode } from '../../util';
-import * as os from 'os';
+import os from 'os';
 
 describeNode('processDetector() on Node.js', () => {
   afterEach(() => {

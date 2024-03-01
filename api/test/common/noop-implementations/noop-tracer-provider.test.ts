@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { NoopTracer } from '../../../src/trace/NoopTracer';
 import { NoopTracerProvider } from '../../../src/trace/NoopTracerProvider';
 

@@ -15,7 +15,7 @@
  */
 import { ExponentMapping } from '../../../src/aggregator/exponential-histogram/mapping/ExponentMapping';
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
-import * as assert from 'assert';
+import assert from 'assert';
 
 const MIN_SCALE = -10;
 const MAX_SCALE = 0;

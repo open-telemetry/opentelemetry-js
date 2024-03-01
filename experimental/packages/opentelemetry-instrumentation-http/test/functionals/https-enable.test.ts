@@ -33,9 +33,9 @@ import {
   NetTransportValues,
   SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as fs from 'fs';
-import * as nock from 'nock';
+import nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
@@ -46,8 +46,8 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
-import * as https from 'https';
+import http from 'http';
+import https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
 
 const applyCustomAttributesOnSpanErrorMessage =

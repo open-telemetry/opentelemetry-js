@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { getGlobal } from '../../../src/internal/global-utils';
 import { _globalThis } from '../../../src/platform';
 import { NoopContextManager } from '../../../src/context/NoopContextManager';

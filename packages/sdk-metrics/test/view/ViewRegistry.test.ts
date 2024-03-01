@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { InstrumentType } from '../../src';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
 import {

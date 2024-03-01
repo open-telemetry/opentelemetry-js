@@ -19,8 +19,8 @@ import { shimPropagation } from '../src/propagation';
 import * as oc from '@opencensus/core';
 import { propagation } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 
 const dummyGetterWithHeader: oc.HeaderGetter = {
   getHeader(name) {

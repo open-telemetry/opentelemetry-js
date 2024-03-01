@@ -24,10 +24,10 @@ import {
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
+import assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import * as url from 'url';
 import { IgnoreMatcher, ParsedRequestOptions } from '../../src/types';
 import * as utils from '../../src/utils';

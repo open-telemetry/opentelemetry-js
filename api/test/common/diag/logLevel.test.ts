@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { diag } from '../../../src';
 import { createLogLevelDiagLogger } from '../../../src/diag/internal/logLevelLogger';
 import { createNoopDiagLogger } from '../../../src/diag/internal/noopLogger';

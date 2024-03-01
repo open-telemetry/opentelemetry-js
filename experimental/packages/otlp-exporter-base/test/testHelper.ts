@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { HrTime } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 
 export interface SimpleTestObject {
   readonly propString: string;

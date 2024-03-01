@@ -20,7 +20,7 @@ import { Resource } from '../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../types';
 import { ResourceDetectionConfig } from '../../config';
 import { IResource } from '../../IResource';
-import * as os from 'os';
+import os from 'os';
 
 /**
  * ProcessDetectorSync will be used to detect the resources related current process running

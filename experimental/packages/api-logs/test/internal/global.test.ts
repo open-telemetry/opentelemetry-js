@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { _global, GLOBAL_LOGS_API_KEY } from '../../src/internal/global-utils';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 

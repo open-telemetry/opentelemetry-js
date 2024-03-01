@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import sinon = require('sinon');
 import { diag, DiagLogLevel } from '../../../src';
 import { createNoopDiagLogger } from '../../../src/diag/internal/noopLogger';

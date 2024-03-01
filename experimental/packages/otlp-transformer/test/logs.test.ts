@@ -16,7 +16,7 @@
 import { HrTime, TraceFlags } from '@opentelemetry/api';
 import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   createExportLogsServiceRequest,
   ESeverityNumber,

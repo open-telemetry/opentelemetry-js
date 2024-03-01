@@ -29,7 +29,7 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import * as protoLoader from '@grpc/proto-loader';
 import * as path from 'path';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   context,
   ContextManager,

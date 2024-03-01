@@ -16,9 +16,9 @@
 
 import { Counter, Meter, ObservableResult } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import * as http from 'http';
+import assert from 'assert';
+import sinon from 'sinon';
+import http from 'http';
 import { PrometheusExporter } from '../src';
 import {
   mockHrTime,

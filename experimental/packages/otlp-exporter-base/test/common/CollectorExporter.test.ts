@@ -15,8 +15,8 @@
  */
 
 import { ExportResultCode } from '@opentelemetry/core';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { OTLPExporterBase } from '../../src/OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../src/types';
 import { ComplexTestObject, mockedComplexTestObject } from '../testHelper';

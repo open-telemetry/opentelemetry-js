@@ -16,7 +16,7 @@
 
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as oc from '@opencensus/core';
-import * as assert from 'assert';
+import assert from 'assert';
 import { withTestTracer, setupNodeContextManager } from './util';
 import { ShimSpan } from '../src/ShimSpan';
 

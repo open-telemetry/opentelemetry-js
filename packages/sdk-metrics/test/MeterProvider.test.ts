@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   MeterProvider,
   InstrumentType,
@@ -29,7 +29,7 @@ import {
   defaultResource,
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { View } from '../src/view/View';
 import { Meter } from '../src/Meter';
 

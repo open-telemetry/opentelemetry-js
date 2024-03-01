@@ -21,7 +21,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as path from 'path';
 import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
@@ -32,12 +32,12 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
-import * as request from 'request-promise-native';
+import http from 'http';
+import request from 'request-promise-native';
 import * as superagent from 'superagent';
 // Temporarily removed. See https://github.com/open-telemetry/opentelemetry-js/issues/3344
 // import * as got from 'got';
-import * as nock from 'nock';
+import nock from 'nock';
 import axios, { AxiosResponse } from 'axios';
 
 const memoryExporter = new InMemorySpanExporter();

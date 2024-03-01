@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as http from 'http';
-import * as https from 'https';
+import http from 'http';
+import https from 'https';
 import { URL } from 'url';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

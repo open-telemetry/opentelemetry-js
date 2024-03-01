@@ -15,8 +15,8 @@
  */
 
 import * as api from '@opentelemetry/api';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { DataPointType } from '../../src/export/MetricData';

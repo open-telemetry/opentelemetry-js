@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { wrapTracer } from '../../../../src/experimental';
-import * as assert from 'assert';
+import assert from 'assert';
 import { NoopTracerProvider } from '../../../../src/trace/NoopTracerProvider';
 import { NoopTracer } from '../../../../src/trace/NoopTracer';
 import { Span } from '../../../../src';

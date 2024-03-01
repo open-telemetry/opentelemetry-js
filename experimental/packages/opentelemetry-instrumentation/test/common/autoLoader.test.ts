@@ -21,8 +21,8 @@ import {
   MeterOptions,
   MeterProvider,
 } from '@opentelemetry/api';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
 import { Logger, LoggerOptions, LoggerProvider } from '@opentelemetry/api-logs';
 

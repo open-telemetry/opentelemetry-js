@@ -15,7 +15,7 @@
  */
 
 import { ValueType } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import { InstrumentType } from '../src';
 import { ObservableInstrument } from '../src/Instruments';
 import {

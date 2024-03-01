@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { ExportResult, ExportResultCode } from '../../src';
 import * as suppress from '../../src/trace/suppress-tracing';
 import { _export } from '../../src/internal/exporter';

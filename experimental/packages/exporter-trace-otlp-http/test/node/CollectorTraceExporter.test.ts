@@ -22,11 +22,11 @@ import {
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
-import * as http from 'http';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import http from 'http';
+import sinon from 'sinon';
 import { PassThrough, Stream } from 'stream';
-import * as zlib from 'zlib';
+import zlib from 'zlib';
 import { OTLPTraceExporter } from '../../src/platform/node';
 import {
   ensureExportTraceServiceRequestIsSet,

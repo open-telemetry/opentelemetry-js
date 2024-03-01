@@ -23,8 +23,8 @@ import {
 } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
 import {
   collect,

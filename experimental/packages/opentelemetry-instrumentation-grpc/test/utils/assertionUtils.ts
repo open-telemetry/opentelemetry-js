@@ -15,7 +15,7 @@
  */
 
 import { SpanKind, SpanStatusCode } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import type { status as GrpcStatus } from '@grpc/grpc-js';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {

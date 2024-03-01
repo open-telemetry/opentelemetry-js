@@ -22,7 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { Tracer } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
+import assert from 'assert';
 import { StackContextManager, WebTracerProvider } from '../src';
 
 describe('Node Globals Foolproofing', () => {

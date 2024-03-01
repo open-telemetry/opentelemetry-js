@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
-import * as assert from 'assert';
+import sinon from 'sinon';
+import assert from 'assert';
 
 import { diag } from '@opentelemetry/api';
 import * as grpc from '@grpc/grpc-js';

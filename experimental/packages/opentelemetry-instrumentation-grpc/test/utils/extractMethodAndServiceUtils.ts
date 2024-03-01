@@ -15,7 +15,7 @@
  */
 
 import { _extractMethodAndService } from '../../src/utils';
-import * as assert from 'assert';
+import assert from 'assert';
 
 const cases = [
   {

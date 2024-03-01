@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as nock from 'nock';
+import assert from 'assert';
+import nock from 'nock';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import {
   ExportResult,

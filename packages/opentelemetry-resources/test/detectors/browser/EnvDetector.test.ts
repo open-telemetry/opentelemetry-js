@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { RAW_ENVIRONMENT } from '@opentelemetry/core';
 import { envDetector, IResource } from '../../../src';
 import {
