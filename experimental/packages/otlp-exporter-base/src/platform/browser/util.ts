@@ -86,28 +86,22 @@ export function sendWithXhr(
   }, exporterTimeout);
 
   const sendWithRetry = (
+    innerBody: string | Blob | Uint8Array,
+    headers: Record<string, string>,
     retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
     minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
   ) => {
     xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
-    const defaultHeaders = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    };
-
-    Object.entries({
-      ...defaultHeaders,
-      ...headers,
-    }).forEach(([k, v]) => {
+    Object.entries(headers).forEach(([k, v]) => {
       xhr.setRequestHeader(k, v);
     });
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === false) {
         if (xhr.status >= 200 && xhr.status <= 299) {
-          diag.debug('xhr success', body);
+          diag.debug('xhr success', innerBody);
           onSuccess();
           clearTimeout(exporterTimer);
           clearTimeout(retryTimer);
@@ -128,7 +122,7 @@ export function sendWithXhr(
           }
 
           retryTimer = setTimeout(() => {
-            sendWithRetry(retries - 1, minDelay);
+            sendWithRetry(innerBody, headers, retries - 1, minDelay);
           }, retryTime);
         } else {
           const error = new OTLPExporterError(
@@ -160,23 +154,28 @@ export function sendWithXhr(
       clearTimeout(retryTimer);
     };
 
-    if (compressionAlgorithm === CompressionAlgorithm.GZIP) {
-      const sendCompressed = (body: string | Blob | Uint8Array) => {
-        xhr.setRequestHeader('Content-Encoding', 'gzip'); // Set the Content-Encoding header to 'gzip' for compressed requests
-        xhr.send(body);
-      };
-
-      compressContent(body, compressionAlgorithm)
-        .then(sendCompressed)
-        .catch(() => {
-          xhr.send(body); // Send the original body when compression fails
-        });
-    } else {
-      xhr.send(body);
-    }
+    xhr.send(innerBody);
   };
 
-  sendWithRetry();
+  const commonHeaders = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  compressContent(body, compressionAlgorithm)
+    .then(compressedContent => {
+      sendWithRetry(compressedContent, {
+        ...commonHeaders,
+        ...headers,
+        'Content-Encoding': compressionAlgorithm,
+      });
+    })
+    .catch(_error => {
+      sendWithRetry(body, {
+        ...commonHeaders,
+        ...headers,
+      });
+    });
 }
 
 async function compressContent(
