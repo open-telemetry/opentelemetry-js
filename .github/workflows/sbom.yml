@@ -1,0 +1,35 @@
+name: SBOM
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+          
+permissions: read-all
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install -g npm@latest
+
+      - name: Bootstrap
+        run: npm ci
+
+      - name: Generate SBOM
+        run: |
+          npm sbom --sbom-format=spdx --legacy-peer-deps > sbom.spdx
+          zip sbom.zip ./sbom.spdx 
+
+      - uses: actions/upload-artifact@v4
+        with: 
+          path: ./sbom.zip
+          name: "SBOM"
