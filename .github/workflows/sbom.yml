@@ -26,11 +26,11 @@ jobs:
 
       - name: Generate SBOM for the whole repository
         run: |
-          npm sbom --sbom-format=spdx --legacy-peer-deps > sbom.spdx
+          npm sbom --sbom-format=spdx --legacy-peer-deps > opentelemetry-js.spdx
 
       - name: Generate SBOM for the API package
         run: |
-          npm sbom --sbom-format=spdx --legacy-peer-deps --workspace api > api.spdx
+          npm sbom --sbom-format=spdx --legacy-peer-deps --workspace api > opentelemetry-js_api.spdx
 
       - name: Generate SBOMs for packages 
         run: |
@@ -38,7 +38,7 @@ jobs:
           do
             dir_name=$(basename "$dir")
             echo "Generating SBOM for $dir_name"
-            npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "${dir_name}.spdx"
+            npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "opentelemetry-js_${dir_name}.spdx"
           done
 
       - name: Generate SBOMs for experimental packages 
@@ -47,7 +47,7 @@ jobs:
           do
             dir_name=$(basename "$dir")
             echo "Generating SBOM for $dir_name"
-            npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "${dir_name}.spdx"
+            npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "opentelemetry-js_${dir_name}.spdx"
           done
 
       - name: Zip all SBOM files
