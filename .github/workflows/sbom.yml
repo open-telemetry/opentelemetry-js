@@ -28,6 +28,10 @@ jobs:
         run: |
           npm sbom --sbom-format=spdx --legacy-peer-deps > sbom.spdx
 
+      - name: Generate SBOM for the API package
+        run: |
+          npm sbom --sbom-format=spdx --legacy-peer-deps --workspace api > api.spdx
+
       - name: Generate SBOMs for packages 
         run: |
           for dir in $(find packages -mindepth 1 -maxdepth 1 -type d)
