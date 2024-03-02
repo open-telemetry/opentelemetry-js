@@ -24,10 +24,31 @@ jobs:
       - name: Bootstrap
         run: npm ci
 
-      - name: Generate SBOM
+      - name: Generate SBOM for the whole repository
         run: |
           npm sbom --sbom-format=spdx --legacy-peer-deps > sbom.spdx
-          zip sbom.zip ./sbom.spdx 
+
+      - name: Generate SBOMs for packages 
+        run: |
+          for dir in $(find packages -mindepth 1 -maxdepth 1 -type d)
+          do
+            dir_name=$(basename "$dir")
+            echo "Generating SBOM for $dir_name"
+            npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "${dir_name}.spdx"
+          done
+
+      - name: Generate SBOMs for experimental packages 
+        run: |
+          for dir in $(find experimental/packages -mindepth 1 -maxdepth 1 -type d)
+          do
+            dir_name=$(basename "$dir")
+            echo "Generating SBOM for $dir_name"
+            npm sbom --sbom-format=spdx --legacy-peer-deps --workspace ${dir} > "${dir_name}.spdx"
+          done
+
+      - name: Zip all SBOM files
+        run: |
+          zip sbom.zip *.spdx 
 
       - uses: actions/upload-artifact@v4
         with: 
