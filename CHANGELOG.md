@@ -35,6 +35,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
   * fixes a bug where `Meter.createHistogram()` with the advice `explicitBucketBoundaries: []` would throw
 * fix(context-zone-peer-dep, context-zone):  support zone.js 0.13.x, 0.14.x [#4469](https://github.com/open-telemetry/opentelemetry-js/pull/4469) @pichlermarc
   * fixes a bug where old versions of `zone.js` affected by <https://github.com/angular/angular/issues/53507> would be pulled in
+  * fix(sdk-metrics): increase the depth of the output to the console such that objects in the metric are printed fully to the console [#4522](https://github.com/open-telemetry/opentelemetry-js/pull/4522) @JacksonWeber
 
 ### :books: (Refine Doc)
 
