@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import * as ansiRegex from 'ansi-regex';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 
 import {
@@ -24,60 +25,97 @@ import {
   SimpleLogRecordProcessor,
 } from './../../../src';
 
-/* eslint-disable no-console */
+const isColorText = (text: string) => ansiRegex().test(text);
+
 describe('ConsoleLogRecordExporter', () => {
-  let previousConsoleDir: typeof console.dir;
-
-  beforeEach(() => {
-    previousConsoleDir = console.dir;
-    console.dir = () => {};
-  });
-
-  afterEach(() => {
-    console.dir = previousConsoleDir;
-  });
-
   describe('export', () => {
     it('should export information about log record', () => {
-      assert.doesNotThrow(() => {
-        const consoleExporter = new ConsoleLogRecordExporter();
-        const spyConsole = sinon.spy(console, 'dir');
-        const spyExport = sinon.spy(consoleExporter, 'export');
-        const provider = new LoggerProvider();
-        provider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(consoleExporter)
-        );
+      const consoleExporter = new ConsoleLogRecordExporter();
+      const consoleSpy = sinon.spy(console, 'dir');
+      const spyExport = sinon.spy(consoleExporter, 'export');
+      const provider = new LoggerProvider();
+      provider.addLogRecordProcessor(
+        new SimpleLogRecordProcessor(consoleExporter)
+      );
 
-        provider.getLogger('default').emit({
-          body: 'body1',
-          severityNumber: SeverityNumber.DEBUG,
-          severityText: 'DEBUG',
-        });
-
-        const logRecords = spyExport.args[0];
-        const firstLogRecord = logRecords[0][0];
-        const consoleArgs = spyConsole.args[0];
-        const consoleLogRecord = consoleArgs[0];
-        const keys = Object.keys(consoleLogRecord).sort().join(',');
-
-        const expectedKeys = [
-          'attributes',
-          'body',
-          'severityNumber',
-          'severityText',
-          'spanId',
-          'timestamp',
-          'traceFlags',
-          'traceId',
-        ].join(',');
-
-        assert.ok(firstLogRecord.body === 'body1');
-        assert.ok(firstLogRecord.severityNumber === SeverityNumber.DEBUG);
-        assert.ok(firstLogRecord.severityText === 'DEBUG');
-        assert.ok(keys === expectedKeys, 'expectedKeys');
-
-        assert.ok(spyExport.calledOnce);
+      const stdoutStub = sinon.stub(process.stdout, 'write');
+      provider.getLogger('default').emit({
+        body: 'body1',
+        severityNumber: SeverityNumber.DEBUG,
+        severityText: 'DEBUG',
       });
+      const consoleOutput = stdoutStub.getCalls()[0].firstArg;
+      stdoutStub.restore();
+
+      const logRecords = spyExport.args[0];
+      const firstLogRecord = logRecords[0][0];
+      const consoleArgs = consoleSpy.args[0];
+      const consoleLogRecord = consoleArgs[0];
+      const keys = Object.keys(consoleLogRecord).sort().join(',');
+      consoleSpy.restore();
+
+      const expectedKeys = [
+        'attributes',
+        'body',
+        'severityNumber',
+        'severityText',
+        'spanId',
+        'timestamp',
+        'traceFlags',
+        'traceId',
+      ].join(',');
+
+      assert.equal(firstLogRecord.body, 'body1');
+      assert.equal(firstLogRecord.severityNumber, SeverityNumber.DEBUG);
+      assert.equal(firstLogRecord.severityText, 'DEBUG');
+      assert.equal(keys, expectedKeys);
+
+      assert.ok(spyExport.calledOnce);
+
+      const containsColor = isColorText(consoleOutput);
+      assert.equal(
+        containsColor,
+        (process.env.FORCE_COLOR && process.env.FORCE_COLOR !== '0') ||
+          process.stdout.isTTY
+      );
+    });
+    it('should colorize log records', () => {
+      const consoleExporter = new ConsoleLogRecordExporter({ colors: true });
+      const provider = new LoggerProvider();
+      provider.addLogRecordProcessor(
+        new SimpleLogRecordProcessor(consoleExporter)
+      );
+
+      const stdoutStub = sinon.stub(process.stdout, 'write');
+      provider.getLogger('default').emit({
+        body: 'body2',
+        severityNumber: SeverityNumber.DEBUG,
+        severityText: 'DEBUG',
+      });
+      const consoleOutput = stdoutStub.getCalls()[0].firstArg;
+      stdoutStub.restore();
+
+      const containsColor = isColorText(consoleOutput);
+      assert.ok(containsColor);
+    });
+    it('should not colorize log records', () => {
+      const consoleExporter = new ConsoleLogRecordExporter({ colors: false });
+      const provider = new LoggerProvider();
+      provider.addLogRecordProcessor(
+        new SimpleLogRecordProcessor(consoleExporter)
+      );
+
+      const stdoutStub = sinon.stub(process.stdout, 'write');
+      provider.getLogger('default').emit({
+        body: 'body3',
+        severityNumber: SeverityNumber.DEBUG,
+        severityText: 'DEBUG',
+      });
+      const consoleOutput = stdoutStub.getCalls()[0].firstArg;
+      stdoutStub.restore();
+
+      const doesNotContainColor = !isColorText(consoleOutput);
+      assert.ok(doesNotContainColor);
     });
   });
 });
