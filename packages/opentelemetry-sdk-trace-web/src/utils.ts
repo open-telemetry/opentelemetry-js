@@ -62,22 +62,25 @@ export function addSpanNetworkEvent(
   performanceName: string,
   entries: PerformanceEntries,
   refPerfName?: string
-): api.Span | undefined {
+): api.Span {
+  let perfTime = undefined;
+  let refTime = undefined;
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
   ) {
-    let perfTime = entries[performanceName];
+    perfTime = entries[performanceName];
+  }
     const refName = refPerfName || PTN.FETCH_START;
     // Use a reference time whcih is the earliest possible value so that the performance timing are earlier can be corrected to this reference time
     // using FETCH START time in case no reference is provided
     if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
-      perfTime = Math.max(perfTime || 0, entries[refName] || 0);
+      refTime = entries[refName]
     }
-    span.addEvent(performanceName, perfTime);
+    if(perfTime && refTime && perfTime>=refTime) {
+      span.addEvent(performanceName, perfTime);
+    }
     return span;
-  }
-  return undefined;
 }
 
 /**
