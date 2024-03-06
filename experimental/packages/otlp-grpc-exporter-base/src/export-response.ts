@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-export { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
-export { OTLPGRPCExporterConfigNode } from './types';
-export { DEFAULT_COLLECTOR_URL, validateAndNormalizeUrl } from './util';
-export {
-  MetricsSerializer,
-  TraceSerializer,
-  LogsSerializer,
-  ISerializer,
-} from './serializers';
+export interface ExportResponseSuccess {
+  status: 'success';
+  data?: Uint8Array;
+}
+
+export interface ExportResponseFailure {
+  status: 'failure';
+  error: Error;
+}
+
+export type ExportResponse = ExportResponseSuccess | ExportResponseFailure;
