@@ -77,7 +77,7 @@ export function addSpanNetworkEvent(
   if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
     refTime = entries[refName];
   }
-  if (perfTime && refTime && perfTime >= refTime) {
+  if (perfTime !== undefined && refTime !== undefined && perfTime >= refTime) {
     span.addEvent(performanceName, perfTime);
     return span;
   }
