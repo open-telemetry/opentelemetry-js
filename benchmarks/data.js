@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709213895607,
+  "lastUpdate": 1709724515663,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5214,6 +5214,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 671630,
             "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "47067795+JacksonWeber@users.noreply.github.com",
+            "name": "Jackson Weber",
+            "username": "JacksonWeber"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "75bd7233ea1140cb5c185e6e50aec16485df6601",
+          "message": "fix: ConsoleMetricExporter Should Not Export Shallowly (#4522)\n\n* fix: (ConsoleMetricExporter): Increase console log depth to get useful information from metrics.\r\n\r\n* update: add contribution to changelog.\r\n\r\n* Update CHANGELOG.md",
+          "timestamp": "2024-03-06T12:26:39+01:00",
+          "tree_id": "d85b4073b642fd7012c809ed762c677d422e737c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/75bd7233ea1140cb5c185e6e50aec16485df6601"
+        },
+        "date": 1709724512825,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 916605,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11619,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 665206,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 650062,
+            "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "96 samples"
           }
