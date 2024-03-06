@@ -62,7 +62,7 @@ export function addSpanNetworkEvent(
   performanceName: string,
   entries: PerformanceEntries,
   refPerfName?: string
-): api.Span {
+): api.Span | undefined {
   let perfTime = undefined;
   let refTime = undefined;
   if (
@@ -79,8 +79,9 @@ export function addSpanNetworkEvent(
   }
   if (perfTime && refTime && perfTime >= refTime) {
     span.addEvent(performanceName, perfTime);
+    return span;
   }
-  return span;
+  return undefined;
 }
 
 /**
