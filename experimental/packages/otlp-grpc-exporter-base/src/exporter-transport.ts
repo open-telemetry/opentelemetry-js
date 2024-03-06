@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-export { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
-export { OTLPGRPCExporterConfigNode } from './types';
-export { DEFAULT_COLLECTOR_URL, validateAndNormalizeUrl } from './util';
-export {
-  MetricsSerializer,
-  TraceSerializer,
-  LogsSerializer,
-  ISerializer,
-} from './serializers';
+import { ExportResponse } from './export-response';
+
+export interface IExporterTransport {
+  send(data: Uint8Array): Promise<ExportResponse>;
+  shutdown(): void;
+}
