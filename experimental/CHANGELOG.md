@@ -59,6 +59,19 @@ All notable changes to experimental packages in this project will be documented 
   * This breaking change only affects users that are using the *experimental* `@opentelemetry/instrumentation/hook.mjs` loader hook AND Node.js 18.19 or later:
     * This reverts back to an older version of `import-in-the-middle` due to <https://github.com/DataDog/import-in-the-middle/issues/57>
     * This version does not support Node.js 18.19 or later
+* fix(exporter-*-otlp-grpc)!: lazy load gRPC to improve compatibility with `@opentelemetry/instrumenation-grpc` [#4432](https://github.com/open-telemetry/opentelemetry-js/pull/4432) @pichlermarc
+  * Fixes a bug where requiring up the gRPC exporter before enabling the instrumentation from `@opentelemetry/instrumentation-grpc` would lead to missing telemetry
+  * Breaking changes, removes several functions and properties that were used internally and were not intended for end-users
+    * `getServiceClientType()`
+      * this returned a static enum value that would denote the export type (`SPAN`, `METRICS`, `LOGS`)
+    * `getServiceProtoPath()`
+      * this returned a static enum value that would correspond to the gRPC service path
+    * `metadata`
+      * was used internally to access metadata, but as a side effect allowed end-users to modify metadata on runtime.
+    * `serviceClient`
+      * was used internally to keep track of the service client used by the exporter, as a side effect it allowed end-users to modify the gRPC service client that was used
+    * `compression`
+      * was used internally to keep track of the compression to use but was unintentionally exposed to the users. It allowed to read and write the value, writing, however, would have no effect.
 
 ### :bug: (Bug Fix)
 
