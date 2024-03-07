@@ -25,7 +25,7 @@ import { createConstMap } from '../internal/utils';
 //----------------------------------------------------------------------------------------------------------
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_CLOUD_PROVIDER = 'cloud.provider';
 const TMP_CLOUD_ACCOUNT_ID = 'cloud.account.id';
 const TMP_CLOUD_REGION = 'cloud.region';
@@ -1130,7 +1130,7 @@ export const SemanticResourceAttributes: SemanticResourceAttributes =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD = 'alibaba_cloud';
 const TMP_CLOUDPROVIDERVALUES_AWS = 'aws';
 const TMP_CLOUDPROVIDERVALUES_AZURE = 'azure';
@@ -1198,7 +1198,7 @@ export const CloudProviderValues: CloudProviderValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
 const TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
 const TMP_CLOUDPLATFORMVALUES_AWS_EC2 = 'aws_ec2';
@@ -1442,7 +1442,7 @@ export const CloudPlatformValues: CloudPlatformValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_AWSECSLAUNCHTYPEVALUES_EC2 = 'ec2';
 const TMP_AWSECSLAUNCHTYPEVALUES_FARGATE = 'fargate';
 
@@ -1488,7 +1488,7 @@ export const AwsEcsLaunchtypeValues: AwsEcsLaunchtypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_HOSTARCHVALUES_AMD64 = 'amd64';
 const TMP_HOSTARCHVALUES_ARM32 = 'arm32';
 const TMP_HOSTARCHVALUES_ARM64 = 'arm64';
@@ -1583,7 +1583,7 @@ export const HostArchValues: HostArchValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_OSTYPEVALUES_WINDOWS = 'windows';
 const TMP_OSTYPEVALUES_LINUX = 'linux';
 const TMP_OSTYPEVALUES_DARWIN = 'darwin';
@@ -1718,7 +1718,7 @@ export const OsTypeValues: OsTypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_TELEMETRYSDKLANGUAGEVALUES_CPP = 'cpp';
 const TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET = 'dotnet';
 const TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG = 'erlang';

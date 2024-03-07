@@ -555,7 +555,7 @@ describe('HttpInstrumentation', () => {
       });
 
       for (const arg of ['string', {}, new Date()]) {
-        it(`should be tracable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
+        it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
@@ -1101,10 +1101,10 @@ describe('HttpInstrumentation', () => {
 
       it('should set rpc metadata for incoming http request', async () => {
         server = http.createServer((request, response) => {
-          const rpcMemadata = getRPCMetadata(context.active());
-          assert(typeof rpcMemadata !== 'undefined');
-          assert(rpcMemadata.type === RPCType.HTTP);
-          assert(rpcMemadata.span.setAttribute('key', 'value'));
+          const rpcMetadata = getRPCMetadata(context.active());
+          assert(typeof rpcMetadata !== 'undefined');
+          assert(rpcMetadata.type === RPCType.HTTP);
+          assert(rpcMetadata.span.setAttribute('key', 'value'));
           response.end('Test Server Response');
         });
         await new Promise<void>(resolve => server.listen(serverPort, resolve));

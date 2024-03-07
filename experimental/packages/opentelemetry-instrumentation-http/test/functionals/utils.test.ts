@@ -311,7 +311,7 @@ describe('Utility', () => {
       );
     });
 
-    it('should succesfully process without middleware stack', () => {
+    it('should successfully process without middleware stack', () => {
       const request = {
         socket: {},
       } as IncomingMessage;

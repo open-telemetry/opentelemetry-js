@@ -73,7 +73,7 @@ export const MIN_VALUE = Math.pow(2, -1022);
 export function getNormalBase2(value: number): number {
   const dv = new DataView(new ArrayBuffer(8));
   dv.setFloat64(0, value);
-  // access the raw 64-bit float as 32-bit uints
+  // access the raw 64-bit float as 32-bit units
   const hiBits = dv.getUint32(0);
   const expBits = (hiBits & EXPONENT_MASK) >> 20;
   return expBits - EXPONENT_BIAS;
@@ -87,7 +87,7 @@ export function getNormalBase2(value: number): number {
 export function getSignificand(value: number): number {
   const dv = new DataView(new ArrayBuffer(8));
   dv.setFloat64(0, value);
-  // access the raw 64-bit float as two 32-bit uints
+  // access the raw 64-bit float as two 32-bit units
   const hiBits = dv.getUint32(0);
   const loBits = dv.getUint32(4);
   // extract the significand bits from the hi bits and left shift 32 places note:
