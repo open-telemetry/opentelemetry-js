@@ -25,7 +25,7 @@ import { createConstMap } from '../internal/utils';
 //----------------------------------------------------------------------------------------------------------
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
 const TMP_DB_SYSTEM = 'db.system';
 const TMP_DB_CONNECTION_STRING = 'db.connection_string';
@@ -1760,7 +1760,7 @@ export const SemanticAttributes: SemanticAttributes =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_DBSYSTEMVALUES_OTHER_SQL = 'other_sql';
 const TMP_DBSYSTEMVALUES_MSSQL = 'mssql';
 const TMP_DBSYSTEMVALUES_MYSQL = 'mysql';
@@ -2255,7 +2255,7 @@ export const DbSystemValues: DbSystemValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ALL = 'all';
 const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM = 'each_quorum';
 const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM = 'quorum';
@@ -2401,7 +2401,7 @@ export const DbCassandraConsistencyLevelValues: DbCassandraConsistencyLevelValue
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_FAASTRIGGERVALUES_DATASOURCE = 'datasource';
 const TMP_FAASTRIGGERVALUES_HTTP = 'http';
 const TMP_FAASTRIGGERVALUES_PUBSUB = 'pubsub';
@@ -2476,7 +2476,7 @@ export const FaasTriggerValues: FaasTriggerValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_FAASDOCUMENTOPERATIONVALUES_INSERT = 'insert';
 const TMP_FAASDOCUMENTOPERATIONVALUES_EDIT = 'edit';
 const TMP_FAASDOCUMENTOPERATIONVALUES_DELETE = 'delete';
@@ -2536,7 +2536,7 @@ export const FaasDocumentOperationValues: FaasDocumentOperationValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD = 'alibaba_cloud';
 const TMP_FAASINVOKEDPROVIDERVALUES_AWS = 'aws';
 const TMP_FAASINVOKEDPROVIDERVALUES_AZURE = 'azure';
@@ -2613,7 +2613,7 @@ export const FaasInvokedProviderValues: FaasInvokedProviderValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_NETTRANSPORTVALUES_IP_TCP = 'ip_tcp';
 const TMP_NETTRANSPORTVALUES_IP_UDP = 'ip_udp';
 const TMP_NETTRANSPORTVALUES_IP = 'ip';
@@ -2708,7 +2708,7 @@ export const NetTransportValues: NetTransportValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_NETHOSTCONNECTIONTYPEVALUES_WIFI = 'wifi';
 const TMP_NETHOSTCONNECTIONTYPEVALUES_WIRED = 'wired';
 const TMP_NETHOSTCONNECTIONTYPEVALUES_CELL = 'cell';
@@ -2788,7 +2788,7 @@ export const NetHostConnectionTypeValues: NetHostConnectionTypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GPRS = 'gprs';
 const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EDGE = 'edge';
 const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_UMTS = 'umts';
@@ -3046,7 +3046,7 @@ export const NetHostConnectionSubtypeValues: NetHostConnectionSubtypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_HTTPFLAVORVALUES_HTTP_1_0 = '1.0';
 const TMP_HTTPFLAVORVALUES_HTTP_1_1 = '1.1';
 const TMP_HTTPFLAVORVALUES_HTTP_2_0 = '2.0';
@@ -3132,7 +3132,7 @@ export const HttpFlavorValues: HttpFlavorValues = {
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_MESSAGINGDESTINATIONKINDVALUES_QUEUE = 'queue';
 const TMP_MESSAGINGDESTINATIONKINDVALUES_TOPIC = 'topic';
 
@@ -3179,7 +3179,7 @@ export const MessagingDestinationKindValues: MessagingDestinationKindValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_MESSAGINGOPERATIONVALUES_RECEIVE = 'receive';
 const TMP_MESSAGINGOPERATIONVALUES_PROCESS = 'process';
 
@@ -3226,7 +3226,7 @@ export const MessagingOperationValues: MessagingOperationValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_RPCGRPCSTATUSCODEVALUES_OK = 0;
 const TMP_RPCGRPCSTATUSCODEVALUES_CANCELLED = 1;
 const TMP_RPCGRPCSTATUSCODEVALUES_UNKNOWN = 2;
@@ -3436,7 +3436,7 @@ export const RpcGrpcStatusCodeValues: RpcGrpcStatusCodeValues = {
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
+// Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_MESSAGETYPEVALUES_SENT = 'SENT';
 const TMP_MESSAGETYPEVALUES_RECEIVED = 'RECEIVED';
 
