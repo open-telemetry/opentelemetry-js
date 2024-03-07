@@ -20,7 +20,7 @@ import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
-import { getEnv, baggageUtils, _globalThis } from '@opentelemetry/core';
+import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -52,13 +52,9 @@ export abstract class OTLPExporterBrowserBase<
     }
   }
 
-  onInit(): void {
-    _globalThis.addEventListener('unload', this.shutdown);
-  }
+  onInit(): void {}
 
-  onShutdown(): void {
-    _globalThis.removeEventListener('unload', this.shutdown);
-  }
+  onShutdown(): void {}
 
   send(
     items: ExportItem[],

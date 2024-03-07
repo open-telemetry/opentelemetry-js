@@ -19,6 +19,7 @@ import {
   Instrumentation,
   InstrumentationBase,
   InstrumentationConfig,
+  InstrumentationModuleDefinition,
 } from '../../src';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
@@ -130,6 +131,56 @@ describe('BaseInstrumentation', () => {
       const configuration =
         instrumentation.getConfig() as TestInstrumentationConfig;
       assert.strictEqual(configuration.isActive, true);
+    });
+  });
+
+  describe('getModuleDefinitions', () => {
+    const moduleDefinition: InstrumentationModuleDefinition<unknown> = {
+      name: 'foo',
+      patch: moduleExports => {},
+      unpatch: moduleExports => {},
+      moduleExports: {},
+      files: [],
+      supportedVersions: ['*'],
+    };
+
+    it('should return single module definition from init() as array ', () => {
+      class TestInstrumentation2 extends TestInstrumentation {
+        override init() {
+          return moduleDefinition;
+        }
+      }
+      const instrumentation = new TestInstrumentation2();
+
+      assert.deepStrictEqual(instrumentation.getModuleDefinitions(), [
+        moduleDefinition,
+      ]);
+    });
+
+    it('should return multiple module definitions from init() as array ', () => {
+      class TestInstrumentation2 extends TestInstrumentation {
+        override init() {
+          return [moduleDefinition, moduleDefinition, moduleDefinition];
+        }
+      }
+      const instrumentation = new TestInstrumentation2();
+
+      assert.deepStrictEqual(instrumentation.getModuleDefinitions(), [
+        moduleDefinition,
+        moduleDefinition,
+        moduleDefinition,
+      ]);
+    });
+
+    it('should return void from init() as empty array ', () => {
+      class TestInstrumentation2 extends TestInstrumentation {
+        override init() {
+          return;
+        }
+      }
+      const instrumentation = new TestInstrumentation2();
+
+      assert.deepStrictEqual(instrumentation.getModuleDefinitions(), []);
     });
   });
 });

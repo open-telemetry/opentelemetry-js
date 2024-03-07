@@ -84,7 +84,7 @@
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.8.0",
-    "zone.js": "^0.10.2 || ^0.11.0 || ^0.13.0"
+    "zone.js": "^0.10.2 || ^0.11.0 || ^0.13.0 || ^0.14.0"
   },
   "sideEffects": false,
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"
