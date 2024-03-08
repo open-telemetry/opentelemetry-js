@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1709744130495,
+  "lastUpdate": 1709913675391,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5370,6 +5370,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 697729,
             "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7fa2c84e6f5f3e50dba9830ae0cb020250977a61",
+          "message": "chore(deps-dev): bump ip from 1.1.8 to 1.1.9 (#4495)\n\nBumps [ip](https://github.com/indutny/node-ip) from 1.1.8 to 1.1.9.\r\n- [Commits](https://github.com/indutny/node-ip/compare/v1.1.8...v1.1.9)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: ip\r\n  dependency-type: indirect\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-03-08T16:58:44+01:00",
+          "tree_id": "192cc84aa7e02a5cd61b167ffb90f3ef0fc4177f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7fa2c84e6f5f3e50dba9830ae0cb020250977a61"
+        },
+        "date": 1709913674185,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 905453,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11635,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 661064,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 634804,
+            "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
