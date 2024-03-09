@@ -71,11 +71,14 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   ): void {
     for (const scopeMetrics of metrics.scopeMetrics) {
       for (const metric of scopeMetrics.metrics) {
-        console.dir({
-          descriptor: metric.descriptor,
-          dataPointType: metric.dataPointType,
-          dataPoints: metric.dataPoints,
-        });
+        console.dir(
+          {
+            descriptor: metric.descriptor,
+            dataPointType: metric.dataPointType,
+            dataPoints: metric.dataPoints,
+          },
+          { depth: null }
+        );
       }
     }
 
