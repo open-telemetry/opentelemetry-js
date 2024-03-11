@@ -5,7 +5,8 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides auto instrumentation for web using fetch.
+This module provides auto instrumentation for web using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/fetch).
+(Note: This instrumentation does **not** instrument [Node.js' fetch](https://nodejs.org/api/globals.html#fetch). See [this issue](https://github.com/open-telemetry/opentelemetry-js/issues/4333).)
 
 ## Installation
 

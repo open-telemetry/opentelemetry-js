@@ -35,6 +35,8 @@ import { _globalThis } from '@opentelemetry/core';
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
+const isNode = typeof process === 'object' && process.release?.name === 'node';
+
 export interface FetchCustomAttributeFunction {
   (
     span: api.Span,
@@ -465,6 +467,14 @@ export class FetchInstrumentation extends InstrumentationBase<
    * implements enable function
    */
   override enable(): void {
+    if (isNode) {
+      // Node.js v18+ *does* have a global `fetch()`, but this package does not
+      // support instrumenting it.
+      this._diag.warn(
+        "this instrumentation is intended for web usage only, it does not instrument Node.js's fetch()"
+      );
+      return;
+    }
     if (isWrapped(fetch)) {
       this._unwrap(_globalThis, 'fetch');
       this._diag.debug('removing previous patch for constructor');
@@ -476,6 +486,9 @@ export class FetchInstrumentation extends InstrumentationBase<
    * implements unpatch function
    */
   override disable(): void {
+    if (isNode) {
+      return;
+    }
     this._unwrap(_globalThis, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
