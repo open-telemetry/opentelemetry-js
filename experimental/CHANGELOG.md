@@ -8,6 +8,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-logs): added colors option to ConsoleLogRecordExporter
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
