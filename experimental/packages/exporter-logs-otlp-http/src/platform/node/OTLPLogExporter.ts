@@ -25,6 +25,11 @@ import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
 import { createExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 import { getDefaultUrl } from '../config';
+import { VERSION } from '../../version';
+
+const USER_AGENT = {
+  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+};
 
 /**
  * Collector Logs Exporter for Node
@@ -41,14 +46,19 @@ export class OTLPLogExporter
     });
     this.headers = {
       ...this.headers,
+      ...USER_AGENT,
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
       ),
+      ...config.headers,
     };
   }
 
   convert(logRecords: ReadableLogRecord[]): IExportLogsServiceRequest {
-    return createExportLogsServiceRequest(logRecords, true);
+    return createExportLogsServiceRequest(logRecords, {
+      useHex: true,
+      useLongBits: false,
+    });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {

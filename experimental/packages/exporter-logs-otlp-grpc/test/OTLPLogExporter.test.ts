@@ -32,11 +32,11 @@ import {
 } from './logsHelper';
 import * as core from '@opentelemetry/core';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
-import { GrpcCompressionAlgorithm } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   IExportLogsServiceRequest,
   IResourceLogs,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../src/version';
 
 const logsServiceProtoPath =
   'opentelemetry/proto/collector/logs/v1/logs_service.proto';
@@ -291,7 +291,7 @@ const testCollectorExporter = (params: TestParams) => {
         });
         assert.strictEqual(
           collectorExporter.compression,
-          GrpcCompressionAlgorithm.GZIP
+          CompressionAlgorithm.GZIP
         );
         delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
       });
@@ -319,38 +319,54 @@ describe('OTLPLogExporter - node (getDefaultUrl)', () => {
 
 describe('when configuring via environment', () => {
   const envSource = process.env;
+
+  afterEach(function () {
+    // Ensure we don't pollute other tests if assertions fail
+    delete envSource.OTEL_EXPORTER_OTLP_ENDPOINT;
+    delete envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT;
+    delete envSource.OTEL_EXPORTER_OTLP_HEADERS;
+    delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
+    sinon.restore();
+  });
+
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     const collectorExporter = new OTLPLogExporter();
     assert.strictEqual(collectorExporter.url, 'foo.bar');
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should override global exporter url with signal url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.logs';
     const collectorExporter = new OTLPLogExporter();
     assert.strictEqual(collectorExporter.url, 'foo.logs');
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
+  });
+  it('should include user-agent header by default', () => {
+    const collectorExporter = new OTLPLogExporter();
+    const actualMetadata =
+      collectorExporter['_transport']['_parameters'].metadata();
+    assert.deepStrictEqual(actualMetadata.get('User-Agent'), [
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+    ]);
   });
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPLogExporter();
-    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['bar']);
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    const actualMetadata =
+      collectorExporter['_transport']['_parameters'].metadata();
+    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
   });
-  it('should override global headers config with signal headers defined via env', () => {
+  it('should not override hard-coded headers config with headers defined via env', () => {
     const metadata = new grpc.Metadata();
     metadata.set('foo', 'bar');
     metadata.set('goo', 'lol');
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
     envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPLogExporter({ metadata });
-    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['boo']);
-    assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['foo']);
-    assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['lol']);
-    envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = '';
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    const actualMetadata =
+      collectorExporter['_transport']['_parameters'].metadata();
+    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
+    assert.deepStrictEqual(actualMetadata.get('goo'), ['lol']);
+    assert.deepStrictEqual(actualMetadata.get('bar'), ['foo']);
   });
 });
 

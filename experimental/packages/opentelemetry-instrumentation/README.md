@@ -216,13 +216,13 @@ registerInstrumentations({
 The `registerInstrumentations()` API allows to specify which `TracerProvider` and/or `MeterProvider` to use by the given options object.
 If nothing is specified the global registered provider is used. Usually this is what most users want therefore it's recommended to keep this default.
 
-There might be usecase where someone has the need for more providers within an application. Please note that special care must be takes in such setups
+There might be use case where someone has the need for more providers within an application. Please note that special care must be takes in such setups
 to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
-## Instrumentation for ES Modules In NodeJS (experimental)
+## Instrumentation for ES Modules In Node.js (experimental)
 
-As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the esm module it want to patch. To do so, you must provide the `--experimental-loader=@opentelemetry/instrumentation/hook.mjs` flag to the `node` binary. Alternatively you can set the `NODE_OPTIONS` environment variable to `NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs"`.
-As the ESM module loader from NodeJS is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
+As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the ESM module it want to patch. To do so, you must provide the `--experimental-loader=@opentelemetry/instrumentation/hook.mjs` flag to the `node` binary. Alternatively you can set the `NODE_OPTIONS` environment variable to `NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs"`.
+As the ESM module loader from Node.js is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
 
 **Note**: ESM Instrumentation is not yet supported for Node 20.
 

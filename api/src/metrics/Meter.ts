@@ -85,7 +85,7 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createUpDownCounter<
-    AttributesTypes extends MetricAttributes = MetricAttributes
+    AttributesTypes extends MetricAttributes = MetricAttributes,
   >(
     name: string,
     options?: MetricOptions
@@ -100,7 +100,7 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createObservableGauge<
-    AttributesTypes extends MetricAttributes = MetricAttributes
+    AttributesTypes extends MetricAttributes = MetricAttributes,
   >(
     name: string,
     options?: MetricOptions
@@ -115,7 +115,7 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createObservableCounter<
-    AttributesTypes extends MetricAttributes = MetricAttributes
+    AttributesTypes extends MetricAttributes = MetricAttributes,
   >(
     name: string,
     options?: MetricOptions
@@ -130,7 +130,7 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createObservableUpDownCounter<
-    AttributesTypes extends MetricAttributes = MetricAttributes
+    AttributesTypes extends MetricAttributes = MetricAttributes,
   >(
     name: string,
     options?: MetricOptions
@@ -151,7 +151,7 @@ export interface Meter {
    * @param observables the observables associated with this batch observable callback
    */
   addBatchObservableCallback<
-    AttributesTypes extends MetricAttributes = MetricAttributes
+    AttributesTypes extends MetricAttributes = MetricAttributes,
   >(
     callback: BatchObservableCallback<AttributesTypes>,
     observables: Observable<AttributesTypes>[]
@@ -167,7 +167,7 @@ export interface Meter {
    * @param observables the observables associated with this batch observable callback
    */
   removeBatchObservableCallback<
-    AttributesTypes extends MetricAttributes = MetricAttributes
+    AttributesTypes extends MetricAttributes = MetricAttributes,
   >(
     callback: BatchObservableCallback<AttributesTypes>,
     observables: Observable<AttributesTypes>[]

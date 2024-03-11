@@ -21,6 +21,8 @@ import {
   InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
+  Aggregation,
+  AggregationSelector,
 } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporalityPreference,
@@ -104,19 +106,31 @@ function chooseTemporalitySelector(
   return chooseTemporalitySelectorFromEnvironment();
 }
 
+function chooseAggregationSelector(
+  config: OTLPMetricExporterOptions | undefined
+) {
+  if (config?.aggregationPreference) {
+    return config.aggregationPreference;
+  } else {
+    return (_instrumentType: any) => Aggregation.Default();
+  }
+}
+
 export class OTLPMetricExporterBase<
   T extends OTLPExporterBase<
     OTLPMetricExporterOptions,
     ResourceMetrics,
     IExportMetricsServiceRequest
-  >
+  >,
 > implements PushMetricExporter
 {
   public _otlpExporter: T;
   private _aggregationTemporalitySelector: AggregationTemporalitySelector;
+  private _aggregationSelector: AggregationSelector;
 
   constructor(exporter: T, config?: OTLPMetricExporterOptions) {
     this._otlpExporter = exporter;
+    this._aggregationSelector = chooseAggregationSelector(config);
     this._aggregationTemporalitySelector = chooseTemporalitySelector(
       config?.temporalityPreference
     );
@@ -135,6 +149,10 @@ export class OTLPMetricExporterBase<
 
   forceFlush(): Promise<void> {
     return Promise.resolve();
+  }
+
+  selectAggregation(instrumentType: InstrumentType): Aggregation {
+    return this._aggregationSelector(instrumentType);
   }
 
   selectAggregationTemporality(

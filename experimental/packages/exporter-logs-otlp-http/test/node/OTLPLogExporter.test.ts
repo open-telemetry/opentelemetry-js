@@ -31,11 +31,15 @@ import {
 import { PassThrough, Stream } from 'stream';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
+import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
 class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
+  constructor(
+    private _code: number,
+    private _msg?: string
+  ) {
     super();
   }
 
@@ -76,6 +80,14 @@ describe('OTLPLogExporter', () => {
       assert.ok(exporter instanceof OTLPLogExporter);
     });
 
+    it('should include user-agent header by default', () => {
+      const exporter = new OTLPLogExporter();
+      assert.strictEqual(
+        exporter.headers['User-Agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
+    });
+
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=bar';
       const exporter = new OTLPLogExporter();
@@ -90,6 +102,18 @@ describe('OTLPLogExporter', () => {
       assert.strictEqual(exporter.timeoutMillis, 30000);
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT;
+    });
+
+    it('should override headers defined via env with headers defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+      const collectorExporter = new OTLPLogExporter({
+        headers: {
+          foo: 'constructor',
+        },
+      });
+      assert.strictEqual(collectorExporter.headers.foo, 'constructor');
+      assert.strictEqual(collectorExporter.headers.bar, 'foo');
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
   });
 

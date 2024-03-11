@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "1.15.0",
+  "version": "1.22.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -17,7 +17,8 @@
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "size-check": "npm run compile && ts-mocha -p tsconfig.json 'test/**/*.test.ts'"
   },
   "keywords": [
     "opentelemetry",
@@ -49,21 +50,23 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "10.0.1",
+    "@size-limit/file": "^11.0.1",
+    "@size-limit/time": "^11.0.1",
+    "@size-limit/webpack": "^11.0.1",
+    "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
-    "@types/sinon": "10.0.15",
+    "@types/sinon": "10.0.20",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "lerna": "7.1.1",
+    "lerna": "6.6.2",
     "mocha": "10.2.0",
-    "nock": "13.3.1",
+    "nock": "13.3.8",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
+    "size-limit": "^11.0.1",
     "ts-mocha": "10.0.0",
+    "ts-node": "10.9.2",
     "typescript": "4.4.4"
-  },
-  "dependencies": {
-    "tslib": "^2.3.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-semantic-conventions",
   "sideEffects": false

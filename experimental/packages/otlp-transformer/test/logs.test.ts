@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { HrTime, TraceFlags } from '@opentelemetry/api';
-import { InstrumentationScope, hexToBase64 } from '@opentelemetry/core';
+import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import {
@@ -28,8 +28,8 @@ import { SeverityNumber } from '@opentelemetry/api-logs';
 function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
   const traceId = useHex
     ? '00000000000000000000000000000001'
-    : hexToBase64('00000000000000000000000000000001');
-  const spanId = useHex ? '0000000000000002' : hexToBase64('0000000000000002');
+    : hexToBinary('00000000000000000000000000000001');
+  const spanId = useHex ? '0000000000000002' : hexToBinary('0000000000000002');
 
   return {
     resourceLogs: [
@@ -49,10 +49,8 @@ function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
             scope: { name: 'scope_name_1', version: '0.1.0' },
             logRecords: [
               {
-                // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                timeUnixNano: 1680253513123241635,
-                // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                observedTimeUnixNano: 1683526948965142784,
+                timeUnixNano: { low: 4132445859, high: 391214506 },
+                observedTimeUnixNano: { low: 584929536, high: 391976663 },
                 severityNumber: ESeverityNumber.SEVERITY_NUMBER_ERROR,
                 severityText: 'error',
                 body: { stringValue: 'some_log_body' },
@@ -109,6 +107,7 @@ describe('Logs', () => {
         attributes: {
           'some-attribute': 'some attribute value',
         },
+        droppedAttributesCount: 0,
         severityNumber: SeverityNumber.ERROR,
         severityText: 'error',
         body: 'some_log_body',
@@ -124,6 +123,7 @@ describe('Logs', () => {
         attributes: {
           'another-attribute': 'another attribute value',
         },
+        droppedAttributesCount: 0,
       };
       log_1_1_1 = {
         ...log_fragment_1,
@@ -148,19 +148,26 @@ describe('Logs', () => {
     });
 
     it('returns null on an empty list', () => {
-      assert.deepStrictEqual(createExportLogsServiceRequest([], true), {
-        resourceLogs: [],
-      });
+      assert.deepStrictEqual(
+        createExportLogsServiceRequest([], { useHex: true }),
+        {
+          resourceLogs: [],
+        }
+      );
     });
 
     it('serializes a log record with useHex = true', () => {
-      const exportRequest = createExportLogsServiceRequest([log_1_1_1], true);
+      const exportRequest = createExportLogsServiceRequest([log_1_1_1], {
+        useHex: true,
+      });
       assert.ok(exportRequest);
       assert.deepStrictEqual(exportRequest, createExpectedLogJson(true));
     });
 
     it('serializes a log record with useHex = false', () => {
-      const exportRequest = createExportLogsServiceRequest([log_1_1_1], false);
+      const exportRequest = createExportLogsServiceRequest([log_1_1_1], {
+        useHex: false,
+      });
       assert.ok(exportRequest);
       assert.deepStrictEqual(exportRequest, createExpectedLogJson(false));
     });
@@ -168,7 +175,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with same resource and same scope', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_1_1_2],
-        false
+        { useHex: false }
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 1);
@@ -182,7 +189,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with same resource and different scopes', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_1_2_1],
-        false
+        { useHex: false }
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 1);
@@ -192,7 +199,7 @@ describe('Logs', () => {
     it('aggregates multiple logs with different resources', () => {
       const exportRequest = createExportLogsServiceRequest(
         [log_1_1_1, log_2_1_1],
-        false
+        { useHex: false }
       );
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceLogs?.length, 2);

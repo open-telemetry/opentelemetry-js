@@ -36,6 +36,7 @@ Before any other module in your application is loaded, you must initialize the S
 If you fail to initialize the SDK or initialize it too late, no-op implementations will be provided to any library which acquires a tracer or meter from the API.
 
 This example uses Jaeger and Prometheus, but exporters exist for [other tracing backends][other-tracing-backends].
+As shown in the installation instructions, exporters passed to the SDK must be installed alongside `@opentelemetry/sdk-node`.
 
 ```javascript
 const opentelemetry = require("@opentelemetry/sdk-node");
@@ -46,10 +47,10 @@ const {
 } = require("@opentelemetry/auto-instrumentations-node");
 
 const jaegerExporter = new JaegerExporter();
-const prometheusExporter = new PrometheusExporter({ startServer: true });
+const prometheusExporter = new PrometheusExporter();
 
 const sdk = new opentelemetry.NodeSDK({
-  // Optional - if omitted, the tracing SDK will not be initialized
+  // Optional - if omitted, the tracing SDK will be initialized from environment variables
   traceExporter: jaegerExporter,
   // Optional - If omitted, the metrics SDK will not be initialized
   metricReader: prometheusExporter,
@@ -123,9 +124,15 @@ Configure a custom sampler. By default, all traces will be sampled.
 
 ### spanProcessor
 
+Deprecated, please use [spanProcessors](#spanprocessors) instead.
+
+### spanProcessors
+
+An array of span processors to register to the tracer provider.
+
 ### traceExporter
 
-Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
+Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programmatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
 
 ### spanLimits
 

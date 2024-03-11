@@ -71,23 +71,23 @@ main();
 function main() {
   const pkgRoot = process.cwd();
   const projectRoot = findProjectRoot(pkgRoot);
-  const lernaPackages = resolveLernaPackages(projectRoot);
+  const workspacePackages = resolveWorkspacePackages(projectRoot);
 
-  generateTsConfig(projectRoot, lernaPackages, pkgRoot, true);
-  for (const packageMeta of lernaPackages.values()) {
-    generateTsConfig(projectRoot, lernaPackages, path.join(projectRoot, packageMeta.dir), false, packageMeta);
+  generateTsConfig(projectRoot, workspacePackages, pkgRoot, true);
+  for (const packageMeta of workspacePackages.values()) {
+    generateTsConfig(projectRoot, workspacePackages, path.join(projectRoot, packageMeta.dir), false, packageMeta);
   }
 }
 
-function generateTsConfig(projectRoot, lernaProjects, pkgRoot, isLernaRoot, packageMeta) {
+function generateTsConfig(projectRoot, workspacePackages, pkgRoot, isLernaRoot, packageMeta) {
   // Root tsconfig.json
   if (isLernaRoot) {
-    writeRootTsConfigJson(pkgRoot, projectRoot, lernaProjects);
+    writeRootTsConfigJson(pkgRoot, projectRoot, workspacePackages);
     return;
   }
 
   const otelDependencies = getOtelDependencies(packageMeta.pkgJson);
-  const dependenciesDir = resolveDependencyDirs(lernaProjects, otelDependencies);
+  const dependenciesDir = resolveDependencyDirs(workspacePackages, otelDependencies);
   const references = dependenciesDir.map(it => path.relative(pkgRoot, path.join(projectRoot, it))).sort();
 
   if (packageMeta.hasMultiTarget) {
@@ -97,16 +97,16 @@ function generateTsConfig(projectRoot, lernaProjects, pkgRoot, isLernaRoot, pack
   writeSingleTargetTsConfig(pkgRoot, projectRoot, references);
 }
 
-function writeRootTsConfigJson(pkgRoot, projectRoot, lernaProjects) {
+function writeRootTsConfigJson(pkgRoot, projectRoot, workspacePackages) {
   const tsconfigPath = path.join(pkgRoot, 'tsconfig.json');
   const tsconfig = readJSON(tsconfigPath);
-  const references = Array.from(lernaProjects.values())
+  const references = Array.from(workspacePackages.values())
     .filter(it => it.isTsProject)
     .map(it => toPosix(path.relative(pkgRoot, path.join(projectRoot, it.dir)))).sort();
   tsconfig.references = references.map(path => {
     return { path: toPosix(path) }
   });
-  tsconfig.typedocOptions.entryPoints = Array.from(lernaProjects.values())
+  tsconfig.typedocOptions.entryPoints = Array.from(workspacePackages.values())
     .filter(it => !it.private && it.isTsProject)
     .map(it => toPosix(path.relative(pkgRoot, path.join(projectRoot, it.dir)))).sort();
   writeJSON(tsconfigPath, tsconfig, dryRun);
@@ -114,7 +114,7 @@ function writeRootTsConfigJson(pkgRoot, projectRoot, lernaProjects) {
   for (const tsconfigName of ['tsconfig.esm.json', 'tsconfig.esnext.json']) {
     const tsconfigPath = path.join(pkgRoot, tsconfigName);
     const tsconfig = readJSON(tsconfigPath);
-    const references = Array.from(lernaProjects.values())
+    const references = Array.from(workspacePackages.values())
       .filter(it => it.isTsProject && it.hasMultiTarget)
       .map(it => toPosix(path.relative(pkgRoot, path.join(projectRoot, it.dir)))).sort();
     tsconfig.references = references.map(pkgPath => {
@@ -182,10 +182,10 @@ function getOtelDependencies(packageJson) {
   return Array.from(deps.values());
 }
 
-function resolveLernaPackages(projectRoot) {
+function resolveWorkspacePackages(projectRoot) {
   const map = new Map();
-  const lernaJson = readJSON(`${projectRoot}/lerna.json`);
-  for (const pkgDefinition of lernaJson.packages) {
+  const packageJson = readJSON(`${projectRoot}/package.json`);
+  for (const pkgDefinition of packageJson.workspaces) {
     if (ignoredLernaProjects.includes(pkgDefinition)) {
       continue;
     }

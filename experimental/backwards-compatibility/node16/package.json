@@ -1,6 +1,6 @@
 {
   "name": "backcompat-node16",
-  "version": "0.41.0",
+  "version": "0.49.1",
   "private": true,
   "description": "Backwards compatibility app for node 16 types and the OpenTelemetry Node.js SDK",
   "main": "index.js",
@@ -9,9 +9,8 @@
     "peer-api-check": "node ../../../scripts/peer-api-check.js"
   },
   "dependencies": {
-    "@opentelemetry/sdk-node": "0.41.0",
-    "@opentelemetry/sdk-trace-base": "1.15.0",
-    "tslib": "^2.3.1"
+    "@opentelemetry/sdk-node": "0.49.1",
+    "@opentelemetry/sdk-trace-base": "1.22.0"
   },
   "devDependencies": {
     "@types/node": "16.11.52",

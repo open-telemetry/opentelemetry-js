@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone",
-  "version": "1.15.0",
+  "version": "1.22.0",
   "description": "OpenTelemetry Context Zone",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -50,34 +50,13 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.22.8",
-    "@types/mocha": "10.0.1",
-    "@types/node": "18.6.5",
-    "@types/sinon": "10.0.15",
-    "@types/webpack-env": "1.16.3",
-    "babel-loader": "8.3.0",
-    "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "karma": "6.4.2",
-    "karma-chrome-launcher": "3.1.0",
-    "karma-mocha": "2.0.1",
-    "karma-spec-reporter": "0.0.36",
-    "karma-webpack": "4.0.2",
-    "lerna": "7.1.1",
-    "mocha": "10.2.0",
-    "nyc": "15.1.0",
-    "sinon": "15.1.2",
-    "ts-loader": "8.4.0",
-    "ts-mocha": "10.0.0",
-    "typescript": "4.4.4",
-    "webpack": "4.46.0",
-    "webpack-cli": "4.10.0",
-    "webpack-merge": "5.9.0"
+    "lerna": "6.6.2",
+    "typescript": "4.4.4"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "1.15.0",
-    "tslib": "^2.3.1",
-    "zone.js": "^0.11.0"
+    "@opentelemetry/context-zone-peer-dep": "1.22.0",
+    "zone.js": "^0.11.0 || ^0.13.0 || ^0.14.0"
   },
   "sideEffects": true,
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone"

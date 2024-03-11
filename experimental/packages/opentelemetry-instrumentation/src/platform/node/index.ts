@@ -14,9 +14,4 @@
  * limitations under the License.
  */
 export { InstrumentationBase } from './instrumentation';
-export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
-export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
-export {
-  InstrumentationModuleDefinition,
-  InstrumentationModuleFile,
-} from './types';
+export { normalize } from './normalize';

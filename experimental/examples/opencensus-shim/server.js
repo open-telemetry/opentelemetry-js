@@ -5,6 +5,8 @@ const setup = require('./setup');
 const utils = require('./utils');
 const { trace } = require('@opentelemetry/api');
 
+const oc = require('@opencensus/core');
+
 setup('opencensus-shim-example-server');
 const http = require('http');
 

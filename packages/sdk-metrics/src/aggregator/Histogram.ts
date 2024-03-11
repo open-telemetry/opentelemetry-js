@@ -20,9 +20,13 @@ import {
   Aggregator,
   AggregatorKind,
 } from './types';
-import { DataPointType, HistogramMetricData } from '../export/MetricData';
+import {
+  DataPointType,
+  HistogramMetricData,
+  MetricDescriptor,
+} from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentType } from '../InstrumentDescriptor';
 import { binarySearchLB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
@@ -68,6 +72,12 @@ export class HistogramAccumulation implements Accumulation {
   ) {}
 
   record(value: number): void {
+    // NaN does not fall into any bucket, is not zero and should not be counted,
+    // NaN is never greater than max nor less than min, therefore return as there's nothing for us to do.
+    if (Number.isNaN(value)) {
+      return;
+    }
+
     this._current.count += 1;
     this._current.sum += value;
 
@@ -207,7 +217,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   }
 
   toMetricData(
-    descriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
     endTime: HrTime

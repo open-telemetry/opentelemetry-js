@@ -26,7 +26,7 @@ import {
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
 import * as ImportInTheMiddle from 'import-in-the-middle';
-import { InstrumentationModuleDefinition } from './types';
+import { InstrumentationModuleDefinition } from '../../types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
 import { Hook } from 'require-in-the-middle';
@@ -204,8 +204,9 @@ export abstract class InstrumentationBase<T = any>
     }
     // internal file
     const files = module.files ?? [];
+    const normalizedName = path.normalize(name);
     const supportedFileInstrumentations = files
-      .filter(f => f.name === name)
+      .filter(f => f.name === normalizedName)
       .filter(f =>
         isSupported(f.supportedVersions, version, module.includePrerelease)
       );

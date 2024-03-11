@@ -19,13 +19,13 @@ import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import {
-  InstrumentDescriptor,
   InstrumentType,
   MeterProvider,
   MetricReader,
   DataPoint,
   DataPointType,
   Histogram,
+  MetricDescriptor,
 } from '../src';
 import {
   TestDeltaMetricReader,
@@ -74,9 +74,14 @@ describe('Instruments', () => {
       });
 
       counter.add(1);
-      // floating-point value should be trunc-ed.
-      counter.add(1.1);
       counter.add(1, { foo: 'bar' });
+      // floating-point values should be trunc-ed.
+      counter.add(1.1);
+      // non-finite/non-number values should be ignored.
+      counter.add(Infinity);
+      counter.add(-Infinity);
+      counter.add(NaN);
+      counter.add('1' as any);
       await validateExport(cumulativeReader, {
         descriptor: {
           name: 'test',
@@ -124,10 +129,13 @@ describe('Instruments', () => {
       });
 
       counter.add(1);
-      // add floating-point value.
-      counter.add(1.1);
       counter.add(1, { foo: 'bar' });
+      // add floating-point values.
+      counter.add(1.1);
       counter.add(1.2, { foo: 'bar' });
+      // non-number values should be ignored.
+      counter.add('1' as any);
+
       await validateExport(cumulativeReader, {
         dataPointType: DataPointType.SUM,
         isMonotonic: true,
@@ -197,6 +205,13 @@ describe('Instruments', () => {
       upDownCounter.add(-1.1);
       upDownCounter.add(4, { foo: 'bar' });
       upDownCounter.add(1.1, { foo: 'bar' });
+
+      // non-finite/non-number values should be ignored.
+      upDownCounter.add(Infinity);
+      upDownCounter.add(-Infinity);
+      upDownCounter.add(NaN);
+      upDownCounter.add('1' as any);
+
       await validateExport(deltaReader, {
         descriptor: {
           name: 'test',
@@ -230,6 +245,9 @@ describe('Instruments', () => {
       upDownCounter.add(-1.1);
       upDownCounter.add(4, { foo: 'bar' });
       upDownCounter.add(1.1, { foo: 'bar' });
+      // non-number values should be ignored.
+      upDownCounter.add('1' as any);
+
       await validateExport(deltaReader, {
         dataPointType: DataPointType.SUM,
         isMonotonic: false,
@@ -283,6 +301,12 @@ describe('Instruments', () => {
       histogram.record(0.1);
       histogram.record(100, { foo: 'bar' });
       histogram.record(0.1, { foo: 'bar' });
+      // non-finite/non-number values should be ignored.
+      histogram.record(Infinity);
+      histogram.record(-Infinity);
+      histogram.record(NaN);
+      histogram.record('1' as any);
+
       await validateExport(deltaReader, {
         descriptor: {
           name: 'test',
@@ -326,6 +350,74 @@ describe('Instruments', () => {
             },
           },
         ],
+      });
+    });
+
+    it('should recognize metric advice', async () => {
+      const { meter, deltaReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.INT,
+        advice: {
+          // Set explicit boundaries that are different from the default one.
+          explicitBucketBoundaries: [1, 9, 100],
+        },
+      });
+
+      histogram.record(10);
+      histogram.record(0);
+      histogram.record(100, { foo: 'bar' });
+      histogram.record(0, { foo: 'bar' });
+      await validateExport(deltaReader, {
+        descriptor: {
+          name: 'test',
+          description: '',
+          unit: '',
+          type: InstrumentType.HISTOGRAM,
+          valueType: ValueType.INT,
+        },
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            value: {
+              buckets: {
+                boundaries: [1, 9, 100],
+                counts: [1, 0, 1, 0],
+              },
+              count: 2,
+              sum: 10,
+              max: 10,
+              min: 0,
+            },
+          },
+          {
+            attributes: { foo: 'bar' },
+            value: {
+              buckets: {
+                boundaries: [1, 9, 100],
+                counts: [1, 0, 0, 1],
+              },
+              count: 2,
+              sum: 100,
+              max: 100,
+              min: 0,
+            },
+          },
+        ],
+      });
+    });
+
+    it('should allow metric advice with empty explicit boundaries', function () {
+      const meter = new MeterProvider({
+        readers: [new TestMetricReader()],
+      }).getMeter('meter');
+
+      assert.doesNotThrow(() => {
+        meter.createHistogram('histogram', {
+          advice: {
+            explicitBucketBoundaries: [],
+          },
+        });
       });
     });
 
@@ -411,10 +503,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(-1, { foo: 'bar' });
-      await validateExport(deltaReader, {
-        dataPointType: DataPointType.HISTOGRAM,
-        dataPoints: [],
-      });
+      const result = await deltaReader.collect();
+
+      // nothing observed
+      assert.equal(result.resourceMetrics.scopeMetrics.length, 0);
     });
 
     it('should record DOUBLE values', async () => {
@@ -427,6 +519,10 @@ describe('Instruments', () => {
       histogram.record(0.1);
       histogram.record(100, { foo: 'bar' });
       histogram.record(0.1, { foo: 'bar' });
+      // non-number values should be ignored.
+      histogram.record('1' as any);
+      histogram.record(NaN);
+
       await validateExport(deltaReader, {
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -473,10 +569,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(-0.5, { foo: 'bar' });
-      await validateExport(deltaReader, {
-        dataPointType: DataPointType.HISTOGRAM,
-        dataPoints: [],
-      });
+      const result = await deltaReader.collect();
+
+      // nothing observed
+      assert.equal(result.resourceMetrics.scopeMetrics.length, 0);
     });
   });
 
@@ -671,7 +767,12 @@ describe('Instruments', () => {
 });
 
 function setup() {
-  const meterProvider = new MeterProvider({ resource: defaultResource });
+  const deltaReader = new TestDeltaMetricReader();
+  const cumulativeReader = new TestMetricReader();
+  const meterProvider = new MeterProvider({
+    resource: defaultResource,
+    readers: [deltaReader, cumulativeReader],
+  });
   const meter = meterProvider.getMeter(
     defaultInstrumentationScope.name,
     defaultInstrumentationScope.version,
@@ -679,10 +780,6 @@ function setup() {
       schemaUrl: defaultInstrumentationScope.schemaUrl,
     }
   );
-  const deltaReader = new TestDeltaMetricReader();
-  meterProvider.addMetricReader(deltaReader);
-  const cumulativeReader = new TestMetricReader();
-  meterProvider.addMetricReader(cumulativeReader);
 
   return {
     meterProvider,
@@ -695,7 +792,7 @@ function setup() {
 interface ValidateMetricData {
   resource?: Resource;
   instrumentationScope?: InstrumentationScope;
-  descriptor?: InstrumentDescriptor;
+  descriptor?: MetricDescriptor;
   dataPointType?: DataPointType;
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
   isMonotonic?: boolean;

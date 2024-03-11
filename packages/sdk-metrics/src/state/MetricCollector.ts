@@ -16,12 +16,11 @@
 
 import { millisToHrTime } from '@opentelemetry/core';
 import { AggregationTemporalitySelector } from '../export/AggregationSelector';
-import { CollectionResult } from '../export/MetricData';
+import { CollectionResult, ScopeMetrics } from '../export/MetricData';
 import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { ForceFlushOptions, ShutdownOptions } from '../types';
-import { FlatMap } from '../utils';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
 
 /**
@@ -37,19 +36,36 @@ export class MetricCollector implements MetricProducer {
 
   async collect(options?: MetricCollectOptions): Promise<CollectionResult> {
     const collectionTime = millisToHrTime(Date.now());
+    const scopeMetrics: ScopeMetrics[] = [];
+    const errors: unknown[] = [];
+
     const meterCollectionPromises = Array.from(
       this._sharedState.meterSharedStates.values()
-    ).map(meterSharedState =>
-      meterSharedState.collect(this, collectionTime, options)
-    );
-    const result = await Promise.all(meterCollectionPromises);
+    ).map(async meterSharedState => {
+      const current = await meterSharedState.collect(
+        this,
+        collectionTime,
+        options
+      );
+
+      // only add scope metrics if available
+      if (current?.scopeMetrics != null) {
+        scopeMetrics.push(current.scopeMetrics);
+      }
+
+      // only add errors if available
+      if (current?.errors != null) {
+        errors.push(...current.errors);
+      }
+    });
+    await Promise.all(meterCollectionPromises);
 
     return {
       resourceMetrics: {
         resource: this._sharedState.resource,
-        scopeMetrics: result.map(it => it.scopeMetrics),
+        scopeMetrics: scopeMetrics,
       },
-      errors: FlatMap(result, it => it.errors),
+      errors: errors,
     };
   }
 

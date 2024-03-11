@@ -44,6 +44,7 @@ export class PrometheusExporter extends MetricReader {
   private readonly _prefix?: string;
   private readonly _appendTimestamp: boolean;
   private _serializer: PrometheusSerializer;
+  private _startServerPromise: Promise<void> | undefined;
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a attribute named 'le'
@@ -62,6 +63,7 @@ export class PrometheusExporter extends MetricReader {
       aggregationSelector: _instrumentType => Aggregation.Default(),
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
+      metricProducers: config.metricProducers,
     });
     this._host =
       config.host ||
@@ -94,7 +96,8 @@ export class PrometheusExporter extends MetricReader {
         callback(err);
       });
     } else if (callback) {
-      callback();
+      // Do not invoke callback immediately to avoid zalgo problem.
+      queueMicrotask(callback);
     }
   }
 
@@ -141,7 +144,7 @@ export class PrometheusExporter extends MetricReader {
    * Starts the Prometheus export server
    */
   startServer(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    this._startServerPromise ??= new Promise((resolve, reject) => {
       this._server.once('error', reject);
       this._server.listen(
         {
@@ -156,6 +159,8 @@ export class PrometheusExporter extends MetricReader {
         }
       );
     });
+
+    return this._startServerPromise;
   }
 
   /**

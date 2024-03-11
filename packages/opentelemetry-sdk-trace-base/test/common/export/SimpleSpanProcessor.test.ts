@@ -37,7 +37,6 @@ import {
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { Resource, ResourceAttributes } from '@opentelemetry/resources';
-import { Resource as Resource190 } from '@opentelemetry/resources_1.9.0';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 
 describe('SimpleSpanProcessor', () => {
@@ -292,35 +291,36 @@ describe('SimpleSpanProcessor', () => {
     });
   });
 
-  describe('compatibility', () => {
-    it('should export when using old resource implementation', async () => {
-      const processor = new SimpleSpanProcessor(exporter);
-      const providerWithAsyncResource = new BasicTracerProvider({
-        resource: new Resource190({ fromold: 'fromold' }),
-      });
-      const spanContext: SpanContext = {
-        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
-        spanId: '5e0c63257de34c92',
-        traceFlags: TraceFlags.SAMPLED,
-      };
-      const span = new Span(
-        providerWithAsyncResource.getTracer('default'),
-        ROOT_CONTEXT,
-        'span-name',
-        spanContext,
-        SpanKind.CLIENT
-      );
-      processor.onStart(span, ROOT_CONTEXT);
-      assert.strictEqual(exporter.getFinishedSpans().length, 0);
-      processor.onEnd(span);
+  // TODO: https://github.com/open-telemetry/opentelemetry-js/pull/4238#issuecomment-1788516773
+  // describe('compatibility', () => {
+  //   it('should export when using old resource implementation', async () => {
+  //     const processor = new SimpleSpanProcessor(exporter);
+  //     const providerWithAsyncResource = new BasicTracerProvider({
+  //       resource: new Resource190({ fromold: 'fromold' }),
+  //     });
+  //     const spanContext: SpanContext = {
+  //       traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+  //       spanId: '5e0c63257de34c92',
+  //       traceFlags: TraceFlags.SAMPLED,
+  //     };
+  //     const span = new Span(
+  //       providerWithAsyncResource.getTracer('default'),
+  //       ROOT_CONTEXT,
+  //       'span-name',
+  //       spanContext,
+  //       SpanKind.CLIENT
+  //     );
+  //     processor.onStart(span, ROOT_CONTEXT);
+  //     assert.strictEqual(exporter.getFinishedSpans().length, 0);
+  //     processor.onEnd(span);
 
-      const exportedSpans = exporter.getFinishedSpans();
+  //     const exportedSpans = exporter.getFinishedSpans();
 
-      assert.strictEqual(exportedSpans.length, 1);
-      assert.strictEqual(
-        exportedSpans[0].resource.attributes['fromold'],
-        'fromold'
-      );
-    });
-  });
+  //     assert.strictEqual(exportedSpans.length, 1);
+  //     assert.strictEqual(
+  //       exportedSpans[0].resource.attributes['fromold'],
+  //       'fromold'
+  //     );
+  //   });
+  // });
 });

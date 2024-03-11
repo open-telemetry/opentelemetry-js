@@ -30,6 +30,9 @@
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-http/tsconfig.esnext.json"
     },
     {
+      "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-proto/tsconfig.esnext.json"
+    },
+    {
       "path": "experimental/packages/opentelemetry-instrumentation/tsconfig.esnext.json"
     },
     {

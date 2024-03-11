@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AttributeValue, Context } from '@opentelemetry/api';
+import { AttributeValue, Context, TimeInput } from '@opentelemetry/api';
 
 export type LogAttributeValue = AttributeValue | LogAttributes;
 export interface LogAttributes {
@@ -53,12 +53,12 @@ export interface LogRecord {
   /**
    * The time when the log record occurred as UNIX Epoch time in nanoseconds.
    */
-  timestamp?: number;
+  timestamp?: TimeInput;
 
   /**
    * Time when the event was observed by the collection system.
    */
-  observedTimestamp?: number;
+  observedTimestamp?: TimeInput;
 
   /**
    * Numerical value of the severity.

@@ -21,8 +21,7 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "es2017",
-    "useUnknownInCatchVariables": false,
-    "importHelpers": true
+    "useUnknownInCatchVariables": false
   },
   "exclude": [
     "node_modules"

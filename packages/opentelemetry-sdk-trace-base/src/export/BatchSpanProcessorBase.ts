@@ -41,12 +41,16 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
 
+  private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
-  constructor(private readonly _exporter: SpanExporter, config?: T) {
+  constructor(
+    private readonly _exporter: SpanExporter,
+    config?: T
+  ) {
     const env = getEnv();
     this._maxExportBatchSize =
       typeof config?.maxExportBatchSize === 'number'
@@ -200,8 +204,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
           doExport();
         } else {
           Promise.all(
-            pendingResources.map(resource =>
-              resource.waitForAsyncAttributes?.()
+            pendingResources.map(
+              resource => resource.waitForAsyncAttributes?.()
             )
           ).then(doExport, err => {
             globalErrorHandler(err);
@@ -213,19 +217,28 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   }
 
   private _maybeStartTimer() {
-    if (this._timer !== undefined) return;
-    this._timer = setTimeout(() => {
+    if (this._isExporting) return;
+    const flush = () => {
+      this._isExporting = true;
       this._flushOneBatch()
-        .then(() => {
+        .finally(() => {
+          this._isExporting = false;
           if (this._finishedSpans.length > 0) {
             this._clearTimer();
             this._maybeStartTimer();
           }
         })
         .catch(e => {
+          this._isExporting = false;
           globalErrorHandler(e);
         });
-    }, this._scheduledDelayMillis);
+    };
+    // we only wait if the queue doesn't have enough elements yet
+    if (this._finishedSpans.length >= this._maxExportBatchSize) {
+      return flush();
+    }
+    if (this._timer !== undefined) return;
+    this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
     unrefTimer(this._timer);
   }
 

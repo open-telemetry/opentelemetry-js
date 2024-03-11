@@ -49,11 +49,15 @@ export class OTLPTraceExporter
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
       ),
+      ...config.headers,
     };
   }
 
   convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans, true);
+    return createExportTraceServiceRequest(spans, {
+      useHex: true,
+      useLongBits: false,
+    });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {

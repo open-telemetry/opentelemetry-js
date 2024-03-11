@@ -73,7 +73,7 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   private _init(uid: number, type: string) {
     // ignore TIMERWRAP as they combine timers with same timeout which can lead to
     // false context propagation. TIMERWRAP has been removed in node 11
-    // every timer has it's own `Timeout` resource anyway which is used to propagete
+    // every timer has it's own `Timeout` resource anyway which is used to propagate
     // context.
     if (type === 'TIMERWRAP') return;
 

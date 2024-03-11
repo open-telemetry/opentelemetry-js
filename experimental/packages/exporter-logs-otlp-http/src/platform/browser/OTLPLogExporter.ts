@@ -48,7 +48,10 @@ export class OTLPLogExporter
   }
 
   convert(logRecords: ReadableLogRecord[]): IExportLogsServiceRequest {
-    return createExportLogsServiceRequest(logRecords, true);
+    return createExportLogsServiceRequest(logRecords, {
+      useHex: true,
+      useLongBits: false,
+    });
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {

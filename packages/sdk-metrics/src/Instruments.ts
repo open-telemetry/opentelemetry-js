@@ -48,6 +48,12 @@ export class SyncInstrument {
     attributes: MetricAttributes = {},
     context: Context = contextApi.active()
   ) {
+    if (typeof value !== 'number') {
+      diag.warn(
+        `non-number value provided to metric ${this._descriptor.name}: ${value}`
+      );
+      return;
+    }
     if (
       this._descriptor.valueType === ValueType.INT &&
       !Number.isInteger(value)
@@ -56,6 +62,10 @@ export class SyncInstrument {
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
+      // ignore non-finite values.
+      if (!Number.isInteger(value)) {
+        return;
+      }
     }
     this._writableMetricStorage.record(
       value,

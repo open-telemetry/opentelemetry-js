@@ -27,6 +27,22 @@ module.exports = {
     rules: [
       { test: /\.ts$/, use: 'ts-loader' },
       {
+        test: /\.js$/,
+        exclude: {
+          and: [/node_modules/], // Exclude libraries in node_modules ...
+          not: [
+            // Except for a few of them that needs to be transpiled because they use modern syntax
+            /zone.js/,
+          ],
+        },
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          }
+        },
+      },
+      {
         enforce: 'post',
         exclude: /(node_modules|\.test\.[tj]sx?$)/,
         test: /\.ts$/,

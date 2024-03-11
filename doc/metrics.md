@@ -1,6 +1,6 @@
 # Metrics
 
-This quick start is for end users of OpenTelemetry who wish to manually measure their applications. If you are a library author, please see the [Library Authors Guide](library-author.md). If you wish to automatically instrument your application, see the automatic instrumentation documentation for the SDK you wish to use.
+This quick start is for end users of OpenTelemetry who wish to manually measure their applications. If you wish to automatically instrument your application, see the automatic instrumentation documentation for the SDK you wish to use.
 
 For a high-level overview of OpenTelemetry metrics in general and definitions of some common terms, you can refer to the [OpenTelemetry Specification Overview][spec-overview]
 
@@ -20,7 +20,7 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/class
   - [Customizing the metric attributes of instrument](#customizing-the-metric-attributes-of-instrument)
 - [Exporting measurements](#exporting-measurements)
   - [Exporting measurements to Prometheus](#exporting-measurements-to-prometheus)
-  - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
+  - [Exporting measurements to OpenTelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
 
 ## Getting Started
 
@@ -59,7 +59,7 @@ const {
   getNodeAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-node");
 
-const prometheusExporter = new PrometheusExporter({ startServer: true });
+const prometheusExporter = new PrometheusExporter();
 
 const sdk = new opentelemetry.NodeSDK({
   // Optional - If omitted, the metrics SDK will not be initialized
@@ -147,7 +147,7 @@ const {
   getNodeAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-node");
 
-const prometheusExporter = new PrometheusExporter({ startServer: true });
+const prometheusExporter = new PrometheusExporter();
 
 const sdk = new opentelemetry.NodeSDK({
   // Optional - If omitted, the metrics SDK will not be initialized
@@ -266,7 +266,7 @@ Most of the time, instruments will be used to measure operations in your applica
 
 ```typescript
 async function myTask() {
-  const histogram = meter.createHistogram("taks.duration");
+  const histogram = meter.createHistogram("task.duration");
   const startTime = new Date().getTime()
   try {
     // Wait for five seconds before continuing code execution
@@ -286,7 +286,7 @@ await myTask()
 
 ## Describing a instrument measurement
 
-Using attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/metrics/semantic_conventions), we can more accurately describe the measurement in a way our metrics backend will more easily understand. The following example uses these mechanisms, which are described below, for recording a measurement
+Using attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metrics.md), we can more accurately describe the measurement in a way our metrics backend will more easily understand. The following example uses these mechanisms, which are described below, for recording a measurement
 of a HTTP request.
 
 Each metric instruments allows to associate a description, unit of measure, and the value type.
@@ -343,7 +343,7 @@ One problem with metrics names and attributes is recognizing, categorizing, and 
 
 The use of semantic conventions is always recommended where applicable, but they are merely conventions. For example, you may find that some name other than the name suggested by the semantic conventions more accurately describes your metric, you may decide not to include a metric attribute which is suggested by semantic conventions for privacy reasons, or you may wish to add a custom attribute which isn't covered by semantic conventions. All of these cases are fine, but please keep in mind that if you stray from the semantic conventions, the categorization of metrics in your metrics backend may be affected.
 
-_See the current metrics semantic conventions in the OpenTelemetry Specification repository: <https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/metrics/semantic_conventions>_
+_See the current metrics semantic conventions in the OpenTelemetry Specification repository: <https://github.com/open-telemetry/semantic-conventions/blob/main/docs/general/metrics.md>_
 
 [spec-overview]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/overview.md
 
@@ -479,7 +479,7 @@ new View({
 
 After you have instrumented your application with metrics, you also need to make
 sure that the metrics get collected by your metrics backend. The most common formats
-that are used are Prometheus and OLTP.
+that are used are Prometheus and OTLP.
 
 The latter is the [OpenTelemetry protocol format](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md)
 which is supported by the OpenTelemetry Collector. The former is based on the [OpenMetrics
@@ -499,8 +499,8 @@ to use the Prometheus exporter `PrometheusExporter` which is included in the
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const { MeterProvider }  = require('@opentelemetry/sdk-metrics');
 
-// Add your port and startServer to the Prometheus options
-const options = { port: 9464, startServer: true };
+// Add your port to the Prometheus options
+const options = { port: 9464 };
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader
@@ -528,7 +528,7 @@ at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/e
 ## Exporting measurements to OpenTelemetry Protocol
 
 OpenTelemetry JavaScript comes with three different kinds of exporters that export
-the OTLP protocol, a) [over HTTP](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http), b) [over GRPC](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc), c) [over Protofbuf](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto).
+the OTLP protocol, a) [over HTTP](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http), b) [over GRPC](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc), c) [over Protobuf](https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto).
 
 The example below shows how you can configure OpenTelemetry JavaScript to use
 the OTLP exporter using http/protobuf.

@@ -91,8 +91,8 @@ describe('PrometheusSerializer', () => {
               instrumentName: '*',
             }),
           ],
+          readers: [reader],
         });
-        meterProvider.addMetricReader(reader);
         const meter = meterProvider.getMeter('test');
 
         const counter = meter.createCounter('test_total');
@@ -141,8 +141,8 @@ describe('PrometheusSerializer', () => {
               instrumentName: '*',
             }),
           ],
+          readers: [reader],
         });
-        meterProvider.addMetricReader(reader);
         const meter = meterProvider.getMeter('test');
 
         const histogram = meter.createHistogram('test');
@@ -206,8 +206,8 @@ describe('PrometheusSerializer', () => {
               instrumentName: '*',
             }),
           ],
+          readers: [reader],
         });
-        meterProvider.addMetricReader(reader);
         const meter = meterProvider.getMeter('test');
 
         const counter = meter.createCounter('test_total', {
@@ -261,8 +261,8 @@ describe('PrometheusSerializer', () => {
               instrumentName: '*',
             }),
           ],
+          readers: [reader],
         });
-        meterProvider.addMetricReader(reader);
         const meter = meterProvider.getMeter('test');
 
         const counter = meter.createUpDownCounter('test_total', {
@@ -315,8 +315,8 @@ describe('PrometheusSerializer', () => {
               instrumentName: '*',
             }),
           ],
+          readers: [reader],
         });
-        meterProvider.addMetricReader(reader);
         const meter = meterProvider.getMeter('test');
 
         const counter = meter.createUpDownCounter('test_total', {
@@ -369,8 +369,8 @@ describe('PrometheusSerializer', () => {
               instrumentName: '*',
             }),
           ],
+          readers: [reader],
         });
-        meterProvider.addMetricReader(reader);
         const meter = meterProvider.getMeter('test');
 
         const histogram = meter.createHistogram('test', {
@@ -424,8 +424,8 @@ describe('PrometheusSerializer', () => {
               instrumentName: '*',
             }),
           ],
+          readers: [reader],
         });
-        meterProvider.addMetricReader(reader);
         const meter = meterProvider.getMeter('test');
 
         const upDownCounter = meter.createUpDownCounter('test', {
@@ -474,8 +474,8 @@ describe('PrometheusSerializer', () => {
         views: [
           new View({ aggregation: new SumAggregation(), instrumentName: '*' }),
         ],
+        readers: [reader],
       });
-      meterProvider.addMetricReader(reader);
       const meter = meterProvider.getMeter('test');
 
       const { unit, exportAll = false } = options;
@@ -563,8 +563,8 @@ describe('PrometheusSerializer', () => {
         views: [
           new View({ aggregation: new SumAggregation(), instrumentName: '*' }),
         ],
+        readers: [reader],
       });
-      meterProvider.addMetricReader(reader);
       const meter = meterProvider.getMeter('test');
 
       const counter = meter.createUpDownCounter(name);
@@ -622,7 +622,6 @@ describe('PrometheusSerializer', () => {
     it('should serialize non-finite values', async () => {
       const serializer = new PrometheusSerializer();
       const cases = [
-        [NaN, 'NaN'],
         [-Infinity, '-Inf'],
         [+Infinity, '+Inf'],
       ] as [number, string][];

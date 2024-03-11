@@ -12,11 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16'
-
-      - uses: actions/checkout@v3
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: '20'
 
       - name: Lint changelog file
         uses: avto-dev/markdown-lint@v1
@@ -34,24 +37,8 @@ jobs:
           args: "./**/*.md"
           ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
-      - name: restore lerna
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-            packages/*/package-lock.json
-            experimental/packages/*/node_modules
-            experimental/packages/*/package-lock.json
-          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04142022
-
-      # On a cache miss, install dependencies
       - name: Bootstrap
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
+        run: npm ci
 
       - name: Lint
         run: |

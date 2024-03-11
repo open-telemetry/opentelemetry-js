@@ -45,6 +45,7 @@ export const mockedReadableLogRecord: ReadableLogRecord = {
   attributes: {
     'some-attribute': 'some attribute value',
   },
+  droppedAttributesCount: 0,
   severityNumber: SeverityNumber.ERROR,
   severityText: 'error',
   body: 'some_log_body',
@@ -82,12 +83,12 @@ export function ensureExportedLogRecordIsCorrect(logRecord: ILogRecord) {
   ensureExportedAttributesAreCorrect(logRecord.attributes);
   assert.strictEqual(
     logRecord.timeUnixNano,
-    '1680253513123241728',
+    '1680253513123241635',
     'timeUnixNano is wrong'
   );
   assert.strictEqual(
     logRecord.observedTimeUnixNano,
-    '1680253513123241728',
+    '1680253513123241635',
     'observedTimeUnixNano is wrong'
   );
   assert.strictEqual(
@@ -167,7 +168,10 @@ export function ensureExportLogsServiceRequestIsSet(
 }
 
 export class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
+  constructor(
+    private _code: number,
+    private _msg?: string
+  ) {
     super();
   }
 

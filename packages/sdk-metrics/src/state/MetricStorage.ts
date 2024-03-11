@@ -39,7 +39,6 @@ export abstract class MetricStorage {
    */
   abstract collect(
     collector: MetricCollectorHandle,
-    collectors: MetricCollectorHandle[],
     collectionTime: HrTime
   ): Maybe<MetricData>;
 
@@ -55,6 +54,7 @@ export abstract class MetricStorage {
         description: description,
         valueType: this._instrumentDescriptor.valueType,
         unit: this._instrumentDescriptor.unit,
+        advice: this._instrumentDescriptor.advice,
       }
     );
   }

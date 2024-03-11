@@ -21,8 +21,9 @@ import {
   getEnv,
   globalErrorHandler,
   unrefTimer,
-  callWithTimeout,
   BindOnceFuture,
+  internal,
+  callWithTimeout,
 } from '@opentelemetry/core';
 
 import type { BufferConfig } from '../types';
@@ -42,7 +43,10 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
 
-  constructor(private readonly _exporter: LogRecordExporter, config?: T) {
+  constructor(
+    private readonly _exporter: LogRecordExporter,
+    config?: T
+  ) {
     const env = getEnv();
     this._maxExportBatchSize =
       config?.maxExportBatchSize ?? env.OTEL_BLRP_MAX_EXPORT_BATCH_SIZE;
@@ -160,21 +164,34 @@ export abstract class BatchLogRecordProcessorBase<T extends BufferConfig>
     }
   }
 
-  private _export(logRecords: LogRecord[]): Promise<ExportResult> {
-    return new Promise((resolve, reject) => {
-      this._exporter.export(logRecords, (res: ExportResult) => {
-        if (res.code !== ExportResultCode.SUCCESS) {
-          reject(
-            res.error ??
-              new Error(
-                `BatchLogRecordProcessorBase: log record export failed (status ${res})`
-              )
-          );
-          return;
-        }
-        resolve(res);
-      });
-    });
+  private _export(logRecords: LogRecord[]): Promise<void> {
+    const doExport = () =>
+      internal
+        ._export(this._exporter, logRecords)
+        .then((result: ExportResult) => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              result.error ??
+                new Error(
+                  `BatchLogRecordProcessor: log record export failed (status ${result})`
+                )
+            );
+          }
+        })
+        .catch(globalErrorHandler);
+
+    const pendingResources = logRecords
+      .map(logRecord => logRecord.resource)
+      .filter(resource => resource.asyncAttributesPending);
+
+    // Avoid scheduling a promise to make the behavior more predictable and easier to test
+    if (pendingResources.length === 0) {
+      return doExport();
+    } else {
+      return Promise.all(
+        pendingResources.map(resource => resource.waitForAsyncAttributes?.())
+      ).then(doExport, globalErrorHandler);
+    }
   }
 
   protected abstract onShutdown(): void;

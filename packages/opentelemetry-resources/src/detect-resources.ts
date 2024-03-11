@@ -26,7 +26,7 @@ import { IResource } from './IResource';
  * does not resolve until all the underlying detectors have resolved, unlike
  * detectResourcesSync.
  *
- * @deprecated use detectResourceSync() instead.
+ * @deprecated use detectResourcesSync() instead.
  * @param config Configuration for resource detection
  */
 export const detectResources = async (

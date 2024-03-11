@@ -33,30 +33,32 @@ import {
   LogRecordLimits,
   LogRecordProcessor,
   LogRecord,
-  Logger,
   LoggerProvider,
 } from './../../src';
 import { invalidAttributes, validAttributes } from './utils';
+import { LoggerProviderSharedState } from '../../src/internal/LoggerProviderSharedState';
+import { reconfigureLimits } from '../../src/config';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
-const setup = (limits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
+const setup = (logRecordLimits?: LogRecordLimits, data?: logsAPI.LogRecord) => {
   const instrumentationScope = {
     name: 'test name',
     version: 'test version',
     schemaUrl: 'test schema url',
   };
   const resource = Resource.default();
-  const loggerProvider = new LoggerProvider({ resource });
-  const logger = new Logger(
-    instrumentationScope,
-    {
-      logRecordLimits: limits,
-    },
-    loggerProvider
+  const sharedState = new LoggerProviderSharedState(
+    resource,
+    Infinity,
+    reconfigureLimits(logRecordLimits ?? {})
   );
-  const logRecord = new LogRecord(logger, data || {});
-  return { logger, logRecord, instrumentationScope, resource };
+  const logRecord = new LogRecord(
+    sharedState,
+    instrumentationScope,
+    data ?? {}
+  );
+  return { logRecord, instrumentationScope, resource };
 };
 
 describe('LogRecord', () => {
@@ -177,15 +179,38 @@ describe('LogRecord', () => {
       describe('when "attributeCountLimit" option defined', () => {
         const { logRecord } = setup({ attributeCountLimit: 100 });
         for (let i = 0; i < 150; i++) {
-          logRecord.setAttribute(`foo${i}`, `bar${i}`);
+          let attributeValue;
+          switch (i % 3) {
+            case 0: {
+              attributeValue = `bar${i}`;
+              break;
+            }
+            case 1: {
+              attributeValue = [`bar${i}`];
+              break;
+            }
+            case 2: {
+              attributeValue = {
+                bar: `bar${i}`,
+              };
+              break;
+            }
+            default: {
+              attributeValue = `bar${i}`;
+            }
+          }
+          logRecord.setAttribute(`foo${i}`, attributeValue);
         }
 
         it('should remove / drop all remaining values after the number of values exceeds this limit', () => {
-          const { attributes } = logRecord;
+          const { attributes, droppedAttributesCount } = logRecord;
           assert.strictEqual(Object.keys(attributes).length, 100);
           assert.strictEqual(attributes.foo0, 'bar0');
-          assert.strictEqual(attributes.foo99, 'bar99');
+          assert.deepStrictEqual(attributes.foo98, { bar: 'bar98' });
+          assert.strictEqual(attributes.foo147, undefined);
+          assert.strictEqual(attributes.foo148, undefined);
           assert.strictEqual(attributes.foo149, undefined);
+          assert.strictEqual(droppedAttributesCount, 50);
         });
       });
 
@@ -320,7 +345,7 @@ describe('LogRecord', () => {
     it('should not rewrite directly through the property method', () => {
       const warnStub = sinon.spy(diag, 'warn');
       const { logRecord } = setup(undefined, logRecordData);
-      logRecord.makeReadonly();
+      logRecord._makeReadonly();
 
       logRecord.body = newBody;
       logRecord.severityNumber = newSeverityNumber;
@@ -346,7 +371,7 @@ describe('LogRecord', () => {
     it('should not rewrite using the set method', () => {
       const warnStub = sinon.spy(diag, 'warn');
       const { logRecord } = setup(undefined, logRecordData);
-      logRecord.makeReadonly();
+      logRecord._makeReadonly();
 
       logRecord.setBody(newBody);
       logRecord.setSeverityNumber(newSeverityNumber);

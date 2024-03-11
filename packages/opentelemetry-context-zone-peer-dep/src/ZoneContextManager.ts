@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/// <reference types="zone.js" />
 import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
 import { TargetWithEvents } from './types';
 import { isListenerObject } from './util';

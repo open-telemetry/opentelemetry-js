@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
-import { HrTime, MetricAttributes } from '@opentelemetry/api';
+import { HrTime, MetricAttributes, ValueType } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { IResource } from '@opentelemetry/resources';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { InstrumentType } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
 import { Histogram, ExponentialHistogram } from '../aggregator/types';
+
+export interface MetricDescriptor {
+  readonly name: string;
+  readonly description: string;
+  readonly unit: string;
+  /**
+   * @deprecated exporter should avoid depending on the type of the instrument
+   * as their resulting aggregator can be re-mapped with views.
+   */
+  readonly type: InstrumentType;
+  readonly valueType: ValueType;
+}
 
 /**
  * Basic metric data fields.
  */
 interface BaseMetricData {
-  readonly descriptor: InstrumentDescriptor;
+  readonly descriptor: MetricDescriptor;
   readonly aggregationTemporality: AggregationTemporality;
   /**
    * DataPointType of the metric instrument.

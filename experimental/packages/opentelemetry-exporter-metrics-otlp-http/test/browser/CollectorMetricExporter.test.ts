@@ -21,7 +21,7 @@ import {
   Counter,
   Histogram,
 } from '@opentelemetry/api';
-import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -138,14 +138,9 @@ describe('OTLPMetricExporter - web', () => {
 
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .startTime
-            )
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+              .startTime
           );
 
           assert.ok(
@@ -154,14 +149,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .startTime,
             6,
             'double-observable-gauge2'
           );
@@ -172,14 +163,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .startTime,
             [0, 100],
             [0, 2, 0]
           );
@@ -273,14 +260,9 @@ describe('OTLPMetricExporter - web', () => {
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .startTime
-            )
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+              .startTime
           );
 
           assert.ok(
@@ -289,14 +271,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .startTime,
             6,
             'double-observable-gauge2'
           );
@@ -307,14 +285,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .startTime,
             [0, 100],
             [0, 2, 0]
           );

@@ -129,7 +129,7 @@ export function hrTimeToNanoseconds(time: api.HrTime): number {
  * @param time
  */
 export function hrTimeToMilliseconds(time: api.HrTime): number {
-  return Math.round(time[0] * 1e3 + time[1] / 1e6);
+  return time[0] * 1e3 + time[1] / 1e6;
 }
 
 /**
@@ -137,7 +137,7 @@ export function hrTimeToMilliseconds(time: api.HrTime): number {
  * @param time
  */
 export function hrTimeToMicroseconds(time: api.HrTime): number {
-  return Math.round(time[0] * 1e6 + time[1] / 1e3);
+  return time[0] * 1e6 + time[1] / 1e3;
 }
 
 /**

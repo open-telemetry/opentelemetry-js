@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/shim-opentracing",
-  "version": "1.15.0",
+  "version": "1.22.0",
   "description": "OpenTracing to OpenTelemetry shim",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -42,28 +42,27 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.5.0",
-    "@opentelemetry/propagator-b3": "1.15.0",
-    "@opentelemetry/propagator-jaeger": "1.15.0",
-    "@opentelemetry/sdk-trace-base": "1.15.0",
-    "@types/mocha": "10.0.1",
+    "@opentelemetry/api": ">=1.0.0 <1.9.0",
+    "@opentelemetry/propagator-b3": "1.22.0",
+    "@opentelemetry/propagator-jaeger": "1.22.0",
+    "@opentelemetry/sdk-trace-base": "1.22.0",
+    "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "lerna": "7.1.1",
+    "lerna": "6.6.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.5.0"
+    "@opentelemetry/api": ">=1.0.0 <1.9.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.15.0",
-    "@opentelemetry/semantic-conventions": "1.15.0",
-    "opentracing": "^0.14.4",
-    "tslib": "^2.3.1"
+    "@opentelemetry/core": "1.22.0",
+    "@opentelemetry/semantic-conventions": "1.22.0",
+    "opentracing": "^0.14.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing",
   "sideEffects": false

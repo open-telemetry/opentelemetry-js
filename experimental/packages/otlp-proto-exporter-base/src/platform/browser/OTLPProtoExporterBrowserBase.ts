@@ -30,7 +30,7 @@ import { getExportRequestProto } from '../util';
  */
 export abstract class OTLPProtoExporterBrowserBase<
   ExportItem,
-  ServiceRequest
+  ServiceRequest,
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);

@@ -15,77 +15,103 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { Metadata } from '@grpc/grpc-js';
+import { GRPCQueueItem, OTLPGRPCExporterConfigNode } from './types';
+import { baggageUtils, getEnv } from '@opentelemetry/core';
 import {
-  OTLPGRPCExporterConfigNode,
-  GRPCQueueItem,
-  ServiceClientType,
-} from './types';
-import { ServiceClient } from './types';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { configureCompression, GrpcCompressionAlgorithm } from './util';
-import {
+  CompressionAlgorithm,
   OTLPExporterBase,
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
+import {
+  createEmptyMetadata,
+  GrpcExporterTransport,
+} from './grpc-exporter-transport';
+import { configureCompression, configureCredentials } from './util';
+import { ISerializer } from './serializers';
+import { IExporterTransport } from './exporter-transport';
 
 /**
  * OTLP Exporter abstract base class
  */
 export abstract class OTLPGRPCExporterNodeBase<
   ExportItem,
-  ServiceRequest
+  ServiceRequest,
+  ServiceResponse,
 > extends OTLPExporterBase<
   OTLPGRPCExporterConfigNode,
   ExportItem,
   ServiceRequest
 > {
   grpcQueue: GRPCQueueItem<ExportItem>[] = [];
-  metadata?: Metadata;
-  serviceClient?: ServiceClient = undefined;
-  private _send!: Function;
-  compression: GrpcCompressionAlgorithm;
+  compression: CompressionAlgorithm;
+  private _transport: IExporterTransport;
+  private _serializer: ISerializer<ServiceRequest, ServiceResponse>;
 
-  constructor(config: OTLPGRPCExporterConfigNode = {}) {
+  constructor(
+    config: OTLPGRPCExporterConfigNode = {},
+    signalSpecificMetadata: Record<string, string>,
+    grpcName: string,
+    grpcPath: string,
+    serializer: ISerializer<ServiceRequest, ServiceResponse>
+  ) {
     super(config);
+    this._serializer = serializer;
     if (config.headers) {
       diag.warn('Headers cannot be set when using grpc');
     }
-    const headers = baggageUtils.parseKeyPairsIntoRecord(
+    const nonSignalSpecificMetadata = baggageUtils.parseKeyPairsIntoRecord(
       getEnv().OTEL_EXPORTER_OTLP_HEADERS
     );
-    this.metadata = config.metadata || new Metadata();
-    for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v);
-    }
-    this.compression = configureCompression(config.compression);
-  }
+    const rawMetadata = Object.assign(
+      {},
+      nonSignalSpecificMetadata,
+      signalSpecificMetadata
+    );
 
-  private _sendPromise(
-    objects: ExportItem[],
-    onSuccess: () => void,
-    onError: (error: OTLPExporterError) => void
-  ): void {
-    const promise = new Promise<void>((resolve, reject) => {
-      this._send(this, objects, resolve, reject);
-    }).then(onSuccess, onError);
-
-    this._sendingPromises.push(promise);
-    const popPromise = () => {
-      const index = this._sendingPromises.indexOf(promise);
-      this._sendingPromises.splice(index, 1);
+    let credentialProvider = () => {
+      return configureCredentials(undefined, this.getUrlFromConfig(config));
     };
-    promise.then(popPromise, popPromise);
+
+    if (config.credentials != null) {
+      const credentials = config.credentials;
+      credentialProvider = () => {
+        return credentials;
+      };
+    }
+
+    // Ensure we don't modify the original.
+    const configMetadata = config.metadata?.clone();
+    const metadataProvider = () => {
+      const metadata = configMetadata ?? createEmptyMetadata();
+      for (const [key, value] of Object.entries(rawMetadata)) {
+        // only override with env var data if the key has no values.
+        // not using Metadata.merge() as it will keep both values.
+        if (metadata.get(key).length < 1) {
+          metadata.set(key, value);
+        }
+      }
+
+      return metadata;
+    };
+
+    this.compression = configureCompression(config.compression);
+    this._transport = new GrpcExporterTransport({
+      address: this.getDefaultUrl(config),
+      compression: this.compression,
+      credentials: credentialProvider,
+      grpcName: grpcName,
+      grpcPath: grpcPath,
+      metadata: metadataProvider,
+      timeoutMillis: this.timeoutMillis,
+    });
   }
 
-  onInit(config: OTLPGRPCExporterConfigNode): void {
-    // defer to next tick and lazy load to avoid loading grpc too early
-    // and making this impossible to be instrumented
-    setImmediate(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { onInit } = require('./util');
-      onInit(this, config);
-    });
+  onInit() {
+    // Intentionally left empty; nothing to do.
+  }
+
+  override onShutdown() {
+    this._transport.shutdown();
   }
 
   send(
@@ -97,28 +123,33 @@ export abstract class OTLPGRPCExporterNodeBase<
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
-    if (!this._send) {
-      // defer to next tick and lazy load to avoid loading grpc too early
-      // and making this impossible to be instrumented
-      setImmediate(() => {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { send } = require('./util');
-        this._send = send;
 
-        this._sendPromise(objects, onSuccess, onError);
-      });
-    } else {
-      this._sendPromise(objects, onSuccess, onError);
+    const converted = this.convert(objects);
+    const data = this._serializer.serializeRequest(converted);
+
+    if (data == null) {
+      onError(new Error('Could not serialize message'));
+      return;
     }
+
+    const promise = this._transport.send(data).then(response => {
+      if (response.status === 'success') {
+        onSuccess();
+        return;
+      }
+      if (response.status === 'failure' && response.error) {
+        onError(response.error);
+      }
+      onError(new OTLPExporterError('Export failed with unknown error'));
+    }, onError);
+
+    this._sendingPromises.push(promise);
+    const popPromise = () => {
+      const index = this._sendingPromises.indexOf(promise);
+      this._sendingPromises.splice(index, 1);
+    };
+    promise.then(popPromise, popPromise);
   }
 
-  onShutdown(): void {
-    if (this.serviceClient) {
-      this.serviceClient.close();
-    }
-  }
-
-  abstract getServiceProtoPath(): string;
-  abstract getServiceClientType(): ServiceClientType;
   abstract getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string;
 }

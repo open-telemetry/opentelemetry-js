@@ -21,19 +21,38 @@ import {
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
+import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { Resource as Resource190 } from '@opentelemetry/resources_1.9.0';
 
 import {
   InMemoryLogRecordExporter,
   LogRecordExporter,
   SimpleLogRecordProcessor,
   LogRecord,
-  LoggerProvider,
-  Logger,
 } from './../../../src';
+import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
+import { reconfigureLimits } from '../../../src/config';
+import { TestExporterWithDelay } from './TestExporterWithDelay';
 
-const setup = (exporter: LogRecordExporter) => {
+const setup = (exporter: LogRecordExporter, resource?: Resource) => {
+  const sharedState = new LoggerProviderSharedState(
+    resource || Resource.default(),
+    Infinity,
+    reconfigureLimits({})
+  );
+  const logRecord = new LogRecord(
+    sharedState,
+    {
+      name: 'test name',
+      version: 'test version',
+      schemaUrl: 'test schema url',
+    },
+    {
+      body: 'body',
+    }
+  );
   const processor = new SimpleLogRecordProcessor(exporter);
-  return { exporter, processor };
+  return { exporter, processor, logRecord };
 };
 
 describe('SimpleLogRecordProcessor', () => {
@@ -49,21 +68,9 @@ describe('SimpleLogRecordProcessor', () => {
   describe('onEmit', () => {
     it('should handle onEmit', async () => {
       const exporter = new InMemoryLogRecordExporter();
-      const { processor } = setup(exporter);
+      const { processor, logRecord } = setup(exporter);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
 
-      const logger = new Logger(
-        {
-          name: 'test name',
-          version: 'test version',
-          schemaUrl: 'test schema url',
-        },
-        {},
-        new LoggerProvider()
-      );
-      const logRecord = new LogRecord(logger, {
-        body: 'body',
-      });
       processor.onEmit(logRecord);
       assert.strictEqual(exporter.getFinishedLogRecords().length, 1);
 
@@ -82,20 +89,8 @@ describe('SimpleLogRecordProcessor', () => {
           ),
         shutdown: () => Promise.resolve(),
       };
-      const { processor } = setup(exporter);
+      const { processor, logRecord } = setup(exporter);
 
-      const logger = new Logger(
-        {
-          name: 'test name',
-          version: 'test version',
-          schemaUrl: 'test schema url',
-        },
-        {},
-        new LoggerProvider()
-      );
-      const logRecord = new LogRecord(logger, {
-        body: 'body',
-      });
       const errorHandlerSpy = sinon.spy();
       setGlobalErrorHandler(errorHandlerSpy);
       processor.onEmit(logRecord);
@@ -118,6 +113,67 @@ describe('SimpleLogRecordProcessor', () => {
       const { processor } = setup(exporter);
       await processor.shutdown();
       assert.ok(shutdownSpy.callCount === 1);
+    });
+  });
+
+  describe('force flush', () => {
+    it('should await unresolved resources', async () => {
+      const exporter = new InMemoryLogRecordExporter();
+      const asyncResource = new Resource(
+        {},
+        new Promise<ResourceAttributes>(resolve => {
+          setTimeout(() => resolve({ async: 'fromasync' }), 1);
+        })
+      );
+      const { processor, logRecord } = setup(exporter, asyncResource);
+      assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
+      processor.onEmit(logRecord);
+
+      await processor.forceFlush();
+
+      const exportedLogs = exporter.getFinishedLogRecords();
+      assert.strictEqual(exportedLogs.length, 1);
+      assert.strictEqual(
+        exportedLogs[0].resource.attributes['async'],
+        'fromasync'
+      );
+    });
+
+    it('should await doExport() and delete from _unresolvedExports', async () => {
+      const testExporterWithDelay = new TestExporterWithDelay();
+      const asyncResource = new Resource(
+        {},
+        new Promise<ResourceAttributes>(resolve => {
+          setTimeout(() => resolve({ async: 'fromasync' }), 1);
+        })
+      );
+      const processor = new SimpleLogRecordProcessor(testExporterWithDelay);
+      const { logRecord } = setup(testExporterWithDelay, asyncResource);
+
+      processor.onEmit(logRecord);
+      assert.strictEqual(processor['_unresolvedExports'].size, 1);
+      await processor.forceFlush();
+      assert.strictEqual(processor['_unresolvedExports'].size, 0);
+      const exportedLogRecords = testExporterWithDelay.getFinishedLogRecords();
+      assert.strictEqual(exportedLogRecords.length, 1);
+    });
+  });
+
+  describe('compatibility', () => {
+    it('should export when using old resource implementation', async () => {
+      const exporter = new InMemoryLogRecordExporter();
+      const { processor, logRecord } = setup(
+        exporter,
+        new Resource190({ fromold: 'fromold' })
+      );
+      assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
+      processor.onEmit(logRecord);
+      const exportedLogs = exporter.getFinishedLogRecords();
+      assert.strictEqual(exportedLogs.length, 1);
+      assert.strictEqual(
+        exportedLogs[0].resource.attributes['fromold'],
+        'fromold'
+      );
     });
   });
 });

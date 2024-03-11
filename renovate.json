@@ -5,7 +5,7 @@
       "groupName": "all patch versions",
       "groupSlug": "all-patch",
       "matchUpdateTypes": ["patch"],
-      "excludePackageNames": ["prettier"],
+      "excludePackageNames": ["prettier", "import-in-the-middle"],
       "schedule": ["before 3am every weekday"]
     },
     {
@@ -17,16 +17,11 @@
       "schedule": ["before 3am on Monday"]
     },
     {
-      "matchPackageNames": ["typescript", "webpack", "webpack-cli"],
+      "matchPackageNames": ["typescript", "lerna"],
       "dependencyDashboardApproval": true
-    },
-    {
-      "matchPaths": ["experimental/backwards-compatibility/**"],
-      "matchPackageNames": ["@types/node"],
-      "enabled": false
     }
   ],
-  "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0"],
+  "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0", "@types/node"],
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
   "labels": ["dependencies"]
 }

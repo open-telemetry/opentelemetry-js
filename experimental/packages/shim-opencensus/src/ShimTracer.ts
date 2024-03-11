@@ -26,7 +26,7 @@ import {
   Tracer,
 } from '@opentelemetry/api';
 import { DEFAULT_SPAN_NAME, ShimSpan } from './ShimSpan';
-import { mapSpanContext, mapSpanKind } from './transform';
+import { mapSpanContext, mapSpanKind } from './trace-transform';
 import { shimPropagation } from './propagation';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -77,7 +77,7 @@ export class ShimTracer implements oc.Tracer {
   onStartSpan(): void {}
   onEndSpan(): void {}
   setCurrentRootSpan() {
-    // This can't be correctly overriden since OTel context does not provide a way to set
+    // This can't be correctly overridden since OTel context does not provide a way to set
     // context without a callback. Leave noop for now.
   }
 

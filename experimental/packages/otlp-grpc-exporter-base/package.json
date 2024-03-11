@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-grpc-exporter-base",
-  "version": "0.41.0",
+  "version": "0.49.1",
   "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -48,21 +48,20 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.22.8",
-    "@opentelemetry/api": "1.4.1",
-    "@opentelemetry/otlp-transformer": "0.41.0",
-    "@opentelemetry/resources": "1.15.0",
-    "@opentelemetry/sdk-trace-base": "1.15.0",
-    "@types/mocha": "10.0.1",
+    "@opentelemetry/api": "1.8.0",
+    "@opentelemetry/otlp-transformer": "0.49.1",
+    "@opentelemetry/resources": "1.22.0",
+    "@opentelemetry/sdk-trace-base": "1.22.0",
+    "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
-    "@types/sinon": "10.0.15",
+    "@types/sinon": "10.0.20",
     "codecov": "3.8.3",
     "cpx": "1.5.0",
     "cross-var": "1.1.0",
-    "lerna": "7.1.1",
+    "lerna": "6.6.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
-    "protobufjs-cli": "1.1.1",
+    "protobufjs-cli": "1.1.2",
     "sinon": "15.1.2",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
@@ -73,10 +72,9 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
-    "@opentelemetry/core": "1.15.0",
-    "@opentelemetry/otlp-exporter-base": "0.41.0",
-    "protobufjs": "^7.2.3",
-    "tslib": "^2.3.1"
+    "@opentelemetry/core": "1.22.0",
+    "@opentelemetry/otlp-exporter-base": "0.49.1",
+    "protobufjs": "^7.2.3"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base",
   "sideEffects": false

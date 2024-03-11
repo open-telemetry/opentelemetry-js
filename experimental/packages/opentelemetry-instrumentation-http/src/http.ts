@@ -105,7 +105,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
   init(): [
     InstrumentationNodeModuleDefinition<Https>,
-    InstrumentationNodeModuleDefinition<Http>
+    InstrumentationNodeModuleDefinition<Http>,
   ] {
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
   }
@@ -237,7 +237,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       // https://nodejs.org/dist/latest/docs/api/http.html#http_http_get_options_callback
       // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-http.ts#L198
       return function outgoingGetRequest<
-        T extends http.RequestOptions | string | url.URL
+        T extends http.RequestOptions | string | url.URL,
       >(options: T, ...args: HttpRequestArgs): http.ClientRequest {
         const req = clientRequest(options, ...args);
         req.end();
@@ -330,6 +330,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         this._diag.debug('outgoingRequest on response()');
+        if (request.listenerCount('response') <= 1) {
+          response.resume();
+        }
         const responseAttributes =
           utils.getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
@@ -672,6 +675,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
+      } else {
+        // Make a copy of the headers object to avoid mutating an object the
+        // caller might have a reference to.
+        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
       }
       propagation.inject(requestContext, optionsParsed.headers);
 

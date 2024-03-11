@@ -43,7 +43,9 @@ import {
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 import {
+  Aggregation,
   AggregationTemporality,
+  ExplicitBucketHistogramAggregation,
   InstrumentType,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
@@ -218,6 +220,31 @@ describe('OTLPMetricExporter - node with json over http', () => {
     });
   });
 
+  describe('aggregation', () => {
+    it('aggregationSelector calls the selector supplied to the constructor', () => {
+      const aggregation = new ExplicitBucketHistogramAggregation([
+        0, 100, 100000,
+      ]);
+      const exporter = new OTLPMetricExporter({
+        aggregationPreference: _instrumentType => aggregation,
+      });
+      assert.equal(
+        exporter.selectAggregation(InstrumentType.COUNTER),
+        aggregation
+      );
+    });
+
+    it('aggregationSelector returns the default aggregation preference when nothing is supplied', () => {
+      const exporter = new OTLPMetricExporter({
+        aggregationPreference: _instrumentType => Aggregation.Default(),
+      });
+      assert.equal(
+        exporter.selectAggregation(InstrumentType.COUNTER),
+        Aggregation.Default()
+      );
+    });
+  });
+
   describe('when configuring via environment', () => {
     const envSource = process.env;
     it('should use url defined in env that ends with root path and append version and signal path', () => {
@@ -296,6 +323,18 @@ describe('OTLPMetricExporter - node with json over http', () => {
       );
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
+    it('should use override url defined in env with url defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
+      const constructorDefinedEndpoint = 'http://constructor/v1/metrics';
+      const collectorExporter = new OTLPMetricExporter({
+        url: constructorDefinedEndpoint,
+      });
+      assert.strictEqual(
+        collectorExporter._otlpExporter.url,
+        constructorDefinedEndpoint
+      );
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
       const collectorExporter = new OTLPMetricExporter();
@@ -316,6 +355,20 @@ describe('OTLPMetricExporter - node with json over http', () => {
       assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'boo');
       assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
+    it('should override headers defined via env with headers defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+      const collectorExporter = new OTLPMetricExporter({
+        headers: {
+          foo: 'constructor',
+        },
+      });
+      assert.strictEqual(
+        collectorExporter._otlpExporter.headers.foo,
+        'constructor'
+      );
+      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should use delta temporality defined via env', () => {
@@ -491,13 +544,8 @@ describe('OTLPMetricExporter - node with json over http', () => {
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(
           metric1,
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime
-          ),
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-              .startTime
-          )
+          metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+          metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime
         );
         assert.ok(
           typeof metric2 !== 'undefined',
@@ -505,28 +553,19 @@ describe('OTLPMetricExporter - node with json over http', () => {
         );
         ensureObservableGaugeIsCorrect(
           metric2,
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-              .endTime
-          ),
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-              .startTime
-          ),
+          metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+            .endTime,
+          metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+            .startTime,
           6,
           'double-observable-gauge2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureHistogramIsCorrect(
           metric3,
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-              .endTime
-          ),
-          core.hrTimeToNanoseconds(
-            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-              .startTime
-          ),
+          metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime,
+          metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+            .startTime,
           [0, 100],
           [0, 2, 0]
         );

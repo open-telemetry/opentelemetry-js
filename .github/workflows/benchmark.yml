@@ -1,0 +1,50 @@
+name: Benchmark Tests
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  benchmark-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version:
+          - "18"
+    runs-on: self-hosted
+    timeout-minutes: 10
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+          node-version: ${{ matrix.node_version }}
+
+      - run: npm install -g npm@latest
+
+      - name: Bootstrap
+        run: npm ci
+
+      - name: Build 🔧
+        run: npm run compile
+
+      - name: Benchmark tests
+        run: |
+          npm run test:bench
+          find . -name .benchmark-results.txt -exec cat {} + > combined_benchmarks.txt
+
+      - name: Store benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'benchmarkjs'
+          output-file-path: combined_benchmarks.txt
+          gh-pages-branch: gh-pages
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          benchmark-data-dir-path: "benchmarks"
+          auto-push: true

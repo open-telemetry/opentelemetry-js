@@ -73,27 +73,35 @@ describe('MeterProvider', () => {
     });
 
     it('get meter with same identity', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
       const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+      });
 
-      // Create meter and instrument.
+      // Create meter and instrument, needs observation on instrument, otherwise the scope will not be reported.
       // name+version pair 1
-      meterProvider.getMeter('meter1', 'v1.0.0');
-      meterProvider.getMeter('meter1', 'v1.0.0');
+      meterProvider.getMeter('meter1', 'v1.0.0').createCounter('test').add(1);
+      meterProvider.getMeter('meter1', 'v1.0.0').createCounter('test').add(1);
       // name+version pair 2
-      meterProvider.getMeter('meter2', 'v1.0.0');
-      meterProvider.getMeter('meter2', 'v1.0.0');
+      meterProvider.getMeter('meter2', 'v1.0.0').createCounter('test').add(1);
+      meterProvider.getMeter('meter2', 'v1.0.0').createCounter('test').add(1);
       // name+version pair 3
-      meterProvider.getMeter('meter1', 'v1.0.1');
-      meterProvider.getMeter('meter1', 'v1.0.1');
+      meterProvider.getMeter('meter1', 'v1.0.1').createCounter('test').add(1);
+      meterProvider.getMeter('meter1', 'v1.0.1').createCounter('test').add(1);
       // name+version+schemaUrl pair 4
-      meterProvider.getMeter('meter1', 'v1.0.1', {
-        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
-      });
-      meterProvider.getMeter('meter1', 'v1.0.1', {
-        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
-      });
+      meterProvider
+        .getMeter('meter1', 'v1.0.1', {
+          schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+        })
+        .createCounter('test')
+        .add(1);
+      meterProvider
+        .getMeter('meter1', 'v1.0.1', {
+          schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+        })
+        .createCounter('test')
+        .add(1);
 
       // Perform collection.
       const { resourceMetrics, errors } = await reader.collect();
@@ -125,6 +133,7 @@ describe('MeterProvider', () => {
 
   describe('addView', () => {
     it('with existing instrument should rename', async () => {
+      const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
@@ -135,10 +144,8 @@ describe('MeterProvider', () => {
             instrumentName: 'non-renamed-instrument',
           }),
         ],
+        readers: [reader],
       });
-
-      const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
 
       // Create meter and instrument.
       const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -194,6 +201,8 @@ describe('MeterProvider', () => {
     });
 
     it('with attributeKeys should drop non-listed attributes', async () => {
+      const reader = new TestMetricReader();
+
       // Add view to drop all attributes except 'attrib1'
       const meterProvider = new MeterProvider({
         resource: defaultResource,
@@ -203,10 +212,8 @@ describe('MeterProvider', () => {
             instrumentName: 'non-renamed-instrument',
           }),
         ],
+        readers: [reader],
       });
-
-      const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
 
       // Create meter and instrument.
       const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -260,6 +267,8 @@ describe('MeterProvider', () => {
     });
 
     it('with no meter name should apply view to instruments of all meters', async () => {
+      const reader = new TestMetricReader();
+
       // Add view that renames 'test-counter' to 'renamed-instrument'
       const meterProvider = new MeterProvider({
         resource: defaultResource,
@@ -269,10 +278,8 @@ describe('MeterProvider', () => {
             instrumentName: 'test-counter',
           }),
         ],
+        readers: [reader],
       });
-
-      const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
 
       // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -333,6 +340,7 @@ describe('MeterProvider', () => {
     });
 
     it('with meter name should apply view to only the selected meter', async () => {
+      const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
@@ -343,10 +351,8 @@ describe('MeterProvider', () => {
             meterName: 'meter1',
           }),
         ],
+        readers: [reader],
       });
-
-      const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
 
       // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -407,6 +413,7 @@ describe('MeterProvider', () => {
     });
 
     it('with different instrument types does not throw', async () => {
+      const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         // Add Views to rename both instruments (of different types) to the same name.
@@ -422,9 +429,8 @@ describe('MeterProvider', () => {
             meterName: 'meter1',
           }),
         ],
+        readers: [reader],
       });
-      const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
 
       // Create meter and instruments.
       const meter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -475,6 +481,8 @@ describe('MeterProvider', () => {
       const msBoundaries = [0, 1, 2, 3, 4, 5];
       const sBoundaries = [10, 50, 250, 1000];
 
+      const reader = new TestMetricReader();
+
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
@@ -487,10 +495,8 @@ describe('MeterProvider', () => {
             aggregation: new ExplicitBucketHistogramAggregation(sBoundaries),
           }),
         ],
+        readers: [reader],
       });
-
-      const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
 
       // Create meter and histograms, with different units.
       const meter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -537,14 +543,14 @@ describe('MeterProvider', () => {
 
   describe('shutdown', () => {
     it('should shutdown all registered metric readers', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
       const reader1 = new TestMetricReader();
       const reader2 = new TestMetricReader();
       const reader1ShutdownSpy = sinon.spy(reader1, 'shutdown');
       const reader2ShutdownSpy = sinon.spy(reader2, 'shutdown');
-
-      meterProvider.addMetricReader(reader1);
-      meterProvider.addMetricReader(reader2);
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader1, reader2],
+      });
 
       await meterProvider.shutdown({ timeoutMillis: 1234 });
       await meterProvider.shutdown();
@@ -563,14 +569,14 @@ describe('MeterProvider', () => {
 
   describe('forceFlush', () => {
     it('should forceFlush all registered metric readers', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
       const reader1 = new TestMetricReader();
       const reader2 = new TestMetricReader();
       const reader1ForceFlushSpy = sinon.spy(reader1, 'forceFlush');
       const reader2ForceFlushSpy = sinon.spy(reader2, 'forceFlush');
-
-      meterProvider.addMetricReader(reader1);
-      meterProvider.addMetricReader(reader2);
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader1, reader2],
+      });
 
       await meterProvider.forceFlush({ timeoutMillis: 1234 });
       await meterProvider.forceFlush({ timeoutMillis: 5678 });

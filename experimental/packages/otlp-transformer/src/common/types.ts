@@ -73,3 +73,17 @@ export interface IKeyValueList {
   /** KeyValueList values */
   values: IKeyValue[];
 }
+
+export interface LongBits {
+  low: number;
+  high: number;
+}
+
+export type Fixed64 = LongBits | string | number;
+
+export interface OtlpEncodingOptions {
+  /** Convert trace and span IDs to hex strings. */
+  useHex?: boolean;
+  /** Convert HrTime to 2 part 64 bit values. */
+  useLongBits?: boolean;
+}
