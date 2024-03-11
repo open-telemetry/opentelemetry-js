@@ -104,7 +104,7 @@ An entry into `CHANGELOG.md` or `experimental/CHANGELOG.md` is required for the 
 - Changes to default settings
 - New components being added
 
-It is reasonable to omit an entry to the changelog under these circuimstances:
+It is reasonable to omit an entry to the changelog under these circumstances:
 
 - Updating test to remove flakiness or improve coverage
 - Updates to the CI/CD process

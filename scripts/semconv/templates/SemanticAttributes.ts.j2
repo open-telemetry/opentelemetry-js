@@ -38,7 +38,7 @@ import { createConstMap } from '../internal/utils';
 //----------------------------------------------------------------------------------------------------------
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
 const TMP_{{attribute.fqn | to_const_name}} = {{ print_value ("string", attribute.fqn) }};
 {%- endfor %}
@@ -117,7 +117,7 @@ export const {{class}}:{{class}} = /*#__PURE__*/createConstMap<{{class}}>([
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
 const TMP_{{class_name|upper}}_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }};
 {%- endfor %}
