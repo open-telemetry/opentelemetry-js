@@ -160,7 +160,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   /**
-   * @returns {Number} The scale used by thie accumulation
+   * @returns {Number} The scale used by this accumulation
    */
   get scale(): number {
     if (this._count === this._zeroCount) {
@@ -171,7 +171,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   /**
-   * positive holds the postive values
+   * positive holds the positive values
    * @returns {Buckets}
    */
   get positive(): Buckets {
@@ -187,7 +187,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   /**
-   * uppdateByIncr supports updating a histogram with a non-negative
+   * updateByIncr supports updating a histogram with a non-negative
    * increment.
    * @param value
    * @param increment
@@ -253,7 +253,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   }
 
   /**
-   * diff substracts other from self
+   * diff subtracts other from self
    * @param {ExponentialHistogramAccumulation} other
    */
   diff(other: ExponentialHistogramAccumulation) {
@@ -512,7 +512,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
 }
 
 /**
- * Aggregator for ExponentialHistogramAccumlations
+ * Aggregator for ExponentialHistogramAccumulations
  */
 export class ExponentialHistogramAggregator
   implements Aggregator<ExponentialHistogramAccumulation>

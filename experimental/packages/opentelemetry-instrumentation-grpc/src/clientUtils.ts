@@ -152,7 +152,7 @@ export function patchResponseStreamEvents(span: Span, call: EventEmitter) {
 }
 
 /**
- * Execute grpc client call. Apply completitionspan properties and end the
+ * Execute grpc client call. Apply completion span properties and end the
  * span on callback or receiving an emitted event.
  */
 export function makeGrpcClientRemoteCall(

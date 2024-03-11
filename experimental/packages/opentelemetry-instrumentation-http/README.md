@@ -67,7 +67,7 @@ The following options are deprecated:
 | Options | Type | Description |
 | ------- | ---- | ----------- |
 | `ignoreIncomingPaths` | `IgnoreMatcher[]` | Http instrumentation will not trace all incoming requests that match paths |
-| `ignoreOutgoingUrls` | `IgnoreMatcher[]` | Http instrumentation will not trace all outgoing requests that match urls |
+| `ignoreOutgoingUrls` | `IgnoreMatcher[]` | Http instrumentation will not trace all outgoing requests that match URLs |
 
 ## Useful links
 

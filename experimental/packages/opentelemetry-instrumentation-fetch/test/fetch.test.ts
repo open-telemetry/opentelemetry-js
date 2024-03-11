@@ -654,7 +654,7 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('applies attributes when the request is succesful', async () => {
+    it('applies attributes when the request is successful', async () => {
       await prepare(url, span => {
         span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
       });

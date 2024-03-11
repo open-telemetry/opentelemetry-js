@@ -25,7 +25,7 @@ export interface ExporterConfig {
   /** Time to wait for an onShutdown flush to finish before closing the sender */
   flushTimeout?: number; // default: 2000
   //The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces
-  //If setten will override host and port
+  //If set, will override host and port
   endpoint?: string;
   //Username to send as part of "Basic" authentication to the collector endpoint
   username?: string;

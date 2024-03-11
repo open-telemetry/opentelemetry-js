@@ -51,4 +51,4 @@ start().then(()=> console.log("Instrumentation started"));
 
 The browser identification attributes will be added to the resource spans when traces are created.
 These attributes include platform, brands, mobile, language if the browser supports
-the userAgentData api, otherwise it will contain only the user_agent informations
+the userAgentData api, otherwise it will contain only the user_agent information

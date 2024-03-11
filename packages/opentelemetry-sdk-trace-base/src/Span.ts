@@ -357,7 +357,7 @@ export class Span implements APISpan, ReadableSpan {
 
   /**
    * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
-   * return string with trucated to {@code attributeValueLengthLimit} characters
+   * return string with truncated to {@code attributeValueLengthLimit} characters
    *
    * If the given attribute value is array of strings then
    * return new array of strings with each element truncated to {@code attributeValueLengthLimit} characters
