@@ -951,7 +951,7 @@ describe('setup exporter from env', () => {
     assert(activeProcessor instanceof NoopSpanProcessor);
     delete env.OTEL_TRACES_EXPORTER;
   });
-  it('log warning that sdk will not be initalized when exporter is set to none', async () => {
+  it('log warning that sdk will not be initialized when exporter is set to none', async () => {
     env.OTEL_TRACES_EXPORTER = 'none';
     const sdk = new NodeSDK();
     sdk.start();
