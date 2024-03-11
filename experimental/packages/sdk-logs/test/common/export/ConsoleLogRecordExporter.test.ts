@@ -44,13 +44,13 @@ describe('ConsoleLogRecordExporter', () => {
         severityNumber: SeverityNumber.DEBUG,
         severityText: 'DEBUG',
       });
-      const consoleOutput = stdoutStub.getCalls()[0].firstArg;
       stdoutStub.restore();
 
       const logRecords = spyExport.args[0];
       const firstLogRecord = logRecords[0][0];
       const consoleArgs = consoleSpy.args[0];
       const consoleLogRecord = consoleArgs[0];
+      const consoleDirOpts = consoleArgs[1];
       const keys = Object.keys(consoleLogRecord).sort().join(',');
       consoleSpy.restore();
 
@@ -69,15 +69,8 @@ describe('ConsoleLogRecordExporter', () => {
       assert.equal(firstLogRecord.severityNumber, SeverityNumber.DEBUG);
       assert.equal(firstLogRecord.severityText, 'DEBUG');
       assert.equal(keys, expectedKeys);
-
+      assert.equal(consoleDirOpts?.colors, undefined);
       assert.ok(spyExport.calledOnce);
-
-      const containsColor = isColorText(consoleOutput);
-      assert.equal(
-        containsColor,
-        (process.env.FORCE_COLOR && process.env.FORCE_COLOR !== '0') ||
-          process.stdout.isTTY
-      );
     });
     it('should colorize log records', () => {
       const consoleExporter = new ConsoleLogRecordExporter({ colors: true });
@@ -86,6 +79,7 @@ describe('ConsoleLogRecordExporter', () => {
         new SimpleLogRecordProcessor(consoleExporter)
       );
 
+      const consoleSpy = sinon.spy(console, 'dir');
       const stdoutStub = sinon.stub(process.stdout, 'write');
       provider.getLogger('default').emit({
         body: 'body2',
@@ -93,8 +87,11 @@ describe('ConsoleLogRecordExporter', () => {
         severityText: 'DEBUG',
       });
       const consoleOutput = stdoutStub.getCalls()[0].firstArg;
+      const consoleDirOpts = consoleSpy.args[0][1];
       stdoutStub.restore();
+      consoleSpy.restore();
 
+      assert.equal(consoleDirOpts?.colors, true);
       const containsColor = isColorText(consoleOutput);
       assert.ok(containsColor);
     });
@@ -105,6 +102,7 @@ describe('ConsoleLogRecordExporter', () => {
         new SimpleLogRecordProcessor(consoleExporter)
       );
 
+      const consoleSpy = sinon.spy(console, 'dir');
       const stdoutStub = sinon.stub(process.stdout, 'write');
       provider.getLogger('default').emit({
         body: 'body3',
@@ -112,8 +110,11 @@ describe('ConsoleLogRecordExporter', () => {
         severityText: 'DEBUG',
       });
       const consoleOutput = stdoutStub.getCalls()[0].firstArg;
+      const consoleDirOpts = consoleSpy.args[0][1];
       stdoutStub.restore();
+      consoleSpy.restore();
 
+      assert.equal(consoleDirOpts?.colors, false);
       const doesNotContainColor = !isColorText(consoleOutput);
       assert.ok(doesNotContainColor);
     });
