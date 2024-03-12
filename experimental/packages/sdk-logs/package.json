@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.48.0",
+  "version": "0.49.1",
   "publishConfig": {
     "access": "public"
   },
@@ -68,14 +68,14 @@
   ],
   "sideEffects": false,
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.4.0 <1.8.0",
+    "@opentelemetry/api": ">=1.4.0 <1.9.0",
     "@opentelemetry/api-logs": ">=0.39.1"
   },
   "devDependencies": {
     "@babel/core": "7.23.6",
     "@babel/preset-env": "7.22.20",
-    "@opentelemetry/api": ">=1.4.0 <1.8.0",
-    "@opentelemetry/api-logs": "0.48.0",
+    "@opentelemetry/api": ">=1.4.0 <1.9.0",
+    "@opentelemetry/api-logs": "0.49.1",
     "@opentelemetry/resources_1.9.0": "npm:@opentelemetry/resources@1.9.0",
     "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
@@ -101,7 +101,7 @@
     "webpack-merge": "5.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.21.0",
-    "@opentelemetry/resources": "1.21.0"
+    "@opentelemetry/core": "1.22.0",
+    "@opentelemetry/resources": "1.22.0"
   }
 }
