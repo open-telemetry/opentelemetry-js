@@ -46,7 +46,7 @@ describe('utils', () => {
       const args = spyWarn.args[0];
       assert.strictEqual(
         args[0],
-        'Header "foo1" has wrong value and will be ignored'
+        'Header "foo1" has invalid value (undefined) and will be ignored'
       );
     });
 
