@@ -71,7 +71,7 @@ export function prepareSend(
         // Consider 2xx and 3xx as success.
         if (statusCode < 400) {
           return done({ code: ExportResultCode.SUCCESS });
-          // Consider 4xx as failed non-retriable.
+          // Consider 4xx as failed non-retryable.
         } else {
           return done({
             code: ExportResultCode.FAILED,

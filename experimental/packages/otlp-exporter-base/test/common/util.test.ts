@@ -72,7 +72,7 @@ describe('utils', () => {
       const finalUrl = appendResourcePathToUrl(url, resourcePath);
       assert.strictEqual(finalUrl, url + '/' + resourcePath);
     });
-    it('should append resourse path even when url already contains path ', () => {
+    it('should append resource path even when url already contains path ', () => {
       const url = 'http://foo.bar/v1/traces';
       const resourcePath = 'v1/traces';
 
@@ -82,7 +82,7 @@ describe('utils', () => {
   });
 
   // only invoked with signal specific endpoint
-  describe('appendRootPathToUrlIfNeeded - specifc signal http endpoint', () => {
+  describe('appendRootPathToUrlIfNeeded - specific signal http endpoint', () => {
     it('should append root path when missing', () => {
       const url = 'http://foo.bar';
 
@@ -110,7 +110,7 @@ describe('utils', () => {
       }
     });
 
-    it('should not change string when url is not parseable', () => {
+    it('should not change string when url is not parsable', () => {
       const url = 'this is not a URL';
 
       const finalUrl = appendRootPathToUrlIfNeeded(url);
