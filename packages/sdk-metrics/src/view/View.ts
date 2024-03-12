@@ -16,8 +16,9 @@
 
 import { PatternPredicate } from './Predicate';
 import {
-  AttributesProcessor,
-  FilteringAttributesProcessor,
+  createMultiAttributesProcessor,
+  createNoopAttributesProcessor,
+  IAttributesProcessor,
 } from './AttributesProcessor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
@@ -42,15 +43,18 @@ export type ViewOptions = {
   description?: string;
   /**
    * Alters the metric stream:
-   * If provided, the attributes that are not in the list will be ignored.
+   * If provided, the attributes will be modified as defined by the processors in the list. Processors are applied
+   * in the order they're provided.
    * If not provided, all attribute keys will be used by default.
    *
    * @example <caption>drops all attributes with top-level keys except for 'myAttr' and 'myOtherAttr'</caption>
-   * attributeKeys: ['myAttr', 'myOtherAttr']
+   * attributesProcessors: [createAllowListProcessor(['myAttr', 'myOtherAttr'])]
    * @example <caption>drops all attributes</caption>
-   * attributeKeys: []
+   * attributesProcessors: [createAllowListProcessor([])]
+   * @example <caption>allows all attributes except for 'myAttr'</caption>
+   * attributesProcessors: [createDenyListProcessor(['myAttr']]
    */
-  attributeKeys?: string[];
+  attributesProcessors?: IAttributesProcessor[];
   /**
    * Alters the metric stream:
    * Alters the {@link Aggregation} of the metric stream.
@@ -135,7 +139,7 @@ export class View {
   readonly name?: string;
   readonly description?: string;
   readonly aggregation: Aggregation;
-  readonly attributesProcessor: AttributesProcessor;
+  readonly attributesProcessor: IAttributesProcessor;
   readonly instrumentSelector: InstrumentSelector;
   readonly meterSelector: MeterSelector;
 
@@ -157,9 +161,9 @@ export class View {
    * Alters the metric stream:
    *  This will be used as the description of the metrics stream.
    *  If not provided, the original Instrument description will be used by default.
-   * @param viewOptions.attributeKeys
+   * @param viewOptions.attributesProcessors
    * Alters the metric stream:
-   *  If provided, the attributes that are not in the list will be ignored.
+   *  If provided, the attributes will be modified as defined by the added processors.
    *  If not provided, all attribute keys will be used by default.
    * @param viewOptions.aggregation
    * Alters the metric stream:
@@ -210,13 +214,13 @@ export class View {
       );
     }
 
-    // Create AttributesProcessor if attributeKeys are defined set.
-    if (viewOptions.attributeKeys != null) {
-      this.attributesProcessor = new FilteringAttributesProcessor(
-        viewOptions.attributeKeys
+    // Create multi-processor if attributesProcessors are defined.
+    if (viewOptions.attributesProcessors != null) {
+      this.attributesProcessor = createMultiAttributesProcessor(
+        viewOptions.attributesProcessors
       );
     } else {
-      this.attributesProcessor = AttributesProcessor.Noop();
+      this.attributesProcessor = createNoopAttributesProcessor();
     }
 
     this.name = viewOptions.name;
