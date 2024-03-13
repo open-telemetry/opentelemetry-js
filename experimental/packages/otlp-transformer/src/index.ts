@@ -31,4 +31,10 @@ export {
   ProtobufTraceSerializer,
 } from './protobuf/serializers';
 
+export {
+  JsonTraceSerializer,
+  JsonLogsSerializer,
+  JsonMetricsSerializer,
+} from './json/serializers';
+
 export { ISerializer } from './common/i-serializer';

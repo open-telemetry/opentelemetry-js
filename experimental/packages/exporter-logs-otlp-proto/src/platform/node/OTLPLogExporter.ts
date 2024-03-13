@@ -19,14 +19,13 @@ import {
   OTLPExporterConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
+  OTLPExporterNodeBase,
 } from '@opentelemetry/otlp-exporter-base';
+import { ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import {
-  OTLPProtoExporterNodeBase,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
-import {
-  createExportLogsServiceRequest,
   IExportLogsServiceRequest,
+  IExportLogsServiceResponse,
+  ProtobufLogsSerializer,
 } from '@opentelemetry/otlp-transformer';
 
 import { ReadableLogRecord, LogRecordExporter } from '@opentelemetry/sdk-logs';
@@ -43,14 +42,15 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURC
  * Collector Trace Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPProtoExporterNodeBase<
+  extends OTLPExporterNodeBase<
     ReadableLogRecord,
-    IExportLogsServiceRequest
+    IExportLogsServiceRequest,
+    IExportLogsServiceResponse
   >
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config);
+    super(config, ProtobufLogsSerializer, 'application/x-protobuf');
     this.headers = {
       ...this.headers,
       ...USER_AGENT,
@@ -59,9 +59,6 @@ export class OTLPLogExporter
       ),
       ...config.headers,
     };
-  }
-  convert(logs: ReadableLogRecord[]): IExportLogsServiceRequest {
-    return createExportLogsServiceRequest(logs);
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {
