@@ -83,10 +83,10 @@ class EnvDetectorSync implements DetectorSync {
    * OTEL_RESOURCE_ATTRIBUTES: A comma-separated list of attributes describing
    * the source in more detail, e.g. “key1=val1,key2=val2”. Domain names and
    * paths are accepted as attribute keys. Values may be quoted or unquoted in
-   * general. If a value contains whitespaces, =, or " characters, it must
+   * general. If a value contains whitespace, =, or " characters, it must
    * always be quoted.
    *
-   * @param rawEnvAttributes The resource attributes as a comma-seperated list
+   * @param rawEnvAttributes The resource attributes as a comma-separated list
    * of key/value pairs.
    * @returns The sanitized resource attributes.
    */

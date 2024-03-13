@@ -42,7 +42,7 @@ describe('Metric', () => {
       const counter: Counter<Attributes> = {
         add(_value: number, _attribute: Attributes) {},
       };
-      // @ts-expect-error Expacting the type of Attributes
+      // @ts-expect-error Expecting the type of Attributes
       counter.add(1, { 'another-attribute': 'value' });
     });
   });
@@ -72,7 +72,7 @@ describe('Metric', () => {
       const counter: UpDownCounter<Attributes> = {
         add(_value: number, _attribute: Attributes) {},
       };
-      // @ts-expect-error Expacting the type of Attributes
+      // @ts-expect-error Expecting the type of Attributes
       counter.add(1, { 'another-attribute': 'value' });
     });
   });
@@ -102,7 +102,7 @@ describe('Metric', () => {
       const counter: Histogram<Attributes> = {
         record(_value: number, _attribute: Attributes) {},
       };
-      // @ts-expect-error Expacting the type of Attributes
+      // @ts-expect-error Expecting the type of Attributes
       counter.record(1, { 'another-attribute': 'value' });
     });
   });

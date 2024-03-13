@@ -373,7 +373,7 @@ export const getOutgoingRequestMetricAttributes = (
     spanAttributes[SemanticAttributes.HTTP_METHOD];
   metricAttributes[SemanticAttributes.NET_PEER_NAME] =
     spanAttributes[SemanticAttributes.NET_PEER_NAME];
-  //TODO: http.url attribute, it should susbtitute any parameters to avoid high cardinality.
+  //TODO: http.url attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
 
@@ -514,7 +514,7 @@ export const getIncomingRequestMetricAttributes = (
     spanAttributes[SemanticAttributes.NET_HOST_NAME];
   metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
     spanAttributes[SemanticAttributes.HTTP_FLAVOR];
-  //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
+  //TODO: http.target attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
 

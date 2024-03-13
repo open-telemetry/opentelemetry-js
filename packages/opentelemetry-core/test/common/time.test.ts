@@ -191,7 +191,7 @@ describe('time', () => {
     });
   });
 
-  describe('#hrTimeToMicroeconds', () => {
+  describe('#hrTimeToMicroseconds', () => {
     it('should return microseconds', () => {
       const output = hrTimeToMicroseconds([1, 200000000]);
       assert.deepStrictEqual(output, 1200000);

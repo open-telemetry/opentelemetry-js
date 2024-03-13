@@ -36,7 +36,7 @@ npm install @opentelemetry/api @opentelemetry/sdk-trace-base
 
 ### Trace Your Application
 
-In order to get started with tracing, you will need to first register an SDK. The SDK you are using may provide a convenience method which calls the registration methods for you, but if you would like to call them directly they are documented here: [sdk registration methods][docs-sdk-registration].
+In order to get started with tracing, you will need to first register an SDK. The SDK you are using may provide a convenience method which calls the registration methods for you, but if you would like to call them directly they are documented here: [SDK registration methods][docs-sdk-registration].
 
 Once you have registered an SDK, you can start and end spans. A simple example of basic SDK registration and tracing a simple operation is below. The example should export spans to the console once per second. For more information, see the [tracing documentation][docs-tracing].
 
