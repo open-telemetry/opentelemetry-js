@@ -40,9 +40,7 @@ import { VERSION } from '../src/version';
 
 const logsServiceProtoPath =
   'opentelemetry/proto/collector/logs/v1/logs_service.proto';
-const includeDirs = [
-  path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
-];
+const includeDirs = [path.resolve(__dirname, '../../otlp-transformer/protos')];
 
 const httpAddr = 'https://localhost:1503';
 const udsAddr = 'unix:///tmp/otlp-logs.sock';

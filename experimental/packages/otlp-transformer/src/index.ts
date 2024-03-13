@@ -24,3 +24,11 @@ export * from './logs/types';
 export { createExportTraceServiceRequest } from './trace';
 export { createExportMetricsServiceRequest } from './metrics';
 export { createExportLogsServiceRequest } from './logs';
+
+export {
+  ProtobufLogsSerializer,
+  ProtobufMetricsSerializer,
+  ProtobufTraceSerializer,
+} from './protobuf/serializers';
+
+export { ISerializer } from './common/i-serializer';

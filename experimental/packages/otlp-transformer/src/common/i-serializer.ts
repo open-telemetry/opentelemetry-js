@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-export { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
-export { OTLPGRPCExporterConfigNode } from './types';
-export { DEFAULT_COLLECTOR_URL, validateAndNormalizeUrl } from './util';
+/**
+ * Serializes and deserializes the OTLP request/response to and from {@link Uint8Array}
+ */
+export interface ISerializer<Request, Response> {
+  serializeRequest(request: Request): Uint8Array | undefined;
+  deserializeResponse(data: Uint8Array): Response;
+}
