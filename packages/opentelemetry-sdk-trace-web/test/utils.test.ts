@@ -192,6 +192,27 @@ describe('utils', () => {
         assert.strictEqual(addEventSpy.callCount, 0);
       });
     });
+    describe('when entries does NOT contain the performance', () => {
+      it('should NOT add event to span', () => {
+        const addEventSpy = sinon.spy();
+        const span = {
+          addEvent: addEventSpy,
+        } as unknown as tracing.Span;
+        const entries = {
+          [PTN.FETCH_START]: 123,
+        } as PerformanceEntries;
+
+        assert.strictEqual(addEventSpy.callCount, 0);
+
+        addSpanNetworkEvent(span, 'foo', entries);
+
+        assert.strictEqual(
+          addEventSpy.callCount,
+          0,
+          'should not call addEvent'
+        );
+      });
+    });
     describe('when entries contain invalid performance timing', () => {
       it('should only add events with time greater that or equal to reference value to span', () => {
         const addEventSpy = sinon.spy();
