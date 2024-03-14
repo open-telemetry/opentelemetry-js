@@ -10,6 +10,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(exporter-*-otlp-*): use parseHeaders() to ensure header-values are not 'undefined' #4540
+  * Fixes a bug where passing `undefined` as a header value would crash the end-user app after the export timeout elapsed.
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
