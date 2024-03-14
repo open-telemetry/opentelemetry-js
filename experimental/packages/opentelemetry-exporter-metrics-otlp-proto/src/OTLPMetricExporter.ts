@@ -26,6 +26,7 @@ import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
+  parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
 import {
   createExportMetricsServiceRequest,
@@ -51,7 +52,7 @@ class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
-      ...config?.headers,
+      ...parseHeaders(config?.headers),
     };
   }
 
