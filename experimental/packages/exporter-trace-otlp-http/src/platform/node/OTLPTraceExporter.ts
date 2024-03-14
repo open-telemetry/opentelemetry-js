@@ -16,7 +16,10 @@
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  OTLPExporterNodeBase,
+  parseHeaders,
+} from '@opentelemetry/otlp-exporter-base';
 import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
@@ -54,7 +57,7 @@ export class OTLPTraceExporter
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
       ),
-      ...config.headers,
+      ...parseHeaders(config?.headers),
     };
   }
 
