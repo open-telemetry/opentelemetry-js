@@ -36,9 +36,9 @@ export const JsonTraceSerializer: ISerializer<
     const encoder = new TextEncoder();
     return encoder.encode(JSON.stringify(request));
   },
-  deserializeResponse: (_arg: Uint8Array) => {
-    // Not yet implemented
-    return {};
+  deserializeResponse: (arg: Uint8Array) => {
+    const decoder = new TextDecoder();
+    return JSON.parse(decoder.decode(arg)) as IExportTraceServiceResponse;
   },
 };
 
@@ -54,9 +54,9 @@ export const JsonMetricsSerializer: ISerializer<
     const encoder = new TextEncoder();
     return encoder.encode(JSON.stringify(request));
   },
-  deserializeResponse: (_arg: Uint8Array) => {
-    // Not yet implemented
-    return {};
+  deserializeResponse: (arg: Uint8Array) => {
+    const decoder = new TextDecoder();
+    return JSON.parse(decoder.decode(arg)) as IExportMetricsServiceResponse;
   },
 };
 
@@ -72,8 +72,8 @@ export const JsonLogsSerializer: ISerializer<
     const encoder = new TextEncoder();
     return encoder.encode(JSON.stringify(request));
   },
-  deserializeResponse: (_arg: Uint8Array) => {
-    // Not yet implemented
-    return {};
+  deserializeResponse: (arg: Uint8Array) => {
+    const decoder = new TextDecoder();
+    return JSON.parse(decoder.decode(arg)) as IExportLogsServiceResponse;
   },
 };
