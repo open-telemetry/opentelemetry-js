@@ -2,13 +2,11 @@
 
 ## [1.3.1](https://github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v1.3.0...propagator-aws-xray-v1.3.1) (2023-08-14)
 
-
 ### Bug Fixes
 
 * Revert "feat(minification): Add importHelpers and tslib as a dependency ([#1545](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/1545))" ([#1611](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/1611)) ([e5bca5f](https://github.com/open-telemetry/opentelemetry-js-contrib/commit/e5bca5fe5b27adc59c8de8fe4087d38b69d93bd4))
 
 ## [1.3.0](https://github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v1.2.1...propagator-aws-xray-v1.3.0) (2023-07-12)
-
 
 ### Features
 
@@ -16,13 +14,11 @@
 
 ## [1.2.1](https://github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v1.2.0...propagator-aws-xray-v1.2.1) (2023-05-16)
 
-
 ### Bug Fixes
 
 * **eslint-config:** replace gts with prettier and eslint ([#1439](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/1439)) ([2571c37](https://github.com/open-telemetry/opentelemetry-js-contrib/commit/2571c371be1b5738442200cab2415b6a04c32aab))
 
 ## [1.2.0](https://github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v1.1.1...propagator-aws-xray-v1.2.0) (2023-02-07)
-
 
 ### Features
 
@@ -30,13 +26,11 @@
 
 ## [1.1.1](https://github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v1.1.0...propagator-aws-xray-v1.1.1) (2022-11-02)
 
-
 ### Bug Fixes
 
 * address webpack memory issue for browser tests ([#1264](https://github.com/open-telemetry/opentelemetry-js-contrib/issues/1264)) ([c7f08fe](https://github.com/open-telemetry/opentelemetry-js-contrib/commit/c7f08fed51bca68b0c522769c3c589102b98ec93))
 
 ## [1.1.0](https://github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v1.0.1...propagator-aws-xray-v1.1.0) (2022-05-14)
-
 
 ### Features
 
@@ -47,14 +41,12 @@
 
 ### [1.0.1](https://www.github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v1.0.0...propagator-aws-xray-v1.0.1) (2022-01-24)
 
-
 ### Bug Fixes
 
 * fix CI by forcing colors@1.4.0 ([#825](https://www.github.com/open-telemetry/opentelemetry-js-contrib/issues/825)) ([0ec9f08](https://www.github.com/open-telemetry/opentelemetry-js-contrib/commit/0ec9f080520fe0f146a915a656300ef53a151ace))
 * rename lerna's --include-filtered-dependencies option ([#817](https://www.github.com/open-telemetry/opentelemetry-js-contrib/issues/817)) ([cf268e7](https://www.github.com/open-telemetry/opentelemetry-js-contrib/commit/cf268e7a92b7800ad6dbec9ca77466f9ee03ee1a))
 
 ## [1.0.0](https://www.github.com/open-telemetry/opentelemetry-js-contrib/compare/propagator-aws-xray-v0.25.0...propagator-aws-xray-v1.0.0) (2021-10-22)
-
 
 ### Features
 
