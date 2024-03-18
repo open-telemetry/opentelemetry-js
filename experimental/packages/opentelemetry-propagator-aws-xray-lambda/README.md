@@ -13,7 +13,7 @@ see the [semantic conventions specification for AWS Lambda](https://github.com/o
 
 ## Propagator Details
 
-The propagator extracts context from the `_X_AMZN_TRACE_ID` environment variable, except when there is already another 
+The propagator extracts context from the `_X_AMZN_TRACE_ID` environment variable, except when there is already another
 context active. It also automatically uses the [AWS X-Ray propagator](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/propagators/opentelemetry-propagator-aws-xray).
 
 ## Useful links
