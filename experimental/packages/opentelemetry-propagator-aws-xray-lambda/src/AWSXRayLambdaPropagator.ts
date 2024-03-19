@@ -21,14 +21,17 @@ import {
   TextMapGetter,
   isSpanContextValid,
   defaultTextMapGetter,
-  trace
+  trace,
 } from '@opentelemetry/api';
-import { AWSXRayPropagator, AWSXRAY_TRACE_ID_HEADER } from '@opentelemetry/propagator-aws-xray';
+import {
+  AWSXRayPropagator,
+  AWSXRAY_TRACE_ID_HEADER,
+} from '@opentelemetry/propagator-aws-xray';
 
 export const AWSXRAY_TRACE_ID_ENV_VAR = '_X_AMZN_TRACE_ID';
 
 /**
- * Implementation of the AWS X-Ray Trace Header propagation protocol with special 
+ * Implementation of the AWS X-Ray Trace Header propagation protocol with special
  * logic for handling Lambda X-ray environment variable.
  *
  * An example AWS Xray Tracing Header is shown below:
@@ -42,7 +45,11 @@ export class AWSXRayLambdaPropagator implements TextMapPropagator {
   }
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
-    const xrayContext = this._awsXrayPropagator.extract(context, carrier, getter);
+    const xrayContext = this._awsXrayPropagator.extract(
+      context,
+      carrier,
+      getter
+    );
 
     const spanContext = trace.getSpanContext(context);
     if (spanContext && isSpanContextValid(spanContext)) {
@@ -56,7 +63,7 @@ export class AWSXRayLambdaPropagator implements TextMapPropagator {
 
     return this._awsXrayPropagator.extract(
       xrayContext,
-      { [AWSXRAY_TRACE_ID_HEADER]: xrayEnvVar},
+      { [AWSXRAY_TRACE_ID_HEADER]: xrayEnvVar },
       defaultTextMapGetter
     );
   }

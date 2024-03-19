@@ -27,7 +27,10 @@ import {
 import * as sinon from 'sinon';
 
 import { AWSXRAY_TRACE_ID_ENV_VAR, AWSXRayLambdaPropagator } from '../src';
-import { AWSXRAY_TRACE_ID_HEADER, AWSXRayPropagator } from '@opentelemetry/propagator-aws-xray';
+import {
+  AWSXRAY_TRACE_ID_HEADER,
+  AWSXRayPropagator,
+} from '@opentelemetry/propagator-aws-xray';
 
 describe('AWSXRayPropagator', () => {
   const xrayLambdaPropagator = new AWSXRayLambdaPropagator();
@@ -40,9 +43,13 @@ describe('AWSXRayPropagator', () => {
 
   describe('.inject()', () => {
     it('should call use AWSXRayPropagator inject()', () => {
-      let spy = sinon.spy(AWSXRayPropagator.prototype, 'inject');
+      const spy = sinon.spy(AWSXRayPropagator.prototype, 'inject');
       assert.equal(spy.callCount, 0);
-      xrayLambdaPropagator.inject(context.active(), carrier, defaultTextMapSetter);
+      xrayLambdaPropagator.inject(
+        context.active(),
+        carrier,
+        defaultTextMapSetter
+      );
       assert.equal(spy.callCount, 1);
     });
   });
@@ -55,7 +62,11 @@ describe('AWSXRayPropagator', () => {
         'Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad8;Sampled=1';
       const extractedSpanContext = trace
         .getSpan(
-          xrayLambdaPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+          xrayLambdaPropagator.extract(
+            ROOT_CONTEXT,
+            carrier,
+            defaultTextMapGetter
+          )
         )
         ?.spanContext();
 
@@ -126,10 +137,10 @@ describe('AWSXRayPropagator', () => {
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
-    }); 
+    });
 
     it('should return env variable context if there is no active context but carrier also has xray headers', () => {
-      const xrayEnvSpanId  = '53995c3f42cd8ad8';
+      const xrayEnvSpanId = '53995c3f42cd8ad8';
       const xrayEnvTraceId = '8a3c60f7d188f8fa79d48a391a778fa6';
       process.env[AWSXRAY_TRACE_ID_ENV_VAR] =
         'Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad8;Sampled=1';
@@ -139,7 +150,11 @@ describe('AWSXRayPropagator', () => {
 
       const extractedSpanContext = trace
         .getSpan(
-          xrayLambdaPropagator.extract(context.active(), carrier, defaultTextMapGetter)
+          xrayLambdaPropagator.extract(
+            context.active(),
+            carrier,
+            defaultTextMapGetter
+          )
         )
         ?.spanContext();
 
@@ -160,7 +175,11 @@ describe('AWSXRayPropagator', () => {
         'Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad8;Sampled=1';
       const extractedSpanContext = trace
         .getSpan(
-          xrayLambdaPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+          xrayLambdaPropagator.extract(
+            ROOT_CONTEXT,
+            carrier,
+            defaultTextMapGetter
+          )
         )
         ?.spanContext();
 
