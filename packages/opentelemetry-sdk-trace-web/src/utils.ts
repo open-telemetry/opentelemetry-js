@@ -56,6 +56,7 @@ export function hasKey<O extends object>(
  * @param span
  * @param performanceName name of performance entry for time start
  * @param entries
+ * @param refPerfName name of performance entry to use for reference
  */
 export function addSpanNetworkEvent(
   span: api.Span,
