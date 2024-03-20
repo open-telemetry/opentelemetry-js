@@ -20,7 +20,6 @@ All notable changes to experimental packages in this project will be documented 
     * `compression`
       * was used internally to keep track of the compression to use but was unintentionally exposed to the users. It allowed to read and write the value, writing, however, would have no effect.
 
-
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
