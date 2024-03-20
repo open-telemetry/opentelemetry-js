@@ -33,6 +33,7 @@ import {
   IExportMetricsServiceResponse,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from './version';
+import { parseHeaders } from '@opentelemetry/otlp-exporter-base';
 
 const USER_AGENT = {
   'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
@@ -49,7 +50,7 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
-      ...config?.headers,
+      ...parseHeaders(config?.headers),
     };
     super(
       config,

@@ -465,7 +465,7 @@ describe('HttpsInstrumentation', () => {
       });
 
       for (const arg of ['string', {}, new Date()]) {
-        it(`should be tracable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
+        it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
