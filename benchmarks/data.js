@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1710426224189,
+  "lastUpdate": 1710946122179,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5528,6 +5528,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.36%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "aabd1a9b001ae9c8190bf2ddc1f3c8fe3a94a74d",
+          "message": "SBOM workflow using \"npm sbom\" (#4521)\n\n* add sbom workflow\r\n\r\n* generate sbom for each package\r\n\r\n* generate sbom API\r\n\r\n* add prefix to all files\r\n\r\n* conditionally add artifacts to releases\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-20T15:46:52+01:00",
+          "tree_id": "1fa3579c8aa2cf7a3f6012eb9c510fa340f1f1fe",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/aabd1a9b001ae9c8190bf2ddc1f3c8fe3a94a74d"
+        },
+        "date": 1710946121380,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 912250,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11577,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 654026,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 641096,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
