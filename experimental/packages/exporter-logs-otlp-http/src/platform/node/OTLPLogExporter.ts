@@ -21,7 +21,10 @@ import type {
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import type { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  OTLPExporterNodeBase,
+  parseHeaders,
+} from '@opentelemetry/otlp-exporter-base';
 import { createExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 import { getDefaultUrl } from '../config';
@@ -50,7 +53,7 @@ export class OTLPLogExporter
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
       ),
-      ...config.headers,
+      ...parseHeaders(config?.headers),
     };
   }
 
