@@ -16,24 +16,26 @@
 
 import { diag, SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
 
-export function sanitizeAttributes(attributes: unknown): SpanAttributes {
-  const out: SpanAttributes = {};
-
+export function sanitizeAttributes(
+  attributes: unknown,
+  out: SpanAttributes = {}
+): SpanAttributes {
   if (typeof attributes !== 'object' || attributes == null) {
     return out;
   }
 
-  for (const [key, val] of Object.entries(attributes)) {
+  for (const key in attributes) {
     if (!isAttributeKey(key)) {
       diag.warn(`Invalid attribute key: ${key}`);
       continue;
     }
+    const val = attributes[key as keyof typeof attributes] as unknown;
     if (!isAttributeValue(val)) {
       diag.warn(`Invalid attribute value set for key: ${key}`);
       continue;
     }
     if (Array.isArray(val)) {
-      out[key] = val.slice();
+      out[key] = out[key] == val ? val : val.slice();
     } else {
       out[key] = val;
     }
