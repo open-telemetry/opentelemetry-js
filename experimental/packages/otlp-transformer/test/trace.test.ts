@@ -27,6 +27,7 @@ import {
   ProtobufTraceSerializer,
   JsonTraceSerializer,
 } from '../src';
+import { toBase64 } from './utils';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
@@ -134,21 +135,6 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
       },
     ],
   };
-}
-
-/**
- * utility function to convert a string representing a hex value to a base64 string
- * that represents the bytes of that hex value. This is needed as we need to support Node.js 14
- * where btoa() does not exist, and the Browser, where Buffer does not exist.
- * @param hexStr
- */
-function toBase64(hexStr: string) {
-  if (typeof btoa !== 'undefined') {
-    const decoder = new TextDecoder('utf8');
-    return btoa(decoder.decode(hexToBinary(hexStr)));
-  }
-
-  return Buffer.from(hexToBinary(hexStr)).toString('base64');
 }
 
 function createExpectedSpanProtobuf() {
