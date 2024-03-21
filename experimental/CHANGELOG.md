@@ -22,6 +22,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(node-sdk): add `HostDetector` as default resource detector
+
 ### :bug: (Bug Fix)
 
 * fix(exporter-*-otlp-*): use parseHeaders() to ensure header-values are not 'undefined' #4540
