@@ -26,14 +26,12 @@ export interface EventEmitterProvider {
    * schemaUrl pair is not already created.
    *
    * @param name The name of the event emitter or instrumentation library.
-   * @param domain The domain for events created by the event emitter.
    * @param version The version of the event emitter or instrumentation library.
    * @param options The options of the event emitter or instrumentation library.
    * @returns EventEmitter An event emitter with the given name and version.
    */
   getEventEmitter(
     name: string,
-    domain: string,
     version?: string,
     options?: EventEmitterOptions
   ): EventEmitter;
