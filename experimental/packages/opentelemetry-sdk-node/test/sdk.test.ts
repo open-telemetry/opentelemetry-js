@@ -48,9 +48,9 @@ import {
   IdGenerator,
   AlwaysOffSampler,
 } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as semver from 'semver';
-import * as Sinon from 'sinon';
+import sinon from 'sinon';
 import { NodeSDK } from '../src';
 import { env } from 'process';
 import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExporter';
@@ -89,7 +89,7 @@ describe('Node SDK', () => {
   });
 
   afterEach(() => {
-    Sinon.restore();
+    sinon.restore();
   });
 
   describe('Basic Registration', () => {
@@ -126,7 +126,7 @@ describe('Node SDK', () => {
     it('should register a diag logger with OTEL_LOG_LEVEL', () => {
       env.OTEL_LOG_LEVEL = 'ERROR';
 
-      const spy = Sinon.spy(diag, 'setLogger');
+      const spy = sinon.spy(diag, 'setLogger');
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
@@ -145,7 +145,7 @@ describe('Node SDK', () => {
     it('should not register a diag logger with OTEL_LOG_LEVEL unset', () => {
       delete env.OTEL_LOG_LEVEL;
 
-      const spy = Sinon.spy(diag, 'setLogger');
+      const spy = sinon.spy(diag, 'setLogger');
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
@@ -598,8 +598,8 @@ describe('Node SDK', () => {
         });
 
         // This test depends on the env detector to be functioning as intended
-        const mockedLoggerMethod = Sinon.fake();
-        const mockedVerboseLoggerMethod = Sinon.fake();
+        const mockedLoggerMethod = sinon.fake();
+        const mockedVerboseLoggerMethod = sinon.fake();
 
         diag.setLogger(
           {
@@ -634,7 +634,7 @@ describe('Node SDK', () => {
           const sdk = new NodeSDK({
             autoDetectResources: true,
           });
-          const mockedLoggerMethod = Sinon.fake();
+          const mockedLoggerMethod = sinon.fake();
           diag.setLogger(
             {
               debug: mockedLoggerMethod,
@@ -834,15 +834,15 @@ describe('Node SDK', () => {
 });
 
 describe('setup exporter from env', () => {
-  let spyGetOtlpProtocol: Sinon.SinonSpy;
-  let stubLoggerError: Sinon.SinonStub;
+  let spyGetOtlpProtocol: sinon.SinonSpy;
+  let stubLoggerError: sinon.SinonStub;
 
   beforeEach(() => {
-    spyGetOtlpProtocol = Sinon.spy(
+    spyGetOtlpProtocol = sinon.spy(
       TracerProviderWithEnvExporters,
       'getOtlpProtocol'
     );
-    stubLoggerError = Sinon.stub(diag, 'warn');
+    stubLoggerError = sinon.stub(diag, 'warn');
   });
   afterEach(() => {
     spyGetOtlpProtocol.restore();

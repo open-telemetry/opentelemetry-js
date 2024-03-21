@@ -21,8 +21,8 @@ import { HrTime } from '@opentelemetry/api';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { MetricData, InstrumentType } from '../../src';
 import { Maybe } from '../../src/utils';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import {
   getDescriptionResolutionRecipe,
   getTypeConflictResolutionRecipe,

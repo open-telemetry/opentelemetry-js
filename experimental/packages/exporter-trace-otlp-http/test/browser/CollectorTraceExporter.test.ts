@@ -18,8 +18,8 @@ import * as core from '@opentelemetry/core';
 import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
 import {
   ensureSpanIsCorrect,

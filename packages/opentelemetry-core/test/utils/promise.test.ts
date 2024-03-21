@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { Deferred } from '../../src/utils/promise';
 import { assertRejects } from '../test-utils';
 

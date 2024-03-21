@@ -18,8 +18,8 @@ import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportin
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { Aggregation, InstrumentType, PushMetricExporter } from '../../src';
 import { ResourceMetrics } from '../../src/export/MetricData';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';

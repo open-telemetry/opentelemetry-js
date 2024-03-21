@@ -19,7 +19,7 @@ import {
   trace,
   TraceFlags,
 } from '@opentelemetry/api';
-import type * as http from 'http';
+import type http from 'http';
 
 export class DummyPropagation implements TextMapPropagator {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';

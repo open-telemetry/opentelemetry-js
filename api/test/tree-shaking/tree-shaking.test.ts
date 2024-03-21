@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as webpack from 'webpack';
-import * as path from 'path';
+import assert from 'assert';
+import webpack from 'webpack';
+import path from 'path';
 import { Union } from 'unionfs';
 import { fs as mfs } from 'memfs';
-import * as realFs from 'fs';
+import realFs from 'fs';
 
 /**
  * Verify that tree-shaking can be properly applied on the @opentelemetry/api package.

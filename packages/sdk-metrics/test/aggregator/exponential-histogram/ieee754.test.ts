@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
-import * as assert from 'assert';
+import assert from 'assert';
 
 describe('ieee754 helpers', () => {
   describe('MIN_NORMAL_EXPONENT', () => {

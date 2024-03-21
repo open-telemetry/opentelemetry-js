@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import * as path from 'path';
 import type { OnRequireFn } from 'require-in-the-middle';
 import { RequireInTheMiddleSingleton } from '../../src/platform/node/RequireInTheMiddleSingleton';

@@ -21,7 +21,7 @@ import {
   ProxyTracerProvider,
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
-import * as assert from 'assert';
+import assert from 'assert';
 import { StackContextManager, WebTracerProvider } from '../src';
 
 describe('API registration', () => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { context } from '@opentelemetry/api';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { FilteringAttributesProcessor } from '../../src/view/AttributesProcessor';

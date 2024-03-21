@@ -20,7 +20,7 @@ import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
+import assert from 'assert';
 import { WebTracerConfig } from '../src';
 import { WebTracerProvider } from '../src/WebTracerProvider';
 

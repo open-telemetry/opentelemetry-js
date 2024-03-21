@@ -30,7 +30,7 @@ import {
   ReadableSpan,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as protoLoader from '@grpc/proto-loader';
 import {
   status as GrpcStatus,

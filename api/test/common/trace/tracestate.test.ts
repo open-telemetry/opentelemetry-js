@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { createTraceState } from '../../../src/trace/internal/utils';
 import { TraceStateImpl } from '../../../src/trace/internal/tracestate-impl';
 

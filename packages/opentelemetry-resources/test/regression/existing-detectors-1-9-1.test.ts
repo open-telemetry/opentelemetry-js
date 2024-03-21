@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Resource, Detector, ResourceDetectionConfig } from '../../src';
-import * as assert from 'assert';
+import assert from 'assert';
 
 // DO NOT MODIFY THIS DETECTOR: Previous detectors used Resource as IResource did not yet exist.
 // If compilation fails at this point then the changes made are breaking.

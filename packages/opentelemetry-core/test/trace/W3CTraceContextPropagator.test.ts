@@ -24,7 +24,7 @@ import {
   trace,
   TraceFlags,
 } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   W3CTraceContextPropagator,
   TRACE_PARENT_HEADER,

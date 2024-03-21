@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
-import * as assert from 'assert';
+import sinon from 'sinon';
+import assert from 'assert';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { describeNode } from '../../util';
 import { osDetector, IResource } from '../../../src';

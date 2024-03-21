@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
-import * as assert from 'assert';
+import assert from 'assert';
 import { B3MultiPropagator } from '../src/B3MultiPropagator';
 import {
   X_B3_FLAGS,

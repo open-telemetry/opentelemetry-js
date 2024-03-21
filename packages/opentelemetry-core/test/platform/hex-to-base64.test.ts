@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { hexToBase64 } from '../../src/platform';
 
 describe('hexToBase64', () => {

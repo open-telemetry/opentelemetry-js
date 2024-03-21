@@ -23,7 +23,7 @@ import {
   baggageEntryMetadataFromString,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import { W3CBaggagePropagator } from '../../src/baggage/propagation/W3CBaggagePropagator';
 import { BAGGAGE_HEADER } from '../../src/baggage/constants';
 

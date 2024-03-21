@@ -21,7 +21,7 @@ import {
   MetricReader,
   PushMetricExporter,
 } from '../../src';
-import * as assert from 'assert';
+import assert from 'assert';
 
 const instrumentTypes = [
   InstrumentType.COUNTER,

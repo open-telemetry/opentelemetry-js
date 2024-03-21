@@ -15,8 +15,8 @@
  */
 
 import { Tracer as Tracer } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import * as oc from '@opencensus/core';
 import { ShimTracer, getRootSpan } from '../src/ShimTracer';
 import {

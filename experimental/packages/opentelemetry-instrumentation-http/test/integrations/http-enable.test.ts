@@ -20,7 +20,7 @@ import {
   NetTransportValues,
   SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as url from 'url';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
@@ -36,7 +36,7 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
+import http from 'http';
 import { httpRequest } from '../utils/httpRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { Socket } from 'net';

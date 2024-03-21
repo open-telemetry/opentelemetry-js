@@ -16,8 +16,8 @@
 import { logs, NoopLogger } from '@opentelemetry/api-logs';
 import { diag } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 
 import { LoggerProvider, NoopLogRecordProcessor } from '../../src';
 import { loadDefaultConfig } from '../../src/config';

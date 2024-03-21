@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import { DropAggregator, SumAggregator } from '../../src/aggregator';
 import { DeltaMetricProcessor } from '../../src/state/DeltaMetricProcessor';
 import { AttributeHashMap } from '../../src/state/HashMap';

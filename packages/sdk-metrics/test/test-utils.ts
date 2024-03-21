@@ -18,7 +18,7 @@
  * Changes to this file should be applied to opentelemetry-core/test/test-utils.ts too.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 
 interface ErrorLikeConstructor {
   new (): Error;

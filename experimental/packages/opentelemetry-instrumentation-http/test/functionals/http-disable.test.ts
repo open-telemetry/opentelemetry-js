@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as assert from 'assert';
+import assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { AddressInfo } from 'net';
-import * as nock from 'nock';
-import * as sinon from 'sinon';
+import nock from 'nock';
+import sinon from 'sinon';
 import { httpRequest } from '../utils/httpRequest';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
@@ -25,7 +25,7 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
+import http from 'http';
 import {
   trace,
   TracerProvider,

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
-import * as assert from 'assert';
+import sinon from 'sinon';
+import assert from 'assert';
 import { promises as fs } from 'fs';
 import { PromiseWithChild } from 'child_process';
 import * as util from '../../../../src/platform/node/machine-id/execAsync';

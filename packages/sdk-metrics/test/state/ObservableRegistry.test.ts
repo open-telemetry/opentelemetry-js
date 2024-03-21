@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { ObservableInstrument } from '../../src/Instruments';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
 import { defaultInstrumentDescriptor } from '../util';

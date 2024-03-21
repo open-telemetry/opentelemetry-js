@@ -24,7 +24,7 @@ import {
 import * as oc from '@opencensus/core';
 import { SpanKind } from '@opentelemetry/api';
 import { TraceState } from '@opentelemetry/core';
-import * as assert from 'assert';
+import assert from 'assert';
 
 describe('trace-transform', () => {
   describe('mapSpanKind', () => {

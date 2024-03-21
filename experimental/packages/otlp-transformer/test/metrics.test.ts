@@ -22,7 +22,7 @@ import {
   MetricData,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
-import * as assert from 'assert';
+import assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
 import { EAggregationTemporality } from '../src/metrics/types';
 import { hrTime } from '@opentelemetry/core';

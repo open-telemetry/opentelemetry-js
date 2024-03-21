@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { AttributesProcessor } from '../../src/view/AttributesProcessor';
 import { View } from '../../src/view/View';
 import {

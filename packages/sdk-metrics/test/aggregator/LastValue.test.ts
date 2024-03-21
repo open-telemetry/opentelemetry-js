@@ -15,8 +15,8 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { AggregationTemporality } from '../../src';
 import {
   LastValueAccumulation,

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import * as url from 'url';
-import * as http from 'http';
-import * as https from 'https';
-import * as zlib from 'zlib';
+import http from 'http';
+import https from 'https';
+import zlib from 'zlib';
 import { Readable } from 'stream';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { OTLPExporterNodeConfigBase } from '.';

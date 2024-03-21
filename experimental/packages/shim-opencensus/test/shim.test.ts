@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { installShim, uninstallShim } from '../src/shim';
 import { ShimTracer } from '../src';
 import { CoreTracer as OrigCoreTracer } from '@opencensus/core';

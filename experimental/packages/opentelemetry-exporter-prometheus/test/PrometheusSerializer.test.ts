@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { MetricAttributes, UpDownCounter } from '@opentelemetry/api';
 import {
   Aggregation,
@@ -29,7 +29,7 @@ import {
   SumAggregation,
   View,
 } from '@opentelemetry/sdk-metrics';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
 import {
   mockedHrTimeMs,

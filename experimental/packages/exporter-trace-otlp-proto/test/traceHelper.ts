@@ -18,7 +18,7 @@ import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { hexToBase64 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
+import assert from 'assert';
 import { Stream } from 'stream';
 import {
   IEvent,

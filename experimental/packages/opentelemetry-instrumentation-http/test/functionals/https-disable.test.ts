@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import * as fs from 'fs';
 import type { AddressInfo } from 'net';
-import * as nock from 'nock';
-import * as sinon from 'sinon';
+import nock from 'nock';
+import sinon from 'sinon';
 import { HttpInstrumentation } from '../../src';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
@@ -26,7 +26,7 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as https from 'https';
+import https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
 import {
   INVALID_SPAN_CONTEXT,

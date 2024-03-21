@@ -24,7 +24,7 @@ import {
   trace,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   CompositePropagator,
   W3CTraceContextPropagator,

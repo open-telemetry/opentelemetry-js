@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 
 import { LogRecordExporter } from '../../../src';
 import { BatchLogRecordProcessor } from '../../../src/platform/browser/export/BatchLogRecordProcessor';

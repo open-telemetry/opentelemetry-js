@@ -16,8 +16,8 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import * as http from 'http';
-import * as https from 'https';
+import http from 'http';
+import https from 'https';
 import * as url from 'url';
 import * as zipkinTypes from '../../types';
 

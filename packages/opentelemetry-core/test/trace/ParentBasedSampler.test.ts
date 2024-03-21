@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as assert from 'assert';
+import assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from '../../src/trace/sampler/ParentBasedSampler';

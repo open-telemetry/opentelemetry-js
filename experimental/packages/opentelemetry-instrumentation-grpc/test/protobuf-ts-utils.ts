@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Span, SpanKind } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 
 import {
   InMemorySpanExporter,

@@ -15,8 +15,8 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { Resource, Detector, detectResourcesSync, DetectorSync } from '../src';
 import { describeNode } from './util';
 

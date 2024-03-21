@@ -15,7 +15,7 @@
  */
 import { LogarithmMapping } from '../../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
 import * as ieee754 from '../../../src/aggregator/exponential-histogram/mapping/ieee754';
-import * as assert from 'assert';
+import assert from 'assert';
 import { assertInEpsilon } from './helpers';
 
 const MIN_SCALE = 1;

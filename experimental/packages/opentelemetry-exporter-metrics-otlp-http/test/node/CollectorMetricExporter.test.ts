@@ -16,9 +16,9 @@
 
 import { diag, DiagLogger } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
-import * as assert from 'assert';
-import * as http from 'http';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import http from 'http';
+import sinon from 'sinon';
 import {
   AggregationTemporalityPreference,
   CumulativeTemporalitySelector,

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { IResource } from '@opentelemetry/resources';
 import { browserDetector } from '../src/BrowserDetector';
 import { describeBrowser, assertResource, assertEmptyResource } from './util';

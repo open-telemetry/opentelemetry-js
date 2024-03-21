@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import * as opentracing from 'opentracing';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SpanContextShim, SpanShim, TracerShim } from '../src/shim';

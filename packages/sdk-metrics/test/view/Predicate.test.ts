@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { ExactPredicate, PatternPredicate } from '../../src/view/Predicate';
 
 describe('PatternPredicate', () => {

@@ -23,7 +23,7 @@ import {
   HrTime,
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   ExplicitBucketHistogramAggregation,
   MeterProvider,

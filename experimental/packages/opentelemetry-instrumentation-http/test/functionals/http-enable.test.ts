@@ -33,8 +33,8 @@ import {
   NetTransportValues,
   SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
-import * as nock from 'nock';
+import assert from 'assert';
+import nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
 import { HttpInstrumentationConfig } from '../../src/types';
@@ -56,7 +56,7 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
+import http from 'http';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';

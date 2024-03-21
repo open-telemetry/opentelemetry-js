@@ -21,7 +21,7 @@ import {
   trace,
 } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
-import * as assert from 'assert';
+import assert from 'assert';
 
 import {
   SimpleFixedSizeExemplarReservoir,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import * as context from '../../../src/trace/spancontext-utils';
 import { INVALID_SPANID, INVALID_TRACEID, TraceFlags } from '../../../src';
 

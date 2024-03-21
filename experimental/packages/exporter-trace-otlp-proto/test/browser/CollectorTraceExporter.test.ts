@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
 
 describe('OTLPTraceExporter - web', () => {

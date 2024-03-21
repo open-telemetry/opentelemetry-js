@@ -21,7 +21,7 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
+import assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
 import { TestMetricReader } from '../utils/TestMetricReader';
@@ -30,7 +30,7 @@ const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
+import http from 'http';
 
 let server: http.Server;
 const serverPort = 22346;

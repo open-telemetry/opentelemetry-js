@@ -25,7 +25,7 @@ import {
   Hooked,
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
-import * as ImportInTheMiddle from 'import-in-the-middle';
+import ImportInTheMiddle from 'import-in-the-middle';
 import { InstrumentationModuleDefinition } from '../../types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
@@ -267,12 +267,11 @@ export abstract class InstrumentationBase<T = any>
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      const esmHook =
-        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
-          [module.name],
-          { internals: false },
-          <HookFn>hookFn
-        );
+      const esmHook = new ImportInTheMiddle(
+        [module.name],
+        { internals: false },
+        <HookFn>hookFn
+      );
       this._hooks.push(esmHook);
     }
   }

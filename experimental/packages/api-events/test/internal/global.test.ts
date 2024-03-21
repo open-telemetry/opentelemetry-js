@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   _global,
   GLOBAL_EVENTS_API_KEY,

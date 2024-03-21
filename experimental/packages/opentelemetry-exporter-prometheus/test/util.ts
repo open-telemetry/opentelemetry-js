@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 

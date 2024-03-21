@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { Span, SpanAttributes } from '@opentelemetry/api';
-import type * as http from 'http';
-import type * as https from 'https';
+import type http from 'http';
+import type https from 'https';
 import {
   ClientRequest,
   get,

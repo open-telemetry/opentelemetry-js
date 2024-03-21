@@ -22,8 +22,8 @@ import * as core from '@opentelemetry/core';
 import * as tracing from '@opentelemetry/sdk-trace-base';
 import { HrTime } from '@opentelemetry/api';
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import assert from 'assert';
+import sinon from 'sinon';
 import {
   addSpanNetworkEvent,
   addSpanNetworkEvents,

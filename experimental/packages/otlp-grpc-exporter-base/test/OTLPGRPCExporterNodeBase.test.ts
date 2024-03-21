@@ -15,7 +15,7 @@
  */
 
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
+import assert from 'assert';
 import { OTLPGRPCExporterNodeBase } from '../src/OTLPGRPCExporterNodeBase';
 import { OTLPGRPCExporterConfigNode } from '../src/types';
 import { mockedReadableSpan } from './traceHelper';

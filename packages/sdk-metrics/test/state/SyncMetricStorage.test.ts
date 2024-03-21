@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
