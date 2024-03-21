@@ -26,6 +26,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix(exporter-*-otlp-*): use parseHeaders() to ensure header-values are not 'undefined' #4540
   * Fixes a bug where passing `undefined` as a header value would crash the end-user app after the export timeout elapsed.
+* fix(sdk-logs): ensure default resource attributes are used as fallbacks when a resource is passed to LoggerProvider.
 
 ### :books: (Refine Doc)
 

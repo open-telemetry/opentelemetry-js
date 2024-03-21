@@ -46,7 +46,7 @@ const logger = logsAPI.logs.getLogger('default');
 
 // emit a log record
 logger.emit({
-  severityNumber: SeverityNumber.INFO,
+  severityNumber: logsAPI.SeverityNumber.INFO,
   severityText: 'INFO',
   body: 'this is a log record body',
   attributes: { 'log.type': 'LogRecord' },
