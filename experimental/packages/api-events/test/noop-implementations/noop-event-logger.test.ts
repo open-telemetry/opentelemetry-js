@@ -15,20 +15,20 @@
  */
 
 import * as assert from 'assert';
-import { NoopEventEmitter } from '../../src/NoopEventEmitter';
-import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
+import { NoopEventLogger } from '../../src/NoopEventLogger';
+import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 
-describe('NoopEventEmitter', () => {
+describe('NoopEventLogger', () => {
   it('constructor should not crash', () => {
-    const logger = new NoopEventEmitterProvider().getEventEmitter(
+    const logger = new NoopEventLoggerProvider().getEventLogger(
       'test-noop',
       'test-domain'
     );
-    assert(logger instanceof NoopEventEmitter);
+    assert(logger instanceof NoopEventLogger);
   });
 
   it('calling emit should not crash', () => {
-    const emitter = new NoopEventEmitterProvider().getEventEmitter(
+    const emitter = new NoopEventLoggerProvider().getEventLogger(
       'test-noop',
       'test-domain'
     );

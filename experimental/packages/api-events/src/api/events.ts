@@ -20,10 +20,10 @@ import {
   _global,
   makeGetter,
 } from '../internal/global-utils';
-import { EventEmitterProvider } from '../types/EventEmitterProvider';
-import { NOOP_EVENT_EMITTER_PROVIDER } from '../NoopEventEmitterProvider';
-import { EventEmitter } from '../types/EventEmitter';
-import { EventEmitterOptions } from '../types/EventEmitterOptions';
+import { EventLoggerProvider } from '../types/EventLoggerProvider';
+import { NOOP_EVENT_EMITTER_PROVIDER } from '../NoopEventLoggerProvider';
+import { EventLogger } from '../types/EventLogger';
+import { EventLoggerOptions } from '../types/EventLoggerOptions';
 
 export class EventsAPI {
   private static _instance?: EventsAPI;
@@ -38,14 +38,14 @@ export class EventsAPI {
     return this._instance;
   }
 
-  public setGlobalEventEmitterProvider(
-    provider: EventEmitterProvider
-  ): EventEmitterProvider {
+  public setGlobalEventLoggerProvider(
+    provider: EventLoggerProvider
+  ): EventLoggerProvider {
     if (_global[GLOBAL_EVENTS_API_KEY]) {
-      return this.getEventEmitterProvider();
+      return this.getEventLoggerProvider();
     }
 
-    _global[GLOBAL_EVENTS_API_KEY] = makeGetter<EventEmitterProvider>(
+    _global[GLOBAL_EVENTS_API_KEY] = makeGetter<EventLoggerProvider>(
       API_BACKWARDS_COMPATIBILITY_VERSION,
       provider,
       NOOP_EVENT_EMITTER_PROVIDER
@@ -57,9 +57,9 @@ export class EventsAPI {
   /**
    * Returns the global event emitter provider.
    *
-   * @returns EventEmitterProvider
+   * @returns EventLoggerProvider
    */
-  public getEventEmitterProvider(): EventEmitterProvider {
+  public getEventLoggerProvider(): EventLoggerProvider {
     return (
       _global[GLOBAL_EVENTS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
       NOOP_EVENT_EMITTER_PROVIDER
@@ -69,15 +69,15 @@ export class EventsAPI {
   /**
    * Returns a event emitter from the global event emitter provider.
    *
-   * @returns EventEmitter
+   * @returns EventLogger
    */
-  public getEventEmitter(
+  public getEventLogger(
     name: string,
     domain: string,
     version?: string,
-    options?: EventEmitterOptions
-  ): EventEmitter {
-    return this.getEventEmitterProvider().getEventEmitter(
+    options?: EventLoggerOptions
+  ): EventLogger {
+    return this.getEventLoggerProvider().getEventLogger(
       name,
       domain,
       version,
