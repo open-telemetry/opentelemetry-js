@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711022696100,
+  "lastUpdate": 1711022808380,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5632,6 +5632,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.19%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "65474404326d6ffbdd8e84799e88a46bfe66632a",
+          "message": "fix(sdk-logs): ensure default resource attributes are used as fallbacks when a resource is passed to LoggerProvider (#4564)\n\nBefore this Resource.default() attributes would only be used if *no*\r\nresource was given to LoggerProvider. That would mean that\r\n'service.name' and others could be missing, e.g. when called from\r\nNodeSDK.\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-21T13:05:01+01:00",
+          "tree_id": "8983cfab074fa517cf862c6cb5b14c8f95ab1cad",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/65474404326d6ffbdd8e84799e88a46bfe66632a"
+        },
+        "date": 1711022807539,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 899637,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11435,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 655935,
+            "range": "±0.89%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 651022,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
