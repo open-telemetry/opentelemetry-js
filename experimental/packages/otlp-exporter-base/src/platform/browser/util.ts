@@ -162,26 +162,39 @@ export function sendWithXhr(
     'Content-Type': 'application/json',
   };
 
-  compressContent(body, compressionAlgorithm)
-    .then(compressedContent => {
-      sendWithRetry(compressedContent, {
-        ...commonHeaders,
-        ...headers,
-        'Content-Encoding': compressionAlgorithm,
-      });
-    })
-    .catch(_error => {
-      sendWithRetry(body, {
-        ...commonHeaders,
-        ...headers,
-      });
+  if (compressionAlgorithm === CompressionAlgorithm.NONE) {
+    // Although this case is handled by the catch block below, we still had to
+    // call sendWithRetry here in a sync manner to get the unit tests to pass.
+    sendWithRetry(body, {
+      ...commonHeaders,
+      ...headers,
     });
+  } else {
+    compressContent(body, compressionAlgorithm)
+      .then(compressedContent => {
+        sendWithRetry(compressedContent, {
+          ...commonHeaders,
+          ...headers,
+          'Content-Encoding': compressionAlgorithm,
+        });
+      })
+      .catch(_error => {
+        sendWithRetry(body, {
+          ...commonHeaders,
+          ...headers,
+        });
+      });
+  }
 }
 
 async function compressContent(
   content: string | Blob,
   compressionAlgorithm: string
 ): Promise<Uint8Array> {
+  if (compressionAlgorithm === CompressionAlgorithm.NONE) {
+    return Promise.reject(new Error('Compression algorithm cannot be "none"'));
+  }
+
   const compressionStream = new CompressionStream(
     compressionAlgorithm as CompressionFormat
   );
