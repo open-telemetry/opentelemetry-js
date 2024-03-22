@@ -19,7 +19,6 @@ import {
   Sampler,
   SamplingResult,
 } from '../../../../packages/opentelemetry-sdk-trace-base/src/Sampler';
-import { globalErrorHandler } from '@opentelemetry/core';
 import { SpanKind } from '@opentelemetry/api/src/trace/span_kind';
 import { Link } from '@opentelemetry/api/src/trace/link';
 import { SpanAttributes } from '@opentelemetry/api/src/trace/attributes';
@@ -45,21 +44,6 @@ export class JaegerRemoteSampler implements Sampler {
     this._poolingInterval = config.poolingInterval;
     this._sampler = config.initialSampler;
     this._syncingConfig = false;
-    if (!this._endpoint) {
-      globalErrorHandler(
-        new Error('JaegerRemoteSampler must have a endpoint configured')
-      );
-    }
-    if (!this._poolingInterval) {
-      globalErrorHandler(
-        new Error('JaegerRemoteSampler must have a pooling interval configured')
-      );
-    }
-    if (!this._sampler) {
-      globalErrorHandler(
-        new Error('JaegerRemoteSampler must have a initial sampler configured')
-      );
-    }
 
     setInterval(async () => {
       if (this._syncingConfig) {
@@ -96,23 +80,21 @@ export class JaegerRemoteSampler implements Sampler {
     return `JaegerRemoteSampler${this._sampler}`;
   }
 
-  private async getAndUpdateSampler() {
+  async getAndUpdateSampler() {
     const newConfig = await this.getSamplerConfig(this._serviceName);
-    this._sampler = this.convertSamplingResponseToSampler(newConfig.data);
+    this._sampler = this.convertSamplingResponseToSampler(newConfig);
   }
 
-  private convertSamplingResponseToSampler(
-    newConfig: SamplingStrategyResponse
-  ) {
-    if (newConfig.operationSampling.perOperationStrategies.length > 0) {
+  convertSamplingResponseToSampler(newConfig: SamplingStrategyResponse) {
+    const perOperationStrategies = newConfig.operationSampling?.perOperationStrategies;
+    if (perOperationStrategies && perOperationStrategies.length > 0) {
       const defaultSampler: Sampler = new TraceIdRatioBasedSampler(
-        newConfig.operationSampling.defaultSamplingProbability
+        newConfig.operationSampling?.defaultSamplingProbability
       );
       return new ParentBasedSampler({
         root: new PerOperationSampler({
           defaultSampler,
-          perOperationStrategies:
-            newConfig.operationSampling.perOperationStrategies,
+          perOperationStrategies: newConfig.operationSampling?.perOperationStrategies ?? [],
         }),
       });
     }
@@ -128,11 +110,15 @@ export class JaegerRemoteSampler implements Sampler {
     }
   }
 
-  private async getSamplerConfig(serviceName?: string) {
+  async getSamplerConfig(serviceName?: string) {
     const response = await axios.get<SamplingStrategyResponse>(
       `${this._endpoint}/sampling?service=${serviceName ?? ''}`
     );
-    return response;
+    return response.data;
+  }
+
+  getCurrentSampler() {
+    return this._sampler;
   }
 }
 

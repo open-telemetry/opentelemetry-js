@@ -28,6 +28,7 @@
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-proto-exporter-base",
       "experimental/packages/otlp-transformer",
+      "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-logs",
       "experimental/packages/shim-opencensus",
       "packages/opentelemetry-context-async-hooks",
@@ -128,6 +129,9 @@
     },
     {
       "path": "experimental/packages/otlp-transformer"
+    },
+    {
+      "path": "experimental/packages/sampler-jaeger-remote"
     },
     {
       "path": "experimental/packages/sdk-logs"

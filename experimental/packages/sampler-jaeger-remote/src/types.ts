@@ -32,7 +32,7 @@ export interface PerOperationStrategy {
 export interface SamplingStrategyResponse {
   strategyType: StrategyType;
   probabilisticSampling: ProbabilisticSamplingOptions;
-  operationSampling: {
+  operationSampling?: {
     defaultSamplingProbability: number;
     defaultLowerBoundTracesPerSecond: number;
     perOperationStrategies: PerOperationStrategy[];
