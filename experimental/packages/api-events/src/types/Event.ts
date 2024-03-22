@@ -15,6 +15,7 @@
  */
 
 import { Attributes } from '@opentelemetry/api';
+import { LogAttributeValue } from '@opentelemetry/api-logs';
 
 export interface Event {
   /**
@@ -26,6 +27,12 @@ export interface Event {
    * The name of the event.
    */
   name: string;
+
+  /**
+   * Attributes that describe the event.
+   * Intended to be used by instrumentation libraries.
+   */
+  data?: LogAttributeValue;
 
   /**
    * Additional attributes that describe the event.

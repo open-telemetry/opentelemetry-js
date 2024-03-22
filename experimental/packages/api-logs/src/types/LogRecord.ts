@@ -73,7 +73,7 @@ export interface LogRecord {
   /**
    * A value containing the body of the log record.
    */
-  body?: string;
+  body?: LogAttributeValue;
 
   /**
    * Attributes that define the log record.
