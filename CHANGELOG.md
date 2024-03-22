@@ -11,7 +11,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes
+* perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes
 
 ### :bug: (Bug Fix)
 
