@@ -17,7 +17,11 @@
 import type { IResource } from '@opentelemetry/resources';
 import type { HrTime, SpanContext } from '@opentelemetry/api';
 import type { InstrumentationScope } from '@opentelemetry/core';
-import type { LogAttributeValue, LogAttributes, SeverityNumber } from '@opentelemetry/api-logs';
+import type {
+  LogAttributeValue,
+  LogAttributes,
+  SeverityNumber,
+} from '@opentelemetry/api-logs';
 
 export interface ReadableLogRecord {
   readonly hrTime: HrTime;
