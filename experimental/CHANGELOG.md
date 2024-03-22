@@ -22,6 +22,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
+
 ### :bug: (Bug Fix)
 
 * fix(exporter-*-otlp-*): use parseHeaders() to ensure header-values are not 'undefined' #4540
