@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Context, MetricAttributes } from '@opentelemetry/api';
 
 export type CommonReaderOptions = {
   timeoutMillis?: number;
@@ -23,3 +24,13 @@ export type CollectionOptions = CommonReaderOptions;
 export type ShutdownOptions = CommonReaderOptions;
 
 export type ForceFlushOptions = CommonReaderOptions;
+
+// NOTE: This is here because of the strange dependency on api?
+export interface Gauge<
+  AttributesTypes extends MetricAttributes = MetricAttributes,
+> {
+  /**
+   * Records a measurement. Value of the measurement must not be negative.
+   */
+  record(value: number, attributes?: AttributesTypes, context?: Context): void;
+}
