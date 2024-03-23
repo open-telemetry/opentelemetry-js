@@ -167,11 +167,8 @@ export const isIgnored = (
 export const setSpanWithError = (span: Span, error: Err): void => {
   const message = error.message;
 
-  span.setAttributes({
-    [AttributeNames.HTTP_ERROR_NAME]: error.name,
-    [AttributeNames.HTTP_ERROR_MESSAGE]: message,
-  });
-
+  span.setAttribute(AttributeNames.HTTP_ERROR_NAME, error.name);
+  span.setAttribute(AttributeNames.HTTP_ERROR_MESSAGE, message);
   span.setStatus({ code: SpanStatusCode.ERROR, message });
   span.recordException(error);
 };
@@ -371,7 +368,7 @@ export const getOutgoingRequestAttributes = (
     [SEMATTRS_HTTP_METHOD]: method,
     [SEMATTRS_HTTP_TARGET]: requestOptions.path || '/',
     [SEMATTRS_NET_PEER_NAME]: hostname,
-    [SEMATTRS_HTTP_HOST]: requestOptions.headers?.host ?? `${hostname}:${port}`,
+    [SEMATTRS_HTTP_HOST]: headers.host ?? `${hostname}:${port}`,
   };
 
   if (userAgent !== undefined) {
@@ -399,8 +396,10 @@ export const getOutgoingRequestMetricAttributes = (
  * Returns attributes related to the kind of HTTP protocol used
  * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
  */
-export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
-  const attributes: SpanAttributes = {};
+export const setAttributesFromHttpKind = (
+  kind: string | undefined,
+  attributes: SpanAttributes
+): void => {
   if (kind) {
     attributes[SEMATTRS_HTTP_FLAVOR] = kind;
     if (kind.toUpperCase() !== 'QUIC') {
@@ -409,7 +408,6 @@ export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
       attributes[SEMATTRS_NET_TRANSPORT] = NETTRANSPORTVALUES_IP_UDP;
     }
   }
-  return attributes;
 };
 
 /**
@@ -436,8 +434,8 @@ export const getOutgoingRequestAttributesOnResponse = (
     ).toUpperCase();
   }
 
-  const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-  return Object.assign(attributes, httpKindAttributes);
+  setAttributesFromHttpKind(httpVersion, attributes);
+  return attributes;
 };
 
 /**
@@ -509,9 +507,8 @@ export const getIncomingRequestAttributes = (
     attributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
   setRequestContentLengthAttribute(request, attributes);
-
-  const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-  return Object.assign(attributes, httpKindAttributes, options.hookAttributes);
+  setAttributesFromHttpKind(httpVersion, attributes);
+  return Object.assign(attributes, options.hookAttributes);
 };
 
 /**
@@ -584,24 +581,24 @@ export const getIncomingRequestMetricAttributesOnResponse = (
 };
 
 export function headerCapture(type: 'request' | 'response', headers: string[]) {
-  const normalizedHeaders = new Map(
-    headers.map(header => [
-      header.toLowerCase(),
-      header.toLowerCase().replace(/-/g, '_'),
-    ])
-  );
+  const normalizedHeaders = new Map<string, string>();
+  for (let i = 0, len = headers.length; i < len; i++) {
+    const capturedHeader = headers[i].toLowerCase();
+    normalizedHeaders.set(capturedHeader, capturedHeader.replace(/-/g, '_'));
+  }
 
   return (
     span: Span,
     getHeader: (key: string) => undefined | string | string[] | number
   ) => {
-    for (const [capturedHeader, normalizedHeader] of normalizedHeaders) {
+    for (const capturedHeader of normalizedHeaders.keys()) {
       const value = getHeader(capturedHeader);
 
       if (value === undefined) {
         continue;
       }
 
+      const normalizedHeader = normalizedHeaders.get(capturedHeader);
       const key = `http.${type}.header.${normalizedHeader}`;
 
       if (typeof value === 'string') {
