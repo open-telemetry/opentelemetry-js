@@ -19,10 +19,13 @@ All notable changes to experimental packages in this project will be documented 
       * was used internally to keep track of the service client used by the exporter, as a side effect it allowed end-users to modify the gRPC service client that was used
     * `compression`
       * was used internally to keep track of the compression to use but was unintentionally exposed to the users. It allowed to read and write the value, writing, however, would have no effect.
+* feat(api-events)!: removed domain from the Events API [#4569](https://github.com/open-telemetry/opentelemetry-js/pull/4569)
 
 ### :rocket: (Enhancement)
 
+* refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
 * feat(sdk-node): add `HostDetector` as default resource detector
+
 
 ### :bug: (Bug Fix)
 
