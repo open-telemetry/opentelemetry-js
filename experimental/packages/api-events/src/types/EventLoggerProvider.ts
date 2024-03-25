@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-import { EventEmitter } from './EventEmitter';
-import { EventEmitterOptions } from './EventEmitterOptions';
+import { EventLogger } from './EventLogger';
+import { EventLoggerOptions } from './EventLoggerOptions';
 
 /**
- * A registry for creating named {@link EventEmitter}s.
+ * A registry for creating named {@link EventLogger}s.
  */
-export interface EventEmitterProvider {
+export interface EventLoggerProvider {
   /**
-   * Returns an EventEmitter, creating one if one with the given name, version, and
+   * Returns an EventLogger, creating one if one with the given name, version, and
    * schemaUrl pair is not already created.
    *
-   * @param name The name of the event emitter or instrumentation library.
-   * @param version The version of the event emitter or instrumentation library.
-   * @param options The options of the event emitter or instrumentation library.
-   * @returns EventEmitter An event emitter with the given name and version.
+   * @param name The name of the event logger or instrumentation library.
+   * @param version The version of the event logger or instrumentation library.
+   * @param options The options of the event logger or instrumentation library.
+   * @returns EventLogger An event logger with the given name and version.
    */
-  getEventEmitter(
+  getEventLogger(
     name: string,
     version?: string,
-    options?: EventEmitterOptions
-  ): EventEmitter;
+    options?: EventLoggerOptions
+  ): EventLogger;
 }
