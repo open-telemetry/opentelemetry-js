@@ -17,7 +17,11 @@ import type { IAnyValue, IKeyValue } from './types';
 import { Attributes } from '@opentelemetry/api';
 
 export function toAttributes(attributes: Attributes): IKeyValue[] {
-  return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
+  const result = [];
+  for (const key in attributes) {
+    result.push(toKeyValue(key, attributes[key]));
+  }
+  return result;
 }
 
 export function toKeyValue(key: string, value: unknown): IKeyValue {
