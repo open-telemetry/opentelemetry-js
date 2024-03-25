@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711381367316,
+  "lastUpdate": 1711384628945,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5892,6 +5892,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.16%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f6a075be3204befa970cd4b7d6101419ee5d562e",
+          "message": "Rename EventEmitter to EventLogger in the Events API (#4568)\n\n* renamed EventEmitter to EventLogger\r\n\r\n* updated changelog\r\n\r\n* renamed remaining references to emitter\r\n\r\n* lint",
+          "timestamp": "2024-03-25T17:35:20+01:00",
+          "tree_id": "d84bcee473ce315bddf1df07f9cc9b92966de365",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f6a075be3204befa970cd4b7d6101419ee5d562e"
+        },
+        "date": 1711384628049,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 907554,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11361,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 667433,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 642835,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
