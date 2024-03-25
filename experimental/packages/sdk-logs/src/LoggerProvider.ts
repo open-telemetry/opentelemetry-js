@@ -33,15 +33,14 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
   private readonly _sharedState: LoggerProviderSharedState;
 
   constructor(config: LoggerProviderConfig = {}) {
-    const {
-      resource = Resource.default(),
-      logRecordLimits,
-      forceFlushTimeoutMillis,
-    } = merge({}, loadDefaultConfig(), config);
+    const mergedConfig = merge({}, loadDefaultConfig(), config);
+    const resource = Resource.default().merge(
+      mergedConfig.resource ?? Resource.empty()
+    );
     this._sharedState = new LoggerProviderSharedState(
       resource,
-      forceFlushTimeoutMillis,
-      reconfigureLimits(logRecordLimits)
+      mergedConfig.forceFlushTimeoutMillis,
+      reconfigureLimits(mergedConfig.logRecordLimits)
     );
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
