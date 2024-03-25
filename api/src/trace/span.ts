@@ -81,6 +81,7 @@ export interface Span {
    * Adds a single link to the span.
    *
    * Links added after the creation will not affect the sampling decision.
+   * It is preferred span links be added at span creation.
    *
    * @param link the link to add.
    */
@@ -90,6 +91,7 @@ export interface Span {
    * Adds multiple links to the span.
    *
    * Links added after the creation will not affect the sampling decision.
+   * It is preferred span links be added at span creation.
    *
    * @param links the links to add.
    */
