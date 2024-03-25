@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-trace-web): fix invalid timings in span events [#4486](https://github.com/open-telemetry/opentelemetry-js/pull/4486) @Abinet18
