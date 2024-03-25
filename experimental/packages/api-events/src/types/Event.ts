@@ -17,6 +17,8 @@
 import { Attributes } from '@opentelemetry/api';
 import { LogAttributeValue } from '@opentelemetry/api-logs';
 
+export type EventDataValue = LogAttributeValue;
+
 export interface Event {
   /**
    * The time when the event occurred as UNIX Epoch time in nanoseconds.
@@ -29,10 +31,10 @@ export interface Event {
   name: string;
 
   /**
-   * Attributes that describe the event.
+   * Data that describes the event.
    * Intended to be used by instrumentation libraries.
    */
-  data?: LogAttributeValue;
+  data?: EventDataValue;
 
   /**
    * Additional attributes that describe the event.
