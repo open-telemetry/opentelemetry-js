@@ -22,7 +22,6 @@ import { NoopEventLogger } from './NoopEventLogger';
 export class NoopEventLoggerProvider implements EventLoggerProvider {
   getEventLogger(
     _name: string,
-    _domain: string,
     _version?: string | undefined,
     _options?: EventLoggerOptions | undefined
   ): EventLogger {

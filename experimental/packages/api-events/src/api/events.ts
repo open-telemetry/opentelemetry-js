@@ -73,13 +73,11 @@ export class EventsAPI {
    */
   public getEventLogger(
     name: string,
-    domain: string,
     version?: string,
     options?: EventLoggerOptions
   ): EventLogger {
     return this.getEventLoggerProvider().getEventLogger(
       name,
-      domain,
       version,
       options
     );

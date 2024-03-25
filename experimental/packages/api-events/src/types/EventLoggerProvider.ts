@@ -26,14 +26,12 @@ export interface EventLoggerProvider {
    * schemaUrl pair is not already created.
    *
    * @param name The name of the event logger or instrumentation library.
-   * @param domain The domain for events created by the event logger.
    * @param version The version of the event logger or instrumentation library.
    * @param options The options of the event logger or instrumentation library.
    * @returns EventLogger An event logger with the given name and version.
    */
   getEventLogger(
     name: string,
-    domain: string,
     version?: string,
     options?: EventLoggerOptions
   ): EventLogger;

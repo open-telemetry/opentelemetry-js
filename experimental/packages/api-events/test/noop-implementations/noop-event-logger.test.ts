@@ -22,7 +22,6 @@ describe('NoopEventLogger', () => {
   it('constructor should not crash', () => {
     const logger = new NoopEventLoggerProvider().getEventLogger(
       'test-noop',
-      'test-domain'
     );
     assert(logger instanceof NoopEventLogger);
   });
@@ -30,7 +29,6 @@ describe('NoopEventLogger', () => {
   it('calling emit should not crash', () => {
     const logger = new NoopEventLoggerProvider().getEventLogger(
       'test-noop',
-      'test-domain'
     );
     logger.emit({
       name: 'event name',

@@ -39,7 +39,7 @@ api.events.getEventLoggerProvider();
 const eventLogger = api.events.getEventLogger(name, version);
 
 // logging an event in an instrumentation library
-eventLogger.emit({ name: 'event-name', domain: 'event-domain' });
+eventLogger.emit({ name: 'event-name' });
 ```
 
 ## Useful links

@@ -37,7 +37,7 @@ describe('API', () => {
       events.setGlobalEventLoggerProvider(new TestEventLoggerProvider());
       const eventLogger = events
         .getEventLoggerProvider()
-        .getEventLogger('name', 'domain');
+        .getEventLogger('name');
       assert.deepStrictEqual(eventLogger, dummyEventLogger);
     });
 
@@ -58,7 +58,7 @@ describe('API', () => {
 
     it('should return a event logger instance from global provider', () => {
       events.setGlobalEventLoggerProvider(new TestEventLoggerProvider());
-      const eventLogger = events.getEventLogger('myEventLogger', 'domain');
+      const eventLogger = events.getEventLogger('myEventLogger');
       assert.deepStrictEqual(eventLogger, dummyEventLogger);
     });
   });
