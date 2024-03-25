@@ -76,11 +76,7 @@ export class EventsAPI {
     version?: string,
     options?: EventLoggerOptions
   ): EventLogger {
-    return this.getEventLoggerProvider().getEventLogger(
-      name,
-      version,
-      options
-    );
+    return this.getEventLoggerProvider().getEventLogger(name, version, options);
   }
 
   /** Remove the global event logger provider */

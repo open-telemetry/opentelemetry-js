@@ -20,16 +20,12 @@ import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 
 describe('NoopEventLogger', () => {
   it('constructor should not crash', () => {
-    const logger = new NoopEventLoggerProvider().getEventLogger(
-      'test-noop',
-    );
+    const logger = new NoopEventLoggerProvider().getEventLogger('test-noop');
     assert(logger instanceof NoopEventLogger);
   });
 
   it('calling emit should not crash', () => {
-    const logger = new NoopEventLoggerProvider().getEventLogger(
-      'test-noop',
-    );
+    const logger = new NoopEventLoggerProvider().getEventLogger('test-noop');
     logger.emit({
       name: 'event name',
     });

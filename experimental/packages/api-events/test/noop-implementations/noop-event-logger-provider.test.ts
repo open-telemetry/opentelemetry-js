@@ -27,10 +27,8 @@ describe('NoopLoggerProvider', () => {
         NoopEventLogger
     );
     assert.ok(
-      eventLoggerProvider.getEventLogger(
-        'logger-name',
-        'v1'
-      ) instanceof NoopEventLogger
+      eventLoggerProvider.getEventLogger('logger-name', 'v1') instanceof
+        NoopEventLogger
     );
     assert.ok(
       eventLoggerProvider.getEventLogger('logger-name', 'v1', {
