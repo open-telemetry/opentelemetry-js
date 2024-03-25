@@ -26,22 +26,11 @@ import {
 
 /* eslint-disable no-console */
 describe('ConsoleLogRecordExporter', () => {
-  let previousConsoleDir: typeof console.dir;
-
-  beforeEach(() => {
-    previousConsoleDir = console.dir;
-    console.dir = () => {};
-  });
-
-  afterEach(() => {
-    console.dir = previousConsoleDir;
-  });
-
   describe('export', () => {
     it('should export information about log record', () => {
       assert.doesNotThrow(() => {
         const consoleExporter = new ConsoleLogRecordExporter();
-        const spyConsole = sinon.spy(console, 'dir');
+        const spyConsole = sinon.stub(console, 'dir');
         const spyExport = sinon.spy(consoleExporter, 'export');
         const provider = new LoggerProvider();
         provider.addLogRecordProcessor(

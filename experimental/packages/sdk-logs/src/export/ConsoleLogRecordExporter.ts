@@ -17,6 +17,7 @@
 import { ExportResult, hrTimeToMicroseconds } from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 
+import type { ConsoleLogRecordExporterConfig } from '../types';
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
 
@@ -27,6 +28,15 @@ import type { LogRecordExporter } from './LogRecordExporter';
 
 /* eslint-disable no-console */
 export class ConsoleLogRecordExporter implements LogRecordExporter {
+  private _dirOpts: {
+    depth: number;
+    colors?: boolean;
+  } = { depth: 3 };
+
+  constructor(config: ConsoleLogRecordExporterConfig = {}) {
+    if (typeof config.colors !== 'undefined')
+      this._dirOpts.colors = config.colors;
+  }
   /**
    * Export logs.
    * @param logs
@@ -73,7 +83,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const logRecord of logRecords) {
-      console.dir(this._exportInfo(logRecord), { depth: 3 });
+      console.dir(this._exportInfo(logRecord), this._dirOpts);
     }
     done?.({ code: ExportResultCode.SUCCESS });
   }

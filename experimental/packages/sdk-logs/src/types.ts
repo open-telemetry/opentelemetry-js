@@ -62,3 +62,8 @@ export interface BatchLogRecordProcessorBrowserConfig extends BufferConfig {
    * on mobile, switches to a different app. Auto flush is enabled by default. */
   disableAutoFlushOnDocumentHide?: boolean;
 }
+
+export interface ConsoleLogRecordExporterConfig {
+  /** Force colorization of console logs instead of relying on detection */
+  colors?: boolean;
+}

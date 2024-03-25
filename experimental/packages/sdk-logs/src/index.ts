@@ -19,6 +19,7 @@ export {
   LogRecordLimits,
   BufferConfig,
   BatchLogRecordProcessorBrowserConfig,
+  ConsoleLogRecordExporterConfig,
 } from './types';
 export { LoggerProvider } from './LoggerProvider';
 export { LogRecord } from './LogRecord';
