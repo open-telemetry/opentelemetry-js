@@ -25,11 +25,11 @@ export interface EventLoggerProvider {
    * Returns an EventLogger, creating one if one with the given name, version, and
    * schemaUrl pair is not already created.
    *
-   * @param name The name of the event emitter or instrumentation library.
-   * @param domain The domain for events created by the event emitter.
-   * @param version The version of the event emitter or instrumentation library.
-   * @param options The options of the event emitter or instrumentation library.
-   * @returns EventLogger An event emitter with the given name and version.
+   * @param name The name of the event logger or instrumentation library.
+   * @param domain The domain for events created by the event logger.
+   * @param version The version of the event logger or instrumentation library.
+   * @param options The options of the event logger or instrumentation library.
+   * @returns EventLogger An event logger with the given name and version.
    */
   getEventLogger(
     name: string,

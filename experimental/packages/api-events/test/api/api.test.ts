@@ -22,7 +22,7 @@ import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 describe('API', () => {
   const dummyEventLogger = new NoopEventLogger();
 
-  it('should expose a event emitter provider via getEventLoggerProvider', () => {
+  it('should expose a event logger provider via getEventLoggerProvider', () => {
     const provider = events.getEventLoggerProvider();
     assert.ok(provider);
     assert.strictEqual(typeof provider, 'object');
@@ -33,7 +33,7 @@ describe('API', () => {
       events.disable();
     });
 
-    it('should use the global event emitter provider', () => {
+    it('should use the global event logger provider', () => {
       events.setGlobalEventLoggerProvider(new TestEventLoggerProvider());
       const eventLogger = events
         .getEventLoggerProvider()
@@ -56,7 +56,7 @@ describe('API', () => {
       events.disable();
     });
 
-    it('should return a event emitter instance from global provider', () => {
+    it('should return a event logger instance from global provider', () => {
       events.setGlobalEventLoggerProvider(new TestEventLoggerProvider());
       const eventLogger = events.getEventLogger('myEventLogger', 'domain');
       assert.deepStrictEqual(eventLogger, dummyEventLogger);

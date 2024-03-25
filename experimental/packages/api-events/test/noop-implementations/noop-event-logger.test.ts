@@ -28,11 +28,11 @@ describe('NoopEventLogger', () => {
   });
 
   it('calling emit should not crash', () => {
-    const emitter = new NoopEventLoggerProvider().getEventLogger(
+    const logger = new NoopEventLoggerProvider().getEventLogger(
       'test-noop',
       'test-domain'
     );
-    emitter.emit({
+    logger.emit({
       name: 'event name',
     });
   });

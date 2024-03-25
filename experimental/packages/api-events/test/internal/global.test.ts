@@ -43,7 +43,7 @@ describe('Global Utils', () => {
     api2.events.disable();
   });
 
-  it('should change the global event emitter provider', () => {
+  it('should change the global event logger provider', () => {
     const original = api1.events.getEventLoggerProvider();
     const newEventLoggerProvider = new NoopEventLoggerProvider();
     api1.events.setGlobalEventLoggerProvider(newEventLoggerProvider);

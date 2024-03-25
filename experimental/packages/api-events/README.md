@@ -35,7 +35,7 @@ const eventLoggerProvider = createEventLoggerProvider();
 api.events.setGlobalEventLoggerProvider(eventLoggerProvider);
 /* returns eventLoggerProvider (no-op if a working provider has not been initialized) */
 api.events.getEventLoggerProvider();
-/* returns an event emitter from the registered global event emitter provider (no-op if a working provider has not been initialized) */
+/* returns an event logger from the registered global event logger provider (no-op if a working provider has not been initialized) */
 const eventLogger = api.events.getEventLogger(name, version);
 
 // logging an event in an instrumentation library

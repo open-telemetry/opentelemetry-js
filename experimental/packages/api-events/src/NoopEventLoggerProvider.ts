@@ -30,4 +30,4 @@ export class NoopEventLoggerProvider implements EventLoggerProvider {
   }
 }
 
-export const NOOP_EVENT_EMITTER_PROVIDER = new NoopEventLoggerProvider();
+export const NOOP_EVENT_LOGGER_PROVIDER = new NoopEventLoggerProvider();

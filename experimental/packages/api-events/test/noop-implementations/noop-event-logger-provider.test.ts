@@ -23,18 +23,18 @@ describe('NoopLoggerProvider', () => {
     const eventLoggerProvider = new NoopEventLoggerProvider();
 
     assert.ok(
-      eventLoggerProvider.getEventLogger('emitter-name', 'domain') instanceof
+      eventLoggerProvider.getEventLogger('logger-name', 'domain') instanceof
         NoopEventLogger
     );
     assert.ok(
       eventLoggerProvider.getEventLogger(
-        'emitter-name',
+        'logger-name',
         'domain',
         'v1'
       ) instanceof NoopEventLogger
     );
     assert.ok(
-      eventLoggerProvider.getEventLogger('emitter-name', 'domain', 'v1', {
+      eventLoggerProvider.getEventLogger('logger-name', 'domain', 'v1', {
         schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
       }) instanceof NoopEventLogger
     );

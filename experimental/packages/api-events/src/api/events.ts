@@ -21,7 +21,7 @@ import {
   makeGetter,
 } from '../internal/global-utils';
 import { EventLoggerProvider } from '../types/EventLoggerProvider';
-import { NOOP_EVENT_EMITTER_PROVIDER } from '../NoopEventLoggerProvider';
+import { NOOP_EVENT_LOGGER_PROVIDER } from '../NoopEventLoggerProvider';
 import { EventLogger } from '../types/EventLogger';
 import { EventLoggerOptions } from '../types/EventLoggerOptions';
 
@@ -48,26 +48,26 @@ export class EventsAPI {
     _global[GLOBAL_EVENTS_API_KEY] = makeGetter<EventLoggerProvider>(
       API_BACKWARDS_COMPATIBILITY_VERSION,
       provider,
-      NOOP_EVENT_EMITTER_PROVIDER
+      NOOP_EVENT_LOGGER_PROVIDER
     );
 
     return provider;
   }
 
   /**
-   * Returns the global event emitter provider.
+   * Returns the global event logger provider.
    *
    * @returns EventLoggerProvider
    */
   public getEventLoggerProvider(): EventLoggerProvider {
     return (
       _global[GLOBAL_EVENTS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_EVENT_EMITTER_PROVIDER
+      NOOP_EVENT_LOGGER_PROVIDER
     );
   }
 
   /**
-   * Returns a event emitter from the global event emitter provider.
+   * Returns a event logger from the global event logger provider.
    *
    * @returns EventLogger
    */
@@ -85,7 +85,7 @@ export class EventsAPI {
     );
   }
 
-  /** Remove the global event emitter provider */
+  /** Remove the global event logger provider */
   public disable(): void {
     delete _global[GLOBAL_EVENTS_API_KEY];
   }
