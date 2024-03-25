@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711358055067,
+  "lastUpdate": 1711381367316,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5840,6 +5840,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.14%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "maryliag@gmail.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "97af8e6d4d6312fec84817e7b35c182e008461f1",
+          "message": "feat(sdk-node): add `HostDetector` as default resource detector (#4566)\n\n* feat(node-sdk): add `HostDetector` as default resource detector\r\n\r\nFixes #4282\r\n\r\n- Add `HostDetector` to the list of default resource detectors\r\n- Add test to make sure host and process values are being set by default\r\n- Update from deprecated `sdk.detectResources()` to `sdk.start()` on tests\r\n- Update from deprecated `SemanticResourceAttributes.SERVICE_NAME` to `SEMRESATTRS_SERVICE_NAME` on SDK file\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\n* fix lint\r\n\r\nremove extra lint causing lint error\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-25T16:40:56+01:00",
+          "tree_id": "c52abc9a5a743ceac8d565b07def6e6cf8b8883d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/97af8e6d4d6312fec84817e7b35c182e008461f1"
+        },
+        "date": 1711381366523,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 914863,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11667,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 642380,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 664262,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
