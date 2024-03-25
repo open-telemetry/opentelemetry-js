@@ -22,7 +22,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat(node-sdk): add `HostDetector` as default resource detector
+* feat(sdk-node): add `HostDetector` as default resource detector
 
 ### :bug: (Bug Fix)
 
