@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711357528498,
+  "lastUpdate": 1711358055067,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5788,6 +5788,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.35%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fec6286127129ec0082e5dd080242501f15ea0af",
+          "message": "Remove domain from the Events API (#4569)\n\n* removed domain from the events API\r\n\r\n* lint\r\n\r\n* updated changelog\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-25T10:12:25+01:00",
+          "tree_id": "3767bf49143fb3753f7099e3d2912fa4c9de2587",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/fec6286127129ec0082e5dd080242501f15ea0af"
+        },
+        "date": 1711358054226,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 896581,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11416,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 661369,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 637170,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
