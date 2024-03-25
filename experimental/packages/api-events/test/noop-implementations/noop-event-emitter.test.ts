@@ -20,18 +20,12 @@ import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
 
 describe('NoopEventEmitter', () => {
   it('constructor should not crash', () => {
-    const logger = new NoopEventEmitterProvider().getEventEmitter(
-      'test-noop',
-      'test-domain'
-    );
+    const logger = new NoopEventEmitterProvider().getEventEmitter('test-noop');
     assert(logger instanceof NoopEventEmitter);
   });
 
   it('calling emit should not crash', () => {
-    const emitter = new NoopEventEmitterProvider().getEventEmitter(
-      'test-noop',
-      'test-domain'
-    );
+    const emitter = new NoopEventEmitterProvider().getEventEmitter('test-noop');
     emitter.emit({
       name: 'event name',
     });
