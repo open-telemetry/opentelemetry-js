@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711124375751,
+  "lastUpdate": 1711357528498,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -5736,6 +5736,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "Samuron@users.noreply.github.com",
+            "name": "Ievgen Makukh",
+            "username": "Samuron"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5fb65b4145eb90b868a90a566d632e788a293b32",
+          "message": "perf(export): do not allocate arrays if resource has no pending async attributes (#4550)\n\n* perf(eport): do not allocate arrays if resource has no pending async attributes\r\n\r\n* perf(export): do not use splice if fit in one batch\r\n\r\n* Update CHANGELOG.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-25T10:03:41+01:00",
+          "tree_id": "c6002ea0735debc4350398aac8e71b3ae8c47899",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5fb65b4145eb90b868a90a566d632e788a293b32"
+        },
+        "date": 1711357527635,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 855010,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11224,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 660417,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 653603,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
