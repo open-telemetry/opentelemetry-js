@@ -29,14 +29,12 @@ import {
   OTLPExporterBase,
   OTLPExporterConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
 
 class OTLPMetricExporter extends OTLPExporterBase<
   CollectorExporterConfig,
-  ResourceMetrics,
-  IExportMetricsServiceRequest
+  ResourceMetrics
 > {
   onInit() {}
 
@@ -46,10 +44,6 @@ class OTLPMetricExporter extends OTLPExporterBase<
 
   getDefaultUrl(config: CollectorExporterConfig) {
     return config.url || '';
-  }
-
-  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return { resourceMetrics: [] };
   }
 }
 

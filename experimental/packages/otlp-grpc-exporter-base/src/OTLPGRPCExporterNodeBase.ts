@@ -35,13 +35,8 @@ import { IExporterTransport } from './exporter-transport';
  */
 export abstract class OTLPGRPCExporterNodeBase<
   ExportItem,
-  ServiceRequest,
   ServiceResponse,
-> extends OTLPExporterBase<
-  OTLPGRPCExporterConfigNode,
-  ExportItem,
-  ServiceRequest
-> {
+> extends OTLPExporterBase<OTLPGRPCExporterConfigNode, ExportItem> {
   grpcQueue: GRPCQueueItem<ExportItem>[] = [];
   compression: CompressionAlgorithm;
   private _transport: IExporterTransport;
@@ -112,11 +107,6 @@ export abstract class OTLPGRPCExporterNodeBase<
 
   override onShutdown() {
     this._transport.shutdown();
-  }
-
-  override convert(_objects: ExportItem[]): ServiceRequest {
-    // Not used, nothing to do.
-    return {} as ServiceRequest;
   }
 
   send(

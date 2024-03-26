@@ -23,7 +23,6 @@ import {
   DEFAULT_COLLECTOR_URL,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
-  IExportTraceServiceRequest,
   IExportTraceServiceResponse,
   ProtobufTraceSerializer,
 } from '@opentelemetry/otlp-transformer';
@@ -37,11 +36,7 @@ const USER_AGENT = {
  * OTLP Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPGRPCExporterNodeBase<
-    ReadableSpan,
-    IExportTraceServiceRequest,
-    IExportTraceServiceResponse
-  >
+  extends OTLPGRPCExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
   implements SpanExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {

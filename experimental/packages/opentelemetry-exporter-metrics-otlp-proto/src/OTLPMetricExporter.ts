@@ -26,7 +26,6 @@ import {
   OTLPExporterNodeBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  IExportMetricsServiceRequest,
   IExportMetricsServiceResponse,
   ProtobufMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
@@ -40,7 +39,6 @@ const USER_AGENT = {
 
 class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest,
   IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {

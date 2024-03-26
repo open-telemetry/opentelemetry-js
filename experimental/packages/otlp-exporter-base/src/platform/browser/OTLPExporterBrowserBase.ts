@@ -28,9 +28,8 @@ import { ISerializer } from '@opentelemetry/otlp-transformer';
  */
 export abstract class OTLPExporterBrowserBase<
   ExportItem,
-  ServiceRequest,
   ServiceResponse,
-> extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
+> extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem> {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
   private _contentType: string;
@@ -67,12 +66,6 @@ export abstract class OTLPExporterBrowserBase<
   onInit(): void {}
 
   onShutdown(): void {}
-
-  override convert(_objects: ExportItem[]): ServiceRequest {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore nothing to do
-    return {};
-  }
 
   send(
     items: ExportItem[],

@@ -26,7 +26,6 @@ import {
   appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  IExportTraceServiceRequest,
   IExportTraceServiceResponse,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
@@ -42,11 +41,7 @@ const USER_AGENT = {
  * Collector Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<
-    ReadableSpan,
-    IExportTraceServiceRequest,
-    IExportTraceServiceResponse
-  >
+  extends OTLPExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
