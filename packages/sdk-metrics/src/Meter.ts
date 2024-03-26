@@ -25,6 +25,8 @@ import {
   ObservableUpDownCounter,
   BatchObservableCallback,
   Observable,
+  Attributes,
+  Gauge,
 } from '@opentelemetry/api';
 import {
   createInstrumentDescriptor,
@@ -32,6 +34,7 @@ import {
 } from './InstrumentDescriptor';
 import {
   CounterInstrument,
+  GaugeInstrument,
   HistogramInstrument,
   ObservableCounterInstrument,
   ObservableGaugeInstrument,
@@ -45,6 +48,22 @@ import { MeterSharedState } from './state/MeterSharedState';
  */
 export class Meter implements IMeter {
   constructor(private _meterSharedState: MeterSharedState) {}
+
+  /**
+   * Create a {@link Gauge} instrument.
+   */
+  createGauge<AttributesTypes extends Attributes = Attributes>(
+    name: string,
+    options?: MetricOptions
+  ): Gauge<AttributesTypes> {
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.GAUGE,
+      options
+    );
+    const storage = this._meterSharedState.registerMetricStorage(descriptor);
+    return new GaugeInstrument(storage, descriptor);
+  }
 
   /**
    * Create a {@link Histogram} instrument.
