@@ -66,6 +66,9 @@
       "path": "packages/opentelemetry-exporter-zipkin/tsconfig.esnext.json"
     },
     {
+      "path": "packages/opentelemetry-propagator-aws-xray/tsconfig.esnext.json"
+    },
+    {
       "path": "packages/opentelemetry-propagator-b3/tsconfig.esnext.json"
     },
     {

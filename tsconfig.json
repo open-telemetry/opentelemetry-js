@@ -36,6 +36,7 @@
       "packages/opentelemetry-core",
       "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
+      "packages/opentelemetry-propagator-aws-xray",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
@@ -152,6 +153,9 @@
     },
     {
       "path": "packages/opentelemetry-exporter-zipkin"
+    },
+    {
+      "path": "packages/opentelemetry-propagator-aws-xray"
     },
     {
       "path": "packages/opentelemetry-propagator-b3"
