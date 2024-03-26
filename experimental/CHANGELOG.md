@@ -26,6 +26,7 @@ and AnyValueMap types [#4575](https://github.com/open-telemetry/opentelemetry-js
 
 ### :rocket: (Enhancement)
 
+* feat(metrics): added synchronous gauge to SDK [#4565](https://github.com/open-telemetry/opentelemetry-js/pull/4565) @clintonb
 * feat(opentelemetry-instrumentation-xhr): optionally ignore network events [#4571](https://github.com/open-telemetry/opentelemetry-js/pull/4571/) @mustafahaddara
 * refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
 * perf(instrumentation-http): remove obvious temp allocations [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron

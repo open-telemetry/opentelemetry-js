@@ -51,6 +51,7 @@ export class Meter implements IMeter {
 
   /**
    * Create a {@link Gauge} instrument.
+   * @experimental
    */
   createGauge<AttributesTypes extends Attributes = Attributes>(
     name: string,
