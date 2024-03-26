@@ -160,6 +160,7 @@ describe('ConsoleMetricExporter', () => {
         switch (instrumentType) {
           case InstrumentType.COUNTER:
           case InstrumentType.OBSERVABLE_COUNTER:
+          case InstrumentType.GAUGE:
           case InstrumentType.HISTOGRAM:
           case InstrumentType.OBSERVABLE_GAUGE:
             return AggregationTemporality.DELTA;

@@ -580,6 +580,7 @@ export class ExponentialHistogramAggregator
 
         // determine if instrument allows negative values.
         const allowsNegativeValues =
+          descriptor.type === InstrumentType.GAUGE ||
           descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
           descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
           descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER;
