@@ -77,7 +77,8 @@
     "@opentelemetry/otlp-transformer": "0.49.1",
     "@opentelemetry/resources": "1.22.0",
     "@opentelemetry/sdk-metrics": "1.22.0",
-    "body-parser": "1.20.2"
+    "body-parser": "1.20.2",
+    "npm": "^9.8.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sampler-jaeger-remote",
   "sideEffects": false

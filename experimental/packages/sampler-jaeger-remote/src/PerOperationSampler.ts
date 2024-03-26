@@ -42,6 +42,15 @@ export class PerOperationSampler implements Sampler {
     );
   }
 
+  // Required for testing
+  getSamplerForOperation(spanName: string): Sampler {
+    let resultantSampler = this._perOperationSampler.get(spanName);
+    if (resultantSampler == null) {
+      resultantSampler = this._defaultSampler;
+    }
+    return resultantSampler;
+  }
+
   shouldSample(
     context: Context,
     traceId: string,
@@ -50,11 +59,7 @@ export class PerOperationSampler implements Sampler {
     attributes: SpanAttributes,
     links: Link[]
   ): SamplingResult {
-    let resultantSampler = this._perOperationSampler.get(spanName);
-    if (resultantSampler == null) {
-      resultantSampler = this._defaultSampler;
-    }
-    return resultantSampler.shouldSample(
+    return this.getSamplerForOperation(spanName).shouldSample(
       context,
       traceId,
       spanName,
@@ -65,7 +70,11 @@ export class PerOperationSampler implements Sampler {
   }
 
   toString(): string {
-    return `PerOperationSampler{default=${this._defaultSampler}, perOperation=${this._perOperationSampler}}`;
+    return `PerOperationSampler{default=${
+      this._defaultSampler
+    }, perOperationSamplers={${Array.from(this._perOperationSampler).map(
+      ([key, value]) => `${key}=${value}`
+    )}}}`;
   }
 }
 

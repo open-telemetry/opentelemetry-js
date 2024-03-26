@@ -14,33 +14,29 @@
  * limitations under the License.
  */
 
-import { AlwaysOffSampler, AlwaysOnSampler, SamplingDecision } from '../../../../packages/opentelemetry-sdk-trace-base/src';
+import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  ParentBasedSampler,
+  SamplingDecision,
+  TraceIdRatioBasedSampler,
+} from '../../../../packages/opentelemetry-sdk-trace-base/src';
+import * as api from '@opentelemetry/api';
 import { JaegerRemoteSampler } from '../src';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { Context, SpanKind } from '@opentelemetry/api';
+import { DiagAPI, SpanKind } from '@opentelemetry/api';
 import { SamplingStrategyResponse, StrategyType } from '../src/types';
+import { PerOperationSampler } from '../src/PerOperationSampler';
+import { randomSamplingProability } from './utils';
 
 describe('JaegerRemoteSampler', () => {
-
   const endpoint = 'http://localhost:5778';
   const serviceName = 'foo';
   const alwaysOnSampler = new AlwaysOnSampler();
   const alwaysOffSampler = new AlwaysOffSampler();
-  const numberOfIterations = Math.floor(Math.random() + 1  * 100);
+  const numberOfIterations = Math.floor(Math.random() + 1 * 100);
   const poolingInterval = Math.floor(Math.random() + 1 * 5) * 1000;
-
-  const shouldSampleContext = {
-    getValue: function (key: symbol): unknown {
-      throw new Error('Function not implemented.');
-    },
-    setValue: function (key: symbol, value: unknown): Context {
-      throw new Error('Function not implemented.');
-    },
-    deleteValue: function (key: symbol): Context {
-      throw new Error('Function not implemented.');
-    }
-  };
 
   let clock: sinon.SinonFakeTimers;
 
@@ -56,23 +52,23 @@ describe('JaegerRemoteSampler', () => {
     let getAndUpdateSamplerStub: sinon.SinonStub;
 
     before(() => {
-      getAndUpdateSamplerStub = sinon.stub(JaegerRemoteSampler.prototype, 'getAndUpdateSampler').resolves();
+      getAndUpdateSamplerStub = sinon
+        .stub(JaegerRemoteSampler.prototype, 'getAndUpdateSampler')
+        .resolves();
     });
 
     after(() => {
       getAndUpdateSamplerStub.restore();
     });
-  
+
     it('Test Sampler to run at fixed poolingInterval', async () => {
-      console.log(`numberOfIterations: ${numberOfIterations}`);
-      console.log(`poolingInterval: ${poolingInterval}`);
       new JaegerRemoteSampler({
         endpoint,
         serviceName,
         poolingInterval,
         initialSampler: alwaysOnSampler,
       });
-      await clock.tickAsync(poolingInterval*numberOfIterations);
+      await clock.tickAsync(poolingInterval * numberOfIterations);
       sinon.assert.callCount(getAndUpdateSamplerStub, numberOfIterations);
     });
   });
@@ -83,8 +79,8 @@ describe('JaegerRemoteSampler', () => {
     before(() => {
       samplerStubInstance = sinon.createStubInstance(AlwaysOnSampler);
       samplerStubInstance.shouldSample.returns({
-        decision: SamplingDecision.RECORD
-      })
+        decision: SamplingDecision.RECORD,
+      });
     });
 
     it('Should return SamplingDecision.RECORD decision provided by the current sampler set in it.', async () => {
@@ -95,7 +91,17 @@ describe('JaegerRemoteSampler', () => {
         initialSampler: samplerStubInstance,
       });
 
-      assert.equal(jaegerRemoteSampler.shouldSample(shouldSampleContext, "", "", SpanKind.CLIENT, {}, []).decision, SamplingDecision.RECORD);
+      assert.equal(
+        jaegerRemoteSampler.shouldSample(
+          api.ROOT_CONTEXT,
+          '',
+          '',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision,
+        SamplingDecision.RECORD
+      );
     });
   });
 
@@ -103,22 +109,26 @@ describe('JaegerRemoteSampler', () => {
     let getSamplerConfigStub: sinon.SinonStub;
     let convertSamplingResponseToSamplerStub: sinon.SinonStub;
 
-    const sampleSamplingStrategyResponse : SamplingStrategyResponse = {
+    const sampleSamplingStrategyResponse: SamplingStrategyResponse = {
       strategyType: StrategyType.PROBABILISTIC,
       probabilisticSampling: {
-        samplingRate: 0
+        samplingRate: 0,
       },
       operationSampling: {
         defaultSamplingProbability: 0,
         defaultLowerBoundTracesPerSecond: 0,
         perOperationStrategies: [],
-        defaultUpperBoundTracesPerSecond: 0
-      }
+        defaultUpperBoundTracesPerSecond: 0,
+      },
     };
 
     beforeEach(() => {
-      getSamplerConfigStub = sinon.stub(JaegerRemoteSampler.prototype, 'getSamplerConfig').resolves(sampleSamplingStrategyResponse);
-      convertSamplingResponseToSamplerStub = sinon.stub(JaegerRemoteSampler.prototype, 'convertSamplingResponseToSampler').resolves(alwaysOffSampler);
+      getSamplerConfigStub = sinon
+        .stub(JaegerRemoteSampler.prototype, 'getSamplerConfig')
+        .resolves(sampleSamplingStrategyResponse);
+      convertSamplingResponseToSamplerStub = sinon
+        .stub(JaegerRemoteSampler.prototype, 'convertSamplingResponseToSampler')
+        .resolves(alwaysOffSampler);
     });
 
     afterEach(() => {
@@ -145,7 +155,10 @@ describe('JaegerRemoteSampler', () => {
         initialSampler: alwaysOnSampler,
       });
       await clock.tickAsync(poolingInterval);
-      sinon.assert.calledWithExactly(convertSamplingResponseToSamplerStub, sampleSamplingStrategyResponse);
+      sinon.assert.calledWithExactly(
+        convertSamplingResponseToSamplerStub,
+        sampleSamplingStrategyResponse
+      );
     });
 
     it('internal sampler is set to sampler returned by convertSamplingResponseToSampler.', async () => {
@@ -156,84 +169,251 @@ describe('JaegerRemoteSampler', () => {
         initialSampler: alwaysOnSampler,
       });
       await clock.tickAsync(poolingInterval);
-      assert.equal(await jaegerRemoteSampler.getCurrentSampler(), alwaysOffSampler);
+      assert.equal(
+        await jaegerRemoteSampler.getCurrentSampler(),
+        alwaysOffSampler
+      );
     });
   });
 
-  // describe('convertSamplingResponseToSampler', () => {
-  //   let getSamplerConfigStub: sinon.SinonStub;
+  describe('convertSamplingResponseToSampler', () => {
+    let getSamplerConfigStub: sinon.SinonStub;
 
-  //   const sampleSamplingStrategyResponse : SamplingStrategyResponse = {
-  //     strategyType: StrategyType.PROBABILISTIC,
-  //     probabilisticSampling: {
-  //       samplingRate: 0
-  //     },
-  //     operationSampling: {
-  //       defaultSamplingProbability: 0,
-  //       defaultLowerBoundTracesPerSecond: 0,
-  //       perOperationStrategies: [],
-  //       defaultUpperBoundTracesPerSecond: 0
-  //     }
-  //   };
+    beforeEach(() => {
+      getSamplerConfigStub = sinon.stub(
+        JaegerRemoteSampler.prototype,
+        'getSamplerConfig'
+      );
+    });
 
-  //   beforeEach(() => {
-  //     getSamplerConfigStub = sinon.stub(JaegerRemoteSampler.prototype, 'getSamplerConfig').resolves(sampleSamplingStrategyResponse);
-  //   });
+    afterEach(() => {
+      getSamplerConfigStub.restore();
+    });
 
-  //   afterEach(() => {
-  //     getSamplerConfigStub.restore();
-  //   });
+    describe('defaultStrategy', () => {
+      const samplingRate = randomSamplingProability();
 
-  //   it('enter perOperationStrategy flow if per operation strategies exist.', async () => {
-  //     new JaegerRemoteSampler({
-  //       endpoint,
-  //       serviceName,
-  //       poolingInterval,
-  //       initialSampler: alwaysOnSampler,
-  //     });
-  //     await clock.tickAsync(poolingInterval);
-  //     sinon.assert.calledWithExactly(getSamplerConfigStub, serviceName);
-  //   });
+      const samplingStrategyResponseWithoutPerOperationStrategies: SamplingStrategyResponse =
+        {
+          strategyType: StrategyType.PROBABILISTIC,
+          probabilisticSampling: {
+            samplingRate,
+          },
+          operationSampling: {
+            defaultSamplingProbability: 1.5,
+            defaultLowerBoundTracesPerSecond: 1.6,
+            perOperationStrategies: [],
+            defaultUpperBoundTracesPerSecond: 18,
+          },
+        };
 
-  //   describe('perOperationStrategy', () => {
+      beforeEach(() => {
+        getSamplerConfigStub.resolves(
+          samplingStrategyResponseWithoutPerOperationStrategies
+        );
+      });
 
-  //   beforeEach(() => {
-  //   });
+      it('Use root level samplingRate.', async () => {
+        const jaegerRemoteSampler = new JaegerRemoteSampler({
+          endpoint,
+          serviceName,
+          poolingInterval,
+          initialSampler: alwaysOnSampler,
+        });
+        await clock.tickAsync(poolingInterval);
+        const jaegerCurrentSampler = jaegerRemoteSampler.getCurrentSampler();
+        assert.equal(jaegerCurrentSampler instanceof ParentBasedSampler, true);
+        const parentBasedRootSampler = (
+          jaegerCurrentSampler as ParentBasedSampler
+        ).getRootSampler();
+        assert.equal(
+          parentBasedRootSampler instanceof TraceIdRatioBasedSampler,
+          true
+        );
+        const internalTraceIdRatioBasedSamplerRatio = (
+          parentBasedRootSampler as TraceIdRatioBasedSampler
+        ).getRatio();
+        assert.equal(internalTraceIdRatioBasedSamplerRatio, samplingRate);
+      });
+    });
 
-  //   afterEach(() => {
-  //   });
+    describe('perOperationStrategy', () => {
+      const defaultSamplingProbability = randomSamplingProability();
+      const op1SamplingRate = randomSamplingProability();
+      const op2SamplingRate = randomSamplingProability();
+      const op1 = 'op1';
+      const op2 = 'op2';
 
-  //   it('getSamplerConfig is called with service name set in the constructor.', async () => {
-  //     // new JaegerRemoteSampler({
-  //     //   endpoint,
-  //     //   serviceName,
-  //     //   poolingInterval,
-  //     //   initialSampler: alwaysOnSampler,
-  //     // });
-  //     // await clock.tickAsync(poolingInterval);
-  //     // sinon.assert.calledWithExactly(getSamplerConfigStub, serviceName);
-  //   });
+      const samplingStrategyResponseWithPerOperationStrategies: SamplingStrategyResponse =
+        {
+          strategyType: StrategyType.PROBABILISTIC,
+          probabilisticSampling: {
+            samplingRate: 1.5,
+          },
+          operationSampling: {
+            defaultSamplingProbability,
+            defaultLowerBoundTracesPerSecond: 1.6,
+            perOperationStrategies: [
+              {
+                operation: op1,
+                probabilisticSampling: {
+                  samplingRate: op1SamplingRate,
+                },
+              },
+              {
+                operation: op2,
+                probabilisticSampling: {
+                  samplingRate: op2SamplingRate,
+                },
+              },
+            ],
+            defaultUpperBoundTracesPerSecond: 1.8,
+          },
+        };
 
-  //   });
-  //   describe('defaultStrategy', () => {
+      beforeEach(() => {
+        getSamplerConfigStub.resolves(
+          samplingStrategyResponseWithPerOperationStrategies
+        );
+      });
 
-  //     beforeEach(() => {
-  //     });
-  
-  //     afterEach(() => {
-  //     });
-  
-  //     it('getSamplerConfig is called with service name set in the constructor.', async () => {
-  //       // new JaegerRemoteSampler({
-  //       //   endpoint,
-  //       //   serviceName,
-  //       //   poolingInterval,
-  //       //   initialSampler: alwaysOnSampler,
-  //       // });
-  //       // await clock.tickAsync(poolingInterval);
-  //       // sinon.assert.calledWithExactly(getSamplerConfigStub, serviceName);
-  //     });
-  
-  //     });
-  //   });
+      it('Use default probability from inside operationSampling object and perOperationStrategies values for specific operations.', async () => {
+        const jaegerRemoteSampler = new JaegerRemoteSampler({
+          endpoint,
+          serviceName,
+          poolingInterval,
+          initialSampler: alwaysOnSampler,
+        });
+        await clock.tickAsync(poolingInterval);
+        const jaegerCurrentSampler = jaegerRemoteSampler.getCurrentSampler();
+        assert.equal(jaegerCurrentSampler instanceof ParentBasedSampler, true);
+        const parentBasedRootSampler = (
+          jaegerCurrentSampler as ParentBasedSampler
+        ).getRootSampler();
+        assert.equal(
+          parentBasedRootSampler instanceof PerOperationSampler,
+          true
+        );
+        const perOperationSampler =
+          parentBasedRootSampler as PerOperationSampler;
+
+        const defaultSampler = perOperationSampler.getSamplerForOperation('');
+        assert.equal(defaultSampler instanceof TraceIdRatioBasedSampler, true);
+
+        const defautRatio = (
+          defaultSampler as TraceIdRatioBasedSampler
+        ).getRatio();
+        assert.equal(defaultSamplingProbability, defautRatio);
+
+        const op1Sampler = perOperationSampler.getSamplerForOperation(op1);
+        assert.equal(op1Sampler instanceof TraceIdRatioBasedSampler, true);
+
+        const op1Ratio = (op1Sampler as TraceIdRatioBasedSampler).getRatio();
+        assert.equal(op1SamplingRate, op1Ratio);
+
+        const op2Sampler = perOperationSampler.getSamplerForOperation(op2);
+        assert.equal(op2Sampler instanceof TraceIdRatioBasedSampler, true);
+
+        const op2Ratio = (op2Sampler as TraceIdRatioBasedSampler).getRatio();
+        assert.equal(op2SamplingRate, op2Ratio);
+      });
+    });
+
+    describe('errorCase', () => {
+      let diagWarnStub: sinon.SinonStub;
+      const invalidStrategyType = 'ANY_TEXT';
+      const errorSamplingStrategyResponse = {
+        strategyType: invalidStrategyType,
+        probabilisticSampling: {
+          samplingRate: 0,
+        },
+        operationSampling: {
+          defaultSamplingProbability: 0,
+          defaultLowerBoundTracesPerSecond: 0,
+          perOperationStrategies: [],
+          defaultUpperBoundTracesPerSecond: 0,
+        },
+      };
+
+      beforeEach(() => {
+        getSamplerConfigStub.resolves(errorSamplingStrategyResponse);
+        diagWarnStub = sinon.stub(api.diag, 'warn');
+      });
+
+      it('Throw error when unsupported strategy type is sent by api.', async () => {
+        new JaegerRemoteSampler({
+          endpoint,
+          serviceName,
+          poolingInterval,
+          initialSampler: alwaysOnSampler,
+        });
+        await clock.tickAsync(poolingInterval);
+        sinon.assert.calledOnceWithExactly(
+          diagWarnStub,
+          `Strategy ${invalidStrategyType} not supported.`
+        );
+      });
+    });
+  });
+
+  describe('toString', () => {
+    let getSamplerConfigStub: sinon.SinonStub;
+
+    const defaultSamplingProbability = randomSamplingProability();
+    const op1SamplingRate = randomSamplingProability();
+    const op1 = 'op1';
+
+    const samplingStrategyResponseWithPerOperationStrategies: SamplingStrategyResponse =
+      {
+        strategyType: StrategyType.PROBABILISTIC,
+        probabilisticSampling: {
+          samplingRate: 1.5,
+        },
+        operationSampling: {
+          defaultSamplingProbability,
+          defaultLowerBoundTracesPerSecond: 1.6,
+          perOperationStrategies: [
+            {
+              operation: op1,
+              probabilisticSampling: {
+                samplingRate: op1SamplingRate,
+              },
+            },
+          ],
+          defaultUpperBoundTracesPerSecond: 1.8,
+        },
+      };
+
+    beforeEach(() => {
+      getSamplerConfigStub = sinon.stub(
+        JaegerRemoteSampler.prototype,
+        'getSamplerConfig'
+      );
+    });
+
+    afterEach(() => {
+      getSamplerConfigStub.restore();
+    });
+
+    beforeEach(() => {
+      getSamplerConfigStub.resolves(
+        samplingStrategyResponseWithPerOperationStrategies
+      );
+    });
+
+    it('Should reflect sampler name with current sampler runninng in it', async () => {
+      const jaegerRemoteSampler = new JaegerRemoteSampler({
+        endpoint,
+        serviceName,
+        poolingInterval,
+        initialSampler: alwaysOnSampler,
+      });
+      await clock.tickAsync(poolingInterval);
+      const jaegerCurrentSampler = jaegerRemoteSampler.toString();
+      assert.equal(
+        jaegerCurrentSampler,
+        `JaegerRemoteSampler{endpoint=${endpoint}, serviceName=${serviceName}, poolingInterval=${poolingInterval}, sampler=ParentBased{root=PerOperationSampler{default=TraceIdRatioBased{${defaultSamplingProbability}}, perOperationSamplers={${op1}=TraceIdRatioBased{${op1SamplingRate}}}}, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}}`
+      );
+    });
+  });
 });

@@ -29,6 +29,7 @@ import {
 } from '../../../../packages/opentelemetry-sdk-trace-base/src';
 import { PerOperationSampler } from './PerOperationSampler';
 import { SamplingStrategyResponse, StrategyType } from './types';
+import { diag } from '@opentelemetry/api';
 
 /** JaegerRemoteSampler */
 export class JaegerRemoteSampler implements Sampler {
@@ -77,16 +78,21 @@ export class JaegerRemoteSampler implements Sampler {
   }
 
   toString(): string {
-    return `JaegerRemoteSampler${this._sampler}`;
+    return `JaegerRemoteSampler{endpoint=${this._endpoint},${
+      this._serviceName && ` serviceName=${this._serviceName},`
+    } poolingInterval=${this._poolingInterval}, sampler=${this._sampler}}`;
   }
 
   async getAndUpdateSampler() {
     const newConfig = await this.getSamplerConfig(this._serviceName);
-    this._sampler = this.convertSamplingResponseToSampler(newConfig);
+    this._sampler = await this.convertSamplingResponseToSampler(newConfig);
   }
 
-  convertSamplingResponseToSampler(newConfig: SamplingStrategyResponse) {
-    const perOperationStrategies = newConfig.operationSampling?.perOperationStrategies;
+  convertSamplingResponseToSampler(
+    newConfig: SamplingStrategyResponse
+  ): Sampler {
+    const perOperationStrategies =
+      newConfig.operationSampling?.perOperationStrategies;
     if (perOperationStrategies && perOperationStrategies.length > 0) {
       const defaultSampler: Sampler = new TraceIdRatioBasedSampler(
         newConfig.operationSampling?.defaultSamplingProbability
@@ -94,7 +100,7 @@ export class JaegerRemoteSampler implements Sampler {
       return new ParentBasedSampler({
         root: new PerOperationSampler({
           defaultSampler,
-          perOperationStrategies: newConfig.operationSampling?.perOperationStrategies ?? [],
+          perOperationStrategies,
         }),
       });
     }
@@ -106,18 +112,22 @@ export class JaegerRemoteSampler implements Sampler {
           ),
         });
       default:
-        throw new Error('Strategy not supported.');
+        diag.warn(`Strategy ${newConfig.strategyType} not supported.`);
+        return this._sampler;
     }
   }
 
-  async getSamplerConfig(serviceName?: string) {
+  async getSamplerConfig(
+    serviceName?: string
+  ): Promise<SamplingStrategyResponse> {
     const response = await axios.get<SamplingStrategyResponse>(
       `${this._endpoint}/sampling?service=${serviceName ?? ''}`
     );
     return response.data;
   }
 
-  getCurrentSampler() {
+  // Required for testing
+  getCurrentSampler(): Sampler {
     return this._sampler;
   }
 }
