@@ -22,15 +22,10 @@ import { OTLPExporterConfigBase } from '../../src/types';
 import { ComplexTestObject, mockedComplexTestObject } from '../testHelper';
 import * as otlpTypes from '../../src/types';
 
-interface ExportRequest {
-  resourceSpans: object[];
-}
-
 type CollectorExporterConfig = OTLPExporterConfigBase;
 class OTLPTraceExporter extends OTLPExporterBase<
   CollectorExporterConfig,
-  ComplexTestObject,
-  ExportRequest
+  ComplexTestObject
 > {
   onInit() {}
   onShutdown() {}
@@ -48,10 +43,6 @@ class OTLPTraceExporter extends OTLPExporterBase<
   }
   getDefaultUrl(config: CollectorExporterConfig): string {
     return config.url || '';
-  }
-
-  convert(spans: ComplexTestObject[]): ExportRequest {
-    return { resourceSpans: [] };
   }
 }
 

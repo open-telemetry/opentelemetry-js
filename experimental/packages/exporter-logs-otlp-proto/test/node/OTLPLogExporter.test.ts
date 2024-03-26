@@ -33,15 +33,26 @@ import {
   OTLPExporterNodeConfigBase,
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  getExportRequestProto,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { VERSION } from '../../src/version';
+import { Root } from 'protobufjs';
+import * as path from 'path';
 
 let fakeRequest: PassThrough;
+
+const dir = path.resolve(__dirname, '../../../otlp-transformer/protos');
+const root = new Root();
+root.resolvePath = function (origin, target) {
+  return `${dir}/${target}`;
+};
+const proto = root.loadSync([
+  'opentelemetry/proto/common/v1/common.proto',
+  'opentelemetry/proto/resource/v1/resource.proto',
+  'opentelemetry/proto/logs/v1/logs.proto',
+  'opentelemetry/proto/collector/logs/v1/logs_service.proto',
+]);
+const exportRequestServiceProto = proto?.lookupType('ExportLogsServiceRequest');
 
 describe('OTLPLogExporter - node with proto over http', () => {
   let collectorExporter: OTLPLogExporter;
@@ -193,8 +204,6 @@ describe('OTLPLogExporter - node with proto over http', () => {
     });
 
     it('should open the connection', done => {
-      collectorExporter.export(logs, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
@@ -206,11 +215,10 @@ describe('OTLPLogExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+      collectorExporter.export(logs, () => {});
     });
 
     it('should set custom headers', done => {
-      collectorExporter.export(logs, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
@@ -220,11 +228,10 @@ describe('OTLPLogExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+      collectorExporter.export(logs, () => {});
     });
 
     it('should have keep alive and keepAliveMsecs option set', done => {
-      collectorExporter.export(logs, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
@@ -235,6 +242,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+      collectorExporter.export(logs, () => {});
     });
 
     it('should successfully send the logs', done => {
@@ -243,10 +251,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
 
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
-        const ExportLogsServiceRequestProto = getExportRequestProto(
-          ServiceClientType.LOGS
-        );
-        const data = ExportLogsServiceRequestProto.decode(buff);
+        const data = exportRequestServiceProto.decode(buff);
         const json = data?.toJSON() as IExportLogsServiceRequest;
         const log1 = json.resourceLogs?.[0].scopeLogs?.[0].logRecords?.[0];
         assert.ok(typeof log1 !== 'undefined', "log doesn't exist");
@@ -271,34 +276,34 @@ describe('OTLPLogExporter - node with proto over http', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spyLoggerError = sinon.stub(diag, 'error');
 
-      collectorExporter.export(logs, result => {
-        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(spyLoggerError.args.length, 0);
-        done();
-      });
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockRes = new MockedResponse(200);
         cb(mockRes);
         mockRes.send('success');
         return fakeRequest as any;
       });
+
+      collectorExporter.export(logs, result => {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(spyLoggerError.args.length, 0);
+        done();
+      });
     });
 
     it('should log the error message', done => {
-      collectorExporter.export(logs, result => {
-        assert.strictEqual(result.code, ExportResultCode.FAILED);
-        // @ts-expect-error verify error code
-        assert.strictEqual(result.error.code, 400);
-        done();
-      });
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockResError = new MockedResponse(400);
         cb(mockResError);
         mockResError.send('failed');
 
         return fakeRequest as any;
+      });
+
+      collectorExporter.export(logs, result => {
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        // @ts-expect-error verify error code
+        assert.strictEqual(result.error.code, 400);
+        done();
       });
     });
   });
@@ -331,10 +336,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
-        const ExportLogsServiceRequestProto = getExportRequestProto(
-          ServiceClientType.LOGS
-        );
-        const data = ExportLogsServiceRequestProto.decode(unzippedBuff);
+        const data = exportRequestServiceProto.decode(unzippedBuff);
         const json = data?.toJSON() as IExportLogsServiceRequest;
         const log1 = json.resourceLogs?.[0].scopeLogs?.[0].logRecords?.[0];
         assert.ok(typeof log1 !== 'undefined', "log doesn't exist");

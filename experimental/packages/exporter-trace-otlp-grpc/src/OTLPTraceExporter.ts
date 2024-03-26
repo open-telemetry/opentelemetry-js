@@ -21,12 +21,10 @@ import {
   OTLPGRPCExporterNodeBase,
   validateAndNormalizeUrl,
   DEFAULT_COLLECTOR_URL,
-  TraceSerializer,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
-  createExportTraceServiceRequest,
-  IExportTraceServiceRequest,
   IExportTraceServiceResponse,
+  ProtobufTraceSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from './version';
 
@@ -38,11 +36,7 @@ const USER_AGENT = {
  * OTLP Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPGRPCExporterNodeBase<
-    ReadableSpan,
-    IExportTraceServiceRequest,
-    IExportTraceServiceResponse
-  >
+  extends OTLPGRPCExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
   implements SpanExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
@@ -57,12 +51,8 @@ export class OTLPTraceExporter
       signalSpecificMetadata,
       'TraceExportService',
       '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
-      TraceSerializer
+      ProtobufTraceSerializer
     );
-  }
-
-  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans);
   }
 
   getDefaultUrl(config: OTLPGRPCExporterConfigNode) {

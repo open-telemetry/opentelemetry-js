@@ -21,12 +21,10 @@ import {
   OTLPGRPCExporterNodeBase,
   validateAndNormalizeUrl,
   DEFAULT_COLLECTOR_URL,
-  LogsSerializer,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
-  createExportLogsServiceRequest,
-  IExportLogsServiceRequest,
   IExportLogsServiceResponse,
+  ProtobufLogsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from './version';
 
@@ -40,7 +38,6 @@ const USER_AGENT = {
 export class OTLPLogExporter
   extends OTLPGRPCExporterNodeBase<
     ReadableLogRecord,
-    IExportLogsServiceRequest,
     IExportLogsServiceResponse
   >
   implements LogRecordExporter
@@ -57,12 +54,8 @@ export class OTLPLogExporter
       signalSpecificMetadata,
       'LogsExportService',
       '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
-      LogsSerializer
+      ProtobufLogsSerializer
     );
-  }
-
-  convert(logRecords: ReadableLogRecord[]): IExportLogsServiceRequest {
-    return createExportLogsServiceRequest(logRecords);
   }
 
   getDefaultUrl(config: OTLPGRPCExporterConfigNode) {

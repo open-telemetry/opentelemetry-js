@@ -13,5 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { OTLPProtoExporterBrowserBase } from './OTLPProtoExporterBrowserBase';
-export { ServiceClientType } from '../types';
+
+import * as protobuf from 'protobufjs';
+
+export interface ExportType<T, R = T & { toJSON: () => unknown }> {
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
+}

@@ -238,7 +238,10 @@ describe('OTLPMetricExporter - web', () => {
           assert.strictEqual(request.url, 'http://foo.bar.com');
 
           const body = request.requestBody;
-          const json = JSON.parse(body) as IExportMetricsServiceRequest;
+          const decoder = new TextDecoder();
+          const json = JSON.parse(
+            decoder.decode(body)
+          ) as IExportMetricsServiceRequest;
           // The order of the metrics is not guaranteed.
           const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
             it => it.descriptor.name === 'int-counter'

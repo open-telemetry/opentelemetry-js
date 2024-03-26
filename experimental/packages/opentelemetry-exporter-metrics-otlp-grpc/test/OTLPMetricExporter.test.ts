@@ -45,9 +45,7 @@ import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metric
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
-const includeDirs = [
-  path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
-];
+const includeDirs = [path.resolve(__dirname, '../../otlp-transformer/protos')];
 
 const httpAddr = 'https://localhost:1502';
 const udsAddr = 'unix:///tmp/otlp-metrics.sock';
