@@ -25,9 +25,7 @@ import {
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportTraceServiceResponse,
-} from '@opentelemetry/otlp-transformer';
+import { IExportTraceServiceResponse } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
 import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer';
 
