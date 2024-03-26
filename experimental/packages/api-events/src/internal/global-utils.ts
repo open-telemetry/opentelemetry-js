@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { EventEmitterProvider } from '../types/EventEmitterProvider';
+import { EventLoggerProvider } from '../types/EventLoggerProvider';
 import { _globalThis } from '../platform';
 
 export const GLOBAL_EVENTS_API_KEY = Symbol.for(
@@ -23,7 +23,7 @@ export const GLOBAL_EVENTS_API_KEY = Symbol.for(
 
 type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{
-  [GLOBAL_EVENTS_API_KEY]: Get<EventEmitterProvider>;
+  [GLOBAL_EVENTS_API_KEY]: Get<EventLoggerProvider>;
 }>;
 
 export const _global = _globalThis as OtelGlobal;

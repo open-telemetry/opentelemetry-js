@@ -19,7 +19,7 @@ import {
   _global,
   GLOBAL_EVENTS_API_KEY,
 } from '../../src/internal/global-utils';
-import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
+import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 
 const api1 = require('../../src') as typeof import('../../src');
 
@@ -34,8 +34,8 @@ describe('Global Utils', () => {
   assert.notStrictEqual(api1, api2);
   // that return separate noop instances to start
   assert.notStrictEqual(
-    api1.events.getEventEmitterProvider(),
-    api2.events.getEventEmitterProvider()
+    api1.events.getEventLoggerProvider(),
+    api2.events.getEventLoggerProvider()
   );
 
   beforeEach(() => {
@@ -43,38 +43,38 @@ describe('Global Utils', () => {
     api2.events.disable();
   });
 
-  it('should change the global event emitter provider', () => {
-    const original = api1.events.getEventEmitterProvider();
-    const newEventEmitterProvider = new NoopEventEmitterProvider();
-    api1.events.setGlobalEventEmitterProvider(newEventEmitterProvider);
-    assert.notStrictEqual(api1.events.getEventEmitterProvider(), original);
+  it('should change the global event logger provider', () => {
+    const original = api1.events.getEventLoggerProvider();
+    const newEventLoggerProvider = new NoopEventLoggerProvider();
+    api1.events.setGlobalEventLoggerProvider(newEventLoggerProvider);
+    assert.notStrictEqual(api1.events.getEventLoggerProvider(), original);
     assert.strictEqual(
-      api1.events.getEventEmitterProvider(),
-      newEventEmitterProvider
+      api1.events.getEventLoggerProvider(),
+      newEventLoggerProvider
     );
   });
 
   it('should load an instance from one which was set in the other', () => {
-    api1.events.setGlobalEventEmitterProvider(new NoopEventEmitterProvider());
+    api1.events.setGlobalEventLoggerProvider(new NoopEventLoggerProvider());
     assert.strictEqual(
-      api1.events.getEventEmitterProvider(),
-      api2.events.getEventEmitterProvider()
+      api1.events.getEventLoggerProvider(),
+      api2.events.getEventLoggerProvider()
     );
   });
 
   it('should disable both if one is disabled', () => {
-    const original = api1.events.getEventEmitterProvider();
+    const original = api1.events.getEventLoggerProvider();
 
-    api1.events.setGlobalEventEmitterProvider(new NoopEventEmitterProvider());
+    api1.events.setGlobalEventLoggerProvider(new NoopEventLoggerProvider());
 
-    assert.notStrictEqual(original, api1.events.getEventEmitterProvider());
+    assert.notStrictEqual(original, api1.events.getEventLoggerProvider());
     api2.events.disable();
-    assert.strictEqual(original, api1.events.getEventEmitterProvider());
+    assert.strictEqual(original, api1.events.getEventLoggerProvider());
   });
 
   it('should return the module NoOp implementation if the version is a mismatch', () => {
-    const original = api1.events.getEventEmitterProvider();
-    api1.events.setGlobalEventEmitterProvider(new NoopEventEmitterProvider());
+    const original = api1.events.getEventLoggerProvider();
+    api1.events.setGlobalEventLoggerProvider(new NoopEventLoggerProvider());
     const afterSet = _global[GLOBAL_EVENTS_API_KEY]!(-1);
 
     assert.strictEqual(original, afterSet);

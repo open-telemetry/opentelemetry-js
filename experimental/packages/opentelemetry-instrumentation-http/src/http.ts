@@ -58,7 +58,7 @@ import {
 } from '@opentelemetry/instrumentation';
 import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { errorMonitor } from 'events';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMATTRS_HTTP_ROUTE } from '@opentelemetry/semantic-conventions';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
@@ -746,7 +746,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
 
-    const route = attributes[SemanticAttributes.HTTP_ROUTE];
+    const route = attributes[SEMATTRS_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
     }

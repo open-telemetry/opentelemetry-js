@@ -57,6 +57,7 @@ import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExpo
 import {
   envDetector,
   processDetector,
+  hostDetector,
   Resource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
@@ -66,6 +67,10 @@ import {
   InMemoryLogRecordExporter,
   LoggerProvider,
 } from '@opentelemetry/sdk-logs';
+import {
+  SEMRESATTRS_HOST_NAME,
+  SEMRESATTRS_PROCESS_PID,
+} from '@opentelemetry/semantic-conventions';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -527,9 +532,10 @@ describe('Node SDK', () => {
               },
             },
             envDetector,
+            hostDetector,
           ],
         });
-        sdk.detectResources();
+        sdk.start();
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
@@ -541,6 +547,28 @@ describe('Node SDK', () => {
           namespace: 'default',
           version: '0.0.1',
         });
+      });
+    });
+
+    describe('default resource detectors', () => {
+      it('default detectors populate values properly', async () => {
+        const sdk = new NodeSDK();
+        sdk.start();
+        const resource = sdk['_resource'];
+        await resource.waitForAsyncAttributes?.();
+
+        assertServiceResource(resource, {
+          instanceId: '627cc493',
+          name: 'my-service',
+          namespace: 'default',
+          version: '0.0.1',
+        });
+
+        assert.notEqual(
+          resource.attributes[SEMRESATTRS_PROCESS_PID],
+          undefined
+        );
+        assert.notEqual(resource.attributes[SEMRESATTRS_HOST_NAME], undefined);
       });
     });
 
@@ -556,10 +584,11 @@ describe('Node SDK', () => {
               },
             },
             envDetector,
+            hostDetector,
           ],
         });
 
-        sdk.detectResources();
+        sdk.start();
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
@@ -609,7 +638,7 @@ describe('Node SDK', () => {
           DiagLogLevel.VERBOSE
         );
 
-        sdk.detectResources();
+        sdk.start();
         await sdk['_resource'].waitForAsyncAttributes?.();
 
         // Test that the Env Detector successfully found its resource and populated it with the right values.
@@ -642,7 +671,7 @@ describe('Node SDK', () => {
             DiagLogLevel.DEBUG
           );
 
-          sdk.detectResources();
+          sdk.start();
 
           assert.ok(
             callArgsContains(
@@ -794,9 +823,10 @@ describe('Node SDK', () => {
               },
             },
             envDetector,
+            hostDetector,
           ],
         });
-        sdk.detectResources();
+        sdk.start();
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 

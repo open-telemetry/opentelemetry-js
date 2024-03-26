@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-import { EventEmitterProvider } from './types/EventEmitterProvider';
-import { EventEmitter } from './types/EventEmitter';
-import { EventEmitterOptions } from './types/EventEmitterOptions';
-import { NoopEventEmitter } from './NoopEventEmitter';
+import { EventLoggerProvider } from './types/EventLoggerProvider';
+import { EventLogger } from './types/EventLogger';
+import { EventLoggerOptions } from './types/EventLoggerOptions';
+import { NoopEventLogger } from './NoopEventLogger';
 
-export class NoopEventEmitterProvider implements EventEmitterProvider {
-  getEventEmitter(
+export class NoopEventLoggerProvider implements EventLoggerProvider {
+  getEventLogger(
     _name: string,
-    _domain: string,
     _version?: string | undefined,
-    _options?: EventEmitterOptions | undefined
-  ): EventEmitter {
-    return new NoopEventEmitter();
+    _options?: EventLoggerOptions | undefined
+  ): EventLogger {
+    return new NoopEventLogger();
   }
 }
 
-export const NOOP_EVENT_EMITTER_PROVIDER = new NoopEventEmitterProvider();
+export const NOOP_EVENT_LOGGER_PROVIDER = new NoopEventLoggerProvider();

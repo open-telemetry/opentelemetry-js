@@ -16,9 +16,11 @@
 
 import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
 import {
-  HttpFlavorValues,
-  NetTransportValues,
-  SemanticAttributes,
+  HTTPFLAVORVALUES_HTTP_1_1,
+  NETTRANSPORTVALUES_IP_TCP,
+  SEMATTRS_HTTP_FLAVOR,
+  SEMATTRS_HTTP_HOST,
+  SEMATTRS_NET_TRANSPORT,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as url from 'url';
@@ -236,12 +238,12 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
       assert.strictEqual(
-        span.attributes[SemanticAttributes.HTTP_FLAVOR],
-        HttpFlavorValues.HTTP_1_1
+        span.attributes[SEMATTRS_HTTP_FLAVOR],
+        HTTPFLAVORVALUES_HTTP_1_1
       );
       assert.strictEqual(
-        span.attributes[SemanticAttributes.NET_TRANSPORT],
-        NetTransportValues.IP_TCP
+        span.attributes[SEMATTRS_NET_TRANSPORT],
+        NETTRANSPORTVALUES_IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -397,7 +399,7 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.ok(span);
       assert.strictEqual(span.name, 'GET');
       assert.strictEqual(
-        span.attributes[SemanticAttributes.HTTP_HOST],
+        span.attributes[SEMATTRS_HTTP_HOST],
         `localhost:${mockServerPort}`
       );
     });

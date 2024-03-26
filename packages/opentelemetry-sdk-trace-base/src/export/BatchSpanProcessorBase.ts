@@ -181,7 +181,13 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         // Reset the finished spans buffer here because the next invocations of the _flush method
         // could pass the same finished spans to the exporter if the buffer is cleared
         // outside the execution of this callback.
-        const spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
+        let spans: ReadableSpan[];
+        if (this._finishedSpans.length <= this._maxExportBatchSize) {
+          spans = this._finishedSpans;
+          this._finishedSpans = [];
+        } else {
+          spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
+        }
 
         const doExport = () =>
           this._exporter.export(spans, result => {
@@ -195,19 +201,24 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
               );
             }
           });
-        const pendingResources = spans
-          .map(span => span.resource)
-          .filter(resource => resource.asyncAttributesPending);
+
+        let pendingResources: Array<Promise<void>> | null = null;
+        for (let i = 0, len = spans.length; i < len; i++) {
+          const span = spans[i];
+          if (
+            span.resource.asyncAttributesPending &&
+            span.resource.waitForAsyncAttributes
+          ) {
+            pendingResources ??= [];
+            pendingResources.push(span.resource.waitForAsyncAttributes());
+          }
+        }
 
         // Avoid scheduling a promise to make the behavior more predictable and easier to test
-        if (pendingResources.length === 0) {
+        if (pendingResources === null) {
           doExport();
         } else {
-          Promise.all(
-            pendingResources.map(
-              resource => resource.waitForAsyncAttributes?.()
-            )
-          ).then(doExport, err => {
+          Promise.all(pendingResources).then(doExport, err => {
             globalErrorHandler(err);
             reject(err);
           });

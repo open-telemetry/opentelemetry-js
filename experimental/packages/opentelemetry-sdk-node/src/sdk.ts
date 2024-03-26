@@ -31,6 +31,7 @@ import {
   DetectorSync,
   detectResourcesSync,
   envDetector,
+  hostDetector,
   IResource,
   processDetector,
   Resource,
@@ -46,7 +47,7 @@ import {
   NodeTracerConfig,
   NodeTracerProvider,
 } from '@opentelemetry/sdk-trace-node';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
@@ -123,6 +124,7 @@ export class NodeSDK {
     this._resourceDetectors = configuration.resourceDetectors ?? [
       envDetector,
       processDetector,
+      hostDetector,
     ];
 
     this._serviceName = configuration.serviceName;
@@ -328,7 +330,7 @@ export class NodeSDK {
         ? this._resource
         : this._resource.merge(
             new Resource({
-              [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName,
+              [SEMRESATTRS_SERVICE_NAME]: this._serviceName,
             })
           );
 

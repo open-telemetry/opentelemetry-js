@@ -15,57 +15,57 @@
  */
 
 import * as assert from 'assert';
-import { EventEmitter, events } from '../../src';
-import { NoopEventEmitter } from '../../src/NoopEventEmitter';
-import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
+import { EventLogger, events } from '../../src';
+import { NoopEventLogger } from '../../src/NoopEventLogger';
+import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 
 describe('API', () => {
-  const dummyEventEmitter = new NoopEventEmitter();
+  const dummyEventLogger = new NoopEventLogger();
 
-  it('should expose a event emitter provider via getEventEmitterProvider', () => {
-    const provider = events.getEventEmitterProvider();
+  it('should expose a event logger provider via getEventLoggerProvider', () => {
+    const provider = events.getEventLoggerProvider();
     assert.ok(provider);
     assert.strictEqual(typeof provider, 'object');
   });
 
-  describe('GlobalEventEmitterProvider', () => {
+  describe('GlobalEventLoggerProvider', () => {
     beforeEach(() => {
       events.disable();
     });
 
-    it('should use the global event emitter provider', () => {
-      events.setGlobalEventEmitterProvider(new TestEventEmitterProvider());
-      const eventEmitter = events
-        .getEventEmitterProvider()
-        .getEventEmitter('name', 'domain');
-      assert.deepStrictEqual(eventEmitter, dummyEventEmitter);
+    it('should use the global event logger provider', () => {
+      events.setGlobalEventLoggerProvider(new TestEventLoggerProvider());
+      const eventLogger = events
+        .getEventLoggerProvider()
+        .getEventLogger('name');
+      assert.deepStrictEqual(eventLogger, dummyEventLogger);
     });
 
     it('should not allow overriding global provider if already set', () => {
-      const provider1 = new TestEventEmitterProvider();
-      const provider2 = new TestEventEmitterProvider();
-      events.setGlobalEventEmitterProvider(provider1);
-      assert.equal(events.getEventEmitterProvider(), provider1);
-      events.setGlobalEventEmitterProvider(provider2);
-      assert.equal(events.getEventEmitterProvider(), provider1);
+      const provider1 = new TestEventLoggerProvider();
+      const provider2 = new TestEventLoggerProvider();
+      events.setGlobalEventLoggerProvider(provider1);
+      assert.equal(events.getEventLoggerProvider(), provider1);
+      events.setGlobalEventLoggerProvider(provider2);
+      assert.equal(events.getEventLoggerProvider(), provider1);
     });
   });
 
-  describe('getEventEmitter', () => {
+  describe('getEventLogger', () => {
     beforeEach(() => {
       events.disable();
     });
 
-    it('should return a event emitter instance from global provider', () => {
-      events.setGlobalEventEmitterProvider(new TestEventEmitterProvider());
-      const eventEmitter = events.getEventEmitter('myEventEmitter', 'domain');
-      assert.deepStrictEqual(eventEmitter, dummyEventEmitter);
+    it('should return a event logger instance from global provider', () => {
+      events.setGlobalEventLoggerProvider(new TestEventLoggerProvider());
+      const eventLogger = events.getEventLogger('myEventLogger');
+      assert.deepStrictEqual(eventLogger, dummyEventLogger);
     });
   });
 
-  class TestEventEmitterProvider extends NoopEventEmitterProvider {
-    override getEventEmitter(): EventEmitter {
-      return dummyEventEmitter;
+  class TestEventLoggerProvider extends NoopEventLoggerProvider {
+    override getEventLogger(): EventLogger {
+      return dummyEventLogger;
     }
   }
 });

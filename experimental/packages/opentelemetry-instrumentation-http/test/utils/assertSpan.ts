@@ -21,7 +21,24 @@ import {
 } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+  SEMATTRS_HTTP_SCHEME,
+  SEMATTRS_HTTP_SERVER_NAME,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_TARGET,
+  SEMATTRS_HTTP_URL,
+  SEMATTRS_HTTP_USER_AGENT,
+  SEMATTRS_NET_HOST_IP,
+  SEMATTRS_NET_HOST_PORT,
+  SEMATTRS_NET_PEER_IP,
+  SEMATTRS_NET_PEER_NAME,
+  SEMATTRS_NET_PEER_PORT,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as utils from '../../src/utils';
@@ -55,15 +72,15 @@ export const assertSpan = (
     span.status.message
   );
   assert.strictEqual(
-    span.attributes[SemanticAttributes.HTTP_METHOD],
+    span.attributes[SEMATTRS_HTTP_METHOD],
     validations.httpMethod
   );
   assert.strictEqual(
-    span.attributes[SemanticAttributes.HTTP_TARGET],
+    span.attributes[SEMATTRS_HTTP_TARGET],
     validations.path || validations.pathname
   );
   assert.strictEqual(
-    span.attributes[SemanticAttributes.HTTP_STATUS_CODE],
+    span.attributes[SEMATTRS_HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
 
@@ -97,10 +114,7 @@ export const assertSpan = (
   if (validations.reqHeaders) {
     const userAgent = validations.reqHeaders['user-agent'];
     if (userAgent) {
-      assert.strictEqual(
-        span.attributes[SemanticAttributes.HTTP_USER_AGENT],
-        userAgent
-      );
+      assert.strictEqual(span.attributes[SEMATTRS_HTTP_USER_AGENT], userAgent);
     }
   }
   if (span.kind === SpanKind.CLIENT) {
@@ -112,36 +126,28 @@ export const assertSpan = (
         validations.resHeaders['content-encoding'] !== 'identity'
       ) {
         assert.strictEqual(
-          span.attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH],
+          span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH],
           contentLength
         );
       } else {
         assert.strictEqual(
-          span.attributes[
-            SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
-          ],
+          span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
           contentLength
         );
       }
     }
     assert.strictEqual(
-      span.attributes[SemanticAttributes.NET_PEER_NAME],
+      span.attributes[SEMATTRS_NET_PEER_NAME],
       validations.hostname,
       'must be consistent (PEER_NAME and hostname)'
     );
     if (!validations.noNetPeer) {
-      assert.ok(
-        span.attributes[SemanticAttributes.NET_PEER_IP],
-        'must have PEER_IP'
-      );
-      assert.ok(
-        span.attributes[SemanticAttributes.NET_PEER_PORT],
-        'must have PEER_PORT'
-      );
+      assert.ok(span.attributes[SEMATTRS_NET_PEER_IP], 'must have PEER_IP');
+      assert.ok(span.attributes[SEMATTRS_NET_PEER_PORT], 'must have PEER_PORT');
     }
     assert.ok(
-      (span.attributes[SemanticAttributes.HTTP_URL] as string).indexOf(
-        span.attributes[SemanticAttributes.NET_PEER_NAME] as string
+      (span.attributes[SEMATTRS_HTTP_URL] as string).indexOf(
+        span.attributes[SEMATTRS_NET_PEER_NAME] as string
       ) > -1,
       'must be consistent'
     );
@@ -155,35 +161,27 @@ export const assertSpan = (
         validations.reqHeaders['content-encoding'] !== 'identity'
       ) {
         assert.strictEqual(
-          span.attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH],
+          span.attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
           contentLength
         );
       } else {
         assert.strictEqual(
-          span.attributes[
-            SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
-          ],
+          span.attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
           contentLength
         );
       }
     }
     if (validations.serverName) {
       assert.strictEqual(
-        span.attributes[SemanticAttributes.HTTP_SERVER_NAME],
+        span.attributes[SEMATTRS_HTTP_SERVER_NAME],
         validations.serverName,
         ' must have serverName attribute'
       );
-      assert.ok(
-        span.attributes[SemanticAttributes.NET_HOST_PORT],
-        'must have HOST_PORT'
-      );
-      assert.ok(
-        span.attributes[SemanticAttributes.NET_HOST_IP],
-        'must have HOST_IP'
-      );
+      assert.ok(span.attributes[SEMATTRS_NET_HOST_PORT], 'must have HOST_PORT');
+      assert.ok(span.attributes[SEMATTRS_NET_HOST_IP], 'must have HOST_IP');
     }
     assert.strictEqual(
-      span.attributes[SemanticAttributes.HTTP_SCHEME],
+      span.attributes[SEMATTRS_HTTP_SCHEME],
       validations.component,
       ' must have http.scheme attribute'
     );
