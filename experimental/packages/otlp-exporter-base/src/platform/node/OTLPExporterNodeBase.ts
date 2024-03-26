@@ -31,13 +31,8 @@ import { ISerializer } from '@opentelemetry/otlp-transformer';
  */
 export abstract class OTLPExporterNodeBase<
   ExportItem,
-  ServiceRequest,
   ServiceResponse,
-> extends OTLPExporterBase<
-  OTLPExporterNodeConfigBase,
-  ExportItem,
-  ServiceRequest
-> {
+> extends OTLPExporterBase<OTLPExporterNodeConfigBase, ExportItem> {
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
@@ -67,11 +62,6 @@ export abstract class OTLPExporterNodeBase<
   }
 
   onInit(_config: OTLPExporterNodeConfigBase): void {}
-
-  override convert(_objects: ExportItem[]): ServiceRequest {
-    // TODO(pichlermarc): needs to be removed from base in a follow-up
-    return {} as ServiceRequest;
-  }
 
   send(
     objects: ExportItem[],

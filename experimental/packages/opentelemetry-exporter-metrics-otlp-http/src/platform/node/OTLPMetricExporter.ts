@@ -26,7 +26,6 @@ import {
   parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  IExportMetricsServiceRequest,
   IExportMetricsServiceResponse,
   JsonMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
@@ -40,7 +39,6 @@ const USER_AGENT = {
 
 class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest,
   IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {

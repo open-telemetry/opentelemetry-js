@@ -22,7 +22,6 @@ import {
   OTLPExporterBrowserBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  IExportLogsServiceRequest,
   IExportLogsServiceResponse,
   ProtobufLogsSerializer,
 } from '@opentelemetry/otlp-transformer';
@@ -36,15 +35,11 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURC
  * Collector Trace Exporter for Web
  */
 export class OTLPLogExporter
-  extends OTLPExporterBrowserBase<
-    ReadableLogRecord,
-    IExportLogsServiceRequest,
-    IExportLogsServiceResponse
-  >
+  extends OTLPExporterBrowserBase<ReadableLogRecord, IExportLogsServiceResponse>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config, ProtobufLogsSerializer, 'x-application/protobuf');
+    super(config, ProtobufLogsSerializer, 'application/x-protobuf');
     this._headers = Object.assign(
       this._headers,
       baggageUtils.parseKeyPairsIntoRecord(

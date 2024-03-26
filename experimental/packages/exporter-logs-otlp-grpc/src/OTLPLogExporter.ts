@@ -23,7 +23,6 @@ import {
   DEFAULT_COLLECTOR_URL,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
-  IExportLogsServiceRequest,
   IExportLogsServiceResponse,
   ProtobufLogsSerializer,
 } from '@opentelemetry/otlp-transformer';
@@ -39,7 +38,6 @@ const USER_AGENT = {
 export class OTLPLogExporter
   extends OTLPGRPCExporterNodeBase<
     ReadableLogRecord,
-    IExportLogsServiceRequest,
     IExportLogsServiceResponse
   >
   implements LogRecordExporter

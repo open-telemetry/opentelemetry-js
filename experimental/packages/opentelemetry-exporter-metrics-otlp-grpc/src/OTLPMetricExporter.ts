@@ -27,7 +27,6 @@ import {
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import {
-  IExportMetricsServiceRequest,
   IExportMetricsServiceResponse,
   ProtobufMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
@@ -40,7 +39,6 @@ const USER_AGENT = {
 
 class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest,
   IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
