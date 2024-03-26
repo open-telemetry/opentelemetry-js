@@ -16,10 +16,6 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
-import {
-  getExportRequestProto,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
@@ -46,8 +42,25 @@ import {
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { VERSION } from '../src/version';
+import { Root } from 'protobufjs';
+import * as path from 'path';
 
 let fakeRequest: PassThrough;
+
+const dir = path.resolve(__dirname, '../../otlp-transformer/protos');
+const root = new Root();
+root.resolvePath = function (origin, target) {
+  return `${dir}/${target}`;
+};
+const proto = root.loadSync([
+  'opentelemetry/proto/common/v1/common.proto',
+  'opentelemetry/proto/resource/v1/resource.proto',
+  'opentelemetry/proto/metrics/v1/metrics.proto',
+  'opentelemetry/proto/collector/metrics/v1/metrics_service.proto',
+]);
+const exportRequestServiceProto = proto?.lookupType(
+  'ExportMetricsServiceRequest'
+);
 
 describe('OTLPMetricExporter - node with proto over http', () => {
   let collectorExporter: OTLPMetricExporter;
@@ -281,10 +294,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       let buff = Buffer.from('');
 
       fakeRequest.on('end', () => {
-        const ExportTraceServiceRequestProto = getExportRequestProto(
-          ServiceClientType.METRICS
-        );
-        const data = ExportTraceServiceRequestProto.decode(buff);
+        const data = exportRequestServiceProto.decode(buff);
         const json = data?.toJSON() as any;
 
         // The order of the metrics is not guaranteed.

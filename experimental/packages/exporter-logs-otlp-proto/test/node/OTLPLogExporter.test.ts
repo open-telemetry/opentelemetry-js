@@ -33,15 +33,26 @@ import {
   OTLPExporterNodeConfigBase,
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  getExportRequestProto,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { VERSION } from '../../src/version';
+import { Root } from 'protobufjs';
+import * as path from 'path';
 
 let fakeRequest: PassThrough;
+
+const dir = path.resolve(__dirname, '../../../otlp-transformer/protos');
+const root = new Root();
+root.resolvePath = function (origin, target) {
+  return `${dir}/${target}`;
+};
+const proto = root.loadSync([
+  'opentelemetry/proto/common/v1/common.proto',
+  'opentelemetry/proto/resource/v1/resource.proto',
+  'opentelemetry/proto/logs/v1/logs.proto',
+  'opentelemetry/proto/collector/logs/v1/logs_service.proto',
+]);
+const exportRequestServiceProto = proto?.lookupType('ExportLogsServiceRequest');
 
 describe('OTLPLogExporter - node with proto over http', () => {
   let collectorExporter: OTLPLogExporter;
@@ -240,10 +251,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
 
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
-        const ExportLogsServiceRequestProto = getExportRequestProto(
-          ServiceClientType.LOGS
-        );
-        const data = ExportLogsServiceRequestProto.decode(buff);
+        const data = exportRequestServiceProto.decode(buff);
         const json = data?.toJSON() as IExportLogsServiceRequest;
         const log1 = json.resourceLogs?.[0].scopeLogs?.[0].logRecords?.[0];
         assert.ok(typeof log1 !== 'undefined', "log doesn't exist");
@@ -328,10 +336,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
-        const ExportLogsServiceRequestProto = getExportRequestProto(
-          ServiceClientType.LOGS
-        );
-        const data = ExportLogsServiceRequestProto.decode(unzippedBuff);
+        const data = exportRequestServiceProto.decode(unzippedBuff);
         const json = data?.toJSON() as IExportLogsServiceRequest;
         const log1 = json.resourceLogs?.[0].scopeLogs?.[0].logRecords?.[0];
         assert.ok(typeof log1 !== 'undefined', "log doesn't exist");

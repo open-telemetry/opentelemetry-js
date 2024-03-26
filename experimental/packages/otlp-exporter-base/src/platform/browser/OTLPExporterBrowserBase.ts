@@ -21,6 +21,7 @@ import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { ISerializer } from '@opentelemetry/otlp-transformer';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -28,15 +29,26 @@ import { getEnv, baggageUtils } from '@opentelemetry/core';
 export abstract class OTLPExporterBrowserBase<
   ExportItem,
   ServiceRequest,
+  ServiceResponse,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
+  private _contentType: string;
+  private _serializer: ISerializer<ExportItem[], ServiceResponse>;
 
   /**
    * @param config
+   * @param serializer
+   * @param contentType
    */
-  constructor(config: OTLPExporterConfigBase = {}) {
+  constructor(
+    config: OTLPExporterConfigBase = {},
+    serializer: ISerializer<ExportItem[], ServiceResponse>,
+    contentType: string
+  ) {
     super(config);
+    this._serializer = serializer;
+    this._contentType = contentType;
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
     if (this._useXHR) {
@@ -56,6 +68,12 @@ export abstract class OTLPExporterBrowserBase<
 
   onShutdown(): void {}
 
+  override convert(_objects: ExportItem[]): ServiceRequest {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore nothing to do
+    return {};
+  }
+
   send(
     items: ExportItem[],
     onSuccess: () => void,
@@ -65,15 +83,17 @@ export abstract class OTLPExporterBrowserBase<
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
-    const serviceRequest = this.convert(items);
-    const body = JSON.stringify(serviceRequest);
+    const body = this._serializer.serializeRequest(items) ?? new Uint8Array();
 
     const promise = new Promise<void>((resolve, reject) => {
       if (this._useXHR) {
         sendWithXhr(
           body,
           this.url,
-          this._headers,
+          {
+            ...this._headers,
+            'Content-Type': this._contentType,
+          },
           this.timeoutMillis,
           resolve,
           reject
@@ -82,7 +102,7 @@ export abstract class OTLPExporterBrowserBase<
         sendWithBeacon(
           body,
           this.url,
-          { type: 'application/json' },
+          { type: this._contentType },
           resolve,
           reject
         );
