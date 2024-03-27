@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { NoopEventEmitter } from '../../src/NoopEventEmitter';
-import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
+import { EventLoggerProvider } from './types/EventLoggerProvider';
+import { EventLogger } from './types/EventLogger';
+import { EventLoggerOptions } from './types/EventLoggerOptions';
+import { NoopEventLogger } from './NoopEventLogger';
 
-describe('NoopEventEmitter', () => {
-  it('constructor should not crash', () => {
-    const logger = new NoopEventEmitterProvider().getEventEmitter('test-noop');
-    assert(logger instanceof NoopEventEmitter);
-  });
+export class NoopEventLoggerProvider implements EventLoggerProvider {
+  getEventLogger(
+    _name: string,
+    _version?: string | undefined,
+    _options?: EventLoggerOptions | undefined
+  ): EventLogger {
+    return new NoopEventLogger();
+  }
+}
 
-  it('calling emit should not crash', () => {
-    const emitter = new NoopEventEmitterProvider().getEventEmitter('test-noop');
-    emitter.emit({
-      name: 'event name',
-    });
-  });
-});
+export const NOOP_EVENT_LOGGER_PROVIDER = new NoopEventLoggerProvider();

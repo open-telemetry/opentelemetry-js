@@ -15,25 +15,25 @@
  */
 
 import * as assert from 'assert';
-import { NoopEventEmitter } from '../../src/NoopEventEmitter';
-import { NoopEventEmitterProvider } from '../../src/NoopEventEmitterProvider';
+import { NoopEventLogger } from '../../src/NoopEventLogger';
+import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 
 describe('NoopLoggerProvider', () => {
   it('should not crash', () => {
-    const eventEmitterProvider = new NoopEventEmitterProvider();
+    const eventLoggerProvider = new NoopEventLoggerProvider();
 
     assert.ok(
-      eventEmitterProvider.getEventEmitter('emitter-name') instanceof
-        NoopEventEmitter
+      eventLoggerProvider.getEventLogger('logger-name') instanceof
+        NoopEventLogger
     );
     assert.ok(
-      eventEmitterProvider.getEventEmitter('emitter-name', 'v1') instanceof
-        NoopEventEmitter
+      eventLoggerProvider.getEventLogger('logger-name', 'v1') instanceof
+        NoopEventLogger
     );
     assert.ok(
-      eventEmitterProvider.getEventEmitter('emitter-name', 'v1', {
+      eventLoggerProvider.getEventLogger('logger-name', 'v1', {
         schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
-      }) instanceof NoopEventEmitter
+      }) instanceof NoopEventLogger
     );
   });
 });

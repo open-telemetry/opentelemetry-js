@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import * as assert from 'assert';
+import { NoopEventLogger } from '../../src/NoopEventLogger';
+import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 
-export interface EventEmitterOptions {
-  /**
-   * The schemaUrl of the tracer or instrumentation library
-   * @default ''
-   */
-  schemaUrl?: string;
+describe('NoopEventLogger', () => {
+  it('constructor should not crash', () => {
+    const logger = new NoopEventLoggerProvider().getEventLogger('test-noop');
+    assert(logger instanceof NoopEventLogger);
+  });
 
-  /**
-   * The instrumentation scope attributes to associate with emitted telemetry
-   */
-  scopeAttributes?: Attributes;
-}
+  it('calling emit should not crash', () => {
+    const logger = new NoopEventLoggerProvider().getEventLogger('test-noop');
+    logger.emit({
+      name: 'event name',
+    });
+  });
+});

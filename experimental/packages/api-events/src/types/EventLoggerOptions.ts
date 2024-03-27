@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-import { EventEmitterProvider } from './types/EventEmitterProvider';
-import { EventEmitter } from './types/EventEmitter';
-import { EventEmitterOptions } from './types/EventEmitterOptions';
-import { NoopEventEmitter } from './NoopEventEmitter';
+import { Attributes } from '@opentelemetry/api';
 
-export class NoopEventEmitterProvider implements EventEmitterProvider {
-  getEventEmitter(
-    _name: string,
-    _version?: string | undefined,
-    _options?: EventEmitterOptions | undefined
-  ): EventEmitter {
-    return new NoopEventEmitter();
-  }
+export interface EventLoggerOptions {
+  /**
+   * The schemaUrl of the tracer or instrumentation library
+   * @default ''
+   */
+  schemaUrl?: string;
+
+  /**
+   * The instrumentation scope attributes to associate with emitted telemetry
+   */
+  scopeAttributes?: Attributes;
 }
-
-export const NOOP_EVENT_EMITTER_PROVIDER = new NoopEventEmitterProvider();
