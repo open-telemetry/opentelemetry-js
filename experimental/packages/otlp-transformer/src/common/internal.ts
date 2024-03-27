@@ -19,7 +19,7 @@ import { Attributes } from '@opentelemetry/api';
 export function toAttributes(attributes: Attributes): IKeyValue[] {
   const result = [];
   for (const key in attributes) {
-    if (attributes.propertyIsEnumerable(key))
+    if (Object.prototype.propertyIsEnumerable.call(attributes, key))
       result.push(toKeyValue(key, attributes[key]));
   }
   return result;
