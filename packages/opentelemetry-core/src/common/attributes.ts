@@ -25,6 +25,9 @@ export function sanitizeAttributes(
   }
 
   for (const key in attributes) {
+    if (!Object.prototype.propertyIsEnumerable.call(attributes, key)) {
+      continue;
+    }
     if (!isAttributeKey(key)) {
       diag.warn(`Invalid attribute key: ${key}`);
       continue;
@@ -35,7 +38,7 @@ export function sanitizeAttributes(
       continue;
     }
     if (Array.isArray(val)) {
-      out[key] = out[key] == val ? val : val.slice();
+      out[key] = out[key] === val ? val : val.slice();
     } else {
       out[key] = val;
     }
