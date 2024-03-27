@@ -74,14 +74,17 @@ describe('JaegerRemoteSampler', () => {
     });
 
     it('Dont try to sync if already syncing.', async () => {
-      getAndUpdateSamplerStub.callsFake(async () => new Promise(resolve => setTimeout(resolve, poolingInterval+1000)));
+      getAndUpdateSamplerStub.callsFake(
+        async () =>
+          new Promise(resolve => setTimeout(resolve, poolingInterval + 1000))
+      );
       new JaegerRemoteSampler({
         endpoint,
         serviceName,
         poolingInterval,
         initialSampler: alwaysOnSampler,
       });
-      await clock.tickAsync(poolingInterval*2);
+      await clock.tickAsync(poolingInterval * 2);
       sinon.assert.callCount(getAndUpdateSamplerStub, 1);
     });
   });
@@ -204,7 +207,6 @@ describe('JaegerRemoteSampler', () => {
     });
 
     describe('defaultStrategy', () => {
-
       it('Use root level samplingRate when operationSampling object is null.', async () => {
         const samplingRate = randomSamplingProability();
 
@@ -213,9 +215,9 @@ describe('JaegerRemoteSampler', () => {
             strategyType: StrategyType.PROBABILISTIC,
             probabilisticSampling: {
               samplingRate,
-            }
+            },
           };
-  
+
         getSamplerConfigStub.resolves(
           samplingStrategyResponseWithoutPerOperationStrategies
         );
@@ -258,7 +260,7 @@ describe('JaegerRemoteSampler', () => {
               defaultUpperBoundTracesPerSecond: 18,
             },
           };
-  
+
         getSamplerConfigStub.resolves(
           samplingStrategyResponseWithoutPerOperationStrategies
         );
@@ -485,7 +487,10 @@ describe('JaegerRemoteSampler', () => {
         initialSampler: alwaysOnSampler,
       });
       await clock.tickAsync(poolingInterval);
-      sinon.assert.calledOnceWithExactly(axiosGetStub, `${endpoint}/sampling?service=${serviceName}`);
+      sinon.assert.calledOnceWithExactly(
+        axiosGetStub,
+        `${endpoint}/sampling?service=${serviceName}`
+      );
     });
 
     it('Should pass endpoint and blank service name if nothing is provided.', async () => {
@@ -496,7 +501,10 @@ describe('JaegerRemoteSampler', () => {
         initialSampler: alwaysOnSampler,
       });
       await clock.tickAsync(poolingInterval);
-      sinon.assert.calledOnceWithExactly(axiosGetStub, `${endpoint}/sampling?service=`);
+      sinon.assert.calledOnceWithExactly(
+        axiosGetStub,
+        `${endpoint}/sampling?service=`
+      );
     });
   });
 });

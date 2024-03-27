@@ -103,7 +103,11 @@ export class JaegerRemoteSampler implements Sampler {
   ): Sampler {
     const perOperationStrategies =
       newConfig.operationSampling?.perOperationStrategies;
-    if (newConfig.operationSampling && perOperationStrategies && perOperationStrategies.length > 0) {
+    if (
+      newConfig.operationSampling &&
+      perOperationStrategies &&
+      perOperationStrategies.length > 0
+    ) {
       const defaultSampler: Sampler = new TraceIdRatioBasedSampler(
         newConfig.operationSampling.defaultSamplingProbability
       );
