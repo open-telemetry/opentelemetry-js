@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import { Event } from './Event';
 
-export interface EventEmitterOptions {
+export interface EventLogger {
   /**
-   * The schemaUrl of the tracer or instrumentation library
-   * @default ''
+   * Emit an event. This method should only be used by instrumentations emitting events.
+   *
+   * @param event
    */
-  schemaUrl?: string;
-
-  /**
-   * The instrumentation scope attributes to associate with emitted telemetry
-   */
-  scopeAttributes?: Attributes;
+  emit(event: Event): void;
 }
