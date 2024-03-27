@@ -382,32 +382,32 @@ describe('fetch', () => {
         `attributes ${SemanticAttributes.HTTP_URL} is wrong`
       );
       assert.strictEqual(
-        attributes[keys[3]],
+        attributes[keys[4]],
         200,
         `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
       );
       assert.ok(
-        attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
+        attributes[keys[5]] === 'OK' || attributes[keys[5]] === '',
         `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.ok(
-        (attributes[keys[5]] as string).indexOf('localhost') === 0,
+        (attributes[keys[6]] as string).indexOf('localhost') === 0,
         `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
       );
       assert.ok(
-        attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+        attributes[keys[7]] === 'http' || attributes[keys[6]] === 'https',
         `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
       );
       assert.ok(
-        attributes[keys[7]] !== '',
+        attributes[keys[8]] !== '',
         `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
       );
       assert.ok(
-        (attributes[keys[8]] as number) > 0,
+        (attributes[keys[9]] as number) > 0,
         `attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
-      assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+      assert.strictEqual(keys.length, 11, 'number of attributes is wrong');
     });
 
     it('span should have correct events', () => {
@@ -932,7 +932,7 @@ describe('fetch', () => {
 
       // should still have basic attributes
       assert.strictEqual(
-        attributes[keys[3]],
+        attributes[keys[4]],
         200,
         `Missing basic attribute ${SemanticAttributes.HTTP_STATUS_CODE}`
       );

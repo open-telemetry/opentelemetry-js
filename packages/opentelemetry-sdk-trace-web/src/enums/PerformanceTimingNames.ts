@@ -35,6 +35,7 @@ export enum PerformanceTimingNames {
   RESPONSE_END = 'responseEnd',
   RESPONSE_START = 'responseStart',
   SECURE_CONNECTION_START = 'secureConnectionStart',
+  TRANSFER_SIZE = 'transferSize',
   UNLOAD_EVENT_END = 'unloadEventEnd',
   UNLOAD_EVENT_START = 'unloadEventStart',
 }

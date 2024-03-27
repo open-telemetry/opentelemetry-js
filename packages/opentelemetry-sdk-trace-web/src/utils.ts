@@ -110,6 +110,10 @@ export function addSpanNetworkEvents(
       decodedLength
     );
   }
+  const transferSize = resource[PTN.TRANSFER_SIZE];
+  if (transferSize !== undefined) {
+    span.setAttribute('http.response_transfer_size', transferSize);
+  }
 }
 
 /**

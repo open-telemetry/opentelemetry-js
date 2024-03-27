@@ -37,6 +37,32 @@ const OBSERVER_WAIT_TIME_MS = 300;
 
 const isNode = typeof process === 'object' && process.release?.name === 'node';
 
+const computeBodySize = (
+  body: Request['body'] | RequestInit['body']
+): number | undefined => {
+  if (body === undefined || body === null) {
+    return 0;
+  }
+  if (body instanceof Blob) {
+    return body.size;
+  }
+  if (body instanceof FormData) {
+    return [...body].reduce(
+      (size, [name, value]) =>
+        size +
+        (typeof value === 'string' ? new Blob([value]).size : value.size),
+      0
+    );
+  }
+  if (body instanceof URLSearchParams) {
+    return new Blob([body.toString()]).size;
+  }
+  if (body instanceof ArrayBuffer) {
+    return body.byteLength;
+  }
+  return undefined;
+};
+
 export interface FetchCustomAttributeFunction {
   (
     span: api.Span,
@@ -209,13 +235,19 @@ export class FetchInstrumentation extends InstrumentationBase<
     }
     const method = (options.method || 'GET').toUpperCase();
     const spanName = `HTTP ${method}`;
+    const attributes: api.Attributes = {
+      [AttributeNames.COMPONENT]: this.moduleName,
+      [SemanticAttributes.HTTP_METHOD]: method,
+      [SemanticAttributes.HTTP_URL]: url,
+    };
+    const requestContentLength = computeBodySize(options.body);
+    if (requestContentLength !== undefined) {
+      attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH] =
+        requestContentLength;
+    }
     return this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
-      attributes: {
-        [AttributeNames.COMPONENT]: this.moduleName,
-        [SemanticAttributes.HTTP_METHOD]: method,
-        [SemanticAttributes.HTTP_URL]: url,
-      },
+      attributes,
     });
   }
 
