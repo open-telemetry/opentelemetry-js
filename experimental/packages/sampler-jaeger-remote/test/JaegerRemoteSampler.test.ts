@@ -25,18 +25,19 @@ import * as api from '@opentelemetry/api';
 import { JaegerRemoteSampler } from '../src';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { DiagAPI, SpanKind } from '@opentelemetry/api';
+import { SpanKind } from '@opentelemetry/api';
 import { SamplingStrategyResponse, StrategyType } from '../src/types';
 import { PerOperationSampler } from '../src/PerOperationSampler';
 import { randomSamplingProability } from './utils';
+import axios from 'axios';
 
 describe('JaegerRemoteSampler', () => {
   const endpoint = 'http://localhost:5778';
   const serviceName = 'foo';
   const alwaysOnSampler = new AlwaysOnSampler();
   const alwaysOffSampler = new AlwaysOffSampler();
-  const numberOfIterations = Math.floor(Math.random() + 1 * 100);
-  const poolingInterval = Math.floor(Math.random() + 1 * 5) * 1000;
+  const numberOfIterations = Math.floor((Math.random() + 0.01) * 100);
+  const poolingInterval = Math.floor((Math.random() + 0.01) * 5 * 1000);
 
   let clock: sinon.SinonFakeTimers;
 
@@ -51,13 +52,13 @@ describe('JaegerRemoteSampler', () => {
   describe('constructor', () => {
     let getAndUpdateSamplerStub: sinon.SinonStub;
 
-    before(() => {
+    beforeEach(() => {
       getAndUpdateSamplerStub = sinon
         .stub(JaegerRemoteSampler.prototype, 'getAndUpdateSampler')
         .resolves();
     });
 
-    after(() => {
+    afterEach(() => {
       getAndUpdateSamplerStub.restore();
     });
 
@@ -71,12 +72,24 @@ describe('JaegerRemoteSampler', () => {
       await clock.tickAsync(poolingInterval * numberOfIterations);
       sinon.assert.callCount(getAndUpdateSamplerStub, numberOfIterations);
     });
+
+    it('Dont try to sync if already syncing.', async () => {
+      getAndUpdateSamplerStub.callsFake(async () => new Promise(resolve => setTimeout(resolve, poolingInterval+1000)));
+      new JaegerRemoteSampler({
+        endpoint,
+        serviceName,
+        poolingInterval,
+        initialSampler: alwaysOnSampler,
+      });
+      await clock.tickAsync(poolingInterval*2);
+      sinon.assert.callCount(getAndUpdateSamplerStub, 1);
+    });
   });
 
   describe('shouldSample', () => {
     let samplerStubInstance: sinon.SinonStubbedInstance<AlwaysOnSampler>;
 
-    before(() => {
+    beforeEach(() => {
       samplerStubInstance = sinon.createStubInstance(AlwaysOnSampler);
       samplerStubInstance.shouldSample.returns({
         decision: SamplingDecision.RECORD,
@@ -191,29 +204,65 @@ describe('JaegerRemoteSampler', () => {
     });
 
     describe('defaultStrategy', () => {
-      const samplingRate = randomSamplingProability();
 
-      const samplingStrategyResponseWithoutPerOperationStrategies: SamplingStrategyResponse =
-        {
-          strategyType: StrategyType.PROBABILISTIC,
-          probabilisticSampling: {
-            samplingRate,
-          },
-          operationSampling: {
-            defaultSamplingProbability: 1.5,
-            defaultLowerBoundTracesPerSecond: 1.6,
-            perOperationStrategies: [],
-            defaultUpperBoundTracesPerSecond: 18,
-          },
-        };
+      it('Use root level samplingRate when operationSampling object is null.', async () => {
+        const samplingRate = randomSamplingProability();
 
-      beforeEach(() => {
+        const samplingStrategyResponseWithoutPerOperationStrategies: SamplingStrategyResponse =
+          {
+            strategyType: StrategyType.PROBABILISTIC,
+            probabilisticSampling: {
+              samplingRate,
+            }
+          };
+  
         getSamplerConfigStub.resolves(
           samplingStrategyResponseWithoutPerOperationStrategies
         );
+
+        const jaegerRemoteSampler = new JaegerRemoteSampler({
+          endpoint,
+          serviceName,
+          poolingInterval,
+          initialSampler: alwaysOnSampler,
+        });
+        await clock.tickAsync(poolingInterval);
+        const jaegerCurrentSampler = jaegerRemoteSampler.getCurrentSampler();
+        assert.equal(jaegerCurrentSampler instanceof ParentBasedSampler, true);
+        const parentBasedRootSampler = (
+          jaegerCurrentSampler as ParentBasedSampler
+        ).getRootSampler();
+        assert.equal(
+          parentBasedRootSampler instanceof TraceIdRatioBasedSampler,
+          true
+        );
+        const internalTraceIdRatioBasedSamplerRatio = (
+          parentBasedRootSampler as TraceIdRatioBasedSampler
+        ).getRatio();
+        assert.equal(internalTraceIdRatioBasedSamplerRatio, samplingRate);
       });
 
-      it('Use root level samplingRate.', async () => {
+      it('Use root level samplingRate perOperation Strategies is a empty array.', async () => {
+        const samplingRate = randomSamplingProability();
+
+        const samplingStrategyResponseWithoutPerOperationStrategies: SamplingStrategyResponse =
+          {
+            strategyType: StrategyType.PROBABILISTIC,
+            probabilisticSampling: {
+              samplingRate,
+            },
+            operationSampling: {
+              defaultSamplingProbability: 1.5,
+              defaultLowerBoundTracesPerSecond: 1.6,
+              perOperationStrategies: [],
+              defaultUpperBoundTracesPerSecond: 18,
+            },
+          };
+  
+        getSamplerConfigStub.resolves(
+          samplingStrategyResponseWithoutPerOperationStrategies
+        );
+
         const jaegerRemoteSampler = new JaegerRemoteSampler({
           endpoint,
           serviceName,
@@ -414,6 +463,40 @@ describe('JaegerRemoteSampler', () => {
         jaegerCurrentSampler,
         `JaegerRemoteSampler{endpoint=${endpoint}, serviceName=${serviceName}, poolingInterval=${poolingInterval}, sampler=ParentBased{root=PerOperationSampler{default=TraceIdRatioBased{${defaultSamplingProbability}}, perOperationSamplers={${op1}=TraceIdRatioBased{${op1SamplingRate}}}}, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}}`
       );
+    });
+  });
+
+  describe('getSamplerConfig', () => {
+    let axiosGetStub: sinon.SinonStub;
+
+    beforeEach(() => {
+      axiosGetStub = sinon.stub(axios, 'get');
+    });
+
+    afterEach(() => {
+      axiosGetStub.restore();
+    });
+
+    it('Should pass endpoint and service name.', async () => {
+      new JaegerRemoteSampler({
+        endpoint,
+        serviceName,
+        poolingInterval,
+        initialSampler: alwaysOnSampler,
+      });
+      await clock.tickAsync(poolingInterval);
+      sinon.assert.calledOnceWithExactly(axiosGetStub, `${endpoint}/sampling?service=${serviceName}`);
+    });
+
+    it('Should pass endpoint and blank service name if nothing is provided.', async () => {
+      new JaegerRemoteSampler({
+        endpoint,
+        serviceName: undefined,
+        poolingInterval,
+        initialSampler: alwaysOnSampler,
+      });
+      await clock.tickAsync(poolingInterval);
+      sinon.assert.calledOnceWithExactly(axiosGetStub, `${endpoint}/sampling?service=`);
     });
   });
 });

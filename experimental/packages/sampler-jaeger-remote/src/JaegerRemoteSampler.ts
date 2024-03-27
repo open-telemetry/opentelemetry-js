@@ -21,7 +21,6 @@ import {
 } from '../../../../packages/opentelemetry-sdk-trace-base/src/Sampler';
 import { SpanKind } from '@opentelemetry/api/src/trace/span_kind';
 import { Link } from '@opentelemetry/api/src/trace/link';
-import { SpanAttributes } from '@opentelemetry/api/src/trace/attributes';
 import axios from 'axios';
 import {
   ParentBasedSampler,
@@ -29,7 +28,18 @@ import {
 } from '../../../../packages/opentelemetry-sdk-trace-base/src';
 import { PerOperationSampler } from './PerOperationSampler';
 import { SamplingStrategyResponse, StrategyType } from './types';
-import { diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
+
+interface JaegerRemoteSamplerOptions {
+  /** Address of a service that implements the Remote Sampling API, such as Jaeger Collector or OpenTelemetry Collector */
+  endpoint: string;
+  /** Service name for Remote Sampling API */
+  serviceName?: string;
+  /** Polling interval for getting configuration from remote */
+  poolingInterval: number;
+  /** Initial sampler that is used before the first configuration is fetched */
+  initialSampler: Sampler;
+}
 
 /** JaegerRemoteSampler */
 export class JaegerRemoteSampler implements Sampler {
@@ -64,7 +74,7 @@ export class JaegerRemoteSampler implements Sampler {
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
-    attributes: SpanAttributes,
+    attributes: Attributes,
     links: Link[]
   ): SamplingResult {
     return this._sampler.shouldSample(
@@ -93,9 +103,9 @@ export class JaegerRemoteSampler implements Sampler {
   ): Sampler {
     const perOperationStrategies =
       newConfig.operationSampling?.perOperationStrategies;
-    if (perOperationStrategies && perOperationStrategies.length > 0) {
+    if (newConfig.operationSampling && perOperationStrategies && perOperationStrategies.length > 0) {
       const defaultSampler: Sampler = new TraceIdRatioBasedSampler(
-        newConfig.operationSampling?.defaultSamplingProbability
+        newConfig.operationSampling.defaultSamplingProbability
       );
       return new ParentBasedSampler({
         root: new PerOperationSampler({
@@ -130,15 +140,4 @@ export class JaegerRemoteSampler implements Sampler {
   getCurrentSampler(): Sampler {
     return this._sampler;
   }
-}
-
-interface JaegerRemoteSamplerOptions {
-  /** Address of a service that implements the Remote Sampling API, such as Jaeger Collector or OpenTelemetry Collector */
-  endpoint: string;
-  /** Service name for Remote Sampling API */
-  serviceName?: string;
-  /** Polling interval for getting configuration from remote */
-  poolingInterval: number;
-  /** Initial sampler that is used before the first configuration is fetched */
-  initialSampler: Sampler;
 }

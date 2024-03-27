@@ -25,7 +25,14 @@ import { SpanAttributes } from '@opentelemetry/api/src/trace/attributes';
 import { PerOperationStrategy } from './types';
 import { TraceIdRatioBasedSampler } from '../../../../packages/opentelemetry-sdk-trace-base/src';
 
-/** PerOperationSampler to be used from */
+interface PerOperationSamplerOptions {
+  /** The default sampler to use in case span does not have a custom strategy. */
+  defaultSampler: Sampler;
+  /** Stores strategies for every custom span. */
+  perOperationStrategies: PerOperationStrategy[];
+}
+
+/** PerOperationSampler to be used from JaegerRemoteSampler */
 export class PerOperationSampler implements Sampler {
   private _defaultSampler: Sampler;
   private _perOperationSampler: Map<string, Sampler>;
@@ -76,11 +83,4 @@ export class PerOperationSampler implements Sampler {
       ([key, value]) => `${key}=${value}`
     )}}}`;
   }
-}
-
-interface PerOperationSamplerOptions {
-  /** The default sampler to use in case span does not have a custom strategy. */
-  defaultSampler: Sampler;
-  /** Stores strategies for every custom span. */
-  perOperationStrategies: PerOperationStrategy[];
 }
