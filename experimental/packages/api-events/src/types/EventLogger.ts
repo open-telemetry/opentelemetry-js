@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-import { EventEmitter } from './types/EventEmitter';
-import { Event } from './types/Event';
+import { Event } from './Event';
 
-export class NoopEventEmitter implements EventEmitter {
-  emit(_event: Event): void {}
+export interface EventLogger {
+  /**
+   * Emit an event. This method should only be used by instrumentations emitting events.
+   *
+   * @param event
+   */
+  emit(event: Event): void;
 }

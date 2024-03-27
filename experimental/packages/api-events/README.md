@@ -28,18 +28,18 @@ If you are writing an instrumentation library, or prefer to call the API methods
 ```javascript
 const api = require("@opentelemetry/api-events");
 
-/* A specific implementation of EventEmitterProvider comes from an SDK */
-const eventEmitterProvider = createEventEmitterProvider();
+/* A specific implementation of EventLoggerProvider comes from an SDK */
+const eventLoggerProvider = createEventLoggerProvider();
 
-/* Initialize EventEmitterProvider */
-api.events.setGlobalEventEmitterProvider(eventEmitterProvider);
-/* returns eventEmitterProvider (no-op if a working provider has not been initialized) */
-api.events.getEventEmitterProvider();
-/* returns an event emitter from the registered global event emitter provider (no-op if a working provider has not been initialized) */
-const eventEmitter = api.events.getEventEmitter(name, version);
+/* Initialize EventLoggerProvider */
+api.events.setGlobalEventLoggerProvider(eventLoggerProvider);
+/* returns eventLoggerProvider (no-op if a working provider has not been initialized) */
+api.events.getEventLoggerProvider();
+/* returns an event logger from the registered global event logger provider (no-op if a working provider has not been initialized) */
+const eventLogger = api.events.getEventLogger(name, version);
 
 // logging an event in an instrumentation library
-eventEmitter.emit({ name: 'event-name' });
+eventLogger.emit({ name: 'event-name' });
 ```
 
 ## Useful links
