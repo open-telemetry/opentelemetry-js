@@ -23,6 +23,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
+* perf(instrumentation-http): remove obvious temp allocations [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
 
 ### :bug: (Bug Fix)
 
