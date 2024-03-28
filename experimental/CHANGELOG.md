@@ -36,6 +36,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
+* docs(instr-http): document semantic conventions and attributes in use. [#4587](https://github.com/open-telemetry/opentelemetry-js/pull/4587/) @JamieDanielson
+
 ### :house: (Internal)
 
 ## 0.49.1
