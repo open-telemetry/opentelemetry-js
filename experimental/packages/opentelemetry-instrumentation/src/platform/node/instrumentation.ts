@@ -30,6 +30,7 @@ import { InstrumentationModuleDefinition } from '../../types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
 import { Hook } from 'require-in-the-middle';
+import { readFileSync } from 'fs';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -160,8 +161,10 @@ export abstract class InstrumentationBase<T = any>
 
   private _extractPackageVersion(baseDir: string): string | undefined {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const version = require(path.join(baseDir, 'package.json')).version;
+      const json = readFileSync(path.join(baseDir, 'package.json'), {
+        encoding: 'utf8',
+      });
+      const version = JSON.parse(json).version;
       return typeof version === 'string' ? version : undefined;
     } catch (error) {
       diag.warn('Failed extracting version', baseDir);
