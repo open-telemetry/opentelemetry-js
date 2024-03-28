@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
-import { LogAttributeValue } from '@opentelemetry/api-logs';
-
-export type EventDataValue = LogAttributeValue;
+import { AnyValue, Attributes } from '@opentelemetry/api';
 
 export interface Event {
   /**
@@ -34,7 +31,7 @@ export interface Event {
    * Data that describes the event.
    * Intended to be used by instrumentation libraries.
    */
-  data?: EventDataValue;
+  data?: AnyValue;
 
   /**
    * Additional attributes that describe the event.
