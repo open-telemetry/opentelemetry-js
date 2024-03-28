@@ -134,9 +134,8 @@ export class Tracer implements api.Tracer {
 
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.
-    const initAttributes = sanitizeAttributes(
-      Object.assign(attributes, samplingResult.attributes)
-    );
+    Object.assign(attributes, samplingResult.attributes);
+    const initAttributes = sanitizeAttributes(attributes, attributes);
 
     const span = new Span(
       this,
