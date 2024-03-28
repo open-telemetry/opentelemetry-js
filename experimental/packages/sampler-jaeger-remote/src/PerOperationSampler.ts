@@ -18,7 +18,7 @@ import { Context } from '@opentelemetry/api/src/context/types';
 import {
   Sampler,
   SamplingResult,
-  TraceIdRatioBasedSampler
+  TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
 import { SpanKind } from '@opentelemetry/api/src/trace/span_kind';
 import { Link } from '@opentelemetry/api/src/trace/link';
