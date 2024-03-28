@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import { AttributeValue, Context, TimeInput } from '@opentelemetry/api';
+import { AnyValue, AnyValueMap, Context, TimeInput } from '@opentelemetry/api';
 
-export type LogAttributeValue = AttributeValue | LogAttributes;
-export interface LogAttributes {
-  [attributeKey: string]: LogAttributeValue | undefined;
-}
+export type LogBody = AnyValue;
+export type LogAttributes = AnyValueMap;
 
 export enum SeverityNumber {
   UNSPECIFIED = 0,
@@ -73,7 +71,7 @@ export interface LogRecord {
   /**
    * A value containing the body of the log record.
    */
-  body?: string;
+  body?: LogBody;
 
   /**
    * Attributes that define the log record.

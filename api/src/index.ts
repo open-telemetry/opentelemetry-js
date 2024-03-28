@@ -18,7 +18,12 @@ export { BaggageEntry, BaggageEntryMetadata, Baggage } from './baggage/types';
 export { baggageEntryMetadataFromString } from './baggage/utils';
 export { Exception } from './common/Exception';
 export { HrTime, TimeInput } from './common/Time';
-export { Attributes, AttributeValue } from './common/Attributes';
+export {
+  Attributes,
+  AttributeValue,
+  AnyValue,
+  AnyValueMap,
+} from './common/Attributes';
 
 // Context APIs
 export { createContextKey, ROOT_CONTEXT } from './context/context';
