@@ -63,6 +63,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation): add getModuleDefinitions() to InstrumentationBase [#4475](https://github.com/open-telemetry/opentelemetry-js/pull/4475) @pichlermarc
 * feat(exporter-metrics-otlp-http): add option to set the exporter aggregation preference  [#4409](https://github.com/open-telemetry/opentelemetry-js/pull/4409) @AkselAllas
 * feat(node-sdk): add spanProcessors option [#4454](https://github.com/open-telemetry/opentelemetry-js/pull/4454) @naseemkullah
+* feat(otlp-exporter-base): Add fetch sender for WebWorker and ServiceWorker environment. [#3542](https://github.com/open-telemetry/opentelemetry-js/pull/3542) @sugi
 
 ### :bug: (Bug Fix)
 
