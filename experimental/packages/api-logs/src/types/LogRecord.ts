@@ -16,7 +16,7 @@
 
 import { AnyValue, AnyValueMap, Context, TimeInput } from '@opentelemetry/api';
 
-export type LogAttributeValue = AnyValue;
+export type LogBody = AnyValue;
 export type LogAttributes = AnyValueMap;
 
 export enum SeverityNumber {
@@ -71,7 +71,7 @@ export interface LogRecord {
   /**
    * A value containing the body of the log record.
    */
-  body?: LogAttributeValue;
+  body?: LogBody;
 
   /**
    * Attributes that define the log record.
