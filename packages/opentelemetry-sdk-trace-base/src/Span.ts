@@ -210,6 +210,16 @@ export class Span implements APISpan, ReadableSpan {
     return this;
   }
 
+  addLink(link: Link): this {
+    this.links.push(link);
+    return this;
+  }
+
+  addLinks(links: Link[]): this {
+    this.links.push(...links);
+    return this;
+  }
+
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
     this.status = status;

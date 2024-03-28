@@ -771,30 +771,6 @@ describe('Span', () => {
     });
   });
 
-  it('should set a link', () => {
-    const spanContext: SpanContext = {
-      traceId: 'a3cda95b652f4a1592b449d5929fda1b',
-      spanId: '5e0c63257de34c92',
-      traceFlags: TraceFlags.SAMPLED,
-    };
-    const linkContext: SpanContext = {
-      traceId: 'b3cda95b652f4a1592b449d5929fda1b',
-      spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.SAMPLED,
-    };
-    const attributes = { attr1: 'value', attr2: 123, attr3: true };
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
-      spanContext,
-      SpanKind.CLIENT,
-      '12345',
-      [{ context: linkContext }, { context: linkContext, attributes }]
-    );
-    span.end();
-  });
-
   it('should drop extra events', () => {
     const span = new Span(
       tracer,
@@ -957,6 +933,58 @@ describe('Span', () => {
     ]);
 
     span.end();
+  });
+
+  it('should be possible to add a link after span creation', () => {
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.CONSUMER
+    );
+
+    span.addLink({ context: linkContext });
+
+    span.end();
+
+    assert.strictEqual(span.links.length, 1);
+    assert.deepStrictEqual(span.links, [
+      {
+        context: linkContext,
+      },
+    ]);
+  });
+
+  it('should be possible to add multiple links after span creation', () => {
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.CONSUMER
+    );
+
+    span.addLinks([
+      { context: linkContext },
+      {
+        context: linkContext,
+        attributes: { attr1: 'value', attr2: 123, attr3: true },
+      },
+    ]);
+
+    span.end();
+
+    assert.strictEqual(span.links.length, 2);
+    assert.deepStrictEqual(span.links, [
+      {
+        context: linkContext,
+      },
+      {
+        attributes: { attr1: 'value', attr2: 123, attr3: true },
+        context: linkContext,
+      },
+    ]);
   });
 
   it('should return ReadableSpan with events', () => {

@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 ### :bug: (Bug Fix)
 
 * fix(api): fix unreachable @opentelemetry/api/experimental entry [#4446](https://github.com/open-telemetry/opentelemetry-js/pull/4446) @legendecas
+* feat(api): allow adding span links after span creation [#4536](https://github.com/open-telemetry/opentelemetry-js/pull/4536) @seemk
 
 ## 1.7.0
 
