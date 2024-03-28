@@ -64,6 +64,7 @@ export abstract class OTLPProtoExporterBrowserBase<
             Accept: 'application/x-protobuf',
           },
           this.timeoutMillis,
+          this.compression,
           onSuccess,
           onError
         );
