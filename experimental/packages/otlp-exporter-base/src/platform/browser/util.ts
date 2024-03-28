@@ -162,9 +162,10 @@ export function sendWithXhr(
     'Content-Type': 'application/json',
   };
 
-  if (compressionAlgorithm === CompressionAlgorithm.NONE) {
-    // Although this case is handled by the catch block below, we still had to
-    // call sendWithRetry here in a sync manner to get the unit tests to pass.
+  if (
+    compressionAlgorithm === CompressionAlgorithm.NONE ||
+    typeof CompressionStream === 'undefined'
+  ) {
     sendWithRetry(body, {
       ...commonHeaders,
       ...headers,
