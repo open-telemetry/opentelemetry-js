@@ -51,6 +51,9 @@
       "path": "experimental/packages/otlp-transformer/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/sdk-events/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/sdk-logs/tsconfig.esm.json"
     },
     {

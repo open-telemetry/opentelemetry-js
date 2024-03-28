@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
-import { AnyValue } from '@opentelemetry/api-logs';
+import { Attributes, Context } from '@opentelemetry/api';
+import { AnyValue, SeverityNumber } from '@opentelemetry/api-logs';
 
 export interface Event {
   /**
@@ -40,17 +40,12 @@ export interface Event {
   attributes?: Attributes;
 
   /**
-   * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
+   * Numerical value of the severity.
    */
-  traceFlags?: number;
+  severityNumber?: SeverityNumber;
 
   /**
-   * A unique identifier for a trace.
+   * The Context associated with the Event.
    */
-  traceId?: string;
-
-  /**
-   * A unique identifier for a span within a trace.
-   */
-  spanId?: string;
+  context?: Context;
 }

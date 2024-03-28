@@ -1,29 +1,40 @@
 {
-  "name": "@opentelemetry/api-events",
+  "name": "@opentelemetry/sdk-events",
   "version": "0.50.0",
-  "description": "Public events API for OpenTelemetry",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "OpenTelemetry events SDK",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-events",
+  "license": "Apache-2.0",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
   },
-  "repository": "open-telemetry/opentelemetry-js",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
-    "build": "npm run compile",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "prepublishOnly": "npm run compile",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "prewatch": "node ../../../scripts/version-update.js",
+    "prewatch": "npm run precompile",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
@@ -33,16 +44,10 @@
     "opentelemetry",
     "nodejs",
     "browser",
-    "profiling",
     "events",
     "stats",
-    "monitoring"
+    "profiling"
   ],
-  "author": "OpenTelemetry Authors",
-  "license": "Apache-2.0",
-  "engines": {
-    "node": ">=14"
-  },
   "files": [
     "build/esm/**/*.js",
     "build/esm/**/*.js.map",
@@ -57,17 +62,22 @@
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/api-logs": "0.50.0"
+  "sideEffects": false,
+  "peerDependencies": {
+    "@opentelemetry/api": ">=1.4.0 <1.9.0",
+    "@opentelemetry/api-logs": ">=0.39.1",
+    "@opentelemetry/api-events": ">=0.49.1"
   },
   "devDependencies": {
+    "@babel/core": "7.22.20",
+    "@opentelemetry/api": ">=1.4.0 <1.9.0",
+    "@opentelemetry/api-logs": "0.50.0",
+    "@opentelemetry/api-events": "0.50.0",
     "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
+    "@types/sinon": "10.0.20",
     "@types/webpack-env": "1.16.3",
+    "babel-loader": "8.3.0",
     "babel-plugin-istanbul": "6.1.1",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
@@ -80,11 +90,12 @@
     "lerna": "6.6.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
+    "sinon": "15.1.2",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4",
-    "webpack": "5.89.0"
-  },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-events",
-  "sideEffects": false
+    "webpack": "5.89.0",
+    "webpack-cli": "5.1.4",
+    "webpack-merge": "5.10.0"
+  }
 }

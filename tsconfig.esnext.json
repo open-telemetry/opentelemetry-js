@@ -51,6 +51,9 @@
       "path": "experimental/packages/otlp-transformer/tsconfig.esnext.json"
     },
     {
+      "path": "experimental/packages/sdk-events/tsconfig.esnext.json"
+    },
+    {
       "path": "experimental/packages/sdk-logs/tsconfig.esnext.json"
     },
     {
