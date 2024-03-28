@@ -18,12 +18,12 @@ import { Context } from '@opentelemetry/api/src/context/types';
 import {
   Sampler,
   SamplingResult,
-} from '../../../../packages/opentelemetry-sdk-trace-base/src/Sampler';
+  TraceIdRatioBasedSampler
+} from '@opentelemetry/sdk-trace-base';
 import { SpanKind } from '@opentelemetry/api/src/trace/span_kind';
 import { Link } from '@opentelemetry/api/src/trace/link';
 import { SpanAttributes } from '@opentelemetry/api/src/trace/attributes';
 import { PerOperationStrategy } from './types';
-import { TraceIdRatioBasedSampler } from '../../../../packages/opentelemetry-sdk-trace-base/src';
 
 interface PerOperationSamplerOptions {
   /** The default sampler to use in case span does not have a custom strategy. */

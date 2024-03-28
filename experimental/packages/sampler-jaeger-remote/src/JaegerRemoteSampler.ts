@@ -18,14 +18,12 @@ import { Context } from '@opentelemetry/api/src/context/types';
 import {
   Sampler,
   SamplingResult,
-} from '../../../../packages/opentelemetry-sdk-trace-base/src/Sampler';
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+} from '@opentelemetry/sdk-trace-base';
 import { SpanKind } from '@opentelemetry/api/src/trace/span_kind';
 import { Link } from '@opentelemetry/api/src/trace/link';
 import axios from 'axios';
-import {
-  ParentBasedSampler,
-  TraceIdRatioBasedSampler,
-} from '../../../../packages/opentelemetry-sdk-trace-base/src';
 import { PerOperationSampler } from './PerOperationSampler';
 import { SamplingStrategyResponse, StrategyType } from './types';
 import { Attributes, diag } from '@opentelemetry/api';
