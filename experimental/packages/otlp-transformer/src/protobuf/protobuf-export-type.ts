@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-export { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
-export { OTLPGRPCExporterConfigNode } from './types';
-export { DEFAULT_COLLECTOR_URL, validateAndNormalizeUrl } from './util';
+import * as protobuf from 'protobufjs';
+
+export interface ExportType<T, R = T & { toJSON: () => unknown }> {
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
+}

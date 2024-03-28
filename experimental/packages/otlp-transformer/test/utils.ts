@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
-export { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
-export { OTLPGRPCExporterConfigNode } from './types';
-export { DEFAULT_COLLECTOR_URL, validateAndNormalizeUrl } from './util';
+import { hexToBinary } from '@opentelemetry/core';
+
+/**
+ * utility function to convert a string representing a hex value to a base64 string
+ * that represents the bytes of that hex value. This is needed as we need to support Node.js 14
+ * where btoa() does not exist, and the Browser, where Buffer does not exist.
+ * @param hexStr
+ */
+export function toBase64(hexStr: string) {
+  if (typeof btoa !== 'undefined') {
+    const decoder = new TextDecoder('utf8');
+    return btoa(decoder.decode(hexToBinary(hexStr)));
+  }
+
+  return Buffer.from(hexToBinary(hexStr)).toString('base64');
+}

@@ -24,13 +24,12 @@ import {
   OTLPGRPCExporterNodeBase,
   validateAndNormalizeUrl,
   DEFAULT_COLLECTOR_URL,
-  MetricsSerializer,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import {
-  createExportMetricsServiceRequest,
   IExportMetricsServiceRequest,
   IExportMetricsServiceResponse,
+  ProtobufMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from './version';
 import { parseHeaders } from '@opentelemetry/otlp-exporter-base';
@@ -57,16 +56,12 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
       signalSpecificMetadata,
       'MetricsExportService',
       '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
-      MetricsSerializer
+      ProtobufMetricsSerializer
     );
   }
 
   getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {
     return validateAndNormalizeUrl(this.getUrlFromConfig(config));
-  }
-
-  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return createExportMetricsServiceRequest(metrics);
   }
 
   getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {

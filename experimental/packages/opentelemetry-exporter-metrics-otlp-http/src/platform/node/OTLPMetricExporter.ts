@@ -26,8 +26,9 @@ import {
   parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  createExportMetricsServiceRequest,
   IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse,
+  JsonMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
 
@@ -39,10 +40,11 @@ const USER_AGENT = {
 
 class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest
+  IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config);
+    super(config, JsonMetricsSerializer, 'application/json');
     this.headers = {
       ...this.headers,
       ...USER_AGENT,
@@ -51,10 +53,6 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
       ),
       ...parseHeaders(config?.headers),
     };
-  }
-
-  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return createExportMetricsServiceRequest(metrics, { useLongBits: false });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {

@@ -193,8 +193,6 @@ describe('OTLPLogExporter - node with proto over http', () => {
     });
 
     it('should open the connection', done => {
-      collectorExporter.export(logs, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
@@ -206,11 +204,10 @@ describe('OTLPLogExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+      collectorExporter.export(logs, () => {});
     });
 
     it('should set custom headers', done => {
-      collectorExporter.export(logs, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
@@ -220,11 +217,10 @@ describe('OTLPLogExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+      collectorExporter.export(logs, () => {});
     });
 
     it('should have keep alive and keepAliveMsecs option set', done => {
-      collectorExporter.export(logs, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
@@ -235,6 +231,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+      collectorExporter.export(logs, () => {});
     });
 
     it('should successfully send the logs', done => {
@@ -271,34 +268,34 @@ describe('OTLPLogExporter - node with proto over http', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spyLoggerError = sinon.stub(diag, 'error');
 
-      collectorExporter.export(logs, result => {
-        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(spyLoggerError.args.length, 0);
-        done();
-      });
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockRes = new MockedResponse(200);
         cb(mockRes);
         mockRes.send('success');
         return fakeRequest as any;
       });
+
+      collectorExporter.export(logs, result => {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(spyLoggerError.args.length, 0);
+        done();
+      });
     });
 
     it('should log the error message', done => {
-      collectorExporter.export(logs, result => {
-        assert.strictEqual(result.code, ExportResultCode.FAILED);
-        // @ts-expect-error verify error code
-        assert.strictEqual(result.error.code, 400);
-        done();
-      });
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockResError = new MockedResponse(400);
         cb(mockResError);
         mockResError.send('failed');
 
         return fakeRequest as any;
+      });
+
+      collectorExporter.export(logs, result => {
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        // @ts-expect-error verify error code
+        assert.strictEqual(result.error.code, 400);
+        done();
       });
     });
   });

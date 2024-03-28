@@ -28,6 +28,7 @@ import { OTLPExporterError } from '../../src/types';
 import { PassThrough } from 'stream';
 import * as http from 'http';
 import * as zlib from 'zlib';
+import { ISerializer } from '@opentelemetry/otlp-transformer';
 
 // Meant to simulate http.IncomingMessage, at least the parts that sendWithHttp cares about
 // but make it a PassThrough so we can inspect it for the test
@@ -50,19 +51,24 @@ class HttpRequest extends PassThrough {
 
 // Barebones exporter for use by sendWithHttp
 type ExporterConfig = OTLPExporterNodeConfigBase;
-class Exporter extends OTLPExporterNodeBase<object, object> {
+class Exporter extends OTLPExporterNodeBase<object, object, object> {
   getDefaultUrl(config: ExporterConfig): string {
     return config.url || '';
   }
-
-  convert(spans: object[]): object {
-    return {};
-  }
 }
+
+const noopSerializer: ISerializer<object, object> = {
+  serializeRequest(request: object): Uint8Array | undefined {
+    return new Uint8Array();
+  },
+  deserializeResponse(data: Uint8Array): object {
+    return {};
+  },
+};
 
 describe('force flush', () => {
   it('forceFlush should flush spans and return', async () => {
-    const exporter = new Exporter({});
+    const exporter = new Exporter({}, noopSerializer, '');
     await exporter.forceFlush();
   });
 });
@@ -219,10 +225,14 @@ describe('sendWithHttp', () => {
   });
 
   it('should send with no compression if configured to do so', () => {
-    exporter = new Exporter({
-      url: 'http://foobar.com',
-      compression: CompressionAlgorithm.NONE,
-    });
+    exporter = new Exporter(
+      {
+        url: 'http://foobar.com',
+        compression: CompressionAlgorithm.NONE,
+      },
+      noopSerializer,
+      ''
+    );
     const data = JSON.stringify(spanData);
 
     // Show that data is written to the request stream
@@ -252,10 +262,14 @@ describe('sendWithHttp', () => {
   });
 
   it('should send with gzip compression if configured to do so', () => {
-    exporter = new Exporter({
-      url: 'http://foobar.com',
-      compression: CompressionAlgorithm.GZIP,
-    });
+    exporter = new Exporter(
+      {
+        url: 'http://foobar.com',
+        compression: CompressionAlgorithm.GZIP,
+      },
+      noopSerializer,
+      ''
+    );
 
     const data = JSON.stringify(spanData);
     const compressedData = zlib.gzipSync(Buffer.from(data));
@@ -287,10 +301,14 @@ describe('sendWithHttp', () => {
   });
 
   it('should work with gzip compression enabled even after multiple requests', () => {
-    exporter = new Exporter({
-      url: 'http://foobar.com',
-      compression: CompressionAlgorithm.GZIP,
-    });
+    exporter = new Exporter(
+      {
+        url: 'http://foobar.com',
+        compression: CompressionAlgorithm.GZIP,
+      },
+      noopSerializer,
+      ''
+    );
 
     const data = JSON.stringify(spanData);
     const compressedData = zlib.gzipSync(Buffer.from(data));
