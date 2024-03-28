@@ -213,7 +213,84 @@ describe('utils', () => {
         );
       });
     });
+    describe('when entries contain invalid performance timing', () => {
+      it('should only add events with time greater that or equal to reference value to span', () => {
+        const addEventSpy = sinon.spy();
+        const span = {
+          addEvent: addEventSpy,
+        } as unknown as tracing.Span;
+        const entries = {
+          [PTN.FETCH_START]: 123, // default reference time
+          [PTN.CONNECT_START]: 0,
+          [PTN.REQUEST_START]: 140,
+        } as PerformanceEntries;
+
+        assert.strictEqual(addEventSpy.callCount, 0);
+
+        addSpanNetworkEvent(span, PTN.CONNECT_START, entries);
+
+        assert.strictEqual(
+          addEventSpy.callCount,
+          0,
+          'should not call addEvent'
+        );
+
+        addSpanNetworkEvent(span, PTN.REQUEST_START, entries);
+
+        assert.strictEqual(
+          addEventSpy.callCount,
+          1,
+          'should call addEvent for valid value'
+        );
+      });
+    });
+
+    describe('when entries contain invalid performance timing and a reference event', () => {
+      it('should only add events with time greater that or equal to reference value to span', () => {
+        const addEventSpy = sinon.spy();
+        const span = {
+          addEvent: addEventSpy,
+        } as unknown as tracing.Span;
+        const entries = {
+          [PTN.FETCH_START]: 120,
+          [PTN.CONNECT_START]: 120, // this is used as reference time here
+          [PTN.REQUEST_START]: 10,
+        } as PerformanceEntries;
+
+        assert.strictEqual(addEventSpy.callCount, 0);
+
+        addSpanNetworkEvent(
+          span,
+          PTN.REQUEST_START,
+          entries,
+          PTN.CONNECT_START
+        );
+
+        assert.strictEqual(
+          addEventSpy.callCount,
+          0,
+          'should not call addEvent'
+        );
+
+        addSpanNetworkEvent(span, PTN.FETCH_START, entries, PTN.CONNECT_START);
+
+        assert.strictEqual(
+          addEventSpy.callCount,
+          1,
+          'should call addEvent for valid value'
+        );
+
+        addEventSpy.resetHistory();
+        addSpanNetworkEvent(span, PTN.CONNECT_START, entries, 'foo'); // invalid reference , not adding event to span
+        assert.strictEqual(
+          addEventSpy.callCount,
+          0,
+          'should not call addEvent for invalid reference(non-existent)'
+        );
+      });
+    });
   });
+
   describe('getResource', () => {
     const startTime = [0, 123123123] as HrTime;
     beforeEach(() => {
