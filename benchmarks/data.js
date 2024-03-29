@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711632287923,
+  "lastUpdate": 1711711575012,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6046,6 +6046,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 675117,
             "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9a5688e61feb9ecf94bbef45352563287639b6a7",
+          "message": "chore(deps): update dependency chromedriver to v123 (#4577)\n\nCo-authored-by: Nev <54870357+MSNev@users.noreply.github.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-29T12:24:42+01:00",
+          "tree_id": "fdb0b2c8f99962151dbf9e33aa759cb3bfaaed36",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9a5688e61feb9ecf94bbef45352563287639b6a7"
+        },
+        "date": 1711711574001,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 904804,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11450,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 667993,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 641256,
+            "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
