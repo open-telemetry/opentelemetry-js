@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AnyValue, Attributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
+import { AnyValue } from '@opentelemetry/api-logs';
 
 export interface Event {
   /**

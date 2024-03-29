@@ -35,15 +35,3 @@ export type AttributeValue =
   | Array<null | undefined | string>
   | Array<null | undefined | number>
   | Array<null | undefined | boolean>;
-
-/**
- * AnyValueMap is a map from string to AnyValue (attribute value or a nested map)
- */
-export interface AnyValueMap {
-  [attributeKey: string]: AnyValue | undefined;
-}
-
-/**
- * AnyValue is a either an attribute value or a map of AnyValue(s)
- */
-export type AnyValue = AttributeValue | AnyValueMap;

@@ -157,7 +157,7 @@ export class LogRecord implements ReadableLogRecord {
     return this;
   }
 
-  public setBody(body: string) {
+  public setBody(body: LogBody) {
     this.body = body;
     return this;
   }
