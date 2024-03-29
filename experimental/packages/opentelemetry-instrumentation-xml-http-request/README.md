@@ -64,6 +64,15 @@ req.send();
 
 ```
 
+### XHR Instrumentation options
+
+XHR instrumentation plugin has few options available to choose from. You can set the following:
+
+| Options                                                                                                                                                                           | Type                         | Description                                                                             |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|-----------------------------------------------------------------------------------------|
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L76) | `XHRCustomAttributeFunction` | Function for adding custom attributes                                                   |
+| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L78)         | `boolean`                    | Disable network events being added as span events (network events are added by default) |
+
 ## Example Screenshots
 
 ![Screenshot of the running example](images/main.jpg)
