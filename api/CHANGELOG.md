@@ -6,9 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
-* feat(api)!: add AnyValue and AnyValueMap types [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
-
 ### :rocket: (Enhancement)
+
+* feat(api): add AnyValue and AnyValueMap types [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
 
 ### :bug: (Bug Fix)
 
