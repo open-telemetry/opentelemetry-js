@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711711575012,
+  "lastUpdate": 1711712263743,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6098,6 +6098,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 641256,
             "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "Samuron@users.noreply.github.com",
+            "name": "Ievgen Makukh",
+            "username": "Samuron"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b418d36609c371d1fcae46898e9ede6278aca917",
+          "message": "perf(instrumentation-http): remove obvious temp allocations (#4576)\n\n* perf(instrumentation-http): remove obvious temp allocations\r\n\r\n* fix: changelog\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-29T12:35:48+01:00",
+          "tree_id": "7d9abfff4742d33e149755aaf0151897b3becf1f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b418d36609c371d1fcae46898e9ede6278aca917"
+        },
+        "date": 1711712262700,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 962686,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11996,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 639481,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 653065,
+            "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
