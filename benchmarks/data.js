@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711712263743,
+  "lastUpdate": 1711725583161,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6152,6 +6152,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f3aedb76ff00ca82281f8d2bf94a19714487f1d6",
+          "message": "chore(deps): bump express from 4.17.3 to 4.19.2 (#4591)\n\nBumps [express](https://github.com/expressjs/express) from 4.17.3 to 4.19.2.\r\n- [Release notes](https://github.com/expressjs/express/releases)\r\n- [Changelog](https://github.com/expressjs/express/blob/master/History.md)\r\n- [Commits](https://github.com/expressjs/express/compare/4.17.3...4.19.2)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: express\r\n  dependency-type: direct:production\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-03-29T16:18:09+01:00",
+          "tree_id": "d0f1b380443a0ca51060ed7276a1d1e606fd469f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f3aedb76ff00ca82281f8d2bf94a19714487f1d6"
+        },
+        "date": 1711725582180,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 958452,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12030,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 666020,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 667409,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
