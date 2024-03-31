@@ -102,7 +102,7 @@ export interface Gauge<
   AttributesTypes extends MetricAttributes = MetricAttributes,
 > {
   /**
-   * Records a measurement. Value of the measurement must not be negative.
+   * Records a measurement.
    */
   record(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
