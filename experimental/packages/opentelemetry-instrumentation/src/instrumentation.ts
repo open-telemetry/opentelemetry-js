@@ -35,9 +35,7 @@ import {
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract
-  implements Instrumentation
-{
+export abstract class InstrumentationAbstract implements Instrumentation {
   protected _config: InstrumentationConfig;
 
   private _tracer: Tracer;
