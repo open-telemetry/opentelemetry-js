@@ -783,6 +783,20 @@ describe('xhr', () => {
             );
           });
         });
+
+        describe('when network events are ignored', () => {
+          beforeEach(done => {
+            clearData();
+            prepareData(done, url, {
+              ignoreNetworkEvents: true,
+            });
+          });
+          it('should NOT add network events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const events = span.events;
+            assert.strictEqual(events.length, 3, 'number of events is wrong');
+          });
+        });
       });
 
       describe('when request is NOT successful', () => {
