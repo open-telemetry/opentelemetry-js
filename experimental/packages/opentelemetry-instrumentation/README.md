@@ -36,7 +36,7 @@ export class MyInstrumentation extends InstrumentationBase {
    *   the plugin should patch multiple modules or versions.
    */
   protected init() {
-    const module = new InstrumentationNodeModuleDefinition<typeof module_name_to_be_patched>(
+    const module = new InstrumentationNodeModuleDefinition(
       'module_name_to_be_patched',
       ['1.*'],
        this._onPatchMain,
@@ -63,8 +63,8 @@ export class MyInstrumentation extends InstrumentationBase {
     this._unwrap(moduleExports, 'mainMethodName');
   }
 
-  private _addPatchingMethod(): InstrumentationNodeModuleFile<typeof module_name_to_be_patched> {
-    const file = new InstrumentationNodeModuleFile<typeof module_name_to_be_patched>(
+  private _addPatchingMethod(): InstrumentationNodeModuleFile {
+    const file = new InstrumentationNodeModuleFile(
       'module_name_to_be_patched/src/some_file.js',
       this._onPatchMethodName,
       this._onUnPatchMethodName,
