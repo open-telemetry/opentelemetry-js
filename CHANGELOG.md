@@ -9,6 +9,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* feat!(instrumentation): remove moudleExports generic type from instrumentation registration [#4598](https://github.com/open-telemetry/opentelemetry-js/pull/4598) @blumamir
+
 ### :rocket: (Enhancement)
 
 * perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes
