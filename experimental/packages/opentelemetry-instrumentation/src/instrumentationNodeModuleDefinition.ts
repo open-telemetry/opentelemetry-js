@@ -19,16 +19,16 @@ import {
   InstrumentationModuleFile,
 } from './types';
 
-export class InstrumentationNodeModuleDefinition<T>
-  implements InstrumentationModuleDefinition<T>
+export class InstrumentationNodeModuleDefinition
+  implements InstrumentationModuleDefinition
 {
-  files: InstrumentationModuleFile<T>[];
+  files: InstrumentationModuleFile[];
   constructor(
     public name: string,
     public supportedVersions: string[],
-    public patch?: (exports: T, moduleVersion?: string) => T,
-    public unpatch?: (exports: T, moduleVersion?: string) => void,
-    files?: InstrumentationModuleFile<any>[]
+    public patch?: (exports: any, moduleVersion?: string) => any,
+    public unpatch?: (exports: any, moduleVersion?: string) => void,
+    files?: InstrumentationModuleFile[]
   ) {
     this.files = files || [];
   }

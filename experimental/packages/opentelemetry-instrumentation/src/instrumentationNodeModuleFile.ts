@@ -17,15 +17,15 @@
 import { InstrumentationModuleFile } from './types';
 import { normalize } from './platform/index';
 
-export class InstrumentationNodeModuleFile<T>
-  implements InstrumentationModuleFile<T>
+export class InstrumentationNodeModuleFile
+  implements InstrumentationModuleFile
 {
   public name: string;
   constructor(
     name: string,
     public supportedVersions: string[],
-    public patch: (moduleExports: T, moduleVersion?: string) => T,
-    public unpatch: (moduleExports?: T, moduleVersion?: string) => void
+    public patch: (moduleExports: any, moduleVersion?: string) => any,
+    public unpatch: (moduleExports?: any, moduleVersion?: string) => void
   ) {
     this.name = normalize(name);
   }
