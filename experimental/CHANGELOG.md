@@ -24,7 +24,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(opentelemetry-instrumentation-xhr): optionally ignore network events [#4571](https://github.com/open-telemetry/opentelemetry-js/pull/4571/) @mustafahaddara
 * refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
+* perf(instrumentation-http): remove obvious temp allocations [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
 * feat(sdk-node): add `HostDetector` as default resource detector
 
 ### :bug: (Bug Fix)
@@ -34,6 +36,8 @@ All notable changes to experimental packages in this project will be documented 
 * fix(sdk-logs): ensure default resource attributes are used as fallbacks when a resource is passed to LoggerProvider.
 
 ### :books: (Refine Doc)
+
+* docs(instr-http): document semantic conventions and attributes in use. [#4587](https://github.com/open-telemetry/opentelemetry-js/pull/4587/) @JamieDanielson
 
 ### :house: (Internal)
 
