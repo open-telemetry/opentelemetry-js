@@ -21,7 +21,6 @@
     "opentelemetry",
     "nodejs",
     "tracing",
-    "profiling",
     "awsxray"
   ],
   "author": "OpenTelemetry Authors",
