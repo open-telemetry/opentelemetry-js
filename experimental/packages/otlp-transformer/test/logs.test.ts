@@ -49,7 +49,6 @@ function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
             scope: {
               name: 'scope_name_1',
               version: '0.1.0',
-              droppedAttributesCount: 0,
             },
             logRecords: [
               {

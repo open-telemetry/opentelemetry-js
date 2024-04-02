@@ -23,7 +23,6 @@ export function createInstrumentationScope(
   return {
     name: scope.name,
     version: scope.version,
-    droppedAttributesCount: 0,
   };
 }
 

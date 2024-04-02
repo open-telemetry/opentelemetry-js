@@ -55,7 +55,6 @@ describe('Metrics', () => {
     const expectedScope = {
       name: 'mylib',
       version: '0.1.0',
-      droppedAttributesCount: 0,
     };
 
     const expectedSchemaUrl = 'http://url.to.schema';

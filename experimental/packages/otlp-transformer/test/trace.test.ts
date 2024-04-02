@@ -71,7 +71,6 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
             scope: {
               name: 'myLib',
               version: '0.1.0',
-              droppedAttributesCount: 0,
             },
             spans: [
               {
