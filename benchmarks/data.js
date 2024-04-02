@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1711725583161,
+  "lastUpdate": 1712071991463,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6204,6 +6204,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.17%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clinton.blackburn@gmail.com",
+            "name": "Clinton Blackburn",
+            "username": "clintonb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "928796d8532dea7ba81c73a1bc8ee49266da2d12",
+          "message": "feat(sdk-metrics): added synchronous gauge to SDK (#4565)\n\n* feat(instrumentation): added synchronous gauge to SDK\r\n\r\n* fixup! feat(instrumentation): added synchronous gauge to SDK\r\n\r\n* fixup! feat(instrumentation): added synchronous gauge to SDK\r\n\r\n* fixup! feat(instrumentation): added synchronous gauge to SDK\r\n\r\n* fixup! feat(instrumentation): added synchronous gauge to SDK\r\n\r\n* fixup! feat(instrumentation): added synchronous gauge to SDK",
+          "timestamp": "2024-04-02T17:31:15+02:00",
+          "tree_id": "3ca469bfc774f4be9abffde532301c5ca0f9f8ab",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/928796d8532dea7ba81c73a1bc8ee49266da2d12"
+        },
+        "date": 1712071990436,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 883638,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11459,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 626478,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 617714,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
