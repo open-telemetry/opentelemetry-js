@@ -84,6 +84,9 @@
       "path": "packages/opentelemetry-semantic-conventions/tsconfig.esnext.json"
     },
     {
+      "path": "packages/propagator-aws-xray/tsconfig.esnext.json"
+    },
+    {
       "path": "packages/sdk-metrics/tsconfig.esnext.json"
     }
   ]
