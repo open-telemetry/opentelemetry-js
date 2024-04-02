@@ -21,6 +21,8 @@ All notable changes to experimental packages in this project will be documented 
       * was used internally to keep track of the compression to use but was unintentionally exposed to the users. It allowed to read and write the value, writing, however, would have no effect.
 * feat(api-events)!: removed domain from the Events API [#4569](https://github.com/open-telemetry/opentelemetry-js/pull/4569)
 * fix(events-api)!: renamed EventEmitter to EventLogger in the Events API [#4569](https://github.com/open-telemetry/opentelemetry-js/pull/4568)
+* feat(api-logs)!: changed LogRecord body data type to AnyValue [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
+and AnyValueMap types [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
 
 ### :rocket: (Enhancement)
 
@@ -28,6 +30,7 @@ All notable changes to experimental packages in this project will be documented 
 * refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
 * perf(instrumentation-http): remove obvious temp allocations [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
 * feat(sdk-node): add `HostDetector` as default resource detector
+* feat(api-events): added data field to the Event interface [4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
 
 ### :bug: (Bug Fix)
 
