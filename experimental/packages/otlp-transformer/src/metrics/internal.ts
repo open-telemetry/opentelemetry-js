@@ -34,9 +34,9 @@ import {
   IResourceMetrics,
   IScopeMetrics,
 } from './types';
-import {Encoder, getOtlpEncoder} from '../common';
+import { Encoder, getOtlpEncoder } from '../common';
 import { createInstrumentationScope, toAttributes } from '../common/internal';
-import { createResource } from "../resource/internal";
+import { createResource } from '../resource/internal';
 
 export function toResourceMetrics(
   resourceMetrics: ResourceMetrics,

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 import { IResource as ISdkResource } from '@opentelemetry/resources';
-import { toAttributes } from "../common/internal";
-import { IResource } from "./types";
+import { toAttributes } from '../common/internal';
+import { IResource } from './types';
 
-export function createResource(
-  resource: ISdkResource): IResource {
+export function createResource(resource: ISdkResource): IResource {
   return {
     attributes: toAttributes(resource.attributes),
     droppedAttributesCount: 0,
-  }
+  };
 }

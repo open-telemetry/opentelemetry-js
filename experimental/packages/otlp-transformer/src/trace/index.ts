@@ -22,9 +22,9 @@ import {
   IResourceSpans,
   IScopeSpans,
 } from './types';
-import { Encoder, getOtlpEncoder} from '../common';
+import { Encoder, getOtlpEncoder } from '../common';
 import { createInstrumentationScope } from '../common/internal';
-import { createResource } from "../resource/internal";
+import { createResource } from '../resource/internal';
 
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
@@ -85,7 +85,9 @@ function spanRecordsToResourceSpans(
         );
 
         scopeResourceSpans.push({
-          scope: createInstrumentationScope(scopeSpans[0].instrumentationLibrary),
+          scope: createInstrumentationScope(
+            scopeSpans[0].instrumentationLibrary
+          ),
           spans: spans,
           schemaUrl: scopeSpans[0].instrumentationLibrary.schemaUrl,
         });

@@ -23,11 +23,15 @@ import {
 } from './types';
 import { IResource } from '@opentelemetry/resources';
 import { Encoder, getOtlpEncoder } from '../common';
-import { createInstrumentationScope, toAnyValue, toKeyValue } from '../common/internal';
+import {
+  createInstrumentationScope,
+  toAnyValue,
+  toKeyValue,
+} from '../common/internal';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { OtlpEncodingOptions, IKeyValue } from '../common/types';
 import { LogAttributes } from '@opentelemetry/api-logs';
-import { createResource } from "../resource/internal";
+import { createResource } from '../resource/internal';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],

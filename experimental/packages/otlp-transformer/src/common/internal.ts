@@ -15,15 +15,16 @@
  */
 import type { IAnyValue, IInstrumentationScope, IKeyValue } from './types';
 import { Attributes } from '@opentelemetry/api';
-import {InstrumentationScope} from "@opentelemetry/core";
+import { InstrumentationScope } from '@opentelemetry/core';
 
 export function createInstrumentationScope(
-  scope: InstrumentationScope): IInstrumentationScope {
-  return  {
+  scope: InstrumentationScope
+): IInstrumentationScope {
+  return {
     name: scope.name,
     version: scope.version,
     droppedAttributesCount: 0,
-  }
+  };
 }
 
 export function toAttributes(attributes: Attributes): IKeyValue[] {
