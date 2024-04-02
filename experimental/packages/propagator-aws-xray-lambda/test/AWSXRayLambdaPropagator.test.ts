@@ -26,7 +26,8 @@ import {
 } from '@opentelemetry/api';
 import * as sinon from 'sinon';
 
-import { AWSXRAY_TRACE_ID_ENV_VAR, AWSXRayLambdaPropagator } from '../src';
+import { AWSXRayLambdaPropagator } from '../src';
+import { AWSXRAY_TRACE_ID_ENV_VAR } from '../src/AWSXRayLambdaPropagator';
 import {
   AWSXRAY_TRACE_ID_HEADER,
   AWSXRayPropagator,
@@ -42,7 +43,7 @@ describe('AWSXRayPropagator', () => {
   });
 
   describe('.inject()', () => {
-    it('should call use AWSXRayPropagator inject()', () => {
+    it('should use AWSXRayPropagator inject()', () => {
       const spy = sinon.spy(AWSXRayPropagator.prototype, 'inject');
       assert.equal(spy.callCount, 0);
       xrayLambdaPropagator.inject(
@@ -50,7 +51,7 @@ describe('AWSXRayPropagator', () => {
         carrier,
         defaultTextMapSetter
       );
-      assert.equal(spy.callCount, 1);
+      sinon.assert.calledOnceWithExactly(spy, context.active(), carrier, defaultTextMapSetter);
     });
   });
 
@@ -194,8 +195,8 @@ describe('AWSXRayPropagator', () => {
 
   describe('.fields()', () => {
     it('should return a field with AWS X-Ray Trace ID header', () => {
-      const expectedField = xrayLambdaPropagator.fields();
-      assert.deepStrictEqual([AWSXRAY_TRACE_ID_HEADER], expectedField);
+      const expectedFields = xrayLambdaPropagator.fields();
+      assert.deepStrictEqual([AWSXRAY_TRACE_ID_HEADER], expectedFields);
     });
   });
 });
