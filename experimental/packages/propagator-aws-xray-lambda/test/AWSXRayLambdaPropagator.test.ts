@@ -51,7 +51,12 @@ describe('AWSXRayPropagator', () => {
         carrier,
         defaultTextMapSetter
       );
-      sinon.assert.calledOnceWithExactly(spy, context.active(), carrier, defaultTextMapSetter);
+      sinon.assert.calledOnceWithExactly(
+        spy,
+        context.active(),
+        carrier,
+        defaultTextMapSetter
+      );
     });
   });
 
