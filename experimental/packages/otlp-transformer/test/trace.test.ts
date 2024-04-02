@@ -68,7 +68,11 @@ function createExpectedSpanJson(options: OtlpEncodingOptions) {
         schemaUrl: undefined,
         scopeSpans: [
           {
-            scope: { name: 'myLib', version: '0.1.0' },
+            scope: {
+              name: 'myLib',
+              version: '0.1.0',
+              droppedAttributesCount: 0,
+            },
             spans: [
               {
                 traceId: traceId,
