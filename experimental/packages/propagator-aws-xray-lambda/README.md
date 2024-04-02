@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**NOTE: Support for `@opentelemetry/exporter-jaeger` will end March 2024, please use any of the following packages instead:**
+
 The OpenTelemetry Propagator for AWS X-Ray Lambda provides propagation based on the X-Ray `_X_AMZN_TRACE_ID` environment
 variable in addition to the AWS X-Ray HTTP headers. This propagator should be used only for an AWS Lambda instrumentation.
 
