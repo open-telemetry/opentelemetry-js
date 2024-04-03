@@ -80,5 +80,5 @@
   "dependencies": {
     "@opentelemetry/core": "1.22.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-aws-xray#readme"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/propagator-aws-xray#readme"
 }
