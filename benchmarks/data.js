@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712131143407,
+  "lastUpdate": 1712143412342,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6308,6 +6308,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "35442169+Abinet18@users.noreply.github.com",
+            "name": "Abinet18",
+            "username": "Abinet18"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e01f493a2480bda39f9ee67da1c33f31a57f91ff",
+          "message": "Fix invalid timings in span events (#4486)\n\n* fix: use reference value to avoid invalid timings in span\r\n\r\n* add comment, add to changelog\r\n\r\n* donot report invalid timing in span\r\n\r\n* lint fix\r\n\r\n* fix failing test\r\n\r\n* fix failing test 2\r\n\r\n* Add tests\r\n\r\n* add removed test\r\n\r\n* suggested changes\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-03T13:21:31+02:00",
+          "tree_id": "2a2e48f6be2610dfdaf9924b157bbf78e6b5de00",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e01f493a2480bda39f9ee67da1c33f31a57f91ff"
+        },
+        "date": 1712143408862,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 934970,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11590,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 671385,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 650840,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
