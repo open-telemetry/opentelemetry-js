@@ -51,7 +51,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
     ],
     ['jaeger', () => new JaegerPropagator()],
-    ['xray', ()=> new AWSXRayPropagator()]
+    ['xray', () => new AWSXRayPropagator()]
   ]);
 
   constructor(config: NodeTracerConfig = {}) {
