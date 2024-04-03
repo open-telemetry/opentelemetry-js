@@ -11,15 +11,23 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes
-
 ### :bug: (Bug Fix)
-
-* fix(sdk-metrics): increase the depth of the output to the console such that objects in the metric are printed fully to the console [#4522](https://github.com/open-telemetry/opentelemetry-js/pull/4522) @JacksonWeber
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.23.0
+
+### :rocket: (Enhancement)
+
+* perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
+* feat(sdk-metrics): added experimental synchronous gauge to SDK [#4565](https://github.com/open-telemetry/opentelemetry-js/pull/4565) @clintonb
+  * this change will become user-facing in an upcoming release
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): increase the depth of the output to the console such that objects in the metric are printed fully to the console [#4522](https://github.com/open-telemetry/opentelemetry-js/pull/4522) @JacksonWeber
 
 ## 1.22.0
 
