@@ -12,7 +12,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes
-* feat(jaeger-remote-samper): added support of jaeger-remote-samper
+* feat(jaeger-remote-samper): added support of jaeger-remote-sampler
 
 ### :bug: (Bug Fix)
 
