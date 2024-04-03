@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/LoggerOptions';
-export * from './types/AnyValue';
-export * from './NoopLogger';
-export * from './NoopLoggerProvider';
+import { AttributeValue } from '@opentelemetry/api';
 
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+/**
+ * AnyValueMap is a map from string to AnyValue (attribute value or a nested map)
+ */
+export interface AnyValueMap {
+  [attributeKey: string]: AnyValue | undefined;
+}
+
+/**
+ * AnyValue is a either an attribute value or a map of AnyValue(s)
+ */
+export type AnyValue = AttributeValue | AnyValueMap;
