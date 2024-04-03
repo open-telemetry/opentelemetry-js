@@ -26,10 +26,10 @@ class BrowserDetectorSync implements DetectorSync {
   detect(config?: ResourceDetectionConfig): IResource {
     const isBrowser =
       typeof navigator !== 'undefined' &&
-      process?.versions?.node === undefined && // Node.js v21 adds `navigator`
+      global.process?.versions?.node === undefined && // Node.js v21 adds `navigator`
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore don't have Bun types
-      Bun?.version === undefined; // Bun (bun.sh) defines `navigator`
+      global.Bun?.version === undefined; // Bun (bun.sh) defines `navigator`
     if (!isBrowser) {
       return Resource.empty();
     }
