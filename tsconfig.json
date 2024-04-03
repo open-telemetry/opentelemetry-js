@@ -44,6 +44,7 @@
       "packages/opentelemetry-sdk-trace-web",
       "packages/opentelemetry-semantic-conventions",
       "packages/opentelemetry-shim-opentracing",
+      "packages/propagator-aws-xray",
       "packages/sdk-metrics"
     ],
     "out": "docs",
@@ -176,6 +177,9 @@
     },
     {
       "path": "packages/opentelemetry-shim-opentracing"
+    },
+    {
+      "path": "packages/propagator-aws-xray"
     },
     {
       "path": "packages/sdk-metrics"
