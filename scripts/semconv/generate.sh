@@ -52,21 +52,21 @@ docker run --rm --platform linux/amd64 \
 docker run --rm --platform linux/amd64 \
   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
   -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/metrics/:/output \
+  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/metric/:/output \
   otel/semconvgen:${GENERATOR_VERSION} \
   --only metric \
   --yaml-root /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/SemanticMetricsAttributes.ts \
-  -Dclass=SemanticMetricsAttributes \
+  --output /output/SemanticMetricAttributes.ts \
+  -Dclass=SemanticMetricAttributes \
   -Dcls_prefix=SEMMTRCSATTRS
 
 # Run the automatic linting fixing task to ensure it will pass eslint
-# cd "$ROOT_DIR"
+cd "$ROOT_DIR"
 
-# npm run lint:fix:changed
+npm run lint:fix:changed
 
 # # Run the size checks for the generated files
-# cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
-# npm run size-check
+cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
+npm run size-check

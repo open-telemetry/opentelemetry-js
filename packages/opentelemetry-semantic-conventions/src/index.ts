@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-export * from './metrics';
+export * from './metric';
 export * from './resource';
 export * from './trace';

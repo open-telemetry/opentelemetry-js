@@ -21,13 +21,14 @@ import { createConstMap } from '../internal/utils';
 //----------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------
-// Constant values for SemanticMetricsAttributes
+// Constant values for SemanticMetricAttributes
 //----------------------------------------------------------------------------------------------------------
 
 // Temporary local constants to assign to the individual exports and the namespaced version
 // Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status';
-const TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = 'aspnetcore.diagnostics.exception.result';
+const TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT =
+  'aspnetcore.diagnostics.exception.result';
 const TMP_JVM_GC_ACTION = 'jvm.gc.action';
 const TMP_JVM_GC_NAME = 'jvm.gc.name';
 const TMP_JVM_THREAD_DAEMON = 'jvm.thread.daemon';
@@ -36,117 +37,121 @@ const TMP_PROCESS_CONTEXT_SWITCH_TYPE = 'process.context_switch_type';
 const TMP_PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
 
 /**
-* Match result - success or failure.
-*/
-export const SEMMTRCSATTRS_ASPNETCORE_ROUTING_MATCH_STATUS = TMP_ASPNETCORE_ROUTING_MATCH_STATUS;
+ * Match result - success or failure.
+ */
+export const SEMMTRCSATTRS_ASPNETCORE_ROUTING_MATCH_STATUS =
+  TMP_ASPNETCORE_ROUTING_MATCH_STATUS;
 
 /**
-* ASP.NET Core exception middleware handling result.
-*/
-export const SEMMTRCSATTRS_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT;
+ * ASP.NET Core exception middleware handling result.
+ */
+export const SEMMTRCSATTRS_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT =
+  TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT;
 
 /**
-* Name of the garbage collector action.
-*
-* Note: Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
-*/
+ * Name of the garbage collector action.
+ *
+ * Note: Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
+ */
 export const SEMMTRCSATTRS_JVM_GC_ACTION = TMP_JVM_GC_ACTION;
 
 /**
-* Name of the garbage collector.
-*
-* Note: Garbage collector name is generally obtained via [GarbageCollectionNotificationInfo#getGcName()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcName()).
-*/
+ * Name of the garbage collector.
+ *
+ * Note: Garbage collector name is generally obtained via [GarbageCollectionNotificationInfo#getGcName()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcName()).
+ */
 export const SEMMTRCSATTRS_JVM_GC_NAME = TMP_JVM_GC_NAME;
 
 /**
-* Whether the thread is daemon or not.
-*/
+ * Whether the thread is daemon or not.
+ */
 export const SEMMTRCSATTRS_JVM_THREAD_DAEMON = TMP_JVM_THREAD_DAEMON;
 
 /**
-* State of the thread.
-*/
+ * State of the thread.
+ */
 export const SEMMTRCSATTRS_JVM_THREAD_STATE = TMP_JVM_THREAD_STATE;
 
 /**
-* Specifies whether the context switches for this data point were voluntary or involuntary.
-*/
-export const SEMMTRCSATTRS_PROCESS_CONTEXT_SWITCH_TYPE = TMP_PROCESS_CONTEXT_SWITCH_TYPE;
-
-/**
-* The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
-*/
-export const SEMMTRCSATTRS_PROCESS_PAGING_FAULT_TYPE = TMP_PROCESS_PAGING_FAULT_TYPE;
-
-/**
- * Definition of available values for SemanticMetricsAttributes
- * This type is used for backward compatibility, you should use the individual exported
- * constants SemanticMetricsAttributes_XXXXX rather than the exported constant map. As any single reference
- * to a constant map value will result in all strings being included into your bundle.
- * @deprecated Use the SEMMTRCSATTRS_XXXXX constants rather than the SemanticMetricsAttributes.XXXXX for bundle minification.
+ * Specifies whether the context switches for this data point were voluntary or involuntary.
  */
-export type SemanticMetricsAttributes = {
+export const SEMMTRCSATTRS_PROCESS_CONTEXT_SWITCH_TYPE =
+  TMP_PROCESS_CONTEXT_SWITCH_TYPE;
+
+/**
+ * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+ */
+export const SEMMTRCSATTRS_PROCESS_PAGING_FAULT_TYPE =
+  TMP_PROCESS_PAGING_FAULT_TYPE;
+
+/**
+ * Definition of available values for SemanticMetricAttributes
+ * This type is used for backward compatibility, you should use the individual exported
+ * constants SemanticMetricAttributes_XXXXX rather than the exported constant map. As any single reference
+ * to a constant map value will result in all strings being included into your bundle.
+ * @deprecated Use the SEMMTRCSATTRS_XXXXX constants rather than the SemanticMetricAttributes.XXXXX for bundle minification.
+ */
+export type SemanticMetricAttributes = {
+  /**
+   * Match result - success or failure.
+   */
+  ASPNETCORE_ROUTING_MATCH_STATUS: 'aspnetcore.routing.match_status';
 
   /**
-  * Match result - success or failure.
-  */
-  ASPNETCORE_ROUTING_MATCH_STATUS: 'aspnetcore.routing.match_status',
+   * ASP.NET Core exception middleware handling result.
+   */
+  ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT: 'aspnetcore.diagnostics.exception.result';
 
   /**
-  * ASP.NET Core exception middleware handling result.
-  */
-  ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT: 'aspnetcore.diagnostics.exception.result',
+   * Name of the garbage collector action.
+   *
+   * Note: Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
+   */
+  JVM_GC_ACTION: 'jvm.gc.action';
 
   /**
-  * Name of the garbage collector action.
-  *
-  * Note: Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
-  */
-  JVM_GC_ACTION: 'jvm.gc.action',
+   * Name of the garbage collector.
+   *
+   * Note: Garbage collector name is generally obtained via [GarbageCollectionNotificationInfo#getGcName()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcName()).
+   */
+  JVM_GC_NAME: 'jvm.gc.name';
 
   /**
-  * Name of the garbage collector.
-  *
-  * Note: Garbage collector name is generally obtained via [GarbageCollectionNotificationInfo#getGcName()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcName()).
-  */
-  JVM_GC_NAME: 'jvm.gc.name',
+   * Whether the thread is daemon or not.
+   */
+  JVM_THREAD_DAEMON: 'jvm.thread.daemon';
 
   /**
-  * Whether the thread is daemon or not.
-  */
-  JVM_THREAD_DAEMON: 'jvm.thread.daemon',
+   * State of the thread.
+   */
+  JVM_THREAD_STATE: 'jvm.thread.state';
 
   /**
-  * State of the thread.
-  */
-  JVM_THREAD_STATE: 'jvm.thread.state',
+   * Specifies whether the context switches for this data point were voluntary or involuntary.
+   */
+  PROCESS_CONTEXT_SWITCH_TYPE: 'process.context_switch_type';
 
   /**
-  * Specifies whether the context switches for this data point were voluntary or involuntary.
-  */
-  PROCESS_CONTEXT_SWITCH_TYPE: 'process.context_switch_type',
-
-  /**
-  * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
-  */
-  PROCESS_PAGING_FAULT_TYPE: 'process.paging.fault_type',
+   * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+   */
+  PROCESS_PAGING_FAULT_TYPE: 'process.paging.fault_type';
 };
 
 /**
- * Create exported Value Map for SemanticMetricsAttributes values
- * @deprecated Use the SEMMTRCSATTRS_XXXXX constants rather than the SemanticMetricsAttributes.XXXXX for bundle minification
+ * Create exported Value Map for SemanticMetricAttributes values
+ * @deprecated Use the SEMMTRCSATTRS_XXXXX constants rather than the SemanticMetricAttributes.XXXXX for bundle minification
  */
-export const SemanticMetricsAttributes:SemanticMetricsAttributes = /*#__PURE__*/createConstMap<SemanticMetricsAttributes>([
-  TMP_ASPNETCORE_ROUTING_MATCH_STATUS,
-  TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT,
-  TMP_JVM_GC_ACTION,
-  TMP_JVM_GC_NAME,
-  TMP_JVM_THREAD_DAEMON,
-  TMP_JVM_THREAD_STATE,
-  TMP_PROCESS_CONTEXT_SWITCH_TYPE,
-  TMP_PROCESS_PAGING_FAULT_TYPE,
-]);
+export const SemanticMetricAttributes: SemanticMetricAttributes =
+  /*#__PURE__*/ createConstMap<SemanticMetricAttributes>([
+    TMP_ASPNETCORE_ROUTING_MATCH_STATUS,
+    TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT,
+    TMP_JVM_GC_ACTION,
+    TMP_JVM_GC_NAME,
+    TMP_JVM_THREAD_DAEMON,
+    TMP_JVM_THREAD_STATE,
+    TMP_PROCESS_CONTEXT_SWITCH_TYPE,
+    TMP_PROCESS_PAGING_FAULT_TYPE,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for AspnetcoreRoutingMatchStatusValues enum definition
@@ -162,12 +167,14 @@ const TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE = 'failure';
 /**
  * Match result - success or failure.
  */
-export const ASPNETCOREROUTINGMATCHSTATUSVALUES_SUCCESS = TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_SUCCESS;
+export const ASPNETCOREROUTINGMATCHSTATUSVALUES_SUCCESS =
+  TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_SUCCESS;
 
 /**
  * Match result - success or failure.
  */
-export const ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE = TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE;
+export const ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE =
+  TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE;
 
 /**
  * Identifies the Values for AspnetcoreRoutingMatchStatusValues enum definition
@@ -176,24 +183,22 @@ export const ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE = TMP_ASPNETCOREROUTINGM
  * @deprecated Use the ASPNETCOREROUTINGMATCHSTATUSVALUES_XXXXX constants rather than the AspnetcoreRoutingMatchStatusValues.XXXXX for bundle minification.
  */
 export type AspnetcoreRoutingMatchStatusValues = {
-
   /** Match succeeded. */
-  SUCCESS: 'success',
+  SUCCESS: 'success';
 
   /** Match failed. */
-  FAILURE: 'failure',
-}
+  FAILURE: 'failure';
+};
 
 /**
  * The constant map of values for AspnetcoreRoutingMatchStatusValues.
  * @deprecated Use the ASPNETCOREROUTINGMATCHSTATUSVALUES_XXXXX constants rather than the AspnetcoreRoutingMatchStatusValues.XXXXX for bundle minification.
  */
-export const AspnetcoreRoutingMatchStatusValues:AspnetcoreRoutingMatchStatusValues = /*#__PURE__*/createConstMap<AspnetcoreRoutingMatchStatusValues>([
-  TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_SUCCESS,
-  TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE,
-]);
-
-
+export const AspnetcoreRoutingMatchStatusValues: AspnetcoreRoutingMatchStatusValues =
+  /*#__PURE__*/ createConstMap<AspnetcoreRoutingMatchStatusValues>([
+    TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_SUCCESS,
+    TMP_ASPNETCOREROUTINGMATCHSTATUSVALUES_FAILURE,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for AspnetcoreDiagnosticsExceptionResultValues enum definition
@@ -211,22 +216,26 @@ const TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED = 'aborted';
 /**
  * ASP.NET Core exception middleware handling result.
  */
-export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_HANDLED = TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_HANDLED;
+export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_HANDLED =
+  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_HANDLED;
 
 /**
  * ASP.NET Core exception middleware handling result.
  */
-export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_UNHANDLED = TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_UNHANDLED;
+export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_UNHANDLED =
+  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_UNHANDLED;
 
 /**
  * ASP.NET Core exception middleware handling result.
  */
-export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_SKIPPED = TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_SKIPPED;
+export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_SKIPPED =
+  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_SKIPPED;
 
 /**
  * ASP.NET Core exception middleware handling result.
  */
-export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED = TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED;
+export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED =
+  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED;
 
 /**
  * Identifies the Values for AspnetcoreDiagnosticsExceptionResultValues enum definition
@@ -235,32 +244,30 @@ export const ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED = TMP_ASPNETCORE
  * @deprecated Use the ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_XXXXX constants rather than the AspnetcoreDiagnosticsExceptionResultValues.XXXXX for bundle minification.
  */
 export type AspnetcoreDiagnosticsExceptionResultValues = {
-
   /** Exception was handled by the exception handling middleware. */
-  HANDLED: 'handled',
+  HANDLED: 'handled';
 
   /** Exception was not handled by the exception handling middleware. */
-  UNHANDLED: 'unhandled',
+  UNHANDLED: 'unhandled';
 
   /** Exception handling was skipped because the response had started. */
-  SKIPPED: 'skipped',
+  SKIPPED: 'skipped';
 
   /** Exception handling didn&#39;t run because the request was aborted. */
-  ABORTED: 'aborted',
-}
+  ABORTED: 'aborted';
+};
 
 /**
  * The constant map of values for AspnetcoreDiagnosticsExceptionResultValues.
  * @deprecated Use the ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_XXXXX constants rather than the AspnetcoreDiagnosticsExceptionResultValues.XXXXX for bundle minification.
  */
-export const AspnetcoreDiagnosticsExceptionResultValues:AspnetcoreDiagnosticsExceptionResultValues = /*#__PURE__*/createConstMap<AspnetcoreDiagnosticsExceptionResultValues>([
-  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_HANDLED,
-  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_UNHANDLED,
-  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_SKIPPED,
-  TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED,
-]);
-
-
+export const AspnetcoreDiagnosticsExceptionResultValues: AspnetcoreDiagnosticsExceptionResultValues =
+  /*#__PURE__*/ createConstMap<AspnetcoreDiagnosticsExceptionResultValues>([
+    TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_HANDLED,
+    TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_UNHANDLED,
+    TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_SKIPPED,
+    TMP_ASPNETCOREDIAGNOSTICSEXCEPTIONRESULTVALUES_ABORTED,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for JvmThreadStateValues enum definition
@@ -300,12 +307,14 @@ export const JVMTHREADSTATEVALUES_WAITING = TMP_JVMTHREADSTATEVALUES_WAITING;
 /**
  * State of the thread.
  */
-export const JVMTHREADSTATEVALUES_TIMED_WAITING = TMP_JVMTHREADSTATEVALUES_TIMED_WAITING;
+export const JVMTHREADSTATEVALUES_TIMED_WAITING =
+  TMP_JVMTHREADSTATEVALUES_TIMED_WAITING;
 
 /**
  * State of the thread.
  */
-export const JVMTHREADSTATEVALUES_TERMINATED = TMP_JVMTHREADSTATEVALUES_TERMINATED;
+export const JVMTHREADSTATEVALUES_TERMINATED =
+  TMP_JVMTHREADSTATEVALUES_TERMINATED;
 
 /**
  * Identifies the Values for JvmThreadStateValues enum definition
@@ -314,40 +323,38 @@ export const JVMTHREADSTATEVALUES_TERMINATED = TMP_JVMTHREADSTATEVALUES_TERMINAT
  * @deprecated Use the JVMTHREADSTATEVALUES_XXXXX constants rather than the JvmThreadStateValues.XXXXX for bundle minification.
  */
 export type JvmThreadStateValues = {
-
   /** A thread that has not yet started is in this state. */
-  NEW: 'new',
+  NEW: 'new';
 
   /** A thread executing in the Java virtual machine is in this state. */
-  RUNNABLE: 'runnable',
+  RUNNABLE: 'runnable';
 
   /** A thread that is blocked waiting for a monitor lock is in this state. */
-  BLOCKED: 'blocked',
+  BLOCKED: 'blocked';
 
   /** A thread that is waiting indefinitely for another thread to perform a particular action is in this state. */
-  WAITING: 'waiting',
+  WAITING: 'waiting';
 
   /** A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state. */
-  TIMED_WAITING: 'timed_waiting',
+  TIMED_WAITING: 'timed_waiting';
 
   /** A thread that has exited is in this state. */
-  TERMINATED: 'terminated',
-}
+  TERMINATED: 'terminated';
+};
 
 /**
  * The constant map of values for JvmThreadStateValues.
  * @deprecated Use the JVMTHREADSTATEVALUES_XXXXX constants rather than the JvmThreadStateValues.XXXXX for bundle minification.
  */
-export const JvmThreadStateValues:JvmThreadStateValues = /*#__PURE__*/createConstMap<JvmThreadStateValues>([
-  TMP_JVMTHREADSTATEVALUES_NEW,
-  TMP_JVMTHREADSTATEVALUES_RUNNABLE,
-  TMP_JVMTHREADSTATEVALUES_BLOCKED,
-  TMP_JVMTHREADSTATEVALUES_WAITING,
-  TMP_JVMTHREADSTATEVALUES_TIMED_WAITING,
-  TMP_JVMTHREADSTATEVALUES_TERMINATED,
-]);
-
-
+export const JvmThreadStateValues: JvmThreadStateValues =
+  /*#__PURE__*/ createConstMap<JvmThreadStateValues>([
+    TMP_JVMTHREADSTATEVALUES_NEW,
+    TMP_JVMTHREADSTATEVALUES_RUNNABLE,
+    TMP_JVMTHREADSTATEVALUES_BLOCKED,
+    TMP_JVMTHREADSTATEVALUES_WAITING,
+    TMP_JVMTHREADSTATEVALUES_TIMED_WAITING,
+    TMP_JVMTHREADSTATEVALUES_TERMINATED,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for ProcessContextSwitchTypeValues enum definition
@@ -363,12 +370,14 @@ const TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY = 'involuntary';
 /**
  * Specifies whether the context switches for this data point were voluntary or involuntary.
  */
-export const PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY = TMP_PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY;
+export const PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY =
+  TMP_PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY;
 
 /**
  * Specifies whether the context switches for this data point were voluntary or involuntary.
  */
-export const PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY = TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY;
+export const PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY =
+  TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY;
 
 /**
  * Identifies the Values for ProcessContextSwitchTypeValues enum definition
@@ -377,24 +386,22 @@ export const PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY = TMP_PROCESSCONTEXTSWIT
  * @deprecated Use the PROCESSCONTEXTSWITCHTYPEVALUES_XXXXX constants rather than the ProcessContextSwitchTypeValues.XXXXX for bundle minification.
  */
 export type ProcessContextSwitchTypeValues = {
-
   /** voluntary. */
-  VOLUNTARY: 'voluntary',
+  VOLUNTARY: 'voluntary';
 
   /** involuntary. */
-  INVOLUNTARY: 'involuntary',
-}
+  INVOLUNTARY: 'involuntary';
+};
 
 /**
  * The constant map of values for ProcessContextSwitchTypeValues.
  * @deprecated Use the PROCESSCONTEXTSWITCHTYPEVALUES_XXXXX constants rather than the ProcessContextSwitchTypeValues.XXXXX for bundle minification.
  */
-export const ProcessContextSwitchTypeValues:ProcessContextSwitchTypeValues = /*#__PURE__*/createConstMap<ProcessContextSwitchTypeValues>([
-  TMP_PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY,
-  TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY,
-]);
-
-
+export const ProcessContextSwitchTypeValues: ProcessContextSwitchTypeValues =
+  /*#__PURE__*/ createConstMap<ProcessContextSwitchTypeValues>([
+    TMP_PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY,
+    TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY,
+  ]);
 
 /* ----------------------------------------------------------------------------------------------------------
  * Constant values for ProcessPagingFaultTypeValues enum definition
@@ -410,12 +417,14 @@ const TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR = 'minor';
 /**
  * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
  */
-export const PROCESSPAGINGFAULTTYPEVALUES_MAJOR = TMP_PROCESSPAGINGFAULTTYPEVALUES_MAJOR;
+export const PROCESSPAGINGFAULTTYPEVALUES_MAJOR =
+  TMP_PROCESSPAGINGFAULTTYPEVALUES_MAJOR;
 
 /**
  * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
  */
-export const PROCESSPAGINGFAULTTYPEVALUES_MINOR = TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR;
+export const PROCESSPAGINGFAULTTYPEVALUES_MINOR =
+  TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR;
 
 /**
  * Identifies the Values for ProcessPagingFaultTypeValues enum definition
@@ -424,20 +433,19 @@ export const PROCESSPAGINGFAULTTYPEVALUES_MINOR = TMP_PROCESSPAGINGFAULTTYPEVALU
  * @deprecated Use the PROCESSPAGINGFAULTTYPEVALUES_XXXXX constants rather than the ProcessPagingFaultTypeValues.XXXXX for bundle minification.
  */
 export type ProcessPagingFaultTypeValues = {
-
   /** major. */
-  MAJOR: 'major',
+  MAJOR: 'major';
 
   /** minor. */
-  MINOR: 'minor',
-}
+  MINOR: 'minor';
+};
 
 /**
  * The constant map of values for ProcessPagingFaultTypeValues.
  * @deprecated Use the PROCESSPAGINGFAULTTYPEVALUES_XXXXX constants rather than the ProcessPagingFaultTypeValues.XXXXX for bundle minification.
  */
-export const ProcessPagingFaultTypeValues:ProcessPagingFaultTypeValues = /*#__PURE__*/createConstMap<ProcessPagingFaultTypeValues>([
-  TMP_PROCESSPAGINGFAULTTYPEVALUES_MAJOR,
-  TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR,
-]);
-
+export const ProcessPagingFaultTypeValues: ProcessPagingFaultTypeValues =
+  /*#__PURE__*/ createConstMap<ProcessPagingFaultTypeValues>([
+    TMP_PROCESSPAGINGFAULTTYPEVALUES_MAJOR,
+    TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR,
+  ]);
