@@ -21,7 +21,7 @@ import { createConstMap } from '../internal/utils';
 //----------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------
-// Constant values for SemanticTraceAttributes
+// Constant values for SemanticAttributes
 //----------------------------------------------------------------------------------------------------------
 
 // Temporary local constants to assign to the individual exports and the namespaced version
@@ -301,53 +301,53 @@ const TMP_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
 *
 * Note: SHOULD be equal to the `faas.name` resource attribute of the invoked function.
 */
-export const SEMTRCATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
+export const SEMATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
 
 /**
 * The cloud provider of the invoked function.
 *
 * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
 */
-export const SEMTRCATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
+export const SEMATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
 
 /**
 * The cloud region of the invoked function.
 *
 * Note: SHOULD be equal to the `cloud.region` resource attribute of the invoked function.
 */
-export const SEMTRCATTRS_FAAS_INVOKED_REGION = TMP_FAAS_INVOKED_REGION;
+export const SEMATTRS_FAAS_INVOKED_REGION = TMP_FAAS_INVOKED_REGION;
 
 /**
 * Type of the trigger which caused this function invocation.
 */
-export const SEMTRCATTRS_FAAS_TRIGGER = TMP_FAAS_TRIGGER;
+export const SEMATTRS_FAAS_TRIGGER = TMP_FAAS_TRIGGER;
 
 /**
 * The [`service.name`](/docs/resource/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
 */
-export const SEMTRCATTRS_PEER_SERVICE = TMP_PEER_SERVICE;
+export const SEMATTRS_PEER_SERVICE = TMP_PEER_SERVICE;
 
 /**
 * Username or client_id extracted from the access token or [Authorization](https://tools.ietf.org/html/rfc7235#section-4.2) header in the inbound request from outside the system.
 */
-export const SEMTRCATTRS_ENDUSER_ID = TMP_ENDUSER_ID;
+export const SEMATTRS_ENDUSER_ID = TMP_ENDUSER_ID;
 
 /**
 * Actual/assumed role the client is making the request under extracted from token or application security context.
 */
-export const SEMTRCATTRS_ENDUSER_ROLE = TMP_ENDUSER_ROLE;
+export const SEMATTRS_ENDUSER_ROLE = TMP_ENDUSER_ROLE;
 
 /**
 * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
 */
-export const SEMTRCATTRS_ENDUSER_SCOPE = TMP_ENDUSER_SCOPE;
+export const SEMATTRS_ENDUSER_SCOPE = TMP_ENDUSER_SCOPE;
 
 /**
 * Identifies the class / type of event.
 *
 * Note: Event names are subject to the same rules as [attribute names](https://github.com/open-telemetry/opentelemetry-specification/tree/v1.26.0/specification/common/attribute-naming.md). Notably, event names are namespaced to avoid collisions and provide a clean separation of semantics for events in separate domains like browser, mobile, and kubernetes.
 */
-export const SEMTRCATTRS_EVENT_NAME = TMP_EVENT_NAME;
+export const SEMATTRS_EVENT_NAME = TMP_EVENT_NAME;
 
 /**
 * A unique identifier for the Log Record.
@@ -355,545 +355,545 @@ export const SEMTRCATTRS_EVENT_NAME = TMP_EVENT_NAME;
 * Note: If an id is provided, other log records with the same id will be considered duplicates and can be removed safely. This means, that two distinguishable log records MUST have different values.
 The id MAY be an [Universally Unique Lexicographically Sortable Identifier (ULID)](https://github.com/ulid/spec), but other identifiers (e.g. UUID) may be used as needed.
 */
-export const SEMTRCATTRS_LOG_RECORD_UID = TMP_LOG_RECORD_UID;
+export const SEMATTRS_LOG_RECORD_UID = TMP_LOG_RECORD_UID;
 
 /**
 * The stream associated with the log. See below for a list of well-known values.
 */
-export const SEMTRCATTRS_LOG_IOSTREAM = TMP_LOG_IOSTREAM;
+export const SEMATTRS_LOG_IOSTREAM = TMP_LOG_IOSTREAM;
 
 /**
 * The basename of the file.
 */
-export const SEMTRCATTRS_LOG_FILE_NAME = TMP_LOG_FILE_NAME;
+export const SEMATTRS_LOG_FILE_NAME = TMP_LOG_FILE_NAME;
 
 /**
 * The basename of the file, with symlinks resolved.
 */
-export const SEMTRCATTRS_LOG_FILE_NAME_RESOLVED = TMP_LOG_FILE_NAME_RESOLVED;
+export const SEMATTRS_LOG_FILE_NAME_RESOLVED = TMP_LOG_FILE_NAME_RESOLVED;
 
 /**
 * The full path to the file.
 */
-export const SEMTRCATTRS_LOG_FILE_PATH = TMP_LOG_FILE_PATH;
+export const SEMATTRS_LOG_FILE_PATH = TMP_LOG_FILE_PATH;
 
 /**
 * The full path to the file, with symlinks resolved.
 */
-export const SEMTRCATTRS_LOG_FILE_PATH_RESOLVED = TMP_LOG_FILE_PATH_RESOLVED;
+export const SEMATTRS_LOG_FILE_PATH_RESOLVED = TMP_LOG_FILE_PATH_RESOLVED;
 
 /**
 * This attribute represents the state the application has transitioned into at the occurrence of the event.
 *
 * Note: The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
 */
-export const SEMTRCATTRS_IOS_STATE = TMP_IOS_STATE;
+export const SEMATTRS_IOS_STATE = TMP_IOS_STATE;
 
 /**
 * This attribute represents the state the application has transitioned into at the occurrence of the event.
 *
 * Note: The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
 */
-export const SEMTRCATTRS_ANDROID_STATE = TMP_ANDROID_STATE;
+export const SEMATTRS_ANDROID_STATE = TMP_ANDROID_STATE;
 
 /**
 * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation doesn&#39;t provide a name, then the [db.connection_string](/docs/database/database-spans.md#connection-level-attributes) should be used.
 */
-export const SEMTRCATTRS_POOL_NAME = TMP_POOL_NAME;
+export const SEMATTRS_POOL_NAME = TMP_POOL_NAME;
 
 /**
 * The state of a connection in the pool.
 */
-export const SEMTRCATTRS_STATE = TMP_STATE;
+export const SEMATTRS_STATE = TMP_STATE;
 
 /**
 * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
 */
-export const SEMTRCATTRS_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = TMP_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE;
+export const SEMATTRS_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = TMP_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE;
 
 /**
 * Rate limiting policy name.
 */
-export const SEMTRCATTRS_ASPNETCORE_RATE_LIMITING_POLICY = TMP_ASPNETCORE_RATE_LIMITING_POLICY;
+export const SEMATTRS_ASPNETCORE_RATE_LIMITING_POLICY = TMP_ASPNETCORE_RATE_LIMITING_POLICY;
 
 /**
 * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
 */
-export const SEMTRCATTRS_ASPNETCORE_RATE_LIMITING_RESULT = TMP_ASPNETCORE_RATE_LIMITING_RESULT;
+export const SEMATTRS_ASPNETCORE_RATE_LIMITING_RESULT = TMP_ASPNETCORE_RATE_LIMITING_RESULT;
 
 /**
 * Flag indicating if request was handled by the application pipeline.
 */
-export const SEMTRCATTRS_ASPNETCORE_REQUEST_IS_UNHANDLED = TMP_ASPNETCORE_REQUEST_IS_UNHANDLED;
+export const SEMATTRS_ASPNETCORE_REQUEST_IS_UNHANDLED = TMP_ASPNETCORE_REQUEST_IS_UNHANDLED;
 
 /**
 * A value that indicates whether the matched route is a fallback route.
 */
-export const SEMTRCATTRS_ASPNETCORE_ROUTING_IS_FALLBACK = TMP_ASPNETCORE_ROUTING_IS_FALLBACK;
+export const SEMATTRS_ASPNETCORE_ROUTING_IS_FALLBACK = TMP_ASPNETCORE_ROUTING_IS_FALLBACK;
 
 /**
 * SignalR HTTP connection closure status.
 */
-export const SEMTRCATTRS_SIGNALR_CONNECTION_STATUS = TMP_SIGNALR_CONNECTION_STATUS;
+export const SEMATTRS_SIGNALR_CONNECTION_STATUS = TMP_SIGNALR_CONNECTION_STATUS;
 
 /**
 * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md).
 */
-export const SEMTRCATTRS_SIGNALR_TRANSPORT = TMP_SIGNALR_TRANSPORT;
+export const SEMATTRS_SIGNALR_TRANSPORT = TMP_SIGNALR_TRANSPORT;
 
 /**
 * Name of the buffer pool.
 *
 * Note: Pool names are generally obtained via [BufferPoolMXBean#getName()](https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/BufferPoolMXBean.html#getName()).
 */
-export const SEMTRCATTRS_JVM_BUFFER_POOL_NAME = TMP_JVM_BUFFER_POOL_NAME;
+export const SEMATTRS_JVM_BUFFER_POOL_NAME = TMP_JVM_BUFFER_POOL_NAME;
 
 /**
 * Name of the memory pool.
 *
 * Note: Pool names are generally obtained via [MemoryPoolMXBean#getName()](https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html#getName()).
 */
-export const SEMTRCATTRS_JVM_MEMORY_POOL_NAME = TMP_JVM_MEMORY_POOL_NAME;
+export const SEMATTRS_JVM_MEMORY_POOL_NAME = TMP_JVM_MEMORY_POOL_NAME;
 
 /**
 * The type of memory.
 */
-export const SEMTRCATTRS_JVM_MEMORY_TYPE = TMP_JVM_MEMORY_TYPE;
+export const SEMATTRS_JVM_MEMORY_TYPE = TMP_JVM_MEMORY_TYPE;
 
 /**
 * The device identifier.
 */
-export const SEMTRCATTRS_SYSTEM_DEVICE = TMP_SYSTEM_DEVICE;
+export const SEMATTRS_SYSTEM_DEVICE = TMP_SYSTEM_DEVICE;
 
 /**
 * The logical CPU number [0..n-1].
 */
-export const SEMTRCATTRS_SYSTEM_CPU_LOGICAL_NUMBER = TMP_SYSTEM_CPU_LOGICAL_NUMBER;
+export const SEMATTRS_SYSTEM_CPU_LOGICAL_NUMBER = TMP_SYSTEM_CPU_LOGICAL_NUMBER;
 
 /**
 * The state of the CPU.
 */
-export const SEMTRCATTRS_SYSTEM_CPU_STATE = TMP_SYSTEM_CPU_STATE;
+export const SEMATTRS_SYSTEM_CPU_STATE = TMP_SYSTEM_CPU_STATE;
 
 /**
 * The memory state.
 */
-export const SEMTRCATTRS_SYSTEM_MEMORY_STATE = TMP_SYSTEM_MEMORY_STATE;
+export const SEMATTRS_SYSTEM_MEMORY_STATE = TMP_SYSTEM_MEMORY_STATE;
 
 /**
 * The paging access direction.
 */
-export const SEMTRCATTRS_SYSTEM_PAGING_DIRECTION = TMP_SYSTEM_PAGING_DIRECTION;
+export const SEMATTRS_SYSTEM_PAGING_DIRECTION = TMP_SYSTEM_PAGING_DIRECTION;
 
 /**
 * The memory paging state.
 */
-export const SEMTRCATTRS_SYSTEM_PAGING_STATE = TMP_SYSTEM_PAGING_STATE;
+export const SEMATTRS_SYSTEM_PAGING_STATE = TMP_SYSTEM_PAGING_STATE;
 
 /**
 * The memory paging type.
 */
-export const SEMTRCATTRS_SYSTEM_PAGING_TYPE = TMP_SYSTEM_PAGING_TYPE;
+export const SEMATTRS_SYSTEM_PAGING_TYPE = TMP_SYSTEM_PAGING_TYPE;
 
 /**
 * The filesystem mode.
 */
-export const SEMTRCATTRS_SYSTEM_FILESYSTEM_MODE = TMP_SYSTEM_FILESYSTEM_MODE;
+export const SEMATTRS_SYSTEM_FILESYSTEM_MODE = TMP_SYSTEM_FILESYSTEM_MODE;
 
 /**
 * The filesystem mount path.
 */
-export const SEMTRCATTRS_SYSTEM_FILESYSTEM_MOUNTPOINT = TMP_SYSTEM_FILESYSTEM_MOUNTPOINT;
+export const SEMATTRS_SYSTEM_FILESYSTEM_MOUNTPOINT = TMP_SYSTEM_FILESYSTEM_MOUNTPOINT;
 
 /**
 * The filesystem state.
 */
-export const SEMTRCATTRS_SYSTEM_FILESYSTEM_STATE = TMP_SYSTEM_FILESYSTEM_STATE;
+export const SEMATTRS_SYSTEM_FILESYSTEM_STATE = TMP_SYSTEM_FILESYSTEM_STATE;
 
 /**
 * The filesystem type.
 */
-export const SEMTRCATTRS_SYSTEM_FILESYSTEM_TYPE = TMP_SYSTEM_FILESYSTEM_TYPE;
+export const SEMATTRS_SYSTEM_FILESYSTEM_TYPE = TMP_SYSTEM_FILESYSTEM_TYPE;
 
 /**
 * A stateless protocol MUST NOT set this attribute.
 */
-export const SEMTRCATTRS_SYSTEM_NETWORK_STATE = TMP_SYSTEM_NETWORK_STATE;
+export const SEMATTRS_SYSTEM_NETWORK_STATE = TMP_SYSTEM_NETWORK_STATE;
 
 /**
 * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES).
 */
-export const SEMTRCATTRS_SYSTEM_PROCESSES_STATUS = TMP_SYSTEM_PROCESSES_STATUS;
+export const SEMATTRS_SYSTEM_PROCESSES_STATUS = TMP_SYSTEM_PROCESSES_STATUS;
 
 /**
 * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
 *
 * Note: When observed from the server side, and when communicating through an intermediary, `client.address` SHOULD represent the client address behind any intermediaries,  for example proxies, if it&#39;s available.
 */
-export const SEMTRCATTRS_CLIENT_ADDRESS = TMP_CLIENT_ADDRESS;
+export const SEMATTRS_CLIENT_ADDRESS = TMP_CLIENT_ADDRESS;
 
 /**
 * Client port number.
 *
 * Note: When observed from the server side, and when communicating through an intermediary, `client.port` SHOULD represent the client port behind any intermediaries,  for example proxies, if it&#39;s available.
 */
-export const SEMTRCATTRS_CLIENT_PORT = TMP_CLIENT_PORT;
+export const SEMATTRS_CLIENT_PORT = TMP_CLIENT_PORT;
 
 /**
 * The column number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
 */
-export const SEMTRCATTRS_CODE_COLUMN = TMP_CODE_COLUMN;
+export const SEMATTRS_CODE_COLUMN = TMP_CODE_COLUMN;
 
 /**
 * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
 */
-export const SEMTRCATTRS_CODE_FILEPATH = TMP_CODE_FILEPATH;
+export const SEMATTRS_CODE_FILEPATH = TMP_CODE_FILEPATH;
 
 /**
 * The method or function name, or equivalent (usually rightmost part of the code unit&#39;s name).
 */
-export const SEMTRCATTRS_CODE_FUNCTION = TMP_CODE_FUNCTION;
+export const SEMATTRS_CODE_FUNCTION = TMP_CODE_FUNCTION;
 
 /**
 * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
 */
-export const SEMTRCATTRS_CODE_LINENO = TMP_CODE_LINENO;
+export const SEMATTRS_CODE_LINENO = TMP_CODE_LINENO;
 
 /**
 * The &#34;namespace&#34; within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
 */
-export const SEMTRCATTRS_CODE_NAMESPACE = TMP_CODE_NAMESPACE;
+export const SEMATTRS_CODE_NAMESPACE = TMP_CODE_NAMESPACE;
 
 /**
 * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
 */
-export const SEMTRCATTRS_CODE_STACKTRACE = TMP_CODE_STACKTRACE;
+export const SEMATTRS_CODE_STACKTRACE = TMP_CODE_STACKTRACE;
 
 /**
 * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
 */
-export const SEMTRCATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL = TMP_DB_CASSANDRA_CONSISTENCY_LEVEL;
+export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL = TMP_DB_CASSANDRA_CONSISTENCY_LEVEL;
 
 /**
 * The data center of the coordinating node for a query.
 */
-export const SEMTRCATTRS_DB_CASSANDRA_COORDINATOR_DC = TMP_DB_CASSANDRA_COORDINATOR_DC;
+export const SEMATTRS_DB_CASSANDRA_COORDINATOR_DC = TMP_DB_CASSANDRA_COORDINATOR_DC;
 
 /**
 * The ID of the coordinating node for a query.
 */
-export const SEMTRCATTRS_DB_CASSANDRA_COORDINATOR_ID = TMP_DB_CASSANDRA_COORDINATOR_ID;
+export const SEMATTRS_DB_CASSANDRA_COORDINATOR_ID = TMP_DB_CASSANDRA_COORDINATOR_ID;
 
 /**
 * Whether or not the query is idempotent.
 */
-export const SEMTRCATTRS_DB_CASSANDRA_IDEMPOTENCE = TMP_DB_CASSANDRA_IDEMPOTENCE;
+export const SEMATTRS_DB_CASSANDRA_IDEMPOTENCE = TMP_DB_CASSANDRA_IDEMPOTENCE;
 
 /**
 * The fetch size used for paging, i.e. how many rows will be returned at once.
 */
-export const SEMTRCATTRS_DB_CASSANDRA_PAGE_SIZE = TMP_DB_CASSANDRA_PAGE_SIZE;
+export const SEMATTRS_DB_CASSANDRA_PAGE_SIZE = TMP_DB_CASSANDRA_PAGE_SIZE;
 
 /**
 * The number of times a query was speculatively executed. Not set or `0` if the query was not executed speculatively.
 */
-export const SEMTRCATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT = TMP_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT;
+export const SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT = TMP_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT;
 
 /**
 * The name of the primary Cassandra table that the operation is acting upon, including the keyspace name (if applicable).
 *
 * Note: This mirrors the db.sql.table attribute but references cassandra rather than sql. It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
 */
-export const SEMTRCATTRS_DB_CASSANDRA_TABLE = TMP_DB_CASSANDRA_TABLE;
+export const SEMATTRS_DB_CASSANDRA_TABLE = TMP_DB_CASSANDRA_TABLE;
 
 /**
 * The connection string used to connect to the database. It is recommended to remove embedded credentials.
 */
-export const SEMTRCATTRS_DB_CONNECTION_STRING = TMP_DB_CONNECTION_STRING;
+export const SEMATTRS_DB_CONNECTION_STRING = TMP_DB_CONNECTION_STRING;
 
 /**
 * Unique Cosmos client instance id.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_CLIENT_ID = TMP_DB_COSMOSDB_CLIENT_ID;
+export const SEMATTRS_DB_COSMOSDB_CLIENT_ID = TMP_DB_COSMOSDB_CLIENT_ID;
 
 /**
 * Cosmos client connection mode.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_CONNECTION_MODE = TMP_DB_COSMOSDB_CONNECTION_MODE;
+export const SEMATTRS_DB_COSMOSDB_CONNECTION_MODE = TMP_DB_COSMOSDB_CONNECTION_MODE;
 
 /**
 * Cosmos DB container name.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_CONTAINER = TMP_DB_COSMOSDB_CONTAINER;
+export const SEMATTRS_DB_COSMOSDB_CONTAINER = TMP_DB_COSMOSDB_CONTAINER;
 
 /**
 * CosmosDB Operation Type.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_OPERATION_TYPE = TMP_DB_COSMOSDB_OPERATION_TYPE;
+export const SEMATTRS_DB_COSMOSDB_OPERATION_TYPE = TMP_DB_COSMOSDB_OPERATION_TYPE;
 
 /**
 * RU consumed for that operation.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_REQUEST_CHARGE = TMP_DB_COSMOSDB_REQUEST_CHARGE;
+export const SEMATTRS_DB_COSMOSDB_REQUEST_CHARGE = TMP_DB_COSMOSDB_REQUEST_CHARGE;
 
 /**
 * Request payload size in bytes.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_REQUEST_CONTENT_LENGTH = TMP_DB_COSMOSDB_REQUEST_CONTENT_LENGTH;
+export const SEMATTRS_DB_COSMOSDB_REQUEST_CONTENT_LENGTH = TMP_DB_COSMOSDB_REQUEST_CONTENT_LENGTH;
 
 /**
 * Cosmos DB status code.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_STATUS_CODE = TMP_DB_COSMOSDB_STATUS_CODE;
+export const SEMATTRS_DB_COSMOSDB_STATUS_CODE = TMP_DB_COSMOSDB_STATUS_CODE;
 
 /**
 * Cosmos DB sub status code.
 */
-export const SEMTRCATTRS_DB_COSMOSDB_SUB_STATUS_CODE = TMP_DB_COSMOSDB_SUB_STATUS_CODE;
+export const SEMATTRS_DB_COSMOSDB_SUB_STATUS_CODE = TMP_DB_COSMOSDB_SUB_STATUS_CODE;
 
 /**
 * Represents the identifier of an Elasticsearch cluster.
 */
-export const SEMTRCATTRS_DB_ELASTICSEARCH_CLUSTER_NAME = TMP_DB_ELASTICSEARCH_CLUSTER_NAME;
+export const SEMATTRS_DB_ELASTICSEARCH_CLUSTER_NAME = TMP_DB_ELASTICSEARCH_CLUSTER_NAME;
 
 /**
 * Represents the human-readable identifier of the node/instance to which a request was routed.
 */
-export const SEMTRCATTRS_DB_ELASTICSEARCH_NODE_NAME = TMP_DB_ELASTICSEARCH_NODE_NAME;
+export const SEMATTRS_DB_ELASTICSEARCH_NODE_NAME = TMP_DB_ELASTICSEARCH_NODE_NAME;
 
 /**
 * An identifier (address, unique name, or any other identifier) of the database instance that is executing queries or mutations on the current connection. This is useful in cases where the database is running in a clustered environment and the instrumentation is able to record the node executing the query. The client may obtain this value in databases like MySQL using queries like `select @@hostname`.
 */
-export const SEMTRCATTRS_DB_INSTANCE_ID = TMP_DB_INSTANCE_ID;
+export const SEMATTRS_DB_INSTANCE_ID = TMP_DB_INSTANCE_ID;
 
 /**
 * The fully-qualified class name of the [Java Database Connectivity (JDBC)](https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/) driver used to connect.
 */
-export const SEMTRCATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
+export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
 
 /**
 * The MongoDB collection being accessed within the database stated in `db.name`.
 */
-export const SEMTRCATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
+export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
 
 /**
 * The Microsoft SQL Server [instance name](https://docs.microsoft.com/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15) connecting to. This name is used to determine the port of a named instance.
 *
 * Note: If setting a `db.mssql.instance_name`, `server.port` is no longer required (but still recommended if non-standard).
 */
-export const SEMTRCATTRS_DB_MSSQL_INSTANCE_NAME = TMP_DB_MSSQL_INSTANCE_NAME;
+export const SEMATTRS_DB_MSSQL_INSTANCE_NAME = TMP_DB_MSSQL_INSTANCE_NAME;
 
 /**
 * This attribute is used to report the name of the database being accessed. For commands that switch the database, this should be set to the target database (even if the command fails).
 *
 * Note: In some SQL databases, the database name to be used is called &#34;schema name&#34;. In case there are multiple layers that could be considered for database name (e.g. Oracle instance name and schema name), the database name to be used is the more specific layer (e.g. Oracle schema name).
 */
-export const SEMTRCATTRS_DB_NAME = TMP_DB_NAME;
+export const SEMATTRS_DB_NAME = TMP_DB_NAME;
 
 /**
 * The name of the operation being executed, e.g. the [MongoDB command name](https://docs.mongodb.com/manual/reference/command/#database-operations) such as `findAndModify`, or the SQL keyword.
 *
 * Note: When setting this to an SQL keyword, it is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if the operation name is provided by the library being instrumented. If the SQL statement has an ambiguous operation, or performs more than one operation, this value may be omitted.
 */
-export const SEMTRCATTRS_DB_OPERATION = TMP_DB_OPERATION;
+export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
 
 /**
 * The index of the database being accessed as used in the [`SELECT` command](https://redis.io/commands/select), provided as an integer. To be used instead of the generic `db.name` attribute.
 */
-export const SEMTRCATTRS_DB_REDIS_DATABASE_INDEX = TMP_DB_REDIS_DATABASE_INDEX;
+export const SEMATTRS_DB_REDIS_DATABASE_INDEX = TMP_DB_REDIS_DATABASE_INDEX;
 
 /**
 * The name of the primary table that the operation is acting upon, including the database name (if applicable).
 *
 * Note: It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
 */
-export const SEMTRCATTRS_DB_SQL_TABLE = TMP_DB_SQL_TABLE;
+export const SEMATTRS_DB_SQL_TABLE = TMP_DB_SQL_TABLE;
 
 /**
 * The database statement being executed.
 */
-export const SEMTRCATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
+export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
 
 /**
 * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
 */
-export const SEMTRCATTRS_DB_SYSTEM = TMP_DB_SYSTEM;
+export const SEMATTRS_DB_SYSTEM = TMP_DB_SYSTEM;
 
 /**
 * Username for accessing the database.
 */
-export const SEMTRCATTRS_DB_USER = TMP_DB_USER;
+export const SEMATTRS_DB_USER = TMP_DB_USER;
 
 /**
 * Deprecated, use `network.protocol.name` instead.
 *
 * @deprecated Replaced by `network.protocol.name`.
 */
-export const SEMTRCATTRS_HTTP_FLAVOR = TMP_HTTP_FLAVOR;
+export const SEMATTRS_HTTP_FLAVOR = TMP_HTTP_FLAVOR;
 
 /**
 * Deprecated, use `http.request.method` instead.
 *
 * @deprecated Replaced by `http.request.method`.
 */
-export const SEMTRCATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
+export const SEMATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
 
 /**
 * Deprecated, use `http.request.header.content-length` instead.
 *
 * @deprecated Replaced by `http.request.header.content-length`.
 */
-export const SEMTRCATTRS_HTTP_REQUEST_CONTENT_LENGTH = TMP_HTTP_REQUEST_CONTENT_LENGTH;
+export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH = TMP_HTTP_REQUEST_CONTENT_LENGTH;
 
 /**
 * Deprecated, use `http.response.header.content-length` instead.
 *
 * @deprecated Replaced by `http.response.header.content-length`.
 */
-export const SEMTRCATTRS_HTTP_RESPONSE_CONTENT_LENGTH = TMP_HTTP_RESPONSE_CONTENT_LENGTH;
+export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH = TMP_HTTP_RESPONSE_CONTENT_LENGTH;
 
 /**
 * Deprecated, use `url.scheme` instead.
 *
 * @deprecated Replaced by `url.scheme` instead.
 */
-export const SEMTRCATTRS_HTTP_SCHEME = TMP_HTTP_SCHEME;
+export const SEMATTRS_HTTP_SCHEME = TMP_HTTP_SCHEME;
 
 /**
 * Deprecated, use `http.response.status_code` instead.
 *
 * @deprecated Replaced by `http.response.status_code`.
 */
-export const SEMTRCATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
+export const SEMATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
 
 /**
 * Deprecated, use `url.path` and `url.query` instead.
 *
 * @deprecated Split to `url.path` and `url.query.
 */
-export const SEMTRCATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
+export const SEMATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
 
 /**
 * Deprecated, use `url.full` instead.
 *
 * @deprecated Replaced by `url.full`.
 */
-export const SEMTRCATTRS_HTTP_URL = TMP_HTTP_URL;
+export const SEMATTRS_HTTP_URL = TMP_HTTP_URL;
 
 /**
 * Deprecated, use `user_agent.original` instead.
 *
 * @deprecated Replaced by `user_agent.original`.
 */
-export const SEMTRCATTRS_HTTP_USER_AGENT = TMP_HTTP_USER_AGENT;
+export const SEMATTRS_HTTP_USER_AGENT = TMP_HTTP_USER_AGENT;
 
 /**
 * Deprecated, use `server.address`.
 *
 * @deprecated Replaced by `server.address`.
 */
-export const SEMTRCATTRS_NET_HOST_NAME = TMP_NET_HOST_NAME;
+export const SEMATTRS_NET_HOST_NAME = TMP_NET_HOST_NAME;
 
 /**
 * Deprecated, use `server.port`.
 *
 * @deprecated Replaced by `server.port`.
 */
-export const SEMTRCATTRS_NET_HOST_PORT = TMP_NET_HOST_PORT;
+export const SEMATTRS_NET_HOST_PORT = TMP_NET_HOST_PORT;
 
 /**
 * Deprecated, use `server.address` on client spans and `client.address` on server spans.
 *
 * @deprecated Replaced by `server.address` on client spans and `client.address` on server spans.
 */
-export const SEMTRCATTRS_NET_PEER_NAME = TMP_NET_PEER_NAME;
+export const SEMATTRS_NET_PEER_NAME = TMP_NET_PEER_NAME;
 
 /**
 * Deprecated, use `server.port` on client spans and `client.port` on server spans.
 *
 * @deprecated Replaced by `server.port` on client spans and `client.port` on server spans.
 */
-export const SEMTRCATTRS_NET_PEER_PORT = TMP_NET_PEER_PORT;
+export const SEMATTRS_NET_PEER_PORT = TMP_NET_PEER_PORT;
 
 /**
 * Deprecated, use `network.protocol.name`.
 *
 * @deprecated Replaced by `network.protocol.name`.
 */
-export const SEMTRCATTRS_NET_PROTOCOL_NAME = TMP_NET_PROTOCOL_NAME;
+export const SEMATTRS_NET_PROTOCOL_NAME = TMP_NET_PROTOCOL_NAME;
 
 /**
 * Deprecated, use `network.protocol.version`.
 *
 * @deprecated Replaced by `network.protocol.version`.
 */
-export const SEMTRCATTRS_NET_PROTOCOL_VERSION = TMP_NET_PROTOCOL_VERSION;
+export const SEMATTRS_NET_PROTOCOL_VERSION = TMP_NET_PROTOCOL_VERSION;
 
 /**
 * Deprecated, use `network.transport` and `network.type`.
 *
 * @deprecated Split to `network.transport` and `network.type`.
 */
-export const SEMTRCATTRS_NET_SOCK_FAMILY = TMP_NET_SOCK_FAMILY;
+export const SEMATTRS_NET_SOCK_FAMILY = TMP_NET_SOCK_FAMILY;
 
 /**
 * Deprecated, use `network.local.address`.
 *
 * @deprecated Replaced by `network.local.address`.
 */
-export const SEMTRCATTRS_NET_SOCK_HOST_ADDR = TMP_NET_SOCK_HOST_ADDR;
+export const SEMATTRS_NET_SOCK_HOST_ADDR = TMP_NET_SOCK_HOST_ADDR;
 
 /**
 * Deprecated, use `network.local.port`.
 *
 * @deprecated Replaced by `network.local.port`.
 */
-export const SEMTRCATTRS_NET_SOCK_HOST_PORT = TMP_NET_SOCK_HOST_PORT;
+export const SEMATTRS_NET_SOCK_HOST_PORT = TMP_NET_SOCK_HOST_PORT;
 
 /**
 * Deprecated, use `network.peer.address`.
 *
 * @deprecated Replaced by `network.peer.address`.
 */
-export const SEMTRCATTRS_NET_SOCK_PEER_ADDR = TMP_NET_SOCK_PEER_ADDR;
+export const SEMATTRS_NET_SOCK_PEER_ADDR = TMP_NET_SOCK_PEER_ADDR;
 
 /**
 * Deprecated, no replacement at this time.
 *
 * @deprecated Removed.
 */
-export const SEMTRCATTRS_NET_SOCK_PEER_NAME = TMP_NET_SOCK_PEER_NAME;
+export const SEMATTRS_NET_SOCK_PEER_NAME = TMP_NET_SOCK_PEER_NAME;
 
 /**
 * Deprecated, use `network.peer.port`.
 *
 * @deprecated Replaced by `network.peer.port`.
 */
-export const SEMTRCATTRS_NET_SOCK_PEER_PORT = TMP_NET_SOCK_PEER_PORT;
+export const SEMATTRS_NET_SOCK_PEER_PORT = TMP_NET_SOCK_PEER_PORT;
 
 /**
 * Deprecated, use `network.transport`.
 *
 * @deprecated Replaced by `network.transport`.
 */
-export const SEMTRCATTRS_NET_TRANSPORT = TMP_NET_TRANSPORT;
+export const SEMATTRS_NET_TRANSPORT = TMP_NET_TRANSPORT;
 
 /**
 * Destination address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
 *
 * Note: When observed from the source side, and when communicating through an intermediary, `destination.address` SHOULD represent the destination address behind any intermediaries, for example proxies, if it&#39;s available.
 */
-export const SEMTRCATTRS_DESTINATION_ADDRESS = TMP_DESTINATION_ADDRESS;
+export const SEMATTRS_DESTINATION_ADDRESS = TMP_DESTINATION_ADDRESS;
 
 /**
 * Destination port number.
 */
-export const SEMTRCATTRS_DESTINATION_PORT = TMP_DESTINATION_PORT;
+export const SEMATTRS_DESTINATION_PORT = TMP_DESTINATION_PORT;
 
 /**
 * The disk IO operation direction.
 */
-export const SEMTRCATTRS_DISK_IO_DIRECTION = TMP_DISK_IO_DIRECTION;
+export const SEMATTRS_DISK_IO_DIRECTION = TMP_DISK_IO_DIRECTION;
 
 /**
 * Describes a class of error the operation ended with.
@@ -914,7 +914,7 @@ it&#39;s RECOMMENDED to:
 * Use a domain-specific attribute
 * Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
 */
-export const SEMTRCATTRS_ERROR_TYPE = TMP_ERROR_TYPE;
+export const SEMATTRS_ERROR_TYPE = TMP_ERROR_TYPE;
 
 /**
 * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
@@ -936,27 +936,27 @@ even if the `exception.escaped` attribute was not set or set to false,
 since the event might have been recorded at a time where it was not
 clear whether the exception will escape.
 */
-export const SEMTRCATTRS_EXCEPTION_ESCAPED = TMP_EXCEPTION_ESCAPED;
+export const SEMATTRS_EXCEPTION_ESCAPED = TMP_EXCEPTION_ESCAPED;
 
 /**
 * The exception message.
 */
-export const SEMTRCATTRS_EXCEPTION_MESSAGE = TMP_EXCEPTION_MESSAGE;
+export const SEMATTRS_EXCEPTION_MESSAGE = TMP_EXCEPTION_MESSAGE;
 
 /**
 * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
 */
-export const SEMTRCATTRS_EXCEPTION_STACKTRACE = TMP_EXCEPTION_STACKTRACE;
+export const SEMATTRS_EXCEPTION_STACKTRACE = TMP_EXCEPTION_STACKTRACE;
 
 /**
 * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
 */
-export const SEMTRCATTRS_EXCEPTION_TYPE = TMP_EXCEPTION_TYPE;
+export const SEMATTRS_EXCEPTION_TYPE = TMP_EXCEPTION_TYPE;
 
 /**
 * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
 */
-export const SEMTRCATTRS_HTTP_REQUEST_BODY_SIZE = TMP_HTTP_REQUEST_BODY_SIZE;
+export const SEMATTRS_HTTP_REQUEST_BODY_SIZE = TMP_HTTP_REQUEST_BODY_SIZE;
 
 /**
 * HTTP request method.
@@ -976,29 +976,29 @@ HTTP method names are case-sensitive and `http.request.method` attribute value M
 Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
 Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
 */
-export const SEMTRCATTRS_HTTP_REQUEST_METHOD = TMP_HTTP_REQUEST_METHOD;
+export const SEMATTRS_HTTP_REQUEST_METHOD = TMP_HTTP_REQUEST_METHOD;
 
 /**
 * Original HTTP method sent by the client in the request line.
 */
-export const SEMTRCATTRS_HTTP_REQUEST_METHOD_ORIGINAL = TMP_HTTP_REQUEST_METHOD_ORIGINAL;
+export const SEMATTRS_HTTP_REQUEST_METHOD_ORIGINAL = TMP_HTTP_REQUEST_METHOD_ORIGINAL;
 
 /**
 * The ordinal number of request resending attempt (for any reason, including redirects).
 *
 * Note: The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
 */
-export const SEMTRCATTRS_HTTP_REQUEST_RESEND_COUNT = TMP_HTTP_REQUEST_RESEND_COUNT;
+export const SEMATTRS_HTTP_REQUEST_RESEND_COUNT = TMP_HTTP_REQUEST_RESEND_COUNT;
 
 /**
 * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
 */
-export const SEMTRCATTRS_HTTP_RESPONSE_BODY_SIZE = TMP_HTTP_RESPONSE_BODY_SIZE;
+export const SEMATTRS_HTTP_RESPONSE_BODY_SIZE = TMP_HTTP_RESPONSE_BODY_SIZE;
 
 /**
 * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
 */
-export const SEMTRCATTRS_HTTP_RESPONSE_STATUS_CODE = TMP_HTTP_RESPONSE_STATUS_CODE;
+export const SEMATTRS_HTTP_RESPONSE_STATUS_CODE = TMP_HTTP_RESPONSE_STATUS_CODE;
 
 /**
 * The matched route, that is, the path template in the format used by the respective server framework.
@@ -1006,24 +1006,24 @@ export const SEMTRCATTRS_HTTP_RESPONSE_STATUS_CODE = TMP_HTTP_RESPONSE_STATUS_CO
 * Note: MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
 SHOULD include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
 */
-export const SEMTRCATTRS_HTTP_ROUTE = TMP_HTTP_ROUTE;
+export const SEMATTRS_HTTP_ROUTE = TMP_HTTP_ROUTE;
 
 /**
 * The number of messages sent, received, or processed in the scope of the batching operation.
 *
 * Note: Instrumentations SHOULD NOT set `messaging.batch.message_count` on spans that operate with a single message. When a messaging client library supports both batch and single-message API for the same operation, instrumentations SHOULD use `messaging.batch.message_count` for batching APIs and SHOULD NOT use it for single-message APIs.
 */
-export const SEMTRCATTRS_MESSAGING_BATCH_MESSAGE_COUNT = TMP_MESSAGING_BATCH_MESSAGE_COUNT;
+export const SEMATTRS_MESSAGING_BATCH_MESSAGE_COUNT = TMP_MESSAGING_BATCH_MESSAGE_COUNT;
 
 /**
 * A unique identifier for the client that consumes or produces a message.
 */
-export const SEMTRCATTRS_MESSAGING_CLIENT_ID = TMP_MESSAGING_CLIENT_ID;
+export const SEMATTRS_MESSAGING_CLIENT_ID = TMP_MESSAGING_CLIENT_ID;
 
 /**
 * A boolean that is true if the message destination is anonymous (could be unnamed or have auto-generated name).
 */
-export const SEMTRCATTRS_MESSAGING_DESTINATION_ANONYMOUS = TMP_MESSAGING_DESTINATION_ANONYMOUS;
+export const SEMATTRS_MESSAGING_DESTINATION_ANONYMOUS = TMP_MESSAGING_DESTINATION_ANONYMOUS;
 
 /**
 * The message destination name.
@@ -1031,24 +1031,24 @@ export const SEMTRCATTRS_MESSAGING_DESTINATION_ANONYMOUS = TMP_MESSAGING_DESTINA
 * Note: Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
 the broker doesn&#39;t have such notion, the destination name SHOULD uniquely identify the broker.
 */
-export const SEMTRCATTRS_MESSAGING_DESTINATION_NAME = TMP_MESSAGING_DESTINATION_NAME;
+export const SEMATTRS_MESSAGING_DESTINATION_NAME = TMP_MESSAGING_DESTINATION_NAME;
 
 /**
 * Low cardinality representation of the messaging destination name.
 *
 * Note: Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
 */
-export const SEMTRCATTRS_MESSAGING_DESTINATION_TEMPLATE = TMP_MESSAGING_DESTINATION_TEMPLATE;
+export const SEMATTRS_MESSAGING_DESTINATION_TEMPLATE = TMP_MESSAGING_DESTINATION_TEMPLATE;
 
 /**
 * A boolean that is true if the message destination is temporary and might not exist anymore after messages are processed.
 */
-export const SEMTRCATTRS_MESSAGING_DESTINATION_TEMPORARY = TMP_MESSAGING_DESTINATION_TEMPORARY;
+export const SEMATTRS_MESSAGING_DESTINATION_TEMPORARY = TMP_MESSAGING_DESTINATION_TEMPORARY;
 
 /**
 * A boolean that is true if the publish message destination is anonymous (could be unnamed or have auto-generated name).
 */
-export const SEMTRCATTRS_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = TMP_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS;
+export const SEMATTRS_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = TMP_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS;
 
 /**
 * The name of the original destination the message was published to.
@@ -1056,39 +1056,39 @@ export const SEMTRCATTRS_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = TMP_MESSAGING
 * Note: The name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
 the broker doesn&#39;t have such notion, the original destination name SHOULD uniquely identify the broker.
 */
-export const SEMTRCATTRS_MESSAGING_DESTINATION_PUBLISH_NAME = TMP_MESSAGING_DESTINATION_PUBLISH_NAME;
+export const SEMATTRS_MESSAGING_DESTINATION_PUBLISH_NAME = TMP_MESSAGING_DESTINATION_PUBLISH_NAME;
 
 /**
 * The ordering key for a given message. If the attribute is not present, the message does not have an ordering key.
 */
-export const SEMTRCATTRS_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY = TMP_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY;
+export const SEMATTRS_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY = TMP_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY;
 
 /**
 * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
 */
-export const SEMTRCATTRS_MESSAGING_KAFKA_CONSUMER_GROUP = TMP_MESSAGING_KAFKA_CONSUMER_GROUP;
+export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP = TMP_MESSAGING_KAFKA_CONSUMER_GROUP;
 
 /**
 * Partition the message is sent to.
 */
-export const SEMTRCATTRS_MESSAGING_KAFKA_DESTINATION_PARTITION = TMP_MESSAGING_KAFKA_DESTINATION_PARTITION;
+export const SEMATTRS_MESSAGING_KAFKA_DESTINATION_PARTITION = TMP_MESSAGING_KAFKA_DESTINATION_PARTITION;
 
 /**
 * Message keys in Kafka are used for grouping alike messages to ensure they&#39;re processed on the same partition. They differ from `messaging.message.id` in that they&#39;re not unique. If the key is `null`, the attribute MUST NOT be set.
 *
 * Note: If the key type is not string, it&#39;s string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don&#39;t include its value.
 */
-export const SEMTRCATTRS_MESSAGING_KAFKA_MESSAGE_KEY = TMP_MESSAGING_KAFKA_MESSAGE_KEY;
+export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_KEY = TMP_MESSAGING_KAFKA_MESSAGE_KEY;
 
 /**
 * The offset of a record in the corresponding Kafka partition.
 */
-export const SEMTRCATTRS_MESSAGING_KAFKA_MESSAGE_OFFSET = TMP_MESSAGING_KAFKA_MESSAGE_OFFSET;
+export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_OFFSET = TMP_MESSAGING_KAFKA_MESSAGE_OFFSET;
 
 /**
 * A boolean that is true if the message is a tombstone.
 */
-export const SEMTRCATTRS_MESSAGING_KAFKA_MESSAGE_TOMBSTONE = TMP_MESSAGING_KAFKA_MESSAGE_TOMBSTONE;
+export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_TOMBSTONE = TMP_MESSAGING_KAFKA_MESSAGE_TOMBSTONE;
 
 /**
 * The size of the message body in bytes.
@@ -1096,12 +1096,12 @@ export const SEMTRCATTRS_MESSAGING_KAFKA_MESSAGE_TOMBSTONE = TMP_MESSAGING_KAFKA
 * Note: This can refer to both the compressed or uncompressed body size. If both sizes are known, the uncompressed
 body size should be used.
 */
-export const SEMTRCATTRS_MESSAGING_MESSAGE_BODY_SIZE = TMP_MESSAGING_MESSAGE_BODY_SIZE;
+export const SEMATTRS_MESSAGING_MESSAGE_BODY_SIZE = TMP_MESSAGING_MESSAGE_BODY_SIZE;
 
 /**
 * The conversation ID identifying the conversation to which the message belongs, represented as a string. Sometimes called &#34;Correlation ID&#34;.
 */
-export const SEMTRCATTRS_MESSAGING_MESSAGE_CONVERSATION_ID = TMP_MESSAGING_MESSAGE_CONVERSATION_ID;
+export const SEMATTRS_MESSAGING_MESSAGE_CONVERSATION_ID = TMP_MESSAGING_MESSAGE_CONVERSATION_ID;
 
 /**
 * The size of the message body and metadata in bytes.
@@ -1109,143 +1109,143 @@ export const SEMTRCATTRS_MESSAGING_MESSAGE_CONVERSATION_ID = TMP_MESSAGING_MESSA
 * Note: This can refer to both the compressed or uncompressed size. If both sizes are known, the uncompressed
 size should be used.
 */
-export const SEMTRCATTRS_MESSAGING_MESSAGE_ENVELOPE_SIZE = TMP_MESSAGING_MESSAGE_ENVELOPE_SIZE;
+export const SEMATTRS_MESSAGING_MESSAGE_ENVELOPE_SIZE = TMP_MESSAGING_MESSAGE_ENVELOPE_SIZE;
 
 /**
 * A value used by the messaging system as an identifier for the message, represented as a string.
 */
-export const SEMTRCATTRS_MESSAGING_MESSAGE_ID = TMP_MESSAGING_MESSAGE_ID;
+export const SEMATTRS_MESSAGING_MESSAGE_ID = TMP_MESSAGING_MESSAGE_ID;
 
 /**
 * A string identifying the kind of messaging operation.
 *
 * Note: If a custom value is used, it MUST be of low cardinality.
 */
-export const SEMTRCATTRS_MESSAGING_OPERATION = TMP_MESSAGING_OPERATION;
+export const SEMATTRS_MESSAGING_OPERATION = TMP_MESSAGING_OPERATION;
 
 /**
 * RabbitMQ message routing key.
 */
-export const SEMTRCATTRS_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = TMP_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY;
+export const SEMATTRS_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY = TMP_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY;
 
 /**
 * Name of the RocketMQ producer/consumer group that is handling the message. The client type is identified by the SpanKind.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_CLIENT_GROUP = TMP_MESSAGING_ROCKETMQ_CLIENT_GROUP;
+export const SEMATTRS_MESSAGING_ROCKETMQ_CLIENT_GROUP = TMP_MESSAGING_ROCKETMQ_CLIENT_GROUP;
 
 /**
 * Model of message consumption. This only applies to consumer spans.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL = TMP_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL;
+export const SEMATTRS_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL = TMP_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL;
 
 /**
 * The delay time level for delay message, which determines the message delay time.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL = TMP_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL;
+export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL = TMP_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL;
 
 /**
 * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = TMP_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP;
+export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP = TMP_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP;
 
 /**
 * It is essential for FIFO message. Messages that belong to the same message group are always processed one by one within the same consumer group.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_MESSAGE_GROUP = TMP_MESSAGING_ROCKETMQ_MESSAGE_GROUP;
+export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_GROUP = TMP_MESSAGING_ROCKETMQ_MESSAGE_GROUP;
 
 /**
 * Key(s) of message, another way to mark message besides message id.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_MESSAGE_KEYS = TMP_MESSAGING_ROCKETMQ_MESSAGE_KEYS;
+export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_KEYS = TMP_MESSAGING_ROCKETMQ_MESSAGE_KEYS;
 
 /**
 * The secondary classifier of message besides topic.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_MESSAGE_TAG = TMP_MESSAGING_ROCKETMQ_MESSAGE_TAG;
+export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_TAG = TMP_MESSAGING_ROCKETMQ_MESSAGE_TAG;
 
 /**
 * Type of message.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_MESSAGE_TYPE = TMP_MESSAGING_ROCKETMQ_MESSAGE_TYPE;
+export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_TYPE = TMP_MESSAGING_ROCKETMQ_MESSAGE_TYPE;
 
 /**
 * Namespace of RocketMQ resources, resources in different namespaces are individual.
 */
-export const SEMTRCATTRS_MESSAGING_ROCKETMQ_NAMESPACE = TMP_MESSAGING_ROCKETMQ_NAMESPACE;
+export const SEMATTRS_MESSAGING_ROCKETMQ_NAMESPACE = TMP_MESSAGING_ROCKETMQ_NAMESPACE;
 
 /**
 * An identifier for the messaging system being used. See below for a list of well-known identifiers.
 */
-export const SEMTRCATTRS_MESSAGING_SYSTEM = TMP_MESSAGING_SYSTEM;
+export const SEMATTRS_MESSAGING_SYSTEM = TMP_MESSAGING_SYSTEM;
 
 /**
 * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
 */
-export const SEMTRCATTRS_NETWORK_CARRIER_ICC = TMP_NETWORK_CARRIER_ICC;
+export const SEMATTRS_NETWORK_CARRIER_ICC = TMP_NETWORK_CARRIER_ICC;
 
 /**
 * The mobile carrier country code.
 */
-export const SEMTRCATTRS_NETWORK_CARRIER_MCC = TMP_NETWORK_CARRIER_MCC;
+export const SEMATTRS_NETWORK_CARRIER_MCC = TMP_NETWORK_CARRIER_MCC;
 
 /**
 * The mobile carrier network code.
 */
-export const SEMTRCATTRS_NETWORK_CARRIER_MNC = TMP_NETWORK_CARRIER_MNC;
+export const SEMATTRS_NETWORK_CARRIER_MNC = TMP_NETWORK_CARRIER_MNC;
 
 /**
 * The name of the mobile carrier.
 */
-export const SEMTRCATTRS_NETWORK_CARRIER_NAME = TMP_NETWORK_CARRIER_NAME;
+export const SEMATTRS_NETWORK_CARRIER_NAME = TMP_NETWORK_CARRIER_NAME;
 
 /**
 * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
 */
-export const SEMTRCATTRS_NETWORK_CONNECTION_SUBTYPE = TMP_NETWORK_CONNECTION_SUBTYPE;
+export const SEMATTRS_NETWORK_CONNECTION_SUBTYPE = TMP_NETWORK_CONNECTION_SUBTYPE;
 
 /**
 * The internet connection type.
 */
-export const SEMTRCATTRS_NETWORK_CONNECTION_TYPE = TMP_NETWORK_CONNECTION_TYPE;
+export const SEMATTRS_NETWORK_CONNECTION_TYPE = TMP_NETWORK_CONNECTION_TYPE;
 
 /**
 * The network IO operation direction.
 */
-export const SEMTRCATTRS_NETWORK_IO_DIRECTION = TMP_NETWORK_IO_DIRECTION;
+export const SEMATTRS_NETWORK_IO_DIRECTION = TMP_NETWORK_IO_DIRECTION;
 
 /**
 * Local address of the network connection - IP address or Unix domain socket name.
 */
-export const SEMTRCATTRS_NETWORK_LOCAL_ADDRESS = TMP_NETWORK_LOCAL_ADDRESS;
+export const SEMATTRS_NETWORK_LOCAL_ADDRESS = TMP_NETWORK_LOCAL_ADDRESS;
 
 /**
 * Local port number of the network connection.
 */
-export const SEMTRCATTRS_NETWORK_LOCAL_PORT = TMP_NETWORK_LOCAL_PORT;
+export const SEMATTRS_NETWORK_LOCAL_PORT = TMP_NETWORK_LOCAL_PORT;
 
 /**
 * Peer address of the network connection - IP address or Unix domain socket name.
 */
-export const SEMTRCATTRS_NETWORK_PEER_ADDRESS = TMP_NETWORK_PEER_ADDRESS;
+export const SEMATTRS_NETWORK_PEER_ADDRESS = TMP_NETWORK_PEER_ADDRESS;
 
 /**
 * Peer port number of the network connection.
 */
-export const SEMTRCATTRS_NETWORK_PEER_PORT = TMP_NETWORK_PEER_PORT;
+export const SEMATTRS_NETWORK_PEER_PORT = TMP_NETWORK_PEER_PORT;
 
 /**
 * [OSI application layer](https://osi-model.com/application-layer/) or non-OSI equivalent.
 *
 * Note: The value SHOULD be normalized to lowercase.
 */
-export const SEMTRCATTRS_NETWORK_PROTOCOL_NAME = TMP_NETWORK_PROTOCOL_NAME;
+export const SEMATTRS_NETWORK_PROTOCOL_NAME = TMP_NETWORK_PROTOCOL_NAME;
 
 /**
 * Version of the protocol specified in `network.protocol.name`.
 *
 * Note: `network.protocol.version` refers to the version of the protocol used and might be different from the protocol client&#39;s version. If the HTTP client has a version of `0.27.2`, but sends HTTP version `1.1`, this attribute should be set to `1.1`.
 */
-export const SEMTRCATTRS_NETWORK_PROTOCOL_VERSION = TMP_NETWORK_PROTOCOL_VERSION;
+export const SEMATTRS_NETWORK_PROTOCOL_VERSION = TMP_NETWORK_PROTOCOL_VERSION;
 
 /**
 * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
@@ -1256,251 +1256,251 @@ Consider always setting the transport when setting a port number, since
 a port number is ambiguous without knowing the transport. For example
 different processes could be listening on TCP port 12345 and UDP port 12345.
 */
-export const SEMTRCATTRS_NETWORK_TRANSPORT = TMP_NETWORK_TRANSPORT;
+export const SEMATTRS_NETWORK_TRANSPORT = TMP_NETWORK_TRANSPORT;
 
 /**
 * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
 *
 * Note: The value SHOULD be normalized to lowercase.
 */
-export const SEMTRCATTRS_NETWORK_TYPE = TMP_NETWORK_TYPE;
+export const SEMATTRS_NETWORK_TYPE = TMP_NETWORK_TYPE;
 
 /**
 * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
 */
-export const SEMTRCATTRS_RPC_CONNECT_RPC_ERROR_CODE = TMP_RPC_CONNECT_RPC_ERROR_CODE;
+export const SEMATTRS_RPC_CONNECT_RPC_ERROR_CODE = TMP_RPC_CONNECT_RPC_ERROR_CODE;
 
 /**
 * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
 */
-export const SEMTRCATTRS_RPC_GRPC_STATUS_CODE = TMP_RPC_GRPC_STATUS_CODE;
+export const SEMATTRS_RPC_GRPC_STATUS_CODE = TMP_RPC_GRPC_STATUS_CODE;
 
 /**
 * `error.code` property of response if it is an error response.
 */
-export const SEMTRCATTRS_RPC_JSONRPC_ERROR_CODE = TMP_RPC_JSONRPC_ERROR_CODE;
+export const SEMATTRS_RPC_JSONRPC_ERROR_CODE = TMP_RPC_JSONRPC_ERROR_CODE;
 
 /**
 * `error.message` property of response if it is an error response.
 */
-export const SEMTRCATTRS_RPC_JSONRPC_ERROR_MESSAGE = TMP_RPC_JSONRPC_ERROR_MESSAGE;
+export const SEMATTRS_RPC_JSONRPC_ERROR_MESSAGE = TMP_RPC_JSONRPC_ERROR_MESSAGE;
 
 /**
 * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
 */
-export const SEMTRCATTRS_RPC_JSONRPC_REQUEST_ID = TMP_RPC_JSONRPC_REQUEST_ID;
+export const SEMATTRS_RPC_JSONRPC_REQUEST_ID = TMP_RPC_JSONRPC_REQUEST_ID;
 
 /**
 * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 doesn&#39;t specify this, the value can be omitted.
 */
-export const SEMTRCATTRS_RPC_JSONRPC_VERSION = TMP_RPC_JSONRPC_VERSION;
+export const SEMATTRS_RPC_JSONRPC_VERSION = TMP_RPC_JSONRPC_VERSION;
 
 /**
 * The name of the (logical) method being called, must be equal to the $method part in the span name.
 *
 * Note: This is the logical name of the method from the RPC interface perspective, which can be different from the name of any implementing method/function. The `code.function` attribute may be used to store the latter (e.g., method actually executing the call on the server side, RPC client stub method on the client side).
 */
-export const SEMTRCATTRS_RPC_METHOD = TMP_RPC_METHOD;
+export const SEMATTRS_RPC_METHOD = TMP_RPC_METHOD;
 
 /**
 * The full (logical) name of the service being called, including its package name, if applicable.
 *
 * Note: This is the logical name of the service from the RPC interface perspective, which can be different from the name of any implementing class. The `code.namespace` attribute may be used to store the latter (despite the attribute name, it may include a class name; e.g., class with method actually executing the call on the server side, RPC client stub class on the client side).
 */
-export const SEMTRCATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
+export const SEMATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
 
 /**
 * A string identifying the remoting system. See below for a list of well-known identifiers.
 */
-export const SEMTRCATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
+export const SEMATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
 
 /**
 * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
 *
 * Note: When observed from the client side, and when communicating through an intermediary, `server.address` SHOULD represent the server address behind any intermediaries, for example proxies, if it&#39;s available.
 */
-export const SEMTRCATTRS_SERVER_ADDRESS = TMP_SERVER_ADDRESS;
+export const SEMATTRS_SERVER_ADDRESS = TMP_SERVER_ADDRESS;
 
 /**
 * Server port number.
 *
 * Note: When observed from the client side, and when communicating through an intermediary, `server.port` SHOULD represent the server port behind any intermediaries, for example proxies, if it&#39;s available.
 */
-export const SEMTRCATTRS_SERVER_PORT = TMP_SERVER_PORT;
+export const SEMATTRS_SERVER_PORT = TMP_SERVER_PORT;
 
 /**
 * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
 *
 * Note: When observed from the destination side, and when communicating through an intermediary, `source.address` SHOULD represent the source address behind any intermediaries, for example proxies, if it&#39;s available.
 */
-export const SEMTRCATTRS_SOURCE_ADDRESS = TMP_SOURCE_ADDRESS;
+export const SEMATTRS_SOURCE_ADDRESS = TMP_SOURCE_ADDRESS;
 
 /**
 * Source port number.
 */
-export const SEMTRCATTRS_SOURCE_PORT = TMP_SOURCE_PORT;
+export const SEMATTRS_SOURCE_PORT = TMP_SOURCE_PORT;
 
 /**
 * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
 */
-export const SEMTRCATTRS_THREAD_ID = TMP_THREAD_ID;
+export const SEMATTRS_THREAD_ID = TMP_THREAD_ID;
 
 /**
 * Current thread name.
 */
-export const SEMTRCATTRS_THREAD_NAME = TMP_THREAD_NAME;
+export const SEMATTRS_THREAD_NAME = TMP_THREAD_NAME;
 
 /**
 * String indicating the [cipher](https://datatracker.ietf.org/doc/html/rfc5246#appendix-A.5) used during the current connection.
 *
 * Note: The values allowed for `tls.cipher` MUST be one of the `Descriptions` of the [registered TLS Cipher Suits](https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#table-tls-parameters-4).
 */
-export const SEMTRCATTRS_TLS_CIPHER = TMP_TLS_CIPHER;
+export const SEMATTRS_TLS_CIPHER = TMP_TLS_CIPHER;
 
 /**
 * PEM-encoded stand-alone certificate offered by the client. This is usually mutually-exclusive of `client.certificate_chain` since this value also exists in that list.
 */
-export const SEMTRCATTRS_TLS_CLIENT_CERTIFICATE = TMP_TLS_CLIENT_CERTIFICATE;
+export const SEMATTRS_TLS_CLIENT_CERTIFICATE = TMP_TLS_CLIENT_CERTIFICATE;
 
 /**
 * Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
 */
-export const SEMTRCATTRS_TLS_CLIENT_CERTIFICATE_CHAIN = TMP_TLS_CLIENT_CERTIFICATE_CHAIN;
+export const SEMATTRS_TLS_CLIENT_CERTIFICATE_CHAIN = TMP_TLS_CLIENT_CERTIFICATE_CHAIN;
 
 /**
 * Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
 */
-export const SEMTRCATTRS_TLS_CLIENT_HASH_MD5 = TMP_TLS_CLIENT_HASH_MD5;
+export const SEMATTRS_TLS_CLIENT_HASH_MD5 = TMP_TLS_CLIENT_HASH_MD5;
 
 /**
 * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
 */
-export const SEMTRCATTRS_TLS_CLIENT_HASH_SHA1 = TMP_TLS_CLIENT_HASH_SHA1;
+export const SEMATTRS_TLS_CLIENT_HASH_SHA1 = TMP_TLS_CLIENT_HASH_SHA1;
 
 /**
 * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
 */
-export const SEMTRCATTRS_TLS_CLIENT_HASH_SHA256 = TMP_TLS_CLIENT_HASH_SHA256;
+export const SEMATTRS_TLS_CLIENT_HASH_SHA256 = TMP_TLS_CLIENT_HASH_SHA256;
 
 /**
 * Distinguished name of [subject](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6) of the issuer of the x.509 certificate presented by the client.
 */
-export const SEMTRCATTRS_TLS_CLIENT_ISSUER = TMP_TLS_CLIENT_ISSUER;
+export const SEMATTRS_TLS_CLIENT_ISSUER = TMP_TLS_CLIENT_ISSUER;
 
 /**
 * A hash that identifies clients based on how they perform an SSL/TLS handshake.
 */
-export const SEMTRCATTRS_TLS_CLIENT_JA3 = TMP_TLS_CLIENT_JA3;
+export const SEMATTRS_TLS_CLIENT_JA3 = TMP_TLS_CLIENT_JA3;
 
 /**
 * Date/Time indicating when client certificate is no longer considered valid.
 */
-export const SEMTRCATTRS_TLS_CLIENT_NOT_AFTER = TMP_TLS_CLIENT_NOT_AFTER;
+export const SEMATTRS_TLS_CLIENT_NOT_AFTER = TMP_TLS_CLIENT_NOT_AFTER;
 
 /**
 * Date/Time indicating when client certificate is first considered valid.
 */
-export const SEMTRCATTRS_TLS_CLIENT_NOT_BEFORE = TMP_TLS_CLIENT_NOT_BEFORE;
+export const SEMATTRS_TLS_CLIENT_NOT_BEFORE = TMP_TLS_CLIENT_NOT_BEFORE;
 
 /**
 * Also called an SNI, this tells the server which hostname to which the client is attempting to connect to.
 */
-export const SEMTRCATTRS_TLS_CLIENT_SERVER_NAME = TMP_TLS_CLIENT_SERVER_NAME;
+export const SEMATTRS_TLS_CLIENT_SERVER_NAME = TMP_TLS_CLIENT_SERVER_NAME;
 
 /**
 * Distinguished name of subject of the x.509 certificate presented by the client.
 */
-export const SEMTRCATTRS_TLS_CLIENT_SUBJECT = TMP_TLS_CLIENT_SUBJECT;
+export const SEMATTRS_TLS_CLIENT_SUBJECT = TMP_TLS_CLIENT_SUBJECT;
 
 /**
 * Array of ciphers offered by the client during the client hello.
 */
-export const SEMTRCATTRS_TLS_CLIENT_SUPPORTED_CIPHERS = TMP_TLS_CLIENT_SUPPORTED_CIPHERS;
+export const SEMATTRS_TLS_CLIENT_SUPPORTED_CIPHERS = TMP_TLS_CLIENT_SUPPORTED_CIPHERS;
 
 /**
 * String indicating the curve used for the given cipher, when applicable.
 */
-export const SEMTRCATTRS_TLS_CURVE = TMP_TLS_CURVE;
+export const SEMATTRS_TLS_CURVE = TMP_TLS_CURVE;
 
 /**
 * Boolean flag indicating if the TLS negotiation was successful and transitioned to an encrypted tunnel.
 */
-export const SEMTRCATTRS_TLS_ESTABLISHED = TMP_TLS_ESTABLISHED;
+export const SEMATTRS_TLS_ESTABLISHED = TMP_TLS_ESTABLISHED;
 
 /**
 * String indicating the protocol being tunneled. Per the values in the [IANA registry](https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids), this string should be lower case.
 */
-export const SEMTRCATTRS_TLS_NEXT_PROTOCOL = TMP_TLS_NEXT_PROTOCOL;
+export const SEMATTRS_TLS_NEXT_PROTOCOL = TMP_TLS_NEXT_PROTOCOL;
 
 /**
 * Normalized lowercase protocol name parsed from original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES).
 */
-export const SEMTRCATTRS_TLS_PROTOCOL_NAME = TMP_TLS_PROTOCOL_NAME;
+export const SEMATTRS_TLS_PROTOCOL_NAME = TMP_TLS_PROTOCOL_NAME;
 
 /**
 * Numeric part of the version parsed from the original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES).
 */
-export const SEMTRCATTRS_TLS_PROTOCOL_VERSION = TMP_TLS_PROTOCOL_VERSION;
+export const SEMATTRS_TLS_PROTOCOL_VERSION = TMP_TLS_PROTOCOL_VERSION;
 
 /**
 * Boolean flag indicating if this TLS connection was resumed from an existing TLS negotiation.
 */
-export const SEMTRCATTRS_TLS_RESUMED = TMP_TLS_RESUMED;
+export const SEMATTRS_TLS_RESUMED = TMP_TLS_RESUMED;
 
 /**
 * PEM-encoded stand-alone certificate offered by the server. This is usually mutually-exclusive of `server.certificate_chain` since this value also exists in that list.
 */
-export const SEMTRCATTRS_TLS_SERVER_CERTIFICATE = TMP_TLS_SERVER_CERTIFICATE;
+export const SEMATTRS_TLS_SERVER_CERTIFICATE = TMP_TLS_SERVER_CERTIFICATE;
 
 /**
 * Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
 */
-export const SEMTRCATTRS_TLS_SERVER_CERTIFICATE_CHAIN = TMP_TLS_SERVER_CERTIFICATE_CHAIN;
+export const SEMATTRS_TLS_SERVER_CERTIFICATE_CHAIN = TMP_TLS_SERVER_CERTIFICATE_CHAIN;
 
 /**
 * Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
 */
-export const SEMTRCATTRS_TLS_SERVER_HASH_MD5 = TMP_TLS_SERVER_HASH_MD5;
+export const SEMATTRS_TLS_SERVER_HASH_MD5 = TMP_TLS_SERVER_HASH_MD5;
 
 /**
 * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
 */
-export const SEMTRCATTRS_TLS_SERVER_HASH_SHA1 = TMP_TLS_SERVER_HASH_SHA1;
+export const SEMATTRS_TLS_SERVER_HASH_SHA1 = TMP_TLS_SERVER_HASH_SHA1;
 
 /**
 * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
 */
-export const SEMTRCATTRS_TLS_SERVER_HASH_SHA256 = TMP_TLS_SERVER_HASH_SHA256;
+export const SEMATTRS_TLS_SERVER_HASH_SHA256 = TMP_TLS_SERVER_HASH_SHA256;
 
 /**
 * Distinguished name of [subject](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6) of the issuer of the x.509 certificate presented by the client.
 */
-export const SEMTRCATTRS_TLS_SERVER_ISSUER = TMP_TLS_SERVER_ISSUER;
+export const SEMATTRS_TLS_SERVER_ISSUER = TMP_TLS_SERVER_ISSUER;
 
 /**
 * A hash that identifies servers based on how they perform an SSL/TLS handshake.
 */
-export const SEMTRCATTRS_TLS_SERVER_JA3S = TMP_TLS_SERVER_JA3S;
+export const SEMATTRS_TLS_SERVER_JA3S = TMP_TLS_SERVER_JA3S;
 
 /**
 * Date/Time indicating when server certificate is no longer considered valid.
 */
-export const SEMTRCATTRS_TLS_SERVER_NOT_AFTER = TMP_TLS_SERVER_NOT_AFTER;
+export const SEMATTRS_TLS_SERVER_NOT_AFTER = TMP_TLS_SERVER_NOT_AFTER;
 
 /**
 * Date/Time indicating when server certificate is first considered valid.
 */
-export const SEMTRCATTRS_TLS_SERVER_NOT_BEFORE = TMP_TLS_SERVER_NOT_BEFORE;
+export const SEMATTRS_TLS_SERVER_NOT_BEFORE = TMP_TLS_SERVER_NOT_BEFORE;
 
 /**
 * Distinguished name of subject of the x.509 certificate presented by the server.
 */
-export const SEMTRCATTRS_TLS_SERVER_SUBJECT = TMP_TLS_SERVER_SUBJECT;
+export const SEMATTRS_TLS_SERVER_SUBJECT = TMP_TLS_SERVER_SUBJECT;
 
 /**
 * The [URI fragment](https://www.rfc-editor.org/rfc/rfc3986#section-3.5) component.
 */
-export const SEMTRCATTRS_URL_FRAGMENT = TMP_URL_FRAGMENT;
+export const SEMATTRS_URL_FRAGMENT = TMP_URL_FRAGMENT;
 
 /**
 * Absolute URL describing a network resource according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986).
@@ -1509,138 +1509,138 @@ export const SEMTRCATTRS_URL_FRAGMENT = TMP_URL_FRAGMENT;
 `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password SHOULD be redacted and attribute&#39;s value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
 `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed) and SHOULD NOT be validated or modified except for sanitizing purposes.
 */
-export const SEMTRCATTRS_URL_FULL = TMP_URL_FULL;
+export const SEMATTRS_URL_FULL = TMP_URL_FULL;
 
 /**
 * The [URI path](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) component.
 */
-export const SEMTRCATTRS_URL_PATH = TMP_URL_PATH;
+export const SEMATTRS_URL_PATH = TMP_URL_PATH;
 
 /**
 * The [URI query](https://www.rfc-editor.org/rfc/rfc3986#section-3.4) component.
 *
 * Note: Sensitive content provided in query string SHOULD be scrubbed when instrumentations can identify it.
 */
-export const SEMTRCATTRS_URL_QUERY = TMP_URL_QUERY;
+export const SEMATTRS_URL_QUERY = TMP_URL_QUERY;
 
 /**
 * The [URI scheme](https://www.rfc-editor.org/rfc/rfc3986#section-3.1) component identifying the used protocol.
 */
-export const SEMTRCATTRS_URL_SCHEME = TMP_URL_SCHEME;
+export const SEMATTRS_URL_SCHEME = TMP_URL_SCHEME;
 
 /**
 * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
 */
-export const SEMTRCATTRS_USER_AGENT_ORIGINAL = TMP_USER_AGENT_ORIGINAL;
+export const SEMATTRS_USER_AGENT_ORIGINAL = TMP_USER_AGENT_ORIGINAL;
 
 /**
 * A unique id to identify a session.
 */
-export const SEMTRCATTRS_SESSION_ID = TMP_SESSION_ID;
+export const SEMATTRS_SESSION_ID = TMP_SESSION_ID;
 
 /**
 * The previous `session.id` for this user, when known.
 */
-export const SEMTRCATTRS_SESSION_PREVIOUS_ID = TMP_SESSION_PREVIOUS_ID;
+export const SEMATTRS_SESSION_PREVIOUS_ID = TMP_SESSION_PREVIOUS_ID;
 
 /**
 * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
 *
 * Note: This may be different from `cloud.resource_id` if an alias is involved.
 */
-export const SEMTRCATTRS_AWS_LAMBDA_INVOKED_ARN = TMP_AWS_LAMBDA_INVOKED_ARN;
+export const SEMATTRS_AWS_LAMBDA_INVOKED_ARN = TMP_AWS_LAMBDA_INVOKED_ARN;
 
 /**
 * The [event_id](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#id) uniquely identifies the event.
 */
-export const SEMTRCATTRS_CLOUDEVENTS_EVENT_ID = TMP_CLOUDEVENTS_EVENT_ID;
+export const SEMATTRS_CLOUDEVENTS_EVENT_ID = TMP_CLOUDEVENTS_EVENT_ID;
 
 /**
 * The [source](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#source-1) identifies the context in which an event happened.
 */
-export const SEMTRCATTRS_CLOUDEVENTS_EVENT_SOURCE = TMP_CLOUDEVENTS_EVENT_SOURCE;
+export const SEMATTRS_CLOUDEVENTS_EVENT_SOURCE = TMP_CLOUDEVENTS_EVENT_SOURCE;
 
 /**
 * The [version of the CloudEvents specification](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#specversion) which the event uses.
 */
-export const SEMTRCATTRS_CLOUDEVENTS_EVENT_SPEC_VERSION = TMP_CLOUDEVENTS_EVENT_SPEC_VERSION;
+export const SEMATTRS_CLOUDEVENTS_EVENT_SPEC_VERSION = TMP_CLOUDEVENTS_EVENT_SPEC_VERSION;
 
 /**
 * The [subject](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject) of the event in the context of the event producer (identified by source).
 */
-export const SEMTRCATTRS_CLOUDEVENTS_EVENT_SUBJECT = TMP_CLOUDEVENTS_EVENT_SUBJECT;
+export const SEMATTRS_CLOUDEVENTS_EVENT_SUBJECT = TMP_CLOUDEVENTS_EVENT_SUBJECT;
 
 /**
 * The [event_type](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#type) contains a value describing the type of event related to the originating occurrence.
 */
-export const SEMTRCATTRS_CLOUDEVENTS_EVENT_TYPE = TMP_CLOUDEVENTS_EVENT_TYPE;
+export const SEMATTRS_CLOUDEVENTS_EVENT_TYPE = TMP_CLOUDEVENTS_EVENT_TYPE;
 
 /**
 * Parent-child Reference type.
 *
 * Note: The causal relationship between a child Span and a parent Span.
 */
-export const SEMTRCATTRS_OPENTRACING_REF_TYPE = TMP_OPENTRACING_REF_TYPE;
+export const SEMATTRS_OPENTRACING_REF_TYPE = TMP_OPENTRACING_REF_TYPE;
 
 /**
 * Name of the code, either &#34;OK&#34; or &#34;ERROR&#34;. MUST NOT be set if the status code is UNSET.
 */
-export const SEMTRCATTRS_OTEL_STATUS_CODE = TMP_OTEL_STATUS_CODE;
+export const SEMATTRS_OTEL_STATUS_CODE = TMP_OTEL_STATUS_CODE;
 
 /**
 * Description of the Status if it has a value, otherwise not set.
 */
-export const SEMTRCATTRS_OTEL_STATUS_DESCRIPTION = TMP_OTEL_STATUS_DESCRIPTION;
+export const SEMATTRS_OTEL_STATUS_DESCRIPTION = TMP_OTEL_STATUS_DESCRIPTION;
 
 /**
 * The invocation ID of the current function invocation.
 */
-export const SEMTRCATTRS_FAAS_INVOCATION_ID = TMP_FAAS_INVOCATION_ID;
+export const SEMATTRS_FAAS_INVOCATION_ID = TMP_FAAS_INVOCATION_ID;
 
 /**
 * The name of the source on which the triggering operation was performed. For example, in Cloud Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
 */
-export const SEMTRCATTRS_FAAS_DOCUMENT_COLLECTION = TMP_FAAS_DOCUMENT_COLLECTION;
+export const SEMATTRS_FAAS_DOCUMENT_COLLECTION = TMP_FAAS_DOCUMENT_COLLECTION;
 
 /**
 * The document name/table subjected to the operation. For example, in Cloud Storage or S3 is the name of the file, and in Cosmos DB the table name.
 */
-export const SEMTRCATTRS_FAAS_DOCUMENT_NAME = TMP_FAAS_DOCUMENT_NAME;
+export const SEMATTRS_FAAS_DOCUMENT_NAME = TMP_FAAS_DOCUMENT_NAME;
 
 /**
 * Describes the type of the operation that was performed on the data.
 */
-export const SEMTRCATTRS_FAAS_DOCUMENT_OPERATION = TMP_FAAS_DOCUMENT_OPERATION;
+export const SEMATTRS_FAAS_DOCUMENT_OPERATION = TMP_FAAS_DOCUMENT_OPERATION;
 
 /**
 * A string containing the time when the data was accessed in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
 */
-export const SEMTRCATTRS_FAAS_DOCUMENT_TIME = TMP_FAAS_DOCUMENT_TIME;
+export const SEMATTRS_FAAS_DOCUMENT_TIME = TMP_FAAS_DOCUMENT_TIME;
 
 /**
 * A string containing the schedule period as [Cron Expression](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm).
 */
-export const SEMTRCATTRS_FAAS_CRON = TMP_FAAS_CRON;
+export const SEMATTRS_FAAS_CRON = TMP_FAAS_CRON;
 
 /**
 * A string containing the function invocation time in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
 */
-export const SEMTRCATTRS_FAAS_TIME = TMP_FAAS_TIME;
+export const SEMATTRS_FAAS_TIME = TMP_FAAS_TIME;
 
 /**
 * A boolean that is true if the serverless function is executed for the first time (aka cold-start).
 */
-export const SEMTRCATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
+export const SEMATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
 
 /**
 * The unique identifier of the feature flag.
 */
-export const SEMTRCATTRS_FEATURE_FLAG_KEY = TMP_FEATURE_FLAG_KEY;
+export const SEMATTRS_FEATURE_FLAG_KEY = TMP_FEATURE_FLAG_KEY;
 
 /**
 * The name of the service provider that performs the flag evaluation.
 */
-export const SEMTRCATTRS_FEATURE_FLAG_PROVIDER_NAME = TMP_FEATURE_FLAG_PROVIDER_NAME;
+export const SEMATTRS_FEATURE_FLAG_PROVIDER_NAME = TMP_FEATURE_FLAG_PROVIDER_NAME;
 
 /**
 * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
@@ -1654,122 +1654,122 @@ A stringified version of the value can be used in situations where a
 semantic identifier is unavailable. String representation of the value
 should be determined by the implementer.
 */
-export const SEMTRCATTRS_FEATURE_FLAG_VARIANT = TMP_FEATURE_FLAG_VARIANT;
+export const SEMATTRS_FEATURE_FLAG_VARIANT = TMP_FEATURE_FLAG_VARIANT;
 
 /**
 * The AWS request ID as returned in the response headers `x-amz-request-id` or `x-amz-requestid`.
 */
-export const SEMTRCATTRS_AWS_REQUEST_ID = TMP_AWS_REQUEST_ID;
+export const SEMATTRS_AWS_REQUEST_ID = TMP_AWS_REQUEST_ID;
 
 /**
 * The value of the `AttributesToGet` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET = TMP_AWS_DYNAMODB_ATTRIBUTES_TO_GET;
+export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET = TMP_AWS_DYNAMODB_ATTRIBUTES_TO_GET;
 
 /**
 * The value of the `ConsistentRead` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_CONSISTENT_READ = TMP_AWS_DYNAMODB_CONSISTENT_READ;
+export const SEMATTRS_AWS_DYNAMODB_CONSISTENT_READ = TMP_AWS_DYNAMODB_CONSISTENT_READ;
 
 /**
 * The JSON-serialized value of each item in the `ConsumedCapacity` response field.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY = TMP_AWS_DYNAMODB_CONSUMED_CAPACITY;
+export const SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY = TMP_AWS_DYNAMODB_CONSUMED_CAPACITY;
 
 /**
 * The value of the `IndexName` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_INDEX_NAME = TMP_AWS_DYNAMODB_INDEX_NAME;
+export const SEMATTRS_AWS_DYNAMODB_INDEX_NAME = TMP_AWS_DYNAMODB_INDEX_NAME;
 
 /**
 * The JSON-serialized value of the `ItemCollectionMetrics` response field.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS = TMP_AWS_DYNAMODB_ITEM_COLLECTION_METRICS;
+export const SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS = TMP_AWS_DYNAMODB_ITEM_COLLECTION_METRICS;
 
 /**
 * The value of the `Limit` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_LIMIT = TMP_AWS_DYNAMODB_LIMIT;
+export const SEMATTRS_AWS_DYNAMODB_LIMIT = TMP_AWS_DYNAMODB_LIMIT;
 
 /**
 * The value of the `ProjectionExpression` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_PROJECTION = TMP_AWS_DYNAMODB_PROJECTION;
+export const SEMATTRS_AWS_DYNAMODB_PROJECTION = TMP_AWS_DYNAMODB_PROJECTION;
 
 /**
 * The value of the `ProvisionedThroughput.ReadCapacityUnits` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY = TMP_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY;
+export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY = TMP_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY;
 
 /**
 * The value of the `ProvisionedThroughput.WriteCapacityUnits` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY = TMP_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY;
+export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY = TMP_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY;
 
 /**
 * The value of the `Select` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_SELECT = TMP_AWS_DYNAMODB_SELECT;
+export const SEMATTRS_AWS_DYNAMODB_SELECT = TMP_AWS_DYNAMODB_SELECT;
 
 /**
 * The keys in the `RequestItems` object field.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_TABLE_NAMES = TMP_AWS_DYNAMODB_TABLE_NAMES;
+export const SEMATTRS_AWS_DYNAMODB_TABLE_NAMES = TMP_AWS_DYNAMODB_TABLE_NAMES;
 
 /**
 * The JSON-serialized value of each item of the `GlobalSecondaryIndexes` request field.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES = TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES;
+export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES = TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES;
 
 /**
 * The JSON-serialized value of each item of the `LocalSecondaryIndexes` request field.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES = TMP_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES;
+export const SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES = TMP_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES;
 
 /**
 * The value of the `ExclusiveStartTableName` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE = TMP_AWS_DYNAMODB_EXCLUSIVE_START_TABLE;
+export const SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE = TMP_AWS_DYNAMODB_EXCLUSIVE_START_TABLE;
 
 /**
 * The the number of items in the `TableNames` response parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_TABLE_COUNT = TMP_AWS_DYNAMODB_TABLE_COUNT;
+export const SEMATTRS_AWS_DYNAMODB_TABLE_COUNT = TMP_AWS_DYNAMODB_TABLE_COUNT;
 
 /**
 * The value of the `ScanIndexForward` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_SCAN_FORWARD = TMP_AWS_DYNAMODB_SCAN_FORWARD;
+export const SEMATTRS_AWS_DYNAMODB_SCAN_FORWARD = TMP_AWS_DYNAMODB_SCAN_FORWARD;
 
 /**
 * The value of the `Count` response parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_COUNT = TMP_AWS_DYNAMODB_COUNT;
+export const SEMATTRS_AWS_DYNAMODB_COUNT = TMP_AWS_DYNAMODB_COUNT;
 
 /**
 * The value of the `ScannedCount` response parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_SCANNED_COUNT = TMP_AWS_DYNAMODB_SCANNED_COUNT;
+export const SEMATTRS_AWS_DYNAMODB_SCANNED_COUNT = TMP_AWS_DYNAMODB_SCANNED_COUNT;
 
 /**
 * The value of the `Segment` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_SEGMENT = TMP_AWS_DYNAMODB_SEGMENT;
+export const SEMATTRS_AWS_DYNAMODB_SEGMENT = TMP_AWS_DYNAMODB_SEGMENT;
 
 /**
 * The value of the `TotalSegments` request parameter.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS = TMP_AWS_DYNAMODB_TOTAL_SEGMENTS;
+export const SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS = TMP_AWS_DYNAMODB_TOTAL_SEGMENTS;
 
 /**
 * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS = TMP_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS;
+export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS = TMP_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS;
 
 /**
 * The JSON-serialized value of each item in the the `GlobalSecondaryIndexUpdates` request field.
 */
-export const SEMTRCATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES = TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES;
+export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES = TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES;
 
 /**
 * The S3 bucket name the request refers to. Corresponds to the `--bucket` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
@@ -1777,7 +1777,7 @@ export const SEMTRCATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES = TMP_AWS_D
 * Note: The `bucket` attribute is applicable to all S3 operations that reference a bucket, i.e. that require the bucket name as a mandatory parameter.
 This applies to almost all S3 operations except `list-buckets`.
 */
-export const SEMTRCATTRS_AWS_S3_BUCKET = TMP_AWS_S3_BUCKET;
+export const SEMATTRS_AWS_S3_BUCKET = TMP_AWS_S3_BUCKET;
 
 /**
 * The source object (in the form `bucket`/`key`) for the copy operation.
@@ -1789,7 +1789,7 @@ This applies in particular to the following operations:
 - [copy-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html)
 - [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
 */
-export const SEMTRCATTRS_AWS_S3_COPY_SOURCE = TMP_AWS_S3_COPY_SOURCE;
+export const SEMATTRS_AWS_S3_COPY_SOURCE = TMP_AWS_S3_COPY_SOURCE;
 
 /**
 * The delete request container that specifies the objects to be deleted.
@@ -1798,7 +1798,7 @@ export const SEMTRCATTRS_AWS_S3_COPY_SOURCE = TMP_AWS_S3_COPY_SOURCE;
 The `delete` attribute corresponds to the `--delete` parameter of the
 [delete-objects operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-objects.html).
 */
-export const SEMTRCATTRS_AWS_S3_DELETE = TMP_AWS_S3_DELETE;
+export const SEMATTRS_AWS_S3_DELETE = TMP_AWS_S3_DELETE;
 
 /**
 * The S3 object key the request refers to. Corresponds to the `--key` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
@@ -1820,7 +1820,7 @@ This applies in particular to the following operations:
 - [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
 - [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
 */
-export const SEMTRCATTRS_AWS_S3_KEY = TMP_AWS_S3_KEY;
+export const SEMATTRS_AWS_S3_KEY = TMP_AWS_S3_KEY;
 
 /**
 * The part number of the part being uploaded in a multipart-upload operation. This is a positive integer between 1 and 10,000.
@@ -1830,7 +1830,7 @@ and [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/up
 The `part_number` attribute corresponds to the `--part-number` parameter of the
 [upload-part operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html).
 */
-export const SEMTRCATTRS_AWS_S3_PART_NUMBER = TMP_AWS_S3_PART_NUMBER;
+export const SEMATTRS_AWS_S3_PART_NUMBER = TMP_AWS_S3_PART_NUMBER;
 
 /**
 * Upload ID that identifies the multipart upload.
@@ -1845,55 +1845,55 @@ This applies in particular to the following operations:
 - [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
 - [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
 */
-export const SEMTRCATTRS_AWS_S3_UPLOAD_ID = TMP_AWS_S3_UPLOAD_ID;
+export const SEMATTRS_AWS_S3_UPLOAD_ID = TMP_AWS_S3_UPLOAD_ID;
 
 /**
 * The GraphQL document being executed.
 *
 * Note: The value may be sanitized to exclude sensitive information.
 */
-export const SEMTRCATTRS_GRAPHQL_DOCUMENT = TMP_GRAPHQL_DOCUMENT;
+export const SEMATTRS_GRAPHQL_DOCUMENT = TMP_GRAPHQL_DOCUMENT;
 
 /**
 * The name of the operation being executed.
 */
-export const SEMTRCATTRS_GRAPHQL_OPERATION_NAME = TMP_GRAPHQL_OPERATION_NAME;
+export const SEMATTRS_GRAPHQL_OPERATION_NAME = TMP_GRAPHQL_OPERATION_NAME;
 
 /**
 * The type of the operation being executed.
 */
-export const SEMTRCATTRS_GRAPHQL_OPERATION_TYPE = TMP_GRAPHQL_OPERATION_TYPE;
+export const SEMATTRS_GRAPHQL_OPERATION_TYPE = TMP_GRAPHQL_OPERATION_TYPE;
 
 /**
 * Compressed size of the message in bytes.
 */
-export const SEMTRCATTRS_MESSAGE_COMPRESSED_SIZE = TMP_MESSAGE_COMPRESSED_SIZE;
+export const SEMATTRS_MESSAGE_COMPRESSED_SIZE = TMP_MESSAGE_COMPRESSED_SIZE;
 
 /**
 * MUST be calculated as two different counters starting from `1` one for sent messages and one for received message.
 *
 * Note: This way we guarantee that the values will be consistent between different implementations.
 */
-export const SEMTRCATTRS_MESSAGE_ID = TMP_MESSAGE_ID;
+export const SEMATTRS_MESSAGE_ID = TMP_MESSAGE_ID;
 
 /**
 * Whether this is a received or sent message.
 */
-export const SEMTRCATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
+export const SEMATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
 
 /**
 * Uncompressed size of the message in bytes.
 */
-export const SEMTRCATTRS_MESSAGE_UNCOMPRESSED_SIZE = TMP_MESSAGE_UNCOMPRESSED_SIZE;
+export const SEMATTRS_MESSAGE_UNCOMPRESSED_SIZE = TMP_MESSAGE_UNCOMPRESSED_SIZE;
 
 /**
- * Definition of available values for SemanticTraceAttributes
+ * Definition of available values for SemanticAttributes
  * This type is used for backward compatibility, you should use the individual exported
- * constants SemanticTraceAttributes_XXXXX rather than the exported constant map. As any single reference
+ * constants SemanticAttributes_XXXXX rather than the exported constant map. As any single reference
  * to a constant map value will result in all strings being included into your bundle.
- * @deprecated Use the SEMTRCATTRS_XXXXX constants rather than the SemanticTraceAttributes.XXXXX for bundle minification.
+ * @deprecated Use the SEMATTRS_XXXXX constants rather than the SemanticAttributes.XXXXX for bundle minification.
  */
-export type SemanticTraceAttributes = {
+export type SemanticAttributes = {
 
   /**
   * The name of the invoked function.
@@ -3487,10 +3487,10 @@ This applies in particular to the following operations:
 };
 
 /**
- * Create exported Value Map for SemanticTraceAttributes values
- * @deprecated Use the SEMTRCATTRS_XXXXX constants rather than the SemanticTraceAttributes.XXXXX for bundle minification
+ * Create exported Value Map for SemanticAttributes values
+ * @deprecated Use the SEMATTRS_XXXXX constants rather than the SemanticAttributes.XXXXX for bundle minification
  */
-export const SemanticTraceAttributes:SemanticTraceAttributes = /*#__PURE__*/createConstMap<SemanticTraceAttributes>([
+export const SemanticAttributes:SemanticAttributes = /*#__PURE__*/createConstMap<SemanticAttributes>([
   TMP_FAAS_INVOKED_NAME,
   TMP_FAAS_INVOKED_PROVIDER,
   TMP_FAAS_INVOKED_REGION,

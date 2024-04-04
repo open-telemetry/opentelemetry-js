@@ -32,9 +32,9 @@ docker run --rm --platform linux/amd64 \
   --yaml-root /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/SemanticTraceAttributes.ts \
-  -Dclass=SemanticTraceAttributes \
-  -Dcls_prefix=SEMTRCATTRS
+  --output /output/SemanticAttributes.ts \
+  -Dclass=SemanticAttributes \
+  -Dcls_prefix=SEMATTRS
 
 docker run --rm --platform linux/amd64 \
   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
