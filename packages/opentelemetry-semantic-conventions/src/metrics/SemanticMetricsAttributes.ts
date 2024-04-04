@@ -28,12 +28,12 @@ import { createConstMap } from '../internal/utils';
 // Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status';
 const TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = 'aspnetcore.diagnostics.exception.result';
-const TMP_DNS_QUESTION_NAME = 'dns.question.name';
-const TMP_HTTP_CONNECTION_STATE = 'http.connection.state';
 const TMP_JVM_GC_ACTION = 'jvm.gc.action';
 const TMP_JVM_GC_NAME = 'jvm.gc.name';
 const TMP_JVM_THREAD_DAEMON = 'jvm.thread.daemon';
 const TMP_JVM_THREAD_STATE = 'jvm.thread.state';
+const TMP_PROCESS_CONTEXT_SWITCH_TYPE = 'process.context_switch_type';
+const TMP_PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
 
 /**
 * Match result - success or failure.
@@ -44,19 +44,6 @@ export const SEMMTRCSATTRS_ASPNETCORE_ROUTING_MATCH_STATUS = TMP_ASPNETCORE_ROUT
 * ASP.NET Core exception middleware handling result.
 */
 export const SEMMTRCSATTRS_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT;
-
-/**
-* The name being queried.
-*
-* Note: The name being queried.
-If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
-*/
-export const SEMMTRCSATTRS_DNS_QUESTION_NAME = TMP_DNS_QUESTION_NAME;
-
-/**
-* State of the HTTP connection in the HTTP connection pool.
-*/
-export const SEMMTRCSATTRS_HTTP_CONNECTION_STATE = TMP_HTTP_CONNECTION_STATE;
 
 /**
 * Name of the garbage collector action.
@@ -83,6 +70,16 @@ export const SEMMTRCSATTRS_JVM_THREAD_DAEMON = TMP_JVM_THREAD_DAEMON;
 export const SEMMTRCSATTRS_JVM_THREAD_STATE = TMP_JVM_THREAD_STATE;
 
 /**
+* Specifies whether the context switches for this data point were voluntary or involuntary.
+*/
+export const SEMMTRCSATTRS_PROCESS_CONTEXT_SWITCH_TYPE = TMP_PROCESS_CONTEXT_SWITCH_TYPE;
+
+/**
+* The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+*/
+export const SEMMTRCSATTRS_PROCESS_PAGING_FAULT_TYPE = TMP_PROCESS_PAGING_FAULT_TYPE;
+
+/**
  * Definition of available values for SemanticMetricsAttributes
  * This type is used for backward compatibility, you should use the individual exported
  * constants SemanticMetricsAttributes_XXXXX rather than the exported constant map. As any single reference
@@ -100,19 +97,6 @@ export type SemanticMetricsAttributes = {
   * ASP.NET Core exception middleware handling result.
   */
   ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT: 'aspnetcore.diagnostics.exception.result',
-
-  /**
-  * The name being queried.
-  *
-  * Note: The name being queried.
-If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
-  */
-  DNS_QUESTION_NAME: 'dns.question.name',
-
-  /**
-  * State of the HTTP connection in the HTTP connection pool.
-  */
-  HTTP_CONNECTION_STATE: 'http.connection.state',
 
   /**
   * Name of the garbage collector action.
@@ -137,6 +121,16 @@ If the name field contains non-printable characters (below 32 or above 126), tho
   * State of the thread.
   */
   JVM_THREAD_STATE: 'jvm.thread.state',
+
+  /**
+  * Specifies whether the context switches for this data point were voluntary or involuntary.
+  */
+  PROCESS_CONTEXT_SWITCH_TYPE: 'process.context_switch_type',
+
+  /**
+  * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+  */
+  PROCESS_PAGING_FAULT_TYPE: 'process.paging.fault_type',
 };
 
 /**
@@ -146,12 +140,12 @@ If the name field contains non-printable characters (below 32 or above 126), tho
 export const SemanticMetricsAttributes:SemanticMetricsAttributes = /*#__PURE__*/createConstMap<SemanticMetricsAttributes>([
   TMP_ASPNETCORE_ROUTING_MATCH_STATUS,
   TMP_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT,
-  TMP_DNS_QUESTION_NAME,
-  TMP_HTTP_CONNECTION_STATE,
   TMP_JVM_GC_ACTION,
   TMP_JVM_GC_NAME,
   TMP_JVM_THREAD_DAEMON,
   TMP_JVM_THREAD_STATE,
+  TMP_PROCESS_CONTEXT_SWITCH_TYPE,
+  TMP_PROCESS_PAGING_FAULT_TYPE,
 ]);
 
 /* ----------------------------------------------------------------------------------------------------------
@@ -269,53 +263,6 @@ export const AspnetcoreDiagnosticsExceptionResultValues:AspnetcoreDiagnosticsExc
 
 
 /* ----------------------------------------------------------------------------------------------------------
- * Constant values for HttpConnectionStateValues enum definition
- *
- * State of the HTTP connection in the HTTP connection pool.
- * ---------------------------------------------------------------------------------------------------------- */
-
-// Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifiable export names for some package types
-const TMP_HTTPCONNECTIONSTATEVALUES_ACTIVE = 'active';
-const TMP_HTTPCONNECTIONSTATEVALUES_IDLE = 'idle';
-
-/**
- * State of the HTTP connection in the HTTP connection pool.
- */
-export const HTTPCONNECTIONSTATEVALUES_ACTIVE = TMP_HTTPCONNECTIONSTATEVALUES_ACTIVE;
-
-/**
- * State of the HTTP connection in the HTTP connection pool.
- */
-export const HTTPCONNECTIONSTATEVALUES_IDLE = TMP_HTTPCONNECTIONSTATEVALUES_IDLE;
-
-/**
- * Identifies the Values for HttpConnectionStateValues enum definition
- *
- * State of the HTTP connection in the HTTP connection pool.
- * @deprecated Use the HTTPCONNECTIONSTATEVALUES_XXXXX constants rather than the HttpConnectionStateValues.XXXXX for bundle minification.
- */
-export type HttpConnectionStateValues = {
-
-  /** active state. */
-  ACTIVE: 'active',
-
-  /** idle state. */
-  IDLE: 'idle',
-}
-
-/**
- * The constant map of values for HttpConnectionStateValues.
- * @deprecated Use the HTTPCONNECTIONSTATEVALUES_XXXXX constants rather than the HttpConnectionStateValues.XXXXX for bundle minification.
- */
-export const HttpConnectionStateValues:HttpConnectionStateValues = /*#__PURE__*/createConstMap<HttpConnectionStateValues>([
-  TMP_HTTPCONNECTIONSTATEVALUES_ACTIVE,
-  TMP_HTTPCONNECTIONSTATEVALUES_IDLE,
-]);
-
-
-
-/* ----------------------------------------------------------------------------------------------------------
  * Constant values for JvmThreadStateValues enum definition
  *
  * State of the thread.
@@ -398,5 +345,99 @@ export const JvmThreadStateValues:JvmThreadStateValues = /*#__PURE__*/createCons
   TMP_JVMTHREADSTATEVALUES_WAITING,
   TMP_JVMTHREADSTATEVALUES_TIMED_WAITING,
   TMP_JVMTHREADSTATEVALUES_TERMINATED,
+]);
+
+
+
+/* ----------------------------------------------------------------------------------------------------------
+ * Constant values for ProcessContextSwitchTypeValues enum definition
+ *
+ * Specifies whether the context switches for this data point were voluntary or involuntary.
+ * ---------------------------------------------------------------------------------------------------------- */
+
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifiable export names for some package types
+const TMP_PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY = 'voluntary';
+const TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY = 'involuntary';
+
+/**
+ * Specifies whether the context switches for this data point were voluntary or involuntary.
+ */
+export const PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY = TMP_PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY;
+
+/**
+ * Specifies whether the context switches for this data point were voluntary or involuntary.
+ */
+export const PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY = TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY;
+
+/**
+ * Identifies the Values for ProcessContextSwitchTypeValues enum definition
+ *
+ * Specifies whether the context switches for this data point were voluntary or involuntary.
+ * @deprecated Use the PROCESSCONTEXTSWITCHTYPEVALUES_XXXXX constants rather than the ProcessContextSwitchTypeValues.XXXXX for bundle minification.
+ */
+export type ProcessContextSwitchTypeValues = {
+
+  /** voluntary. */
+  VOLUNTARY: 'voluntary',
+
+  /** involuntary. */
+  INVOLUNTARY: 'involuntary',
+}
+
+/**
+ * The constant map of values for ProcessContextSwitchTypeValues.
+ * @deprecated Use the PROCESSCONTEXTSWITCHTYPEVALUES_XXXXX constants rather than the ProcessContextSwitchTypeValues.XXXXX for bundle minification.
+ */
+export const ProcessContextSwitchTypeValues:ProcessContextSwitchTypeValues = /*#__PURE__*/createConstMap<ProcessContextSwitchTypeValues>([
+  TMP_PROCESSCONTEXTSWITCHTYPEVALUES_VOLUNTARY,
+  TMP_PROCESSCONTEXTSWITCHTYPEVALUES_INVOLUNTARY,
+]);
+
+
+
+/* ----------------------------------------------------------------------------------------------------------
+ * Constant values for ProcessPagingFaultTypeValues enum definition
+ *
+ * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+ * ---------------------------------------------------------------------------------------------------------- */
+
+// Temporary local constants to assign to the individual exports and the namespaced version
+// Required to avoid the namespace exports using the unminifiable export names for some package types
+const TMP_PROCESSPAGINGFAULTTYPEVALUES_MAJOR = 'major';
+const TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR = 'minor';
+
+/**
+ * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+ */
+export const PROCESSPAGINGFAULTTYPEVALUES_MAJOR = TMP_PROCESSPAGINGFAULTTYPEVALUES_MAJOR;
+
+/**
+ * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+ */
+export const PROCESSPAGINGFAULTTYPEVALUES_MINOR = TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR;
+
+/**
+ * Identifies the Values for ProcessPagingFaultTypeValues enum definition
+ *
+ * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+ * @deprecated Use the PROCESSPAGINGFAULTTYPEVALUES_XXXXX constants rather than the ProcessPagingFaultTypeValues.XXXXX for bundle minification.
+ */
+export type ProcessPagingFaultTypeValues = {
+
+  /** major. */
+  MAJOR: 'major',
+
+  /** minor. */
+  MINOR: 'minor',
+}
+
+/**
+ * The constant map of values for ProcessPagingFaultTypeValues.
+ * @deprecated Use the PROCESSPAGINGFAULTTYPEVALUES_XXXXX constants rather than the ProcessPagingFaultTypeValues.XXXXX for bundle minification.
+ */
+export const ProcessPagingFaultTypeValues:ProcessPagingFaultTypeValues = /*#__PURE__*/createConstMap<ProcessPagingFaultTypeValues>([
+  TMP_PROCESSPAGINGFAULTTYPEVALUES_MAJOR,
+  TMP_PROCESSPAGINGFAULTTYPEVALUES_MINOR,
 ]);
 
