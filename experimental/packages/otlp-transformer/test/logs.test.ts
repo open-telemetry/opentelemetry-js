@@ -46,7 +46,10 @@ function createExpectedLogJson(useHex: boolean): IExportLogsServiceRequest {
         schemaUrl: undefined,
         scopeLogs: [
           {
-            scope: { name: 'scope_name_1', version: '0.1.0' },
+            scope: {
+              name: 'scope_name_1',
+              version: '0.1.0',
+            },
             logRecords: [
               {
                 timeUnixNano: { low: 4132445859, high: 391214506 },
