@@ -13,7 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export * from './metrics';
-export * from './resource';
-export * from './trace';
+export * from './SemanticMetricsAttributes';
