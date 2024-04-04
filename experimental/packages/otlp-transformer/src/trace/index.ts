@@ -22,8 +22,10 @@ import {
   IExportTraceServiceRequest,
   IResourceSpans,
   IScopeSpans,
+  ISpan,
 } from './types';
 import { Encoder, getOtlpEncoder } from '../common';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
@@ -35,8 +37,11 @@ export function createExportTraceServiceRequest(
   };
 }
 
-function createResourceMap(readableSpans: ReadableSpan[]) {
-  const resourceMap: Map<IResource, Map<string, ReadableSpan[]>> = new Map();
+function createResourceMap(readableSpans: ReadableSpan[], encoder: Encoder) {
+  const resourceMap: Map<
+    IResource,
+    Map<InstrumentationLibrary, ISpan[]>
+  > = new Map();
   for (const record of readableSpans) {
     let ilmMap = resourceMap.get(record.resource);
 
@@ -46,17 +51,14 @@ function createResourceMap(readableSpans: ReadableSpan[]) {
     }
 
     // TODO this is duplicated in basic tracer. Consolidate on a common helper in core
-    const instrumentationLibraryKey = `${record.instrumentationLibrary.name}@${
-      record.instrumentationLibrary.version || ''
-    }:${record.instrumentationLibrary.schemaUrl || ''}`;
-    let records = ilmMap.get(instrumentationLibraryKey);
+    let records = ilmMap.get(record.instrumentationLibrary);
 
     if (!records) {
       records = [];
-      ilmMap.set(instrumentationLibraryKey, records);
+      ilmMap.set(record.instrumentationLibrary, records);
     }
 
-    records.push(record);
+    records.push(sdkSpanToOtlpSpan(record, encoder));
   }
 
   return resourceMap;
@@ -66,34 +68,30 @@ function spanRecordsToResourceSpans(
   readableSpans: ReadableSpan[],
   encoder: Encoder
 ): IResourceSpans[] {
-  const resourceMap = createResourceMap(readableSpans);
+  const resourceMap = createResourceMap(readableSpans, encoder);
   const out: IResourceSpans[] = [];
 
-  const entryIterator = resourceMap.entries();
-  let entry = entryIterator.next();
-  while (!entry.done) {
-    const [resource, ilmMap] = entry.value;
-    const scopeResourceSpans: IScopeSpans[] = [];
-    const ilmIterator = ilmMap.values();
-    let ilmEntry = ilmIterator.next();
-    while (!ilmEntry.done) {
-      const scopeSpans = ilmEntry.value;
-      if (scopeSpans.length > 0) {
-        const { name, version, schemaUrl } =
-          scopeSpans[0].instrumentationLibrary;
-        const spans = scopeSpans.map(readableSpan =>
-          sdkSpanToOtlpSpan(readableSpan, encoder)
-        );
+  for (const resource of resourceMap.keys()) {
+    const ilmMap = resourceMap.get(resource);
+    if (!ilmMap) {
+      continue;
+    }
 
+    const scopeResourceSpans: IScopeSpans[] = [];
+    for (const ilm of ilmMap.keys()) {
+      const scopeSpans = ilmMap.get(ilm);
+      if (scopeSpans && scopeSpans.length > 0) {
         scopeResourceSpans.push({
-          scope: { name, version },
-          spans: spans,
-          schemaUrl: schemaUrl,
+          scope: {
+            name: ilm.name,
+            version: ilm.version,
+          },
+          spans: scopeSpans,
+          schemaUrl: ilm.schemaUrl,
         });
       }
-      ilmEntry = ilmIterator.next();
     }
-    // TODO SDK types don't provide resource schema URL at this time
+
     const transformedSpans: IResourceSpans = {
       resource: {
         attributes: toAttributes(resource.attributes),
@@ -104,7 +102,6 @@ function spanRecordsToResourceSpans(
     };
 
     out.push(transformedSpans);
-    entry = entryIterator.next();
   }
 
   return out;
