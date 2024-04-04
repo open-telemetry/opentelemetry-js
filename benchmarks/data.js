@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712143412342,
+  "lastUpdate": 1712237031587,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6360,6 +6360,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b78d4432d8ad26bc31c99444c5b7a70fae93d5ec",
+          "message": "feat(otlp-transformer): consolidate scope/resource creation in transformer (#4600)\n\n* [chore] consolidate scope/resource creation in transformer\r\n\r\nSigned-off-by: Bogdan Drutu <bogdandrutu@gmail.com>\r\n\r\n* fixup! [chore] consolidate scope/resource creation in transformer\r\n\r\n* fixup! [chore] consolidate scope/resource creation in transformer\r\n\r\n* chore: add changelog entry\r\n\r\n* fixup! [chore] consolidate scope/resource creation in transformer\r\n\r\n---------\r\n\r\nSigned-off-by: Bogdan Drutu <bogdandrutu@gmail.com>\r\nCo-authored-by: Bogdan Drutu <bogdandrutu@gmail.com>",
+          "timestamp": "2024-04-04T15:21:54+02:00",
+          "tree_id": "073ba95996fedccde8cb82998df02fa8034cae1e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b78d4432d8ad26bc31c99444c5b7a70fae93d5ec"
+        },
+        "date": 1712237030589,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 947795,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11979,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 693890,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 666604,
+            "range": "±0.11%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
