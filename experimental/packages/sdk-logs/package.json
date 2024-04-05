@@ -102,6 +102,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.23.0",
-    "@opentelemetry/resources": "1.23.0"
+    "@opentelemetry/resources": "1.23.0",
+    "@opentelemetry/semantic-conventions": "1.23.0"
   }
 }

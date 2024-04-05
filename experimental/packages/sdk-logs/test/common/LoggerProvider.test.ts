@@ -24,6 +24,7 @@ import { loadDefaultConfig } from '../../src/config';
 import { DEFAULT_LOGGER_NAME } from './../../src/LoggerProvider';
 import { MultiLogRecordProcessor } from '../../src/MultiLogRecordProcessor';
 import { Logger } from '../../src/Logger';
+import { assertServiceResource } from './utils';
 
 describe('LoggerProvider', () => {
   let envSource: Record<string, any>;
@@ -60,14 +61,14 @@ describe('LoggerProvider', () => {
       it('should have default resource if not pass', () => {
         const provider = new LoggerProvider();
         const { resource } = provider['_sharedState'];
-        assert.deepStrictEqual(resource, Resource.default());
+        assertServiceResource(resource, Resource.default());
       });
 
       it('should fallback to default resource attrs', () => {
         const passedInResource = new Resource({ foo: 'bar' });
         const provider = new LoggerProvider({ resource: passedInResource });
         const { resource } = provider['_sharedState'];
-        assert.deepStrictEqual(
+        assertServiceResource(
           resource,
           Resource.default().merge(passedInResource)
         );

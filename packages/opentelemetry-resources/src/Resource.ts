@@ -15,11 +15,18 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMRESATTRS_SERVICE_INSTANCE_ID,
+  SEMRESATTRS_SERVICE_NAME,
+  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
+  SEMRESATTRS_TELEMETRY_SDK_NAME,
+  SEMRESATTRS_TELEMETRY_SDK_VERSION,
+} from '@opentelemetry/semantic-conventions';
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
 import { IResource } from './IResource';
+import { randomUUID } from 'crypto';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -51,13 +58,14 @@ export class Resource implements IResource {
    */
   static default(): IResource {
     return new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: defaultServiceName(),
-      [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
-        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
-      [SemanticResourceAttributes.TELEMETRY_SDK_NAME]:
-        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_NAME],
-      [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]:
-        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_VERSION],
+      [SEMRESATTRS_SERVICE_NAME]: defaultServiceName(),
+      [SEMRESATTRS_SERVICE_INSTANCE_ID]: randomUUID(),
+      [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]:
+        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
+      [SEMRESATTRS_TELEMETRY_SDK_NAME]:
+        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
+      [SEMRESATTRS_TELEMETRY_SDK_VERSION]:
+        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
     });
   }
 

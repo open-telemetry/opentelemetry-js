@@ -23,7 +23,11 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMRESATTRS_SERVICE_INSTANCE_ID,
+  SEMRESATTRS_SERVICE_NAME,
+  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
+} from '@opentelemetry/semantic-conventions';
 import {
   defaultStatusCodeTagName,
   defaultStatusErrorTagName,
@@ -35,7 +39,7 @@ import * as zipkinTypes from '../../src/types';
 const tracer = new BasicTracerProvider({
   resource: Resource.default().merge(
     new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+      [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
       cost: '112.12',
       service: 'ui',
       version: '1',
@@ -43,8 +47,7 @@ const tracer = new BasicTracerProvider({
   ),
 }).getTracer('default');
 
-const language =
-  tracer.resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE];
+const language = tracer.resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE];
 
 const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {
@@ -68,6 +71,8 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
       });
+      span.resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] =
+        'faabc844-c78f-4d87-952d-cbb4ca4cbf6b';
       span.addEvent('my-event', { key3: 'value3' });
       span.end();
 
@@ -97,7 +102,9 @@ describe('transform', () => {
         tags: {
           key1: 'value1',
           key2: 'value2',
-          [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+          [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+            'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
           cost: '112.12',
           service: 'ui',
           version: '1',
@@ -117,6 +124,8 @@ describe('transform', () => {
         spanContext,
         api.SpanKind.SERVER
       );
+      span.resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] =
+        'faabc844-c78f-4d87-952d-cbb4ca4cbf6b';
       span.end();
 
       const zipkinSpan = toZipkinSpan(
@@ -138,7 +147,9 @@ describe('transform', () => {
         name: span.name,
         parentId: undefined,
         tags: {
-          [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+          [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+            'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
           cost: '112.12',
           service: 'ui',
           version: '1',
@@ -168,6 +179,8 @@ describe('transform', () => {
           spanContext,
           item.ot
         );
+        span.resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] =
+          'faabc844-c78f-4d87-952d-cbb4ca4cbf6b';
         span.end();
 
         const zipkinSpan = toZipkinSpan(
@@ -189,7 +202,9 @@ describe('transform', () => {
           name: span.name,
           parentId: undefined,
           tags: {
-            [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+            [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+            [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+              'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
             cost: '112.12',
             service: 'ui',
             version: '1',
@@ -218,6 +233,8 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
       });
+      span.resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] =
+        'faabc844-c78f-4d87-952d-cbb4ca4cbf6b';
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
         defaultStatusCodeTagName,
@@ -227,7 +244,9 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+          'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
         'telemetry.sdk.language': language,
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -250,6 +269,8 @@ describe('transform', () => {
         {
           key1: 'value1',
           key2: 'value2',
+          [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+            'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
         }
       );
       const tags: zipkinTypes.Tags = _toZipkinTags(
@@ -261,7 +282,9 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+          'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
         'telemetry.sdk.language': language,
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -286,6 +309,8 @@ describe('transform', () => {
       span.setAttributes({
         key1: 'value1',
         key2: 'value2',
+        [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+          'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
@@ -297,7 +322,9 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+          'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
         'telemetry.sdk.language': language,
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
@@ -323,6 +350,8 @@ describe('transform', () => {
       span.setAttributes({
         key1: 'value1',
         key2: 'value2',
+        [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+          'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
@@ -335,7 +364,9 @@ describe('transform', () => {
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
         [defaultStatusErrorTagName]: status.message,
-        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+        [SEMRESATTRS_SERVICE_INSTANCE_ID]:
+          'faabc844-c78f-4d87-952d-cbb4ca4cbf6b',
         'telemetry.sdk.language': language,
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
