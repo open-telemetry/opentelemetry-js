@@ -91,7 +91,7 @@ export class GrpcExporterTransport implements IExporterTransport {
   constructor(private _parameters: GrpcExporterTransportParameters) {}
 
   shutdown() {
-    this._client?.shutdown();
+    this._client?.close();
   }
 
   send(data: Uint8Array): Promise<ExportResponse> {
