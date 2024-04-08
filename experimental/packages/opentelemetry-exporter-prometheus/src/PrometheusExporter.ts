@@ -79,7 +79,10 @@ export class PrometheusExporter extends MetricReader {
         ? config.appendTimestamp
         : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
     // unref to prevent prometheus exporter from holding the process open on exit
-    this._server = createServer(this._requestHandler).unref();
+    this._server = createServer(this._requestHandler);
+    if (typeof this._server.unref === 'function') {
+      this._server.unref();
+    }
     this._serializer = new PrometheusSerializer(
       this._prefix,
       this._appendTimestamp
