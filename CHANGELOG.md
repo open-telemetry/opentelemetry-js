@@ -14,6 +14,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :bug: (Bug Fix)
 
 * fix(sdk-trace-web): fix invalid timings in span events [#4486](https://github.com/open-telemetry/opentelemetry-js/pull/4486) @Abinet18
+* fix(resources): ensure BrowserDetector does not think Node.js v21 is a browser [#4561](https://github.com/open-telemetry/opentelemetry-js/issues/4561) @trentm
 
 ### :books: (Refine Doc)
 
