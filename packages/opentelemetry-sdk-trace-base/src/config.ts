@@ -54,6 +54,7 @@ export function loadDefaultConfig() {
       attributePerLinkCountLimit:
         getEnv().OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
     },
+    mergeResourceWithDefaults: true,
   };
 }
 
