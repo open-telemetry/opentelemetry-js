@@ -7,6 +7,8 @@ The OpenTelemetry Propagator for AWS X-Ray provides HTTP header propagation for 
 This propagator translates the OpenTelemetry SpanContext into the equivalent AWS header format, for use with the OpenTelemetry JS SDK.
 `TraceState` is currently not propagated.
 
+This package was originally located in [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/propagators/opentelemetry-propagator-aws-xray). It has been moved in order to make it a direct dependency of the Node SDK. As a result, versions from 1.4.0 to 1.22.0 have been skipped.
+
 ## Status
 
 | Maturity                                  | [Component Owner](../../.github/component_owners.yml) | Compatibility         |
