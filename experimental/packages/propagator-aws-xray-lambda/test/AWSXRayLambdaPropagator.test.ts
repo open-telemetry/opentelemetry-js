@@ -200,8 +200,8 @@ describe('AWSXRayPropagator', () => {
 
   describe('.fields()', () => {
     it('should return a field with AWS X-Ray Trace ID header', () => {
-      const expectedFields = xrayLambdaPropagator.fields();
-      assert.deepStrictEqual([AWSXRAY_TRACE_ID_HEADER], expectedFields);
+      const actualFields = xrayLambdaPropagator.fields();
+      assert.deepStrictEqual([AWSXRAY_TRACE_ID_HEADER], actualFields);
     });
   });
 });
