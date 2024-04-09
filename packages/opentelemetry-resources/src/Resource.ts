@@ -26,6 +26,7 @@ import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
 import { IResource } from './IResource';
+import { getEnv } from '@opentelemetry/core';
 import { randomUUID } from 'crypto';
 
 /**
@@ -57,9 +58,8 @@ export class Resource implements IResource {
    * Returns a Resource that identifies the SDK in use.
    */
   static default(): IResource {
-    return new Resource({
+    const defaultResource = new Resource({
       [SEMRESATTRS_SERVICE_NAME]: defaultServiceName(),
-      [SEMRESATTRS_SERVICE_INSTANCE_ID]: randomUUID(),
       [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]:
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
       [SEMRESATTRS_TELEMETRY_SDK_NAME]:
@@ -67,6 +67,13 @@ export class Resource implements IResource {
       [SEMRESATTRS_TELEMETRY_SDK_VERSION]:
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
     });
+
+    if (getEnv().OTEL_NODE_JS_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID) {
+      defaultResource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] =
+        randomUUID();
+    }
+
+    return defaultResource;
   }
 
   constructor(

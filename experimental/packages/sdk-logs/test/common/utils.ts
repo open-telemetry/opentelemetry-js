@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { Resource } from '@opentelemetry/resources';
-import { SEMRESATTRS_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions';
-
 export const validAttributes = {
   string: 'string',
   number: 0,
@@ -35,33 +31,4 @@ export const invalidAttributes = {
   'non-homogeneous-array': [0, ''],
   // This empty length attribute should not be set
   '': 'empty-key',
-};
-
-/**
- * Compare two Service Resource values. Since the value for service.instance.id can be a randomUUID, the function checks if the size of the value matches the size of a randomUUID and removes it from the object, otherwise leave for comparison.
- * @param serviceResourceA
- * @param serviceResourceB
- */
-export const assertServiceResource = (
-  serviceResourceA: Resource,
-  serviceResourceB: Resource
-) => {
-  const UUID_REGEX =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  const instanceIDAisUUID =
-    serviceResourceA.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] != null &&
-    UUID_REGEX.test(
-      serviceResourceA.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID].toString()
-    );
-  const instanceIDBisUUID =
-    serviceResourceB.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] != null &&
-    UUID_REGEX.test(
-      serviceResourceB.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID].toString()
-    );
-  if (instanceIDAisUUID && instanceIDBisUUID) {
-    delete serviceResourceA.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID];
-    delete serviceResourceB.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID];
-  }
-
-  assert.deepStrictEqual(serviceResourceA, serviceResourceB);
 };
