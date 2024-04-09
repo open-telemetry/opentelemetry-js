@@ -29,27 +29,22 @@ export abstract class OTLPExporterBrowserBase<
   ExportItem,
   ServiceRequest,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
-  protected _headers: Record<string, string>;
-  private _useXHR: boolean = false;
+  protected _headers: Record<string, string> = {};
+  private _alwaysUseXhr: boolean = false;
 
   /**
    * @param config
    */
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-    this._useXHR =
-      !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (this._useXHR) {
-      this._headers = Object.assign(
-        {},
-        parseHeaders(config.headers),
-        baggageUtils.parseKeyPairsIntoRecord(
-          getEnv().OTEL_EXPORTER_OTLP_HEADERS
-        )
-      );
-    } else {
-      this._headers = {};
-    }
+    this._alwaysUseXhr =
+      config.alwaysUseXhr || typeof navigator.sendBeacon !== 'function';
+
+    this._headers = Object.assign(
+      {},
+      parseHeaders(config.headers),
+      baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
+    );
   }
 
   onInit(): void {}
@@ -69,20 +64,22 @@ export abstract class OTLPExporterBrowserBase<
     const body = JSON.stringify(serviceRequest);
 
     const promise = new Promise<void>((resolve, reject) => {
-      if (this._useXHR) {
+      if (!this._alwaysUseXhr && document.hidden && body.length < 64 * 1024) {
+        // sendBeacon must be used when the page is being hidden, as per: https://w3c.github.io/beacon/.
+        // Note that headers are ignored in this case, if this is a problem, configuration option `alwaysUseXhr` must be set to true.
+        sendWithBeacon(
+          body,
+          this.url,
+          { type: 'application/json' },
+          resolve,
+          reject
+        );
+      } else {
         sendWithXhr(
           body,
           this.url,
           this._headers,
           this.timeoutMillis,
-          resolve,
-          reject
-        );
-      } else {
-        sendWithBeacon(
-          body,
-          this.url,
-          { type: 'application/json' },
           resolve,
           reject
         );
