@@ -21,6 +21,18 @@ import {
 } from '../src';
 import { EventEmitter } from 'events';
 import { createContextKey, ROOT_CONTEXT } from '@opentelemetry/api';
+import { AsyncLocalStorage } from 'async_hooks';
+
+// The test runtime doesn't expose Node.js API on the global object so we need to set it manually.
+before(() => {
+  // @ts-ignore
+  global.AsyncLocalStorage = AsyncLocalStorage;
+});
+
+after(() => {
+  // @ts-ignore
+  delete global.AsyncLocalStorage;
+});
 
 for (const contextManagerClass of [
   AsyncHooksContextManager,
@@ -41,7 +53,7 @@ for (const contextManagerClass of [
     });
 
     afterEach(() => {
-      contextManager.disable();
+      contextManager?.disable();
       otherContextManager?.disable();
     });
 

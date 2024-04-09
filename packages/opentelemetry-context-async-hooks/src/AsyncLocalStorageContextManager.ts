@@ -15,15 +15,50 @@
  */
 
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
-import { AsyncLocalStorage } from 'async_hooks';
+
+// In some JS runtimes, AsyncLocalStorage is not accessible through the
+// `async_hooks` API. This may cause crashes when `async_hooks` is attempted to
+// be imported. Node.js provides all of its APIs via the global object, including
+// `async_hooks`, meaning we can access `AsyncLocalStorage` through the global
+// object. Other runtimes, like the Vercel Edge runtime put the `AsyncLocalStorage`
+// binding on the global object directly.
+// The import below is only used for type information and needs to be a `type`
+// import, otherwise, it may create errors on runtimes that don't support the
+// `async_hooks` API.
+import type { AsyncLocalStorage } from 'async_hooks';
+
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
+
+type AsyncLocalStorageClass = new () => AsyncLocalStorage<Context>;
 
 export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextManager {
   private _asyncLocalStorage: AsyncLocalStorage<Context>;
 
   constructor() {
     super();
-    this._asyncLocalStorage = new AsyncLocalStorage();
+
+    const _globalThis = typeof globalThis === 'object' ? globalThis : global;
+    const globalWithAsyncLocalStorage = _globalThis as typeof _globalThis & {
+      // Available in Node 14+
+      async_hooks?: {
+        AsyncLocalStorage?: AsyncLocalStorageClass;
+      };
+      // Available in environments like Vercel Edge
+      AsyncLocalStorage?: AsyncLocalStorageClass;
+    };
+
+    const AsyncLocalStorageClass =
+      (globalWithAsyncLocalStorage.async_hooks &&
+        globalWithAsyncLocalStorage.async_hooks.AsyncLocalStorage) ||
+      globalWithAsyncLocalStorage.AsyncLocalStorage;
+
+    if (!AsyncLocalStorageClass) {
+      throw new Error(
+        'AbstractAsyncHooksContext manager is not supported in this JavaScript runtime'
+      );
+    }
+
+    this._asyncLocalStorage = new AsyncLocalStorageClass();
   }
 
   active(): Context {
