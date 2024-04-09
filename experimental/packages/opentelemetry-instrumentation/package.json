@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.49.1",
+  "version": "0.50.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation",
@@ -71,7 +71,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.49.1",
+    "@opentelemetry/api-logs": "0.50.0",
     "@types/shimmer": "^1.0.2",
     "import-in-the-middle": "1.7.1",
     "require-in-the-middle": "^7.1.1",
@@ -86,7 +86,7 @@
     "@babel/preset-env": "7.22.20",
     "@opentelemetry/api": "1.8.0",
     "@opentelemetry/api-logs": "0.47.0",
-    "@opentelemetry/sdk-metrics": "1.22.0",
+    "@opentelemetry/sdk-metrics": "1.23.0",
     "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
     "@types/semver": "7.5.6",
