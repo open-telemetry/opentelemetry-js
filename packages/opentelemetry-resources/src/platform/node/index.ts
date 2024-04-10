@@ -15,10 +15,10 @@
  */
 
 export * from './default-service-name';
-export * from './default-experimental-values';
 export * from './HostDetector';
 export * from './OSDetector';
 export * from './HostDetectorSync';
 export * from './OSDetectorSync';
 export * from './ProcessDetector';
 export * from './ProcessDetectorSync';
+export * from './ServiceInstanceIDDetector';

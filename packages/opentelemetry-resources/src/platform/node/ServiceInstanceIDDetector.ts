@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
+import { Detector } from '../../types';
+import { ResourceDetectionConfig } from '../../config';
 import { IResource } from '../../IResource';
+import { serviceInstanceIDDetectorSync } from '../browser/ServiceInstanceIDDetectorSync';
 
-export function addExperimentalDefault(_: IResource): void {}
+/**
+ * ServiceInstanceIDDetector detects the resources related to the service instance ID.
+ */
+class ServiceInstanceIDDetector implements Detector {
+  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
+    return Promise.resolve(serviceInstanceIDDetectorSync.detect());
+  }
+}
+
+export const serviceInstanceIDDetector = new ServiceInstanceIDDetector();

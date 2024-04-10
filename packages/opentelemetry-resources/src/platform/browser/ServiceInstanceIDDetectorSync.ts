@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-import { IResource } from '../../IResource';
-import { getEnv } from '@opentelemetry/core';
-import { randomUUID } from 'crypto';
-import { SEMRESATTRS_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions';
+import { noopDetectorSync } from '../../detectors/NoopDetectorSync';
 
-export function addExperimentalDefault(resource: IResource): void {
-  if (getEnv().OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID) {
-    resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] = randomUUID();
-  }
-}
+export const serviceInstanceIDDetectorSync = noopDetectorSync;

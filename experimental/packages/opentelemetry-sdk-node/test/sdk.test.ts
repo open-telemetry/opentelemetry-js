@@ -705,10 +705,15 @@ describe('Node SDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
+      const UUID_REGEX =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       assert.equal(
-        resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID]?.toString().length,
-        36
+        UUID_REGEX.test(
+          resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID]?.toString() || ''
+        ),
+        true
       );
+
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
       delete process.env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID;
       await sdk.shutdown();
@@ -746,7 +751,7 @@ describe('Node SDK', () => {
         name: 'my-service',
       });
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-      sdk.shutdown();
+      await sdk.shutdown();
     });
   });
 

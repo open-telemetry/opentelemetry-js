@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
-import { defaultServiceName, addExperimentalDefault } from './platform';
+import { defaultServiceName } from './platform';
 import { IResource } from './IResource';
 
 /**
@@ -55,7 +55,7 @@ export class Resource implements IResource {
    * Returns a Resource that identifies the SDK in use.
    */
   static default(): IResource {
-    const defaultResource = new Resource({
+    return new Resource({
       [SEMRESATTRS_SERVICE_NAME]: defaultServiceName(),
       [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]:
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
@@ -64,10 +64,6 @@ export class Resource implements IResource {
       [SEMRESATTRS_TELEMETRY_SDK_VERSION]:
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
     });
-
-    addExperimentalDefault(defaultResource);
-
-    return defaultResource;
   }
 
   constructor(
