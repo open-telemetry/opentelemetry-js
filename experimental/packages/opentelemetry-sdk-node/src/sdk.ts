@@ -161,19 +161,18 @@ export class NodeSDK {
 
       const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
 
-      this.configureTracerProvider(
-        tracerProviderConfig,
+      this._tracerProviderConfig = {
+        tracerConfig: tracerProviderConfig,
         spanProcessors,
-        configuration.contextManager,
-        configuration.textMapPropagator
-      );
+        contextManager: configuration.contextManager,
+        textMapPropagator: configuration.textMapPropagator,
+      };
     }
 
     if (configuration.logRecordProcessor) {
-      const loggerProviderConfig: LoggerProviderConfig = {
+      this._loggerProviderConfig = {
         logRecordProcessor: configuration.logRecordProcessor,
       };
-      this.configureLoggerProvider(loggerProviderConfig);
     }
 
     if (configuration.metricReader || configuration.views) {
@@ -186,7 +185,7 @@ export class NodeSDK {
         meterProviderConfig.views = configuration.views;
       }
 
-      this.configureMeterProvider(meterProviderConfig);
+      this._meterProviderConfig = meterProviderConfig;
     }
 
     let instrumentations: InstrumentationOption[] = [];
@@ -194,119 +193,6 @@ export class NodeSDK {
       instrumentations = configuration.instrumentations;
     }
     this._instrumentations = instrumentations;
-  }
-
-  /**
-   *
-   * @deprecated Please pass {@code sampler}, {@code generalLimits}, {@code spanLimits}, {@code resource},
-   * {@code IdGenerator}, {@code spanProcessor}, {@code contextManager} and {@code textMapPropagator},
-   * to the constructor options instead.
-   *
-   * Set configurations needed to register a TracerProvider
-   */
-  public configureTracerProvider(
-    tracerConfig: NodeTracerConfig,
-    spanProcessors: SpanProcessor[],
-    contextManager?: ContextManager,
-    textMapPropagator?: TextMapPropagator
-  ): void {
-    this._tracerProviderConfig = {
-      tracerConfig,
-      spanProcessors,
-      contextManager,
-      textMapPropagator,
-    };
-  }
-
-  /**
-   * @deprecated Please pass {@code logRecordProcessor} to the constructor options instead.
-   *
-   * Set configurations needed to register a LoggerProvider
-   */
-  public configureLoggerProvider(config: LoggerProviderConfig): void {
-    // nothing is set yet, we can set config and then return
-    if (this._loggerProviderConfig == null) {
-      this._loggerProviderConfig = config;
-      return;
-    }
-
-    // make sure we do not override existing logRecordProcessor with other logRecordProcessors.
-    if (
-      this._loggerProviderConfig.logRecordProcessor != null &&
-      config.logRecordProcessor != null
-    ) {
-      throw new Error(
-        'LogRecordProcessor passed but LogRecordProcessor has already been configured.'
-      );
-    }
-
-    // set logRecordProcessor, but make sure we do not override existing logRecordProcessors with null/undefined.
-    if (config.logRecordProcessor != null) {
-      this._loggerProviderConfig.logRecordProcessor = config.logRecordProcessor;
-    }
-  }
-
-  /**
-   * @deprecated Please pass {@code views} and {@code reader} to the constructor options instead.
-   *
-   * Set configurations needed to register a MeterProvider
-   */
-  public configureMeterProvider(config: MeterProviderConfig): void {
-    // nothing is set yet, we can set config and return.
-    if (this._meterProviderConfig == null) {
-      this._meterProviderConfig = config;
-      return;
-    }
-
-    // make sure we do not override existing views with other views.
-    if (this._meterProviderConfig.views != null && config.views != null) {
-      throw new Error('Views passed but Views have already been configured.');
-    }
-
-    // set views, but make sure we do not override existing views with null/undefined.
-    if (config.views != null) {
-      this._meterProviderConfig.views = config.views;
-    }
-
-    // make sure we do not override existing reader with another reader.
-    if (this._meterProviderConfig.reader != null && config.reader != null) {
-      throw new Error(
-        'MetricReader passed but MetricReader has already been configured.'
-      );
-    }
-
-    // set reader, but make sure we do not override existing reader with null/undefined.
-    if (config.reader != null) {
-      this._meterProviderConfig.reader = config.reader;
-    }
-  }
-
-  /**
-   * @deprecated Resources are detected automatically on {@link NodeSDK.start()}, when the {@code autoDetectResources}
-   * constructor option is set to {@code true} or left {@code undefined}.
-   *
-   * Detect resource attributes
-   */
-  public detectResources(): void {
-    if (this._disabled) {
-      return;
-    }
-
-    const internalConfig: ResourceDetectionConfig = {
-      detectors: this._resourceDetectors,
-    };
-
-    this.addResource(detectResourcesSync(internalConfig));
-  }
-
-  /**
-   * @deprecated Please pre-merge resources and pass them to the constructor
-   *
-   * Manually add a Resource
-   * @param resource
-   */
-  public addResource(resource: IResource): void {
-    this._resource = this._resource.merge(resource);
   }
 
   /**
@@ -322,7 +208,13 @@ export class NodeSDK {
     });
 
     if (this._autoDetectResources) {
-      this.detectResources();
+      const internalConfig: ResourceDetectionConfig = {
+        detectors: this._resourceDetectors,
+      };
+
+      this._resource = this._resource.merge(
+        detectResourcesSync(internalConfig)
+      );
     }
 
     this._resource =
