@@ -9,6 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(otlp-transformer): consolidate scope/resource creation in transformer [#4600](https://github.com/open-telemetry/opentelemetry-js/pull/4600)
+* feat(sdk-logs): make dropping attribute print message
 
 ### :bug: (Bug Fix)
 
