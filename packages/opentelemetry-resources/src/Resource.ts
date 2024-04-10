@@ -16,7 +16,6 @@
 
 import { diag } from '@opentelemetry/api';
 import {
-  SEMRESATTRS_SERVICE_INSTANCE_ID,
   SEMRESATTRS_SERVICE_NAME,
   SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
   SEMRESATTRS_TELEMETRY_SDK_NAME,
@@ -24,10 +23,8 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
-import { defaultServiceName } from './platform';
+import { defaultServiceName, addExperimentalDefault } from './platform';
 import { IResource } from './IResource';
-import { getEnv } from '@opentelemetry/core';
-import { randomUUID } from 'crypto';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -68,10 +65,7 @@ export class Resource implements IResource {
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
     });
 
-    if (getEnv().OTEL_NODE_JS_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID) {
-      defaultResource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] =
-        randomUUID();
-    }
+    addExperimentalDefault(defaultResource);
 
     return defaultResource;
   }

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-export * from './default-service-name';
-export * from './default-experimental-values';
-export * from './HostDetector';
-export * from './OSDetector';
-export * from './HostDetectorSync';
-export * from './OSDetectorSync';
-export * from './ProcessDetector';
-export * from './ProcessDetectorSync';
+import { IResource } from '../../IResource';
+import { getEnv } from '@opentelemetry/core';
+import { randomUUID } from 'crypto';
+import { SEMRESATTRS_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions';
+
+export function addExperimentalDefault(resource: IResource): void {
+  if (getEnv().OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID) {
+    resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID] = randomUUID();
+  }
+}

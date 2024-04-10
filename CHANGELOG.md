@@ -12,10 +12,10 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
-* feat(resources): set value for `service.instance.id` as random UUID by default if environment variable `OTEL_NODE_JS_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID` is set to true. 
-  * The value can be overwritten by 
+* feat(resources): set value for `service.instance.id` as random UUID by default if environment variable `OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID` is set to true.
+  * The value can be overwritten by
     * merging a resource containing the `service.instance.id` attribute
-    * setting `service.instance.id` via the `OTEL_RESOURCE_ATTRIBUTES`  environment variable when using `envDetector` 
+    * setting `service.instance.id` via the `OTEL_RESOURCE_ATTRIBUTES`  environment variable when using `envDetector`
     * using another resource detector which writes `service.instance.id`
 
 ### :bug: (Bug Fix)

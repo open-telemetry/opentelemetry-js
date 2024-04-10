@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-export * from './default-service-name';
-export * from './default-experimental-values';
-export * from './HostDetector';
-export * from './OSDetector';
-export * from './HostDetectorSync';
-export * from './OSDetectorSync';
-export * from './ProcessDetector';
-export * from './ProcessDetectorSync';
+import { IResource } from '../../IResource';
+
+export function addExperimentalDefault(_: IResource): void {}

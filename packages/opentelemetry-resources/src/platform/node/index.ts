@@ -15,6 +15,7 @@
  */
 
 export * from './default-service-name';
+export * from './default-experimental-values';
 export * from './HostDetector';
 export * from './OSDetector';
 export * from './HostDetectorSync';
