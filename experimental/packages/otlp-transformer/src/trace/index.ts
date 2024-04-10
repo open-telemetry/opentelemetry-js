@@ -16,7 +16,6 @@
 import type { IResource } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import type { OtlpEncodingOptions } from '../common/types';
-import { toAttributes } from '../common/internal';
 import { sdkSpanToOtlpSpan } from './internal';
 import {
   IExportTraceServiceRequest,
@@ -24,6 +23,8 @@ import {
   IScopeSpans,
 } from './types';
 import { Encoder, getOtlpEncoder } from '../common';
+import { createInstrumentationScope } from '../common/internal';
+import { createResource } from '../resource/internal';
 
 export function createExportTraceServiceRequest(
   spans: ReadableSpan[],
@@ -79,26 +80,23 @@ function spanRecordsToResourceSpans(
     while (!ilmEntry.done) {
       const scopeSpans = ilmEntry.value;
       if (scopeSpans.length > 0) {
-        const { name, version, schemaUrl } =
-          scopeSpans[0].instrumentationLibrary;
         const spans = scopeSpans.map(readableSpan =>
           sdkSpanToOtlpSpan(readableSpan, encoder)
         );
 
         scopeResourceSpans.push({
-          scope: { name, version },
+          scope: createInstrumentationScope(
+            scopeSpans[0].instrumentationLibrary
+          ),
           spans: spans,
-          schemaUrl: schemaUrl,
+          schemaUrl: scopeSpans[0].instrumentationLibrary.schemaUrl,
         });
       }
       ilmEntry = ilmIterator.next();
     }
     // TODO SDK types don't provide resource schema URL at this time
     const transformedSpans: IResourceSpans = {
-      resource: {
-        attributes: toAttributes(resource.attributes),
-        droppedAttributesCount: 0,
-      },
+      resource: createResource(resource),
       scopeSpans: scopeResourceSpans,
       schemaUrl: undefined,
     };

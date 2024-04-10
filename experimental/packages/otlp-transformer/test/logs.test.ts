@@ -63,7 +63,10 @@ function createExpectedLogJson(
         schemaUrl: undefined,
         scopeLogs: [
           {
-            scope: { name: 'scope_name_1', version: '0.1.0' },
+            scope: {
+              name: 'scope_name_1',
+              version: '0.1.0',
+            },
             logRecords: [
               {
                 timeUnixNano,
