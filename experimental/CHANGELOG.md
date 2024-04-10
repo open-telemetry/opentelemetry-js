@@ -23,6 +23,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
+* perf(otlp-transfromer): reduce allocations [#4578](https://github.com/open-telemetry/opentelemetry-js/pull/4578) @Samuron
 
 ### :bug: (Bug Fix)
 
