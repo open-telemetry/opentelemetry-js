@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.23.0",
-    "@opentelemetry/otlp-transformer": "0.49.1"
+    "@opentelemetry/otlp-transformer": "0.50.0"
   },
   "devDependencies": {
     "@babel/core": "7.23.6",
