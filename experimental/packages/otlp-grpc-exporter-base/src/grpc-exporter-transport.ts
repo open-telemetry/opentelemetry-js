@@ -155,9 +155,9 @@ export class GrpcExporterTransport implements IExporterTransport {
         });
       }
 
-      // Using `any` as the gRPC client constructor is created on runtime,
-      // so we don't have any types for the resulting client.
-      (this._client as any).export(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore The gRPC client constructor is created on runtime, so we don't have any types for the resulting client.
+      this._client.export(
         buffer,
         this._metadata,
         { deadline: deadline },
