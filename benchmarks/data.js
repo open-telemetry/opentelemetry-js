@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712822956670,
+  "lastUpdate": 1712823044322,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6672,6 +6672,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b067aed8bab73e30cb96d6ea4c61fa877b89b60c",
+          "message": "chore(instrumentation): remove accidental devDep on api-logs (#4627)\n\nThis package accidentally got a dep and devDep on api-logs, at\r\ndifferent versions. The result was it being pinned at the older\r\nversion in package-lock.\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-11T10:07:50+02:00",
+          "tree_id": "dbdea361e3b97a34a898d060a4a8df12334a1ba1",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b067aed8bab73e30cb96d6ea4c61fa877b89b60c"
+        },
+        "date": 1712823043337,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 949422,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12086,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 710222,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 656314,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
