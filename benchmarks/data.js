@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712763743663,
+  "lastUpdate": 1712822956670,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6620,6 +6620,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7a5db08f758e92a3c6287dac858ea419e9328d09",
+          "message": "doc(instr-fetch): mention instr-undici for Node.js fetch() (#4624)\n\nNow that instrumentation-undici exists, point to it for users that want\r\ninstrumentation of Node.js' fetch().",
+          "timestamp": "2024-04-11T10:07:24+02:00",
+          "tree_id": "969739b6c134690d71efbb2cd9f8f57888e4dd7f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7a5db08f758e92a3c6287dac858ea419e9328d09"
+        },
+        "date": 1712822955633,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 943299,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11697,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 647458,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 650130,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
