@@ -16,7 +16,12 @@
 
 // NOTE: do not change these type imports to actual imports. Doing so WILL break `@opentelemetry/instrumentation-http`,
 // as they'd be imported before the http/https modules can be wrapped.
-import type { Metadata, ServiceError, ChannelCredentials } from '@grpc/grpc-js';
+import type {
+  Metadata,
+  ServiceError,
+  ChannelCredentials,
+  Client,
+} from '@grpc/grpc-js';
 import { ExportResponse } from './export-response';
 import { IExporterTransport } from './exporter-transport';
 
@@ -85,7 +90,7 @@ export interface GrpcExporterTransportParameters {
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
-  private _client?: any;
+  private _client?: Client;
   private _metadata?: Metadata;
 
   constructor(private _parameters: GrpcExporterTransportParameters) {}
@@ -150,7 +155,8 @@ export class GrpcExporterTransport implements IExporterTransport {
         });
       }
 
-      this._client.export(
+      // Using `any` as the gRPC client constructor is created on runtime, so we don't have any types for it.
+      (this._client as any).export(
         buffer,
         this._metadata,
         { deadline: deadline },
