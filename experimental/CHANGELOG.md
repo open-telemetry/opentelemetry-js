@@ -12,6 +12,7 @@ All notable changes to experimental packages in this project will be documented 
   * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
   * `NodeSDK.addResource()`, please use constructor options instead
   * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on `NodeSDK.start()` if the constructor option `autoDetectResources` is unset, `undefined` or `true`.
+* feat(api-events): removed traceId and spanId from Event interface, added context and severityNumber [#4629](https://github.com/open-telemetry/opentelemetry-js/pull/4629)
 
 ### :rocket: (Enhancement)
 
