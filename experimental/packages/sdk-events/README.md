@@ -58,6 +58,7 @@ eventLogger.emit({
 
 Alternatively, `EventLoggerProvider` can also be instantiated without registering a global
 `LoggerProvider`.
+
 ```js
 const loggerProvider = new LoggerProvider();
 const eventLoggerProvider = new EventLoggerProvider({
