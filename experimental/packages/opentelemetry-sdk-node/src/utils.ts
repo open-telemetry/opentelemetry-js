@@ -20,13 +20,12 @@ import {
   InstrumentationOption,
 } from '@opentelemetry/instrumentation';
 import {
-  Detector,
   DetectorSync,
   envDetectorSync,
   hostDetectorSync,
   osDetectorSync,
   processDetectorSync,
-  serviceInstanceIDDetectorSync,
+  serviceInstanceIdDetectorSync,
 } from '@opentelemetry/resources';
 
 // TODO: This part of a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
@@ -58,15 +57,12 @@ const RESOURCE_DETECTOR_OS = 'os';
 const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
-export function getResourceDetectorsFromEnv(): Array<Detector | DetectorSync> {
-  const resourceDetectors = new Map<
-    string,
-    Detector | DetectorSync | Detector[]
-  >([
+export function getResourceDetectorsFromEnv(): Array<DetectorSync> {
+  const resourceDetectors = new Map<string, DetectorSync>([
     [RESOURCE_DETECTOR_ENVIRONMENT, envDetectorSync],
     [RESOURCE_DETECTOR_HOST, hostDetectorSync],
     [RESOURCE_DETECTOR_OS, osDetectorSync],
-    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIDDetectorSync],
+    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetectorSync],
     [RESOURCE_DETECTOR_PROCESS, processDetectorSync],
   ]);
 

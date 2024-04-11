@@ -40,7 +40,7 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
-  assertServiceInstanceIDIsUUID,
+  assertServiceInstanceIdIsUUID,
   assertServiceResource,
 } from './util/resource-assertions';
 import {
@@ -707,7 +707,7 @@ describe('Node SDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assertServiceInstanceIDIsUUID(resource);
+      assertServiceInstanceIdIsUUID(resource);
       delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
       await sdk.shutdown();
     });
@@ -727,56 +727,7 @@ describe('Node SDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assertServiceInstanceIDIsUUID(resource);
-      delete process.env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID;
-      await sdk.shutdown();
-    });
-
-    it('should configure service instance id with random UUID with OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID env var', async () => {
-      process.env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID = 'true';
-      const sdk = new NodeSDK();
-
-      sdk.start();
-      const resource = sdk['_resource'];
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceInstanceIDIsUUID(resource);
-      delete process.env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID;
-      await sdk.shutdown();
-    });
-
-    it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var even with OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID env var', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=627cc493,service.name=my-service';
-      process.env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID = 'true';
-      const sdk = new NodeSDK();
-
-      sdk.start();
-      const resource = sdk['_resource'];
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        name: 'my-service',
-        instanceId: '627cc493',
-      });
-      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-      delete process.env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID;
-      sdk.shutdown();
-    });
-
-    it('should not configure service instance id with no value for it on OTEL_RESOURCE_ATTRIBUTES env var and  OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID env var as false', async () => {
-      process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.name=my-service';
-      process.env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID = 'false';
-      const sdk = new NodeSDK();
-
-      sdk.start();
-      const resource = sdk['_resource'];
-      await resource.waitForAsyncAttributes?.();
-
-      assertServiceResource(resource, {
-        name: 'my-service',
-      });
-      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+      assertServiceInstanceIdIsUUID(resource);
       await sdk.shutdown();
     });
   });

@@ -36,7 +36,6 @@ import {
   processDetector,
   Resource,
   ResourceDetectionConfig,
-  serviceInstanceIDDetector,
 } from '@opentelemetry/resources';
 import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
@@ -130,9 +129,6 @@ export class NodeSDK {
       defaultDetectors = getResourceDetectorsFromEnv();
     } else {
       defaultDetectors = [envDetector, processDetector, hostDetector];
-      if (env.OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID) {
-        defaultDetectors.push(serviceInstanceIDDetector);
-      }
     }
 
     this._resourceDetectors =
