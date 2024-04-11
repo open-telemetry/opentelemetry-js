@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712823044322,
+  "lastUpdate": 1712843421797,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6722,6 +6722,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 656314,
             "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "34387774caaa15307e8586206f1ca2e6df96605f",
+          "message": "fix(otlp-grpc-exporter-base): avoid TypeError on exporter shutdown (#4612)\n\n* fix(otlp-grpc-exporter-base): avoid TypeError on exporter shutdown\r\n\r\n* chore: update changelog\r\n\r\n* fix: use gRPC Client type over any\r\n\r\n* fixup! fix: use gRPC Client type over any\r\n\r\n* fix: use ts-lint/ts-ignore",
+          "timestamp": "2024-04-11T15:48:27+02:00",
+          "tree_id": "2966b882d9c872a7637d0c4ea0b89f3890900d74",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/34387774caaa15307e8586206f1ca2e6df96605f"
+        },
+        "date": 1712843420737,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 924379,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11793,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 656728,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 654522,
+            "range": "±0.16%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
