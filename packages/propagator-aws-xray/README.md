@@ -9,12 +9,6 @@ This propagator translates the OpenTelemetry SpanContext into the equivalent AWS
 
 This package was originally located in [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/propagators/opentelemetry-propagator-aws-xray). It has been moved in order to make it a direct dependency of the Node SDK. As a result, versions from 1.4.0 to 1.22.0 have been skipped.
 
-## Status
-
-| Maturity                                  | [Component Owner](../../.github/component_owners.yml) | Compatibility         |
-| ----------------------------------------- | ----------------------------------------------------- | --------------------- |
-| [Stable](../../../CONTRIBUTING.md#stable) | @carolabadeer                                         | API 1.0+<br/>SDK 1.0+ |
-
 ## Installation
 
 ```sh
