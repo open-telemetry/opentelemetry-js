@@ -155,7 +155,8 @@ export class GrpcExporterTransport implements IExporterTransport {
         });
       }
 
-      // Using `any` as the gRPC client constructor is created on runtime, so we don't have any types for it.
+      // Using `any` as the gRPC client constructor is created on runtime,
+      // so we don't have any types for the resulting client.
       (this._client as any).export(
         buffer,
         this._metadata,
