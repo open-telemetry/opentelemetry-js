@@ -18,9 +18,15 @@ import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../types';
 import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
-import { sendWithBeacon, sendWithXhr } from './util';
+import { sendWithBeacon, sendWithFetch, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+
+enum SendMethod {
+  beacon = 1,
+  xhr = 2,
+  fetch = 3,
+}
 
 /**
  * Collector Metric Exporter abstract base class
@@ -30,16 +36,21 @@ export abstract class OTLPExporterBrowserBase<
   ServiceRequest,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
-  private _useXHR: boolean = false;
+  private sendMethod: SendMethod;
 
   /**
    * @param config
    */
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config);
-    this._useXHR =
-      !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (this._useXHR) {
+    if (!config.headers && typeof navigator.sendBeacon === 'function') {
+      this.sendMethod = SendMethod.beacon;
+    } else if (typeof XMLHttpRequest === 'function') {
+      this.sendMethod = SendMethod.xhr;
+    } else {
+      this.sendMethod = SendMethod.fetch;
+    }
+    if (this.sendMethod !== SendMethod.beacon) {
       this._headers = Object.assign(
         {},
         parseHeaders(config.headers),
@@ -69,7 +80,7 @@ export abstract class OTLPExporterBrowserBase<
     const body = JSON.stringify(serviceRequest);
 
     const promise = new Promise<void>((resolve, reject) => {
-      if (this._useXHR) {
+      if (this.sendMethod === SendMethod.xhr) {
         sendWithXhr(
           body,
           this.url,
@@ -78,7 +89,16 @@ export abstract class OTLPExporterBrowserBase<
           resolve,
           reject
         );
-      } else {
+      } else if (this.sendMethod === SendMethod.fetch) {
+        sendWithFetch(
+          body,
+          this.url,
+          this._headers,
+          this.timeoutMillis,
+          resolve,
+          reject
+        );
+      } else if (this.sendMethod === SendMethod.beacon) {
         sendWithBeacon(
           body,
           this.url,

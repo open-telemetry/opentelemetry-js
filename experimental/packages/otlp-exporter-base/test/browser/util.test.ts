@@ -14,33 +14,24 @@
  * limitations under the License.
  */
 
+import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { sendWithXhr } from '../../src/platform/browser/util';
+import { sendWithFetch, sendWithXhr } from '../../src/platform/browser/util';
 import { nextTick } from 'process';
 import { ensureHeadersContain } from '../testHelper';
+import { FetchMockStatic, MockCall } from 'fetch-mock/esm/client';
+const fetchMock = require('fetch-mock/esm/client').default as FetchMockStatic;
 
 describe('util - browser', () => {
-  let server: any;
   const body = '';
   const url = '';
 
-  let onSuccessStub: sinon.SinonStub;
-  let onErrorStub: sinon.SinonStub;
-
-  beforeEach(() => {
-    onSuccessStub = sinon.stub();
-    onErrorStub = sinon.stub();
-    server = sinon.fakeServer.create();
-  });
-
-  afterEach(() => {
-    server.restore();
-    sinon.restore();
-  });
-
   describe('when XMLHTTPRequest is used', () => {
+    let server: any;
     let expectedHeaders: Record<string, string>;
     let clock: sinon.SinonFakeTimers;
+    let onSuccessStub: sinon.SinonStub;
+    let onErrorStub: sinon.SinonStub;
     beforeEach(() => {
       // fakeTimers is used to replace the next setTimeout which is
       // located in sendWithXhr function called by the export method
@@ -51,6 +42,13 @@ describe('util - browser', () => {
         'Content-Type': 'application/json;charset=utf-8',
         Accept: 'application/json',
       };
+      onSuccessStub = sinon.stub();
+      onErrorStub = sinon.stub();
+      server = sinon.fakeServer.create();
+    });
+    afterEach(() => {
+      server.restore();
+      sinon.restore();
     });
     describe('and Content-Type header is set', () => {
       beforeEach(() => {
@@ -153,6 +151,108 @@ describe('util - browser', () => {
           clock.restore();
           done();
         });
+      });
+    });
+  });
+
+  describe('when fetch is used', () => {
+    let clock: sinon.SinonFakeTimers;
+
+    const assertRequesetHeaders = (
+      call: MockCall | undefined,
+      expected: Record<string, string>
+    ) => {
+      assert.ok(call);
+      const headers = call[1]?.headers;
+      assert.ok(headers, 'invalid header');
+      ensureHeadersContain(
+        Object.fromEntries(Object.entries(headers)),
+        expected
+      );
+    };
+
+    beforeEach(() => {
+      // fakeTimers is used to replace the next setTimeout which is
+      // located in sendWithXhr function called by the export method
+      clock = sinon.useFakeTimers();
+
+      fetchMock.mock(url, {});
+    });
+    afterEach(() => {
+      fetchMock.restore();
+      clock.restore();
+    });
+    describe('and Content-Type header is set', () => {
+      beforeEach(done => {
+        const explicitContentType = {
+          'Content-Type': 'application/json',
+        };
+        const exporterTimeout = 10000;
+        sendWithFetch(
+          body,
+          url,
+          explicitContentType,
+          exporterTimeout,
+          done,
+          done
+        );
+      });
+      it('Request Headers should contain "Content-Type" header', () => {
+        assert.ok(fetchMock.called(url));
+        assertRequesetHeaders(fetchMock.lastCall(url), {
+          'Content-Type': 'application/json',
+        });
+      });
+      it('Request Headers should contain "Accept" header', () => {
+        assert.ok(fetchMock.called(url));
+        assertRequesetHeaders(fetchMock.lastCall(url), {
+          Accept: 'application/json',
+        });
+      });
+    });
+
+    describe('and empty headers are set', () => {
+      beforeEach(done => {
+        const emptyHeaders = {};
+        // use default exporter timeout
+        const exporterTimeout = 10000;
+        sendWithFetch(body, url, emptyHeaders, exporterTimeout, done, done);
+      });
+      it('Request Headers should contain "Content-Type" header', () => {
+        assert.ok(fetchMock.called(url));
+        assertRequesetHeaders(fetchMock.lastCall(url), {
+          'Content-Type': 'application/json',
+        });
+      });
+      it('Request Headers should contain "Accept" header', () => {
+        assert.ok(fetchMock.called(url));
+        assertRequesetHeaders(fetchMock.lastCall(url), {
+          Accept: 'application/json',
+        });
+      });
+    });
+    describe('and custom headers are set', () => {
+      let customHeaders: Record<string, string>;
+      beforeEach(done => {
+        customHeaders = { aHeader: 'aValue', bHeader: 'bValue' };
+        const exporterTimeout = 10000;
+        sendWithFetch(body, url, customHeaders, exporterTimeout, done, done);
+      });
+      it('Request Headers should contain "Content-Type" header', () => {
+        assert.ok(fetchMock.called(url));
+        assertRequesetHeaders(fetchMock.lastCall(url), {
+          'Content-Type': 'application/json',
+        });
+      });
+      it('Request Headers should contain "Accept" header', () => {
+        assert.ok(fetchMock.called(url));
+        assertRequesetHeaders(fetchMock.lastCall(url), {
+          Accept: 'application/json',
+        });
+      });
+      it('Request Headers should contain custom headers', () => {
+        assert.ok(fetchMock.called(url));
+        assertRequesetHeaders(fetchMock.lastCall(url), customHeaders);
       });
     });
   });

@@ -24,6 +24,11 @@ import {
   parseRetryAfterToMills,
 } from '../../util';
 
+const defaultHeaders = {
+  Accept: 'application/json',
+  'Content-Type': 'application/json',
+};
+
 /**
  * Send metrics/spans using browser navigator.sendBeacon
  * @param body
@@ -87,11 +92,6 @@ export function sendWithXhr(
   ) => {
     xhr = new XMLHttpRequest();
     xhr.open('POST', url);
-
-    const defaultHeaders = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    };
 
     Object.entries({
       ...defaultHeaders,
@@ -160,4 +160,103 @@ export function sendWithXhr(
   };
 
   sendWithRetry();
+}
+
+/**
+ * function to send metrics/spans using browser fetch
+ *     used when navigator.sendBeacon and XMLHttpRequest are not available
+ * @param body
+ * @param url
+ * @param headers
+ * @param onSuccess
+ * @param onError
+ */
+export function sendWithFetch(
+  body: string,
+  url: string,
+  headers: Record<string, string>,
+  exporterTimeout: number,
+  onSuccess: () => void,
+  onError: (error: OTLPExporterError) => void
+): void {
+  const controller = new AbortController();
+  let cancelRetry: ((e: OTLPExporterError) => void) | undefined;
+  const exporterTimer = setTimeout(() => {
+    controller.abort();
+    cancelRetry?.(new OTLPExporterError('Request Timeout'));
+  }, exporterTimeout);
+
+  const fetchWithRetry = (
+    retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
+    minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
+  ) => {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        ...defaultHeaders,
+        ...headers,
+      },
+      signal: controller.signal,
+      body,
+    }).then(
+      response => {
+        if (response.status >= 200 && response.status <= 299) {
+          diag.debug('Request Success');
+          return;
+        } else if (
+          response.status &&
+          isExportRetryable(response.status) &&
+          retries > 0
+        ) {
+          let retryTime: number;
+          minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
+
+          // retry after interval specified in Retry-After header
+          if (response.headers.has('Retry-After')) {
+            retryTime = parseRetryAfterToMills(
+              response.headers.get('Retry-After')
+            );
+          } else {
+            // exponential backoff with jitter
+            retryTime = Math.round(
+              Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay
+            );
+          }
+
+          return new Promise((resolve, reject) => {
+            const retryTimer = setTimeout(() => {
+              cancelRetry = undefined;
+              fetchWithRetry(retries - 1, minDelay).then(resolve, reject);
+            }, retryTime);
+            cancelRetry = e => {
+              clearTimeout(retryTimer);
+              reject(e);
+            };
+          });
+        } else {
+          return Promise.reject(
+            new OTLPExporterError(
+              `Failed to export with fetch: (${response.status} ${response.statusText})`,
+              response.status
+            )
+          );
+        }
+      },
+      (e: Error) => {
+        if (e.name === 'AbortError') {
+          return Promise.reject(new OTLPExporterError('Request Timeout'));
+        } else {
+          return Promise.reject(
+            new OTLPExporterError(`Request Fail: ${e.name} ${e.message}`)
+          );
+        }
+      }
+    );
+  };
+  fetchWithRetry()
+    .then(
+      () => onSuccess(),
+      e => onError(e)
+    )
+    .finally(() => clearTimeout(exporterTimer));
 }
