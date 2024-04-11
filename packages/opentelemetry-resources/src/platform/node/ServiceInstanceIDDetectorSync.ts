@@ -33,5 +33,7 @@ class ServiceInstanceIDDetectorSync implements DetectorSync {
   }
 }
 
-export const serviceInstanceIDDetectorSync =
-  new ServiceInstanceIDDetectorSync();
+/**
+ * @experimental
+ */
+export const serviceInstanceIDDetector = new ServiceInstanceIDDetectorSync();
