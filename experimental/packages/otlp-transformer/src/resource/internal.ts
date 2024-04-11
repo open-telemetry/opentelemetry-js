@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { IResource as ISdkResource } from '@opentelemetry/resources';
+import { toAttributes } from '../common/internal';
+import { IResource } from './types';
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/LoggerOptions';
-export * from './types/AnyValue';
-export * from './NoopLogger';
-export * from './NoopLoggerProvider';
-
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+export function createResource(resource: ISdkResource): IResource {
+  return {
+    attributes: toAttributes(resource.attributes),
+    droppedAttributesCount: 0,
+  };
+}
