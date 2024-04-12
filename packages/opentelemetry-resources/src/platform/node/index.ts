@@ -21,4 +21,4 @@ export * from './HostDetectorSync';
 export * from './OSDetectorSync';
 export * from './ProcessDetector';
 export * from './ProcessDetectorSync';
-export * from './ServiceInstanceIdDetectorSync';
+export * from './ServiceInstanceIdDetectorSyncA';
