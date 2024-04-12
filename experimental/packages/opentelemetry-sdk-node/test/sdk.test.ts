@@ -59,7 +59,7 @@ import {
   processDetector,
   hostDetector,
   Resource,
-  serviceInstanceIDDetectorSync,
+  serviceInstanceIdDetectorSync,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs } from '@opentelemetry/api-logs';
@@ -704,7 +704,7 @@ describe('Node SDK', () => {
           processDetector,
           envDetector,
           hostDetector,
-          serviceInstanceIDDetectorSync,
+          serviceInstanceIdDetectorSync,
         ],
       });
 

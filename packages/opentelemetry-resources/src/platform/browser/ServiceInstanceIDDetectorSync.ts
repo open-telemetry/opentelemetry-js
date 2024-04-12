@@ -19,4 +19,4 @@ import { noopDetectorSync } from '../../detectors/NoopDetectorSync';
 /**
  * @experimental
  */
-export const serviceInstanceIDDetectorSync = noopDetectorSync;
+export const serviceInstanceIdDetectorSync = noopDetectorSync;

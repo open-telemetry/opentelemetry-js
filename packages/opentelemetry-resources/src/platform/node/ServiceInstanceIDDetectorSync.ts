@@ -21,9 +21,9 @@ import { ResourceDetectionConfig } from '../../config';
 import { randomUUID } from 'crypto';
 
 /**
- * ServiceInstanceIDDetectorSync detects the resources related to the service instance ID.
+ * ServiceInstanceIdDetectorSync detects the resources related to the service instance ID.
  */
-class ServiceInstanceIDDetectorSync implements DetectorSync {
+class ServiceInstanceIdDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): Resource {
     const attributes: ResourceAttributes = {
       [SEMRESATTRS_SERVICE_INSTANCE_ID]: randomUUID(),
@@ -36,5 +36,5 @@ class ServiceInstanceIDDetectorSync implements DetectorSync {
 /**
  * @experimental
  */
-export const serviceInstanceIDDetectorSync =
-  new ServiceInstanceIDDetectorSync();
+export const serviceInstanceIdDetectorSync =
+  new ServiceInstanceIdDetectorSync();
