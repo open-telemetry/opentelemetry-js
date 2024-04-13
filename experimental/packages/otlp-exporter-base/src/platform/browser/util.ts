@@ -192,10 +192,6 @@ async function compressContent(
   content: string | Blob,
   compressionAlgorithm: string
 ): Promise<Uint8Array> {
-  if (compressionAlgorithm === CompressionAlgorithm.NONE) {
-    return Promise.reject(new Error('Compression algorithm cannot be "none"'));
-  }
-
   const compressionStream = new CompressionStream(
     compressionAlgorithm as CompressionFormat
   );
