@@ -245,7 +245,7 @@ export abstract class InstrumentationBase
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
         return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition,
+          module,
           exports,
           name,
           baseDir
