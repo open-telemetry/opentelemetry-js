@@ -72,6 +72,21 @@ Fetch instrumentation plugin has few options available to choose from. You can s
 | [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L64) | `HttpCustomAttributeFunction` | Function for adding custom attributes                                                   |
 | [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L67)                      | `boolean`                     | Disable network events being added as span events (network events are added by default) |
 
+## Semantic Conventions
+
+This package uses `@opentelemetry/semantic-conventions` version `1.22+`, which implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md)
+
+Attributes collected:
+
+| Attribute                                   | Short Description                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| `HTTP_STATUS_CODE`                          | HTTP response status cod                                                       |
+| `HTTP_HOST`                                 | The value of the HTTP host header                                              |
+| `HTTP_USER_AGENT`                           | Value of the HTTP User-Agent header sent by the client                         |
+| `HTTP_SCHEME`                               | The URI scheme identifying the used protocol                                   |
+| `HTTP_URL`                                  | Full HTTP request URL                                                          |
+| `HTTP_METHOD`                               | HTTP request method                                                            |
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
