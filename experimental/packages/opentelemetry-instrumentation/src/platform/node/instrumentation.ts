@@ -253,7 +253,7 @@ export abstract class InstrumentationBase
       };
       const onRequire: OnRequireFn = (exports, name, baseDir) => {
         return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition,
+          module,
           exports,
           name,
           baseDir
