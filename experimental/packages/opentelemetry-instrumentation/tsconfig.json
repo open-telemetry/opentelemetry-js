@@ -18,9 +18,6 @@
     },
     {
       "path": "../api-logs"
-    },
-    {
-      "path": "../sdk-logs"
     }
   ]
 }
