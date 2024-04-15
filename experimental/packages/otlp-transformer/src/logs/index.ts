@@ -23,10 +23,15 @@ import {
 } from './types';
 import { IResource } from '@opentelemetry/resources';
 import { Encoder, getOtlpEncoder } from '../common';
-import { toAnyValue, toAttributes, toKeyValue } from '../common/internal';
+import {
+  createInstrumentationScope,
+  toAnyValue,
+  toKeyValue,
+} from '../common/internal';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { OtlpEncodingOptions, IKeyValue } from '../common/types';
 import { LogAttributes } from '@opentelemetry/api-logs';
+import { createResource } from '../resource/internal';
 
 export function createExportLogsServiceRequest(
   logRecords: ReadableLogRecord[],
@@ -75,18 +80,12 @@ function logRecordsToResourceLogs(
 ): IResourceLogs[] {
   const resourceMap = createResourceMap(logRecords);
   return Array.from(resourceMap, ([resource, ismMap]) => ({
-    resource: {
-      attributes: toAttributes(resource.attributes),
-      droppedAttributesCount: 0,
-    },
+    resource: createResource(resource),
     scopeLogs: Array.from(ismMap, ([, scopeLogs]) => {
-      const {
-        instrumentationScope: { name, version, schemaUrl },
-      } = scopeLogs[0];
       return {
-        scope: { name, version },
+        scope: createInstrumentationScope(scopeLogs[0].instrumentationScope),
         logRecords: scopeLogs.map(log => toLogRecord(log, encoder)),
-        schemaUrl,
+        schemaUrl: scopeLogs[0].instrumentationScope.schemaUrl,
       };
     }),
     schemaUrl: undefined,

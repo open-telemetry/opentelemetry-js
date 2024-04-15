@@ -56,17 +56,30 @@ export function hasKey<O extends object>(
  * @param span
  * @param performanceName name of performance entry for time start
  * @param entries
+ * @param refPerfName name of performance entry to use for reference
  */
 export function addSpanNetworkEvent(
   span: api.Span,
   performanceName: string,
-  entries: PerformanceEntries
+  entries: PerformanceEntries,
+  refPerfName?: string
 ): api.Span | undefined {
+  let perfTime = undefined;
+  let refTime = undefined;
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
   ) {
-    span.addEvent(performanceName, entries[performanceName]);
+    perfTime = entries[performanceName];
+  }
+  const refName = refPerfName || PTN.FETCH_START;
+  // Use a reference time which is the earliest possible value so that the performance timings that are earlier should not be added
+  // using FETCH START time in case no reference is provided
+  if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
+    refTime = entries[refName];
+  }
+  if (perfTime !== undefined && refTime !== undefined && perfTime >= refTime) {
+    span.addEvent(performanceName, perfTime);
     return span;
   }
   return undefined;

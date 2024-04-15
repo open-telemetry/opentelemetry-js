@@ -26,7 +26,7 @@ import type { IResource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import { LogAttributes } from '@opentelemetry/api-logs';
+import { LogAttributes, LogBody } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecord implements ReadableLogRecord {
@@ -38,7 +38,7 @@ export class LogRecord implements ReadableLogRecord {
   readonly attributes: logsAPI.LogAttributes = {};
   private _severityText?: string;
   private _severityNumber?: logsAPI.SeverityNumber;
-  private _body?: string;
+  private _body?: LogBody;
   private totalAttributesCount: number = 0;
 
   private _isReadonly: boolean = false;
@@ -64,13 +64,13 @@ export class LogRecord implements ReadableLogRecord {
     return this._severityNumber;
   }
 
-  set body(body: string | undefined) {
+  set body(body: LogBody | undefined) {
     if (this._isLogRecordReadonly()) {
       return;
     }
     this._body = body;
   }
-  get body(): string | undefined {
+  get body(): LogBody | undefined {
     return this._body;
   }
 
@@ -157,7 +157,7 @@ export class LogRecord implements ReadableLogRecord {
     return this;
   }
 
-  public setBody(body: string) {
+  public setBody(body: LogBody) {
     this.body = body;
     return this;
   }

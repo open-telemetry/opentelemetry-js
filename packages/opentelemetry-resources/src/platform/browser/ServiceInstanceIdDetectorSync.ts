@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/LoggerOptions';
-export * from './types/AnyValue';
-export * from './NoopLogger';
-export * from './NoopLoggerProvider';
+import { noopDetectorSync } from '../../detectors/NoopDetectorSync';
 
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+/**
+ * @experimental
+ */
+export const serviceInstanceIdDetectorSync = noopDetectorSync;

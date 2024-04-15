@@ -182,6 +182,7 @@ export class DefaultAggregation extends Aggregation {
       case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER: {
         return SUM_AGGREGATION;
       }
+      case InstrumentType.GAUGE:
       case InstrumentType.OBSERVABLE_GAUGE: {
         return LAST_VALUE_AGGREGATION;
       }

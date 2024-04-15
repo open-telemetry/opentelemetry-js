@@ -36,6 +36,7 @@ import {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';
+import { Gauge } from './types';
 
 export class SyncInstrument {
   constructor(
@@ -106,6 +107,18 @@ export class CounterInstrument extends SyncInstrument implements Counter {
       return;
     }
 
+    this._record(value, attributes, ctx);
+  }
+}
+
+/**
+ * The class implements {@link Gauge} interface.
+ */
+export class GaugeInstrument extends SyncInstrument implements Gauge {
+  /**
+   * Records a measurement.
+   */
+  record(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     this._record(value, attributes, ctx);
   }
 }
