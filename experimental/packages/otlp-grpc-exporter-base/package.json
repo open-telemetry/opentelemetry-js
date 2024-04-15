@@ -58,7 +58,6 @@
     "lerna": "6.6.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
-    "protobufjs-cli": "1.1.2",
     "sinon": "15.1.2",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
@@ -70,8 +69,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
     "@opentelemetry/core": "1.23.0",
-    "@opentelemetry/otlp-exporter-base": "0.50.0",
-    "protobufjs": "^7.2.3"
+    "@opentelemetry/otlp-exporter-base": "0.50.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base",
   "sideEffects": false
