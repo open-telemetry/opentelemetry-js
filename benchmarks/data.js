@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713179808131,
+  "lastUpdate": 1713180988783,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6984,6 +6984,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "87e25c5e015f86d0a26a596e20ed1195f8f5fec3",
+          "message": "fix: ensure api is not dropped from workspaces in package-lock.json (#4623)",
+          "timestamp": "2024-04-15T13:34:34+02:00",
+          "tree_id": "fa48e1efb76e3901a9dbfcd6297af4bcc15d734b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/87e25c5e015f86d0a26a596e20ed1195f8f5fec3"
+        },
+        "date": 1713180987943,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 934993,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11534,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 662849,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 659685,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
