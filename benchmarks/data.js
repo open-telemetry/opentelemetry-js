@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713170066791,
+  "lastUpdate": 1713179695316,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6878,6 +6878,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 663513,
             "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "tim@timfish.uk",
+            "name": "Tim Fish",
+            "username": "timfish"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "da02c8d6b150998318498e3532d42b2619221f4f",
+          "message": "fix: Don't use `require` to load `package.json` files (#4593)\n\n* fix: Don't use require to load package.json files\r\n\r\n* update changelog\r\n\r\n* Move changelog entry\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-15T13:12:55+02:00",
+          "tree_id": "9a82ad370a1e3deb87626b4d83ee5b5cfdaa0749",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/da02c8d6b150998318498e3532d42b2619221f4f"
+        },
+        "date": 1713179694510,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 955404,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11890,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 634792,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 641995,
+            "range": "±0.36%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
