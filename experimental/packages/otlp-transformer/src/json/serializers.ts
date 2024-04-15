@@ -48,7 +48,6 @@ export const JsonMetricsSerializer: ISerializer<
 > = {
   serializeRequest: (arg: ResourceMetrics[]) => {
     const request = createExportMetricsServiceRequest(arg, {
-      useHex: true,
       useLongBits: false,
     });
     const encoder = new TextEncoder();
