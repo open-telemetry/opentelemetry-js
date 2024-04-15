@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1712843421797,
+  "lastUpdate": 1713169818890,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -6776,6 +6776,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.16%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marylia.gutierrez@grafana.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "583cc7c23d4a95eccdd1bdedc5ed5ab018f6b7e4",
+          "message": "feat(resources): implements `service.instance.id` (#4608)\n\n* feat(node-sdk): implements `service.instance.id`\r\n\r\nImplements `service.instance.id`\r\n\r\nSigned-off-by: maryliag <marylia.gutierrez@grafana.com>\r\n\r\n* implement service instance id by default with env var\r\n\r\nuse an experimental environment variable to set the default value of `service.instance.id` as default\r\n\r\n* Update CHANGELOG.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* create separate add experimental for browser and node\r\n\r\ncreate a function to add experimental default values (currently only service instance id, but others can be added in the future),\r\nwith the value being set on the node case, but not on the browser case.\r\n\r\nSigned-off-by: maryliag <marylia.gutierrez@grafana.com>\r\n\r\n* use resource detector for service instance id\r\n\r\nuse a resource detector for service instance id\r\n\r\n* remove references to env variables\r\n\r\n* remove Detector and use DetectorSync\r\n\r\nremove the Detector and use the DetectorSync instead. Also mark things as experimental.\r\n\r\nSigned-off-by: maryliag <marylia.gutierrez@grafana.com>\r\n\r\n* Update packages/opentelemetry-resources/src/platform/node/ServiceInstanceIDDetectorSync.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* rename ServiceInstanceIDDetector to ServiceInstanceIDDetectorSync\r\n\r\n* change ID to Id\r\n\r\n* renaming something temp so git will pick up the name change\r\n\r\nit was not picking up the case change on previous commit\r\n\r\n* update to final name using Id\r\n\r\n---------\r\n\r\nSigned-off-by: maryliag <marylia.gutierrez@grafana.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-15T10:28:48+02:00",
+          "tree_id": "c79c7e6b0ff2bdbe4c4a4d6feddd5136b4ccf420",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/583cc7c23d4a95eccdd1bdedc5ed5ab018f6b7e4"
+        },
+        "date": 1713169818065,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 931353,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11631,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 652823,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 647672,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
