@@ -29,6 +29,7 @@ const instrumentTypes = [
   InstrumentType.UP_DOWN_COUNTER,
   InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
   InstrumentType.HISTOGRAM,
+  InstrumentType.GAUGE,
   InstrumentType.OBSERVABLE_GAUGE,
 ];
 
