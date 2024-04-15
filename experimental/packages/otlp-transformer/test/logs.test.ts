@@ -147,9 +147,21 @@ describe('Logs', () => {
   let resource_2: Resource;
   let scope_1: InstrumentationScope;
   let scope_2: InstrumentationScope;
+
+  /*
+  The following log_X_Y_Z should follow the pattern
+    - X is the resource
+    - Y is the scope
+    - Z is the log fragment
+   */
+
+  // using `resource_1`, `scope_1`, `log_fragment_1`
   let log_1_1_1: ReadableLogRecord;
+  // using `resource_1`, `scope_1`, `log_fragment_2`
   let log_1_1_2: ReadableLogRecord;
+  // using `resource_1`, `scope_2`, `log_fragment_1`
   let log_1_2_1: ReadableLogRecord;
+  // using `resource_2`, `scope_1`, `log_fragment_1`
   let log_2_1_1: ReadableLogRecord;
 
   beforeEach(() => {
