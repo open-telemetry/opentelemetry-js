@@ -115,8 +115,24 @@ Configure a resource. Resources may also be detected by using the `autoDetectRes
 
 ### resourceDetectors
 
-Configure resource detectors. By default, the resource detectors are [envDetector, processDetector].
+Configure resource detectors. By default, the resource detectors are [envDetector, processDetector, hostDetector].
 NOTE: In order to enable the detection, the parameter `autoDetectResources` has to be `true`.
+
+You can also use the environment variable `OTEL_NODE_RESOURCE_DETECTORS` to enable only certain detectors, or completely disable them:
+
+- `env`
+- `host`
+- `os`
+- `process`
+- `serviceinstance`
+- `all` - enable all resource detectors above
+- `none` - disable resource detection
+
+For example, to enable only the `env`, `host` detectors:
+
+```shell
+export OTEL_NODE_RESOURCE_DETECTORS="env,host"
+```
 
 ### sampler
 
