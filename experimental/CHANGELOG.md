@@ -15,7 +15,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* refactor(instr-grpc): move to use SEMATTRS [#4633](https://github.com/open-telemetry/opentelemetry-js/pull/4633)
+* refactor(instrumentation-grpc): move to use SEMATTRS [#4633](https://github.com/open-telemetry/opentelemetry-js/pull/4633)
 
 * feat(otlp-transformer): consolidate scope/resource creation in transformer [#4600](https://github.com/open-telemetry/opentelemetry-js/pull/4600)
 
