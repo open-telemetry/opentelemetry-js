@@ -31,7 +31,7 @@ class MyContextPropagator extends TextMapPropagator {
       return;
 
     if (typeof carrier.body === 'string' && carrier.hasOwnProperty('body')) {
-      if (args[0].includes(TRACEPARENT_PLACEHOLDER)) {
+      if (carrier.body.includes(TRACEPARENT_PLACEHOLDER)) {
         const traceParent = this.buildTraceparent(spanContext);
         carrier.body = carrier.body.replaceAll(TRACEPARENT_PLACEHOLDER, traceParent);
       }
