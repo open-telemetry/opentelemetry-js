@@ -11,16 +11,31 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes
+* feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
+* feat(propagator-aws-xray): moved AWS Xray propagator from contrib [4603](https://github.com/open-telemetry/opentelemetry-js/pull/4603) @martinkuba
+* feat(resources): new experimental detector ServiceInstanceIdDetectorSync that sets the value for `service.instance.id` as random UUID.
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-metrics): increase the depth of the output to the console such that objects in the metric are printed fully to the console [#4522](https://github.com/open-telemetry/opentelemetry-js/pull/4522) @JacksonWeber
+* fix(sdk-trace-web): fix invalid timings in span events [#4486](https://github.com/open-telemetry/opentelemetry-js/pull/4486) @Abinet18
+* fix(resources): ensure BrowserDetector does not think Node.js v21 is a browser [#4561](https://github.com/open-telemetry/opentelemetry-js/issues/4561) @trentm
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.23.0
+
+### :rocket: (Enhancement)
+
+* perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
+* feat(sdk-metrics): added experimental synchronous gauge to SDK [#4565](https://github.com/open-telemetry/opentelemetry-js/pull/4565) @clintonb
+  * this change will become user-facing in an upcoming release
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): increase the depth of the output to the console such that objects in the metric are printed fully to the console [#4522](https://github.com/open-telemetry/opentelemetry-js/pull/4522) @JacksonWeber
 
 ## 1.22.0
 

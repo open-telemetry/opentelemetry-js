@@ -231,9 +231,9 @@ const testCollectorExporter = (params: TestParams) => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          assert.strictEqual(
+          assert.match(
             responseSpy.args[0][0].error.details,
-            'Deadline exceeded'
+            /Deadline exceeded.*/
           );
           done();
         }, 300);
