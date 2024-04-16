@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713268220080,
+  "lastUpdate": 1713283410616,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7192,6 +7192,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.55%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "neumanns@cisco.com",
+            "name": "Severin Neumann",
+            "username": "svrnm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "26101229aeb1eb8323e8afadd72c3bb1d50865c9",
+          "message": "fix: revert modifications to Apache license (#4640)\n\nSigned-off-by: svrnm <neumanns@cisco.com>",
+          "timestamp": "2024-04-16T18:01:36+02:00",
+          "tree_id": "ad4e0792e64169774e526bfafa5855a739962487",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/26101229aeb1eb8323e8afadd72c3bb1d50865c9"
+        },
+        "date": 1713283409654,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 990334,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11687,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 683806,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648527,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
