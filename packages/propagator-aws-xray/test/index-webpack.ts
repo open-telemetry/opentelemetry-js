@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-export * from './default-service-name';
-export * from './HostDetector';
-export * from './OSDetector';
-export * from './HostDetectorSync';
-export * from './OSDetectorSync';
-export * from './ProcessDetector';
-export * from './ProcessDetectorSync';
-export * from './ServiceInstanceIdDetectorSync';
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
