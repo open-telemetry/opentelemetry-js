@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713180988783,
+  "lastUpdate": 1713257721054,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7036,6 +7036,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7f82b80f3c377de622b1543e8c13a5a853d52c5d",
+          "message": "Move xray propagator from contrib (no history) (#4603)\n\n* moved aws xray propagator from contrib\r\n\r\n* updated package lock file\r\n\r\n* updated dev dependencies\r\n\r\n* added a note about the original location in README\r\n\r\n* updated changelog\r\n\r\n* fix: limit package-lock.json changes\r\n\r\n* removed status section from readme\r\n\r\n* chore: align versions with current release\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-16T10:53:51+02:00",
+          "tree_id": "b163b899b953f91e80bfcac50f3acbfc918059b8",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7f82b80f3c377de622b1543e8c13a5a853d52c5d"
+        },
+        "date": 1713257720146,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 986829,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11924,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 654733,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648373,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
