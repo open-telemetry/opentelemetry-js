@@ -15,9 +15,10 @@
  */
 import { context } from '@opentelemetry/api';
 import { Event } from '@opentelemetry/api-events';
+import * as api from '@opentelemetry/api-events';
 import { Logger, LogRecord } from '@opentelemetry/api-logs';
 
-export class EventLogger {
+export class EventLogger implements api.EventLogger {
   private _logger: Logger;
 
   constructor(logger: Logger) {
