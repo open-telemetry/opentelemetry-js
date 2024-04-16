@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713257721054,
+  "lastUpdate": 1713259994211,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7088,6 +7088,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "55876749+mmouru@users.noreply.github.com",
+            "name": "mmouru",
+            "username": "mmouru"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0a750eb90bcb70abd3003fd3bcf1eb7681a41be0",
+          "message": "refactor(instr-grpc): move to use SEMATTRS (#4633)\n\n* refactor(instr-grpc): move to use SEMATTRS\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-16T11:31:15+02:00",
+          "tree_id": "75cfbd7c4e2c6e0664fd8bb552fdf317c5020f09",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0a750eb90bcb70abd3003fd3bcf1eb7681a41be0"
+        },
+        "date": 1713259993350,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 991770,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11780,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 677708,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 643992,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
