@@ -68,6 +68,7 @@ export class ConsoleSpanExporter implements SpanExporter {
       traceId: span.spanContext().traceId,
       parentId: span.parentSpanId,
       traceState: span.spanContext().traceState?.serialize(),
+      flags: span.spanContext().traceFlags,
       name: span.name,
       id: span.spanContext().spanId,
       kind: span.kind,
@@ -76,7 +77,13 @@ export class ConsoleSpanExporter implements SpanExporter {
       attributes: span.attributes,
       status: span.status,
       events: span.events,
-      links: span.links,
+      links: span.links.map(({ context, attributes }) => ({
+        traceId: context.traceId,
+        spanId: context.spanId,
+        traceState: context.traceState,
+        flags: context.traceFlags,
+        attributes: attributes,
+      })),
     };
   }
 

@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(api): add bit masks for `HAS_IS_REMOTE` and `IS_REMOTE` flags to be used in span and span link flags.
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)

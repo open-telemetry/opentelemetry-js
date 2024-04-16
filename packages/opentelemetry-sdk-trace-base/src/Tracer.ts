@@ -120,9 +120,13 @@ export class Tracer implements api.Tracer {
     traceState = samplingResult.traceState ?? traceState;
 
     const traceFlags =
-      samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
+      (samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
         ? api.TraceFlags.SAMPLED
-        : api.TraceFlags.NONE;
+        : api.TraceFlags.NONE) |
+      (parentSpanContext?.isRemote
+        ? api.TraceFlags.HAS_IS_REMOTE | api.TraceFlags.IS_REMOTE
+        : api.TraceFlags.HAS_IS_REMOTE);
+
     const spanContext = { traceId, spanId, traceFlags, traceState };
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       api.diag.debug(
