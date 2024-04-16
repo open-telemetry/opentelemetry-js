@@ -125,7 +125,7 @@ export class NodeSDK {
 
     this._resource = configuration.resource ?? new Resource({});
     let defaultDetectors: (Detector | DetectorSync)[] = [];
-    if (env.OTEL_NODE_RESOURCE_DETECTORS.length > 0) {
+    if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
       defaultDetectors = getResourceDetectorsFromEnv();
     } else {
       defaultDetectors = [envDetector, processDetector, hostDetector];
@@ -164,6 +164,7 @@ export class NodeSDK {
 
       const spanProcessor =
         configuration.spanProcessor ??
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         new BatchSpanProcessor(configuration.traceExporter!);
 
       const spanProcessors = configuration.spanProcessors ?? [spanProcessor];

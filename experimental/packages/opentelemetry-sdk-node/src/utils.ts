@@ -58,6 +58,7 @@ const RESOURCE_DETECTOR_PROCESS = 'process';
 const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
 
 export function getResourceDetectorsFromEnv(): Array<DetectorSync> {
+  // When updating this list, make sure to also update the section `resourceDetectors` on README.
   const resourceDetectors = new Map<string, DetectorSync>([
     [RESOURCE_DETECTOR_ENVIRONMENT, envDetectorSync],
     [RESOURCE_DETECTOR_HOST, hostDetectorSync],
