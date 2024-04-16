@@ -1,4 +1,4 @@
-const { context, trace } = require('@opentelemetry/api');
+const { context, trace, TraceFlags, TextMapPropagator } = require('@opentelemetry/api');
 const { ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace-base');
 const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
 const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentation-xml-http-request');
@@ -6,6 +6,57 @@ const { ZoneContextManager } = require( '@opentelemetry/context-zone');
 const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
 const { B3Propagator } = require( '@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
+
+
+const TRACEPARENT_PLACEHOLDER = '__TRACEPARENT__';
+class MyContextPropagator extends TextMapPropagator {
+
+  constructor() {
+    super();
+    this._w3cPropagator = new W3CTraceContextPropagator();
+  }
+
+  buildTraceparent (spanContext) {
+    const VERSION = '00';
+
+    const traceParent = `${VERSION}-${spanContext.traceId}-${
+      spanContext.spanId
+    }-0${Number(spanContext.traceFlags || TraceFlags.NONE).toString(16)}`;
+    return traceParent;
+  }
+
+  inject(context, carrier, setter) {
+    const spanContext = trace.getSpanContext(context);
+    if (!spanContext)
+      return;
+
+    if (typeof carrier.body === 'string' && carrier.hasOwnProperty('body')) {
+      if (args[0].includes(TRACEPARENT_PLACEHOLDER)) {
+        const traceParent = this.buildTraceparent(spanContext);
+        carrier.body = carrier.body.replaceAll(TRACEPARENT_PLACEHOLDER, traceParent);
+      }
+    } else {
+      // use the default W3CTraceContextPropagator
+      this._w3cPropagator.inject(context, carrier, setter);
+    }
+  }
+
+  extract(context, carrier, getter) {
+    // Implement the extract function if needed
+  }
+
+  fields() {
+    // Define the fields that this propagator supports
+    return [];
+  }
+
+  toString() {
+    // Provide a string representation of this propagator
+    return 'SFPropagator';
+  }
+}
+
+
 
 const providerWithZone = new WebTracerProvider();
 
@@ -17,7 +68,7 @@ providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter(
 
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
-  propagator: new B3Propagator(),
+  propagator: new MyContextPropagator(),
 });
 
 registerInstrumentations({

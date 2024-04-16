@@ -504,8 +504,16 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
                   xhrMem.createdResources.observer.disconnect();
                 }
               };
-              plugin._addHeaders(this, spanUrl);
+              let addContextToHeaders = false;
+              if (addContextToHeaders) {
+                plugin._addHeaders(this, spanUrl);
+              } else {
+                let bodyWrapper = {body: args[0]};
+                api.propagation.inject(api.context.active(), bodyWrapper);
+                args[0] = bodyWrapper.body;
+              }
               plugin._addResourceObserver(this, spanUrl);
+
             }
           );
         }
