@@ -183,6 +183,13 @@ export abstract class InstrumentationBase<T = any>
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
         if (this._enabled) {
+          this._diag.debug(
+            'Applying instrumentation patch for nodejs core module on require hook',
+            {
+              module: module.name,
+              version: module.moduleVersion,
+            }
+          );
           return module.patch(exports);
         }
       }
@@ -199,6 +206,14 @@ export abstract class InstrumentationBase<T = any>
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
+            this._diag.debug(
+              'Applying instrumentation patch for module on require hook',
+              {
+                module: module.name,
+                version: module.moduleVersion,
+                baseDir,
+              }
+            );
             return module.patch(exports, module.moduleVersion);
           }
         }
@@ -216,6 +231,15 @@ export abstract class InstrumentationBase<T = any>
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
       if (this._enabled) {
+        this._diag.debug(
+          'Applying instrumentation patch for nodejs module file on require hook',
+          {
+            module: module.name,
+            version: module.moduleVersion,
+            fileName: file.name,
+            baseDir,
+          }
+        );
         return file.patch(patchedExports, module.moduleVersion);
       }
       return patchedExports;
@@ -232,10 +256,25 @@ export abstract class InstrumentationBase<T = any>
     if (this._hooks.length > 0) {
       for (const module of this._modules) {
         if (typeof module.patch === 'function' && module.moduleExports) {
+          this._diag.debug(
+            'Applying instrumentation patch for nodejs module on instrumentation enabled',
+            {
+              module: module.name,
+              version: module.moduleVersion,
+            }
+          );
           module.patch(module.moduleExports, module.moduleVersion);
         }
         for (const file of module.files) {
           if (file.moduleExports) {
+            this._diag.debug(
+              'Applying instrumentation patch for nodejs module file on instrumentation enabled',
+              {
+                module: module.name,
+                version: module.moduleVersion,
+                fileName: file.name,
+              }
+            );
             file.patch(file.moduleExports, module.moduleVersion);
           }
         }
@@ -288,10 +327,25 @@ export abstract class InstrumentationBase<T = any>
 
     for (const module of this._modules) {
       if (typeof module.unpatch === 'function' && module.moduleExports) {
+        this._diag.debug(
+          'Removing instrumentation patch for nodejs module on instrumentation disabled',
+          {
+            module: module.name,
+            version: module.moduleVersion,
+          }
+        );
         module.unpatch(module.moduleExports, module.moduleVersion);
       }
       for (const file of module.files) {
         if (file.moduleExports) {
+          this._diag.debug(
+            'Removing instrumentation patch for nodejs module file on instrumentation disabled',
+            {
+              module: module.name,
+              version: module.moduleVersion,
+              fileName: file.name,
+            }
+          );
           file.unpatch(file.moduleExports, module.moduleVersion);
         }
       }
