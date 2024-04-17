@@ -187,7 +187,6 @@ export abstract class InstrumentationBase<T = any>
             'Applying instrumentation patch for nodejs core module on require hook',
             {
               module: module.name,
-              version: module.moduleVersion,
             }
           );
           return module.patch(exports);
