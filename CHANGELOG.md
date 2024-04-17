@@ -14,11 +14,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
 * feat(propagator-aws-xray): moved AWS Xray propagator from contrib [4603](https://github.com/open-telemetry/opentelemetry-js/pull/4603) @martinkuba
 * feat(resources): new experimental detector ServiceInstanceIdDetectorSync that sets the value for `service.instance.id` as random UUID. [#4608](https://github.com/open-telemetry/opentelemetry-js/pull/4608) @maryliag
-* feat(resources): add usage for the detector ServiceInstanceIdDetectorSync. [#4626](https://github.com/open-telemetry/opentelemetry-js/pull/4626) @maryliag
-  * The resource detector can be added to default resource detector list by adding the value `serviceinstance` to the list of resource detectors on the environment variable `OTEL_NODE_RESOURCE_DETECTORS`, e.g `OTEL_NODE_RESOURCE_DETECTORS=env,host,os,serviceinstance`
-  * The value can be overwritten by
-    * merging a resource containing the `service.instance.id` attribute
-    * using another resource detector which writes `service.instance.id`
 
 ### :bug: (Bug Fix)
 
