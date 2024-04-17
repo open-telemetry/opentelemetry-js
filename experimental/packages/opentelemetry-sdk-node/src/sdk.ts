@@ -51,7 +51,10 @@ import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { parseInstrumentationOptions } from './utils';
+import {
+  getResourceDetectorsFromEnv,
+  parseInstrumentationOptions,
+} from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -121,11 +124,15 @@ export class NodeSDK {
     this._configuration = configuration;
 
     this._resource = configuration.resource ?? new Resource({});
-    this._resourceDetectors = configuration.resourceDetectors ?? [
-      envDetector,
-      processDetector,
-      hostDetector,
-    ];
+    let defaultDetectors: (Detector | DetectorSync)[] = [];
+    if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
+      defaultDetectors = getResourceDetectorsFromEnv();
+    } else {
+      defaultDetectors = [envDetector, processDetector, hostDetector];
+    }
+
+    this._resourceDetectors =
+      configuration.resourceDetectors ?? defaultDetectors;
 
     this._serviceName = configuration.serviceName;
 
@@ -157,6 +164,7 @@ export class NodeSDK {
 
       const spanProcessor =
         configuration.spanProcessor ??
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         new BatchSpanProcessor(configuration.traceExporter!);
 
       const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
