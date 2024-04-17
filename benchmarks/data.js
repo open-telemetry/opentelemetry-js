@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713345449164,
+  "lastUpdate": 1713361912121,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7293,6 +7293,58 @@ window.BENCHMARK_DATA = {
           {
             "name": "BatchSpanProcessor process span",
             "value": 638131,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marylia.gutierrez@grafana.com",
+            "name": "Marylia Gutierrez",
+            "username": "maryliag"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "73fddf9b5e7a93bd4cf21c2dbf444cee31d26c88",
+          "message": "feat(sdk-node): add serviceInstanceIdDetector to NodeSDK (#4626)\n\n* feat(sdk-node): add serviceInstanceIDDetector to NodeSDK\r\n\r\nFollow up from #4608\r\n\r\nAdds the resource detector ServiceInstanceIDDetector on the NodeSDK constructor.\r\nIt only gets added by default on any of those conditions:\r\n- the value `serviceinstance` is part of the list `OTEL_NODE_RESOURCE_DETECTORS`\r\n- `OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID` is set to `true`\r\n\r\n* remove OTEL_NODE_EXPERIMENTAL_DEFAULT_SERVICE_INSTANCE_ID\r\n\r\nSigned-off-by: maryliag <marylia.gutierrez@grafana.com>\r\n\r\n* update readme on how to use `OTEL_NODE_RESOURCE_DETECTORS`\r\n\r\n* feedback from review\r\n\r\n* Update experimental/packages/opentelemetry-sdk-node/README.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* feedback from review\r\n\r\n---------\r\n\r\nSigned-off-by: maryliag <marylia.gutierrez@grafana.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-17T15:50:13+02:00",
+          "tree_id": "c9f9293702579ebac6d0721f605e94bf574fcdcf",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/73fddf9b5e7a93bd4cf21c2dbf444cee31d26c88"
+        },
+        "date": 1713361911288,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 908999,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11487,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 645942,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 645147,
             "range": "±0.24%",
             "unit": "ops/sec",
             "extra": "100 samples"
