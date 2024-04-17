@@ -109,30 +109,50 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return new InstrumentationNodeModuleDefinition(
       'http',
       ['*'],
-      (moduleExports: Http): Http => {
-        this._wrap(
-          moduleExports,
-          'request',
-          this._getPatchOutgoingRequestFunction('http')
-        );
-        this._wrap(
-          moduleExports,
-          'get',
-          this._getPatchOutgoingGetFunction(moduleExports.request)
-        );
-        this._wrap(
-          moduleExports.Server.prototype,
-          'emit',
-          this._getPatchIncomingRequestFunction('http')
-        );
+      moduleExports => {
+        this._diag.debug(`Applying patch for http@${version}`);
+        if (this._getConfig().instrumentOutgoingRequests !== false) {
+          if (isWrapped(moduleExports.request)) {
+            this._unwrap(moduleExports, 'request');
+          }
+
+          this._wrap(
+            moduleExports,
+            'request',
+            this._getPatchOutgoingRequestFunction('http')
+          );
+
+          if (isWrapped(moduleExports.get)) {
+            this._unwrap(moduleExports, 'get');
+          }
+          this._wrap(
+            moduleExports,
+            'get',
+            this._getPatchOutgoingGetFunction(moduleExports.request)
+          );
+          if (isWrapped(moduleExports.Server.prototype.emit)) {
+            this._unwrap(moduleExports.Server.prototype, 'emit');
+          }
+        }
+        if (this._getConfig().instrumentIncomingRequests !== false) {
+          this._wrap(
+            moduleExports.Server.prototype,
+            'emit',
+            this._getPatchIncomingRequestFunction('http')
+          );
+        }
         return moduleExports;
       },
       (moduleExports: Http) => {
         if (moduleExports === undefined) return;
 
-        this._unwrap(moduleExports, 'request');
-        this._unwrap(moduleExports, 'get');
-        this._unwrap(moduleExports.Server.prototype, 'emit');
+        if (this._getConfig().instrumentOutgoingRequests !== false) {
+          this._unwrap(moduleExports, 'request');
+          this._unwrap(moduleExports, 'get');
+        }
+        if (this._getConfig().instrumentIncomingRequests !== false) {
+          this._unwrap(moduleExports.Server.prototype, 'emit');
+        }
       }
     );
   }
@@ -141,30 +161,48 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return new InstrumentationNodeModuleDefinition(
       'https',
       ['*'],
-      (moduleExports: Https): Https => {
-        this._wrap(
-          moduleExports,
-          'request',
-          this._getPatchHttpsOutgoingRequestFunction('https')
-        );
-        this._wrap(
-          moduleExports,
-          'get',
-          this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
-        );
-        this._wrap(
-          moduleExports.Server.prototype,
-          'emit',
-          this._getPatchIncomingRequestFunction('https')
-        );
+      moduleExports => {
+        this._diag.debug(`Applying patch for https@${version}`);
+        if (this._getConfig().instrumentOutgoingRequests !== false) {
+          if (isWrapped(moduleExports.request)) {
+            this._unwrap(moduleExports, 'request');
+          }
+          this._wrap(
+            moduleExports,
+            'request',
+            this._getPatchHttpsOutgoingRequestFunction('https')
+          );
+          if (isWrapped(moduleExports.get)) {
+            this._unwrap(moduleExports, 'get');
+          }
+          this._wrap(
+            moduleExports,
+            'get',
+            this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
+          );
+        }
+        if (this._getConfig().instrumentIncomingRequests !== false) {
+          if (isWrapped(moduleExports.Server.prototype.emit)) {
+            this._unwrap(moduleExports.Server.prototype, 'emit');
+          }
+          this._wrap(
+            moduleExports.Server.prototype,
+            'emit',
+            this._getPatchIncomingRequestFunction('https')
+          );
+        }
         return moduleExports;
       },
       (moduleExports: Https) => {
         if (moduleExports === undefined) return;
 
-        this._unwrap(moduleExports, 'request');
-        this._unwrap(moduleExports, 'get');
-        this._unwrap(moduleExports.Server.prototype, 'emit');
+        if (this._getConfig().instrumentOutgoingRequests !== false) {
+          this._unwrap(moduleExports, 'request');
+          this._unwrap(moduleExports, 'get');
+        }
+        if (this._getConfig().instrumentIncomingRequests !== false) {
+          this._unwrap(moduleExports.Server.prototype, 'emit');
+        }
       }
     );
   }
