@@ -104,6 +104,7 @@ export interface InstrumentationModuleDefinition {
   /** Module name or path  */
   name: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   moduleExports?: any;
 
   /** Instrumented module version */
@@ -120,8 +121,10 @@ export interface InstrumentationModuleDefinition {
   includePrerelease?: boolean;
 
   /** Method to patch the instrumentation  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   patch?: (moduleExports: any, moduleVersion?: string) => any;
 
   /** Method to unpatch the instrumentation  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   unpatch?: (moduleExports: any, moduleVersion?: string) => void;
 }
