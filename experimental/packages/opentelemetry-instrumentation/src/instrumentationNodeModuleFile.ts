@@ -24,7 +24,9 @@ export class InstrumentationNodeModuleFile
   constructor(
     name: string,
     public supportedVersions: string[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public patch: (moduleExports: any, moduleVersion?: string) => any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public unpatch: (moduleExports?: any, moduleVersion?: string) => void
   ) {
     this.name = normalize(name);
