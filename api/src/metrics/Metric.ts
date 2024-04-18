@@ -98,15 +98,6 @@ export interface UpDownCounter<
   add(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
 
-export interface Gauge<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
-> {
-  /**
-   * Records a measurement.
-   */
-  record(value: number, attributes?: AttributesTypes, context?: Context): void;
-}
-
 export interface Histogram<
   AttributesTypes extends MetricAttributes = MetricAttributes,
 > {

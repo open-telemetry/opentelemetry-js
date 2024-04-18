@@ -17,7 +17,6 @@
 import {
   BatchObservableCallback,
   Counter,
-  Gauge,
   Histogram,
   MetricAttributes,
   MetricOptions,
@@ -46,16 +45,6 @@ export interface MeterOptions {
  * for the exported metric are deferred.
  */
 export interface Meter {
-  /**
-   * Creates and returns a new `Gauge`.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   */
-  createGauge<AttributesTypes extends MetricAttributes = MetricAttributes>(
-    name: string,
-    options?: MetricOptions
-  ): Gauge<AttributesTypes>;
-
   /**
    * Creates and returns a new `Histogram`.
    * @param name the name of the metric.

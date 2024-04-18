@@ -40,6 +40,7 @@ import {
   defaultResource,
 } from './util';
 import { ObservableResult, ValueType } from '@opentelemetry/api';
+import { wrapMeter } from '@opentelemetry/api/experimental';
 
 describe('Instruments', () => {
   describe('Counter', () => {
@@ -768,7 +769,7 @@ describe('Instruments', () => {
   describe('Gauge', () => {
     it('should record common values and attributes without exceptions', async () => {
       const { meter } = setup();
-      const gauge = meter.createGauge('test');
+      const gauge = wrapMeter(meter).createGauge('test');
 
       for (const values of commonValues) {
         for (const attributes of commonAttributes) {
@@ -779,7 +780,7 @@ describe('Instruments', () => {
 
     it('should record values', async () => {
       const { meter, cumulativeReader } = setup();
-      const gauge = meter.createGauge('test');
+      const gauge = wrapMeter(meter).createGauge('test');
 
       gauge.record(1, { foo: 'bar' });
       gauge.record(-1);

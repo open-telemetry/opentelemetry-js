@@ -26,6 +26,16 @@
       "default": "./build/src/experimental/index.js"
     }
   },
+  "typesVersions": {
+    "<4.9": {
+      "*": [
+        "./build/src/index.d.ts"
+      ],
+      "experimental": [
+        "./build/src/experimental/index.d.ts"
+      ]
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",

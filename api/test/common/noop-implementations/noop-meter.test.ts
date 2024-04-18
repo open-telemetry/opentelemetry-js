@@ -24,9 +24,10 @@ import {
   NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC,
   NOOP_UP_DOWN_COUNTER_METRIC,
   createNoopMeter,
-  NOOP_GAUGE_METRIC,
 } from '../../../src/metrics/NoopMeter';
 import { NoopMeterProvider } from '../../../src/metrics/NoopMeterProvider';
+import { wrapMeter } from '../../../src/experimental';
+import { NOOP_GAUGE_METRIC } from '../../../src/experimental/metrics/Gauge';
 
 const attributes = {};
 const options = {
@@ -119,12 +120,12 @@ describe('NoopMeter', () => {
 
   it('gauge should not crash', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
-    const observableGauge = meter.createGauge('some-name');
+    const observableGauge = wrapMeter(meter).createGauge('some-name');
 
     // ensure the correct noop const is returned
     assert.strictEqual(observableGauge, NOOP_GAUGE_METRIC);
 
-    const gaugeWithOptions = meter.createGauge('some-name', options);
+    const gaugeWithOptions = wrapMeter(meter).createGauge('some-name', options);
     assert.strictEqual(gaugeWithOptions, NOOP_GAUGE_METRIC);
   });
 

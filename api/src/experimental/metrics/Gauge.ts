@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-// Trace
-export { wrapTracer, SugaredTracer } from './trace/SugaredTracer';
-export { SugaredSpanOptions } from './trace/SugaredOptions';
+import { Gauge } from './ExperimentalMeter';
+import { MetricAttributes } from '../../metrics/Metric';
+import { NoopMetric } from '../../metrics/NoopMeter';
 
-// Metrics
-export {
-  wrapMeter,
-  Gauge,
-  IExperimentalMeter,
-} from './metrics/ExperimentalMeter';
+/**
+ * @experimental
+ */
+export class NoopGaugeMetric extends NoopMetric implements Gauge {
+  record(_value: number, _attributes: MetricAttributes): void {}
+}
+
+/**
+ * @experimental
+ */
+export const NOOP_GAUGE_METRIC = new NoopGaugeMetric();

@@ -18,7 +18,6 @@ import { Meter } from './Meter';
 import {
   BatchObservableCallback,
   Counter,
-  Gauge,
   Histogram,
   MetricAttributes,
   MetricOptions,
@@ -36,13 +35,6 @@ import {
  */
 export class NoopMeter implements Meter {
   constructor() {}
-
-  /**
-   * @see {@link Meter.createGauge}
-   */
-  createGauge(_name: string, _options?: MetricOptions): Histogram {
-    return NOOP_GAUGE_METRIC;
-  }
 
   /**
    * @see {@link Meter.createHistogram}
@@ -122,10 +114,6 @@ export class NoopUpDownCounterMetric
   add(_value: number, _attributes: MetricAttributes): void {}
 }
 
-export class NoopGaugeMetric extends NoopMetric implements Gauge {
-  record(_value: number, _attributes: MetricAttributes): void {}
-}
-
 export class NoopHistogramMetric extends NoopMetric implements Histogram {
   record(_value: number, _attributes: MetricAttributes): void {}
 }
@@ -152,7 +140,6 @@ export const NOOP_METER = new NoopMeter();
 
 // Synchronous instruments
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric();
-export const NOOP_GAUGE_METRIC = new NoopGaugeMetric();
 export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric();
 export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric();
 
