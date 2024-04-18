@@ -6,6 +6,37 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(sdk-node)!: remove long deprecated methods in favor of constructor options [#4606](https://github.com/open-telemetry/opentelemetry-js/pull/4606) @pichlermarc
+  * `NodeSDK.configureTracerProvider()`, please use constructor options instead
+  * `NodeSDK.configureMeterProvider()`, please use constructor options instead
+  * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
+  * `NodeSDK.addResource()`, please use constructor options instead
+  * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on `NodeSDK.start()` if the constructor option `autoDetectResources` is unset, `undefined` or `true`.
+
+### :rocket: (Enhancement)
+
+* refactor(instrumentation-grpc): move to use SEMATTRS [#4633](https://github.com/open-telemetry/opentelemetry-js/pull/4633)
+* feat(otlp-transformer): consolidate scope/resource creation in transformer [#4600](https://github.com/open-telemetry/opentelemetry-js/pull/4600)
+* feat(sdk-logs): print message when attributes are dropped due to attribute count limit [#4614](https://github.com/open-telemetry/opentelemetry-js/pull/4614) @HyunnoH
+* feat(sdk-node): add usage for the detector ServiceInstanceIdDetectorSync. [#4626](https://github.com/open-telemetry/opentelemetry-js/pull/4626) @maryliag
+  * The resource detector can be added to default resource detector list by adding the value `serviceinstance` to the list of resource detectors on the environment variable `OTEL_NODE_RESOURCE_DETECTORS`, e.g `OTEL_NODE_RESOURCE_DETECTORS=env,host,os,serviceinstance`
+  * The value can be overwritten by
+    * merging a resource containing the `service.instance.id` attribute
+    * using another resource detector which writes `service.instance.id`
+
+### :bug: (Bug Fix)
+
+* fix(otlp-grpc-exporter-base): avoid TypeError on exporter shutdown [#4612](https://github.com/open-telemetry/opentelemetry-js/pull/4612)
+* fix(instrumentation): Don't use `require` to load `package.json` files
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.50.0
+
+### :boom: Breaking Change
+
 * fix(exporter-*-otlp-grpc)!: lazy load gRPC to improve compatibility with `@opentelemetry/instrumenation-grpc` [#4432](https://github.com/open-telemetry/opentelemetry-js/pull/4432) @pichlermarc
   * Fixes a bug where requiring up the gRPC exporter before enabling the instrumentation from `@opentelemetry/instrumentation-grpc` would lead to missing telemetry
   * Breaking changes, removes several functions and properties that were used internally and were not intended for end-users
@@ -19,19 +50,14 @@ All notable changes to experimental packages in this project will be documented 
       * was used internally to keep track of the service client used by the exporter, as a side effect it allowed end-users to modify the gRPC service client that was used
     * `compression`
       * was used internally to keep track of the compression to use but was unintentionally exposed to the users. It allowed to read and write the value, writing, however, would have no effect.
-* feat(api-events)!: removed domain from the Events API [#4569](https://github.com/open-telemetry/opentelemetry-js/pull/4569)
-* fix(events-api)!: renamed EventEmitter to EventLogger in the Events API [#4569](https://github.com/open-telemetry/opentelemetry-js/pull/4568)
-* feat(api-logs)!: changed LogRecord body data type to AnyValue [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
-and AnyValueMap types [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
 
 ### :rocket: (Enhancement)
 
-* feat(metrics): added synchronous gauge to SDK [#4565](https://github.com/open-telemetry/opentelemetry-js/pull/4565) @clintonb
-* feat(opentelemetry-instrumentation-xhr): optionally ignore network events [#4571](https://github.com/open-telemetry/opentelemetry-js/pull/4571/) @mustafahaddara
-* refactor(instr-http): use exported strings for semconv. [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
+* feat(instrumentation-xhr): optionally ignore network events [#4571](https://github.com/open-telemetry/opentelemetry-js/pull/4571/) @mustafahaddara
+* refactor(instrumentation-http): use exported strings for semconv [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
 * perf(instrumentation-http): remove obvious temp allocations [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
-* feat(sdk-node): add `HostDetector` as default resource detector
-* feat(api-events): added data field to the Event interface [4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575)
+* feat(sdk-node): add `HostDetector` as default resource detector [#4566](https://github.com/open-telemetry/opentelemetry-js/pull/4566) @maryliag
+* feat(api-events): added data field to the Event interface [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575) @martinkuba
 
 ### :bug: (Bug Fix)
 
@@ -41,9 +67,7 @@ and AnyValueMap types [#4575](https://github.com/open-telemetry/opentelemetry-js
 
 ### :books: (Refine Doc)
 
-* docs(instr-http): document semantic conventions and attributes in use. [#4587](https://github.com/open-telemetry/opentelemetry-js/pull/4587/) @JamieDanielson
-
-### :house: (Internal)
+* docs(instrumentation-http): document semantic conventions and attributes in use. [#4587](https://github.com/open-telemetry/opentelemetry-js/pull/4587/) @JamieDanielson
 
 ## 0.49.1
 

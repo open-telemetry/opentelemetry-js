@@ -21,6 +21,10 @@
       "dependencyDashboardApproval": true
     }
   ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 3am on Monday"]
+  },
   "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0", "@types/node"],
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
   "labels": ["dependencies"]

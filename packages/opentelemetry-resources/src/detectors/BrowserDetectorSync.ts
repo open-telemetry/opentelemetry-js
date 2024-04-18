@@ -24,7 +24,12 @@ import { diag } from '@opentelemetry/api';
  */
 class BrowserDetectorSync implements DetectorSync {
   detect(config?: ResourceDetectionConfig): IResource {
-    const isBrowser = typeof navigator !== 'undefined';
+    const isBrowser =
+      typeof navigator !== 'undefined' &&
+      global.process?.versions?.node === undefined && // Node.js v21 adds `navigator`
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore don't have Bun types
+      global.Bun?.version === undefined; // Bun (bun.sh) defines `navigator`
     if (!isBrowser) {
       return Resource.empty();
     }
