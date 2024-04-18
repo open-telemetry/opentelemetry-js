@@ -69,6 +69,7 @@ describe('ConsoleLogRecordExporter', () => {
           'timestamp',
           'traceFlags',
           'traceId',
+          'resource'
         ].join(',');
 
         assert.ok(firstLogRecord.body === 'body1');
