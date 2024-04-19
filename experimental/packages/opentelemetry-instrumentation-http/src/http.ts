@@ -111,12 +111,10 @@ export class HttpInstrumentation extends InstrumentationBase {
   }
 
   private _getHttpInstrumentation() {
-    const version = process.versions.node;
     return new InstrumentationNodeModuleDefinition(
       'http',
       ['*'],
       (moduleExports: Http): Http => {
-        this._diag.debug(`Applying patch for http@${version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -145,7 +143,6 @@ export class HttpInstrumentation extends InstrumentationBase {
       },
       (moduleExports: Http) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for http@${version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -155,12 +152,10 @@ export class HttpInstrumentation extends InstrumentationBase {
   }
 
   private _getHttpsInstrumentation() {
-    const version = process.versions.node;
     return new InstrumentationNodeModuleDefinition(
       'https',
       ['*'],
       (moduleExports: Https): Https => {
-        this._diag.debug(`Applying patch for https@${version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -189,7 +184,6 @@ export class HttpInstrumentation extends InstrumentationBase {
       },
       (moduleExports: Https) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for https@${version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');

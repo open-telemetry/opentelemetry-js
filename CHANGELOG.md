@@ -9,6 +9,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* feat(instrumentation): add patch and unpatch diag log messages [#4641](https://github.com/open-telemetry/opentelemetry-js/pull/4641)
+  * Instrumentations should not log patch and unpatch messages to diag channel.
 * feat!(instrumentation): remove moduleExports generic type from instrumentation registration [#4598](https://github.com/open-telemetry/opentelemetry-js/pull/4598) @blumamir
   * breaking for instrumentation authors that depend on
     * `InstrumentationBase`
