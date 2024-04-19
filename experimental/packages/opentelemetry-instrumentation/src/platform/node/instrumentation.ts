@@ -35,11 +35,11 @@ import { readFileSync } from 'fs';
 /**
  * Base abstract class for instrumenting node plugins
  */
-export abstract class InstrumentationBase<T = any>
+export abstract class InstrumentationBase
   extends InstrumentationAbstract
   implements types.Instrumentation
 {
-  private _modules: InstrumentationModuleDefinition<T>[];
+  private _modules: InstrumentationModuleDefinition[];
   private _hooks: (Hooked | Hook)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
@@ -58,7 +58,7 @@ export abstract class InstrumentationBase<T = any>
       modules = [modules];
     }
 
-    this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
+    this._modules = (modules as InstrumentationModuleDefinition[]) || [];
 
     if (this._modules.length === 0) {
       diag.debug(
@@ -143,7 +143,7 @@ export abstract class InstrumentationBase<T = any>
   };
 
   private _warnOnPreloadedModules(): void {
-    this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
+    this._modules.forEach((module: InstrumentationModuleDefinition) => {
       const { name } = module;
       try {
         const resolvedModule = require.resolve(name);
@@ -174,7 +174,7 @@ export abstract class InstrumentationBase<T = any>
   }
 
   private _onRequire<T>(
-    module: InstrumentationModuleDefinition<T>,
+    module: InstrumentationModuleDefinition,
     exports: T,
     name: string,
     baseDir?: string | void
@@ -216,7 +216,8 @@ export abstract class InstrumentationBase<T = any>
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
       if (this._enabled) {
-        return file.patch(patchedExports, module.moduleVersion);
+        // patch signature is not typed, so we cast it assuming it's correct
+        return file.patch(patchedExports, module.moduleVersion) as T;
       }
       return patchedExports;
     }, exports);
@@ -246,20 +247,10 @@ export abstract class InstrumentationBase<T = any>
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
-        return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition<typeof exports>,
-          exports,
-          name,
-          baseDir
-        );
+        return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
       const onRequire: OnRequireFn = (exports, name, baseDir) => {
-        return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition<typeof exports>,
-          exports,
-          name,
-          baseDir
-        );
+        return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
 
       // `RequireInTheMiddleSingleton` does not support absolute paths.

@@ -9,6 +9,12 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* feat!(instrumentation): remove moduleExports generic type from instrumentation registration [#4598](https://github.com/open-telemetry/opentelemetry-js/pull/4598) @blumamir
+  * breaking for instrumentation authors that depend on
+    * `InstrumentationBase`
+    * `InstrumentationNodeModuleDefinition`
+    * `InstrumentationNodeModuleFile`
+
 ### :rocket: (Enhancement)
 
 * feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
