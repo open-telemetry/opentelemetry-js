@@ -81,7 +81,7 @@ export interface XMLHttpRequestInstrumentationConfig
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
