@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713361912121,
+  "lastUpdate": 1713524727738,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7348,6 +7348,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.24%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "99431df2e2ee33b05fcecf4009eef92c19039fdf",
+          "message": "feat!(instrumentation): remove moduleExports generic type from instrumentation registration (#4598)\n\n* feat!(instrumentation): remove moudleExports generic type from instrumentation registration\r\n\r\n* fix: lint\r\n\r\n* chore: add changelog\r\n\r\n* fix: core instrumentations\r\n\r\n* docs: update README with the change\r\n\r\n* Update experimental/packages/opentelemetry-instrumentation/src/platform/node/instrumentation.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* Update experimental/packages/opentelemetry-instrumentation/src/platform/node/instrumentation.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* Update CHANGELOG.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* chore: lint\r\n\r\n* revert: sdk-logs in tsconfig\r\n\r\n* chore: lint markdown\r\n\r\n* Apply suggestions from code review\r\n\r\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\r\n\r\n* Update experimental/packages/opentelemetry-instrumentation/src/instrumentationNodeModuleFile.ts\r\n\r\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\r\n\r\n* Update experimental/packages/opentelemetry-instrumentation/src/instrumentationNodeModuleDefinition.ts\r\n\r\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\r\n\r\n* fix: remove unrelevant eslint ignore\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>",
+          "timestamp": "2024-04-19T13:03:39+02:00",
+          "tree_id": "96866ec81771931c41e627184bcb6cdc4129f62d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/99431df2e2ee33b05fcecf4009eef92c19039fdf"
+        },
+        "date": 1713524726909,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1000846,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11943,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 645466,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 668403,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
