@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1713524727738,
+  "lastUpdate": 1713526075686,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7400,6 +7400,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.48%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "31eb60dc99dc066cf2085864f2727eb29ee76e91",
+          "message": "feat!(instrumentation): add patch and unpatch diag log messages (#4641)\n\n* refactor(@opentelemetry/instrumentation): add patch and unpatch diag log messages\r\n\r\n* chore: CHANGELOG\r\n\r\n* fix: exclude version in core packages\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-19T13:26:12+02:00",
+          "tree_id": "605303b62c4db1648d8d0b8d9c0261e25ad64a8e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/31eb60dc99dc066cf2085864f2727eb29ee76e91"
+        },
+        "date": 1713526074813,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 961558,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12223,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 651575,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 657123,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
