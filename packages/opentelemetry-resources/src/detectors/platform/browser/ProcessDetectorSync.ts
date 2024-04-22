@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-import { Detector } from '../../types';
-import { ResourceDetectionConfig } from '../../config';
-import { IResource } from '../../IResource';
-import { hostDetectorSync } from './HostDetectorSync';
+import { noopDetector } from '../../NoopDetector';
 
-/**
- * HostDetector detects the resources related to the host current process is
- * running on. Currently only non-cloud-based attributes are included.
- */
-class HostDetector implements Detector {
-  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(hostDetectorSync.detect(_config));
-  }
-}
-
-export const hostDetector = new HostDetector();
+export const processDetectorSync = noopDetector;

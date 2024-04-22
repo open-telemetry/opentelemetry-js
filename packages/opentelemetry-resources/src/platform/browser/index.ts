@@ -13,12 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export * from './default-service-name';
-export * from './HostDetector';
-export * from './HostDetectorSync';
-export * from './OSDetector';
-export * from './OSDetectorSync';
-export * from './ProcessDetector';
-export * from './ProcessDetectorSync';
-export * from './ServiceInstanceIdDetectorSync';
+export { defaultServiceName } from './default-service-name';
