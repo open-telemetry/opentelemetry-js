@@ -20,7 +20,16 @@ import {
   MeterProvider,
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_HTTP_FLAVOR,
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_SCHEME,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_NET_HOST_NAME,
+  SEMATTRS_NET_HOST_PORT,
+  SEMATTRS_NET_PEER_NAME,
+  SEMATTRS_NET_PEER_PORT,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
@@ -38,13 +47,12 @@ const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
 const tracerProvider = new NodeTracerProvider();
-const meterProvider = new MeterProvider();
 const metricsMemoryExporter = new InMemoryMetricExporter(
   AggregationTemporality.DELTA
 );
 const metricReader = new TestMetricReader(metricsMemoryExporter);
+const meterProvider = new MeterProvider({ readers: [metricReader] });
 
-meterProvider.addMetricReader(metricReader);
 instrumentation.setTracerProvider(tracerProvider);
 instrumentation.setMeterProvider(meterProvider);
 
@@ -92,27 +100,27 @@ describe('metrics', () => {
       requestCount
     );
     assert.strictEqual(
-      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_SCHEME],
+      metrics[0].dataPoints[0].attributes[SEMATTRS_HTTP_SCHEME],
       'http'
     );
     assert.strictEqual(
-      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD],
+      metrics[0].dataPoints[0].attributes[SEMATTRS_HTTP_METHOD],
       'GET'
     );
     assert.strictEqual(
-      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR],
+      metrics[0].dataPoints[0].attributes[SEMATTRS_HTTP_FLAVOR],
       '1.1'
     );
     assert.strictEqual(
-      metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_NAME],
+      metrics[0].dataPoints[0].attributes[SEMATTRS_NET_HOST_NAME],
       'localhost'
     );
     assert.strictEqual(
-      metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE],
+      metrics[0].dataPoints[0].attributes[SEMATTRS_HTTP_STATUS_CODE],
       200
     );
     assert.strictEqual(
-      metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_PORT],
+      metrics[0].dataPoints[0].attributes[SEMATTRS_NET_HOST_PORT],
       22346
     );
 
@@ -129,23 +137,23 @@ describe('metrics', () => {
       requestCount
     );
     assert.strictEqual(
-      metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD],
+      metrics[1].dataPoints[0].attributes[SEMATTRS_HTTP_METHOD],
       'GET'
     );
     assert.strictEqual(
-      metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_NAME],
+      metrics[1].dataPoints[0].attributes[SEMATTRS_NET_PEER_NAME],
       'localhost'
     );
     assert.strictEqual(
-      metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_PORT],
+      metrics[1].dataPoints[0].attributes[SEMATTRS_NET_PEER_PORT],
       22346
     );
     assert.strictEqual(
-      metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE],
+      metrics[1].dataPoints[0].attributes[SEMATTRS_HTTP_STATUS_CODE],
       200
     );
     assert.strictEqual(
-      metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR],
+      metrics[1].dataPoints[0].attributes[SEMATTRS_HTTP_FLAVOR],
       '1.1'
     );
   });

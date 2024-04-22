@@ -16,7 +16,7 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
-import { IResource, Resource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig } from './types';
@@ -24,39 +24,25 @@ import type { LogRecordProcessor } from './LogRecordProcessor';
 import { Logger } from './Logger';
 import { loadDefaultConfig, reconfigureLimits } from './config';
 import { MultiLogRecordProcessor } from './MultiLogRecordProcessor';
-import { NoopLogRecordProcessor } from './export/NoopLogRecordProcessor';
+import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
 export class LoggerProvider implements logsAPI.LoggerProvider {
-  public readonly resource: IResource;
-
-  private readonly _loggers: Map<string, Logger> = new Map();
-  private _activeProcessor: MultiLogRecordProcessor;
-  private readonly _registeredLogRecordProcessors: LogRecordProcessor[] = [];
-  private readonly _config: LoggerProviderConfig;
   private _shutdownOnce: BindOnceFuture<void>;
+  private readonly _sharedState: LoggerProviderSharedState;
 
   constructor(config: LoggerProviderConfig = {}) {
-    const {
-      resource = Resource.empty(),
-      logRecordLimits,
-      forceFlushTimeoutMillis,
-    } = merge({}, loadDefaultConfig(), reconfigureLimits(config));
-    this.resource = Resource.default().merge(resource);
-    this._config = {
-      logRecordLimits,
-      resource: this.resource,
-      forceFlushTimeoutMillis,
-    };
-
-    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
-
-    // add a default processor: NoopLogRecordProcessor
-    this._activeProcessor = new MultiLogRecordProcessor(
-      [new NoopLogRecordProcessor()],
-      forceFlushTimeoutMillis
+    const mergedConfig = merge({}, loadDefaultConfig(), config);
+    const resource = Resource.default().merge(
+      mergedConfig.resource ?? Resource.empty()
     );
+    this._sharedState = new LoggerProviderSharedState(
+      resource,
+      mergedConfig.forceFlushTimeoutMillis,
+      reconfigureLimits(mergedConfig.logRecordLimits)
+    );
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
 
   /**
@@ -77,20 +63,17 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     }
     const loggerName = name || DEFAULT_LOGGER_NAME;
     const key = `${loggerName}@${version || ''}:${options?.schemaUrl || ''}`;
-    if (!this._loggers.has(key)) {
-      this._loggers.set(
+    if (!this._sharedState.loggers.has(key)) {
+      this._sharedState.loggers.set(
         key,
         new Logger(
           { name: loggerName, version, schemaUrl: options?.schemaUrl },
-          {
-            logRecordLimits: this._config.logRecordLimits,
-            includeTraceContext: options?.includeTraceContext,
-          },
-          this
+          this._sharedState
         )
       );
     }
-    return this._loggers.get(key)!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return this._sharedState.loggers.get(key)!;
   }
 
   /**
@@ -98,10 +81,10 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
    * @param processor the new LogRecordProcessor to be added.
    */
   public addLogRecordProcessor(processor: LogRecordProcessor) {
-    if (this._registeredLogRecordProcessors.length === 0) {
+    if (this._sharedState.registeredLogRecordProcessors.length === 0) {
       // since we might have enabled by default a batchProcessor, we disable it
       // before adding the new one
-      this._activeProcessor
+      this._sharedState.activeProcessor
         .shutdown()
         .catch(err =>
           diag.error(
@@ -110,10 +93,10 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
           )
         );
     }
-    this._registeredLogRecordProcessors.push(processor);
-    this._activeProcessor = new MultiLogRecordProcessor(
-      this._registeredLogRecordProcessors,
-      this._config.forceFlushTimeoutMillis!
+    this._sharedState.registeredLogRecordProcessors.push(processor);
+    this._sharedState.activeProcessor = new MultiLogRecordProcessor(
+      this._sharedState.registeredLogRecordProcessors,
+      this._sharedState.forceFlushTimeoutMillis
     );
   }
 
@@ -128,7 +111,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
       diag.warn('invalid attempt to force flush after LoggerProvider shutdown');
       return this._shutdownOnce.promise;
     }
-    return this._activeProcessor.forceFlush();
+    return this._sharedState.activeProcessor.forceFlush();
   }
 
   /**
@@ -145,15 +128,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
     return this._shutdownOnce.call();
   }
 
-  public getActiveLogRecordProcessor(): MultiLogRecordProcessor {
-    return this._activeProcessor;
-  }
-
-  public getActiveLoggers(): Map<string, Logger> {
-    return this._loggers;
-  }
-
   private _shutdown(): Promise<void> {
-    return this._activeProcessor.shutdown();
+    return this._sharedState.activeProcessor.shutdown();
   }
 }

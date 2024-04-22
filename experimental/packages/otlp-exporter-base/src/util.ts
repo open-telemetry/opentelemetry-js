@@ -35,7 +35,9 @@ export function parseHeaders(
     if (typeof value !== 'undefined') {
       headers[key] = String(value);
     } else {
-      diag.warn(`Header "${key}" has wrong value and will be ignored`);
+      diag.warn(
+        `Header "${key}" has invalid value (${value}) and will be ignored`
+      );
     }
   });
   return headers;

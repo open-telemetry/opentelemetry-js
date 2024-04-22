@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import * as RequireInTheMiddle from 'require-in-the-middle';
+import type { OnRequireFn } from 'require-in-the-middle';
+import { Hook } from 'require-in-the-middle';
 import * as path from 'path';
 import { ModuleNameTrie, ModuleNameSeparator } from './ModuleNameTrie';
 
 export type Hooked = {
   moduleName: string;
-  onRequire: RequireInTheMiddle.OnRequireFn;
+  onRequire: OnRequireFn;
 };
 
 /**
@@ -59,7 +60,7 @@ export class RequireInTheMiddleSingleton {
   }
 
   private _initialize() {
-    RequireInTheMiddle(
+    new Hook(
       // Intercept all `require` calls; we will filter the matching ones below
       null,
       { internals: true },
@@ -88,13 +89,10 @@ export class RequireInTheMiddleSingleton {
    * Register a hook with `require-in-the-middle`
    *
    * @param {string} moduleName Module name
-   * @param {RequireInTheMiddle.OnRequireFn} onRequire Hook function
+   * @param {OnRequireFn} onRequire Hook function
    * @returns {Hooked} Registered hook
    */
-  register(
-    moduleName: string,
-    onRequire: RequireInTheMiddle.OnRequireFn
-  ): Hooked {
+  register(moduleName: string, onRequire: OnRequireFn): Hooked {
     const hooked = { moduleName, onRequire };
     this._moduleNameTrie.insert(hooked);
     return hooked;

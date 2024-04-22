@@ -36,6 +36,7 @@ import {
 import { nextTick } from 'process';
 import { MockedResponse } from './nodeHelpers';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -117,6 +118,15 @@ describe('OTLPTraceExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
     });
+    it('should override url defined in env with url defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
+      const constructorDefinedEndpoint = 'http://constructor/v1/traces';
+      const collectorExporter = new OTLPTraceExporter({
+        url: constructorDefinedEndpoint,
+      });
+      assert.strictEqual(collectorExporter.url, constructorDefinedEndpoint);
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+    });
     it('should add root path when signal url defined in env contains no path and no root path', () => {
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
       const collectorExporter = new OTLPTraceExporter();
@@ -160,6 +170,13 @@ describe('OTLPTraceExporter - node with json over http', () => {
       assert.strictEqual(collectorExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
+    it('should include user agent in header', () => {
+      const collectorExporter = new OTLPTraceExporter();
+      assert.strictEqual(
+        collectorExporter.headers['User-Agent'],
+        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
+      );
+    });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
@@ -167,6 +184,17 @@ describe('OTLPTraceExporter - node with json over http', () => {
       assert.strictEqual(collectorExporter.headers.foo, 'boo');
       assert.strictEqual(collectorExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
+    it('should override headers defined via env with headers defined in constructor', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+      const collectorExporter = new OTLPTraceExporter({
+        headers: {
+          foo: 'constructor',
+        },
+      });
+      assert.strictEqual(collectorExporter.headers.foo, 'constructor');
+      assert.strictEqual(collectorExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should use compression defined via env', () => {
@@ -337,7 +365,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
       fakeRequest.on('end', () => {
         const responseBody = buff.toString();
-
         const json = JSON.parse(responseBody) as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");

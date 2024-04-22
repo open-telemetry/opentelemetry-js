@@ -21,11 +21,8 @@ import {
   Counter,
   Histogram,
 } from '@opentelemetry/api';
-import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
-import {
-  AggregationTemporality,
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics';
+import { ExportResultCode } from '@opentelemetry/core';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
@@ -44,7 +41,10 @@ import {
   setUp,
   shutdown,
 } from '../metricsHelper';
-import { OTLPMetricExporterOptions } from '../../src';
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporterOptions,
+} from '../../src';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
@@ -102,7 +102,7 @@ describe('OTLPMetricExporter - web', () => {
       beforeEach(() => {
         collectorExporter = new OTLPMetricExporter({
           url: 'http://foo.bar.com',
-          temporalityPreference: AggregationTemporality.CUMULATIVE,
+          temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
         });
       });
 
@@ -138,14 +138,9 @@ describe('OTLPMetricExporter - web', () => {
 
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .startTime
-            )
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+              .startTime
           );
 
           assert.ok(
@@ -154,14 +149,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .startTime,
             6,
             'double-observable-gauge2'
           );
@@ -172,14 +163,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .startTime,
             [0, 100],
             [0, 2, 0]
           );
@@ -230,7 +217,7 @@ describe('OTLPMetricExporter - web', () => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new OTLPMetricExporter({
           url: 'http://foo.bar.com',
-          temporalityPreference: AggregationTemporality.CUMULATIVE,
+          temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
         });
         // Overwrites the start time to make tests consistent
         Object.defineProperty(collectorExporter, '_startTime', {
@@ -273,14 +260,9 @@ describe('OTLPMetricExporter - web', () => {
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-                .startTime
-            )
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
+            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+              .startTime
           );
 
           assert.ok(
@@ -289,14 +271,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+              .startTime,
             6,
             'double-observable-gauge2'
           );
@@ -307,14 +285,10 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .endTime
-            ),
-            hrTimeToNanoseconds(
-              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-                .startTime
-            ),
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .endTime,
+            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+              .startTime,
             [0, 100],
             [0, 2, 0]
           );
@@ -386,7 +360,7 @@ describe('OTLPMetricExporter - web', () => {
     beforeEach(() => {
       collectorExporterConfig = {
         headers: customHeaders,
-        temporalityPreference: AggregationTemporality.CUMULATIVE,
+        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
       };
       server = sinon.fakeServer.create();
     });
@@ -518,7 +492,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPMetricExporter({
       headers: {},
-      temporalityPreference: AggregationTemporality.CUMULATIVE,
+      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
     });
     assert.strictEqual(
       collectorExporter['_otlpExporter']['_headers'].foo,
@@ -531,7 +505,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPMetricExporter({
       headers: {},
-      temporalityPreference: AggregationTemporality.CUMULATIVE,
+      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
     });
     assert.strictEqual(
       collectorExporter['_otlpExporter']['_headers'].foo,

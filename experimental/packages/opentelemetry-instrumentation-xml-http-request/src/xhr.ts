@@ -74,12 +74,14 @@ export interface XMLHttpRequestInstrumentationConfig
   ignoreUrls?: Array<string | RegExp>;
   /** Function for adding custom attributes on the span */
   applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
+  /** Ignore adding network events as span events */
+  ignoreNetworkEvents?: boolean;
 }
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -140,7 +142,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      if (!this._getConfig().ignoreNetworkEvents) {
+        addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      }
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -292,7 +296,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      addSpanNetworkEvents(span, mainRequest);
+      if (!this._getConfig().ignoreNetworkEvents) {
+        addSpanNetworkEvents(span, mainRequest);
+      }
     }
   }
 

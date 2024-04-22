@@ -41,12 +41,16 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   private readonly _scheduledDelayMillis: number;
   private readonly _exportTimeoutMillis: number;
 
+  private _isExporting = false;
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _shutdownOnce: BindOnceFuture<void>;
   private _droppedSpansCount: number = 0;
 
-  constructor(private readonly _exporter: SpanExporter, config?: T) {
+  constructor(
+    private readonly _exporter: SpanExporter,
+    config?: T
+  ) {
     const env = getEnv();
     this._maxExportBatchSize =
       typeof config?.maxExportBatchSize === 'number'
@@ -177,7 +181,13 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
         // Reset the finished spans buffer here because the next invocations of the _flush method
         // could pass the same finished spans to the exporter if the buffer is cleared
         // outside the execution of this callback.
-        const spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
+        let spans: ReadableSpan[];
+        if (this._finishedSpans.length <= this._maxExportBatchSize) {
+          spans = this._finishedSpans;
+          this._finishedSpans = [];
+        } else {
+          spans = this._finishedSpans.splice(0, this._maxExportBatchSize);
+        }
 
         const doExport = () =>
           this._exporter.export(spans, result => {
@@ -191,19 +201,24 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
               );
             }
           });
-        const pendingResources = spans
-          .map(span => span.resource)
-          .filter(resource => resource.asyncAttributesPending);
+
+        let pendingResources: Array<Promise<void>> | null = null;
+        for (let i = 0, len = spans.length; i < len; i++) {
+          const span = spans[i];
+          if (
+            span.resource.asyncAttributesPending &&
+            span.resource.waitForAsyncAttributes
+          ) {
+            pendingResources ??= [];
+            pendingResources.push(span.resource.waitForAsyncAttributes());
+          }
+        }
 
         // Avoid scheduling a promise to make the behavior more predictable and easier to test
-        if (pendingResources.length === 0) {
+        if (pendingResources === null) {
           doExport();
         } else {
-          Promise.all(
-            pendingResources.map(resource =>
-              resource.waitForAsyncAttributes?.()
-            )
-          ).then(doExport, err => {
+          Promise.all(pendingResources).then(doExport, err => {
             globalErrorHandler(err);
             reject(err);
           });
@@ -213,19 +228,28 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig>
   }
 
   private _maybeStartTimer() {
-    if (this._timer !== undefined) return;
-    this._timer = setTimeout(() => {
+    if (this._isExporting) return;
+    const flush = () => {
+      this._isExporting = true;
       this._flushOneBatch()
-        .then(() => {
+        .finally(() => {
+          this._isExporting = false;
           if (this._finishedSpans.length > 0) {
             this._clearTimer();
             this._maybeStartTimer();
           }
         })
         .catch(e => {
+          this._isExporting = false;
           globalErrorHandler(e);
         });
-    }, this._scheduledDelayMillis);
+    };
+    // we only wait if the queue doesn't have enough elements yet
+    if (this._finishedSpans.length >= this._maxExportBatchSize) {
+      return flush();
+    }
+    if (this._timer !== undefined) return;
+    this._timer = setTimeout(() => flush(), this._scheduledDelayMillis);
     unrefTimer(this._timer);
   }
 

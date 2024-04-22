@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.12.0",
+  "version": "1.23.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -30,7 +30,7 @@
     "compile": "tsc --build",
     "version": "node ../../scripts/version-update.js",
     "clean": "tsc --build --clean",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../scripts/peer-api-check.js"
   },
@@ -47,7 +47,7 @@
   "Add/change these to scripts if browser is supported": {
     "compile": "tsc --build tsconfig.json",
     "clean": "tsc --build --clean tsconfig.json",
-    "test:browser": "nyc karma start --single-run",
+    "test:browser": "karma start --single-run",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "watch": "tsc --build --watch tsconfig.json"
   },
@@ -79,6 +79,8 @@
   ],
   "devDependencies": {
     "@types/node": "18.6.5",
+    "cross-var": "1.1.0",
+    "lerna": "6.6.2",
     "typescript": "4.4.4"
   },
   "Add these to devDependencies for testing": {
@@ -87,19 +89,19 @@
     "codecov": "3.8.3",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "sinon": "14.0.0",
+    "sinon": "15.0.0",
     "ts-mocha": "10.0.0"
   },
   "Add these to devDependencies if browser is targeted": {
     "@types/webpack-env": "1.16.0",
-    "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "5.2.3",
+    "babel-plugin-istanbul": "6.1.1",
+    "karma": "6.4.2",
     "karma-chrome-launcher": "3.1.0",
-    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-coverage": "2.2.0",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
     "ts-loader": "8.4.0",
-    "webpack": "4.46.0"
+    "webpack": "5.89.0"
   }
 }

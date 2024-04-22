@@ -22,6 +22,7 @@ import {
   ObservableCounter,
   ObservableGauge,
   ObservableUpDownCounter,
+  HrTime,
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -33,6 +34,7 @@ import {
   View,
 } from '@opentelemetry/sdk-metrics';
 import {
+  encodeAsString,
   IExportMetricsServiceRequest,
   IKeyValue,
   IMetric,
@@ -70,9 +72,11 @@ const defaultResource = Resource.default().merge(
   })
 );
 
-let meterProvider = new MeterProvider({ resource: defaultResource });
 let reader = new TestMetricReader();
-meterProvider.addMetricReader(reader);
+let meterProvider = new MeterProvider({
+  resource: defaultResource,
+  readers: [reader],
+});
 let meter = meterProvider.getMeter('default', '0.0.1');
 
 export async function collect() {
@@ -80,9 +84,12 @@ export async function collect() {
 }
 
 export function setUp(views?: View[]) {
-  meterProvider = new MeterProvider({ resource: defaultResource, views });
   reader = new TestMetricReader();
-  meterProvider.addMetricReader(reader);
+  meterProvider = new MeterProvider({
+    resource: defaultResource,
+    views,
+    readers: [reader],
+  });
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 
@@ -207,26 +214,22 @@ export function ensureWebResourceIsCorrect(resource: IResource) {
 
 export function ensureCounterIsCorrect(
   metric: IMetric,
-  time?: number,
-  startTime?: number
+  time: HrTime,
+  startTime: HrTime
 ) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-counter',
-    description: 'sample counter description',
-    unit: '',
-    sum: {
-      dataPoints: [
-        {
-          attributes: [],
-          asInt: 1,
-          startTimeUnixNano: startTime,
-          timeUnixNano: time,
-        },
-      ],
-      isMonotonic: true,
-      aggregationTemporality: 2,
-    },
-  });
+  assert.strictEqual(metric.name, 'int-counter');
+  assert.strictEqual(metric.description, 'sample counter description');
+  assert.strictEqual(metric.unit, '');
+  assert.strictEqual(metric.sum?.dataPoints.length, 1);
+  assert.strictEqual(metric.sum?.isMonotonic, true);
+  assert.strictEqual(metric.sum?.aggregationTemporality, 2);
+
+  const [dp] = metric.sum.dataPoints;
+
+  assert.deepStrictEqual(dp.attributes, []);
+  assert.strictEqual(dp.asInt, 1);
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureDoubleCounterIsCorrect(
@@ -255,108 +258,50 @@ export function ensureDoubleCounterIsCorrect(
 
 export function ensureObservableGaugeIsCorrect(
   metric: IMetric,
-  time: number,
-  startTime: number,
+  time: HrTime,
+  startTime: HrTime,
   value: number,
   name = 'double-observable-gauge'
 ) {
-  assert.deepStrictEqual(metric, {
-    name,
-    description: 'sample observable gauge description',
-    unit: '',
-    gauge: {
-      dataPoints: [
-        {
-          attributes: [],
-          asDouble: value,
-          startTimeUnixNano: startTime,
-          timeUnixNano: time,
-        },
-      ],
-    },
-  });
-}
+  assert.strictEqual(metric.name, name);
+  assert.strictEqual(metric.description, 'sample observable gauge description');
+  assert.strictEqual(metric.unit, '');
+  assert.strictEqual(metric.gauge?.dataPoints.length, 1);
 
-export function ensureObservableCounterIsCorrect(
-  metric: IMetric,
-  time: number,
-  startTime: number,
-  value: number,
-  name = 'double-observable-counter'
-) {
-  assert.deepStrictEqual(metric, {
-    name,
-    description: 'sample observable counter description',
-    unit: '',
-    doubleSum: {
-      isMonotonic: true,
-      dataPoints: [
-        {
-          attributes: [],
-          value,
-          startTimeUnixNano: startTime,
-          timeUnixNano: time,
-        },
-      ],
-      aggregationTemporality: 2,
-    },
-  });
-}
+  const [dp] = metric.gauge.dataPoints;
 
-export function ensureObservableUpDownCounterIsCorrect(
-  metric: IMetric,
-  time: number,
-  startTime: number,
-  value: number,
-  name = 'double-up-down-observable-counter'
-) {
-  assert.deepStrictEqual(metric, {
-    name,
-    description: 'sample observable up down counter description',
-    unit: '',
-    doubleSum: {
-      isMonotonic: false,
-      dataPoints: [
-        {
-          labels: [],
-          value,
-          startTimeUnixNano: startTime,
-          timeUnixNano: time,
-        },
-      ],
-      aggregationTemporality: 2,
-    },
-  });
+  assert.deepStrictEqual(dp.attributes, []);
+  assert.strictEqual(dp.asDouble, value);
+
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureHistogramIsCorrect(
   metric: IMetric,
-  time: number,
-  startTime: number,
+  time: HrTime,
+  startTime: HrTime,
   explicitBounds: (number | null)[] = [Infinity],
   bucketCounts: number[] = [2, 0]
 ) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-histogram',
-    description: 'sample histogram description',
-    unit: '',
-    histogram: {
-      dataPoints: [
-        {
-          attributes: [],
-          sum: 21,
-          count: 2,
-          min: 7,
-          max: 14,
-          startTimeUnixNano: startTime,
-          timeUnixNano: time,
-          bucketCounts,
-          explicitBounds,
-        },
-      ],
-      aggregationTemporality: 2,
-    },
-  });
+  assert.strictEqual(metric.name, 'int-histogram');
+  assert.strictEqual(metric.description, 'sample histogram description');
+  assert.strictEqual(metric.unit, '');
+  assert.strictEqual(metric.histogram?.dataPoints.length, 1);
+  assert.strictEqual(metric.histogram?.aggregationTemporality, 2);
+
+  const [dp] = metric.histogram.dataPoints;
+
+  assert.deepStrictEqual(dp.attributes, []);
+  assert.strictEqual(dp.sum, 21);
+  assert.strictEqual(dp.count, 2);
+  assert.strictEqual(dp.min, 7);
+  assert.strictEqual(dp.max, 14);
+  assert.deepStrictEqual(dp.bucketCounts, bucketCounts);
+  assert.deepStrictEqual(dp.explicitBounds, explicitBounds);
+
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportMetricsServiceRequestIsSet(

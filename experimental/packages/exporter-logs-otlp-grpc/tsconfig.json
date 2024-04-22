@@ -1,0 +1,37 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "rootDir": "."
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../../api"
+    },
+    {
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/opentelemetry-resources"
+    },
+    {
+      "path": "../api-logs"
+    },
+    {
+      "path": "../otlp-exporter-base"
+    },
+    {
+      "path": "../otlp-grpc-exporter-base"
+    },
+    {
+      "path": "../otlp-transformer"
+    },
+    {
+      "path": "../sdk-logs"
+    }
+  ]
+}

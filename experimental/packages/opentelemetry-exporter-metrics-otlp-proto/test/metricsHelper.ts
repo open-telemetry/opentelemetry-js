@@ -20,6 +20,7 @@ import {
   Histogram,
   ValueType,
   ObservableGauge,
+  HrTime,
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -30,6 +31,7 @@ import {
   View,
 } from '@opentelemetry/sdk-metrics';
 import {
+  encodeAsString,
   IExportMetricsServiceRequest,
   IKeyValue,
   IMetric,
@@ -52,10 +54,11 @@ const testResource = new Resource({
   cost: 112.12,
 });
 
-let meterProvider = new MeterProvider({ resource: testResource });
-
 let reader = new TestMetricReader();
-meterProvider.addMetricReader(reader);
+let meterProvider = new MeterProvider({
+  resource: testResource,
+  readers: [reader],
+});
 
 let meter = meterProvider.getMeter('default', '0.0.1');
 
@@ -64,6 +67,7 @@ export async function collect() {
 }
 
 export function setUp() {
+  reader = new TestMetricReader();
   meterProvider = new MeterProvider({
     resource: testResource,
     views: [
@@ -72,9 +76,8 @@ export function setUp() {
         instrumentName: 'int-histogram',
       }),
     ],
+    readers: [reader],
   });
-  reader = new TestMetricReader();
-  meterProvider.addMetricReader(reader);
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 
@@ -129,75 +132,68 @@ export function ensureProtoAttributesAreCorrect(attributes: IKeyValue[]) {
 
 export function ensureExportedCounterIsCorrect(
   metric: IMetric,
-  time?: number,
-  startTime?: number
+  time: HrTime,
+  startTime: HrTime
 ) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-counter',
-    description: 'sample counter description',
-    unit: '',
-    sum: {
-      dataPoints: [
-        {
-          asInt: '1',
-          startTimeUnixNano: String(startTime),
-          timeUnixNano: String(time),
-        },
-      ],
-      isMonotonic: true,
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
-    },
-  });
+  assert.strictEqual(metric.name, 'int-counter');
+  assert.strictEqual(metric.description, 'sample counter description');
+  assert.strictEqual(metric.unit, '');
+  assert.strictEqual(metric.sum?.dataPoints.length, 1);
+  assert.strictEqual(metric.sum?.isMonotonic, true);
+  assert.strictEqual(
+    metric.sum?.aggregationTemporality,
+    'AGGREGATION_TEMPORALITY_CUMULATIVE'
+  );
+
+  const [dp] = metric.sum.dataPoints;
+  assert.strictEqual(dp.asInt, '1');
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportedObservableGaugeIsCorrect(
   metric: IMetric,
-  time?: number,
-  startTime?: number
+  time: HrTime,
+  startTime: HrTime
 ) {
-  assert.deepStrictEqual(metric, {
-    name: 'double-observable-gauge',
-    description: 'sample observable gauge description',
-    unit: '',
-    gauge: {
-      dataPoints: [
-        {
-          asDouble: 6,
-          startTimeUnixNano: String(startTime),
-          timeUnixNano: String(time),
-        },
-      ],
-    },
-  });
+  assert.strictEqual(metric.name, 'double-observable-gauge');
+  assert.strictEqual(metric.description, 'sample observable gauge description');
+  assert.strictEqual(metric.unit, '');
+  assert.strictEqual(metric.gauge?.dataPoints.length, 1);
+
+  const [dp] = metric.gauge.dataPoints;
+  assert.strictEqual(dp.asDouble, 6);
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportedHistogramIsCorrect(
   metric: IMetric,
-  time?: number,
-  startTime?: number,
+  time: HrTime,
+  startTime: HrTime,
   explicitBounds: number[] = [Infinity],
   bucketCounts: string[] = ['2', '0']
 ) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-histogram',
-    description: 'sample histogram description',
-    unit: '',
-    histogram: {
-      dataPoints: [
-        {
-          sum: 21,
-          count: '2',
-          min: 7,
-          max: 14,
-          startTimeUnixNano: String(startTime),
-          timeUnixNano: String(time),
-          bucketCounts,
-          explicitBounds,
-        },
-      ],
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
-    },
-  });
+  assert.strictEqual(metric.name, 'int-histogram');
+  assert.strictEqual(metric.description, 'sample histogram description');
+  assert.strictEqual(metric.unit, '');
+
+  assert.strictEqual(metric.histogram?.dataPoints.length, 1);
+  assert.strictEqual(
+    metric.histogram.aggregationTemporality,
+    'AGGREGATION_TEMPORALITY_CUMULATIVE'
+  );
+
+  const [dp] = metric.histogram.dataPoints;
+
+  assert.strictEqual(dp.sum, 21);
+  assert.strictEqual(dp.count, '2');
+  assert.strictEqual(dp.min, 7);
+  assert.strictEqual(dp.max, 14);
+  assert.deepStrictEqual(dp.explicitBounds, explicitBounds);
+  assert.deepStrictEqual(dp.bucketCounts, bucketCounts);
+  assert.deepStrictEqual(dp.startTimeUnixNano, encodeAsString(startTime));
+  assert.deepStrictEqual(dp.timeUnixNano, encodeAsString(time));
 }
 
 export function ensureExportMetricsServiceRequestIsSet(
@@ -224,7 +220,10 @@ export function ensureExportMetricsServiceRequestIsSet(
 }
 
 export class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
+  constructor(
+    private _code: number,
+    private _msg?: string
+  ) {
     super();
   }
 

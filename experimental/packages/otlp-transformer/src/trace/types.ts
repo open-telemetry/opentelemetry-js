@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-import { IInstrumentationScope, IKeyValue } from '../common/types';
+import { Fixed64, IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
 
 /** Properties of an ExportTraceServiceRequest. */
 export interface IExportTraceServiceRequest {
   /** ExportTraceServiceRequest resourceSpans */
   resourceSpans?: IResourceSpans[];
+}
+
+export interface IExportTraceServiceResponse {
+  /** ExportTraceServiceResponse partialSuccess */
+  partialSuccess?: IExportTracePartialSuccess;
+}
+
+export interface IExportTracePartialSuccess {
+  /** ExportLogsServiceResponse rejectedLogRecords */
+  rejectedSpans?: number;
+
+  /** ExportLogsServiceResponse errorMessage */
+  errorMessage?: string;
 }
 
 /** Properties of a ResourceSpans. */
@@ -50,16 +63,16 @@ export interface IScopeSpans {
 /** Properties of a Span. */
 export interface ISpan {
   /** Span traceId */
-  traceId: string;
+  traceId: string | Uint8Array;
 
   /** Span spanId */
-  spanId: string;
+  spanId: string | Uint8Array;
 
   /** Span traceState */
   traceState?: string | null;
 
   /** Span parentSpanId */
-  parentSpanId?: string;
+  parentSpanId?: string | Uint8Array;
 
   /** Span name */
   name: string;
@@ -68,10 +81,10 @@ export interface ISpan {
   kind: ESpanKind;
 
   /** Span startTimeUnixNano */
-  startTimeUnixNano: number;
+  startTimeUnixNano: Fixed64;
 
   /** Span endTimeUnixNano */
-  endTimeUnixNano: number;
+  endTimeUnixNano: Fixed64;
 
   /** Span attributes */
   attributes: IKeyValue[];
@@ -153,7 +166,7 @@ export const enum EStatusCode {
 /** Properties of an Event. */
 export interface IEvent {
   /** Event timeUnixNano */
-  timeUnixNano: number;
+  timeUnixNano: Fixed64;
 
   /** Event name */
   name: string;
@@ -168,10 +181,10 @@ export interface IEvent {
 /** Properties of a Link. */
 export interface ILink {
   /** Link traceId */
-  traceId: string;
+  traceId: string | Uint8Array;
 
   /** Link spanId */
-  spanId: string;
+  spanId: string | Uint8Array;
 
   /** Link traceState */
   traceState?: string;

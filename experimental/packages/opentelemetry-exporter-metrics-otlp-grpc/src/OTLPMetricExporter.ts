@@ -22,38 +22,43 @@ import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
   OTLPGRPCExporterConfigNode,
   OTLPGRPCExporterNodeBase,
-  ServiceClientType,
   validateAndNormalizeUrl,
   DEFAULT_COLLECTOR_URL,
+  MetricsSerializer,
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
-import { Metadata } from '@grpc/grpc-js';
 import {
   createExportMetricsServiceRequest,
   IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse,
 } from '@opentelemetry/otlp-transformer';
+import { VERSION } from './version';
+import { parseHeaders } from '@opentelemetry/otlp-exporter-base';
+
+const USER_AGENT = {
+  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+};
 
 class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest
+  IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
-    super(config);
-    const headers = baggageUtils.parseKeyPairsIntoRecord(
-      getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+    const signalSpecificMetadata = {
+      ...USER_AGENT,
+      ...baggageUtils.parseKeyPairsIntoRecord(
+        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+      ),
+      ...parseHeaders(config?.headers),
+    };
+    super(
+      config,
+      signalSpecificMetadata,
+      'MetricsExportService',
+      '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
+      MetricsSerializer
     );
-    this.metadata ||= new Metadata();
-    for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v);
-    }
-  }
-
-  getServiceProtoPath(): string {
-    return 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
-  }
-
-  getServiceClientType(): ServiceClientType {
-    return ServiceClientType.METRICS;
   }
 
   getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {

@@ -36,6 +36,7 @@ import {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';
+import { Gauge } from './types';
 
 export class SyncInstrument {
   constructor(
@@ -48,6 +49,12 @@ export class SyncInstrument {
     attributes: MetricAttributes = {},
     context: Context = contextApi.active()
   ) {
+    if (typeof value !== 'number') {
+      diag.warn(
+        `non-number value provided to metric ${this._descriptor.name}: ${value}`
+      );
+      return;
+    }
     if (
       this._descriptor.valueType === ValueType.INT &&
       !Number.isInteger(value)
@@ -56,6 +63,10 @@ export class SyncInstrument {
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
+      // ignore non-finite values.
+      if (!Number.isInteger(value)) {
+        return;
+      }
     }
     this._writableMetricStorage.record(
       value,
@@ -96,6 +107,18 @@ export class CounterInstrument extends SyncInstrument implements Counter {
       return;
     }
 
+    this._record(value, attributes, ctx);
+  }
+}
+
+/**
+ * The class implements {@link Gauge} interface.
+ */
+export class GaugeInstrument extends SyncInstrument implements Gauge {
+  /**
+   * Records a measurement.
+   */
+  record(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     this._record(value, attributes, ctx);
   }
 }

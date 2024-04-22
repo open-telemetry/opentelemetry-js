@@ -272,7 +272,10 @@ class A {
 }
 
 class B extends A {
-  constructor(name = 'foo', private _ver = 1) {
+  constructor(
+    name = 'foo',
+    private _ver = 1
+  ) {
     super(name);
   }
   getVer() {

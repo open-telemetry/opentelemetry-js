@@ -84,6 +84,7 @@ describe('ConsoleSpanExporter', () => {
           'links',
           'name',
           'parentId',
+          'resource',
           'status',
           'timestamp',
           'traceId',
@@ -97,6 +98,13 @@ describe('ConsoleSpanExporter', () => {
 
         assert.ok(spyExport.calledOnce);
       });
+    });
+  });
+
+  describe('force flush', () => {
+    it('forceFlush should flush spans and return', async () => {
+      consoleExporter = new ConsoleSpanExporter();
+      await consoleExporter.forceFlush();
     });
   });
 });

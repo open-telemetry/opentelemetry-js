@@ -9,13 +9,218 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* feat(instrumentation): add patch and unpatch diag log messages [#4641](https://github.com/open-telemetry/opentelemetry-js/pull/4641)
+  * Instrumentations should not log patch and unpatch messages to diag channel.
+* feat!(instrumentation): remove moduleExports generic type from instrumentation registration [#4598](https://github.com/open-telemetry/opentelemetry-js/pull/4598) @blumamir
+  * breaking for instrumentation authors that depend on
+    * `InstrumentationBase`
+    * `InstrumentationNodeModuleDefinition`
+    * `InstrumentationNodeModuleFile`
+
 ### :rocket: (Enhancement)
 
+* feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
+* feat(propagator-aws-xray): moved AWS Xray propagator from contrib [4603](https://github.com/open-telemetry/opentelemetry-js/pull/4603) @martinkuba
+* feat(resources): new experimental detector ServiceInstanceIdDetectorSync that sets the value for `service.instance.id` as random UUID. [#4608](https://github.com/open-telemetry/opentelemetry-js/pull/4608) @maryliag
+
 ### :bug: (Bug Fix)
+
+* fix(sdk-trace-web): fix invalid timings in span events [#4486](https://github.com/open-telemetry/opentelemetry-js/pull/4486) @Abinet18
+* fix(resources): ensure BrowserDetector does not think Node.js v21 is a browser [#4561](https://github.com/open-telemetry/opentelemetry-js/issues/4561) @trentm
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.23.0
+
+### :rocket: (Enhancement)
+
+* perf(sdk-trace-base): do not allocate arrays if resource has no pending async attributes [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
+* feat(sdk-metrics): added experimental synchronous gauge to SDK [#4565](https://github.com/open-telemetry/opentelemetry-js/pull/4565) @clintonb
+  * this change will become user-facing in an upcoming release
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): increase the depth of the output to the console such that objects in the metric are printed fully to the console [#4522](https://github.com/open-telemetry/opentelemetry-js/pull/4522) @JacksonWeber
+
+## 1.22.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): allow single bucket histograms [#4456](https://github.com/open-telemetry/opentelemetry-js/pull/4456) @pichlermarc
+* feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
+* feat(context-zone-peer-dep, context-zone): support zone.js 0.13.x, 0.14.x [#4469](https://github.com/open-telemetry/opentelemetry-js/pull/4469) @pichlermarc
+* chore: Semantic Conventions export individual strings [4185](https://github.com/open-telemetry/opentelemetry-js/issues/4185)
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): handle zero bucket counts in exponential histogram merge [#4459](https://github.com/open-telemetry/opentelemetry-js/pull/4459) @mwear
+* fix(sdk-metrics): ignore `NaN` value recordings in Histograms [#4455](https://github.com/open-telemetry/opentelemetry-js/pull/4455) @pichlermarc
+  * fixes a bug where recording `NaN` on a histogram would result in the sum of bucket count values not matching the overall count
+* fix(sdk-metrics): allow single bucket histograms [#4456](https://github.com/open-telemetry/opentelemetry-js/pull/4456) @pichlermarc
+  * fixes a bug where `Meter.createHistogram()` with the advice `explicitBucketBoundaries: []` would throw
+* fix(context-zone-peer-dep, context-zone):  support zone.js 0.13.x, 0.14.x [#4469](https://github.com/open-telemetry/opentelemetry-js/pull/4469) @pichlermarc
+  * fixes a bug where old versions of `zone.js` affected by <https://github.com/angular/angular/issues/53507> would be pulled in
+
+### :books: (Refine Doc)
+
+* docs: shorten readme sections [#4460](https://github.com/open-telemetry/opentelemetry-js/pull/4460) @legendecas
+
+## 1.21.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): add constructor option to add metric readers [#4427](https://github.com/open-telemetry/opentelemetry-js/pull/4427) @pichlermarc
+  * deprecates `MeterProvider.addMetricReader()` please use the constructor option `readers` instead.
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): ensure attribute value length limit is enforced on span creation [#4417](https://github.com/open-telemetry/opentelemetry-js/pull/4417) @pichlermarc
+* fix(sdk-trace-base): Export processed spans while exporter failed [#4287](https://github.com/open-telemetry/opentelemetry-js/pull/4287) @Zirak
+
+### :house: (Internal)
+
+* chore(opentelemetry-context-zone-peer-dep): support zone.js ^v0.13.0 [#4320](https://github.com/open-telemetry/opentelemetry-js/pull/4320)
+* refactor(core): drop unnecessary assignment of HOSTNAME [#4421](https://github.com/open-telemetry/opentelemetry-js/pull/4421) @pichlermarc
+* test(opentelemetry-context-zone-peer-dep): transpile zone.js in tests [#4423](https://github.com/open-telemetry/opentelemetry-js/pull/4423) @legendecas
+
+## 1.20.0
+
+### :rocket: (Enhancement)
+
+* perf(otlp-transformer): skip unnecessary base64 encode of span contexts [#4343](https://github.com/open-telemetry/opentelemetry-js/pull/4343) @seemk
+* feat(sdk-trace-base): improve log messages when dropping span events [#4223](https://github.com/open-telemetry/opentelemetry-js/pull/4223) @mkubliniak
+
+## 1.19.0
+
+### :rocket: (Enhancement)
+
+* feat: add node 20 support [#4336](https://github.com/open-telemetry/opentelemetry-js/pull/4336) @dyladan
+
+### :house: (Internal)
+
+* chore: type reference on zone.js [#4257](https://github.com/open-telemetry/opentelemetry-js/pull/4257) @legendecas
+* chore: no need for 'packages' in lerna.json [#4264](https://github.com/open-telemetry/opentelemetry-js/pull/4264) @trentm
+* test: add node 20 to test matrix [#4336](https://github.com/open-telemetry/opentelemetry-js/pull/4336) @dyladan
+
+### :bug: (Bug Fix)
+
+* fix(api-logs): allow for TimeInput type for LogRecord timestamps [#4345](https://github.com/open-telemetry/opentelemetry-js/pull/4345)
+* fix(sdk-trace-web): only access location if it is defined [#4063](https://github.com/open-telemetry/opentelemetry-js/pull/4063)
+* fix(sdk-trace-base): processor onStart called with a span having empty attributes
+
+## 1.18.1
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): hand-roll MetricAdvice type as older API versions do not include it #4260
+
+## 1.18.0
+
+### :rocket: (Enhancement)
+
+* feat(metrics): prototype experimental advice support [#3876](https://github.com/open-telemetry/opentelemetry-js/pull/3876) @legendecas
+
+### :bug: (Bug Fix)
+
+* fix(core): remove re-export of `version.ts` [#4225](https://github.com/open-telemetry/opentelemetry-js/pull/4225) @david-luna
+
+### :house: (Internal)
+
+* chore: track package-lock.json [#4238](https://github.com/open-telemetry/opentelemetry-js/pull/4238) @legendecas
+  * Switched to npm workspaces to bootstrap dependencies.
+
+## 1.17.1
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): BatchSpanProcessor flushes when `maxExportBatchSize` is reached [#3958](https://github.com/open-telemetry/opentelemetry-js/pull/3958) @nordfjord
+* fix(sdk-metrics): allow instrument names to contain '/' [#4155](https://github.com/open-telemetry/opentelemetry-js/pull/4155)
+* fix(sdk-metrics): prevent per-reader storages from keeping unreported accumulations in memory [#4163](https://github.com/open-telemetry/opentelemetry-js/pull/4163) @pichlermarc
+  * fixes a memory leak which occurred when two or more `MetricReader` instances are registered to a `MeterProvider`
+* fix(sdk-metrics): do not report empty scopes and metrics [#4135](https://github.com/open-telemetry/opentelemetry-js/pull/4135) @pichlermarc
+  * Instruments that were created, but did not have measurements will not be exported anymore
+  * Meters (Scopes) that were created, but did not have any instruments with measurements under them will not be exported anymore.
+* fix(exporter-zipkin): round duration to the nearest int in annotations to be compliant with zipkin protocol [#4167](https://github.com/open-telemetry/opentelemetry-js/pull/4167) @FelipeEmerim
+
+### :books: (Refine Doc)
+
+* docs(contributing): added guidelines for adding benchmark tests [#4169](https://github.com/open-telemetry/opentelemetry-js/pull/4169)
+
+### :house: (Internal)
+
+* test: added a performance benchmark test for span creation [#4105](https://github.com/open-telemetry/opentelemetry-js/pull/4105)
+* test: added a workflow to run performance benchmark tests automatically [#4144](https://github.com/open-telemetry/opentelemetry-js/pull/4144)
+
+## 1.17.0
+
+### :bug: (Bug Fix)
+
+* Revert "feat(api): add attributes argument to recordException API [#4071](https://github.com/open-telemetry/opentelemetry-js/pull/4071)"
+  * This feature was an unintentional breaking change introduced with API 1.5.0
+  * This PR updates all SDK packages to allow API 1.6.0, where this change has been reverted.
+
+## 1.16.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): implement MetricProducer specification [#4007](https://github.com/open-telemetry/opentelemetry-js/pull/4007)
+* feat: update PeriodicExportingMetricReader and PrometheusExporter to accept optional metric producers [#4077](https://github.com/open-telemetry/opentelemetry-js/pull/4077) @aabmass
+
+### :bug: (Bug Fix)
+
+* fix(exporter-zipkin): rounding duration to the nearest int to be compliant with zipkin protocol [#4064](https://github.com/open-telemetry/opentelemetry-js/pull/4064) @n0cloud
+* fix(sdk-metrics): metric names should be case-insensitive
+
+### :books: (Refine Doc)
+
+* docs(guidelines): add dependencies guidelines [#4040](https://github.com/open-telemetry/opentelemetry-js/pull/4040)
+
+## 1.15.2
+
+### :bug: (Bug Fix)
+
+* fix(core): stop rounding to nearest int in hrTimeTo*seconds() functions [#4014](https://github.com/open-telemetry/opentelemetry-js/pull/4014/) @aabmass
+* fix(sdk-metrics): ignore invalid metric values [#3988](https://github.com/open-telemetry/opentelemetry-js/pull/3988) @legendecas
+* fix(core): add baggage support for values containing an equals sign [#3975](https://github.com/open-telemetry/opentelemetry-js/pull/3975) @krosenk729
+
+## 1.15.1
+
+### :bug: (Bug Fix)
+
+* Revert "feat(minification): Add noEmitHelpers, importHelpers and tslib as a dependency (#3914)"
+  [#4011](https://github.com/open-telemetry/opentelemetry-js/pull/4011) @dyladan
+
+## 1.15.0
+
+### :bug: (Bug Fix)
+
+* fix(opentelemetry-exporter-prometheus): Update default PrometheusExporter to not append a timestamp to match the text based exposition format [#3961](https://github.com/open-telemetry/opentelemetry-js/pull/3961) @JacksonWeber
+* fix(sdk-metrics): Update default Histogram's boundary to match OTEL's spec [#3893](https://github.com/open-telemetry/opentelemetry-js/pull/3893/) @chigia001
+* fix(sdk-metrics): preserve startTime for cumulative ExponentialHistograms [#3934](https://github.com/open-telemetry/opentelemetry-js/pull/3934/) @aabmass
+* fix(sdk-trace-web): add secureConnectionStart to https only [#3879](https://github.com/open-telemetry/opentelemetry-js/pull/3879) @Abinet18
+
+### :house: (Internal)
+
+* feat(minification): [Minification] Add noEmitHelpers, importHelpers and tslib as a dependency [#3913](https://github.com/open-telemetry/opentelemetry-js/issues/3913) @MSNev
+
+## 1.14.0
+
+### :rocket: (Enhancement)
+
+* feat(SpanExporter): Add optional forceFlush to SpanExporter interface [#3753](https://github.com/open-telemetry/opentelemetry-js/pull/3753/) @sgracias1 @JacksonWeber
+
+## 1.13.0
+
+### :rocket: (Enhancement)
+
+* feat(core): add environment variables for OTLP log exporters. [#3712](https://github.com/open-telemetry/opentelemetry-js/pull/3712/) @llc1123
+
+### :bug: (Bug Fix)
+
+* fix(http-instrumentation): stop listening to `request`'s `close` event once it has emitted `response` [#3625](https://github.com/open-telemetry/opentelemetry-js/pull/3625) @SimenB
+* fix(sdk-node): fix initialization in bundled environments by not loading @opentelemetry/exporter-jaeger [#3739](https://github.com/open-telemetry/opentelemetry-js/pull/3739) @pichlermarc
 
 ## 1.12.0
 
@@ -247,15 +452,7 @@ There are no changes between 1.0.0 and the previous 0.33.0 version.
 
 * fix(sdk-web): parse url with relative url string [#2972](https://github.com/open-telemetry/opentelemetry-js/pull/2972) @legendecas
 
-### :books: (Refine Doc)
-
-### :house: (Internal)
-
 ## 1.2.0
-
-### :boom: Breaking Change
-
-### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
@@ -2172,7 +2369,9 @@ Released 2020-03-19
 
 Released 2020-03-16
 
-### This is a first official beta release, which provides almost fully complete metrics, tracing, and context propagation functionality but makes no promises around breaking changes
+### First official beta release
+
+* provides almost fully complete metrics, tracing, and context propagation functionality but makes **no promises** around breaking changes
 
 ### :boom: Breaking Change
 

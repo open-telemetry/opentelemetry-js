@@ -15,6 +15,7 @@
  */
 
 import { TracerProvider, MeterProvider } from '@opentelemetry/api';
+import { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation {
@@ -42,6 +43,9 @@ export interface Instrumentation {
 
   /** Method to set meter provider  */
   setMeterProvider(meterProvider: MeterProvider): void;
+
+  /** Method to set logger provider  */
+  setLoggerProvider?(loggerProvider: LoggerProvider): void;
 
   /** Method to set instrumentation config  */
   setConfig(config: InstrumentationConfig): void;
@@ -76,4 +80,50 @@ export interface ShimWrapped extends Function {
   __unwrap: Function;
   // eslint-disable-next-line @typescript-eslint/ban-types
   __original: Function;
+}
+
+export interface InstrumentationModuleFile {
+  /** Name of file to be patched with relative path */
+  name: string;
+
+  moduleExports?: unknown;
+
+  /** Supported version this file */
+  supportedVersions: string[];
+
+  /** Method to patch the instrumentation  */
+  patch(moduleExports: unknown, moduleVersion?: string): unknown;
+
+  /** Method to patch the instrumentation  */
+
+  /** Method to unpatch the instrumentation  */
+  unpatch(moduleExports?: unknown, moduleVersion?: string): void;
+}
+
+export interface InstrumentationModuleDefinition {
+  /** Module name or path  */
+  name: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  moduleExports?: any;
+
+  /** Instrumented module version */
+  moduleVersion?: string;
+
+  /** Supported version of module  */
+  supportedVersions: string[];
+
+  /** Module internal files to be patched  */
+  files: InstrumentationModuleFile[];
+
+  /** If set to true, the includePrerelease check will be included when calling semver.satisfies */
+  includePrerelease?: boolean;
+
+  /** Method to patch the instrumentation  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  patch?: (moduleExports: any, moduleVersion?: string) => any;
+
+  /** Method to unpatch the instrumentation  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  unpatch?: (moduleExports: any, moduleVersion?: string) => void;
 }

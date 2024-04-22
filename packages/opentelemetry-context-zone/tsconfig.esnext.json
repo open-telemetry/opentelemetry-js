@@ -5,9 +5,6 @@
     "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
-  "files": [
-    "node_modules/zone.js/dist/zone.js.d.ts"
-  ],
   "include": [
     "src/**/*.ts"
   ],

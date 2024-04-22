@@ -51,6 +51,7 @@ export {
   ObservableUpDownCounter,
   UpDownCounter,
   BatchObservableCallback,
+  MetricAdvice,
   MetricAttributes,
   MetricAttributeValue,
   ObservableCallback,

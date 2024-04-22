@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Attributes, Context } from '@opentelemetry/api';
+import { Context, TimeInput } from '@opentelemetry/api';
+import { AnyValue, AnyValueMap } from './AnyValue';
+
+export type LogBody = AnyValue;
+export type LogAttributes = AnyValueMap;
 
 export enum SeverityNumber {
   UNSPECIFIED = 0,
@@ -48,7 +52,12 @@ export interface LogRecord {
   /**
    * The time when the log record occurred as UNIX Epoch time in nanoseconds.
    */
-  timestamp?: number;
+  timestamp?: TimeInput;
+
+  /**
+   * Time when the event was observed by the collection system.
+   */
+  observedTimestamp?: TimeInput;
 
   /**
    * Numerical value of the severity.
@@ -63,12 +72,12 @@ export interface LogRecord {
   /**
    * A value containing the body of the log record.
    */
-  body?: string;
+  body?: LogBody;
 
   /**
    * Attributes that define the log record.
    */
-  attributes?: Attributes;
+  attributes?: LogAttributes;
 
   /**
    * The Context associated with the LogRecord.

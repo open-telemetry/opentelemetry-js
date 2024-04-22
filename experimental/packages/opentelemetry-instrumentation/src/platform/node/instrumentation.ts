@@ -16,25 +16,31 @@
 
 import * as types from '../../types';
 import * as path from 'path';
+import { types as utilTypes } from 'util';
 import { satisfies } from 'semver';
+import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
 import { InstrumentationAbstract } from '../../instrumentation';
 import {
   RequireInTheMiddleSingleton,
   Hooked,
 } from './RequireInTheMiddleSingleton';
-import { InstrumentationModuleDefinition } from './types';
+import type { HookFn } from 'import-in-the-middle';
+import * as ImportInTheMiddle from 'import-in-the-middle';
+import { InstrumentationModuleDefinition } from '../../types';
 import { diag } from '@opentelemetry/api';
-import * as RequireInTheMiddle from 'require-in-the-middle';
+import type { OnRequireFn } from 'require-in-the-middle';
+import { Hook } from 'require-in-the-middle';
+import { readFileSync } from 'fs';
 
 /**
  * Base abstract class for instrumenting node plugins
  */
-export abstract class InstrumentationBase<T = any>
+export abstract class InstrumentationBase
   extends InstrumentationAbstract
   implements types.Instrumentation
 {
-  private _modules: InstrumentationModuleDefinition<T>[];
-  private _hooks: (Hooked | RequireInTheMiddle.Hooked)[] = [];
+  private _modules: InstrumentationModuleDefinition[];
+  private _hooks: (Hooked | Hook)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
   private _enabled = false;
@@ -52,7 +58,7 @@ export abstract class InstrumentationBase<T = any>
       modules = [modules];
     }
 
-    this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
+    this._modules = (modules as InstrumentationModuleDefinition[]) || [];
 
     if (this._modules.length === 0) {
       diag.debug(
@@ -67,8 +73,77 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
+  protected override _wrap: typeof wrap = (moduleExports, name, wrapper) => {
+    if (!utilTypes.isProxy(moduleExports)) {
+      return wrap(moduleExports, name, wrapper);
+    } else {
+      const wrapped = wrap(Object.assign({}, moduleExports), name, wrapper);
+
+      return Object.defineProperty(moduleExports, name, {
+        value: wrapped,
+      });
+    }
+  };
+
+  protected override _unwrap: typeof unwrap = (moduleExports, name) => {
+    if (!utilTypes.isProxy(moduleExports)) {
+      return unwrap(moduleExports, name);
+    } else {
+      return Object.defineProperty(moduleExports, name, {
+        value: moduleExports[name],
+      });
+    }
+  };
+
+  protected override _massWrap: typeof massWrap = (
+    moduleExportsArray,
+    names,
+    wrapper
+  ) => {
+    if (!moduleExportsArray) {
+      diag.error('must provide one or more modules to patch');
+      return;
+    } else if (!Array.isArray(moduleExportsArray)) {
+      moduleExportsArray = [moduleExportsArray];
+    }
+
+    if (!(names && Array.isArray(names))) {
+      diag.error('must provide one or more functions to wrap on modules');
+      return;
+    }
+
+    moduleExportsArray.forEach(moduleExports => {
+      names.forEach(name => {
+        this._wrap(moduleExports, name, wrapper);
+      });
+    });
+  };
+
+  protected override _massUnwrap: typeof massUnwrap = (
+    moduleExportsArray,
+    names
+  ) => {
+    if (!moduleExportsArray) {
+      diag.error('must provide one or more modules to patch');
+      return;
+    } else if (!Array.isArray(moduleExportsArray)) {
+      moduleExportsArray = [moduleExportsArray];
+    }
+
+    if (!(names && Array.isArray(names))) {
+      diag.error('must provide one or more functions to wrap on modules');
+      return;
+    }
+
+    moduleExportsArray.forEach(moduleExports => {
+      names.forEach(name => {
+        this._unwrap(moduleExports, name);
+      });
+    });
+  };
+
   private _warnOnPreloadedModules(): void {
-    this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
+    this._modules.forEach((module: InstrumentationModuleDefinition) => {
       const { name } = module;
       try {
         const resolvedModule = require.resolve(name);
@@ -86,8 +161,10 @@ export abstract class InstrumentationBase<T = any>
 
   private _extractPackageVersion(baseDir: string): string | undefined {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const version = require(path.join(baseDir, 'package.json')).version;
+      const json = readFileSync(path.join(baseDir, 'package.json'), {
+        encoding: 'utf8',
+      });
+      const version = JSON.parse(json).version;
       return typeof version === 'string' ? version : undefined;
     } catch (error) {
       diag.warn('Failed extracting version', baseDir);
@@ -97,15 +174,21 @@ export abstract class InstrumentationBase<T = any>
   }
 
   private _onRequire<T>(
-    module: InstrumentationModuleDefinition<T>,
+    module: InstrumentationModuleDefinition,
     exports: T,
     name: string,
-    baseDir?: string
+    baseDir?: string | void
   ): T {
     if (!baseDir) {
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
         if (this._enabled) {
+          this._diag.debug(
+            'Applying instrumentation patch for nodejs core module on require hook',
+            {
+              module: module.name,
+            }
+          );
           return module.patch(exports);
         }
       }
@@ -122,6 +205,14 @@ export abstract class InstrumentationBase<T = any>
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
+            this._diag.debug(
+              'Applying instrumentation patch for module on require hook',
+              {
+                module: module.name,
+                version: module.moduleVersion,
+                baseDir,
+              }
+            );
             return module.patch(exports, module.moduleVersion);
           }
         }
@@ -130,15 +221,27 @@ export abstract class InstrumentationBase<T = any>
     }
     // internal file
     const files = module.files ?? [];
+    const normalizedName = path.normalize(name);
     const supportedFileInstrumentations = files
-      .filter(f => f.name === name)
+      .filter(f => f.name === normalizedName)
       .filter(f =>
         isSupported(f.supportedVersions, version, module.includePrerelease)
       );
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
       if (this._enabled) {
-        return file.patch(patchedExports, module.moduleVersion);
+        this._diag.debug(
+          'Applying instrumentation patch for nodejs module file on require hook',
+          {
+            module: module.name,
+            version: module.moduleVersion,
+            fileName: file.name,
+            baseDir,
+          }
+        );
+
+        // patch signature is not typed, so we cast it assuming it's correct
+        return file.patch(patchedExports, module.moduleVersion) as T;
       }
       return patchedExports;
     }, exports);
@@ -154,10 +257,25 @@ export abstract class InstrumentationBase<T = any>
     if (this._hooks.length > 0) {
       for (const module of this._modules) {
         if (typeof module.patch === 'function' && module.moduleExports) {
+          this._diag.debug(
+            'Applying instrumentation patch for nodejs module on instrumentation enabled',
+            {
+              module: module.name,
+              version: module.moduleVersion,
+            }
+          );
           module.patch(module.moduleExports, module.moduleVersion);
         }
         for (const file of module.files) {
           if (file.moduleExports) {
+            this._diag.debug(
+              'Applying instrumentation patch for nodejs module file on instrumentation enabled',
+              {
+                module: module.name,
+                version: module.moduleVersion,
+                fileName: file.name,
+              }
+            );
             file.patch(file.moduleExports, module.moduleVersion);
           }
         }
@@ -167,26 +285,28 @@ export abstract class InstrumentationBase<T = any>
 
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
-      const onRequire: RequireInTheMiddle.OnRequireFn = (
-        exports,
-        name,
-        baseDir
-      ) => {
-        return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition<typeof exports>,
-          exports,
-          name,
-          baseDir
-        );
+      const hookFn: HookFn = (exports, name, baseDir) => {
+        return this._onRequire<typeof exports>(module, exports, name, baseDir);
+      };
+      const onRequire: OnRequireFn = (exports, name, baseDir) => {
+        return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
 
       // `RequireInTheMiddleSingleton` does not support absolute paths.
-      // For an absolute paths, we must create a separate instance of `RequireInTheMiddle`.
+      // For an absolute paths, we must create a separate instance of the
+      // require-in-the-middle `Hook`.
       const hook = path.isAbsolute(module.name)
-        ? RequireInTheMiddle([module.name], { internals: true }, onRequire)
+        ? new Hook([module.name], { internals: true }, onRequire)
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
+      const esmHook =
+        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
+          [module.name],
+          { internals: false },
+          <HookFn>hookFn
+        );
+      this._hooks.push(esmHook);
     }
   }
 
@@ -198,10 +318,25 @@ export abstract class InstrumentationBase<T = any>
 
     for (const module of this._modules) {
       if (typeof module.unpatch === 'function' && module.moduleExports) {
+        this._diag.debug(
+          'Removing instrumentation patch for nodejs module on instrumentation disabled',
+          {
+            module: module.name,
+            version: module.moduleVersion,
+          }
+        );
         module.unpatch(module.moduleExports, module.moduleVersion);
       }
       for (const file of module.files) {
         if (file.moduleExports) {
+          this._diag.debug(
+            'Removing instrumentation patch for nodejs module file on instrumentation disabled',
+            {
+              module: module.name,
+              version: module.moduleVersion,
+              fileName: file.name,
+            }
+          );
           file.unpatch(file.moduleExports, module.moduleVersion);
         }
       }

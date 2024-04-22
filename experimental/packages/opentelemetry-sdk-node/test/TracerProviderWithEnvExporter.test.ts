@@ -132,7 +132,7 @@ describe('set up trace exporter with env exporters', () => {
       assert(listOfProcessors === undefined);
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('log warning that sdk will not be initalized when exporter is set to none', async () => {
+    it('log warning that sdk will not be initialized when exporter is set to none', async () => {
       env.OTEL_TRACES_EXPORTER = 'none';
       new TracerProviderWithEnvExporters();
 

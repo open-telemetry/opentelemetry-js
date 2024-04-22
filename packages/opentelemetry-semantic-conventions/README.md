@@ -38,4 +38,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/semantic-conventions
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsemantic-conventions.svg
 
-[trace-semantic_conventions]: https://github.com/open-telemetry/opentelemetry-specification/tree/master/specification/trace/semantic_conventions
+[trace-semantic_conventions]: https://github.com/open-telemetry/semantic-conventions/tree/main/specification/trace/semantic_conventions

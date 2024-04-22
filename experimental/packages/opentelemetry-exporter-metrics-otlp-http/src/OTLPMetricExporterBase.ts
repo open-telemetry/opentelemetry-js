@@ -21,8 +21,13 @@ import {
   InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
+  Aggregation,
+  AggregationSelector,
 } from '@opentelemetry/sdk-metrics';
-import { OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporterOptions,
+} from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { diag } from '@opentelemetry/api';
@@ -36,11 +41,28 @@ export const DeltaTemporalitySelector: AggregationTemporalitySelector = (
   switch (instrumentType) {
     case InstrumentType.COUNTER:
     case InstrumentType.OBSERVABLE_COUNTER:
+    case InstrumentType.GAUGE:
     case InstrumentType.HISTOGRAM:
     case InstrumentType.OBSERVABLE_GAUGE:
       return AggregationTemporality.DELTA;
     case InstrumentType.UP_DOWN_COUNTER:
     case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
+      return AggregationTemporality.CUMULATIVE;
+  }
+};
+
+export const LowMemoryTemporalitySelector: AggregationTemporalitySelector = (
+  instrumentType: InstrumentType
+) => {
+  switch (instrumentType) {
+    case InstrumentType.COUNTER:
+    case InstrumentType.HISTOGRAM:
+      return AggregationTemporality.DELTA;
+    case InstrumentType.GAUGE:
+    case InstrumentType.UP_DOWN_COUNTER:
+    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
+    case InstrumentType.OBSERVABLE_COUNTER:
+    case InstrumentType.OBSERVABLE_GAUGE:
       return AggregationTemporality.CUMULATIVE;
   }
 };
@@ -56,6 +78,9 @@ function chooseTemporalitySelectorFromEnvironment() {
   if (configuredTemporality === 'delta') {
     return DeltaTemporalitySelector;
   }
+  if (configuredTemporality === 'lowmemory') {
+    return LowMemoryTemporalitySelector;
+  }
 
   diag.warn(
     `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE is set to '${env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE}', but only 'cumulative' and 'delta' are allowed. Using default ('cumulative') instead.`
@@ -64,12 +89,18 @@ function chooseTemporalitySelectorFromEnvironment() {
 }
 
 function chooseTemporalitySelector(
-  temporalityPreference?: AggregationTemporality
+  temporalityPreference?:
+    | AggregationTemporalityPreference
+    | AggregationTemporality
 ): AggregationTemporalitySelector {
   // Directly passed preference has priority.
   if (temporalityPreference != null) {
-    if (temporalityPreference === AggregationTemporality.DELTA) {
+    if (temporalityPreference === AggregationTemporalityPreference.DELTA) {
       return DeltaTemporalitySelector;
+    } else if (
+      temporalityPreference === AggregationTemporalityPreference.LOWMEMORY
+    ) {
+      return LowMemoryTemporalitySelector;
     }
     return CumulativeTemporalitySelector;
   }
@@ -77,19 +108,31 @@ function chooseTemporalitySelector(
   return chooseTemporalitySelectorFromEnvironment();
 }
 
+function chooseAggregationSelector(
+  config: OTLPMetricExporterOptions | undefined
+) {
+  if (config?.aggregationPreference) {
+    return config.aggregationPreference;
+  } else {
+    return (_instrumentType: any) => Aggregation.Default();
+  }
+}
+
 export class OTLPMetricExporterBase<
   T extends OTLPExporterBase<
     OTLPMetricExporterOptions,
     ResourceMetrics,
     IExportMetricsServiceRequest
-  >
+  >,
 > implements PushMetricExporter
 {
   public _otlpExporter: T;
-  protected _aggregationTemporalitySelector: AggregationTemporalitySelector;
+  private _aggregationTemporalitySelector: AggregationTemporalitySelector;
+  private _aggregationSelector: AggregationSelector;
 
   constructor(exporter: T, config?: OTLPMetricExporterOptions) {
     this._otlpExporter = exporter;
+    this._aggregationSelector = chooseAggregationSelector(config);
     this._aggregationTemporalitySelector = chooseTemporalitySelector(
       config?.temporalityPreference
     );
@@ -108,6 +151,10 @@ export class OTLPMetricExporterBase<
 
   forceFlush(): Promise<void> {
     return Promise.resolve();
+  }
+
+  selectAggregation(instrumentType: InstrumentType): Aggregation {
+    return this._aggregationSelector(instrumentType);
   }
 
   selectAggregationTemporality(

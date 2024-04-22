@@ -21,6 +21,7 @@ import {
   diag,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
+import { logs } from '@opentelemetry/api-logs';
 import {
   InstrumentationOption,
   registerInstrumentations,
@@ -30,11 +31,13 @@ import {
   DetectorSync,
   detectResourcesSync,
   envDetector,
+  hostDetector,
   IResource,
   processDetector,
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
+import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
@@ -44,11 +47,14 @@ import {
   NodeTracerConfig,
   NodeTracerProvider,
 } from '@opentelemetry/sdk-trace-node';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { parseInstrumentationOptions } from './utils';
+import {
+  getResourceDetectorsFromEnv,
+  parseInstrumentationOptions,
+} from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -63,13 +69,21 @@ export type MeterProviderConfig = {
   views?: View[];
 };
 
+export type LoggerProviderConfig = {
+  /**
+   * Reference to the LoggerRecordProcessor instance by the NodeSDK
+   */
+  logRecordProcessor: LogRecordProcessor;
+};
+
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
-    spanProcessor: SpanProcessor;
+    spanProcessors: SpanProcessor[];
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
+  private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
 
@@ -79,8 +93,10 @@ export class NodeSDK {
   private _autoDetectResources: boolean;
 
   private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
+  private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
+  private _configuration?: Partial<NodeSDKConfiguration>;
 
   private _disabled?: boolean;
 
@@ -105,17 +121,29 @@ export class NodeSDK {
       });
     }
 
+    this._configuration = configuration;
+
     this._resource = configuration.resource ?? new Resource({});
-    this._resourceDetectors = configuration.resourceDetectors ?? [
-      envDetector,
-      processDetector,
-    ];
+    let defaultDetectors: (Detector | DetectorSync)[] = [];
+    if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
+      defaultDetectors = getResourceDetectorsFromEnv();
+    } else {
+      defaultDetectors = [envDetector, processDetector, hostDetector];
+    }
+
+    this._resourceDetectors =
+      configuration.resourceDetectors ?? defaultDetectors;
 
     this._serviceName = configuration.serviceName;
 
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
-    if (configuration.spanProcessor || configuration.traceExporter) {
+    // If a tracer provider can be created from manual configuration, create it
+    if (
+      configuration.traceExporter ||
+      configuration.spanProcessor ||
+      configuration.spanProcessors
+    ) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
       if (configuration.sampler) {
@@ -128,16 +156,31 @@ export class NodeSDK {
         tracerProviderConfig.idGenerator = configuration.idGenerator;
       }
 
+      if (configuration.spanProcessor) {
+        diag.warn(
+          "The 'spanProcessor' option is deprecated. Please use 'spanProcessors' instead."
+        );
+      }
+
       const spanProcessor =
         configuration.spanProcessor ??
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         new BatchSpanProcessor(configuration.traceExporter!);
 
-      this.configureTracerProvider(
-        tracerProviderConfig,
-        spanProcessor,
-        configuration.contextManager,
-        configuration.textMapPropagator
-      );
+      const spanProcessors = configuration.spanProcessors ?? [spanProcessor];
+
+      this._tracerProviderConfig = {
+        tracerConfig: tracerProviderConfig,
+        spanProcessors,
+        contextManager: configuration.contextManager,
+        textMapPropagator: configuration.textMapPropagator,
+      };
+    }
+
+    if (configuration.logRecordProcessor) {
+      this._loggerProviderConfig = {
+        logRecordProcessor: configuration.logRecordProcessor,
+      };
     }
 
     if (configuration.metricReader || configuration.views) {
@@ -150,7 +193,7 @@ export class NodeSDK {
         meterProviderConfig.views = configuration.views;
       }
 
-      this.configureMeterProvider(meterProviderConfig);
+      this._meterProviderConfig = meterProviderConfig;
     }
 
     let instrumentations: InstrumentationOption[] = [];
@@ -160,72 +203,8 @@ export class NodeSDK {
     this._instrumentations = instrumentations;
   }
 
-  /** Set configurations required to register a NodeTracerProvider */
-  public configureTracerProvider(
-    tracerConfig: NodeTracerConfig,
-    spanProcessor: SpanProcessor,
-    contextManager?: ContextManager,
-    textMapPropagator?: TextMapPropagator
-  ): void {
-    this._tracerProviderConfig = {
-      tracerConfig,
-      spanProcessor,
-      contextManager,
-      textMapPropagator,
-    };
-  }
-
-  /** Set configurations needed to register a MeterProvider */
-  public configureMeterProvider(config: MeterProviderConfig): void {
-    // nothing is set yet, we can set config and return.
-    if (this._meterProviderConfig == null) {
-      this._meterProviderConfig = config;
-      return;
-    }
-
-    // make sure we do not override existing views with other views.
-    if (this._meterProviderConfig.views != null && config.views != null) {
-      throw new Error('Views passed but Views have already been configured.');
-    }
-
-    // set views, but make sure we do not override existing views with null/undefined.
-    if (config.views != null) {
-      this._meterProviderConfig.views = config.views;
-    }
-
-    // make sure we do not override existing reader with another reader.
-    if (this._meterProviderConfig.reader != null && config.reader != null) {
-      throw new Error(
-        'MetricReader passed but MetricReader has already been configured.'
-      );
-    }
-
-    // set reader, but make sure we do not override existing reader with null/undefined.
-    if (config.reader != null) {
-      this._meterProviderConfig.reader = config.reader;
-    }
-  }
-
-  /** Detect resource attributes */
-  public detectResources(): void {
-    if (this._disabled) {
-      return;
-    }
-
-    const internalConfig: ResourceDetectionConfig = {
-      detectors: this._resourceDetectors,
-    };
-
-    this.addResource(detectResourcesSync(internalConfig));
-  }
-
-  /** Manually add a resource */
-  public addResource(resource: IResource): void {
-    this._resource = this._resource.merge(resource);
-  }
-
   /**
-   * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
+   * Call this method to construct SDK components and register them with the OpenTelemetry API.
    */
   public start(): void {
     if (this._disabled) {
@@ -237,7 +216,13 @@ export class NodeSDK {
     });
 
     if (this._autoDetectResources) {
-      this.detectResources();
+      const internalConfig: ResourceDetectionConfig = {
+        detectors: this._resourceDetectors,
+      };
+
+      this._resource = this._resource.merge(
+        detectResourcesSync(internalConfig)
+      );
     }
 
     this._resource =
@@ -245,23 +230,27 @@ export class NodeSDK {
         ? this._resource
         : this._resource.merge(
             new Resource({
-              [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName,
+              [SEMRESATTRS_SERVICE_NAME]: this._serviceName,
             })
           );
 
+    // if there is a tracerProviderConfig (traceExporter/spanProcessor was set manually) or the traceExporter is set manually, use NodeTracerProvider
     const Provider = this._tracerProviderConfig
       ? NodeTracerProvider
       : TracerProviderWithEnvExporters;
 
+    // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations and set them here
     const tracerProvider = new Provider({
-      ...this._tracerProviderConfig?.tracerConfig,
+      ...this._configuration,
       resource: this._resource,
     });
 
     this._tracerProvider = tracerProvider;
 
     if (this._tracerProviderConfig) {
-      tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
+      for (const spanProcessor of this._tracerProviderConfig.spanProcessors) {
+        tracerProvider.addSpanProcessor(spanProcessor);
+      }
     }
 
     tracerProvider.register({
@@ -269,15 +258,29 @@ export class NodeSDK {
       propagator: this._tracerProviderConfig?.textMapPropagator,
     });
 
+    if (this._loggerProviderConfig) {
+      const loggerProvider = new LoggerProvider({
+        resource: this._resource,
+      });
+      loggerProvider.addLogRecordProcessor(
+        this._loggerProviderConfig.logRecordProcessor
+      );
+
+      this._loggerProvider = loggerProvider;
+
+      logs.setGlobalLoggerProvider(loggerProvider);
+    }
+
     if (this._meterProviderConfig) {
+      const readers: MetricReader[] = [];
+      if (this._meterProviderConfig.reader) {
+        readers.push(this._meterProviderConfig.reader);
+      }
       const meterProvider = new MeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
+        readers: readers,
       });
-
-      if (this._meterProviderConfig.reader) {
-        meterProvider.addMetricReader(this._meterProviderConfig.reader);
-      }
 
       this._meterProvider = meterProvider;
 
@@ -298,6 +301,9 @@ export class NodeSDK {
     const promises: Promise<unknown>[] = [];
     if (this._tracerProvider) {
       promises.push(this._tracerProvider.shutdown());
+    }
+    if (this._loggerProvider) {
+      promises.push(this._loggerProvider.shutdown());
     }
     if (this._meterProvider) {
       promises.push(this._meterProvider.shutdown());

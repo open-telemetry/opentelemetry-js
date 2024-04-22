@@ -5,8 +5,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides exporter for node to be used with OTLP (`http/protobuf`) compatible receivers.
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.32 <=0.50`.
+This module provides a trace-exporter for OTLP (http/protobuf) using protocol version `v0.20.0`.
 
 ## Installation
 

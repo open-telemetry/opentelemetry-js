@@ -9,6 +9,8 @@
 - `@opentelemetry/exporter-trace-otlp-grpc`
 - `@opentelemetry/exporter-trace-otlp-http`
 
+**NOTE: Bundling (with e.g. `webpack`, `rollup`, `esbuild`, ...) is not supported by this package. Please use `@opentelemetry/exporter-trace-otlp-proto` instead.**
+
 OpenTelemetry Jaeger Trace Exporter allows the user to send collected traces to Jaeger.
 
 [Jaeger](https://jaeger.readthedocs.io/en/latest/), inspired by [Dapper](https://research.google.com/pubs/pub36356.html) and [OpenZipkin](http://zipkin.io/), is a distributed tracing system released as open source by [Uber Technologies](http://uber.github.io/). It is used for monitoring and troubleshooting microservices-based distributed systems, including:

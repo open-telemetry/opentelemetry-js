@@ -56,17 +56,30 @@ export function hasKey<O extends object>(
  * @param span
  * @param performanceName name of performance entry for time start
  * @param entries
+ * @param refPerfName name of performance entry to use for reference
  */
 export function addSpanNetworkEvent(
   span: api.Span,
   performanceName: string,
-  entries: PerformanceEntries
+  entries: PerformanceEntries,
+  refPerfName?: string
 ): api.Span | undefined {
+  let perfTime = undefined;
+  let refTime = undefined;
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
   ) {
-    span.addEvent(performanceName, entries[performanceName]);
+    perfTime = entries[performanceName];
+  }
+  const refName = refPerfName || PTN.FETCH_START;
+  // Use a reference time which is the earliest possible value so that the performance timings that are earlier should not be added
+  // using FETCH START time in case no reference is provided
+  if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
+    refTime = entries[refName];
+  }
+  if (perfTime !== undefined && refTime !== undefined && perfTime >= refTime) {
+    span.addEvent(performanceName, perfTime);
     return span;
   }
   return undefined;
@@ -85,7 +98,12 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
   addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
   addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-  addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  if (
+    hasKey(resource as PerformanceResourceTiming, 'name') &&
+    (resource as PerformanceResourceTiming)['name'].startsWith('https:')
+  ) {
+    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  }
   addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
@@ -124,6 +142,11 @@ export function sortResources(
     }
     return 0;
   });
+}
+
+/** Returns the origin if present (if in browser context). */
+function getOrigin(): string | undefined {
+  return typeof location !== 'undefined' ? location.origin : undefined;
 }
 
 /**
@@ -169,7 +192,7 @@ export function getResource(
   }
   const sorted = sortResources(filteredResources);
 
-  if (parsedSpanUrl.origin !== location.origin && sorted.length > 1) {
+  if (parsedSpanUrl.origin !== getOrigin() && sorted.length > 1) {
     let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
     let mainRequest: PerformanceResourceTiming = findMainRequest(
       sorted,
@@ -433,7 +456,7 @@ export function shouldPropagateTraceHeaders(
   }
   const parsedSpanUrl = parseUrl(spanUrl);
 
-  if (parsedSpanUrl.origin === location.origin) {
+  if (parsedSpanUrl.origin === getOrigin()) {
     return true;
   } else {
     return propagateTraceHeaderUrls.some(propagateTraceHeaderUrl =>

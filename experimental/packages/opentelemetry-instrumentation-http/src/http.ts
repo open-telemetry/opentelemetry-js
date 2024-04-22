@@ -58,15 +58,14 @@ import {
 } from '@opentelemetry/instrumentation';
 import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { errorMonitor } from 'events';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMATTRS_HTTP_ROUTE } from '@opentelemetry/semantic-conventions';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
  */
-export class HttpInstrumentation extends InstrumentationBase<Http> {
+export class HttpInstrumentation extends InstrumentationBase {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
-  private readonly _version = process.versions.node;
   private _headerCapture;
   private _httpServerDurationHistogram!: Histogram;
   private _httpClientDurationHistogram!: Histogram;
@@ -105,18 +104,17 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   init(): [
-    InstrumentationNodeModuleDefinition<Https>,
-    InstrumentationNodeModuleDefinition<Http>
+    InstrumentationNodeModuleDefinition,
+    InstrumentationNodeModuleDefinition,
   ] {
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
   }
 
   private _getHttpInstrumentation() {
-    return new InstrumentationNodeModuleDefinition<Http>(
+    return new InstrumentationNodeModuleDefinition(
       'http',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for http@${this._version}`);
+      (moduleExports: Http): Http => {
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -143,9 +141,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
         return moduleExports;
       },
-      moduleExports => {
+      (moduleExports: Http) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for http@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -155,11 +152,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   private _getHttpsInstrumentation() {
-    return new InstrumentationNodeModuleDefinition<Https>(
+    return new InstrumentationNodeModuleDefinition(
       'https',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for https@${this._version}`);
+      (moduleExports: Https): Https => {
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -186,9 +182,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
         return moduleExports;
       },
-      moduleExports => {
+      (moduleExports: Https) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for https@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -236,7 +231,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       // https://nodejs.org/dist/latest/docs/api/http.html#http_http_get_options_callback
       // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-http.ts#L198
       return function outgoingGetRequest<
-        T extends http.RequestOptions | string | url.URL
+        T extends http.RequestOptions | string | url.URL,
       >(options: T, ...args: HttpRequestArgs): http.ClientRequest {
         const req = clientRequest(options, ...args);
         req.end();
@@ -315,6 +310,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
+    /**
+     * Determines if the request has errored or the response has ended/errored.
+     */
+    let responseFinished = false;
+
     /*
      * User 'response' event listeners can be added before our listener,
      * force our listener to be the first, so response emitter is bound
@@ -323,6 +323,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
+        this._diag.debug('outgoingRequest on response()');
+        if (request.listenerCount('response') <= 1) {
+          response.resume();
+        }
         const responseAttributes =
           utils.getOutgoingRequestAttributesOnResponse(response);
         span.setAttributes(responseAttributes);
@@ -344,9 +348,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
 
         context.bind(context.active(), response);
-        this._diag.debug('outgoingRequest on response()');
-        response.on('end', () => {
+
+        const endHandler = () => {
           this._diag.debug('outgoingRequest on end()');
+          if (responseFinished) {
+            return;
+          }
+          responseFinished = true;
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -381,15 +389,24 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             startTime,
             metricAttributes
           );
-        });
+        };
+
+        response.on('end', endHandler);
+        // See https://github.com/open-telemetry/opentelemetry-js/pull/3625#issuecomment-1475673533
+        if (semver.lt(process.version, '16.0.0')) {
+          response.on('close', endHandler);
+        }
         response.on(errorMonitor, (error: Err) => {
           this._diag.debug('outgoingRequest on error()', error);
+          if (responseFinished) {
+            return;
+          }
+          responseFinished = true;
           utils.setSpanWithError(span, error);
-          const code = utils.parseResponseStatus(
-            SpanKind.CLIENT,
-            response.statusCode
-          );
-          span.setStatus({ code, message: error.message });
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: error.message,
+          });
           this._closeHttpSpan(
             span,
             SpanKind.CLIENT,
@@ -401,12 +418,18 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     );
     request.on('close', () => {
       this._diag.debug('outgoingRequest on request close()');
-      if (!request.aborted) {
-        this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
+      if (request.aborted || responseFinished) {
+        return;
       }
+      responseFinished = true;
+      this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
     request.on(errorMonitor, (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
+      if (responseFinished) {
+        return;
+      }
+      responseFinished = true;
       utils.setSpanWithError(span, error);
       this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
@@ -646,6 +669,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
+      } else {
+        // Make a copy of the headers object to avoid mutating an object the
+        // caller might have a reference to.
+        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
       }
       propagation.inject(requestContext, optionsParsed.headers);
 
@@ -713,7 +740,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
 
-    const route = attributes[SemanticAttributes.HTTP_ROUTE];
+    const route = attributes[SEMATTRS_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
     }

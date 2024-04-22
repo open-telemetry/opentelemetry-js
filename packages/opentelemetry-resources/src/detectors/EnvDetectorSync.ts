@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../Resource';
 import { DetectorSync, ResourceAttributes } from '../types';
 import { ResourceDetectionConfig } from '../config';
@@ -70,7 +70,7 @@ class EnvDetectorSync implements DetectorSync {
     }
 
     if (serviceName) {
-      attributes[SemanticResourceAttributes.SERVICE_NAME] = serviceName;
+      attributes[SEMRESATTRS_SERVICE_NAME] = serviceName;
     }
 
     return new Resource(attributes);
@@ -83,10 +83,10 @@ class EnvDetectorSync implements DetectorSync {
    * OTEL_RESOURCE_ATTRIBUTES: A comma-separated list of attributes describing
    * the source in more detail, e.g. “key1=val1,key2=val2”. Domain names and
    * paths are accepted as attribute keys. Values may be quoted or unquoted in
-   * general. If a value contains whitespaces, =, or " characters, it must
+   * general. If a value contains whitespace, =, or " characters, it must
    * always be quoted.
    *
-   * @param rawEnvAttributes The resource attributes as a comma-seperated list
+   * @param rawEnvAttributes The resource attributes as a comma-separated list
    * of key/value pairs.
    * @returns The sanitized resource attributes.
    */

@@ -29,7 +29,7 @@ const getData = (url) => fetch(url, {
 
 // example of keeping track of context between async operations
 const prepareClickEvent = () => {
-  const url = 'https://httpbin.org/get';
+  const url = 'https://httpstat.us/200';
 
   const element = document.getElementById('button1');
 

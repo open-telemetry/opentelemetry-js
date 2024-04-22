@@ -12,6 +12,12 @@
       "path": "experimental/packages/api-logs/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/exporter-logs-otlp-http/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/exporter-logs-otlp-proto/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/exporter-trace-otlp-http/tsconfig.esm.json"
     },
     {
@@ -22,6 +28,9 @@
     },
     {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-http/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-proto/tsconfig.esm.json"
     },
     {
       "path": "experimental/packages/opentelemetry-instrumentation/tsconfig.esm.json"
@@ -73,6 +82,9 @@
     },
     {
       "path": "packages/opentelemetry-semantic-conventions/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/propagator-aws-xray/tsconfig.esm.json"
     },
     {
       "path": "packages/sdk-metrics/tsconfig.esm.json"

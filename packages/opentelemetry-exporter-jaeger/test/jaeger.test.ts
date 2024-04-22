@@ -178,6 +178,14 @@ describe('JaegerExporter', () => {
     });
   });
 
+  describe('force flush', () => {
+    let exporter: JaegerExporter;
+    it('forceFlush should flush spans and return', async () => {
+      exporter = new JaegerExporter();
+      await exporter.forceFlush();
+    });
+  });
+
   describe('export', () => {
     let exporter: JaegerExporter;
 

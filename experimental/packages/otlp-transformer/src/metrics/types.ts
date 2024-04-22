@@ -13,13 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IInstrumentationScope, IKeyValue } from '../common/types';
+import { Fixed64, IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
 
 /** Properties of an ExportMetricsServiceRequest. */
 export interface IExportMetricsServiceRequest {
   /** ExportMetricsServiceRequest resourceMetrics */
   resourceMetrics: IResourceMetrics[];
+}
+
+export interface IExportMetricsServiceResponse {
+  /** ExportMetricsServiceResponse partialSuccess */
+  partialSuccess?: IExportMetricsPartialSuccess;
+}
+
+export interface IExportMetricsPartialSuccess {
+  /** ExportMetricsPartialSuccess rejectedDataPoints */
+  rejectedDataPoints?: number;
+
+  /** ExportMetricsPartialSuccess errorMessage */
+  errorMessage?: string;
 }
 
 /** Properties of a ResourceMetrics. */
@@ -121,10 +134,10 @@ export interface INumberDataPoint {
   attributes: IKeyValue[];
 
   /** NumberDataPoint startTimeUnixNano */
-  startTimeUnixNano?: number;
+  startTimeUnixNano?: Fixed64;
 
   /** NumberDataPoint timeUnixNano */
-  timeUnixNano?: number;
+  timeUnixNano?: Fixed64;
 
   /** NumberDataPoint asDouble */
   asDouble?: number | null;
@@ -145,10 +158,10 @@ export interface IHistogramDataPoint {
   attributes?: IKeyValue[];
 
   /** HistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: number;
+  startTimeUnixNano?: Fixed64;
 
   /** HistogramDataPoint timeUnixNano */
-  timeUnixNano?: number;
+  timeUnixNano?: Fixed64;
 
   /** HistogramDataPoint count */
   count?: number;
@@ -181,10 +194,10 @@ export interface IExponentialHistogramDataPoint {
   attributes?: IKeyValue[];
 
   /** ExponentialHistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: number;
+  startTimeUnixNano?: Fixed64;
 
   /** ExponentialHistogramDataPoint timeUnixNano */
-  timeUnixNano?: number;
+  timeUnixNano?: Fixed64;
 
   /** ExponentialHistogramDataPoint count */
   count?: number;
@@ -274,10 +287,10 @@ export interface IExemplar {
   asInt?: number;
 
   /** Exemplar spanId */
-  spanId?: string;
+  spanId?: string | Uint8Array;
 
   /** Exemplar traceId */
-  traceId?: string;
+  traceId?: string | Uint8Array;
 }
 
 /**

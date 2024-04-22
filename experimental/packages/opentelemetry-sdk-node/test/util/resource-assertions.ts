@@ -17,7 +17,13 @@
 import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { IResource, Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMRESATTRS_SERVICE_INSTANCE_ID,
+  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
+  SEMRESATTRS_TELEMETRY_SDK_NAME,
+  SEMRESATTRS_TELEMETRY_SDK_VERSION,
+  SemanticResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 
 /**
  * Test utility method to validate a cloud resource
@@ -199,9 +205,9 @@ export const assertTelemetrySDKResource = (
   }
 ) => {
   const defaults = {
-    name: SDK_INFO.NAME,
-    language: SDK_INFO.LANGUAGE,
-    version: SDK_INFO.VERSION,
+    name: SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
+    language: SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
+    version: SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
   };
   validations = { ...defaults, ...validations };
 
@@ -317,7 +323,9 @@ const assertHasOneLabel = (prefix: string, resource: Resource): void => {
 
   assert.ok(
     hasOne,
-    'Resource must have one of the following attributes: ' +
+    'Must have one node Resource(s) starting with [' +
+      prefix +
+      '] matching the following attributes: ' +
       Object.entries(SemanticResourceAttributes)
         .reduce((result, [key, value]) => {
           if (key.startsWith(prefix)) {
@@ -325,6 +333,18 @@ const assertHasOneLabel = (prefix: string, resource: Resource): void => {
           }
           return result;
         })
-        .join(', ')
+        .join(', ') +
+      JSON.stringify(Object.keys(SemanticResourceAttributes))
+  );
+};
+
+export const assertServiceInstanceIdIsUUID = (resource: Resource): void => {
+  const UUID_REGEX =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  assert.equal(
+    UUID_REGEX.test(
+      resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID]?.toString() || ''
+    ),
+    true
   );
 };

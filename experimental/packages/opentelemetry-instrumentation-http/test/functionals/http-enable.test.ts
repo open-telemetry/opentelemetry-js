@@ -16,11 +16,13 @@
 import {
   SpanStatusCode,
   context,
+  diag,
   propagation,
   Span as ISpan,
   SpanKind,
   trace,
   SpanAttributes,
+  DiagConsoleLogger,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -28,8 +30,14 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
-  NetTransportValues,
-  SemanticAttributes,
+  NETTRANSPORTVALUES_IP_TCP,
+  SEMATTRS_HTTP_CLIENT_IP,
+  SEMATTRS_HTTP_FLAVOR,
+  SEMATTRS_HTTP_ROUTE,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_NET_HOST_PORT,
+  SEMATTRS_NET_PEER_PORT,
+  SEMATTRS_NET_TRANSPORT,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as nock from 'nock';
@@ -209,11 +217,11 @@ describe('HttpInstrumentation', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[SemanticAttributes.NET_HOST_PORT],
+          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SemanticAttributes.NET_PEER_PORT],
+          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
           serverPort
         );
       });
@@ -269,6 +277,14 @@ describe('HttpInstrumentation', () => {
             // hang the request.
             return;
           }
+          if (request.url?.includes('/destroy-request')) {
+            // force flush http response header to trigger client response callback
+            response.write('');
+            setTimeout(() => {
+              request.socket.destroy();
+            }, 100);
+            return;
+          }
           if (request.url?.includes('/ignored')) {
             provider.getTracer('test').startSpan('some-span').end();
           }
@@ -319,28 +335,25 @@ describe('HttpInstrumentation', () => {
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[SemanticAttributes.HTTP_CLIENT_IP],
+          incomingSpan.attributes[SEMATTRS_HTTP_CLIENT_IP],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[SemanticAttributes.NET_HOST_PORT],
+          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SemanticAttributes.NET_PEER_PORT],
+          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
           serverPort
         );
         [
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
+          assert.strictEqual(span.attributes[SEMATTRS_HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[SemanticAttributes.HTTP_FLAVOR],
-            '1.1'
-          );
-          assert.strictEqual(
-            span.attributes[SemanticAttributes.NET_TRANSPORT],
-            NetTransportValues.IP_TCP
+            span.attributes[SEMATTRS_NET_TRANSPORT],
+            NETTRANSPORTVALUES_IP_TCP
           );
           assertSpan(span, kind, validations);
         });
@@ -353,10 +366,7 @@ describe('HttpInstrumentation', () => {
         const span = memoryExporter.getFinishedSpans()[0];
 
         assert.strictEqual(span.kind, SpanKind.SERVER);
-        assert.strictEqual(
-          span.attributes[SemanticAttributes.HTTP_ROUTE],
-          'TheRoute'
-        );
+        assert.strictEqual(span.attributes[SEMATTRS_HTTP_ROUTE], 'TheRoute');
         assert.strictEqual(span.name, 'GET TheRoute');
       });
 
@@ -545,7 +555,7 @@ describe('HttpInstrumentation', () => {
       });
 
       for (const arg of ['string', {}, new Date()]) {
-        it(`should be tracable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
+        it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
@@ -786,10 +796,7 @@ describe('HttpInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(
-              span.attributes[SemanticAttributes.HTTP_STATUS_CODE],
-              404
-            );
+            assert.strictEqual(span.attributes[SEMATTRS_HTTP_STATUS_CODE], 404);
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
@@ -861,11 +868,12 @@ describe('HttpInstrumentation', () => {
       });
 
       it('should have 2 ended span when client prematurely close', async () => {
-        const promise = new Promise<void>((resolve, reject) => {
+        const promise = new Promise<void>(resolve => {
           const req = http.get(
             `${protocol}://${hostname}:${serverPort}/hang`,
             res => {
               res.on('close', () => {});
+              res.on('error', () => {});
             }
           );
           // close the socket.
@@ -873,7 +881,7 @@ describe('HttpInstrumentation', () => {
             req.destroy();
           }, 10);
 
-          req.on('error', reject);
+          req.on('error', () => {});
 
           req.on('close', () => {
             // yield to server to end the span.
@@ -918,6 +926,41 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(clientSpan.kind, SpanKind.CLIENT);
         assert.strictEqual(clientSpan.status.code, SpanStatusCode.ERROR);
         assert.ok(Object.keys(clientSpan.attributes).length >= 6);
+      });
+
+      it('should not end span multiple times if request socket destroyed before response completes', async () => {
+        const warnMessages: string[] = [];
+        diag.setLogger({
+          ...new DiagConsoleLogger(),
+          warn: message => {
+            warnMessages.push(message);
+          },
+        });
+        const promise = new Promise<void>(resolve => {
+          const req = http.request(
+            `${protocol}://${hostname}:${serverPort}/destroy-request`,
+            {
+              // Allow `req.write()`.
+              method: 'POST',
+            },
+            res => {
+              res.on('end', () => {});
+              res.on('close', () => {
+                resolve();
+              });
+              res.on('error', () => {});
+            }
+          );
+          // force flush http request header to trigger client response callback
+          req.write('');
+          req.on('error', () => {});
+        });
+
+        await promise;
+
+        diag.disable();
+
+        assert.deepStrictEqual(warnMessages, []);
       });
     });
 
@@ -1055,10 +1098,10 @@ describe('HttpInstrumentation', () => {
 
       it('should set rpc metadata for incoming http request', async () => {
         server = http.createServer((request, response) => {
-          const rpcMemadata = getRPCMetadata(context.active());
-          assert(typeof rpcMemadata !== 'undefined');
-          assert(rpcMemadata.type === RPCType.HTTP);
-          assert(rpcMemadata.span.setAttribute('key', 'value'));
+          const rpcMetadata = getRPCMetadata(context.active());
+          assert(typeof rpcMetadata !== 'undefined');
+          assert(rpcMetadata.type === RPCType.HTTP);
+          assert(rpcMetadata.span.setAttribute('key', 'value'));
           response.end('Test Server Response');
         });
         await new Promise<void>(resolve => server.listen(serverPort, resolve));

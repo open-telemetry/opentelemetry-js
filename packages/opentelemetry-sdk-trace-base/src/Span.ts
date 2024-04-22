@@ -100,7 +100,8 @@ export class Span implements APISpan, ReadableSpan {
     parentSpanId?: string,
     links: Link[] = [],
     startTime?: TimeInput,
-    _deprecatedClock?: unknown // keeping this argument even though it is unused to ensure backwards compatibility
+    _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
+    attributes?: SpanAttributes
   ) {
     this.name = spanName;
     this._spanContext = spanContext;
@@ -119,10 +120,15 @@ export class Span implements APISpan, ReadableSpan {
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._spanLimits = parentTracer.getSpanLimits();
-    this._spanProcessor = parentTracer.getActiveSpanProcessor();
-    this._spanProcessor.onStart(this, context);
     this._attributeValueLengthLimit =
       this._spanLimits.attributeValueLengthLimit || 0;
+
+    if (attributes != null) {
+      this.setAttributes(attributes);
+    }
+
+    this._spanProcessor = parentTracer.getActiveSpanProcessor();
+    this._spanProcessor.onStart(this, context);
   }
 
   spanContext(): SpanContext {
@@ -179,7 +185,9 @@ export class Span implements APISpan, ReadableSpan {
       return this;
     }
     if (this.events.length >= this._spanLimits.eventCountLimit!) {
-      diag.warn('Dropping extra events.');
+      if (this._droppedEventsCount === 0) {
+        diag.debug('Dropping extra events.');
+      }
       this.events.shift();
       this._droppedEventsCount++;
     }
@@ -234,6 +242,12 @@ export class Span implements APISpan, ReadableSpan {
       );
       this.endTime = this.startTime.slice() as HrTime;
       this._duration = [0, 0];
+    }
+
+    if (this._droppedEventsCount > 0) {
+      diag.warn(
+        `Dropped ${this._droppedEventsCount} events because eventCountLimit reached`
+      );
     }
 
     this._spanProcessor.onEnd(this);
@@ -343,7 +357,7 @@ export class Span implements APISpan, ReadableSpan {
 
   /**
    * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
-   * return string with trucated to {@code attributeValueLengthLimit} characters
+   * return string with truncated to {@code attributeValueLengthLimit} characters
    *
    * If the given attribute value is array of strings then
    * return new array of strings with each element truncated to {@code attributeValueLengthLimit} characters

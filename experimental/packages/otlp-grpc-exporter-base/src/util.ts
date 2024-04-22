@@ -14,116 +14,22 @@
  * limitations under the License.
  */
 
-import * as grpc from '@grpc/grpc-js';
-import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
-import { getEnv, globalErrorHandler } from '@opentelemetry/core';
+import { getEnv } from '@opentelemetry/core';
 import * as path from 'path';
-import { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
 import { URL } from 'url';
 import * as fs from 'fs';
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import {
-  GRPCQueueItem,
-  OTLPGRPCExporterConfigNode,
-  ServiceClientType,
-} from './types';
-import {
-  CompressionAlgorithm,
-  ExportServiceError,
-  OTLPExporterError,
-} from '@opentelemetry/otlp-exporter-base';
+  createInsecureCredentials,
+  createSslCredentials,
+} from './grpc-exporter-transport';
+
+// NOTE: do not change these type imports to actual imports. Doing so WILL break `@opentelemetry/instrumentation-http`,
+// as they'd be imported before the http/https modules can be wrapped.
+import type { ChannelCredentials } from '@grpc/grpc-js';
 
 export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
-
-export function onInit<ExportItem, ServiceRequest>(
-  collector: OTLPGRPCExporterNodeBase<ExportItem, ServiceRequest>,
-  config: OTLPGRPCExporterConfigNode
-): void {
-  collector.grpcQueue = [];
-
-  const credentials: grpc.ChannelCredentials = configureSecurity(
-    config.credentials,
-    collector.getUrlFromConfig(config)
-  );
-
-  const includeDirs = [path.resolve(__dirname, '..', 'protos')];
-
-  protoLoader
-    .load(collector.getServiceProtoPath(), {
-      keepCase: false,
-      longs: String,
-      enums: String,
-      defaults: true,
-      oneofs: true,
-      includeDirs,
-    })
-    .then(packageDefinition => {
-      const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
-
-      const options = {
-        'grpc.default_compression_algorithm': collector.compression,
-      };
-
-      if (collector.getServiceClientType() === ServiceClientType.SPANS) {
-        collector.serviceClient =
-          new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-            collector.url,
-            credentials,
-            options
-          );
-      } else {
-        collector.serviceClient =
-          new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
-            collector.url,
-            credentials,
-            options
-          );
-      }
-
-      if (collector.grpcQueue.length > 0) {
-        const queue = collector.grpcQueue.splice(0);
-        queue.forEach((item: GRPCQueueItem<ExportItem>) => {
-          collector.send(item.objects, item.onSuccess, item.onError);
-        });
-      }
-    })
-    .catch(err => {
-      globalErrorHandler(err);
-    });
-}
-
-export function send<ExportItem, ServiceRequest>(
-  collector: OTLPGRPCExporterNodeBase<ExportItem, ServiceRequest>,
-  objects: ExportItem[],
-  onSuccess: () => void,
-  onError: (error: OTLPExporterError) => void
-): void {
-  if (collector.serviceClient) {
-    const serviceRequest = collector.convert(objects);
-    const deadline = Date.now() + collector.timeoutMillis;
-
-    collector.serviceClient.export(
-      serviceRequest,
-      collector.metadata || new grpc.Metadata(),
-      { deadline: deadline },
-      (err: ExportServiceError) => {
-        if (err) {
-          diag.error('Service request', serviceRequest);
-          onError(err);
-        } else {
-          diag.debug('Objects sent');
-          onSuccess();
-        }
-      }
-    );
-  } else {
-    collector.grpcQueue.push({
-      objects,
-      onSuccess,
-      onError,
-    });
-  }
-}
 
 export function validateAndNormalizeUrl(url: string): string {
   const hasProtocol = url.match(/^([\w]{1,8}):\/\//);
@@ -131,6 +37,9 @@ export function validateAndNormalizeUrl(url: string): string {
     url = `https://${url}`;
   }
   const target = new URL(url);
+  if (target.protocol === 'unix:') {
+    return url;
+  }
   if (target.pathname && target.pathname !== '/') {
     diag.warn(
       'URL path should not be set when using grpc, the path part of the URL will be ignored.'
@@ -142,10 +51,10 @@ export function validateAndNormalizeUrl(url: string): string {
   return target.host;
 }
 
-export function configureSecurity(
-  credentials: grpc.ChannelCredentials | undefined,
+export function configureCredentials(
+  credentials: ChannelCredentials | undefined,
   endpoint: string
-): grpc.ChannelCredentials {
+): ChannelCredentials {
   let insecure: boolean;
 
   if (credentials) {
@@ -162,9 +71,9 @@ export function configureSecurity(
   }
 
   if (insecure) {
-    return grpc.credentials.createInsecure();
+    return createInsecureCredentials();
   } else {
-    return useSecureConnection();
+    return getCredentialsFromEnvironment();
   }
 }
 
@@ -180,16 +89,15 @@ function getSecurityFromEnv(): boolean {
   }
 }
 
-export function useSecureConnection(): grpc.ChannelCredentials {
-  const rootCertPath = retrieveRootCert();
-  const privateKeyPath = retrievePrivateKey();
-  const certChainPath = retrieveCertChain();
+/**
+ * Exported for testing
+ */
+export function getCredentialsFromEnvironment(): ChannelCredentials {
+  const rootCert = retrieveRootCert();
+  const privateKey = retrievePrivateKey();
+  const certChain = retrieveCertChain();
 
-  return grpc.credentials.createSsl(
-    rootCertPath,
-    privateKeyPath,
-    certChainPath
-  );
+  return createSslCredentials(rootCert, privateKey, certChain);
 }
 
 function retrieveRootCert(): Buffer | undefined {
@@ -243,36 +151,25 @@ function retrieveCertChain(): Buffer | undefined {
   }
 }
 
-function toGrpcCompression(
-  compression: CompressionAlgorithm
-): GrpcCompressionAlgorithm {
-  if (compression === CompressionAlgorithm.NONE)
-    return GrpcCompressionAlgorithm.NONE;
-  else if (compression === CompressionAlgorithm.GZIP)
-    return GrpcCompressionAlgorithm.GZIP;
-  return GrpcCompressionAlgorithm.NONE;
-}
-
-/**
- * These values are defined by grpc client
- */
-export enum GrpcCompressionAlgorithm {
-  NONE = 0,
-  GZIP = 2,
-}
-
 export function configureCompression(
   compression: CompressionAlgorithm | undefined
-): GrpcCompressionAlgorithm {
-  if (compression) {
-    return toGrpcCompression(compression);
-  } else {
-    const definedCompression =
-      getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
-      getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
-
-    return definedCompression === 'gzip'
-      ? GrpcCompressionAlgorithm.GZIP
-      : GrpcCompressionAlgorithm.NONE;
+): CompressionAlgorithm {
+  if (compression != null) {
+    return compression;
   }
+
+  const envCompression =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
+    getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+
+  if (envCompression === 'gzip') {
+    return CompressionAlgorithm.GZIP;
+  } else if (envCompression === 'none') {
+    return CompressionAlgorithm.NONE;
+  }
+
+  diag.warn(
+    'Unknown compression "' + envCompression + '", falling back to "none"'
+  );
+  return CompressionAlgorithm.NONE;
 }

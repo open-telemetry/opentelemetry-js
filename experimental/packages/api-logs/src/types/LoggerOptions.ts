@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { Attributes } from '@opentelemetry/api';
-
 export interface LoggerOptions {
   /**
    * The schemaUrl of the tracer or instrumentation library

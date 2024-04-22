@@ -32,7 +32,6 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 export class TracerProviderWithEnvExporters extends NodeTracerProvider {
   private _configuredExporters: SpanExporter[] = [];
@@ -68,13 +67,28 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     );
   }
 
+  private static configureJaeger() {
+    // The JaegerExporter does not support being required in bundled
+    // environments. By delaying the require statement to here, we only crash when
+    // the exporter is actually used in such an environment.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+      return new JaegerExporter();
+    } catch (e) {
+      throw new Error(
+        `Could not instantiate JaegerExporter. This could be due to the JaegerExporter's lack of support for bundling. If possible, use @opentelemetry/exporter-trace-otlp-proto instead. Original Error: ${e}`
+      );
+    }
+  }
+
   protected static override _registeredExporters = new Map<
     string,
     () => SpanExporter
   >([
     ['otlp', () => this.configureOtlp()],
     ['zipkin', () => new ZipkinExporter()],
-    ['jaeger', () => new JaegerExporter()],
+    ['jaeger', () => this.configureJaeger()],
     ['console', () => new ConsoleSpanExporter()],
   ]);
 

@@ -107,7 +107,7 @@ export class LastValueAggregation extends Aggregation {
  */
 export class HistogramAggregation extends Aggregation {
   private static DEFAULT_INSTANCE = new HistogramAggregator(
-    [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
+    [0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000],
     true
   );
   createAggregator(_instrument: InstrumentDescriptor) {
@@ -125,10 +125,15 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
    * @param boundaries the bucket boundaries of the histogram aggregation
    * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
-  constructor(boundaries: number[], private readonly _recordMinMax = true) {
+  constructor(
+    boundaries: number[],
+    private readonly _recordMinMax = true
+  ) {
     super();
-    if (boundaries === undefined || boundaries.length === 0) {
-      throw new Error('HistogramAggregator should be created with boundaries.');
+    if (boundaries == null) {
+      throw new Error(
+        'ExplicitBucketHistogramAggregation should be created with explicit boundaries, if a single bucket histogram is required, please pass an empty array'
+      );
     }
     // Copy the boundaries array for modification.
     boundaries = boundaries.concat();
@@ -177,10 +182,16 @@ export class DefaultAggregation extends Aggregation {
       case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER: {
         return SUM_AGGREGATION;
       }
+      case InstrumentType.GAUGE:
       case InstrumentType.OBSERVABLE_GAUGE: {
         return LAST_VALUE_AGGREGATION;
       }
       case InstrumentType.HISTOGRAM: {
+        if (instrument.advice.explicitBucketBoundaries) {
+          return new ExplicitBucketHistogramAggregation(
+            instrument.advice.explicitBucketBoundaries
+          );
+        }
         return HISTOGRAM_AGGREGATION;
       }
     }

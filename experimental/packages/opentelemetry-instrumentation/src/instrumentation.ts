@@ -24,26 +24,29 @@ import {
   Tracer,
   TracerProvider,
 } from '@opentelemetry/api';
+import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
 import * as shimmer from 'shimmer';
-import { InstrumentationModuleDefinition } from './platform/node';
-import * as types from './types';
+import {
+  InstrumentationModuleDefinition,
+  Instrumentation,
+  InstrumentationConfig,
+} from './types';
 
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract<T = any>
-  implements types.Instrumentation
-{
-  protected _config: types.InstrumentationConfig;
+export abstract class InstrumentationAbstract implements Instrumentation {
+  protected _config: InstrumentationConfig;
 
   private _tracer: Tracer;
   private _meter: Meter;
+  private _logger: Logger;
   protected _diag: DiagLogger;
 
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: types.InstrumentationConfig = {}
+    config: InstrumentationConfig = {}
   ) {
     this._config = {
       enabled: true,
@@ -55,8 +58,8 @@ export abstract class InstrumentationAbstract<T = any>
     });
 
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
-
     this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
+    this._logger = logs.getLogger(instrumentationName, instrumentationVersion);
     this._updateMetricInstruments();
   }
 
@@ -87,6 +90,39 @@ export abstract class InstrumentationAbstract<T = any>
     this._updateMetricInstruments();
   }
 
+  /* Returns logger */
+  protected get logger(): Logger {
+    return this._logger;
+  }
+
+  /**
+   * Sets LoggerProvider to this plugin
+   * @param loggerProvider
+   */
+  public setLoggerProvider(loggerProvider: LoggerProvider): void {
+    this._logger = loggerProvider.getLogger(
+      this.instrumentationName,
+      this.instrumentationVersion
+    );
+  }
+
+  /**
+   * @experimental
+   *
+   * Get module definitions defined by {@link init}.
+   * This can be used for experimental compile-time instrumentation.
+   *
+   * @returns an array of {@link InstrumentationModuleDefinition}
+   */
+  public getModuleDefinitions(): InstrumentationModuleDefinition[] {
+    const initResult = this.init() ?? [];
+    if (!Array.isArray(initResult)) {
+      return [initResult];
+    }
+
+    return initResult;
+  }
+
   /**
    * Sets the new metric instruments with the current Meter.
    */
@@ -95,7 +131,7 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /* Returns InstrumentationConfig */
-  public getConfig(): types.InstrumentationConfig {
+  public getConfig(): InstrumentationConfig {
     return this._config;
   }
 
@@ -103,7 +139,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: types.InstrumentationConfig = {}): void {
+  public setConfig(config: InstrumentationConfig = {}): void {
     this._config = Object.assign({}, config);
   }
 
@@ -131,10 +167,10 @@ export abstract class InstrumentationAbstract<T = any>
 
   /**
    * Init method in which plugin should define _modules and patches for
-   * methods
+   * methods.
    */
   protected abstract init():
-    | InstrumentationModuleDefinition<T>
-    | InstrumentationModuleDefinition<T>[]
+    | InstrumentationModuleDefinition
+    | InstrumentationModuleDefinition[]
     | void;
 }

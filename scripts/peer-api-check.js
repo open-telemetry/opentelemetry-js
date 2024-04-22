@@ -24,7 +24,7 @@ const appRoot = process.cwd();
 const packageJsonUrl = path.resolve(`${appRoot}/package.json`);
 const pjson = require(packageJsonUrl);
 
-const needCheckPackages = ['@opentelemetry/api', '@opentelemetry/api-logs'];
+const needCheckPackages = ['@opentelemetry/api'];
 
 function checkPackage(package) {
   if (pjson.dependencies && pjson.dependencies[package])

@@ -104,7 +104,7 @@ An entry into `CHANGELOG.md` or `experimental/CHANGELOG.md` is required for the 
 - Changes to default settings
 - New components being added
 
-It is reasonable to omit an entry to the changelog under these circuimstances:
+It is reasonable to omit an entry to the changelog under these circumstances:
 
 - Updating test to remove flakiness or improve coverage
 - Updates to the CI/CD process
@@ -161,7 +161,7 @@ Most of the commands needed for development are accessed as [npm scripts](https:
 
 ### Install dependencies
 
-This will install all dependencies for the root project and all modules managed by `lerna`. By default, a `postinstall` script will run `lerna bootstrap` automatically after an install. This can be avoided using the `--ignore-scripts` option if desired.
+This will install all dependencies for the root project and all modules managed by `npm workspaces`.
 
 ```sh
 npm install

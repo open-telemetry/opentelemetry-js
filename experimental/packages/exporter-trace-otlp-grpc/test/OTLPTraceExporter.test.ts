@@ -27,6 +27,7 @@ import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../src';
+import { VERSION } from '../src/version';
 
 import {
   ensureExportedSpanIsCorrect,
@@ -36,7 +37,6 @@ import {
 } from './traceHelper';
 import * as core from '@opentelemetry/core';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
-import { GrpcCompressionAlgorithm } from '@opentelemetry/otlp-grpc-exporter-base';
 import {
   IExportTraceServiceRequest,
   IResourceSpans,
@@ -48,9 +48,11 @@ const includeDirs = [
   path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
 ];
 
-const address = 'localhost:1501';
+const httpAddr = 'https://localhost:1501';
+const udsAddr = 'unix:///tmp/otlp-traces.sock';
 
 type TestParams = {
+  address?: string;
   useTLS?: boolean;
   metadata?: grpc.Metadata;
 };
@@ -58,10 +60,11 @@ type TestParams = {
 const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
-const testCollectorExporter = (params: TestParams) =>
-  describe(`OTLPTraceExporter - node ${
-    params.useTLS ? 'with' : 'without'
-  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
+const testCollectorExporter = (params: TestParams) => {
+  const { address = httpAddr, useTLS, metadata } = params;
+  return describe(`OTLPTraceExporter - node ${
+    useTLS ? 'with' : 'without'
+  } TLS, ${metadata ? 'with' : 'without'} metadata, target ${address}`, () => {
     let collectorExporter: OTLPTraceExporter;
     let server: grpc.Server;
     let exportedData: IResourceSpans | undefined;
@@ -96,7 +99,7 @@ const testCollectorExporter = (params: TestParams) =>
               },
             }
           );
-          const credentials = params.useTLS
+          const credentials = useTLS
             ? grpc.ServerCredentials.createSsl(
                 fs.readFileSync('./test/certs/ca.crt'),
                 [
@@ -107,10 +110,15 @@ const testCollectorExporter = (params: TestParams) =>
                 ]
               )
             : grpc.ServerCredentials.createInsecure();
-          server.bindAsync(address, credentials, () => {
-            server.start();
-            done();
-          });
+          const serverAddr = new URL(address);
+          server.bindAsync(
+            serverAddr.protocol === 'https:' ? serverAddr.host : address,
+            credentials,
+            () => {
+              server.start();
+              done();
+            }
+          );
         });
     });
 
@@ -119,7 +127,7 @@ const testCollectorExporter = (params: TestParams) =>
     });
 
     beforeEach(done => {
-      const credentials = params.useTLS
+      const credentials = useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
             fs.readFileSync('./test/certs/client.key'),
@@ -127,9 +135,9 @@ const testCollectorExporter = (params: TestParams) =>
           )
         : grpc.credentials.createInsecure();
       collectorExporter = new OTLPTraceExporter({
-        url: 'https://' + address,
+        url: address,
         credentials,
-        metadata: params.metadata,
+        metadata: metadata,
       });
 
       const provider = new BasicTracerProvider();
@@ -148,7 +156,7 @@ const testCollectorExporter = (params: TestParams) =>
         // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new OTLPTraceExporter({
-          url: `http://${address}`,
+          url: address,
           headers: {
             foo: 'bar',
           },
@@ -157,9 +165,13 @@ const testCollectorExporter = (params: TestParams) =>
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
       });
       it('should warn about path in url', () => {
+        if (new URL(address).protocol === 'unix:') {
+          // Skip this test for UDS
+          return;
+        }
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new OTLPTraceExporter({
-          url: `http://${address}/v1/trace`,
+          url: `${address}/v1/trace`,
         });
         const args = spyLoggerWarn.args[0];
         assert.strictEqual(
@@ -197,7 +209,7 @@ const testCollectorExporter = (params: TestParams) =>
         }, 500);
       });
       it('should log deadline exceeded error', done => {
-        const credentials = params.useTLS
+        const credentials = useTLS
           ? grpc.credentials.createSsl(
               fs.readFileSync('./test/certs/ca.crt'),
               fs.readFileSync('./test/certs/client.key'),
@@ -206,9 +218,9 @@ const testCollectorExporter = (params: TestParams) =>
           : grpc.credentials.createInsecure();
 
         const collectorExporterWithTimeout = new OTLPTraceExporter({
-          url: 'grpcs://' + address,
+          url: address,
           credentials,
-          metadata: params.metadata,
+          metadata: metadata,
           timeoutMillis: 100,
         });
 
@@ -219,9 +231,9 @@ const testCollectorExporter = (params: TestParams) =>
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          assert.strictEqual(
+          assert.match(
             responseSpy.args[0][0].error.details,
-            'Deadline exceeded'
+            /Deadline exceeded.*/
           );
           done();
         }, 300);
@@ -229,7 +241,7 @@ const testCollectorExporter = (params: TestParams) =>
     });
     describe('export - with gzip compression', () => {
       beforeEach(() => {
-        const credentials = params.useTLS
+        const credentials = useTLS
           ? grpc.credentials.createSsl(
               fs.readFileSync('./test/certs/ca.crt'),
               fs.readFileSync('./test/certs/client.key'),
@@ -237,9 +249,9 @@ const testCollectorExporter = (params: TestParams) =>
             )
           : grpc.credentials.createInsecure();
         collectorExporter = new OTLPTraceExporter({
-          url: 'https://' + address,
+          url: address,
           credentials,
-          metadata: params.metadata,
+          metadata: metadata,
           compression: CompressionAlgorithm.GZIP,
         });
 
@@ -264,7 +276,7 @@ const testCollectorExporter = (params: TestParams) =>
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           ensureResourceIsCorrect(resource);
 
-          ensureMetadataIsCorrect(reqMetadata, params.metadata);
+          ensureMetadataIsCorrect(reqMetadata, metadata);
 
           done();
         }, 500);
@@ -273,7 +285,7 @@ const testCollectorExporter = (params: TestParams) =>
     describe('Trace Exporter with compression', () => {
       const envSource = process.env;
       it('should return gzip compression algorithm on exporter', () => {
-        const credentials = params.useTLS
+        const credentials = useTLS
           ? grpc.credentials.createSsl(
               fs.readFileSync('./test/certs/ca.crt'),
               fs.readFileSync('./test/certs/client.key'),
@@ -283,18 +295,19 @@ const testCollectorExporter = (params: TestParams) =>
 
         envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
         collectorExporter = new OTLPTraceExporter({
-          url: 'https://' + address,
+          url: address,
           credentials,
-          metadata: params.metadata,
+          metadata: metadata,
         });
         assert.strictEqual(
           collectorExporter.compression,
-          GrpcCompressionAlgorithm.GZIP
+          CompressionAlgorithm.GZIP
         );
         delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
       });
     });
   });
+};
 
 describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
@@ -316,41 +329,59 @@ describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
 
 describe('when configuring via environment', () => {
   const envSource = process.env;
+
+  afterEach(function () {
+    // Ensure we don't pollute other tests if assertions fail
+    delete envSource.OTEL_EXPORTER_OTLP_ENDPOINT;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
+    delete envSource.OTEL_EXPORTER_OTLP_HEADERS;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS;
+    sinon.restore();
+  });
+
   it('should use url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     const collectorExporter = new OTLPTraceExporter();
     assert.strictEqual(collectorExporter.url, 'foo.bar');
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should override global exporter url with signal url defined in env', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces';
     const collectorExporter = new OTLPTraceExporter();
     assert.strictEqual(collectorExporter.url, 'foo.traces');
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
   });
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPTraceExporter();
-    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['bar']);
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    const actualMetadata =
+      collectorExporter['_transport']['_parameters'].metadata();
+    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
   });
-  it('should override global headers config with signal headers defined via env', () => {
+  it('should include user agent in header', () => {
+    const collectorExporter = new OTLPTraceExporter();
+    const actualMetadata =
+      collectorExporter['_transport']['_parameters'].metadata();
+    assert.deepStrictEqual(actualMetadata.get('User-Agent'), [
+      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+    ]);
+  });
+  it('should not override hard-coded headers config with headers defined via env', () => {
     const metadata = new grpc.Metadata();
     metadata.set('foo', 'bar');
     metadata.set('goo', 'lol');
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
     envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPTraceExporter({ metadata });
-    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['boo']);
-    assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['foo']);
-    assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['lol']);
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    const actualMetadata =
+      collectorExporter['_transport']['_parameters'].metadata();
+    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
+    assert.deepStrictEqual(actualMetadata.get('goo'), ['lol']);
+    assert.deepStrictEqual(actualMetadata.get('bar'), ['foo']);
   });
 });
 
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });
 testCollectorExporter({ metadata });
+// skip UDS tests on windows
+process.platform !== 'win32' && testCollectorExporter({ address: udsAddr });

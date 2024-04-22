@@ -33,7 +33,7 @@ import { configureExporterTimeout } from './util';
 export abstract class OTLPExporterBase<
   T extends OTLPExporterConfigBase,
   ExportItem,
-  ServiceRequest
+  ServiceRequest,
 > {
   public readonly url: string;
   public readonly hostname: string | undefined;
@@ -57,7 +57,7 @@ export abstract class OTLPExporterBase<
     this._concurrencyLimit =
       typeof config.concurrencyLimit === 'number'
         ? config.concurrencyLimit
-        : Infinity;
+        : 30;
 
     this.timeoutMillis = configureExporterTimeout(config.timeoutMillis);
 
@@ -118,14 +118,21 @@ export abstract class OTLPExporterBase<
   }
 
   /**
+   * Exports any pending spans in the exporter
+   */
+  forceFlush(): Promise<void> {
+    return Promise.all(this._sendingPromises).then(() => {
+      /** ignore resolved values */
+    });
+  }
+
+  /**
    * Called by _shutdownOnce with BindOnceFuture
    */
   private _shutdown(): Promise<void> {
     diag.debug('shutdown started');
     this.onShutdown();
-    return Promise.all(this._sendingPromises).then(() => {
-      /** ignore resolved values */
-    });
+    return this.forceFlush();
   }
 
   abstract onShutdown(): void;

@@ -24,8 +24,14 @@ import { InMemoryLogRecordExporter } from './../../../src/export/InMemoryLogReco
 const describeDocument =
   typeof document === 'object' ? describe : describe.skip;
 
+/**
+ * VisibilityState has been removed from TypeScript 4.6.0+
+ */
+type WebVisibilityState = 'visible' | 'hidden';
+
 describeDocument('BatchLogRecordProcessor - web main context', () => {
-  let visibilityState: VisibilityState = 'visible';
+  // TODO: change to DocumentVisibilityState when TypeScript is upgraded to 4.6+
+  let visibilityState: WebVisibilityState = 'visible';
   let exporter: LogRecordExporter;
   let processor: BatchLogRecordProcessor;
   let forceFlushSpy: sinon.SinonStub;

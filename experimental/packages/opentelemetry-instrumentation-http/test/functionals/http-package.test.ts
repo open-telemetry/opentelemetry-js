@@ -104,7 +104,7 @@ describe('Packages', () => {
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
           const res = result as AxiosResponse<unknown>;
-          resHeaders = res.headers;
+          resHeaders = res.headers as any;
         }
         const spans = memoryExporter.getFinishedSpans();
         const span = spans[0];

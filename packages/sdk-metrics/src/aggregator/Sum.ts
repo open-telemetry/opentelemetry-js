@@ -22,8 +22,11 @@ import {
   AccumulationRecord,
 } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { DataPointType, SumMetricData } from '../export/MetricData';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import {
+  DataPointType,
+  MetricDescriptor,
+  SumMetricData,
+} from '../export/MetricData';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
@@ -109,7 +112,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
   }
 
   toMetricData(
-    descriptor: InstrumentDescriptor,
+    descriptor: MetricDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<SumAccumulation>[],
     endTime: HrTime

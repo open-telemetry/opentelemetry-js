@@ -36,7 +36,7 @@ type SendFn = <ExportItem, ServiceRequest>(
  */
 export abstract class OTLPProtoExporterNodeBase<
   ExportItem,
-  ServiceRequest
+  ServiceRequest,
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {
   private _send!: SendFn;
 

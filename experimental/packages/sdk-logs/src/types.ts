@@ -30,14 +30,6 @@ export interface LoggerProviderConfig {
   logRecordLimits?: LogRecordLimits;
 }
 
-export interface LoggerConfig {
-  /** Log Record Limits*/
-  logRecordLimits?: LogRecordLimits;
-
-  /** include Trace Context */
-  includeTraceContext?: boolean;
-}
-
 export interface LogRecordLimits {
   /** attributeValueLengthLimit is maximum allowed attribute value size */
   attributeValueLengthLimit?: number;

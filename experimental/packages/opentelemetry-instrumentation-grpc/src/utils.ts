@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { SpanStatusCode, SpanStatus, Span } from '@opentelemetry/api';
-import type * as grpcTypes from 'grpc';
-import type * as grpcJsTypes from '@grpc/grpc-js';
-import { IgnoreMatcher } from './types';
+import { SpanStatusCode } from '@opentelemetry/api';
+import type { SpanStatus, Span } from '@opentelemetry/api';
+import type { status as GrpcStatus, Metadata } from '@grpc/grpc-js';
+import type { IgnoreMatcher } from './types';
 
 // e.g., "dns:otel-productcatalogservice:8080" or "otel-productcatalogservice:8080" or "127.0.0.1:8080"
 export const URI_REGEX =
@@ -26,7 +26,7 @@ export const URI_REGEX =
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
   args,
-  fn: Function
+  fn
 ) => {
   let index = -1;
   for (const arg of args) {
@@ -43,7 +43,7 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
  * @param status
  */
 export const _grpcStatusCodeToOpenTelemetryStatusCode = (
-  status?: grpcTypes.status | grpcJsTypes.status
+  status?: GrpcStatus
 ): SpanStatusCode => {
   if (status !== undefined && status === 0) {
     return SpanStatusCode.UNSET;
@@ -128,7 +128,7 @@ export function metadataCapture(
     ])
   );
 
-  return (span: Span, metadata: grpcJsTypes.Metadata | grpcTypes.Metadata) => {
+  return (span: Span, metadata: Metadata) => {
     for (const [
       capturedMetadata,
       normalizedMetadata,
@@ -137,7 +137,7 @@ export function metadataCapture(
         .get(capturedMetadata)
         .flatMap(value => (typeof value === 'string' ? value.toString() : []));
 
-      if (metadataValues === undefined || metadataValues === []) {
+      if (metadataValues === undefined || metadataValues.length === 0) {
         continue;
       }
 

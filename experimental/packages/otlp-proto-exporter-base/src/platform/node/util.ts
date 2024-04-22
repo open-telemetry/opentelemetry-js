@@ -14,33 +14,14 @@
  * limitations under the License.
  */
 
-import { ServiceClientType } from '../types';
 import { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
 import {
   CompressionAlgorithm,
   OTLPExporterError,
   sendWithHttp,
 } from '@opentelemetry/otlp-exporter-base';
-import type * as protobuf from 'protobufjs';
-import * as root from '../../generated/root';
 
-export interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
-  create(properties?: T): R;
-  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
-  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
-}
-
-export function getExportRequestProto<ServiceRequest>(
-  clientType: ServiceClientType
-): ExportRequestType<ServiceRequest> {
-  if (clientType === ServiceClientType.SPANS) {
-    return root.opentelemetry.proto.collector.trace.v1
-      .ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
-  } else {
-    return root.opentelemetry.proto.collector.metrics.v1
-      .ExportMetricsServiceRequest as unknown as ExportRequestType<ServiceRequest>;
-  }
-}
+import { getExportRequestProto } from '../util';
 
 export function send<ExportItem, ServiceRequest>(
   collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,

@@ -20,7 +20,7 @@ export type UserAgentData = {
 };
 
 export const BROWSER_ATTRIBUTES = {
-  PLATFORM: 'browser.platform', //TODO replace with SemantecConventions attribute when available
+  PLATFORM: 'browser.platform', //TODO replace with SemanticConventions attribute when available
   BRANDS: 'browser.brands',
   MOBILE: 'browser.mobile',
   LANGUAGE: 'browser.language',

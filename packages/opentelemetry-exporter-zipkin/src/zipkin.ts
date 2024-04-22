@@ -102,6 +102,13 @@ export class ZipkinExporter implements SpanExporter {
   shutdown(): Promise<void> {
     diag.debug('Zipkin exporter shutdown');
     this._isShutdown = true;
+    return this.forceFlush();
+  }
+
+  /**
+   * Exports any pending spans in exporter
+   */
+  forceFlush(): Promise<void> {
     return new Promise((resolve, reject) => {
       Promise.all(this._sendingPromises).then(() => {
         resolve();
@@ -111,7 +118,7 @@ export class ZipkinExporter implements SpanExporter {
 
   /**
    * if user defines getExportRequestHeaders in config then this will be called
-   * everytime before send, otherwise it will be replaced with noop in
+   * every time before send, otherwise it will be replaced with noop in
    * constructor
    * @default noop
    */

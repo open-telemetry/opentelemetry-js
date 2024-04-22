@@ -135,7 +135,10 @@ describe('HistogramAggregator', () => {
       assert(aggregator instanceof HistogramAggregator);
       assert.deepStrictEqual(
         aggregator['_boundaries'],
-        [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]
+        [
+          0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500,
+          10000,
+        ]
       );
     });
   });
@@ -153,6 +156,25 @@ describe('ExplicitBucketHistogramAggregation', () => {
       assert(aggregation instanceof ExplicitBucketHistogramAggregation);
       assert.deepStrictEqual(aggregation['_boundaries'], [1, 10, 100]);
     }
+  });
+
+  it('construct with empty boundaries', function () {
+    const boundaries: number[] = [];
+    const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
+    assert.ok(aggregation instanceof ExplicitBucketHistogramAggregation);
+    assert.deepStrictEqual(aggregation['_boundaries'], []);
+  });
+
+  it('construct with undefined boundaries should throw', function () {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore simulate how a JS user could pass undefined
+    assert.throws(() => new ExplicitBucketHistogramAggregation(undefined));
+  });
+
+  it('construct with null boundaries should throw', function () {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore simulate how a JS user could pass null
+    assert.throws(() => new ExplicitBucketHistogramAggregation(null));
   });
 
   it('constructor should not modify inputs', () => {

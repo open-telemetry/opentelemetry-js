@@ -17,4 +17,5 @@
 export enum ServiceClientType {
   SPANS,
   METRICS,
+  LOGS,
 }
