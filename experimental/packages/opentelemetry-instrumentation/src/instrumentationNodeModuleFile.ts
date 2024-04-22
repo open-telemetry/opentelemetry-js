@@ -17,15 +17,17 @@
 import { InstrumentationModuleFile } from './types';
 import { normalize } from './platform/index';
 
-export class InstrumentationNodeModuleFile<T>
-  implements InstrumentationModuleFile<T>
+export class InstrumentationNodeModuleFile
+  implements InstrumentationModuleFile
 {
   public name: string;
   constructor(
     name: string,
     public supportedVersions: string[],
-    public patch: (moduleExports: T, moduleVersion?: string) => T,
-    public unpatch: (moduleExports?: T, moduleVersion?: string) => void
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public patch: (moduleExports: any, moduleVersion?: string) => any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public unpatch: (moduleExports?: any, moduleVersion?: string) => void
   ) {
     this.name = normalize(name);
   }
