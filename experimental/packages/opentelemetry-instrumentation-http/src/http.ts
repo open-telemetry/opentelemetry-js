@@ -375,6 +375,7 @@ export class HttpInstrumentation extends InstrumentationBase {
               () =>
                 this._getConfig().applyCustomAttributesOnSpan!(
                   span,
+                  metricAttributes,
                   request,
                   response
                 ),
@@ -750,6 +751,7 @@ export class HttpInstrumentation extends InstrumentationBase {
         () =>
           this._getConfig().applyCustomAttributesOnSpan!(
             span,
+            metricAttributes,
             request,
             response
           ),

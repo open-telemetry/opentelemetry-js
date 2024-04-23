@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Span, SpanAttributes } from '@opentelemetry/api';
+import { MetricAttributes, Span, SpanAttributes } from '@opentelemetry/api';
 import type * as http from 'http';
 import type * as https from 'https';
 import {
@@ -51,6 +51,7 @@ export type Func<T> = (...args: any[]) => T;
 export interface HttpCustomAttributeFunction {
   (
     span: Span,
+    metricAttributes: MetricAttributes,
     request: ClientRequest | IncomingMessage,
     response: IncomingMessage | ServerResponse
   ): void;
