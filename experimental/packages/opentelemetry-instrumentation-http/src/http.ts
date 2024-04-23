@@ -63,7 +63,7 @@ import { SEMATTRS_HTTP_ROUTE } from '@opentelemetry/semantic-conventions';
 /**
  * Http instrumentation instrumentation for Opentelemetry
  */
-export class HttpInstrumentation extends InstrumentationBase<Http> {
+export class HttpInstrumentation extends InstrumentationBase {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
@@ -104,19 +104,17 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   init(): [
-    InstrumentationNodeModuleDefinition<Https>,
-    InstrumentationNodeModuleDefinition<Http>,
+    InstrumentationNodeModuleDefinition,
+    InstrumentationNodeModuleDefinition,
   ] {
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
   }
 
   private _getHttpInstrumentation() {
-    const version = process.versions.node;
-    return new InstrumentationNodeModuleDefinition<Http>(
+    return new InstrumentationNodeModuleDefinition(
       'http',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for http@${version}`);
+      (moduleExports: Http): Http => {
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -143,9 +141,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
         return moduleExports;
       },
-      moduleExports => {
+      (moduleExports: Http) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for http@${version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -155,12 +152,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   private _getHttpsInstrumentation() {
-    const version = process.versions.node;
-    return new InstrumentationNodeModuleDefinition<Https>(
+    return new InstrumentationNodeModuleDefinition(
       'https',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for https@${version}`);
+      (moduleExports: Https): Https => {
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -187,9 +182,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
         return moduleExports;
       },
-      moduleExports => {
+      (moduleExports: Https) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for https@${version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');

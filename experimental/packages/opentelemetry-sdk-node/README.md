@@ -115,8 +115,25 @@ Configure a resource. Resources may also be detected by using the `autoDetectRes
 
 ### resourceDetectors
 
-Configure resource detectors. By default, the resource detectors are [envDetector, processDetector].
+Configure resource detectors. By default, the resource detectors are [envDetector, processDetector, hostDetector].
 NOTE: In order to enable the detection, the parameter `autoDetectResources` has to be `true`.
+
+If `resourceDetectors` was not set, you can also use the environment variable `OTEL_NODE_RESOURCE_DETECTORS` to enable only certain detectors, or completely disable them:
+
+- `env`
+- `host`
+- `os`
+- `process`
+- `serviceinstance` (experimental)
+- `all` - enable all resource detectors above
+  - **NOTE:** future versions of `@opentelemetry/sdk-node` may include additional detectors that will be covered by this scope.
+- `none` - disable resource detection
+
+For example, to enable only the `env`, `host` detectors:
+
+```shell
+export OTEL_NODE_RESOURCE_DETECTORS="env,host"
+```
 
 ### sampler
 

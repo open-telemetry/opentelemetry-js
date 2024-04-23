@@ -39,7 +39,10 @@ import {
   View,
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { assertServiceResource } from './util/resource-assertions';
+import {
+  assertServiceInstanceIdIsUUID,
+  assertServiceResource,
+} from './util/resource-assertions';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
@@ -71,7 +74,6 @@ import {
 import {
   SEMRESATTRS_HOST_NAME,
   SEMRESATTRS_PROCESS_PID,
-  SEMRESATTRS_SERVICE_INSTANCE_ID,
 } from '@opentelemetry/semantic-conventions';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
@@ -682,7 +684,7 @@ describe('Node SDK', () => {
   describe('configureServiceInstanceId', async () => {
     it('should configure service instance id via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
-        'service.instance.id=627cc493,service.name=my-service';
+        'service.instance.id=627cc493,service.name=my-service,service.namespace';
       const sdk = new NodeSDK();
 
       sdk.start();
@@ -694,7 +696,20 @@ describe('Node SDK', () => {
         instanceId: '627cc493',
       });
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-      sdk.shutdown();
+      await sdk.shutdown();
+    });
+
+    it('should configure service instance id via OTEL_NODE_RESOURCE_DETECTORS env var', async () => {
+      process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,host,os,serviceinstance';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+      const resource = sdk['_resource'];
+      await resource.waitForAsyncAttributes?.();
+
+      assertServiceInstanceIdIsUUID(resource);
+      delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
+      await sdk.shutdown();
     });
 
     it('should configure service instance id with random UUID', async () => {
@@ -712,14 +727,7 @@ describe('Node SDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      const UUID_REGEX =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      assert.equal(
-        UUID_REGEX.test(
-          resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID]?.toString() || ''
-        ),
-        true
-      );
+      assertServiceInstanceIdIsUUID(resource);
       await sdk.shutdown();
     });
   });
