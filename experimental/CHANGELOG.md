@@ -6,12 +6,31 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.51.0
+
+### :boom: Breaking Change
+
 * feat(sdk-node)!: remove long deprecated methods in favor of constructor options [#4606](https://github.com/open-telemetry/opentelemetry-js/pull/4606) @pichlermarc
   * `NodeSDK.configureTracerProvider()`, please use constructor options instead
   * `NodeSDK.configureMeterProvider()`, please use constructor options instead
   * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
   * `NodeSDK.addResource()`, please use constructor options instead
   * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on `NodeSDK.start()` if the constructor option `autoDetectResources` is unset, `undefined` or `true`.
+* feat(instrumentation): add patch and unpatch diag log messages [#4641](https://github.com/open-telemetry/opentelemetry-js/pull/4641)
+  * Instrumentations should not log patch and unpatch messages to diag channel.
+* feat!(instrumentation): remove moduleExports generic type from instrumentation registration [#4598](https://github.com/open-telemetry/opentelemetry-js/pull/4598) @blumamir
+  * breaking for instrumentation authors that depend on
+    * `InstrumentationBase`
+    * `InstrumentationNodeModuleDefinition`
+    * `InstrumentationNodeModuleFile`
 
 ### :rocket: (Enhancement)
 
@@ -26,12 +45,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(otlp-grpc-exporter-base): avoid TypeError on exporter shutdown [#4612](https://github.com/open-telemetry/opentelemetry-js/pull/4612)
-* fix(instrumentation): Don't use `require` to load `package.json` files
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(otlp-grpc-exporter-base): avoid TypeError on exporter shutdown [#4612](https://github.com/open-telemetry/opentelemetry-js/pull/4612) @pichlermarc
+* fix(instrumentation): Don't use `require` to load `package.json` files [#4593](https://github.com/open-telemetry/opentelemetry-js/pull/4593) @timfish
 
 ## 0.50.0
 
