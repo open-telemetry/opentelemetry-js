@@ -63,13 +63,13 @@ describe('ConsoleLogRecordExporter', () => {
         const expectedKeys = [
           'attributes',
           'body',
+          'resource',
           'severityNumber',
           'severityText',
           'spanId',
           'timestamp',
           'traceFlags',
           'traceId',
-          'resource'
         ].join(',');
 
         assert.ok(firstLogRecord.body === 'body1');
