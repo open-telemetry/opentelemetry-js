@@ -19,7 +19,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-logs): log resource attributes in ConsoleLogRecordExporter [#4646](https://github.com/open-telemetry/opentelemetry-js/pull/4646) @harelmo-lumigo
 * feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
 * feat(propagator-aws-xray): moved AWS Xray propagator from contrib [4603](https://github.com/open-telemetry/opentelemetry-js/pull/4603) @martinkuba
 * feat(resources): new experimental detector ServiceInstanceIdDetectorSync that sets the value for `service.instance.id` as random UUID. [#4608](https://github.com/open-telemetry/opentelemetry-js/pull/4608) @maryliag
