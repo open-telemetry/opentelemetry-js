@@ -35,9 +35,7 @@ import {
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract<T = any>
-  implements Instrumentation
-{
+export abstract class InstrumentationAbstract implements Instrumentation {
   protected _config: InstrumentationConfig;
 
   private _tracer: Tracer;
@@ -116,7 +114,7 @@ export abstract class InstrumentationAbstract<T = any>
    *
    * @returns an array of {@link InstrumentationModuleDefinition}
    */
-  public getModuleDefinitions(): InstrumentationModuleDefinition<T>[] {
+  public getModuleDefinitions(): InstrumentationModuleDefinition[] {
     const initResult = this.init() ?? [];
     if (!Array.isArray(initResult)) {
       return [initResult];
@@ -172,7 +170,7 @@ export abstract class InstrumentationAbstract<T = any>
    * methods.
    */
   protected abstract init():
-    | InstrumentationModuleDefinition<T>
-    | InstrumentationModuleDefinition<T>[]
+    | InstrumentationModuleDefinition
+    | InstrumentationModuleDefinition[]
     | void;
 }

@@ -135,7 +135,7 @@ describe('BaseInstrumentation', () => {
   });
 
   describe('getModuleDefinitions', () => {
-    const moduleDefinition: InstrumentationModuleDefinition<unknown> = {
+    const moduleDefinition: InstrumentationModuleDefinition = {
       name: 'foo',
       patch: moduleExports => {},
       unpatch: moduleExports => {},

@@ -98,11 +98,10 @@ export class GrpcInstrumentation extends InstrumentationBase {
 
   init() {
     return [
-      new InstrumentationNodeModuleDefinition<any>(
+      new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
         ['1.*'],
-        (moduleExports, version) => {
-          this._diag.debug(`Applying patch for @grpc/grpc-js@${version}`);
+        moduleExports => {
           if (isWrapped(moduleExports.Server.prototype.register)) {
             this._unwrap(moduleExports.Server.prototype, 'register');
           }
@@ -174,9 +173,8 @@ export class GrpcInstrumentation extends InstrumentationBase {
           );
           return moduleExports;
         },
-        (moduleExports, version) => {
+        moduleExports => {
           if (moduleExports === undefined) return;
-          this._diag.debug(`Removing patch for @grpc/grpc-js@${version}`);
 
           this._unwrap(moduleExports.Server.prototype, 'register');
           this._unwrap(moduleExports, 'makeClientConstructor');
