@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { Attributes, Context } from '@opentelemetry/api';
+import { Attributes, Context, TimeInput } from '@opentelemetry/api';
 import { AnyValue, SeverityNumber } from '@opentelemetry/api-logs';
 
 export interface Event {
   /**
    * The time when the event occurred as UNIX Epoch time in nanoseconds.
    */
-  timestamp?: number;
+  timestamp?: TimeInput;
 
   /**
    * The name of the event.

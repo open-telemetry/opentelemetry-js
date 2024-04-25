@@ -16,7 +16,7 @@
 import { context } from '@opentelemetry/api';
 import { Event } from '@opentelemetry/api-events';
 import * as api from '@opentelemetry/api-events';
-import { Logger, LogRecord } from '@opentelemetry/api-logs';
+import { Logger, LogRecord, SeverityNumber } from '@opentelemetry/api-logs';
 
 export class EventLogger implements api.EventLogger {
   private _logger: Logger;
@@ -34,8 +34,8 @@ export class EventLogger implements api.EventLogger {
     const logRecord: LogRecord = {
       attributes: attributes,
       context: ctx,
-      severityNumber: event.severityNumber,
-      timestamp: event.timestamp,
+      severityNumber: event.severityNumber || SeverityNumber.INFO,
+      timestamp: event.timestamp || Date.now(),
     };
 
     if (event.data) {

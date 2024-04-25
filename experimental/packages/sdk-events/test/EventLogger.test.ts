@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { EventLogger } from '../src';
 import { TestLogger } from './utils';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 
 describe('EventLogger', () => {
   describe('constructor', () => {
@@ -31,6 +32,7 @@ describe('EventLogger', () => {
     it('should emit a logRecord instance', () => {
       const logger = new TestLogger();
       const eventLogger = new EventLogger(logger);
+      const now = Date.now();
 
       const spy = sinon.spy(logger, 'emit');
       eventLogger.emit({
@@ -43,6 +45,8 @@ describe('EventLogger', () => {
           c: 3,
           d: 4,
         },
+        severityNumber: SeverityNumber.ERROR,
+        timestamp: now,
       });
 
       assert(
@@ -57,8 +61,38 @@ describe('EventLogger', () => {
               a: 1,
               b: 2,
             },
+            severityNumber: SeverityNumber.ERROR,
+            timestamp: now,
           })
         )
+      );
+    });
+
+    it('should set defaults', () => {
+      const logger = new TestLogger();
+      const eventLogger = new EventLogger(logger);
+
+      const spy = sinon.spy(logger, 'emit');
+      eventLogger.emit({
+        name: 'event name',
+      });
+
+      assert(
+        spy.calledWith(
+          sinon.match({
+            severityNumber: 9,
+          })
+        ),
+        'severityNumber should be set to INFO'
+      );
+
+      assert(
+        spy.calledWith(
+          sinon.match((value: any) => {
+            return value.timestamp !== undefined;
+          })
+        ),
+        'timestamp should not be empty'
       );
     });
   });
