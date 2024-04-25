@@ -16,18 +16,19 @@
 
 import { InstrumentationAbstract } from '../../instrumentation';
 import * as types from '../../types';
+import { InstrumentationConfig } from '../../types';
 
 /**
  * Base abstract class for instrumenting web plugins
  */
-export abstract class InstrumentationBase
-  extends InstrumentationAbstract
+export abstract class InstrumentationBase<ConfigType extends InstrumentationConfig = InstrumentationConfig>
+  extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation
 {
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: types.InstrumentationConfig = {}
+    config: ConfigType
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
