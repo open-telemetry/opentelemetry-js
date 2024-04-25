@@ -32,6 +32,12 @@ const loggerProvider = new LoggerProvider();
 loggerProvider.addLogRecordProcessor(
   new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())
 );
+
+// uncomment to use OTLP exporter
+// import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+// const logExporter = new OTLPLogExporter();
+// loggerProvider.addLogRecordProcessor(new SimpleLogRecordProcessor(logExporter));
+
 logs.setGlobalLoggerProvider(loggerProvider);
 
 // configure global EventLoggerProvider

@@ -20,6 +20,9 @@
     },
     {
       "path": "../../../experimental/packages/sdk-logs"
+    },
+    {
+      "path": "../../../experimental/packages/exporter-logs-otlp-http"
     }
   ]
 }
