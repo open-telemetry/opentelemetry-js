@@ -9,13 +9,15 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
-* feat(instrumentation): add patch and unpatch diag log messages [#4641](https://github.com/open-telemetry/opentelemetry-js/pull/4641)
-  * Instrumentations should not log patch and unpatch messages to diag channel.
-* feat!(instrumentation): remove moduleExports generic type from instrumentation registration [#4598](https://github.com/open-telemetry/opentelemetry-js/pull/4598) @blumamir
-  * breaking for instrumentation authors that depend on
-    * `InstrumentationBase`
-    * `InstrumentationNodeModuleDefinition`
-    * `InstrumentationNodeModuleFile`
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.24.0
 
 ### :rocket: (Enhancement)
 
@@ -27,10 +29,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * fix(sdk-trace-web): fix invalid timings in span events [#4486](https://github.com/open-telemetry/opentelemetry-js/pull/4486) @Abinet18
 * fix(resources): ensure BrowserDetector does not think Node.js v21 is a browser [#4561](https://github.com/open-telemetry/opentelemetry-js/issues/4561) @trentm
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 1.23.0
 
