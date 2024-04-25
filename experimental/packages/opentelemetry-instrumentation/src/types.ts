@@ -64,7 +64,7 @@ export interface Instrumentation<
   supportedVersions?: string[];
 }
 
-/** 
+/**
  * Base interface for configuration options common to all instrumentations.
  * This interface can be extended by individual instrumentations to include
  * additional configuration options specific to that instrumentation.
