@@ -102,7 +102,7 @@ describe('autoLoader', () => {
           unload = undefined;
         }
         instrumentation = new FooInstrumentation('foo', '1', {
-          enabled: false,
+          disabled: false,
         });
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');

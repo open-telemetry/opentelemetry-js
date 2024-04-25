@@ -296,7 +296,7 @@ describe('InstrumentationBase', () => {
       class TestInstrumentation extends InstrumentationBase {
         constructor() {
           super('@opentelemetry/instrumentation-net-test', '0.0.0', {
-            enabled: false,
+            disabled: false,
           });
         }
         init(): InstrumentationNodeModuleDefinition[] {
@@ -338,7 +338,7 @@ describe('InstrumentationBase', () => {
       class TestInstrumentation extends InstrumentationBase {
         constructor() {
           super('@opentelemetry/instrumentation-absolute-path-test', '0.0.0', {
-            enabled: false,
+            disabled: false,
           });
         }
         init(): InstrumentationNodeModuleDefinition[] {

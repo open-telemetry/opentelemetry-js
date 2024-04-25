@@ -36,7 +36,7 @@ import {
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract<ConfigType extends InstrumentationConfig> implements Instrumentation {
+export abstract class InstrumentationAbstract<ConfigType extends InstrumentationConfig> implements Instrumentation<ConfigType> {
   protected _config: ConfigType;
 
   private _tracer: Tracer;
@@ -50,7 +50,7 @@ export abstract class InstrumentationAbstract<ConfigType extends Instrumentation
     config: ConfigType,
   ) {
     this._config = {
-      enabled: true,
+      disabled: true,
       ...config,
     };
 

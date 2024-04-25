@@ -23,7 +23,7 @@ import { InstrumentationConfig } from '../../types';
  */
 export abstract class InstrumentationBase<ConfigType extends InstrumentationConfig = InstrumentationConfig>
   extends InstrumentationAbstract<ConfigType>
-  implements types.Instrumentation
+  implements types.Instrumentation<ConfigType>
 {
   constructor(
     instrumentationName: string,
@@ -32,7 +32,7 @@ export abstract class InstrumentationBase<ConfigType extends InstrumentationConf
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
-    if (this._config.enabled) {
+    if (this._config.disabled) {
       this.enable();
     }
   }

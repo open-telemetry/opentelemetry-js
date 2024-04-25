@@ -37,7 +37,7 @@ import { readFileSync } from 'fs';
  */
 export abstract class InstrumentationBase<ConfigType extends InstrumentationConfig = InstrumentationConfig>
   extends InstrumentationAbstract<ConfigType>
-  implements types.Instrumentation
+  implements types.Instrumentation<ConfigType>
 {
   private _modules: InstrumentationModuleDefinition[];
   private _hooks: (Hooked | Hook)[] = [];
@@ -68,7 +68,7 @@ export abstract class InstrumentationBase<ConfigType extends InstrumentationConf
       );
     }
 
-    if (this._config.enabled) {
+    if (this._config.disabled) {
       this.enable();
     }
   }
