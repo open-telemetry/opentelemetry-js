@@ -142,7 +142,9 @@ export abstract class InstrumentationAbstract<
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: ConfigType): void {
+  public setConfig(config: ConfigType = {} as ConfigType): void {
+    // the assertion that {} is compatible with ConfigType may not be correct,
+    // ConfigType should contain only optional fields, but there is no enforcement in place for that
     this._config = Object.assign({}, config);
   }
 
