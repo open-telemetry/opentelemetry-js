@@ -49,7 +49,7 @@ export abstract class InstrumentationAbstract<
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: ConfigType
+    config: ConfigType = {} as ConfigType // assuming ConfigType is an object with optional fields only
   ) {
     this._config = {
       enabled: true,
