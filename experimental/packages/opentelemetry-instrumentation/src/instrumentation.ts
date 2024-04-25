@@ -32,11 +32,13 @@ import {
   InstrumentationConfig,
 } from './types';
 
-
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract<ConfigType extends InstrumentationConfig> implements Instrumentation<ConfigType> {
+export abstract class InstrumentationAbstract<
+  ConfigType extends InstrumentationConfig,
+> implements Instrumentation<ConfigType>
+{
   protected _config: ConfigType;
 
   private _tracer: Tracer;
@@ -47,7 +49,7 @@ export abstract class InstrumentationAbstract<ConfigType extends Instrumentation
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: ConfigType,
+    config: ConfigType
   ) {
     this._config = {
       enabled: true,

@@ -26,7 +26,10 @@ import {
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
 import * as ImportInTheMiddle from 'import-in-the-middle';
-import { InstrumentationConfig, InstrumentationModuleDefinition } from '../../types';
+import {
+  InstrumentationConfig,
+  InstrumentationModuleDefinition,
+} from '../../types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
 import { Hook } from 'require-in-the-middle';
@@ -35,7 +38,9 @@ import { readFileSync } from 'fs';
 /**
  * Base abstract class for instrumenting node plugins
  */
-export abstract class InstrumentationBase<ConfigType extends InstrumentationConfig = InstrumentationConfig>
+export abstract class InstrumentationBase<
+    ConfigType extends InstrumentationConfig = InstrumentationConfig,
+  >
   extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation<ConfigType>
 {

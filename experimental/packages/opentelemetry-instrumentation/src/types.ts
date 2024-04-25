@@ -18,7 +18,9 @@ import { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
-export interface Instrumentation<ConfigType extends InstrumentationConfig = InstrumentationConfig> {
+export interface Instrumentation<
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+> {
   /** Instrumentation Name  */
   instrumentationName: string;
 

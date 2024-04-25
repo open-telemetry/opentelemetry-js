@@ -21,7 +21,9 @@ import { InstrumentationConfig } from '../../types';
 /**
  * Base abstract class for instrumenting web plugins
  */
-export abstract class InstrumentationBase<ConfigType extends InstrumentationConfig = InstrumentationConfig>
+export abstract class InstrumentationBase<
+    ConfigType extends InstrumentationConfig = InstrumentationConfig,
+  >
   extends InstrumentationAbstract<ConfigType>
   implements types.Instrumentation<ConfigType>
 {
