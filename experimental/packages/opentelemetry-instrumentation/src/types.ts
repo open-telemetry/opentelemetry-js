@@ -64,6 +64,12 @@ export interface Instrumentation<
   supportedVersions?: string[];
 }
 
+/** 
+ * Base interface for configuration options common to all instrumentations.
+ * This interface can be extended by individual instrumentations to include
+ * additional configuration options specific to that instrumentation.
+ * All configuration options must be optional.
+ */
 export interface InstrumentationConfig {
   /**
    * Whether to enable the plugin.
