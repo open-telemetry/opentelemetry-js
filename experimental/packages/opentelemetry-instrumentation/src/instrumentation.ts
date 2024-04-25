@@ -50,7 +50,7 @@ export abstract class InstrumentationAbstract<ConfigType extends Instrumentation
     config: ConfigType,
   ) {
     this._config = {
-      disabled: true,
+      enabled: true,
       ...config,
     };
 

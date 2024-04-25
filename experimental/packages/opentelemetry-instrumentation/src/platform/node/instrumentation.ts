@@ -68,7 +68,7 @@ export abstract class InstrumentationBase<ConfigType extends InstrumentationConf
       );
     }
 
-    if (this._config.disabled) {
+    if (this._config.enabled) {
       this.enable();
     }
   }

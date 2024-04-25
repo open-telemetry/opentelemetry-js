@@ -71,7 +71,7 @@ describe('instrumenting a scoped package', function () {
    */
   it('should patch internal file and main module', function () {
     const instrumentation = new TestInstrumentationSimple({
-      disabled: false,
+      enabled: false,
     });
     instrumentation.enable();
 
@@ -92,7 +92,7 @@ describe('instrumenting a scoped package', function () {
    */
   it('should patch main module', function () {
     const instrumentation = new TestInstrumentationSimple({
-      disabled: false,
+      enabled: false,
     });
     instrumentation.enable();
 

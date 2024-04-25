@@ -33,7 +33,7 @@ const CORE_MODULE = 'random_core';
 
 class TestInstrumentation extends InstrumentationBase {
   constructor() {
-    super(MODULE_NAME, MODULE_VERSION);
+    super(MODULE_NAME, MODULE_VERSION, {});
   }
 
   init() {}
@@ -296,7 +296,7 @@ describe('InstrumentationBase', () => {
       class TestInstrumentation extends InstrumentationBase {
         constructor() {
           super('@opentelemetry/instrumentation-net-test', '0.0.0', {
-            disabled: false,
+            enabled: false,
           });
         }
         init(): InstrumentationNodeModuleDefinition[] {
@@ -338,7 +338,7 @@ describe('InstrumentationBase', () => {
       class TestInstrumentation extends InstrumentationBase {
         constructor() {
           super('@opentelemetry/instrumentation-absolute-path-test', '0.0.0', {
-            disabled: false,
+            enabled: false,
           });
         }
         init(): InstrumentationNodeModuleDefinition[] {

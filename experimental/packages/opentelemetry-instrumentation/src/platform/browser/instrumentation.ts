@@ -32,7 +32,7 @@ export abstract class InstrumentationBase<ConfigType extends InstrumentationConf
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
-    if (this._config.disabled) {
+    if (this._config.enabled) {
       this.enable();
     }
   }

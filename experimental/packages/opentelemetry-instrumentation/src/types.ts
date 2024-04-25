@@ -67,7 +67,7 @@ export interface InstrumentationConfig {
    * Whether to enable the plugin.
    * @default true
    */
-  disabled?: boolean;
+  enabled?: boolean;
 }
 
 /**

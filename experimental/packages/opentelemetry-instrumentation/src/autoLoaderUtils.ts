@@ -71,7 +71,7 @@ export function enableInstrumentations(
     // so enable only if user prevented that by setting enabled to false
     // this is to prevent double enabling but when calling register all
     // instrumentations should be now enabled
-    if (!instrumentation.getConfig().disabled) {
+    if (!instrumentation.getConfig().enabled) {
       instrumentation.enable();
     }
   }
