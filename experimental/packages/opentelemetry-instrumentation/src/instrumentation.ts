@@ -36,7 +36,7 @@ import {
  * Base abstract internal class for instrumenting node and web plugins
  */
 export abstract class InstrumentationAbstract<
-  ConfigType extends InstrumentationConfig,
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
 > implements Instrumentation<ConfigType>
 {
   protected _config: ConfigType;
