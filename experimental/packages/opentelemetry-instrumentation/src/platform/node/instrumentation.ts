@@ -33,6 +33,18 @@ import { Hook } from 'require-in-the-middle';
 import { readFileSync } from 'fs';
 
 /**
+ * Bundlers try and resolve require.resolve calls and complain when they can't
+ * reason about a dynamic module name.
+ * @param mod The module global
+ */
+function hiddenFromBundlersRequireResolve(
+  mod: { require: { resolve: (name: string) => string } },
+  name: string
+): string {
+  return mod.require.resolve(name);
+}
+
+/**
  * Base abstract class for instrumenting node plugins
  */
 export abstract class InstrumentationBase
@@ -143,10 +155,10 @@ export abstract class InstrumentationBase
   };
 
   private _warnOnPreloadedModules(): void {
-    this._modules.forEach((module: InstrumentationModuleDefinition) => {
-      const { name } = module;
+    this._modules.forEach((moduleDef: InstrumentationModuleDefinition) => {
+      const { name } = moduleDef;
       try {
-        const resolvedModule = require.resolve(name);
+        const resolvedModule = hiddenFromBundlersRequireResolve(module, name);
         if (require.cache[resolvedModule]) {
           // Module is already cached, which means the instrumentation hook might not work
           this._diag.warn(
