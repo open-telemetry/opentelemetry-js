@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
-import * as root from './generated/root';
+import * as root from '../generated/root';
+import { ISerializer } from '../common/i-serializer';
+import {
+  IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse,
+} from '../metrics/types';
+import { ExportType } from './protobuf-export-type';
+import {
+  IExportTraceServiceRequest,
+  IExportTraceServiceResponse,
+} from '../trace/types';
 import {
   IExportLogsServiceRequest,
   IExportLogsServiceResponse,
-  IExportMetricsServiceRequest,
-  IExportMetricsServiceResponse,
-  IExportTraceServiceRequest,
-  IExportTraceServiceResponse,
-} from '@opentelemetry/otlp-transformer';
-import { ExportType } from './internal-types';
+} from '../logs/types';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import { createExportTraceServiceRequest } from '../trace';
+import { createExportMetricsServiceRequest } from '../metrics';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
+import { createExportLogsServiceRequest } from '../logs';
+import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 
 const logsResponseType = root.opentelemetry.proto.collector.logs.v1
   .ExportLogsServiceResponse as ExportType<IExportLogsServiceResponse>;
@@ -43,46 +54,41 @@ const traceResponseType = root.opentelemetry.proto.collector.trace.v1
 const traceRequestType = root.opentelemetry.proto.collector.trace.v1
   .ExportTraceServiceRequest as ExportType<IExportTraceServiceRequest>;
 
-/**
- * Serializes and deserializes the OTLP request/response to and from {@link Uint8Array}
- */
-export interface ISerializer<Request, Response> {
-  serializeRequest(request: Request): Uint8Array | undefined;
-  deserializeResponse(data: Uint8Array): Response;
-}
-
-export const LogsSerializer: ISerializer<
-  IExportLogsServiceRequest,
+export const ProtobufLogsSerializer: ISerializer<
+  ReadableLogRecord[],
   IExportLogsServiceResponse
 > = {
-  serializeRequest: (arg: IExportLogsServiceRequest) => {
-    return Buffer.from(logsRequestType.encode(arg).finish());
+  serializeRequest: (arg: ReadableLogRecord[]) => {
+    const request = createExportLogsServiceRequest(arg);
+    return logsRequestType.encode(request).finish();
   },
-  deserializeResponse: (arg: Buffer) => {
+  deserializeResponse: (arg: Uint8Array) => {
     return logsResponseType.decode(arg);
   },
 };
 
-export const TraceSerializer: ISerializer<
-  IExportTraceServiceRequest,
-  IExportTraceServiceResponse
+export const ProtobufMetricsSerializer: ISerializer<
+  ResourceMetrics[],
+  IExportMetricsServiceResponse
 > = {
-  serializeRequest: (arg: IExportTraceServiceRequest) => {
-    return Buffer.from(traceRequestType.encode(arg).finish());
+  serializeRequest: (arg: ResourceMetrics[]) => {
+    const request = createExportMetricsServiceRequest(arg);
+    return metricsRequestType.encode(request).finish();
   },
-  deserializeResponse: (arg: Buffer) => {
-    return traceResponseType.decode(arg);
+  deserializeResponse: (arg: Uint8Array) => {
+    return metricsResponseType.decode(arg);
   },
 };
 
-export const MetricsSerializer: ISerializer<
-  IExportMetricsServiceRequest,
-  IExportMetricsServiceResponse
+export const ProtobufTraceSerializer: ISerializer<
+  ReadableSpan[],
+  IExportTraceServiceResponse
 > = {
-  serializeRequest: (arg: IExportMetricsServiceRequest) => {
-    return Buffer.from(metricsRequestType.encode(arg).finish());
+  serializeRequest: (arg: ReadableSpan[]) => {
+    const request = createExportTraceServiceRequest(arg);
+    return traceRequestType.encode(request).finish();
   },
-  deserializeResponse: (arg: Buffer) => {
-    return metricsResponseType.decode(arg);
+  deserializeResponse: (arg: Uint8Array) => {
+    return traceResponseType.decode(arg);
   },
 };

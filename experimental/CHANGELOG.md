@@ -6,6 +6,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
+  * Breaking changes:
+    * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
+    * (internal) OTLPExporterNodeBase now has additional constructor parameters that are required
+    * (internal) OTLPExporterNodeBase now has an additional `ResponseType` type parameter
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)

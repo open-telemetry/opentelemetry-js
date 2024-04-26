@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type * as protobuf from 'protobufjs';
+import * as protobuf from 'protobufjs';
 
 export interface ExportType<T, R = T & { toJSON: () => unknown }> {
   encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
