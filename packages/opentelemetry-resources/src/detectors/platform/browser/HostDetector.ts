@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-import { Detector } from '../../types';
-import { ResourceDetectionConfig } from '../../config';
-import { IResource } from '../../IResource';
-import { osDetectorSync } from './OSDetectorSync';
+import { noopDetector } from '../../NoopDetector';
 
-/**
- * OSDetector detects the resources related to the operating system (OS) on
- * which the process represented by this resource is running.
- */
-class OSDetector implements Detector {
-  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(osDetectorSync.detect(_config));
-  }
-}
-
-export const osDetector = new OSDetector();
+export const hostDetector = noopDetector;

@@ -18,7 +18,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { promises as fs } from 'fs';
 
-import { getMachineId } from '../../../../src/platform/node/machine-id/getMachineId-linux';
+import { getMachineId } from '../../../../src/detectors/platform/node/machine-id/getMachineId-linux';
 
 describe('getMachineId on linux', () => {
   const expectedMachineId = 'f2c668b579780554f70f72a063dc0864';

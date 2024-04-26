@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-export { Resource } from './Resource';
-export { IResource } from './IResource';
-export { defaultServiceName } from './platform';
-export { DetectorSync, ResourceAttributes, Detector } from './types';
-export { ResourceDetectionConfig } from './config';
-export {
-  browserDetector,
-  browserDetectorSync,
-  envDetector,
-  envDetectorSync,
-  hostDetector,
-  hostDetectorSync,
-  osDetector,
-  osDetectorSync,
-  processDetector,
-  processDetectorSync,
-  serviceInstanceIdDetectorSync,
-} from './detectors';
-export { detectResourcesSync, detectResources } from './detect-resources';
+import { Detector } from '../../../types';
+import { ResourceDetectionConfig } from '../../../config';
+import { IResource } from '../../../IResource';
+import { hostDetectorSync } from './HostDetectorSync';
+
+/**
+ * HostDetector detects the resources related to the host current process is
+ * running on. Currently only non-cloud-based attributes are included.
+ */
+class HostDetector implements Detector {
+  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
+    return Promise.resolve(hostDetectorSync.detect(_config));
+  }
+}
+
+export const hostDetector = new HostDetector();
