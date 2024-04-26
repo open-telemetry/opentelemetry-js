@@ -6,21 +6,11 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* feat(sdk-node)!: remove long deprecated methods in favor of constructor options [#4606](https://github.com/open-telemetry/opentelemetry-js/pull/4606) @pichlermarc
-  * `NodeSDK.configureTracerProvider()`, please use constructor options instead
-  * `NodeSDK.configureMeterProvider()`, please use constructor options instead
-  * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
-  * `NodeSDK.addResource()`, please use constructor options instead
-  * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on `NodeSDK.start()` if the constructor option `autoDetectResources` is unset, `undefined` or `true`.
-
 ### :rocket: (Enhancement)
 
-* feat(otlp-transformer): consolidate scope/resource creation in transformer [#4600](https://github.com/open-telemetry/opentelemetry-js/pull/4600)
-* feat(jaeger-remote-samper): added support of jaeger-remote-samper [#4534](https://github.com/open-telemetry/opentelemetry-js/pull/4589)
+* feat(sampler-jaeger-remote): added support of jaeger-remote-sampler according to this [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#jaegerremotesampler) [#4534](https://github.com/open-telemetry/opentelemetry-js/pull/4589)
 
 ### :bug: (Bug Fix)
-
-* fix(otlp-grpc-exporter-base): avoid TypeError on exporter shutdown [#4612](https://github.com/open-telemetry/opentelemetry-js/pull/4612)
 
 ### :books: (Refine Doc)
 

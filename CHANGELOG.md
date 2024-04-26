@@ -11,8 +11,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
-
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
