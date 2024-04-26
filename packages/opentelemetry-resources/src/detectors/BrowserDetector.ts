@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import {
-  browserDetectorSync,
-  Detector,
-  IResource,
-  ResourceDetectionConfig,
-} from '..';
+import { IResource } from '../IResource';
+import { ResourceDetectionConfig } from '../config';
+import { Detector } from '../types';
+import { browserDetectorSync } from './BrowserDetectorSync';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.

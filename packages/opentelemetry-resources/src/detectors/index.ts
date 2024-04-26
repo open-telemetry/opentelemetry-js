@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-export * from './BrowserDetector';
-export * from './EnvDetector';
-export * from './BrowserDetectorSync';
-export * from './EnvDetectorSync';
+export {
+  hostDetector,
+  hostDetectorSync,
+  osDetector,
+  osDetectorSync,
+  processDetector,
+  processDetectorSync,
+  serviceInstanceIdDetectorSync,
+} from './platform';
+export { browserDetector } from './BrowserDetector';
+export { envDetector } from './EnvDetector';
+export { browserDetectorSync } from './BrowserDetectorSync';
+export { envDetectorSync } from './EnvDetectorSync';
