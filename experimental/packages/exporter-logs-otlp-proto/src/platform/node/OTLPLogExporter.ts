@@ -22,7 +22,6 @@ import {
   OTLPExporterNodeBase,
   parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
-import { ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import {
   IExportLogsServiceRequest,
   IExportLogsServiceResponse,
@@ -73,9 +72,5 @@ export class OTLPLogExporter
           DEFAULT_COLLECTOR_RESOURCE_PATH
         )
       : DEFAULT_COLLECTOR_URL;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.LOGS;
   }
 }

@@ -15,7 +15,6 @@
  */
 
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
-import { ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
@@ -69,10 +68,6 @@ class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<
           DEFAULT_COLLECTOR_RESOURCE_PATH
         )
       : DEFAULT_COLLECTOR_URL;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.METRICS;
   }
 }
 

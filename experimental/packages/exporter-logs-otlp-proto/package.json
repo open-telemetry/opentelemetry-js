@@ -97,7 +97,6 @@
     "@opentelemetry/api-logs": "0.51.0",
     "@opentelemetry/core": "1.24.0",
     "@opentelemetry/otlp-exporter-base": "0.51.0",
-    "@opentelemetry/otlp-proto-exporter-base": "0.51.0",
     "@opentelemetry/otlp-transformer": "0.51.0",
     "@opentelemetry/resources": "1.24.0",
     "@opentelemetry/sdk-logs": "0.51.0",

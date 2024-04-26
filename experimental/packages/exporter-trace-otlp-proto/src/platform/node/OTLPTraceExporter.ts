@@ -23,7 +23,6 @@ import {
   OTLPExporterNodeBase,
   parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
-import { ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import {
   IExportTraceServiceRequest,
   IExportTraceServiceResponse,
@@ -71,9 +70,5 @@ export class OTLPTraceExporter
           DEFAULT_COLLECTOR_RESOURCE_PATH
         )
       : DEFAULT_COLLECTOR_URL;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.SPANS;
   }
 }
