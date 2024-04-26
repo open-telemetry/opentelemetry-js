@@ -56,7 +56,13 @@ import {
   isWrapped,
   InstrumentationBase,
 } from '@opentelemetry/instrumentation';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_NET_PEER_NAME,
+  SEMATTRS_NET_PEER_PORT,
+  SEMATTRS_RPC_METHOD,
+  SEMATTRS_RPC_SERVICE,
+  SEMATTRS_RPC_SYSTEM,
+} from '@opentelemetry/semantic-conventions';
 
 import {
   shouldNotTraceServerCall,
@@ -92,11 +98,10 @@ export class GrpcInstrumentation extends InstrumentationBase {
 
   init() {
     return [
-      new InstrumentationNodeModuleDefinition<any>(
+      new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
         ['1.*'],
-        (moduleExports, version) => {
-          this._diag.debug(`Applying patch for @grpc/grpc-js@${version}`);
+        moduleExports => {
           if (isWrapped(moduleExports.Server.prototype.register)) {
             this._unwrap(moduleExports.Server.prototype, 'register');
           }
@@ -168,9 +173,8 @@ export class GrpcInstrumentation extends InstrumentationBase {
           );
           return moduleExports;
         },
-        (moduleExports, version) => {
+        moduleExports => {
           if (moduleExports === undefined) return;
-          this._diag.debug(`Removing patch for @grpc/grpc-js@${version}`);
 
           this._unwrap(moduleExports.Server.prototype, 'register');
           this._unwrap(moduleExports, 'makeClientConstructor');
@@ -274,10 +278,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [SemanticAttributes.RPC_SYSTEM]:
-                        AttributeValues.RPC_SYSTEM,
-                      [SemanticAttributes.RPC_METHOD]: method,
-                      [SemanticAttributes.RPC_SERVICE]: service,
+                      [SEMATTRS_RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
+                      [SEMATTRS_RPC_METHOD]: method,
+                      [SEMATTRS_RPC_SERVICE]: service,
                     });
 
                   instrumentation._metadataCapture.server.captureRequestMetadata(
@@ -469,9 +472,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
         const span = instrumentation.tracer
           .startSpan(name, { kind: SpanKind.CLIENT })
           .setAttributes({
-            [SemanticAttributes.RPC_SYSTEM]: 'grpc',
-            [SemanticAttributes.RPC_METHOD]: method,
-            [SemanticAttributes.RPC_SERVICE]: service,
+            [SEMATTRS_RPC_SYSTEM]: 'grpc',
+            [SEMATTRS_RPC_METHOD]: method,
+            [SEMATTRS_RPC_SERVICE]: service,
           });
         instrumentation.extractNetMetadata(this, span);
 
@@ -514,9 +517,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
     const span = this.tracer
       .startSpan(name, { kind: SpanKind.CLIENT })
       .setAttributes({
-        [SemanticAttributes.RPC_SYSTEM]: 'grpc',
-        [SemanticAttributes.RPC_METHOD]: methodAttributeValue,
-        [SemanticAttributes.RPC_SERVICE]: service,
+        [SEMATTRS_RPC_SYSTEM]: 'grpc',
+        [SEMATTRS_RPC_METHOD]: methodAttributeValue,
+        [SEMATTRS_RPC_SERVICE]: service,
       });
 
     if (metadata != null) {
@@ -529,12 +532,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
     // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
     const parsedUri = URI_REGEX.exec(client.getChannel().getTarget());
     if (parsedUri != null && parsedUri.groups != null) {
+      span.setAttribute(SEMATTRS_NET_PEER_NAME, parsedUri.groups['name']);
       span.setAttribute(
-        SemanticAttributes.NET_PEER_NAME,
-        parsedUri.groups['name']
-      );
-      span.setAttribute(
-        SemanticAttributes.NET_PEER_PORT,
+        SEMATTRS_NET_PEER_PORT,
         parseInt(parsedUri.groups['port'])
       );
     }

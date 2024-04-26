@@ -18,6 +18,7 @@ import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { IResource, Resource } from '@opentelemetry/resources';
 import {
+  SEMRESATTRS_SERVICE_INSTANCE_ID,
   SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
   SEMRESATTRS_TELEMETRY_SDK_NAME,
   SEMRESATTRS_TELEMETRY_SDK_VERSION,
@@ -334,5 +335,16 @@ const assertHasOneLabel = (prefix: string, resource: Resource): void => {
         })
         .join(', ') +
       JSON.stringify(Object.keys(SemanticResourceAttributes))
+  );
+};
+
+export const assertServiceInstanceIdIsUUID = (resource: Resource): void => {
+  const UUID_REGEX =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  assert.equal(
+    UUID_REGEX.test(
+      resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID]?.toString() || ''
+    ),
+    true
   );
 };
