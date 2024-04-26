@@ -40,7 +40,7 @@ Knowing this if you want to change the submodule to point to a different version
 8. Now thing which is very important. You have to commit this to apply these changes
 
     ```shell script
-    git commit -am "chore: updating submodule for otlp-proto-exporter-base"
+    git commit -am "chore: updating submodule for otlp-transformer"
     ```
 
 9. If you look now at git log you will notice that the folder `protos` has been changed and it will show what was the previous sha and what is current one.
