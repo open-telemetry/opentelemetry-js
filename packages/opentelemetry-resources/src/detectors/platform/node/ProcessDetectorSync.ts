@@ -16,10 +16,10 @@
 
 import { diag } from '@opentelemetry/api';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../../Resource';
-import { DetectorSync, ResourceAttributes } from '../../types';
-import { ResourceDetectionConfig } from '../../config';
-import { IResource } from '../../IResource';
+import { Resource } from '../../../Resource';
+import { DetectorSync, ResourceAttributes } from '../../../types';
+import { ResourceDetectionConfig } from '../../../config';
+import { IResource } from '../../../IResource';
 import * as os from 'os';
 
 /**

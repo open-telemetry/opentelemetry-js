@@ -15,9 +15,11 @@
  */
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { DetectorSync, IResource, Resource, ResourceDetectionConfig } from '..';
-import { ResourceAttributes } from '../types';
+import { DetectorSync, ResourceAttributes } from '../types';
 import { diag } from '@opentelemetry/api';
+import { ResourceDetectionConfig } from '../config';
+import { IResource } from '../IResource';
+import { Resource } from '../Resource';
 
 /**
  * BrowserDetectorSync will be used to detect the resources related to browser.
