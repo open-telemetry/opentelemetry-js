@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714134258099,
+  "lastUpdate": 1714135688818,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7556,6 +7556,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "141b457b8513069b64a5f246165167832fc0d83a",
+          "message": "fix(core): align inconsistent behavior of getEnv() and getEnvWithoutDefaults() when a process polyfill is used (#4649)\n\n* fix(core): align inconsistent behavior of getEnv() and getEnvWithoutDefaults() when a process polyfill is used\r\n\r\n* Update CHANGELOG.md",
+          "timestamp": "2024-04-26T14:46:29+02:00",
+          "tree_id": "16763e72d9c80f7393ef1db804fdb127620907d6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/141b457b8513069b64a5f246165167832fc0d83a"
+        },
+        "date": 1714135688011,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 940558,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11519,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 705075,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 652616,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
