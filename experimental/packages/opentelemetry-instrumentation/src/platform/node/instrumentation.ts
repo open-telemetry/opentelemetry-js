@@ -35,11 +35,11 @@ import { readFileSync } from 'fs';
 /**
  * Base abstract class for instrumenting node plugins
  */
-export abstract class InstrumentationBase<T = any>
+export abstract class InstrumentationBase
   extends InstrumentationAbstract
   implements types.Instrumentation
 {
-  private _modules: InstrumentationModuleDefinition<T>[];
+  private _modules: InstrumentationModuleDefinition[];
   private _hooks: (Hooked | Hook)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
@@ -58,7 +58,7 @@ export abstract class InstrumentationBase<T = any>
       modules = [modules];
     }
 
-    this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
+    this._modules = (modules as InstrumentationModuleDefinition[]) || [];
 
     if (this._modules.length === 0) {
       diag.debug(
@@ -143,7 +143,7 @@ export abstract class InstrumentationBase<T = any>
   };
 
   private _warnOnPreloadedModules(): void {
-    this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
+    this._modules.forEach((module: InstrumentationModuleDefinition) => {
       const { name } = module;
       try {
         const resolvedModule = require.resolve(name);
@@ -174,7 +174,7 @@ export abstract class InstrumentationBase<T = any>
   }
 
   private _onRequire<T>(
-    module: InstrumentationModuleDefinition<T>,
+    module: InstrumentationModuleDefinition,
     exports: T,
     name: string,
     baseDir?: string | void
@@ -183,6 +183,12 @@ export abstract class InstrumentationBase<T = any>
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
         if (this._enabled) {
+          this._diag.debug(
+            'Applying instrumentation patch for nodejs core module on require hook',
+            {
+              module: module.name,
+            }
+          );
           return module.patch(exports);
         }
       }
@@ -199,6 +205,14 @@ export abstract class InstrumentationBase<T = any>
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
+            this._diag.debug(
+              'Applying instrumentation patch for module on require hook',
+              {
+                module: module.name,
+                version: module.moduleVersion,
+                baseDir,
+              }
+            );
             return module.patch(exports, module.moduleVersion);
           }
         }
@@ -216,7 +230,18 @@ export abstract class InstrumentationBase<T = any>
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
       if (this._enabled) {
-        return file.patch(patchedExports, module.moduleVersion);
+        this._diag.debug(
+          'Applying instrumentation patch for nodejs module file on require hook',
+          {
+            module: module.name,
+            version: module.moduleVersion,
+            fileName: file.name,
+            baseDir,
+          }
+        );
+
+        // patch signature is not typed, so we cast it assuming it's correct
+        return file.patch(patchedExports, module.moduleVersion) as T;
       }
       return patchedExports;
     }, exports);
@@ -232,10 +257,25 @@ export abstract class InstrumentationBase<T = any>
     if (this._hooks.length > 0) {
       for (const module of this._modules) {
         if (typeof module.patch === 'function' && module.moduleExports) {
+          this._diag.debug(
+            'Applying instrumentation patch for nodejs module on instrumentation enabled',
+            {
+              module: module.name,
+              version: module.moduleVersion,
+            }
+          );
           module.patch(module.moduleExports, module.moduleVersion);
         }
         for (const file of module.files) {
           if (file.moduleExports) {
+            this._diag.debug(
+              'Applying instrumentation patch for nodejs module file on instrumentation enabled',
+              {
+                module: module.name,
+                version: module.moduleVersion,
+                fileName: file.name,
+              }
+            );
             file.patch(file.moduleExports, module.moduleVersion);
           }
         }
@@ -246,20 +286,10 @@ export abstract class InstrumentationBase<T = any>
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
-        return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition<typeof exports>,
-          exports,
-          name,
-          baseDir
-        );
+        return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
       const onRequire: OnRequireFn = (exports, name, baseDir) => {
-        return this._onRequire<typeof exports>(
-          module as unknown as InstrumentationModuleDefinition<typeof exports>,
-          exports,
-          name,
-          baseDir
-        );
+        return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
 
       // `RequireInTheMiddleSingleton` does not support absolute paths.
@@ -288,10 +318,25 @@ export abstract class InstrumentationBase<T = any>
 
     for (const module of this._modules) {
       if (typeof module.unpatch === 'function' && module.moduleExports) {
+        this._diag.debug(
+          'Removing instrumentation patch for nodejs module on instrumentation disabled',
+          {
+            module: module.name,
+            version: module.moduleVersion,
+          }
+        );
         module.unpatch(module.moduleExports, module.moduleVersion);
       }
       for (const file of module.files) {
         if (file.moduleExports) {
+          this._diag.debug(
+            'Removing instrumentation patch for nodejs module file on instrumentation disabled',
+            {
+              module: module.name,
+              version: module.moduleVersion,
+              fileName: file.name,
+            }
+          );
           file.unpatch(file.moduleExports, module.moduleVersion);
         }
       }

@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-import { noopDetector } from '../../detectors/NoopDetector';
-
-export const hostDetector = noopDetector;
+export * from './AWSXRayPropagator';

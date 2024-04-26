@@ -17,8 +17,8 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { PromiseWithChild } from 'child_process';
-import * as util from '../../../../src/platform/node/machine-id/execAsync';
-import { getMachineId } from '../../../../src/platform/node/machine-id/getMachineId-darwin';
+import * as util from '../../../../src/detectors/platform/node/machine-id/execAsync';
+import { getMachineId } from '../../../../src/detectors/platform/node/machine-id/getMachineId-darwin';
 
 describe('getMachineId on Darwin', () => {
   const expectedMachineId = '81895B8D-9EF9-4EBB-B5DE-B00069CF53F0';

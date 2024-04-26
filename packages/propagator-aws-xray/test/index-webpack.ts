@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-import { noopDetectorSync } from '../../detectors/NoopDetectorSync';
-
-export const hostDetectorSync = noopDetectorSync;
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

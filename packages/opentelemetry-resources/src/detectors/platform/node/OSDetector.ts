@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { Detector } from '../../types';
-import { ResourceDetectionConfig } from '../../config';
-import { IResource } from '../../IResource';
-import { hostDetectorSync } from './HostDetectorSync';
+import { Detector } from '../../../types';
+import { ResourceDetectionConfig } from '../../../config';
+import { IResource } from '../../../IResource';
+import { osDetectorSync } from './OSDetectorSync';
 
 /**
- * HostDetector detects the resources related to the host current process is
- * running on. Currently only non-cloud-based attributes are included.
+ * OSDetector detects the resources related to the operating system (OS) on
+ * which the process represented by this resource is running.
  */
-class HostDetector implements Detector {
+class OSDetector implements Detector {
   detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(hostDetectorSync.detect(_config));
+    return Promise.resolve(osDetectorSync.detect(_config));
   }
 }
 
-export const hostDetector = new HostDetector();
+export const osDetector = new OSDetector();

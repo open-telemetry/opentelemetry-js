@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import {
   Instrumentation,
   InstrumentationOption,
 } from '@opentelemetry/instrumentation';
+import {
+  DetectorSync,
+  envDetectorSync,
+  hostDetectorSync,
+  osDetectorSync,
+  processDetectorSync,
+  serviceInstanceIdDetectorSync,
+} from '@opentelemetry/resources';
 
 // TODO: This part of a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
 // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
@@ -40,4 +49,42 @@ export function parseInstrumentationOptions(
   }
 
   return instrumentations;
+}
+
+const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
+const RESOURCE_DETECTOR_HOST = 'host';
+const RESOURCE_DETECTOR_OS = 'os';
+const RESOURCE_DETECTOR_PROCESS = 'process';
+const RESOURCE_DETECTOR_SERVICE_INSTANCE_ID = 'serviceinstance';
+
+export function getResourceDetectorsFromEnv(): Array<DetectorSync> {
+  // When updating this list, make sure to also update the section `resourceDetectors` on README.
+  const resourceDetectors = new Map<string, DetectorSync>([
+    [RESOURCE_DETECTOR_ENVIRONMENT, envDetectorSync],
+    [RESOURCE_DETECTOR_HOST, hostDetectorSync],
+    [RESOURCE_DETECTOR_OS, osDetectorSync],
+    [RESOURCE_DETECTOR_SERVICE_INSTANCE_ID, serviceInstanceIdDetectorSync],
+    [RESOURCE_DETECTOR_PROCESS, processDetectorSync],
+  ]);
+
+  const resourceDetectorsFromEnv =
+    process.env.OTEL_NODE_RESOURCE_DETECTORS?.split(',') ?? ['all'];
+
+  if (resourceDetectorsFromEnv.includes('all')) {
+    return [...resourceDetectors.values()].flat();
+  }
+
+  if (resourceDetectorsFromEnv.includes('none')) {
+    return [];
+  }
+
+  return resourceDetectorsFromEnv.flatMap(detector => {
+    const resourceDetector = resourceDetectors.get(detector);
+    if (!resourceDetector) {
+      diag.error(
+        `Invalid resource detector "${detector}" specified in the environment variable OTEL_NODE_RESOURCE_DETECTORS`
+      );
+    }
+    return resourceDetector || [];
+  });
 }

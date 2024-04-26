@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-import { noopDetector } from '../../detectors/NoopDetector';
+import { noopDetector } from '../../NoopDetector';
 
-export const processDetector = noopDetector;
+export const osDetector = noopDetector;
