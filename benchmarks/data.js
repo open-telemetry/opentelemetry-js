@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714140781342,
+  "lastUpdate": 1714143880131,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7660,6 +7660,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.28%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "harelm@lumigo.io",
+            "name": "Harel Moshe",
+            "username": "harelmo-lumigo"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e44895fdacc7529f4f3c941912bdc38e5ba99588",
+          "message": "feat(sdk-logs): emit resource attributes from ConsoleLogRecordExporter (#4646)\n\n* feat(sdk-logs): emit resource attributes from ConsoleLogRecordExporter\r\n\r\n* Update CHANGELOG\r\n\r\n* Fix test\r\n\r\n* Update experimental CHANGELOG\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-26T17:02:51+02:00",
+          "tree_id": "fa92476638eeb550d14ad8407a966f4c3631ab5c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e44895fdacc7529f4f3c941912bdc38e5ba99588"
+        },
+        "date": 1714143878958,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 984032,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11643,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 687590,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 677527,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
