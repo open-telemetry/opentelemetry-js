@@ -63,6 +63,7 @@ describe('ConsoleLogRecordExporter', () => {
         const expectedKeys = [
           'attributes',
           'body',
+          'resource',
           'severityNumber',
           'severityText',
           'spanId',
