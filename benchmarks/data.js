@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714135688818,
+  "lastUpdate": 1714140781342,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7608,6 +7608,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.58%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8c12dd5c42659ffd10a2334d9b4186253820f16c",
+          "message": "feat!: move serialization to `@opentelemetry/otlp-transformer` (#4542)\n\n* feat!:move serializers to otlp-transformer\r\n\r\n* feat!: use serializeres in protobuf and json exporters\r\n\r\n* test(otlp-transformer): add tests for trace serializer\r\n\r\n* test(otlp-transformer): add tests for metrics serializer\r\n\r\n* test(otlp-transformer): add tests for logs serializer\r\n\r\n* chore: resolve more conflicts\r\n\r\n* fix: sync package-lock\r\n\r\n* chore: cleanup dependencies, unused code, .gitignore\r\n\r\n* chore: fix changelog indentation\r\n\r\n* fix(otlp-transformer): remove unused useHex from JsonMetricsSerializer\r\n\r\n* chore: add comment about how logs data is structured\r\n\r\n* docs: move submodule.md, adapt contents\r\n\r\n* fixup! Merge branch 'main' into feat/transformer-serializer\r\n\r\n* fixup! Merge branch 'main' into feat/transformer-serializer",
+          "timestamp": "2024-04-26T16:11:38+02:00",
+          "tree_id": "61bc2053e64a3c36f61cf75f7e563419fc17ca5e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8c12dd5c42659ffd10a2334d9b4186253820f16c"
+        },
+        "date": 1714140780410,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 954336,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11467,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 668718,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 687852,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
