@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export * from './node';
+export { defaultServiceName } from './node';

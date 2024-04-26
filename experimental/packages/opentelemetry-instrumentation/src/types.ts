@@ -82,29 +82,30 @@ export interface ShimWrapped extends Function {
   __original: Function;
 }
 
-export interface InstrumentationModuleFile<T> {
+export interface InstrumentationModuleFile {
   /** Name of file to be patched with relative path */
   name: string;
 
-  moduleExports?: T;
+  moduleExports?: unknown;
 
   /** Supported version this file */
   supportedVersions: string[];
 
   /** Method to patch the instrumentation  */
-  patch(moduleExports: T, moduleVersion?: string): T;
+  patch(moduleExports: unknown, moduleVersion?: string): unknown;
 
   /** Method to patch the instrumentation  */
 
   /** Method to unpatch the instrumentation  */
-  unpatch(moduleExports?: T, moduleVersion?: string): void;
+  unpatch(moduleExports?: unknown, moduleVersion?: string): void;
 }
 
-export interface InstrumentationModuleDefinition<T> {
+export interface InstrumentationModuleDefinition {
   /** Module name or path  */
   name: string;
 
-  moduleExports?: T;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  moduleExports?: any;
 
   /** Instrumented module version */
   moduleVersion?: string;
@@ -113,15 +114,16 @@ export interface InstrumentationModuleDefinition<T> {
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  files: InstrumentationModuleFile<any>[];
+  files: InstrumentationModuleFile[];
 
   /** If set to true, the includePrerelease check will be included when calling semver.satisfies */
   includePrerelease?: boolean;
 
   /** Method to patch the instrumentation  */
-  patch?: (moduleExports: T, moduleVersion?: string) => T;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  patch?: (moduleExports: any, moduleVersion?: string) => any;
 
   /** Method to unpatch the instrumentation  */
-  unpatch?: (moduleExports: T, moduleVersion?: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  unpatch?: (moduleExports: any, moduleVersion?: string) => void;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.50.0",
+  "version": "0.51.0",
   "publishConfig": {
     "access": "public"
   },
@@ -75,7 +75,7 @@
     "@babel/core": "7.23.6",
     "@babel/preset-env": "7.22.20",
     "@opentelemetry/api": ">=1.4.0 <1.9.0",
-    "@opentelemetry/api-logs": "0.50.0",
+    "@opentelemetry/api-logs": "0.51.0",
     "@opentelemetry/resources_1.9.0": "npm:@opentelemetry/resources@1.9.0",
     "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
@@ -101,7 +101,7 @@
     "webpack-merge": "5.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.23.0",
-    "@opentelemetry/resources": "1.23.0"
+    "@opentelemetry/core": "1.24.0",
+    "@opentelemetry/resources": "1.24.0"
   }
 }

@@ -11,6 +11,21 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+* fix(core): align inconsistent behavior of `getEnv()` and `getEnvWithoutDefaults()` when a `process` polyfill is used [#4648](https://github.com/open-telemetry/opentelemetry-js/pull/4648) @pichlermarc
+  * `getEnvWithoutDefaults()` would use `process.env` if it was defined when running in a browser, while `getEnv()` would always use `_globalThis`. Now both use `_globalThis` when running in a browser.
+* fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
+  * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.24.0
+
+### :rocket: (Enhancement)
+
 * feat(sdk-trace-base): log resource attributes in ConsoleSpanExporter [#4605](https://github.com/open-telemetry/opentelemetry-js/pull/4605) @pichlermarc
 * feat(propagator-aws-xray): moved AWS Xray propagator from contrib [4603](https://github.com/open-telemetry/opentelemetry-js/pull/4603) @martinkuba
 * feat(resources): new experimental detector ServiceInstanceIdDetectorSync that sets the value for `service.instance.id` as random UUID. [#4608](https://github.com/open-telemetry/opentelemetry-js/pull/4608) @maryliag
@@ -21,10 +36,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * fix(resources): ensure BrowserDetector does not think Node.js v21 is a browser [#4561](https://github.com/open-telemetry/opentelemetry-js/issues/4561) @trentm
 * fix(core): align inconsistent behavior of `getEnv()` and `getEnvWithoutDefaults()` when a `process` polyfill is used [#4648](https://github.com/open-telemetry/opentelemetry-js/pull/4648) @pichlermarc
   * `getEnvWithoutDefaults()` would use `process.env` if it was defined when running in a browser, while `getEnv()` would always use `_globalThis`. Now both use `_globalThis` when running in a browser.
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 1.23.0
 

@@ -56,7 +56,7 @@ describe('InstrumentationBase', () => {
         const instrumentationModule = {
           name: CORE_MODULE,
           patch: modulePatchSpy as unknown,
-        } as InstrumentationModuleDefinition<unknown>;
+        } as InstrumentationModuleDefinition;
 
         // @ts-expect-error access internal property for testing
         instrumentation._onRequire<unknown>(
@@ -79,7 +79,7 @@ describe('InstrumentationBase', () => {
         const instrumentationModule = {
           name: CORE_MODULE,
           patch: modulePatchSpy as unknown,
-        } as InstrumentationModuleDefinition<unknown>;
+        } as InstrumentationModuleDefinition;
 
         // @ts-expect-error access internal property for testing
         instrumentation._onRequire<unknown>(
@@ -117,7 +117,7 @@ describe('InstrumentationBase', () => {
             supportedVersions: [`^${MODULE_VERSION}`],
             name: MODULE_NAME,
             patch: modulePatchSpy as unknown,
-          } as InstrumentationModuleDefinition<unknown>;
+          } as InstrumentationModuleDefinition;
 
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
@@ -140,7 +140,7 @@ describe('InstrumentationBase', () => {
             supportedVersions: [`^${MODULE_VERSION}`, WILDCARD_VERSION],
             name: MODULE_NAME,
             patch: modulePatchSpy as unknown,
-          } as InstrumentationModuleDefinition<unknown>;
+          } as InstrumentationModuleDefinition;
 
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
@@ -186,7 +186,7 @@ describe('InstrumentationBase', () => {
                 patch: filePatchSpy as unknown,
               },
             ],
-          } as InstrumentationModuleDefinition<unknown>;
+          } as InstrumentationModuleDefinition;
 
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
@@ -218,7 +218,7 @@ describe('InstrumentationBase', () => {
                 patch: filePatchSpy as unknown,
               },
             ],
-          } as InstrumentationModuleDefinition<unknown>;
+          } as InstrumentationModuleDefinition;
 
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
@@ -262,7 +262,7 @@ describe('InstrumentationBase', () => {
                 patch: filePatchSpy as unknown,
               },
             ],
-          } as InstrumentationModuleDefinition<unknown>;
+          } as InstrumentationModuleDefinition;
 
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
@@ -293,15 +293,15 @@ describe('InstrumentationBase', () => {
       type Exports = Record<string, unknown>;
       type ExportsPatched = Exports & { __patched?: boolean };
       const moduleName = 'net';
-      class TestInstrumentation extends InstrumentationBase<Exports> {
+      class TestInstrumentation extends InstrumentationBase {
         constructor() {
           super('@opentelemetry/instrumentation-net-test', '0.0.0', {
             enabled: false,
           });
         }
-        init(): InstrumentationNodeModuleDefinition<Exports>[] {
+        init(): InstrumentationNodeModuleDefinition[] {
           return [
-            new InstrumentationNodeModuleDefinition<Exports>(
+            new InstrumentationNodeModuleDefinition(
               moduleName,
               ['*'],
               (exports: ExportsPatched) => {
@@ -335,15 +335,15 @@ describe('InstrumentationBase', () => {
       type ExportsPatched = Exports & { __patched?: boolean };
       const moduleName = 'absolutePathTestFixture';
       const fileName = path.join(__dirname, 'fixtures', `${moduleName}.js`);
-      class TestInstrumentation extends InstrumentationBase<Exports> {
+      class TestInstrumentation extends InstrumentationBase {
         constructor() {
           super('@opentelemetry/instrumentation-absolute-path-test', '0.0.0', {
             enabled: false,
           });
         }
-        init(): InstrumentationNodeModuleDefinition<Exports>[] {
+        init(): InstrumentationNodeModuleDefinition[] {
           return [
-            new InstrumentationNodeModuleDefinition<Exports>(
+            new InstrumentationNodeModuleDefinition(
               fileName,
               ['*'],
               undefined,
