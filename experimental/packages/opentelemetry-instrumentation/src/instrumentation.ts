@@ -23,6 +23,7 @@ import {
   trace,
   Tracer,
   TracerProvider,
+  Span,
 } from '@opentelemetry/api';
 import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
 import * as shimmer from 'shimmer';
@@ -30,6 +31,7 @@ import {
   InstrumentationModuleDefinition,
   Instrumentation,
   InstrumentationConfig,
+  InstrumentationEventHook,
 } from './types';
 
 /**
@@ -173,4 +175,27 @@ export abstract class InstrumentationAbstract implements Instrumentation {
     | InstrumentationModuleDefinition
     | InstrumentationModuleDefinition[]
     | void;
+
+  /**
+   * Execute instrumentation event hook, if configured, and log any errors.
+   * Any semantics of the event type and eventInfo are defined by the specific instrumentation.
+   * @param hookHandler The optional hook handler which the user has configured via instrumentation config\
+   * @param span The span to which the hook should be applied
+   * @param eventInfo The event info to be passed to the hook
+   */
+  protected runInstrumentationEventHook<EventInfoType>(
+    hookHandler: InstrumentationEventHook<EventInfoType> | undefined,
+    span: Span,
+    eventInfo: EventInfoType
+  ) {
+    if(!hookHandler) {
+      return;
+    }
+
+    try {
+      hookHandler(span, eventInfo);
+    } catch (e) {
+      this._diag.error(`Error running span hook for event ${hookHandler.name || 'UnnamedFunction'}`, e);
+    }
+  }
 }
