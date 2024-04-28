@@ -47,9 +47,7 @@ export abstract class OTLPExporterBrowserBase<
       this._headers = Object.assign(
         {},
         parseHeaders(
-          typeof config.headers === 'function'
-            ? config.headers()
-            : config.headers
+          typeof config.headers === 'function' ? {} : config.headers
         ),
         baggageUtils.parseKeyPairsIntoRecord(
           getEnv().OTEL_EXPORTER_OTLP_HEADERS

@@ -63,9 +63,7 @@ export abstract class OTLPExporterNodeBase<
 
     this.headers = Object.assign(
       this.DEFAULT_HEADERS,
-      parseHeaders(
-        typeof config.headers === 'function' ? config.headers() : config.headers
-      ),
+      typeof config.headers === 'function' ? {} : parseHeaders(config.headers),
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
     );
     this.agent = createHttpAgent(config);
