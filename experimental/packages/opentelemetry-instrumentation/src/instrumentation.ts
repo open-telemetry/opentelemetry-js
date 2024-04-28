@@ -197,12 +197,7 @@ export abstract class InstrumentationAbstract implements Instrumentation {
     try {
       hookHandler(span, eventInfo);
     } catch (e) {
-      this._diag.error(
-        `Error running span hook for event ${
-          hookHandler.name || 'UnnamedFunction'
-        }`,
-        e
-      );
+      this._diag.error(`Error running span hook for event ${eventName}`, e);
     }
   }
 }
