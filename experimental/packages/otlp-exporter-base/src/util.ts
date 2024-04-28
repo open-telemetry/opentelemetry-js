@@ -28,7 +28,7 @@ export const DEFAULT_EXPORT_BACKOFF_MULTIPLIER = 1.5;
  * @param partialHeaders
  */
 export function parseHeaders(
-  partialHeaders: Record<string, unknown> = {}
+  partialHeaders: Record<string, unknown> | (() => Record<string, string>) = {}
 ): Record<string, string> {
   const headers: Record<string, string> = {};
   Object.entries(partialHeaders).forEach(([key, value]) => {
