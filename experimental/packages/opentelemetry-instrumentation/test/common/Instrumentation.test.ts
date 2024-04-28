@@ -19,11 +19,13 @@ import {
   Instrumentation,
   InstrumentationBase,
   InstrumentationConfig,
+  InstrumentationEventHook,
   InstrumentationModuleDefinition,
 } from '../../src';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';
+import { InstrumentationAbstract } from '../../src/instrumentation';
 
 interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
@@ -36,6 +38,12 @@ class TestInstrumentation extends InstrumentationBase {
   override enable() {}
   override disable() {}
   init() {}
+
+  // the runInstrumentationEventHook, so we have to invoke it from the class for testing
+  testRunHook(hookHandler?: InstrumentationEventHook<any>) {
+    const span = this.tracer.startSpan('test');
+    this.runInstrumentationEventHook(hookHandler, 'test', span, {});
+  }
 }
 
 describe('BaseInstrumentation', () => {
@@ -181,6 +189,31 @@ describe('BaseInstrumentation', () => {
       const instrumentation = new TestInstrumentation2();
 
       assert.deepStrictEqual(instrumentation.getModuleDefinitions(), []);
+    });
+
+    describe('runInstrumentationEventHook', () => {
+      it('should call the hook', () => {
+        const instrumentation = new TestInstrumentation({});
+        let called = false;
+        const hook = () => {
+          called = true;
+        };
+        instrumentation.testRunHook(hook);
+        assert.strictEqual(called, true);
+      });
+
+      it('empty hook should work', () => {
+        const instrumentation = new TestInstrumentation({});
+        instrumentation.testRunHook(undefined);
+      });
+
+      it('exception in hook should not crash', () => {
+        const instrumentation = new TestInstrumentation({});
+        const hook = () => {
+          throw new Error('test');
+        };
+        instrumentation.testRunHook(hook);
+      });
     });
   });
 });

@@ -180,22 +180,29 @@ export abstract class InstrumentationAbstract implements Instrumentation {
    * Execute instrumentation event hook, if configured, and log any errors.
    * Any semantics of the event type and eventInfo are defined by the specific instrumentation.
    * @param hookHandler The optional hook handler which the user has configured via instrumentation config\
+   * @param eventName The name of the event being triggered, for logging purposes
    * @param span The span to which the hook should be applied
    * @param eventInfo The event info to be passed to the hook
    */
   protected runInstrumentationEventHook<EventInfoType>(
     hookHandler: InstrumentationEventHook<EventInfoType> | undefined,
+    eventName: string,
     span: Span,
     eventInfo: EventInfoType
   ) {
-    if(!hookHandler) {
+    if (!hookHandler) {
       return;
     }
 
     try {
       hookHandler(span, eventInfo);
     } catch (e) {
-      this._diag.error(`Error running span hook for event ${hookHandler.name || 'UnnamedFunction'}`, e);
+      this._diag.error(
+        `Error running span hook for event ${
+          hookHandler.name || 'UnnamedFunction'
+        }`,
+        e
+      );
     }
   }
 }

@@ -131,17 +131,20 @@ export interface InstrumentationModuleDefinition {
 /**
  * InstrumentationEventHook is a common way for instrumentations to expose extension points
  * where users can add custom behavior to a span.
- * This is an advanced feature, commonly used to add additional or non spec compliant attributes to the span, 
+ * This is an advanced feature, commonly used to add additional or non spec compliant attributes to the span,
  * capture payloads, modify the span in some way, or carry some other side effect.
- * 
+ *
  * The hook is registered with the instrumentation specific config by implementing an handler function with this signature,
- * and if the hook is present it will be called with the span and the event information 
+ * and if the hook is present it will be called with the span and the event information
  * when the event is emitted.
- * 
+ *
  * The event semantics - when and under what conditions the hook is called and what information is passed
- * in the eventInfo object, is specific to each instrumentation and event and should be documented 
+ * in the eventInfo object, is specific to each instrumentation and event and should be documented
  * where it is used.
- * 
+ *
  * Instrumentation may define multiple hooks, for different spans, or different events on a span.
  */
-export type InstrumentationEventHook<EventInfoType> = (span: Span, eventInfo: EventInfoType) => void;
+export type InstrumentationEventHook<EventInfoType> = (
+  span: Span,
+  eventInfo: EventInfoType
+) => void;
