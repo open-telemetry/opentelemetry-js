@@ -25,7 +25,6 @@ import {
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';
-import { InstrumentationAbstract } from '../../src/instrumentation';
 
 interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
