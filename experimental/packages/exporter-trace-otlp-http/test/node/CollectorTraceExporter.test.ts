@@ -409,11 +409,11 @@ describe('OTLPTraceExporter - node with json over http', () => {
   });
 
   describe('export - with dynamic headers', () => {
+    let count = 0;
     beforeEach(() => {
-      stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       collectorExporterConfig = {
         headers: () => ({
-          foo: 'dynamic',
+          foo: `dynamic-${count}`,
         }),
         hostname: 'foo',
         url: 'http://foo.bar.com',
@@ -426,17 +426,22 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
 
     it('should set dynamic custom headers', done => {
-      collectorExporter.export(spans, () => {});
-
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
-        const args = stubRequest.args[0];
-        const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+        for (let i = 2; i < 5; i++) {
+          fakeRequest = new Stream.PassThrough();
+          sinon.restore();
+          stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+          count = i;
+          collectorExporter.export(spans, () => {});
+          const mockRes = new MockedResponse(200);
+          const args = stubRequest.args[0];
+          const callback = args[1];
+          callback(mockRes);
+          mockRes.send('success');
 
-        const options = args[0];
-        assert.strictEqual(options.headers['foo'], 'dynamic');
+          const options = args[0];
+          assert.strictEqual(options.headers['foo'], `dynamic-${i}`);
+        }
         done();
       });
     });
