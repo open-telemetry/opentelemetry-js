@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../../Resource';
-import { DetectorSync, ResourceAttributes } from '../../types';
-import { ResourceDetectionConfig } from '../../config';
-import { platform, release } from 'os';
-import { normalizeType } from './utils';
+import { SEMRESATTRS_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions';
+import { Resource } from '../../../Resource';
+import { DetectorSync, ResourceAttributes } from '../../../types';
+import { ResourceDetectionConfig } from '../../../config';
+import { randomUUID } from 'crypto';
 
 /**
- * OSDetectorSync detects the resources related to the operating system (OS) on
- * which the process represented by this resource is running.
+ * ServiceInstanceIdDetectorSync detects the resources related to the service instance ID.
  */
-class OSDetectorSync implements DetectorSync {
+class ServiceInstanceIdDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): Resource {
     const attributes: ResourceAttributes = {
-      [SemanticResourceAttributes.OS_TYPE]: normalizeType(platform()),
-      [SemanticResourceAttributes.OS_VERSION]: release(),
+      [SEMRESATTRS_SERVICE_INSTANCE_ID]: randomUUID(),
     };
+
     return new Resource(attributes);
   }
 }
 
-export const osDetectorSync = new OSDetectorSync();
+/**
+ * @experimental
+ */
+export const serviceInstanceIdDetectorSync =
+  new ServiceInstanceIdDetectorSync();

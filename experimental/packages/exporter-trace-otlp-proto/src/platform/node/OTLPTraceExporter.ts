@@ -20,15 +20,14 @@ import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
+  OTLPExporterNodeBase,
   parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
+import { ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import {
-  OTLPProtoExporterNodeBase,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
-import {
-  createExportTraceServiceRequest,
   IExportTraceServiceRequest,
+  IExportTraceServiceResponse,
+  ProtobufTraceSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
 
@@ -42,11 +41,15 @@ const USER_AGENT = {
  * Collector Trace Exporter for Node with protobuf
  */
 export class OTLPTraceExporter
-  extends OTLPProtoExporterNodeBase<ReadableSpan, IExportTraceServiceRequest>
+  extends OTLPExporterNodeBase<
+    ReadableSpan,
+    IExportTraceServiceRequest,
+    IExportTraceServiceResponse
+  >
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    super(config);
+    super(config, ProtobufTraceSerializer, 'application/x-protobuf');
     this.headers = {
       ...this.headers,
       ...USER_AGENT,
@@ -55,10 +58,6 @@ export class OTLPTraceExporter
       ),
       ...parseHeaders(config?.headers),
     };
-  }
-
-  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans);
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase) {
