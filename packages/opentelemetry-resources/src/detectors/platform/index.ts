@@ -13,17 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export { Resource } from './Resource';
-export { IResource } from './IResource';
-export { defaultServiceName } from './platform';
-export { DetectorSync, ResourceAttributes, Detector } from './types';
-export { ResourceDetectionConfig } from './config';
 export {
-  browserDetector,
-  browserDetectorSync,
-  envDetector,
-  envDetectorSync,
   hostDetector,
   hostDetectorSync,
   osDetector,
@@ -31,5 +21,4 @@ export {
   processDetector,
   processDetectorSync,
   serviceInstanceIdDetectorSync,
-} from './detectors';
-export { detectResourcesSync, detectResources } from './detect-resources';
+} from './node';
