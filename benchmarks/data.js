@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714391212199,
+  "lastUpdate": 1714391649453,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7816,6 +7816,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e86470a53b7641dc84d77bca5cbb4f68aa787b39",
+          "message": "chore(deps): update dependency superagent to v9 (#4665)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-04-29T13:52:50+02:00",
+          "tree_id": "f56ccc3c39452a9b9d4eb6c10f460e279811f5eb",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e86470a53b7641dc84d77bca5cbb4f68aa787b39"
+        },
+        "date": 1714391648518,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 987373,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11787,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 689845,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 631081,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
