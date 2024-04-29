@@ -122,6 +122,11 @@ export class ParentBasedSampler implements Sampler {
     );
   }
 
+  // Required for testing
+  getRootSampler(): Sampler {
+    return this._root;
+  }
+
   toString(): string {
     return `ParentBased{root=${this._root.toString()}, remoteParentSampled=${this._remoteParentSampled.toString()}, remoteParentNotSampled=${this._remoteParentNotSampled.toString()}, localParentSampled=${this._localParentSampled.toString()}, localParentNotSampled=${this._localParentNotSampled.toString()}}`;
   }
