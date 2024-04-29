@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+
 ### :bug: (Bug Fix)
 
 * fix(core): align inconsistent behavior of `getEnv()` and `getEnvWithoutDefaults()` when a `process` polyfill is used [#4648](https://github.com/open-telemetry/opentelemetry-js/pull/4648) @pichlermarc
