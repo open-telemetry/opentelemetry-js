@@ -6,6 +6,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
+  * Breaking changes:
+    * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
+    * (internal) OTLPExporterNodeBase now has additional constructor parameters that are required
+    * (internal) OTLPExporterNodeBase now has an additional `ResponseType` type parameter
+
 ### :rocket: (Enhancement)
 
 * feat(sampler-jaeger-remote): added support of jaeger-remote-sampler according to this [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#jaegerremotesampler) [#4534](https://github.com/open-telemetry/opentelemetry-js/pull/4589)
@@ -36,6 +42,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-logs): log resource attributes in ConsoleLogRecordExporter [#4646](https://github.com/open-telemetry/opentelemetry-js/pull/4646) @harelmo-lumigo
 * refactor(instrumentation-grpc): move to use SEMATTRS [#4633](https://github.com/open-telemetry/opentelemetry-js/pull/4633)
 * feat(otlp-transformer): consolidate scope/resource creation in transformer [#4600](https://github.com/open-telemetry/opentelemetry-js/pull/4600)
 * feat(sdk-logs): print message when attributes are dropped due to attribute count limit [#4614](https://github.com/open-telemetry/opentelemetry-js/pull/4614) @HyunnoH

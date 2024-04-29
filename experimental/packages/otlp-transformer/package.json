@@ -14,16 +14,19 @@
   "scripts": {
     "prepublishOnly": "npm run compile",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "npm run protos && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "protos": "npm run submodule && npm run protos:generate",
+    "protos:generate": "node ../../../scripts/generate-protos.js",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
+    "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:browser": "karma start --single-run",
     "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
     "prewatch": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "watch": "npm run protos && tsc -w tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
   },
@@ -76,7 +79,8 @@
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4",
-    "webpack": "5.89.0"
+    "webpack": "5.89.0",
+    "protobufjs-cli": "1.1.2"
   },
   "dependencies": {
     "@opentelemetry/api-logs": "0.51.0",
@@ -84,7 +88,8 @@
     "@opentelemetry/resources": "1.24.0",
     "@opentelemetry/sdk-logs": "0.51.0",
     "@opentelemetry/sdk-metrics": "1.24.0",
-    "@opentelemetry/sdk-trace-base": "1.24.0"
+    "@opentelemetry/sdk-trace-base": "1.24.0",
+    "protobufjs": "^7.2.3"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
   "sideEffects": false
