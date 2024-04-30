@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714391649453,
+  "lastUpdate": 1714463627465,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7868,6 +7868,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5c8497152888c0a1886f4bc54af98ef1d9738589",
+          "message": "Add node 22 support (#4666)\n\n* Test node 22\r\n\r\n* Update changelog and readme",
+          "timestamp": "2024-04-30T09:52:04+02:00",
+          "tree_id": "28ce6672a200bd976a0731f49af5e9b62cc44bdf",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5c8497152888c0a1886f4bc54af98ef1d9738589"
+        },
+        "date": 1714463626668,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 967203,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11740,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 711456,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 677704,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
