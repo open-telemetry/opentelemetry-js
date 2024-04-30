@@ -184,7 +184,7 @@ export abstract class InstrumentationAbstract implements Instrumentation {
    * @param span The span to which the hook should be applied
    * @param eventInfo The event info to be passed to the hook
    */
-  protected runInstrumentationEventHook<EventInfoType>(
+  protected _runInstrumentationEventHook<EventInfoType>(
     hookHandler: InstrumentationEventHook<EventInfoType> | undefined,
     eventName: string,
     span: Span,

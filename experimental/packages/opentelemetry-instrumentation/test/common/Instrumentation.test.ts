@@ -41,7 +41,7 @@ class TestInstrumentation extends InstrumentationBase {
   // the runInstrumentationEventHook, so we have to invoke it from the class for testing
   testRunHook(hookHandler?: InstrumentationEventHook<any>) {
     const span = this.tracer.startSpan('test');
-    this.runInstrumentationEventHook(hookHandler, 'test', span, {});
+    this._runInstrumentationEventHook(hookHandler, 'test', span, {});
   }
 }
 
