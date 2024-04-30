@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714463627465,
+  "lastUpdate": 1714500295302,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7920,6 +7920,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "753f0a63a29ef60c44863e177b21e3cdafb83568",
+          "message": "fix(deps): update dependency import-in-the-middle to v1.7.4 (#4667)",
+          "timestamp": "2024-04-30T20:03:36+02:00",
+          "tree_id": "0157b5c9032001a8c17c784bc41a32b10a5152e0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/753f0a63a29ef60c44863e177b21e3cdafb83568"
+        },
+        "date": 1714500294417,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 948633,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12088,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 707323,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 647929,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
