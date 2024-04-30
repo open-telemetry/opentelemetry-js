@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { noopDetectorSync } from '../../detectors/NoopDetectorSync';
+import * as protobuf from 'protobufjs';
 
-/**
- * @experimental
- */
-export const serviceInstanceIdDetectorSync = noopDetectorSync;
+export interface ExportType<T, R = T & { toJSON: () => unknown }> {
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
+}

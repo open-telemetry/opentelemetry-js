@@ -16,6 +16,11 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* fix(core): align inconsistent behavior of `getEnv()` and `getEnvWithoutDefaults()` when a `process` polyfill is used [#4648](https://github.com/open-telemetry/opentelemetry-js/pull/4648) @pichlermarc
+  * `getEnvWithoutDefaults()` would use `process.env` if it was defined when running in a browser, while `getEnv()` would always use `_globalThis`. Now both use `_globalThis` when running in a browser.
+* fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
+  * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

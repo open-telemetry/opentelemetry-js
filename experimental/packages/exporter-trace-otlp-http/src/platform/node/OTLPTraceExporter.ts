@@ -26,10 +26,11 @@ import {
   appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  createExportTraceServiceRequest,
   IExportTraceServiceRequest,
+  IExportTraceServiceResponse,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
+import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
@@ -41,11 +42,15 @@ const USER_AGENT = {
  * Collector Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<ReadableSpan, IExportTraceServiceRequest>
+  extends OTLPExporterNodeBase<
+    ReadableSpan,
+    IExportTraceServiceRequest,
+    IExportTraceServiceResponse
+  >
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    super(config);
+    super(config, JsonTraceSerializer, 'application/json');
     this.headers = {
       ...this.headers,
       ...USER_AGENT,
@@ -54,13 +59,6 @@ export class OTLPTraceExporter
       ),
       ...parseHeaders(config?.headers),
     };
-  }
-
-  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans, {
-      useHex: true,
-      useLongBits: false,
-    });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
