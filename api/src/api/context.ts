@@ -32,8 +32,11 @@ const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 export class ContextAPI {
   private static _instance?: ContextAPI;
 
-  /** Empty private constructor prevents end users from constructing a new instance of the API */
-  private constructor() {}
+  /**
+   * Empty protected constructor prevents end users from constructing a new instance
+   * of the API while allowing experimental API to extend it.
+   */
+  protected constructor() {}
 
   /** Get the singleton instance of the Context API */
   public static getInstance(): ContextAPI {
@@ -87,7 +90,7 @@ export class ContextAPI {
     return this._getContextManager().bind(context, target);
   }
 
-  private _getContextManager(): ContextManager {
+  protected _getContextManager(): ContextManager {
     return getGlobal(API_NAME) || NOOP_CONTEXT_MANAGER;
   }
 
