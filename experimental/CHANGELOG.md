@@ -14,6 +14,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
