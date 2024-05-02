@@ -16,13 +16,13 @@
 import * as api from '@opentelemetry/api-events';
 import { EventLogger } from './EventLogger';
 import { EventLoggerProviderConfig } from './types';
-import { LoggerProvider, logs } from '@opentelemetry/api-logs';
+import { LoggerProvider } from '@opentelemetry/api-logs';
 
 export class EventLoggerProvider implements api.EventLoggerProvider {
-  private _loggerProvider?: LoggerProvider;
+  private _loggerProvider: LoggerProvider;
 
-  constructor(config: EventLoggerProviderConfig = {}) {
-    this._loggerProvider = config.loggerProvider;
+  constructor(loggerProvider: LoggerProvider, config: EventLoggerProviderConfig = {}) {
+    this._loggerProvider = loggerProvider;
   }
 
   getEventLogger(
@@ -30,10 +30,7 @@ export class EventLoggerProvider implements api.EventLoggerProvider {
     version?: string | undefined,
     options?: api.EventLoggerOptions | undefined
   ): api.EventLogger {
-    const logger = this._loggerProvider
-      ? this._loggerProvider.getLogger(name, version, options)
-      : logs.getLogger(name, version, options);
-
+    const logger = this._loggerProvider.getLogger(name, version, options);
     return new EventLogger(logger);
   }
 }

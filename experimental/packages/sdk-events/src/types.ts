@@ -14,9 +14,5 @@
  * limitations under the License.
  */
 
-import { LoggerProvider } from '@opentelemetry/api-logs';
-
 export interface EventLoggerProviderConfig {
-  /** delegate LoggerProvider instance   */
-  loggerProvider?: LoggerProvider;
 }
