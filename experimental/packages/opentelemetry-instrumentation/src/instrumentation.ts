@@ -35,8 +35,11 @@ import {
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract implements Instrumentation {
-  protected _config: InstrumentationConfig;
+export abstract class InstrumentationAbstract<
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+> implements Instrumentation<ConfigType>
+{
+  protected _config: ConfigType;
 
   private _tracer: Tracer;
   private _meter: Meter;
@@ -46,7 +49,7 @@ export abstract class InstrumentationAbstract implements Instrumentation {
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: InstrumentationConfig = {}
+    config: ConfigType = {} as ConfigType // assuming ConfigType is an object with optional fields only
   ) {
     this._config = {
       enabled: true,
@@ -131,7 +134,7 @@ export abstract class InstrumentationAbstract implements Instrumentation {
   }
 
   /* Returns InstrumentationConfig */
-  public getConfig(): InstrumentationConfig {
+  public getConfig(): ConfigType {
     return this._config;
   }
 
@@ -139,7 +142,9 @@ export abstract class InstrumentationAbstract implements Instrumentation {
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: InstrumentationConfig = {}): void {
+  public setConfig(config: ConfigType = {} as ConfigType): void {
+    // the assertion that {} is compatible with ConfigType may not be correct,
+    // ConfigType should contain only optional fields, but there is no enforcement in place for that
     this._config = Object.assign({}, config);
   }
 
