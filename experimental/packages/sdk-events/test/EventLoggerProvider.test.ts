@@ -22,9 +22,10 @@ import sinon = require('sinon');
 
 describe('EventLoggerProvider', () => {
   describe('getLogger', () => {
-
     it('returns an instance of EventLogger', () => {
-      const provider = new EventLoggerProvider(new TestLoggerProvider(new TestLogger()));
+      const provider = new EventLoggerProvider(
+        new TestLoggerProvider(new TestLogger())
+      );
       const logger = provider.getEventLogger('logger name');
       assert.ok(logger instanceof EventLogger);
     });
@@ -50,10 +51,7 @@ describe('EventLoggerProvider', () => {
 
     it('uses delegate logger from global LoggerProvider as a fall back', () => {
       const loggerProvider = new TestLoggerProvider(new TestLogger());
-      const globalLoggerProviderSpy = sinon.spy(
-        loggerProvider,
-        'getLogger'
-      );
+      const globalLoggerProviderSpy = sinon.spy(loggerProvider, 'getLogger');
 
       const provider = new EventLoggerProvider(loggerProvider);
 
