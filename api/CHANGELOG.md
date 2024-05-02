@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### :rocket: (Enhancement)
 
 * feat(metrics): added synchronous gauge [#4528](https://github.com/open-telemetry/opentelemetry-js/pull/4528) @clintonb
+* feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 
 ### :bug: (Bug Fix)
 

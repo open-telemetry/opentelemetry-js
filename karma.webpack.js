@@ -14,18 +14,34 @@
  * limitations under the License.
  */
 
-const webpackNodePolyfills = require('./webpack.node-polyfills.js');
+const webpack = require('webpack')
 
 // This is the webpack configuration for browser Karma tests with coverage.
 module.exports = {
   mode: 'development',
   target: 'web',
-  output: { filename: 'bundle.js' },
-  resolve: { extensions: ['.ts', '.js'] },
+  output: {filename: 'bundle.js'},
+  resolve: {
+    extensions: ['.ts', '.js'],
+    fallback: {
+      // Enable the assert library polyfill because that is used in tests
+      "assert": require.resolve('assert/'),
+      "util": require.resolve('util/'),
+    },
+  },
   devtool: 'eval-source-map',
+  plugins: [
+    new webpack.ProvidePlugin({
+      // Make a global `process` variable that points to the `process` package,
+      // because the `util` package expects there to be a global variable named `process`.
+      // Thanks to https://stackoverflow.com/a/65018686/14239942
+      // NOTE: I wish there was a better way as this pollutes the tests with a defined 'process' global.
+      process: 'process/browser'
+    })
+  ],
   module: {
     rules: [
-      { test: /\.ts$/, use: 'ts-loader' },
+      {test: /\.ts$/, use: 'ts-loader'},
       {
         test: /\.js$/,
         exclude: {
@@ -53,9 +69,6 @@ module.exports = {
           }
         },
       },
-      // This setting configures Node polyfills for the browser that will be
-      // added to the webpack bundle for Karma tests.
-      { parser: { node: webpackNodePolyfills } },
     ],
   },
 };

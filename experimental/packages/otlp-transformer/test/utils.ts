@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { Detector } from '../../types';
-import { ResourceDetectionConfig } from '../../config';
-import { IResource } from '../../IResource';
-import { hostDetectorSync } from './HostDetectorSync';
+import { hexToBinary } from '@opentelemetry/core';
 
 /**
- * HostDetector detects the resources related to the host current process is
- * running on. Currently only non-cloud-based attributes are included.
+ * utility function to convert a string representing a hex value to a base64 string
+ * that represents the bytes of that hex value. This is needed as we need to support Node.js 14
+ * where btoa() does not exist, and the Browser, where Buffer does not exist.
+ * @param hexStr
  */
-class HostDetector implements Detector {
-  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(hostDetectorSync.detect(_config));
+export function toBase64(hexStr: string) {
+  if (typeof btoa !== 'undefined') {
+    const decoder = new TextDecoder('utf8');
+    return btoa(decoder.decode(hexToBinary(hexStr)));
   }
-}
 
-export const hostDetector = new HostDetector();
+  return Buffer.from(hexToBinary(hexStr)).toString('base64');
+}

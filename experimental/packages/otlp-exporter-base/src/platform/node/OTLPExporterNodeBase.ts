@@ -24,6 +24,7 @@ import { parseHeaders } from '../../util';
 import { createHttpAgent, sendWithHttp, configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { ISerializer } from '@opentelemetry/otlp-transformer';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -31,6 +32,7 @@ import { getEnv, baggageUtils } from '@opentelemetry/core';
 export abstract class OTLPExporterNodeBase<
   ExportItem,
   ServiceRequest,
+  ServiceResponse,
 > extends OTLPExporterBase<
   OTLPExporterNodeConfigBase,
   ExportItem,
@@ -40,9 +42,16 @@ export abstract class OTLPExporterNodeBase<
   headers: Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
   compression: CompressionAlgorithm;
+  private _serializer: ISerializer<ExportItem[], ServiceResponse>;
+  private _contentType: string;
 
-  constructor(config: OTLPExporterNodeConfigBase = {}) {
+  constructor(
+    config: OTLPExporterNodeConfigBase = {},
+    serializer: ISerializer<ExportItem[], ServiceResponse>,
+    contentType: string
+  ) {
     super(config);
+    this._contentType = contentType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
@@ -54,9 +63,15 @@ export abstract class OTLPExporterNodeBase<
     );
     this.agent = createHttpAgent(config);
     this.compression = configureCompression(config.compression);
+    this._serializer = serializer;
   }
 
   onInit(_config: OTLPExporterNodeConfigBase): void {}
+
+  override convert(_objects: ExportItem[]): ServiceRequest {
+    // TODO(pichlermarc): needs to be removed from base in a follow-up
+    return {} as ServiceRequest;
+  }
 
   send(
     objects: ExportItem[],
@@ -67,13 +82,12 @@ export abstract class OTLPExporterNodeBase<
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
-    const serviceRequest = this.convert(objects);
 
     const promise = new Promise<void>((resolve, reject) => {
       sendWithHttp(
         this,
-        JSON.stringify(serviceRequest),
-        'application/json',
+        this._serializer.serializeRequest(objects) ?? new Uint8Array(),
+        this._contentType,
         resolve,
         reject
       );

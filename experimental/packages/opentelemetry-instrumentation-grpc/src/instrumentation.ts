@@ -88,7 +88,7 @@ import {
 import { AttributeValues } from './enums/AttributeValues';
 import { VERSION } from './version';
 
-export class GrpcInstrumentation extends InstrumentationBase {
+export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
 
   constructor(config?: GrpcInstrumentationConfig) {
@@ -98,11 +98,10 @@ export class GrpcInstrumentation extends InstrumentationBase {
 
   init() {
     return [
-      new InstrumentationNodeModuleDefinition<any>(
+      new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
         ['1.*'],
-        (moduleExports, version) => {
-          this._diag.debug(`Applying patch for @grpc/grpc-js@${version}`);
+        moduleExports => {
           if (isWrapped(moduleExports.Server.prototype.register)) {
             this._unwrap(moduleExports.Server.prototype, 'register');
           }
@@ -174,9 +173,8 @@ export class GrpcInstrumentation extends InstrumentationBase {
           );
           return moduleExports;
         },
-        (moduleExports, version) => {
+        moduleExports => {
           if (moduleExports === undefined) return;
-          this._diag.debug(`Removing patch for @grpc/grpc-js@${version}`);
 
           this._unwrap(moduleExports.Server.prototype, 'register');
           this._unwrap(moduleExports, 'makeClientConstructor');
@@ -197,16 +195,7 @@ export class GrpcInstrumentation extends InstrumentationBase {
     ];
   }
 
-  /**
-   * @internal
-   * Public reference to the protected BaseInstrumentation `_config` instance to be used by this
-   * plugin's external helper functions
-   */
-  override getConfig(): GrpcInstrumentationConfig {
-    return super.getConfig();
-  }
-
-  override setConfig(config?: GrpcInstrumentationConfig): void {
+  override setConfig(config: GrpcInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._metadataCapture = this._createMetadataCapture();
   }
