@@ -27,13 +27,11 @@ export class EventLogger implements api.EventLogger {
 
   emit(event: Event) {
     const attributes = event.attributes || {};
-    const ctx = event.context || context.active();
-
     attributes['event.name'] = event.name;
 
     const logRecord: LogRecord = {
       attributes: attributes,
-      context: ctx,
+      context: event.context || context.active(),
       severityNumber: event.severityNumber || SeverityNumber.INFO,
       timestamp: event.timestamp || Date.now(),
     };
