@@ -1,6 +1,6 @@
 {
   "name": "events-example",
-  "version": "0.50.0",
+  "version": "0.51.0",
   "private": true,
   "scripts": {
     "start": "ts-node index.ts"
