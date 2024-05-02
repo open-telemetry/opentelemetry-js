@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714500295302,
+  "lastUpdate": 1714627384305,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -7972,6 +7972,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "157c8112742ecc15bb818914eb21325380dfd38a",
+          "message": "feat(instrumentation): generic config type in instrumentation base (#4659)\n\n* feat!(instrumentation): generic config type and no default config value\r\n\r\n* fix: apply type in base Instrumentation interface\r\n\r\n* revert: enabled flag rename\r\n\r\n* fix: autoloader types\r\n\r\n* chore: lint fix\r\n\r\n* revert: default config in constructor to empty object\r\n\r\n* revert: make constructor config default empty object\r\n\r\n* docs: note that instrumentation config fields are optional\r\n\r\n* revert: deftaul type for generic\r\n\r\n* revert: default object in instrumentation abstract constructor\r\n\r\n* chore: lint fix\r\n\r\n* chore: changelog\r\n\r\n* fix: changelog in merge",
+          "timestamp": "2024-05-02T08:21:18+03:00",
+          "tree_id": "bde147601a9e70a535c6242f27ef77bb9cb570b6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/157c8112742ecc15bb818914eb21325380dfd38a"
+        },
+        "date": 1714627383490,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 959740,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11748,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 658288,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 623504,
+            "range": "±0.72%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
