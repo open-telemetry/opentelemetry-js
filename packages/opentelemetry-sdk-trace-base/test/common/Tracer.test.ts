@@ -51,7 +51,7 @@ import { invalidAttributes, validAttributes } from './util';
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
   let envSource: Record<string, any>;
-  if (typeof process === 'undefined') {
+  if (global.process?.versions?.node === undefined) {
     envSource = globalThis as unknown as Record<string, any>;
   } else {
     envSource = process.env as Record<string, any>;
