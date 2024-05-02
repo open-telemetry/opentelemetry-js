@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714627384305,
+  "lastUpdate": 1714639222203,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8024,6 +8024,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.72%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9400e726d06b838516bc8491779ac4fa3fc13987",
+          "message": "chore: update karma-webpack to v5.0.1, adapt tests (#4648)\n\n* chore(deps): update dependency karma-webpack to v5\r\n\r\n* feat: add polyfills missing from webpack 5, adapt tests, split up raw env parsing into browser/node specific code\r\n\r\n---------\r\n\r\nCo-authored-by: Mend Renovate <bot@renovateapp.com>",
+          "timestamp": "2024-05-02T10:39:04+02:00",
+          "tree_id": "84571d101c26d368631015bb363a41713d441232",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9400e726d06b838516bc8491779ac4fa3fc13987"
+        },
+        "date": 1714639221355,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 911661,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11543,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 674683,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 636113,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
