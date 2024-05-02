@@ -33,7 +33,7 @@ const CORE_MODULE = 'random_core';
 
 class TestInstrumentation extends InstrumentationBase {
   constructor() {
-    super(MODULE_NAME, MODULE_VERSION);
+    super(MODULE_NAME, MODULE_VERSION, {});
   }
 
   init() {}

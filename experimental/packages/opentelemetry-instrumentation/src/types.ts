@@ -18,7 +18,9 @@ import { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
-export interface Instrumentation {
+export interface Instrumentation<
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+> {
   /** Instrumentation Name  */
   instrumentationName: string;
 
@@ -48,10 +50,10 @@ export interface Instrumentation {
   setLoggerProvider?(loggerProvider: LoggerProvider): void;
 
   /** Method to set instrumentation config  */
-  setConfig(config: InstrumentationConfig): void;
+  setConfig(config: ConfigType): void;
 
   /** Method to get instrumentation config  */
-  getConfig(): InstrumentationConfig;
+  getConfig(): ConfigType;
 
   /**
    * Contains all supported versions.
@@ -62,6 +64,12 @@ export interface Instrumentation {
   supportedVersions?: string[];
 }
 
+/**
+ * Base interface for configuration options common to all instrumentations.
+ * This interface can be extended by individual instrumentations to include
+ * additional configuration options specific to that instrumentation.
+ * All configuration options must be optional.
+ */
 export interface InstrumentationConfig {
   /**
    * Whether to enable the plugin.
