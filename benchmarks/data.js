@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714639222203,
+  "lastUpdate": 1714734115006,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8076,6 +8076,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b518e16ef89da8201fb8711e91d86775adb4dfa7",
+          "message": "add AWS X-Ray Lambda propagator (#4554)\n\n* updates tsconfig files\r\n\r\n* added tests\r\n\r\n* added aws-xray-lambda propagator\r\n\r\n* updated README\r\n\r\n* updated package-lock file\r\n\r\n* markdown lint\r\n\r\n* removed browser tests\r\n\r\n* lint\r\n\r\n* removed opentelemetry- from the package name\r\n\r\n* updated package-lock.json\r\n\r\n* add experimental disclaimer\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* removed profiling from keywords\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* updated package version to experimental\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* use named export\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* removed changelog\r\n\r\n* updated homepage url\r\n\r\n* small updates to tests\r\n\r\n* lint\r\n\r\n* updated changelog\r\n\r\n* Update experimental/packages/propagator-aws-xray-lambda/test/AWSXRayLambdaPropagator.test.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* updated tsconfig files\r\n\r\n* updated license\r\n\r\n* updated readme\r\n\r\n* updated versions\r\n\r\n* fix: update versions and sync package-lock.json\r\n\r\n* fix: move changelog entry\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-03T13:00:35+02:00",
+          "tree_id": "a879e931fd8c28e38b2290713c94dbf56958c1ff",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b518e16ef89da8201fb8711e91d86775adb4dfa7"
+        },
+        "date": 1714734114138,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 932335,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11748,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 661553,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 641301,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
