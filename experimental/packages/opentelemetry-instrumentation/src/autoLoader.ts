@@ -31,10 +31,6 @@ import { AutoLoaderOptions } from './types_internal';
 export function registerInstrumentations(
   options: AutoLoaderOptions
 ): () => void {
-  if (options.instrumentations == null) {
-    return () => {};
-  }
-
   const tracerProvider = options.tracerProvider || trace.getTracerProvider();
   const meterProvider = options.meterProvider || metrics.getMeterProvider();
   const loggerProvider = options.loggerProvider || logs.getLoggerProvider();
