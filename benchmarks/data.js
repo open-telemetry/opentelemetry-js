@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714734115006,
+  "lastUpdate": 1714741475121,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8128,6 +8128,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "anu.sridhar@nearmap.com",
+            "name": "Anuraag Sridhar",
+            "username": "anuraags"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "75d88f71269b430afbed85999881785ee565ad35",
+          "message": "feat(sdk-trace-node): support xray propagator (#4602)\n\n* fix(opentelemetry-sdk-trace-node): support xray propagator\r\n\r\nSigned-off-by: Anu Sridhar <anu.sridhar@nearmap.com>\r\n\r\n* linter fix\r\n\r\nSigned-off-by: Anu Sridhar <anu.sridhar@nearmap.com>\r\n\r\n* Build trigger\r\n\r\n* Update package.json\r\n\r\nRevert newline change\r\n\r\n* chore: add changelog entry\r\n\r\n* fix: lint\r\n\r\n---------\r\n\r\nSigned-off-by: Anu Sridhar <anu.sridhar@nearmap.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-03T15:03:16+02:00",
+          "tree_id": "197582debfcbd32301b762c422827aacd60ecfc8",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/75d88f71269b430afbed85999881785ee565ad35"
+        },
+        "date": 1714741474227,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 948178,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11566,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 669546,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 638529,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
