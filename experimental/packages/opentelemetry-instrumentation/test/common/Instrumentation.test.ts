@@ -19,8 +19,8 @@ import {
   Instrumentation,
   InstrumentationBase,
   InstrumentationConfig,
-  InstrumentationEventHook,
   InstrumentationModuleDefinition,
+  SpanCustomizationHook,
 } from '../../src';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
@@ -39,9 +39,9 @@ class TestInstrumentation extends InstrumentationBase {
   init() {}
 
   // the runInstrumentationEventHook, so we have to invoke it from the class for testing
-  testRunHook(hookHandler?: InstrumentationEventHook<any>) {
+  testRunHook(hookHandler?: SpanCustomizationHook<any>) {
     const span = this.tracer.startSpan('test');
-    this._runInstrumentationEventHook(hookHandler, 'test', span, {});
+    this._runSpanCustomizationHook(hookHandler, 'test', span, {});
   }
 }
 

@@ -31,7 +31,7 @@ import {
   InstrumentationModuleDefinition,
   Instrumentation,
   InstrumentationConfig,
-  InstrumentationEventHook,
+  SpanCustomizationHook,
 } from './types';
 
 /**
@@ -182,29 +182,29 @@ export abstract class InstrumentationAbstract<
     | void;
 
   /**
-   * Execute instrumentation event hook, if configured, and log any errors.
-   * Any semantics of the event type and eventInfo are defined by the specific instrumentation.
+   * Execute span customization hook, if configured, and log any errors.
+   * Any semantics of the trigger and info are defined by the specific instrumentation.
    * @param hookHandler The optional hook handler which the user has configured via instrumentation config\
-   * @param eventName The name of the event being triggered, for logging purposes
+   * @param triggerName The name of the trigger for executing the hook for logging purposes
    * @param span The span to which the hook should be applied
-   * @param eventInfo The event info to be passed to the hook
+   * @param info The info object to be passed to the hook, with useful data the hook may use
    */
-  protected _runInstrumentationEventHook<EventInfoType>(
-    hookHandler: InstrumentationEventHook<EventInfoType> | undefined,
-    eventName: string,
+  protected _runSpanCustomizationHook<SpanCustomizationInfoType>(
+    hookHandler: SpanCustomizationHook<SpanCustomizationInfoType> | undefined,
+    triggerName: string,
     span: Span,
-    eventInfo: EventInfoType
+    info: SpanCustomizationInfoType
   ) {
     if (!hookHandler) {
       return;
     }
 
     try {
-      hookHandler(span, eventInfo);
+      hookHandler(span, info);
     } catch (e) {
       this._diag.error(
-        `Error running instrumentation event hook for event due to exception in handler`,
-        { eventName },
+        `Error running span customization hook due to exception in handler`,
+        { triggerName },
         e
       );
     }
