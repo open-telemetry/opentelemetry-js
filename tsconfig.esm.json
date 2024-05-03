@@ -48,6 +48,9 @@
       "path": "experimental/packages/otlp-transformer/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/propagator-aws-xray-lambda/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/sdk-logs/tsconfig.esm.json"
     },
     {

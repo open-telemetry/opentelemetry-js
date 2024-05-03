@@ -32,7 +32,8 @@ let lastMock: RAW_ENVIRONMENT = {};
  */
 export function mockEnvironment(values: RAW_ENVIRONMENT) {
   lastMock = values;
-  if (typeof process !== 'undefined') {
+
+  if (global.process?.versions?.node !== undefined) {
     Object.keys(values).forEach(key => {
       process.env[key] = String(values[key]);
     });
@@ -47,7 +48,7 @@ export function mockEnvironment(values: RAW_ENVIRONMENT) {
  * Removes mocked environment used for tests.
  */
 export function removeMockEnvironment() {
-  if (typeof process !== 'undefined') {
+  if (global.process?.versions?.node !== undefined) {
     Object.keys(lastMock).forEach(key => {
       delete process.env[key];
     });
