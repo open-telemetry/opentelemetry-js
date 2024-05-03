@@ -15,6 +15,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+* feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 
 ### :bug: (Bug Fix)
 
