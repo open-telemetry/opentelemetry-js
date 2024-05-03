@@ -38,7 +38,7 @@ describe('autoLoaderUtils', () => {
   describe('parseInstrumentationOptions', () => {
     it('should create a new instrumentation from class', () => {
       const { instrumentations } = parseInstrumentationOptions([
-        FooInstrumentation,
+        FooInstrumentation as typeof InstrumentationBase,
       ]);
       assert.strictEqual(instrumentations.length, 1);
       const instrumentation = instrumentations[0];

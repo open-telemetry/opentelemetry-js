@@ -88,7 +88,7 @@ import {
 import { AttributeValues } from './enums/AttributeValues';
 import { VERSION } from './version';
 
-export class GrpcInstrumentation extends InstrumentationBase {
+export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
 
   constructor(config?: GrpcInstrumentationConfig) {
@@ -195,16 +195,7 @@ export class GrpcInstrumentation extends InstrumentationBase {
     ];
   }
 
-  /**
-   * @internal
-   * Public reference to the protected BaseInstrumentation `_config` instance to be used by this
-   * plugin's external helper functions
-   */
-  override getConfig(): GrpcInstrumentationConfig {
-    return super.getConfig();
-  }
-
-  override setConfig(config?: GrpcInstrumentationConfig): void {
+  override setConfig(config: GrpcInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._metadataCapture = this._createMetadataCapture();
   }

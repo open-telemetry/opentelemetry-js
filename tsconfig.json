@@ -28,6 +28,7 @@
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-proto-exporter-base",
       "experimental/packages/otlp-transformer",
+      "experimental/packages/propagator-aws-xray-lambda",
       "experimental/packages/sdk-logs",
       "experimental/packages/shim-opencensus",
       "packages/opentelemetry-context-async-hooks",
@@ -129,6 +130,9 @@
     },
     {
       "path": "experimental/packages/otlp-transformer"
+    },
+    {
+      "path": "experimental/packages/propagator-aws-xray-lambda"
     },
     {
       "path": "experimental/packages/sdk-logs"
