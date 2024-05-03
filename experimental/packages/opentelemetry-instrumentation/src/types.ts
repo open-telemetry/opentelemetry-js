@@ -147,7 +147,7 @@ export interface InstrumentationModuleDefinition {
  * when the event is emitted.
  *
  * When and under what conditions the hook is called and what data is passed
- * in the info argument, is specific to each instrumentation and life-cycle event 
+ * in the info argument, is specific to each instrumentation and life-cycle event
  * and should be documented where it is used.
  *
  * Instrumentation may define multiple hooks, for different spans, or different span life-cycle events.
