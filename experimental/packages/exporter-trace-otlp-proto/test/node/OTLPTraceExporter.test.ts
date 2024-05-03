@@ -34,12 +34,25 @@ import {
   OTLPExporterNodeConfigBase,
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  getExportRequestProto,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { Root } from 'protobufjs';
 import { VERSION } from '../../src/version';
+import * as path from 'path';
+
+const dir = path.resolve(__dirname, '../../../otlp-transformer/protos');
+const root = new Root();
+root.resolvePath = function (origin, target) {
+  return `${dir}/${target}`;
+};
+const proto = root.loadSync([
+  'opentelemetry/proto/common/v1/common.proto',
+  'opentelemetry/proto/resource/v1/resource.proto',
+  'opentelemetry/proto/trace/v1/trace.proto',
+  'opentelemetry/proto/collector/trace/v1/trace_service.proto',
+]);
+const exportRequestServiceProto = proto?.lookupType(
+  'ExportTraceServiceRequest'
+);
 
 let fakeRequest: PassThrough;
 
@@ -247,10 +260,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
 
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
-        const ExportTraceServiceRequestProto = getExportRequestProto(
-          ServiceClientType.SPANS
-        );
-        const data = ExportTraceServiceRequestProto.decode(buff);
+        const data = exportRequestServiceProto.decode(buff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
@@ -335,10 +345,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
-        const ExportTraceServiceRequestProto = getExportRequestProto(
-          ServiceClientType.SPANS
-        );
-        const data = ExportTraceServiceRequestProto.decode(unzippedBuff);
+        const data = exportRequestServiceProto.decode(unzippedBuff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");

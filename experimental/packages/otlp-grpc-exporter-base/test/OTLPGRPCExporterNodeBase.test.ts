@@ -26,7 +26,6 @@ import sinon = require('sinon');
 
 class MockCollectorExporter extends OTLPGRPCExporterNodeBase<
   ReadableSpan,
-  ReadableSpan[],
   any
 > {
   getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {

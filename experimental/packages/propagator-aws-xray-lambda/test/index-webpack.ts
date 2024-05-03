@@ -13,5 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { OTLPProtoExporterBrowserBase } from './OTLPProtoExporterBrowserBase';
-export { ServiceClientType } from '../types';
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
+
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
