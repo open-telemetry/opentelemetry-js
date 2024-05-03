@@ -27,7 +27,7 @@ import {
   GrpcExporterTransport,
 } from './grpc-exporter-transport';
 import { configureCompression, configureCredentials } from './util';
-import { ISerializer } from './serializers';
+import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExporterTransport } from './exporter-transport';
 
 /**
@@ -45,14 +45,14 @@ export abstract class OTLPGRPCExporterNodeBase<
   grpcQueue: GRPCQueueItem<ExportItem>[] = [];
   compression: CompressionAlgorithm;
   private _transport: IExporterTransport;
-  private _serializer: ISerializer<ServiceRequest, ServiceResponse>;
+  private _serializer: ISerializer<ExportItem[], ServiceResponse>;
 
   constructor(
     config: OTLPGRPCExporterConfigNode = {},
     signalSpecificMetadata: Record<string, string>,
     grpcName: string,
     grpcPath: string,
-    serializer: ISerializer<ServiceRequest, ServiceResponse>
+    serializer: ISerializer<ExportItem[], ServiceResponse>
   ) {
     super(config);
     this._serializer = serializer;
@@ -114,6 +114,11 @@ export abstract class OTLPGRPCExporterNodeBase<
     this._transport.shutdown();
   }
 
+  override convert(_objects: ExportItem[]): ServiceRequest {
+    // Not used, nothing to do.
+    return {} as ServiceRequest;
+  }
+
   send(
     objects: ExportItem[],
     onSuccess: () => void,
@@ -124,8 +129,7 @@ export abstract class OTLPGRPCExporterNodeBase<
       return;
     }
 
-    const converted = this.convert(objects);
-    const data = this._serializer.serializeRequest(converted);
+    const data = this._serializer.serializeRequest(objects);
 
     if (data == null) {
       onError(new Error('Could not serialize message'));

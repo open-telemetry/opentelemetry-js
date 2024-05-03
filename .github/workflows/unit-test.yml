@@ -16,6 +16,7 @@ jobs:
           - "16"
           - "18"
           - "20"
+          - "22"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -31,7 +32,7 @@ jobs:
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest
-        if: ${{ matrix.node_version == '18' || matrix.node_version == '20' }}
+        if: ${{ matrix.node_version == '18' || matrix.node_version == '20' || matrix.node_version == '22' }}
 
       # npm@10.0.0 drops support for Node.js v14 and v16
       - run: npm install -g npm@"<10.0.0"
@@ -46,7 +47,7 @@ jobs:
       - name: Unit tests
         run: |
           # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
-          if [ "${{ matrix.node_version }}" = "18" ] || [ "${{ matrix.node_version }}" == "20" ]; then
+          if [ "${{ matrix.node_version }}" = "18" ] || [ "${{ matrix.node_version }}" == "20" ] || [ "${{ matrix.node_version }}" == "22" ]; then
             export NODE_OPTIONS=--openssl-legacy-provider
           fi
           npm run test
