@@ -11,6 +11,12 @@ All notable changes to experimental packages in this project will be documented 
     * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
     * (internal) OTLPExporterNodeBase now has additional constructor parameters that are required
     * (internal) OTLPExporterNodeBase now has an additional `ResponseType` type parameter
+* feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4581](https://github.com/open-telemetry/opentelemetry-js/pull/4581) @pichlermarc
+  * Breaking changes:
+    * (user-facing) `convert()` has been removed from all exporters
+    * (internal) OTLPExporterBrowserBase: `RequestType` has been replaced by a `ResponseType` type-argument
+    * (internal) OTLPExporterNodeBase: `ServiceRequest` has been replaced by a `ServiceResponse` type-argument
+    * (internal) the `@opentelemetry/otlp-exporter-proto-base` package has been removed, and will from now on be deprecated in `npm`
 
 ### :rocket: (Enhancement)
 

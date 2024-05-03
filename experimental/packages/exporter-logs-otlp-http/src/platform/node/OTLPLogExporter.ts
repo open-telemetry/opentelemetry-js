@@ -19,10 +19,7 @@ import type {
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import type {
-  IExportLogsServiceRequest,
-  IExportLogsServiceResponse,
-} from '@opentelemetry/otlp-transformer';
+import type { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import {
   OTLPExporterNodeBase,
@@ -41,11 +38,7 @@ const USER_AGENT = {
  * Collector Logs Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPExporterNodeBase<
-    ReadableLogRecord,
-    IExportLogsServiceRequest,
-    IExportLogsServiceResponse
-  >
+  extends OTLPExporterNodeBase<ReadableLogRecord, IExportLogsServiceResponse>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {

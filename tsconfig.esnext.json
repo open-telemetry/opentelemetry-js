@@ -45,9 +45,6 @@
       "path": "experimental/packages/otlp-exporter-base/tsconfig.esnext.json"
     },
     {
-      "path": "experimental/packages/otlp-proto-exporter-base/tsconfig.esnext.json"
-    },
-    {
       "path": "experimental/packages/otlp-transformer/tsconfig.esnext.json"
     },
     {

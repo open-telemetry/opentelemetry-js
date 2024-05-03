@@ -26,7 +26,6 @@
       "experimental/packages/opentelemetry-sdk-node",
       "experimental/packages/otlp-exporter-base",
       "experimental/packages/otlp-grpc-exporter-base",
-      "experimental/packages/otlp-proto-exporter-base",
       "experimental/packages/otlp-transformer",
       "experimental/packages/propagator-aws-xray-lambda",
       "experimental/packages/sdk-logs",
@@ -124,9 +123,6 @@
     },
     {
       "path": "experimental/packages/otlp-grpc-exporter-base"
-    },
-    {
-      "path": "experimental/packages/otlp-proto-exporter-base"
     },
     {
       "path": "experimental/packages/otlp-transformer"
