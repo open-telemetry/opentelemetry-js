@@ -13,6 +13,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+* feat(sdk-trace-node): support `xray` Propagator via `OTEL_PROPAGATORS` environment variable [#4602](https://github.com/open-telemetry/opentelemetry-js/pull/4602) @anuraags
 
 ### :bug: (Bug Fix)
 

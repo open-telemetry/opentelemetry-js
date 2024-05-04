@@ -51,7 +51,7 @@ class HttpRequest extends PassThrough {
 
 // Barebones exporter for use by sendWithHttp
 type ExporterConfig = OTLPExporterNodeConfigBase;
-class Exporter extends OTLPExporterNodeBase<object, object, object> {
+class Exporter extends OTLPExporterNodeBase<object, object> {
   getDefaultUrl(config: ExporterConfig): string {
     return config.url || '';
   }

@@ -1,13 +1,11 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": true,
     "outDir": "build",
     "rootDir": "."
   },
   "include": [
     "src/**/*.ts",
-    "src/generated/*.js",
     "test/**/*.ts"
   ],
   "references": [
@@ -15,10 +13,7 @@
       "path": "../../../api"
     },
     {
-      "path": "../../../packages/opentelemetry-core"
-    },
-    {
-      "path": "../otlp-exporter-base"
+      "path": "../../../packages/propagator-aws-xray"
     }
   ]
 }

@@ -14,8 +14,4 @@
  * limitations under the License.
  */
 
-export enum ServiceClientType {
-  SPANS,
-  METRICS,
-  LOGS,
-}
+export { AWSXRayLambdaPropagator } from './AWSXRayLambdaPropagator';
