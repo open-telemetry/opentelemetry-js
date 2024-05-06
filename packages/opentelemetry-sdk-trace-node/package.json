@@ -68,6 +68,7 @@
     "@opentelemetry/context-async-hooks": "1.24.0",
     "@opentelemetry/core": "1.24.0",
     "@opentelemetry/propagator-b3": "1.24.0",
+    "@opentelemetry/propagator-aws-xray": "1.24.0",
     "@opentelemetry/propagator-jaeger": "1.24.0",
     "@opentelemetry/sdk-trace-base": "1.24.0",
     "semver": "^7.5.2"
