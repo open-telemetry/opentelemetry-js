@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714984531445,
+  "lastUpdate": 1714993178996,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8336,6 +8336,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "46d79f9a5ecfe9cb01aff778381008b1cc6fb2ea",
+          "message": "feat(instrumentation): add util to execute span customization hook in base class (#4663)\n\n* feat(instrumentation): hoist span event hook execution to base class\r\n\r\n* test: add test for new hook runner\r\n\r\n* chore: changelog\r\n\r\n* fix: use event name from arguments\r\n\r\n* fix: remove unused import\r\n\r\n* fix: make diag message structual\r\n\r\n* make the private function start with underscore\r\n\r\n* chore: rename insetrumentation event to span customization hook\r\n\r\n* chore: update changelog\r\n\r\n* chore: lint fix\r\n\r\n* Update experimental/packages/opentelemetry-instrumentation/src/instrumentation.ts\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* chore: move CHANGELOG to experimental\r\n\r\n* fix: changelog\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-06T12:57:55+02:00",
+          "tree_id": "328178cecb46a1e2f387f8e14a647af7a27557e7",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/46d79f9a5ecfe9cb01aff778381008b1cc6fb2ea"
+        },
+        "date": 1714993178064,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 966110,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11780,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 696499,
+            "range": "±1.22%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 628640,
+            "range": "±1.00%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
