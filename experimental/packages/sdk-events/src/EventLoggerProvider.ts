@@ -15,16 +15,12 @@
  */
 import * as api from '@opentelemetry/api-events';
 import { EventLogger } from './EventLogger';
-import { EventLoggerProviderConfig } from './types';
 import { LoggerProvider } from '@opentelemetry/api-logs';
 
 export class EventLoggerProvider implements api.EventLoggerProvider {
   private _loggerProvider: LoggerProvider;
 
-  constructor(
-    loggerProvider: LoggerProvider,
-    config: EventLoggerProviderConfig = {}
-  ) {
+  constructor(loggerProvider: LoggerProvider) {
     this._loggerProvider = loggerProvider;
   }
 

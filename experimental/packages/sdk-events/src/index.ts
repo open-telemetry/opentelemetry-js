@@ -16,4 +16,3 @@
 
 export { EventLogger } from './EventLogger';
 export { EventLoggerProvider } from './EventLoggerProvider';
-export { EventLoggerProviderConfig } from './types';
