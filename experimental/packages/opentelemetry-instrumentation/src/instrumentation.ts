@@ -23,6 +23,7 @@ import {
   trace,
   Tracer,
   TracerProvider,
+  Span,
 } from '@opentelemetry/api';
 import { Logger, LoggerProvider, logs } from '@opentelemetry/api-logs';
 import * as shimmer from 'shimmer';
@@ -30,6 +31,7 @@ import {
   InstrumentationModuleDefinition,
   Instrumentation,
   InstrumentationConfig,
+  SpanCustomizationHook,
 } from './types';
 
 /**
@@ -178,4 +180,33 @@ export abstract class InstrumentationAbstract<
     | InstrumentationModuleDefinition
     | InstrumentationModuleDefinition[]
     | void;
+
+  /**
+   * Execute span customization hook, if configured, and log any errors.
+   * Any semantics of the trigger and info are defined by the specific instrumentation.
+   * @param hookHandler The optional hook handler which the user has configured via instrumentation config
+   * @param triggerName The name of the trigger for executing the hook for logging purposes
+   * @param span The span to which the hook should be applied
+   * @param info The info object to be passed to the hook, with useful data the hook may use
+   */
+  protected _runSpanCustomizationHook<SpanCustomizationInfoType>(
+    hookHandler: SpanCustomizationHook<SpanCustomizationInfoType> | undefined,
+    triggerName: string,
+    span: Span,
+    info: SpanCustomizationInfoType
+  ) {
+    if (!hookHandler) {
+      return;
+    }
+
+    try {
+      hookHandler(span, info);
+    } catch (e) {
+      this._diag.error(
+        `Error running span customization hook due to exception in handler`,
+        { triggerName },
+        e
+      );
+    }
+  }
 }
