@@ -40,7 +40,7 @@ export class NoopMeter implements Meter {
   /**
    * @see {@link Meter.createGauge}
    */
-  createGauge(_name: string, _options?: MetricOptions): Histogram {
+  createGauge(_name: string, _options?: MetricOptions): Gauge {
     return NOOP_GAUGE_METRIC;
   }
 

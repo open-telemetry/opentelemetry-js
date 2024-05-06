@@ -28,6 +28,7 @@ import {
   ObservableCounter,
   ObservableGauge,
   ObservableUpDownCounter,
+  Gauge,
 } from '@opentelemetry/api';
 import { millisToHrTime } from '@opentelemetry/core';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
@@ -36,7 +37,6 @@ import {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';
-import { Gauge } from './types';
 
 export class SyncInstrument {
   constructor(

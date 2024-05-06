@@ -26,6 +26,7 @@ import {
   BatchObservableCallback,
   Observable,
   Attributes,
+  Gauge,
 } from '@opentelemetry/api';
 import {
   createInstrumentDescriptor,
@@ -41,7 +42,6 @@ import {
   UpDownCounterInstrument,
 } from './Instruments';
 import { MeterSharedState } from './state/MeterSharedState';
-import { Gauge } from './types';
 
 /**
  * This class implements the {@link IMeter} interface.
@@ -51,7 +51,6 @@ export class Meter implements IMeter {
 
   /**
    * Create a {@link Gauge} instrument.
-   * @experimental
    */
   createGauge<AttributesTypes extends Attributes = Attributes>(
     name: string,
