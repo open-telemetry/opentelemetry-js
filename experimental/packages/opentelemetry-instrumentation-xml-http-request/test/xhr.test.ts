@@ -28,6 +28,7 @@ import * as tracing from '@opentelemetry/sdk-trace-base';
 import {
   SEMATTRS_HTTP_HOST,
   SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_STATUS_CODE,
@@ -373,7 +374,7 @@ describe('xhr', () => {
           );
           assert.ok(
             (attributes[keys[2]] as number) > 0,
-            'attributes ${SemanticAttributess.HTTP_RESPONSE_CONTENT_SIZE} <= 0'
+            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
           );
           assert.strictEqual(
             attributes[keys[3]],
