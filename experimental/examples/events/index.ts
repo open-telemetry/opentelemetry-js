@@ -15,7 +15,6 @@
  */
 
 import { DiagConsoleLogger, DiagLogLevel, diag } from '@opentelemetry/api';
-import { logs } from '@opentelemetry/api-logs';
 import {
   LoggerProvider,
   ConsoleLogRecordExporter,
@@ -38,10 +37,8 @@ loggerProvider.addLogRecordProcessor(
 // const logExporter = new OTLPLogExporter();
 // loggerProvider.addLogRecordProcessor(new SimpleLogRecordProcessor(logExporter));
 
-logs.setGlobalLoggerProvider(loggerProvider);
-
 // configure global EventLoggerProvider
-const eventLoggerProvider = new EventLoggerProvider();
+const eventLoggerProvider = new EventLoggerProvider(loggerProvider);
 events.setGlobalEventLoggerProvider(eventLoggerProvider);
 
 // emit a log record
