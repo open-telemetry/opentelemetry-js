@@ -6,8 +6,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
-* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
   * Breaking changes:
     * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
@@ -22,6 +20,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
+* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 
