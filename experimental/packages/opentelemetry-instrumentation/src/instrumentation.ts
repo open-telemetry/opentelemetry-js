@@ -184,7 +184,7 @@ export abstract class InstrumentationAbstract<
   /**
    * Execute span customization hook, if configured, and log any errors.
    * Any semantics of the trigger and info are defined by the specific instrumentation.
-   * @param hookHandler The optional hook handler which the user has configured via instrumentation config\
+   * @param hookHandler The optional hook handler which the user has configured via instrumentation config
    * @param triggerName The name of the trigger for executing the hook for logging purposes
    * @param span The span to which the hook should be applied
    * @param info The info object to be passed to the hook, with useful data the hook may use
