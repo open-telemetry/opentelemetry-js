@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714753636500,
+  "lastUpdate": 1714984232577,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8232,6 +8232,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "siimkallas@gmail.com",
+            "name": "Siim Kallas",
+            "username": "seemk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c503ff1394aac214b5721a0d6a72aaebcfca46f2",
+          "message": "feat: allow adding links after span creation (#4536)\n\n* feat: allow adding links after span creation\r\n\r\n* update changelog\r\n\r\n* improve docs\r\n\r\n* test: increase coverage\r\n\r\n* Update api/CHANGELOG.md\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* update changelog\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-06T10:27:34+02:00",
+          "tree_id": "4fd7a79f9f2a341f089595d7413f8a7ed0a75e7d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c503ff1394aac214b5721a0d6a72aaebcfca46f2"
+        },
+        "date": 1714984231696,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 951846,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11673,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 666846,
+            "range": "±0.65%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 631690,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
