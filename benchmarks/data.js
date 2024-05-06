@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1714984232577,
+  "lastUpdate": 1714984531445,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8282,6 +8282,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 631690,
             "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "allasaksel@gmail.com",
+            "name": "Aksel Allas",
+            "username": "AkselAllas"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a82d8758631ae1bd13e270919fe48bea30883a24",
+          "message": "fix(exporter-metrics-otlp-grpc) Add explicit otlp-exporter-base depen… (#4678)\n\n* fix(exporter-metrics-otlp-grpc) Add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc\r\n\r\n* Update CHANGELOG.md\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-06T10:34:17+02:00",
+          "tree_id": "00ba7bee5a367996a0ee3b89c8d08a216db038fd",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a82d8758631ae1bd13e270919fe48bea30883a24"
+        },
+        "date": 1714984530564,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 961313,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11684,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 685740,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 651863,
+            "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
