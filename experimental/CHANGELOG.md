@@ -10,11 +10,15 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(instrumentation): update import-in-the-middle to 1.7.4
-
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.51.1
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): update import-in-the-middle to 1.7.4
 
 ## 0.51.0
 
