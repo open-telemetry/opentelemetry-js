@@ -6,6 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
+* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
   * Breaking changes:
     * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
