@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-import { noopDetectorSync } from '../../detectors/NoopDetectorSync';
+import { noopDetectorSync } from '../../NoopDetectorSync';
 
-export const osDetectorSync = noopDetectorSync;
+export const hostDetectorSync = noopDetectorSync;

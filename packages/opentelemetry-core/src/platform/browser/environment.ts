@@ -31,3 +31,7 @@ export function getEnv(): Required<ENVIRONMENT> {
   );
   return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
 }
+
+export function getEnvWithoutDefaults(): ENVIRONMENT {
+  return parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
+}
