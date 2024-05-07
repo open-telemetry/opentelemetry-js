@@ -14,29 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  LogRecord,
-  Logger,
-  LoggerOptions,
-  LoggerProvider,
-} from '@opentelemetry/api-logs';
+import { LogRecord, Logger } from '@opentelemetry/api-logs';
 
 export class TestLogger implements Logger {
   emit(logRecord: LogRecord): void {}
-}
-
-export class TestLoggerProvider implements LoggerProvider {
-  private logger: Logger;
-
-  constructor(logger: Logger) {
-    this.logger = logger;
-  }
-
-  getLogger(
-    name: string,
-    version?: string | undefined,
-    options?: LoggerOptions | undefined
-  ): Logger {
-    return this.logger;
-  }
 }

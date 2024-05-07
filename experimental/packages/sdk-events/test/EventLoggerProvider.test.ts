@@ -16,48 +16,38 @@
 
 import * as assert from 'assert';
 import { EventLogger, EventLoggerProvider } from '../src';
-import { TestLogger, TestLoggerProvider } from './utils';
-import { logs } from '@opentelemetry/api-logs';
+import { LoggerProvider } from '@opentelemetry/sdk-logs';
 import sinon = require('sinon');
 
 describe('EventLoggerProvider', () => {
   describe('getLogger', () => {
     it('returns an instance of EventLogger', () => {
-      const provider = new EventLoggerProvider(
-        new TestLoggerProvider(new TestLogger())
-      );
+      const provider = new EventLoggerProvider(new LoggerProvider());
       const logger = provider.getEventLogger('logger name');
       assert.ok(logger instanceof EventLogger);
     });
 
-    it('uses logger from EventLoggerProviderConfig', () => {
-      const globalLoggerProvider = new TestLoggerProvider(new TestLogger());
-      logs.setGlobalLoggerProvider(globalLoggerProvider);
-      const globalLoggerProviderSpy = sinon.spy(
-        globalLoggerProvider,
-        'getLogger'
-      );
-
-      const loggerProvider = new TestLoggerProvider(new TestLogger());
-      const loggerProviderSpy = sinon.spy(loggerProvider, 'getLogger');
+    it('uses logger from provided LoggerProvider', () => {
+      const loggerProvider = new LoggerProvider();
+      const spy = sinon.spy(loggerProvider, 'getLogger');
 
       const provider = new EventLoggerProvider(loggerProvider);
 
       const eventLogger = provider.getEventLogger('logger name');
       assert.ok(eventLogger instanceof EventLogger);
-      loggerProviderSpy.calledOnceWithExactly('logger name');
-      assert.ok(!globalLoggerProviderSpy.called);
+      spy.calledOnceWithExactly('logger name');
     });
+  });
 
-    it('uses delegate logger from global LoggerProvider as a fall back', () => {
-      const loggerProvider = new TestLoggerProvider(new TestLogger());
-      const globalLoggerProviderSpy = sinon.spy(loggerProvider, 'getLogger');
+  describe('forceFlush', () => {
+    it('calls forceFlush on loggerProvider', () => {
+      const loggerProvider = new LoggerProvider();
+      const spy = sinon.spy(loggerProvider, 'forceFlush');
 
       const provider = new EventLoggerProvider(loggerProvider);
 
-      const eventLogger = provider.getEventLogger('logger name');
-      assert.ok(eventLogger instanceof EventLogger);
-      globalLoggerProviderSpy.calledOnceWithExactly('logger name');
+      provider.forceFlush();
+      spy.calledOnceWithExactly();
     });
   });
 });

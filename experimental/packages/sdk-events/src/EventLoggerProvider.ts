@@ -15,7 +15,7 @@
  */
 import * as api from '@opentelemetry/api-events';
 import { EventLogger } from './EventLogger';
-import { LoggerProvider } from '@opentelemetry/api-logs';
+import { LoggerProvider } from '@opentelemetry/sdk-logs';
 
 export class EventLoggerProvider implements api.EventLoggerProvider {
   private _loggerProvider: LoggerProvider;
@@ -31,5 +31,13 @@ export class EventLoggerProvider implements api.EventLoggerProvider {
   ): api.EventLogger {
     const logger = this._loggerProvider.getLogger(name, version, options);
     return new EventLogger(logger);
+  }
+
+  public forceFlush(): Promise<void> {
+    return this._loggerProvider.forceFlush();
+  }
+
+  public shutdown(): Promise<void> {
+    return Promise.resolve();
   }
 }
