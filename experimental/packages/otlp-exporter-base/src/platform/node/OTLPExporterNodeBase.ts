@@ -15,7 +15,7 @@
  */
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
+import { OTLPExporterNodeConfigBase } from './types';
 import { parseHeaders } from '../../util';
 import { configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
@@ -34,7 +34,6 @@ export abstract class OTLPExporterNodeBase<
 > extends OTLPExporterBase<OTLPExporterNodeConfigBase, ExportItem> {
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
-  compression: CompressionAlgorithm;
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
   private _transport: IExporterTransport;
 
@@ -54,7 +53,6 @@ export abstract class OTLPExporterNodeBase<
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS),
       { 'Content-Type': contentType }
     );
-    this.compression = configureCompression(config.compression);
     this._serializer = serializer;
 
     // populate keepAlive for use with new settings
@@ -75,7 +73,7 @@ export abstract class OTLPExporterNodeBase<
 
     this._transport = createHttpExporterTransport({
       agentOptions: config.httpAgentOptions ?? { keepAlive: true },
-      compression: this.compression,
+      compression: configureCompression(config.compression),
       headers: this.headers,
       url: this.url,
       timeoutMillis: this.timeoutMillis,
