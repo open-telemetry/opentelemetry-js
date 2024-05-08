@@ -13,6 +13,9 @@
       "path": "../../api"
     },
     {
+      "path": "../../experimental/packages/propagator-aws-xray-lambda"
+    },
+    {
       "path": "../opentelemetry-context-async-hooks"
     },
     {

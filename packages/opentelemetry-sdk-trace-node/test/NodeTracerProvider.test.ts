@@ -233,6 +233,9 @@ describe('NodeTracerProvider', () => {
       } else {
         delete (process.env as any).OTEL_PROPAGATORS;
       }
+
+      // unregister global propagator
+      propagation.disable();
     });
 
     it('should allow propagators as per the specification', () => {
@@ -250,6 +253,17 @@ describe('NodeTracerProvider', () => {
         'x-b3-parentspanid',
         'uber-trace-id',
         'x-amzn-trace-id',
+      ]);
+    });
+
+    it('should allow xray-lambda propagator', () => {
+      (process.env as any).OTEL_PROPAGATORS = 'xray-lambda';
+
+      const provider = new NodeTracerProvider();
+      provider.register();
+
+      assert.deepStrictEqual(propagation.fields(), [
+        'x-amzn-trace-id'
       ]);
     });
   });
