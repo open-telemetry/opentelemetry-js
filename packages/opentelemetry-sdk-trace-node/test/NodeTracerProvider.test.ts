@@ -262,9 +262,7 @@ describe('NodeTracerProvider', () => {
       const provider = new NodeTracerProvider();
       provider.register();
 
-      assert.deepStrictEqual(propagation.fields(), [
-        'x-amzn-trace-id'
-      ]);
+      assert.deepStrictEqual(propagation.fields(), ['x-amzn-trace-id']);
     });
   });
 
