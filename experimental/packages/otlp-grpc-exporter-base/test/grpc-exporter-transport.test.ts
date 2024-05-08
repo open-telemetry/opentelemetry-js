@@ -28,7 +28,7 @@ import { types } from 'util';
 import {
   ExportResponseFailure,
   ExportResponseSuccess,
-} from '../src/export-response';
+} from '@opentelemetry/otlp-exporter-base';
 
 const testServiceDefinition = {
   export: {

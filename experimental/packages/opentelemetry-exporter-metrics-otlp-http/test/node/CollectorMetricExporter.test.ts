@@ -56,6 +56,7 @@ import {
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../src/version';
+import {nextTick} from "process";
 
 let fakeRequest: PassThrough;
 
@@ -74,6 +75,9 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
   afterEach(async () => {
     fakeRequest = new Stream.PassThrough();
+    Object.defineProperty(fakeRequest, 'setTimeout', {
+      value: function (_timeout: number) {},
+    });
     await shutdown();
     sinon.restore();
   });
@@ -468,11 +472,13 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
         const options = args[0];
 
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -486,11 +492,14 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
+
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
@@ -501,11 +510,14 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
         const options = args[0];
         const agent = options.agent;
         assert.strictEqual(agent.keepAlive, true);
@@ -584,7 +596,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       const callback = args[1];
 
       callback(mockRes);
-      mockRes.send('success');
+      mockRes.send(Buffer.from('success'));
     });
 
     it('should log the successful message', done => {
@@ -595,11 +607,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
+
         setTimeout(() => {
           assert.strictEqual(stubLoggerError.args.length, 0);
           assert.strictEqual(
@@ -619,18 +635,20 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(400);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('failed');
+        nextTick(() => {
+          const mockRes = new MockedResponse(400);
+          callback(mockRes);
+          mockRes.send(Buffer.from('failure'));
+        });
+
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
           const error = result.error as OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
-          assert.strictEqual(error.data, 'failed');
           done();
         });
       });

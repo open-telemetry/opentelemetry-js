@@ -32,6 +32,7 @@ import { PassThrough, Stream } from 'stream';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
 import { VERSION } from '../../src/version';
+import {nextTick} from "process";
 
 let fakeRequest: PassThrough;
 
@@ -43,7 +44,7 @@ class MockedResponse extends Stream {
     super();
   }
 
-  send(data: string) {
+  send(data: Uint8Array) {
     this.emit('data', data);
     this.emit('end');
   }
@@ -65,6 +66,9 @@ describe('OTLPLogExporter', () => {
 
   afterEach(() => {
     fakeRequest = new Stream.PassThrough();
+    Object.defineProperty(fakeRequest, 'setTimeout', {
+      value: function (_timeout: number) {},
+    });
     sinon.restore();
   });
 
@@ -152,10 +156,12 @@ describe('OTLPLogExporter', () => {
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
 
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+          done();
+        });
         return fakeRequest as any;
       });
       collectorExporter.export(logs, () => {});
@@ -165,10 +171,12 @@ describe('OTLPLogExporter', () => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+          done();
+        });
         return fakeRequest as any;
       });
 
@@ -180,10 +188,12 @@ describe('OTLPLogExporter', () => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
 
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+          done();
+        });
         return fakeRequest as any;
       });
 
@@ -192,10 +202,13 @@ describe('OTLPLogExporter', () => {
 
     it('should successfully send the logs', done => {
       const fakeRequest = new Stream.PassThrough();
-      sinon.stub(http, 'request').returns(fakeRequest as any);
+      Object.defineProperty(fakeRequest, 'setTimeout', {
+        value: function (_timeout: number) {},
+      });
 
+      sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
-      fakeRequest.on('end', () => {
+      fakeRequest.on('finish', () => {
         const responseBody = buff.toString();
         const json = JSON.parse(responseBody) as IExportLogsServiceRequest;
         const log1 = json.resourceLogs?.[0].scopeLogs?.[0].logRecords?.[0];
@@ -222,9 +235,11 @@ describe('OTLPLogExporter', () => {
       const spyLoggerError = sinon.stub(diag, 'error');
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
+        nextTick(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
         return fakeRequest as any;
       });
 
@@ -237,9 +252,11 @@ describe('OTLPLogExporter', () => {
 
     it('should log the error message', done => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        const mockResError = new MockedResponse(400);
-        cb(mockResError);
-        mockResError.send('failed');
+        nextTick(() => {
+          const mockRes = new MockedResponse(400);
+          cb(mockRes);
+          mockRes.send(Buffer.from('failure'));
+        });
 
         return fakeRequest as any;
       });

@@ -27,3 +27,11 @@ export {
   configureExporterTimeout,
   invalidTimeout,
 } from './util';
+
+export {
+  ExportResponse,
+  ExportResponseFailure,
+  ExportResponseSuccess,
+} from './export-response';
+
+export { IExporterTransport } from './exporter-transport';
