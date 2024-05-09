@@ -209,104 +209,104 @@ export const METRIC_SIGNALR_SERVER_CONNECTION_DURATION =
 /**
  * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
  */
-export const SEMATTRS_ASPNETCORE_RATE_LIMITING_RESULT =
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT =
   'aspnetcore.rate_limiting.result';
 
 /**
  * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
  */
-export const SEMATTRS_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE =
+export const ATTR_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE =
   'aspnetcore.diagnostics.handler.type';
 
 /**
  * Rate limiting policy name.
  */
-export const SEMATTRS_ASPNETCORE_RATE_LIMITING_POLICY =
+export const ATTR_ASPNETCORE_RATE_LIMITING_POLICY =
   'aspnetcore.rate_limiting.policy';
 
 /**
  * Flag indicating if request was handled by the application pipeline.
  */
-export const SEMATTRS_ASPNETCORE_REQUEST_IS_UNHANDLED =
+export const ATTR_ASPNETCORE_REQUEST_IS_UNHANDLED =
   'aspnetcore.request.is_unhandled';
 
 /**
  * A value that indicates whether the matched route is a fallback route.
  */
-export const SEMATTRS_ASPNETCORE_ROUTING_IS_FALLBACK =
+export const ATTR_ASPNETCORE_ROUTING_IS_FALLBACK =
   'aspnetcore.routing.is_fallback';
 
 /**
  * Match result - success or failure.
  */
-export const SEMATTRS_ASPNETCORE_ROUTING_MATCH_STATUS =
+export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS =
   'aspnetcore.routing.match_status';
 
 /**
  * ASP.NET Core exception middleware handling result.
  */
-export const SEMATTRS_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT =
+export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT =
   'aspnetcore.diagnostics.exception.result';
 
 /**
  * SignalR HTTP connection closure status.
  */
-export const SEMATTRS_SIGNALR_CONNECTION_STATUS = 'signalr.connection.status';
+export const ATTR_SIGNALR_CONNECTION_STATUS = 'signalr.connection.status';
 
 /**
  * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md).
  */
-export const SEMATTRS_SIGNALR_TRANSPORT = 'signalr.transport';
+export const ATTR_SIGNALR_TRANSPORT = 'signalr.transport';
 
 /**
  * Name of the memory pool.
  *
  * Note: Pool names are generally obtained via [MemoryPoolMXBean#getName()](https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html#getName()).
  */
-export const SEMATTRS_JVM_MEMORY_POOL_NAME = 'jvm.memory.pool.name';
+export const ATTR_JVM_MEMORY_POOL_NAME = 'jvm.memory.pool.name';
 
 /**
  * The type of memory.
  */
-export const SEMATTRS_JVM_MEMORY_TYPE = 'jvm.memory.type';
+export const ATTR_JVM_MEMORY_TYPE = 'jvm.memory.type';
 
 /**
  * Name of the garbage collector action.
  *
  * Note: Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
  */
-export const SEMATTRS_JVM_GC_ACTION = 'jvm.gc.action';
+export const ATTR_JVM_GC_ACTION = 'jvm.gc.action';
 
 /**
  * Name of the garbage collector.
  *
  * Note: Garbage collector name is generally obtained via [GarbageCollectionNotificationInfo#getGcName()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcName()).
  */
-export const SEMATTRS_JVM_GC_NAME = 'jvm.gc.name';
+export const ATTR_JVM_GC_NAME = 'jvm.gc.name';
 
 /**
  * Whether the thread is daemon or not.
  */
-export const SEMATTRS_JVM_THREAD_DAEMON = 'jvm.thread.daemon';
+export const ATTR_JVM_THREAD_DAEMON = 'jvm.thread.daemon';
 
 /**
  * State of the thread.
  */
-export const SEMATTRS_JVM_THREAD_STATE = 'jvm.thread.state';
+export const ATTR_JVM_THREAD_STATE = 'jvm.thread.state';
 
 /**
  * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
  *
  * Note: When observed from the server side, and when communicating through an intermediary, `client.address` SHOULD represent the client address behind any intermediaries,  for example proxies, if it&#39;s available.
  */
-export const SEMATTRS_CLIENT_ADDRESS = 'client.address';
+export const ATTR_CLIENT_ADDRESS = 'client.address';
 
 /**
  * Client port number.
  *
  * Note: When observed from the server side, and when communicating through an intermediary, `client.port` SHOULD represent the client port behind any intermediaries,  for example proxies, if it&#39;s available.
  */
-export const SEMATTRS_CLIENT_PORT = 'client.port';
+export const ATTR_CLIENT_PORT = 'client.port';
 
 /**
 * Describes a class of error the operation ended with.
@@ -327,7 +327,7 @@ it&#39;s RECOMMENDED to:
 * Use a domain-specific attribute
 * Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
 */
-export const SEMATTRS_ERROR_TYPE = 'error.type';
+export const ATTR_ERROR_TYPE = 'error.type';
 
 /**
 * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
@@ -349,22 +349,22 @@ even if the `exception.escaped` attribute was not set or set to false,
 since the event might have been recorded at a time where it was not
 clear whether the exception will escape.
 */
-export const SEMATTRS_EXCEPTION_ESCAPED = 'exception.escaped';
+export const ATTR_EXCEPTION_ESCAPED = 'exception.escaped';
 
 /**
  * The exception message.
  */
-export const SEMATTRS_EXCEPTION_MESSAGE = 'exception.message';
+export const ATTR_EXCEPTION_MESSAGE = 'exception.message';
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
  */
-export const SEMATTRS_EXCEPTION_STACKTRACE = 'exception.stacktrace';
+export const ATTR_EXCEPTION_STACKTRACE = 'exception.stacktrace';
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
  */
-export const SEMATTRS_EXCEPTION_TYPE = 'exception.type';
+export const ATTR_EXCEPTION_TYPE = 'exception.type';
 
 /**
 * HTTP request method.
@@ -384,25 +384,24 @@ HTTP method names are case-sensitive and `http.request.method` attribute value M
 Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
 Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
 */
-export const SEMATTRS_HTTP_REQUEST_METHOD = 'http.request.method';
+export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method';
 
 /**
  * Original HTTP method sent by the client in the request line.
  */
-export const SEMATTRS_HTTP_REQUEST_METHOD_ORIGINAL =
-  'http.request.method_original';
+export const ATTR_HTTP_REQUEST_METHOD_ORIGINAL = 'http.request.method_original';
 
 /**
  * The ordinal number of request resending attempt (for any reason, including redirects).
  *
  * Note: The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
  */
-export const SEMATTRS_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count';
+export const ATTR_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count';
 
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
  */
-export const SEMATTRS_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
+export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 
 /**
 * The matched route, that is, the path template in the format used by the respective server framework.
@@ -410,41 +409,41 @@ export const SEMATTRS_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 * Note: MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
 SHOULD include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
 */
-export const SEMATTRS_HTTP_ROUTE = 'http.route';
+export const ATTR_HTTP_ROUTE = 'http.route';
 
 /**
  * Local address of the network connection - IP address or Unix domain socket name.
  */
-export const SEMATTRS_NETWORK_LOCAL_ADDRESS = 'network.local.address';
+export const ATTR_NETWORK_LOCAL_ADDRESS = 'network.local.address';
 
 /**
  * Local port number of the network connection.
  */
-export const SEMATTRS_NETWORK_LOCAL_PORT = 'network.local.port';
+export const ATTR_NETWORK_LOCAL_PORT = 'network.local.port';
 
 /**
  * Peer address of the network connection - IP address or Unix domain socket name.
  */
-export const SEMATTRS_NETWORK_PEER_ADDRESS = 'network.peer.address';
+export const ATTR_NETWORK_PEER_ADDRESS = 'network.peer.address';
 
 /**
  * Peer port number of the network connection.
  */
-export const SEMATTRS_NETWORK_PEER_PORT = 'network.peer.port';
+export const ATTR_NETWORK_PEER_PORT = 'network.peer.port';
 
 /**
  * [OSI application layer](https://osi-model.com/application-layer/) or non-OSI equivalent.
  *
  * Note: The value SHOULD be normalized to lowercase.
  */
-export const SEMATTRS_NETWORK_PROTOCOL_NAME = 'network.protocol.name';
+export const ATTR_NETWORK_PROTOCOL_NAME = 'network.protocol.name';
 
 /**
  * The actual version of the protocol used for network communication.
  *
  * Note: If protocol version is subject to negotiation (for example using [ALPN](https://www.rfc-editor.org/rfc/rfc7301.html)), this attribute SHOULD be set to the negotiated version. If the actual protocol version is not known, this attribute SHOULD NOT be set.
  */
-export const SEMATTRS_NETWORK_PROTOCOL_VERSION = 'network.protocol.version';
+export const ATTR_NETWORK_PROTOCOL_VERSION = 'network.protocol.version';
 
 /**
 * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
@@ -455,45 +454,45 @@ Consider always setting the transport when setting a port number, since
 a port number is ambiguous without knowing the transport. For example
 different processes could be listening on TCP port 12345 and UDP port 12345.
 */
-export const SEMATTRS_NETWORK_TRANSPORT = 'network.transport';
+export const ATTR_NETWORK_TRANSPORT = 'network.transport';
 
 /**
  * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
  *
  * Note: The value SHOULD be normalized to lowercase.
  */
-export const SEMATTRS_NETWORK_TYPE = 'network.type';
+export const ATTR_NETWORK_TYPE = 'network.type';
 
 /**
  * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
  *
  * Note: When observed from the client side, and when communicating through an intermediary, `server.address` SHOULD represent the server address behind any intermediaries, for example proxies, if it&#39;s available.
  */
-export const SEMATTRS_SERVER_ADDRESS = 'server.address';
+export const ATTR_SERVER_ADDRESS = 'server.address';
 
 /**
  * Server port number.
  *
  * Note: When observed from the client side, and when communicating through an intermediary, `server.port` SHOULD represent the server port behind any intermediaries, for example proxies, if it&#39;s available.
  */
-export const SEMATTRS_SERVER_PORT = 'server.port';
+export const ATTR_SERVER_PORT = 'server.port';
 
 /**
  * Logical name of the service.
  *
  * Note: MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md#process), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
  */
-export const SEMATTRS_SERVICE_NAME = 'service.name';
+export const ATTR_SERVICE_NAME = 'service.name';
 
 /**
  * The version string of the service API or implementation. The format is not defined by these conventions.
  */
-export const SEMATTRS_SERVICE_VERSION = 'service.version';
+export const ATTR_SERVICE_VERSION = 'service.version';
 
 /**
  * The language of the telemetry SDK.
  */
-export const SEMATTRS_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
+export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
 
 /**
 * The name of the telemetry SDK as defined above.
@@ -505,17 +504,17 @@ or another suitable identifier depending on the language.
 The identifier `opentelemetry` is reserved and MUST NOT be used in this case.
 All custom identifiers SHOULD be stable across different versions of an implementation.
 */
-export const SEMATTRS_TELEMETRY_SDK_NAME = 'telemetry.sdk.name';
+export const ATTR_TELEMETRY_SDK_NAME = 'telemetry.sdk.name';
 
 /**
  * The version string of the telemetry SDK.
  */
-export const SEMATTRS_TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
+export const ATTR_TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
 
 /**
  * The [URI fragment](https://www.rfc-editor.org/rfc/rfc3986#section-3.5) component.
  */
-export const SEMATTRS_URL_FRAGMENT = 'url.fragment';
+export const ATTR_URL_FRAGMENT = 'url.fragment';
 
 /**
 * Absolute URL describing a network resource according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986).
@@ -524,51 +523,51 @@ export const SEMATTRS_URL_FRAGMENT = 'url.fragment';
 `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password SHOULD be redacted and attribute&#39;s value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
 `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed). Sensitive content provided in `url.full` SHOULD be scrubbed when instrumentations can identify it.
 */
-export const SEMATTRS_URL_FULL = 'url.full';
+export const ATTR_URL_FULL = 'url.full';
 
 /**
  * The [URI path](https://www.rfc-editor.org/rfc/rfc3986#section-3.3) component.
  *
  * Note: Sensitive content provided in `url.path` SHOULD be scrubbed when instrumentations can identify it.
  */
-export const SEMATTRS_URL_PATH = 'url.path';
+export const ATTR_URL_PATH = 'url.path';
 
 /**
  * The [URI query](https://www.rfc-editor.org/rfc/rfc3986#section-3.4) component.
  *
  * Note: Sensitive content provided in `url.query` SHOULD be scrubbed when instrumentations can identify it.
  */
-export const SEMATTRS_URL_QUERY = 'url.query';
+export const ATTR_URL_QUERY = 'url.query';
 
 /**
  * The [URI scheme](https://www.rfc-editor.org/rfc/rfc3986#section-3.1) component identifying the used protocol.
  */
-export const SEMATTRS_URL_SCHEME = 'url.scheme';
+export const ATTR_URL_SCHEME = 'url.scheme';
 
 /**
  * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
  */
-export const SEMATTRS_USER_AGENT_ORIGINAL = 'user_agent.original';
+export const ATTR_USER_AGENT_ORIGINAL = 'user_agent.original';
 
 /**
  * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
  */
-export const SEMATTRS_OTEL_SCOPE_NAME = 'otel.scope.name';
+export const ATTR_OTEL_SCOPE_NAME = 'otel.scope.name';
 
 /**
  * The version of the instrumentation scope - (`InstrumentationScope.Version` in OTLP).
  */
-export const SEMATTRS_OTEL_SCOPE_VERSION = 'otel.scope.version';
+export const ATTR_OTEL_SCOPE_VERSION = 'otel.scope.version';
 
 /**
  * Name of the code, either &#34;OK&#34; or &#34;ERROR&#34;. MUST NOT be set if the status code is UNSET.
  */
-export const SEMATTRS_OTEL_STATUS_CODE = 'otel.status_code';
+export const ATTR_OTEL_STATUS_CODE = 'otel.status_code';
 
 /**
  * Description of the Status if it has a value, otherwise not set.
  */
-export const SEMATTRS_OTEL_STATUS_DESCRIPTION = 'otel.status_description';
+export const ATTR_OTEL_STATUS_DESCRIPTION = 'otel.status_description';
 
 /**
  * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.

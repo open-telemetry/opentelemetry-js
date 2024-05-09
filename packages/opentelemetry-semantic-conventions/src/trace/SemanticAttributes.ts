@@ -172,26 +172,36 @@ const TMP_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
  * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
  *
  * Note: This may be different from `faas.id` if an alias is involved.
+ *
+ * @deprecated use ATTR_AWS_LAMBDA_INVOKED_ARN
  */
 export const SEMATTRS_AWS_LAMBDA_INVOKED_ARN = TMP_AWS_LAMBDA_INVOKED_ARN;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated use ATTR_DB_SYSTEM
  */
 export const SEMATTRS_DB_SYSTEM = TMP_DB_SYSTEM;
 
 /**
  * The connection string used to connect to the database. It is recommended to remove embedded credentials.
+ *
+ * @deprecated use ATTR_DB_CONNECTION_STRING
  */
 export const SEMATTRS_DB_CONNECTION_STRING = TMP_DB_CONNECTION_STRING;
 
 /**
  * Username for accessing the database.
+ *
+ * @deprecated use ATTR_DB_USER
  */
 export const SEMATTRS_DB_USER = TMP_DB_USER;
 
 /**
  * The fully-qualified class name of the [Java Database Connectivity (JDBC)](https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/) driver used to connect.
+ *
+ * @deprecated use ATTR_DB_JDBC_DRIVER_CLASSNAME
  */
 export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
 
@@ -199,6 +209,8 @@ export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
  * If no [tech-specific attribute](#call-level-attributes-for-specific-technologies) is defined, this attribute is used to report the name of the database being accessed. For commands that switch the database, this should be set to the target database (even if the command fails).
  *
  * Note: In some SQL databases, the database name to be used is called &#34;schema name&#34;.
+ *
+ * @deprecated use ATTR_DB_NAME
  */
 export const SEMATTRS_DB_NAME = TMP_DB_NAME;
 
@@ -206,6 +218,8 @@ export const SEMATTRS_DB_NAME = TMP_DB_NAME;
  * The database statement being executed.
  *
  * Note: The value may be sanitized to exclude sensitive information.
+ *
+ * @deprecated use ATTR_DB_STATEMENT
  */
 export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
 
@@ -213,6 +227,8 @@ export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
  * The name of the operation being executed, e.g. the [MongoDB command name](https://docs.mongodb.com/manual/reference/command/#database-operations) such as `findAndModify`, or the SQL keyword.
  *
  * Note: When setting this to an SQL keyword, it is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if the operation name is provided by the library being instrumented. If the SQL statement has an ambiguous operation, or performs more than one operation, this value may be omitted.
+ *
+ * @deprecated use ATTR_DB_OPERATION
  */
 export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
 
@@ -220,21 +236,29 @@ export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
  * The Microsoft SQL Server [instance name](https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15) connecting to. This name is used to determine the port of a named instance.
  *
  * Note: If setting a `db.mssql.instance_name`, `net.peer.port` is no longer required (but still recommended if non-standard).
+ *
+ * @deprecated use ATTR_DB_MSSQL_INSTANCE_NAME
  */
 export const SEMATTRS_DB_MSSQL_INSTANCE_NAME = TMP_DB_MSSQL_INSTANCE_NAME;
 
 /**
  * The name of the keyspace being accessed. To be used instead of the generic `db.name` attribute.
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_KEYSPACE
  */
 export const SEMATTRS_DB_CASSANDRA_KEYSPACE = TMP_DB_CASSANDRA_KEYSPACE;
 
 /**
  * The fetch size used for paging, i.e. how many rows will be returned at once.
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_PAGE_SIZE
  */
 export const SEMATTRS_DB_CASSANDRA_PAGE_SIZE = TMP_DB_CASSANDRA_PAGE_SIZE;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL
  */
 export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
   TMP_DB_CASSANDRA_CONSISTENCY_LEVEL;
@@ -243,44 +267,60 @@ export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
  * The name of the primary table that the operation is acting upon, including the schema name (if applicable).
  *
  * Note: This mirrors the db.sql.table attribute but references cassandra rather than sql. It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_TABLE
  */
 export const SEMATTRS_DB_CASSANDRA_TABLE = TMP_DB_CASSANDRA_TABLE;
 
 /**
  * Whether or not the query is idempotent.
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_IDEMPOTENCE
  */
 export const SEMATTRS_DB_CASSANDRA_IDEMPOTENCE = TMP_DB_CASSANDRA_IDEMPOTENCE;
 
 /**
  * The number of times a query was speculatively executed. Not set or `0` if the query was not executed speculatively.
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT
  */
 export const SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
   TMP_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT;
 
 /**
  * The ID of the coordinating node for a query.
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_COORDINATOR_ID
  */
 export const SEMATTRS_DB_CASSANDRA_COORDINATOR_ID =
   TMP_DB_CASSANDRA_COORDINATOR_ID;
 
 /**
  * The data center of the coordinating node for a query.
+ *
+ * @deprecated use ATTR_DB_CASSANDRA_COORDINATOR_DC
  */
 export const SEMATTRS_DB_CASSANDRA_COORDINATOR_DC =
   TMP_DB_CASSANDRA_COORDINATOR_DC;
 
 /**
  * The [HBase namespace](https://hbase.apache.org/book.html#_namespace) being accessed. To be used instead of the generic `db.name` attribute.
+ *
+ * @deprecated use ATTR_DB_HBASE_NAMESPACE
  */
 export const SEMATTRS_DB_HBASE_NAMESPACE = TMP_DB_HBASE_NAMESPACE;
 
 /**
  * The index of the database being accessed as used in the [`SELECT` command](https://redis.io/commands/select), provided as an integer. To be used instead of the generic `db.name` attribute.
+ *
+ * @deprecated use ATTR_DB_REDIS_DATABASE_INDEX
  */
 export const SEMATTRS_DB_REDIS_DATABASE_INDEX = TMP_DB_REDIS_DATABASE_INDEX;
 
 /**
  * The collection being accessed within the database stated in `db.name`.
+ *
+ * @deprecated use ATTR_DB_MONGODB_COLLECTION
  */
 export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
 
@@ -288,21 +328,29 @@ export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
  * The name of the primary table that the operation is acting upon, including the schema name (if applicable).
  *
  * Note: It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
+ *
+ * @deprecated use ATTR_DB_SQL_TABLE
  */
 export const SEMATTRS_DB_SQL_TABLE = TMP_DB_SQL_TABLE;
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
+ *
+ * @deprecated use ATTR_EXCEPTION_TYPE
  */
 export const SEMATTRS_EXCEPTION_TYPE = TMP_EXCEPTION_TYPE;
 
 /**
  * The exception message.
+ *
+ * @deprecated use ATTR_EXCEPTION_MESSAGE
  */
 export const SEMATTRS_EXCEPTION_MESSAGE = TMP_EXCEPTION_MESSAGE;
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+ *
+ * @deprecated use ATTR_EXCEPTION_STACKTRACE
  */
 export const SEMATTRS_EXCEPTION_STACKTRACE = TMP_EXCEPTION_STACKTRACE;
 
@@ -325,51 +373,71 @@ It follows that an exception may still escape the scope of the span
 even if the `exception.escaped` attribute was not set or set to false,
 since the event might have been recorded at a time where it was not
 clear whether the exception will escape.
+*
+* @deprecated use ATTR_EXCEPTION_ESCAPED
 */
 export const SEMATTRS_EXCEPTION_ESCAPED = TMP_EXCEPTION_ESCAPED;
 
 /**
  * Type of the trigger on which the function is executed.
+ *
+ * @deprecated use ATTR_FAAS_TRIGGER
  */
 export const SEMATTRS_FAAS_TRIGGER = TMP_FAAS_TRIGGER;
 
 /**
  * The execution ID of the current function execution.
+ *
+ * @deprecated use ATTR_FAAS_EXECUTION
  */
 export const SEMATTRS_FAAS_EXECUTION = TMP_FAAS_EXECUTION;
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
+ *
+ * @deprecated use ATTR_FAAS_DOCUMENT_COLLECTION
  */
 export const SEMATTRS_FAAS_DOCUMENT_COLLECTION = TMP_FAAS_DOCUMENT_COLLECTION;
 
 /**
  * Describes the type of the operation that was performed on the data.
+ *
+ * @deprecated use ATTR_FAAS_DOCUMENT_OPERATION
  */
 export const SEMATTRS_FAAS_DOCUMENT_OPERATION = TMP_FAAS_DOCUMENT_OPERATION;
 
 /**
  * A string containing the time when the data was accessed in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
+ *
+ * @deprecated use ATTR_FAAS_DOCUMENT_TIME
  */
 export const SEMATTRS_FAAS_DOCUMENT_TIME = TMP_FAAS_DOCUMENT_TIME;
 
 /**
  * The document name/table subjected to the operation. For example, in Cloud Storage or S3 is the name of the file, and in Cosmos DB the table name.
+ *
+ * @deprecated use ATTR_FAAS_DOCUMENT_NAME
  */
 export const SEMATTRS_FAAS_DOCUMENT_NAME = TMP_FAAS_DOCUMENT_NAME;
 
 /**
  * A string containing the function invocation time in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
+ *
+ * @deprecated use ATTR_FAAS_TIME
  */
 export const SEMATTRS_FAAS_TIME = TMP_FAAS_TIME;
 
 /**
  * A string containing the schedule period as [Cron Expression](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm).
+ *
+ * @deprecated use ATTR_FAAS_CRON
  */
 export const SEMATTRS_FAAS_CRON = TMP_FAAS_CRON;
 
 /**
  * A boolean that is true if the serverless function is executed for the first time (aka cold-start).
+ *
+ * @deprecated use ATTR_FAAS_COLDSTART
  */
 export const SEMATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
 
@@ -377,6 +445,8 @@ export const SEMATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
  * The name of the invoked function.
  *
  * Note: SHOULD be equal to the `faas.name` resource attribute of the invoked function.
+ *
+ * @deprecated use ATTR_FAAS_INVOKED_NAME
  */
 export const SEMATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
 
@@ -384,6 +454,8 @@ export const SEMATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
  * The cloud provider of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ *
+ * @deprecated use ATTR_FAAS_INVOKED_PROVIDER
  */
 export const SEMATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
 
@@ -391,127 +463,177 @@ export const SEMATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
  * The cloud region of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.region` resource attribute of the invoked function.
+ *
+ * @deprecated use ATTR_FAAS_INVOKED_REGION
  */
 export const SEMATTRS_FAAS_INVOKED_REGION = TMP_FAAS_INVOKED_REGION;
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated use ATTR_NET_TRANSPORT
  */
 export const SEMATTRS_NET_TRANSPORT = TMP_NET_TRANSPORT;
 
 /**
  * Remote address of the peer (dotted decimal for IPv4 or [RFC5952](https://tools.ietf.org/html/rfc5952) for IPv6).
+ *
+ * @deprecated use ATTR_NET_PEER_IP
  */
 export const SEMATTRS_NET_PEER_IP = TMP_NET_PEER_IP;
 
 /**
  * Remote port number.
+ *
+ * @deprecated use ATTR_NET_PEER_PORT
  */
 export const SEMATTRS_NET_PEER_PORT = TMP_NET_PEER_PORT;
 
 /**
  * Remote hostname or similar, see note below.
+ *
+ * @deprecated use ATTR_NET_PEER_NAME
  */
 export const SEMATTRS_NET_PEER_NAME = TMP_NET_PEER_NAME;
 
 /**
  * Like `net.peer.ip` but for the host IP. Useful in case of a multi-IP host.
+ *
+ * @deprecated use ATTR_NET_HOST_IP
  */
 export const SEMATTRS_NET_HOST_IP = TMP_NET_HOST_IP;
 
 /**
  * Like `net.peer.port` but for the host port.
+ *
+ * @deprecated use ATTR_NET_HOST_PORT
  */
 export const SEMATTRS_NET_HOST_PORT = TMP_NET_HOST_PORT;
 
 /**
  * Local hostname or similar, see note below.
+ *
+ * @deprecated use ATTR_NET_HOST_NAME
  */
 export const SEMATTRS_NET_HOST_NAME = TMP_NET_HOST_NAME;
 
 /**
  * The internet connection type currently being used by the host.
+ *
+ * @deprecated use ATTR_NET_HOST_CONNECTION_TYPE
  */
 export const SEMATTRS_NET_HOST_CONNECTION_TYPE = TMP_NET_HOST_CONNECTION_TYPE;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated use ATTR_NET_HOST_CONNECTION_SUBTYPE
  */
 export const SEMATTRS_NET_HOST_CONNECTION_SUBTYPE =
   TMP_NET_HOST_CONNECTION_SUBTYPE;
 
 /**
  * The name of the mobile carrier.
+ *
+ * @deprecated use ATTR_NET_HOST_CARRIER_NAME
  */
 export const SEMATTRS_NET_HOST_CARRIER_NAME = TMP_NET_HOST_CARRIER_NAME;
 
 /**
  * The mobile carrier country code.
+ *
+ * @deprecated use ATTR_NET_HOST_CARRIER_MCC
  */
 export const SEMATTRS_NET_HOST_CARRIER_MCC = TMP_NET_HOST_CARRIER_MCC;
 
 /**
  * The mobile carrier network code.
+ *
+ * @deprecated use ATTR_NET_HOST_CARRIER_MNC
  */
 export const SEMATTRS_NET_HOST_CARRIER_MNC = TMP_NET_HOST_CARRIER_MNC;
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
+ *
+ * @deprecated use ATTR_NET_HOST_CARRIER_ICC
  */
 export const SEMATTRS_NET_HOST_CARRIER_ICC = TMP_NET_HOST_CARRIER_ICC;
 
 /**
  * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
+ *
+ * @deprecated use ATTR_PEER_SERVICE
  */
 export const SEMATTRS_PEER_SERVICE = TMP_PEER_SERVICE;
 
 /**
  * Username or client_id extracted from the access token or [Authorization](https://tools.ietf.org/html/rfc7235#section-4.2) header in the inbound request from outside the system.
+ *
+ * @deprecated use ATTR_ENDUSER_ID
  */
 export const SEMATTRS_ENDUSER_ID = TMP_ENDUSER_ID;
 
 /**
  * Actual/assumed role the client is making the request under extracted from token or application security context.
+ *
+ * @deprecated use ATTR_ENDUSER_ROLE
  */
 export const SEMATTRS_ENDUSER_ROLE = TMP_ENDUSER_ROLE;
 
 /**
  * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
+ *
+ * @deprecated use ATTR_ENDUSER_SCOPE
  */
 export const SEMATTRS_ENDUSER_SCOPE = TMP_ENDUSER_SCOPE;
 
 /**
  * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
+ *
+ * @deprecated use ATTR_THREAD_ID
  */
 export const SEMATTRS_THREAD_ID = TMP_THREAD_ID;
 
 /**
  * Current thread name.
+ *
+ * @deprecated use ATTR_THREAD_NAME
  */
 export const SEMATTRS_THREAD_NAME = TMP_THREAD_NAME;
 
 /**
  * The method or function name, or equivalent (usually rightmost part of the code unit&#39;s name).
+ *
+ * @deprecated use ATTR_CODE_FUNCTION
  */
 export const SEMATTRS_CODE_FUNCTION = TMP_CODE_FUNCTION;
 
 /**
  * The &#34;namespace&#34; within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
+ *
+ * @deprecated use ATTR_CODE_NAMESPACE
  */
 export const SEMATTRS_CODE_NAMESPACE = TMP_CODE_NAMESPACE;
 
 /**
  * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
+ *
+ * @deprecated use ATTR_CODE_FILEPATH
  */
 export const SEMATTRS_CODE_FILEPATH = TMP_CODE_FILEPATH;
 
 /**
  * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
+ *
+ * @deprecated use ATTR_CODE_LINENO
  */
 export const SEMATTRS_CODE_LINENO = TMP_CODE_LINENO;
 
 /**
  * HTTP request method.
+ *
+ * @deprecated use ATTR_HTTP_METHOD
  */
 export const SEMATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
 
@@ -519,11 +641,15 @@ export const SEMATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
  * Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`. Usually the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
  *
  * Note: `http.url` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case the attribute&#39;s value should be `https://www.example.com/`.
+ *
+ * @deprecated use ATTR_HTTP_URL
  */
 export const SEMATTRS_HTTP_URL = TMP_HTTP_URL;
 
 /**
  * The full request target as passed in a HTTP request line or equivalent.
+ *
+ * @deprecated use ATTR_HTTP_TARGET
  */
 export const SEMATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
 
@@ -531,16 +657,22 @@ export const SEMATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
  * The value of the [HTTP host header](https://tools.ietf.org/html/rfc7230#section-5.4). An empty Host header should also be reported, see note.
  *
  * Note: When the header is present but empty the attribute SHOULD be set to the empty string. Note that this is a valid situation that is expected in certain cases, according the aforementioned [section of RFC 7230](https://tools.ietf.org/html/rfc7230#section-5.4). When the header is not set the attribute MUST NOT be set.
+ *
+ * @deprecated use ATTR_HTTP_HOST
  */
 export const SEMATTRS_HTTP_HOST = TMP_HTTP_HOST;
 
 /**
  * The URI scheme identifying the used protocol.
+ *
+ * @deprecated use ATTR_HTTP_SCHEME
  */
 export const SEMATTRS_HTTP_SCHEME = TMP_HTTP_SCHEME;
 
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
+ *
+ * @deprecated use ATTR_HTTP_STATUS_CODE
  */
 export const SEMATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
 
@@ -548,34 +680,46 @@ export const SEMATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
  * Kind of HTTP protocol used.
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
+ *
+ * @deprecated use ATTR_HTTP_FLAVOR
  */
 export const SEMATTRS_HTTP_FLAVOR = TMP_HTTP_FLAVOR;
 
 /**
  * Value of the [HTTP User-Agent](https://tools.ietf.org/html/rfc7231#section-5.5.3) header sent by the client.
+ *
+ * @deprecated use ATTR_HTTP_USER_AGENT
  */
 export const SEMATTRS_HTTP_USER_AGENT = TMP_HTTP_USER_AGENT;
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
+ *
+ * @deprecated use ATTR_HTTP_REQUEST_CONTENT_LENGTH
  */
 export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH =
   TMP_HTTP_REQUEST_CONTENT_LENGTH;
 
 /**
  * The size of the uncompressed request payload body after transport decoding. Not set if transport encoding not used.
+ *
+ * @deprecated use ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
  */
 export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED =
   TMP_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED;
 
 /**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
+ *
+ * @deprecated use ATTR_HTTP_RESPONSE_CONTENT_LENGTH
  */
 export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH =
   TMP_HTTP_RESPONSE_CONTENT_LENGTH;
 
 /**
  * The size of the uncompressed response payload body after transport decoding. Not set if transport encoding not used.
+ *
+ * @deprecated use ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
  */
 export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
   TMP_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED;
@@ -584,11 +728,15 @@ export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
  * The primary server name of the matched virtual host. This should be obtained via configuration. If no such configuration can be obtained, this attribute MUST NOT be set ( `net.host.name` should be used instead).
  *
  * Note: `http.url` is usually not readily available on the server side but would have to be assembled in a cumbersome and sometimes lossy process from other information (see e.g. open-telemetry/opentelemetry-python/pull/148). It is thus preferred to supply the raw data that is available.
+ *
+ * @deprecated use ATTR_HTTP_SERVER_NAME
  */
 export const SEMATTRS_HTTP_SERVER_NAME = TMP_HTTP_SERVER_NAME;
 
 /**
  * The matched route (path template).
+ *
+ * @deprecated use ATTR_HTTP_ROUTE
  */
 export const SEMATTRS_HTTP_ROUTE = TMP_HTTP_ROUTE;
 
@@ -606,204 +754,278 @@ comes from a proxy, reverse proxy, or the actual client. Setting
 `http.client_ip` when it&#39;s the same as `net.peer.ip` means that
 one is at least somewhat confident that the address is not that of
 the closest proxy.
+*
+* @deprecated use ATTR_HTTP_CLIENT_IP
 */
 export const SEMATTRS_HTTP_CLIENT_IP = TMP_HTTP_CLIENT_IP;
 
 /**
  * The keys in the `RequestItems` object field.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_TABLE_NAMES
  */
 export const SEMATTRS_AWS_DYNAMODB_TABLE_NAMES = TMP_AWS_DYNAMODB_TABLE_NAMES;
 
 /**
  * The JSON-serialized value of each item in the `ConsumedCapacity` response field.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_CONSUMED_CAPACITY
  */
 export const SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY =
   TMP_AWS_DYNAMODB_CONSUMED_CAPACITY;
 
 /**
  * The JSON-serialized value of the `ItemCollectionMetrics` response field.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_ITEM_COLLECTION_METRICS
  */
 export const SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
   TMP_AWS_DYNAMODB_ITEM_COLLECTION_METRICS;
 
 /**
  * The value of the `ProvisionedThroughput.ReadCapacityUnits` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY
  */
 export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
   TMP_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY;
 
 /**
  * The value of the `ProvisionedThroughput.WriteCapacityUnits` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY
  */
 export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
   TMP_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY;
 
 /**
  * The value of the `ConsistentRead` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_CONSISTENT_READ
  */
 export const SEMATTRS_AWS_DYNAMODB_CONSISTENT_READ =
   TMP_AWS_DYNAMODB_CONSISTENT_READ;
 
 /**
  * The value of the `ProjectionExpression` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_PROJECTION
  */
 export const SEMATTRS_AWS_DYNAMODB_PROJECTION = TMP_AWS_DYNAMODB_PROJECTION;
 
 /**
  * The value of the `Limit` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_LIMIT
  */
 export const SEMATTRS_AWS_DYNAMODB_LIMIT = TMP_AWS_DYNAMODB_LIMIT;
 
 /**
  * The value of the `AttributesToGet` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_ATTRIBUTES_TO_GET
  */
 export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET =
   TMP_AWS_DYNAMODB_ATTRIBUTES_TO_GET;
 
 /**
  * The value of the `IndexName` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_INDEX_NAME
  */
 export const SEMATTRS_AWS_DYNAMODB_INDEX_NAME = TMP_AWS_DYNAMODB_INDEX_NAME;
 
 /**
  * The value of the `Select` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_SELECT
  */
 export const SEMATTRS_AWS_DYNAMODB_SELECT = TMP_AWS_DYNAMODB_SELECT;
 
 /**
  * The JSON-serialized value of each item of the `GlobalSecondaryIndexes` request field.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES
  */
 export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
   TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES;
 
 /**
  * The JSON-serialized value of each item of the `LocalSecondaryIndexes` request field.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES
  */
 export const SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
   TMP_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES;
 
 /**
  * The value of the `ExclusiveStartTableName` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_EXCLUSIVE_START_TABLE
  */
 export const SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
   TMP_AWS_DYNAMODB_EXCLUSIVE_START_TABLE;
 
 /**
  * The the number of items in the `TableNames` response parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_TABLE_COUNT
  */
 export const SEMATTRS_AWS_DYNAMODB_TABLE_COUNT = TMP_AWS_DYNAMODB_TABLE_COUNT;
 
 /**
  * The value of the `ScanIndexForward` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_SCAN_FORWARD
  */
 export const SEMATTRS_AWS_DYNAMODB_SCAN_FORWARD = TMP_AWS_DYNAMODB_SCAN_FORWARD;
 
 /**
  * The value of the `Segment` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_SEGMENT
  */
 export const SEMATTRS_AWS_DYNAMODB_SEGMENT = TMP_AWS_DYNAMODB_SEGMENT;
 
 /**
  * The value of the `TotalSegments` request parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_TOTAL_SEGMENTS
  */
 export const SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS =
   TMP_AWS_DYNAMODB_TOTAL_SEGMENTS;
 
 /**
  * The value of the `Count` response parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_COUNT
  */
 export const SEMATTRS_AWS_DYNAMODB_COUNT = TMP_AWS_DYNAMODB_COUNT;
 
 /**
  * The value of the `ScannedCount` response parameter.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_SCANNED_COUNT
  */
 export const SEMATTRS_AWS_DYNAMODB_SCANNED_COUNT =
   TMP_AWS_DYNAMODB_SCANNED_COUNT;
 
 /**
  * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS
  */
 export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
   TMP_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS;
 
 /**
  * The JSON-serialized value of each item in the the `GlobalSecondaryIndexUpdates` request field.
+ *
+ * @deprecated use ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES
  */
 export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
   TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES;
 
 /**
  * A string identifying the messaging system.
+ *
+ * @deprecated use ATTR_MESSAGING_SYSTEM
  */
 export const SEMATTRS_MESSAGING_SYSTEM = TMP_MESSAGING_SYSTEM;
 
 /**
  * The message destination name. This might be equal to the span name but is required nevertheless.
+ *
+ * @deprecated use ATTR_MESSAGING_DESTINATION
  */
 export const SEMATTRS_MESSAGING_DESTINATION = TMP_MESSAGING_DESTINATION;
 
 /**
  * The kind of message destination.
+ *
+ * @deprecated use ATTR_MESSAGING_DESTINATION_KIND
  */
 export const SEMATTRS_MESSAGING_DESTINATION_KIND =
   TMP_MESSAGING_DESTINATION_KIND;
 
 /**
  * A boolean that is true if the message destination is temporary.
+ *
+ * @deprecated use ATTR_MESSAGING_TEMP_DESTINATION
  */
 export const SEMATTRS_MESSAGING_TEMP_DESTINATION =
   TMP_MESSAGING_TEMP_DESTINATION;
 
 /**
  * The name of the transport protocol.
+ *
+ * @deprecated use ATTR_MESSAGING_PROTOCOL
  */
 export const SEMATTRS_MESSAGING_PROTOCOL = TMP_MESSAGING_PROTOCOL;
 
 /**
  * The version of the transport protocol.
+ *
+ * @deprecated use ATTR_MESSAGING_PROTOCOL_VERSION
  */
 export const SEMATTRS_MESSAGING_PROTOCOL_VERSION =
   TMP_MESSAGING_PROTOCOL_VERSION;
 
 /**
  * Connection string.
+ *
+ * @deprecated use ATTR_MESSAGING_URL
  */
 export const SEMATTRS_MESSAGING_URL = TMP_MESSAGING_URL;
 
 /**
  * A value used by the messaging system as an identifier for the message, represented as a string.
+ *
+ * @deprecated use ATTR_MESSAGING_MESSAGE_ID
  */
 export const SEMATTRS_MESSAGING_MESSAGE_ID = TMP_MESSAGING_MESSAGE_ID;
 
 /**
  * The [conversation ID](#conversations) identifying the conversation to which the message belongs, represented as a string. Sometimes called &#34;Correlation ID&#34;.
+ *
+ * @deprecated use ATTR_MESSAGING_CONVERSATION_ID
  */
 export const SEMATTRS_MESSAGING_CONVERSATION_ID = TMP_MESSAGING_CONVERSATION_ID;
 
 /**
  * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
+ *
+ * @deprecated use ATTR_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES
  */
 export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES =
   TMP_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES;
 
 /**
  * The compressed size of the message payload in bytes.
+ *
+ * @deprecated use ATTR_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES
  */
 export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES =
   TMP_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES;
 
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
+ *
+ * @deprecated use ATTR_MESSAGING_OPERATION
  */
 export const SEMATTRS_MESSAGING_OPERATION = TMP_MESSAGING_OPERATION;
 
 /**
  * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer_group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer_group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
+ *
+ * @deprecated use ATTR_MESSAGING_CONSUMER_ID
  */
 export const SEMATTRS_MESSAGING_CONSUMER_ID = TMP_MESSAGING_CONSUMER_ID;
 
 /**
  * RabbitMQ message routing key.
+ *
+ * @deprecated use ATTR_MESSAGING_RABBITMQ_ROUTING_KEY
  */
 export const SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY =
   TMP_MESSAGING_RABBITMQ_ROUTING_KEY;
@@ -812,33 +1034,45 @@ export const SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY =
  * Message keys in Kafka are used for grouping alike messages to ensure they&#39;re processed on the same partition. They differ from `messaging.message_id` in that they&#39;re not unique. If the key is `null`, the attribute MUST NOT be set.
  *
  * Note: If the key type is not string, it&#39;s string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don&#39;t include its value.
+ *
+ * @deprecated use ATTR_MESSAGING_KAFKA_MESSAGE_KEY
  */
 export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_KEY =
   TMP_MESSAGING_KAFKA_MESSAGE_KEY;
 
 /**
  * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
+ *
+ * @deprecated use ATTR_MESSAGING_KAFKA_CONSUMER_GROUP
  */
 export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP =
   TMP_MESSAGING_KAFKA_CONSUMER_GROUP;
 
 /**
  * Client Id for the Consumer or Producer that is handling the message.
+ *
+ * @deprecated use ATTR_MESSAGING_KAFKA_CLIENT_ID
  */
 export const SEMATTRS_MESSAGING_KAFKA_CLIENT_ID = TMP_MESSAGING_KAFKA_CLIENT_ID;
 
 /**
  * Partition the message is sent to.
+ *
+ * @deprecated use ATTR_MESSAGING_KAFKA_PARTITION
  */
 export const SEMATTRS_MESSAGING_KAFKA_PARTITION = TMP_MESSAGING_KAFKA_PARTITION;
 
 /**
  * A boolean that is true if the message is a tombstone.
+ *
+ * @deprecated use ATTR_MESSAGING_KAFKA_TOMBSTONE
  */
 export const SEMATTRS_MESSAGING_KAFKA_TOMBSTONE = TMP_MESSAGING_KAFKA_TOMBSTONE;
 
 /**
  * A string identifying the remoting system.
+ *
+ * @deprecated use ATTR_RPC_SYSTEM
  */
 export const SEMATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
 
@@ -846,6 +1080,8 @@ export const SEMATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
  * The full (logical) name of the service being called, including its package name, if applicable.
  *
  * Note: This is the logical name of the service from the RPC interface perspective, which can be different from the name of any implementing class. The `code.namespace` attribute may be used to store the latter (despite the attribute name, it may include a class name; e.g., class with method actually executing the call on the server side, RPC client stub class on the client side).
+ *
+ * @deprecated use ATTR_RPC_SERVICE
  */
 export const SEMATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
 
@@ -853,36 +1089,50 @@ export const SEMATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
  * The name of the (logical) method being called, must be equal to the $method part in the span name.
  *
  * Note: This is the logical name of the method from the RPC interface perspective, which can be different from the name of any implementing method/function. The `code.function` attribute may be used to store the latter (e.g., method actually executing the call on the server side, RPC client stub method on the client side).
+ *
+ * @deprecated use ATTR_RPC_METHOD
  */
 export const SEMATTRS_RPC_METHOD = TMP_RPC_METHOD;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated use ATTR_RPC_GRPC_STATUS_CODE
  */
 export const SEMATTRS_RPC_GRPC_STATUS_CODE = TMP_RPC_GRPC_STATUS_CODE;
 
 /**
  * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 does not specify this, the value can be omitted.
+ *
+ * @deprecated use ATTR_RPC_JSONRPC_VERSION
  */
 export const SEMATTRS_RPC_JSONRPC_VERSION = TMP_RPC_JSONRPC_VERSION;
 
 /**
  * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
+ *
+ * @deprecated use ATTR_RPC_JSONRPC_REQUEST_ID
  */
 export const SEMATTRS_RPC_JSONRPC_REQUEST_ID = TMP_RPC_JSONRPC_REQUEST_ID;
 
 /**
  * `error.code` property of response if it is an error response.
+ *
+ * @deprecated use ATTR_RPC_JSONRPC_ERROR_CODE
  */
 export const SEMATTRS_RPC_JSONRPC_ERROR_CODE = TMP_RPC_JSONRPC_ERROR_CODE;
 
 /**
  * `error.message` property of response if it is an error response.
+ *
+ * @deprecated use ATTR_RPC_JSONRPC_ERROR_MESSAGE
  */
 export const SEMATTRS_RPC_JSONRPC_ERROR_MESSAGE = TMP_RPC_JSONRPC_ERROR_MESSAGE;
 
 /**
  * Whether this is a received or sent message.
+ *
+ * @deprecated use ATTR_MESSAGE_TYPE
  */
 export const SEMATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
 
@@ -890,16 +1140,22 @@ export const SEMATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
  * MUST be calculated as two different counters starting from `1` one for sent messages and one for received message.
  *
  * Note: This way we guarantee that the values will be consistent between different implementations.
+ *
+ * @deprecated use ATTR_MESSAGE_ID
  */
 export const SEMATTRS_MESSAGE_ID = TMP_MESSAGE_ID;
 
 /**
  * Compressed size of the message in bytes.
+ *
+ * @deprecated use ATTR_MESSAGE_COMPRESSED_SIZE
  */
 export const SEMATTRS_MESSAGE_COMPRESSED_SIZE = TMP_MESSAGE_COMPRESSED_SIZE;
 
 /**
  * Uncompressed size of the message in bytes.
+ *
+ * @deprecated use ATTR_MESSAGE_UNCOMPRESSED_SIZE
  */
 export const SEMATTRS_MESSAGE_UNCOMPRESSED_SIZE = TMP_MESSAGE_UNCOMPRESSED_SIZE;
 

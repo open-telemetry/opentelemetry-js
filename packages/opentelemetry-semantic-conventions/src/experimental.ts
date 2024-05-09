@@ -676,7 +676,7 @@ export const METRIC_SYSTEM_PROCESS_CREATED = 'system.process.created';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_EVENT_NAME = 'event.name';
+export const ATTR_EVENT_NAME = 'event.name';
 
 /**
 * A unique identifier for the Log Record.
@@ -686,42 +686,42 @@ The id MAY be an [Universally Unique Lexicographically Sortable Identifier (ULID
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_LOG_RECORD_UID = 'log.record.uid';
+export const ATTR_LOG_RECORD_UID = 'log.record.uid';
 
 /**
  * The stream associated with the log. See below for a list of well-known values.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_LOG_IOSTREAM = 'log.iostream';
+export const ATTR_LOG_IOSTREAM = 'log.iostream';
 
 /**
  * The basename of the file.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_LOG_FILE_NAME = 'log.file.name';
+export const ATTR_LOG_FILE_NAME = 'log.file.name';
 
 /**
  * The basename of the file, with symlinks resolved.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_LOG_FILE_NAME_RESOLVED = 'log.file.name_resolved';
+export const ATTR_LOG_FILE_NAME_RESOLVED = 'log.file.name_resolved';
 
 /**
  * The full path to the file.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_LOG_FILE_PATH = 'log.file.path';
+export const ATTR_LOG_FILE_PATH = 'log.file.path';
 
 /**
  * The full path to the file, with symlinks resolved.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_LOG_FILE_PATH_RESOLVED = 'log.file.path_resolved';
+export const ATTR_LOG_FILE_PATH_RESOLVED = 'log.file.path_resolved';
 
 /**
  * This attribute represents the state the application has transitioned into at the occurrence of the event.
@@ -730,7 +730,7 @@ export const SEMATTRS_LOG_FILE_PATH_RESOLVED = 'log.file.path_resolved';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_IOS_STATE = 'ios.state';
+export const ATTR_IOS_STATE = 'ios.state';
 
 /**
  * This attribute represents the state the application has transitioned into at the occurrence of the event.
@@ -739,21 +739,21 @@ export const SEMATTRS_IOS_STATE = 'ios.state';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_ANDROID_STATE = 'android.state';
+export const ATTR_ANDROID_STATE = 'android.state';
 
 /**
  * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation doesn&#39;t provide a name, instrumentation should use a combination of `server.address` and `server.port` attributes formatted as `server.address:server.port`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_POOL_NAME = 'pool.name';
+export const ATTR_POOL_NAME = 'pool.name';
 
 /**
  * The state of a connection in the pool.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_STATE = 'state';
+export const ATTR_STATE = 'state';
 
 /**
  * Name of the buffer pool.
@@ -762,135 +762,133 @@ export const SEMATTRS_STATE = 'state';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_JVM_BUFFER_POOL_NAME = 'jvm.buffer.pool.name';
+export const ATTR_JVM_BUFFER_POOL_NAME = 'jvm.buffer.pool.name';
 
 /**
  * The CPU state for this data point. A process SHOULD be characterized _either_ by data points with no `state` labels, _or only_ data points with `state` labels.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_CPU_STATE = 'process.cpu.state';
+export const ATTR_PROCESS_CPU_STATE = 'process.cpu.state';
 
 /**
  * Specifies whether the context switches for this data point were voluntary or involuntary.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_CONTEXT_SWITCH_TYPE =
-  'process.context_switch_type';
+export const ATTR_PROCESS_CONTEXT_SWITCH_TYPE = 'process.context_switch_type';
 
 /**
  * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
+export const ATTR_PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
 
 /**
  * The device identifier.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_DEVICE = 'system.device';
+export const ATTR_SYSTEM_DEVICE = 'system.device';
 
 /**
  * The logical CPU number [0..n-1].
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_CPU_LOGICAL_NUMBER = 'system.cpu.logical_number';
+export const ATTR_SYSTEM_CPU_LOGICAL_NUMBER = 'system.cpu.logical_number';
 
 /**
  * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_CPU_STATE = 'system.cpu.state';
+export const ATTR_SYSTEM_CPU_STATE = 'system.cpu.state';
 
 /**
  * The memory state.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_MEMORY_STATE = 'system.memory.state';
+export const ATTR_SYSTEM_MEMORY_STATE = 'system.memory.state';
 
 /**
  * The paging access direction.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_PAGING_DIRECTION = 'system.paging.direction';
+export const ATTR_SYSTEM_PAGING_DIRECTION = 'system.paging.direction';
 
 /**
  * The memory paging state.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_PAGING_STATE = 'system.paging.state';
+export const ATTR_SYSTEM_PAGING_STATE = 'system.paging.state';
 
 /**
  * The memory paging type.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_PAGING_TYPE = 'system.paging.type';
+export const ATTR_SYSTEM_PAGING_TYPE = 'system.paging.type';
 
 /**
  * The filesystem mode.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_FILESYSTEM_MODE = 'system.filesystem.mode';
+export const ATTR_SYSTEM_FILESYSTEM_MODE = 'system.filesystem.mode';
 
 /**
  * The filesystem mount path.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_FILESYSTEM_MOUNTPOINT =
-  'system.filesystem.mountpoint';
+export const ATTR_SYSTEM_FILESYSTEM_MOUNTPOINT = 'system.filesystem.mountpoint';
 
 /**
  * The filesystem state.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_FILESYSTEM_STATE = 'system.filesystem.state';
+export const ATTR_SYSTEM_FILESYSTEM_STATE = 'system.filesystem.state';
 
 /**
  * The filesystem type.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_FILESYSTEM_TYPE = 'system.filesystem.type';
+export const ATTR_SYSTEM_FILESYSTEM_TYPE = 'system.filesystem.type';
 
 /**
  * A stateless protocol MUST NOT set this attribute.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_NETWORK_STATE = 'system.network.state';
+export const ATTR_SYSTEM_NETWORK_STATE = 'system.network.state';
 
 /**
  * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SYSTEM_PROCESS_STATUS = 'system.process.status';
+export const ATTR_SYSTEM_PROCESS_STATUS = 'system.process.status';
 
 /**
  * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_ANDROID_OS_API_LEVEL = 'android.os.api_level';
+export const ATTR_ANDROID_OS_API_LEVEL = 'android.os.api_level';
 
 /**
  * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
+export const ATTR_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
   'aws.dynamodb.attribute_definitions';
 
 /**
@@ -898,7 +896,7 @@ export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET =
+export const ATTR_AWS_DYNAMODB_ATTRIBUTES_TO_GET =
   'aws.dynamodb.attributes_to_get';
 
 /**
@@ -906,15 +904,14 @@ export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_CONSISTENT_READ =
-  'aws.dynamodb.consistent_read';
+export const ATTR_AWS_DYNAMODB_CONSISTENT_READ = 'aws.dynamodb.consistent_read';
 
 /**
  * The JSON-serialized value of each item in the `ConsumedCapacity` response field.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY =
+export const ATTR_AWS_DYNAMODB_CONSUMED_CAPACITY =
   'aws.dynamodb.consumed_capacity';
 
 /**
@@ -922,14 +919,14 @@ export const SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_COUNT = 'aws.dynamodb.count';
+export const ATTR_AWS_DYNAMODB_COUNT = 'aws.dynamodb.count';
 
 /**
  * The value of the `ExclusiveStartTableName` request parameter.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
+export const ATTR_AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
   'aws.dynamodb.exclusive_start_table';
 
 /**
@@ -937,7 +934,7 @@ export const SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
+export const ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
   'aws.dynamodb.global_secondary_index_updates';
 
 /**
@@ -945,7 +942,7 @@ export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
+export const ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
   'aws.dynamodb.global_secondary_indexes';
 
 /**
@@ -953,14 +950,14 @@ export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_INDEX_NAME = 'aws.dynamodb.index_name';
+export const ATTR_AWS_DYNAMODB_INDEX_NAME = 'aws.dynamodb.index_name';
 
 /**
  * The JSON-serialized value of the `ItemCollectionMetrics` response field.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
+export const ATTR_AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
   'aws.dynamodb.item_collection_metrics';
 
 /**
@@ -968,14 +965,14 @@ export const SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_LIMIT = 'aws.dynamodb.limit';
+export const ATTR_AWS_DYNAMODB_LIMIT = 'aws.dynamodb.limit';
 
 /**
  * The JSON-serialized value of each item of the `LocalSecondaryIndexes` request field.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
+export const ATTR_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
   'aws.dynamodb.local_secondary_indexes';
 
 /**
@@ -983,14 +980,14 @@ export const SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_PROJECTION = 'aws.dynamodb.projection';
+export const ATTR_AWS_DYNAMODB_PROJECTION = 'aws.dynamodb.projection';
 
 /**
  * The value of the `ProvisionedThroughput.ReadCapacityUnits` request parameter.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
+export const ATTR_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
   'aws.dynamodb.provisioned_read_capacity';
 
 /**
@@ -998,7 +995,7 @@ export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
+export const ATTR_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
   'aws.dynamodb.provisioned_write_capacity';
 
 /**
@@ -1006,50 +1003,49 @@ export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_SCAN_FORWARD = 'aws.dynamodb.scan_forward';
+export const ATTR_AWS_DYNAMODB_SCAN_FORWARD = 'aws.dynamodb.scan_forward';
 
 /**
  * The value of the `ScannedCount` response parameter.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_SCANNED_COUNT = 'aws.dynamodb.scanned_count';
+export const ATTR_AWS_DYNAMODB_SCANNED_COUNT = 'aws.dynamodb.scanned_count';
 
 /**
  * The value of the `Segment` request parameter.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_SEGMENT = 'aws.dynamodb.segment';
+export const ATTR_AWS_DYNAMODB_SEGMENT = 'aws.dynamodb.segment';
 
 /**
  * The value of the `Select` request parameter.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_SELECT = 'aws.dynamodb.select';
+export const ATTR_AWS_DYNAMODB_SELECT = 'aws.dynamodb.select';
 
 /**
  * The number of items in the `TableNames` response parameter.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_TABLE_COUNT = 'aws.dynamodb.table_count';
+export const ATTR_AWS_DYNAMODB_TABLE_COUNT = 'aws.dynamodb.table_count';
 
 /**
  * The keys in the `RequestItems` object field.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_TABLE_NAMES = 'aws.dynamodb.table_names';
+export const ATTR_AWS_DYNAMODB_TABLE_NAMES = 'aws.dynamodb.table_names';
 
 /**
  * The value of the `TotalSegments` request parameter.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS =
-  'aws.dynamodb.total_segments';
+export const ATTR_AWS_DYNAMODB_TOTAL_SEGMENTS = 'aws.dynamodb.total_segments';
 
 /**
  * Array of brand name and version separated by a space.
@@ -1058,7 +1054,7 @@ export const SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_BROWSER_BRANDS = 'browser.brands';
+export const ATTR_BROWSER_BRANDS = 'browser.brands';
 
 /**
  * Preferred language of the user using the browser.
@@ -1067,7 +1063,7 @@ export const SEMATTRS_BROWSER_BRANDS = 'browser.brands';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_BROWSER_LANGUAGE = 'browser.language';
+export const ATTR_BROWSER_LANGUAGE = 'browser.language';
 
 /**
  * A boolean that is true if the browser is running on a mobile device.
@@ -1076,7 +1072,7 @@ export const SEMATTRS_BROWSER_LANGUAGE = 'browser.language';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_BROWSER_MOBILE = 'browser.mobile';
+export const ATTR_BROWSER_MOBILE = 'browser.mobile';
 
 /**
 * The platform on which the browser is running.
@@ -1086,14 +1082,14 @@ The list of possible values is defined in the [W3C User-Agent Client Hints speci
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_BROWSER_PLATFORM = 'browser.platform';
+export const ATTR_BROWSER_PLATFORM = 'browser.platform';
 
 /**
  * The cloud account ID the resource is assigned to.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUD_ACCOUNT_ID = 'cloud.account.id';
+export const ATTR_CLOUD_ACCOUNT_ID = 'cloud.account.id';
 
 /**
  * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
@@ -1102,7 +1098,7 @@ export const SEMATTRS_CLOUD_ACCOUNT_ID = 'cloud.account.id';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
+export const ATTR_CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
 
 /**
  * The cloud platform in use.
@@ -1111,14 +1107,14 @@ export const SEMATTRS_CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUD_PLATFORM = 'cloud.platform';
+export const ATTR_CLOUD_PLATFORM = 'cloud.platform';
 
 /**
  * Name of the cloud provider.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUD_PROVIDER = 'cloud.provider';
+export const ATTR_CLOUD_PROVIDER = 'cloud.provider';
 
 /**
  * The geographical region the resource is running.
@@ -1127,7 +1123,7 @@ export const SEMATTRS_CLOUD_PROVIDER = 'cloud.provider';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUD_REGION = 'cloud.region';
+export const ATTR_CLOUD_REGION = 'cloud.region';
 
 /**
 * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) on AWS, a [fully qualified resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) on Azure, a [full resource name](https://cloud.google.com/apis/design/resource_names#full_resource_name) on GCP).
@@ -1152,28 +1148,28 @@ The following well-known definitions MUST be used if you set this attribute and 
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_CLOUD_RESOURCE_ID = 'cloud.resource_id';
+export const ATTR_CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
 /**
  * The [event_id](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#id) uniquely identifies the event.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUDEVENTS_EVENT_ID = 'cloudevents.event_id';
+export const ATTR_CLOUDEVENTS_EVENT_ID = 'cloudevents.event_id';
 
 /**
  * The [source](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#source-1) identifies the context in which an event happened.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUDEVENTS_EVENT_SOURCE = 'cloudevents.event_source';
+export const ATTR_CLOUDEVENTS_EVENT_SOURCE = 'cloudevents.event_source';
 
 /**
  * The [version of the CloudEvents specification](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#specversion) which the event uses.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUDEVENTS_EVENT_SPEC_VERSION =
+export const ATTR_CLOUDEVENTS_EVENT_SPEC_VERSION =
   'cloudevents.event_spec_version';
 
 /**
@@ -1181,56 +1177,56 @@ export const SEMATTRS_CLOUDEVENTS_EVENT_SPEC_VERSION =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUDEVENTS_EVENT_SUBJECT = 'cloudevents.event_subject';
+export const ATTR_CLOUDEVENTS_EVENT_SUBJECT = 'cloudevents.event_subject';
 
 /**
  * The [event_type](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#type) contains a value describing the type of event related to the originating occurrence.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CLOUDEVENTS_EVENT_TYPE = 'cloudevents.event_type';
+export const ATTR_CLOUDEVENTS_EVENT_TYPE = 'cloudevents.event_type';
 
 /**
  * The column number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CODE_COLUMN = 'code.column';
+export const ATTR_CODE_COLUMN = 'code.column';
 
 /**
  * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CODE_FILEPATH = 'code.filepath';
+export const ATTR_CODE_FILEPATH = 'code.filepath';
 
 /**
  * The method or function name, or equivalent (usually rightmost part of the code unit&#39;s name).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CODE_FUNCTION = 'code.function';
+export const ATTR_CODE_FUNCTION = 'code.function';
 
 /**
  * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CODE_LINENO = 'code.lineno';
+export const ATTR_CODE_LINENO = 'code.lineno';
 
 /**
  * The &#34;namespace&#34; within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CODE_NAMESPACE = 'code.namespace';
+export const ATTR_CODE_NAMESPACE = 'code.namespace';
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CODE_STACKTRACE = 'code.stacktrace';
+export const ATTR_CODE_STACKTRACE = 'code.stacktrace';
 
 /**
  * The command used to run the container (i.e. the command name).
@@ -1239,35 +1235,35 @@ export const SEMATTRS_CODE_STACKTRACE = 'code.stacktrace';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_COMMAND = 'container.command';
+export const ATTR_CONTAINER_COMMAND = 'container.command';
 
 /**
  * All the command arguments (including the command/executable itself) run by the container. [2].
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_COMMAND_ARGS = 'container.command_args';
+export const ATTR_CONTAINER_COMMAND_ARGS = 'container.command_args';
 
 /**
  * The full command run by the container as a single string representing the full command. [2].
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_COMMAND_LINE = 'container.command_line';
+export const ATTR_CONTAINER_COMMAND_LINE = 'container.command_line';
 
 /**
  * The CPU state for this data point.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_CPU_STATE = 'container.cpu.state';
+export const ATTR_CONTAINER_CPU_STATE = 'container.cpu.state';
 
 /**
  * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/reference/run/#container-identification). The UUID might be abbreviated.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_ID = 'container.id';
+export const ATTR_CONTAINER_ID = 'container.id';
 
 /**
 * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
@@ -1278,14 +1274,14 @@ The ID is assinged by the container runtime and can vary in different environmen
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_CONTAINER_IMAGE_ID = 'container.image.id';
+export const ATTR_CONTAINER_IMAGE_ID = 'container.image.id';
 
 /**
  * Name of the image the container was built on.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_IMAGE_NAME = 'container.image.name';
+export const ATTR_CONTAINER_IMAGE_NAME = 'container.image.name';
 
 /**
  * Repo digests of the container image as provided by the container runtime.
@@ -1294,36 +1290,35 @@ export const SEMATTRS_CONTAINER_IMAGE_NAME = 'container.image.name';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_IMAGE_REPO_DIGESTS =
-  'container.image.repo_digests';
+export const ATTR_CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests';
 
 /**
  * Container image tags. An example can be found in [Docker Image Inspect](https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageInspect). Should be only the `&lt;tag&gt;` section of the full name for example from `registry.example.com/my-org/my-image:&lt;tag&gt;`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_IMAGE_TAGS = 'container.image.tags';
+export const ATTR_CONTAINER_IMAGE_TAGS = 'container.image.tags';
 
 /**
  * Container name used by container runtime.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_NAME = 'container.name';
+export const ATTR_CONTAINER_NAME = 'container.name';
 
 /**
  * The container runtime managing this container.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_CONTAINER_RUNTIME = 'container.runtime';
+export const ATTR_CONTAINER_RUNTIME = 'container.runtime';
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL =
   'db.cassandra.consistency_level';
 
 /**
@@ -1331,37 +1326,35 @@ export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_CASSANDRA_COORDINATOR_DC =
-  'db.cassandra.coordinator.dc';
+export const ATTR_DB_CASSANDRA_COORDINATOR_DC = 'db.cassandra.coordinator.dc';
 
 /**
  * The ID of the coordinating node for a query.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_CASSANDRA_COORDINATOR_ID =
-  'db.cassandra.coordinator.id';
+export const ATTR_DB_CASSANDRA_COORDINATOR_ID = 'db.cassandra.coordinator.id';
 
 /**
  * Whether or not the query is idempotent.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_CASSANDRA_IDEMPOTENCE = 'db.cassandra.idempotence';
+export const ATTR_DB_CASSANDRA_IDEMPOTENCE = 'db.cassandra.idempotence';
 
 /**
  * The fetch size used for paging, i.e. how many rows will be returned at once.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_CASSANDRA_PAGE_SIZE = 'db.cassandra.page_size';
+export const ATTR_DB_CASSANDRA_PAGE_SIZE = 'db.cassandra.page_size';
 
 /**
  * The number of times a query was speculatively executed. Not set or `0` if the query was not executed speculatively.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
+export const ATTR_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
   'db.cassandra.speculative_execution_count';
 
 /**
@@ -1371,50 +1364,49 @@ export const SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_CASSANDRA_TABLE = 'db.cassandra.table';
+export const ATTR_DB_CASSANDRA_TABLE = 'db.cassandra.table';
 
 /**
  * Unique Cosmos client instance id.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_CLIENT_ID = 'db.cosmosdb.client_id';
+export const ATTR_DB_COSMOSDB_CLIENT_ID = 'db.cosmosdb.client_id';
 
 /**
  * Cosmos client connection mode.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_CONNECTION_MODE =
-  'db.cosmosdb.connection_mode';
+export const ATTR_DB_COSMOSDB_CONNECTION_MODE = 'db.cosmosdb.connection_mode';
 
 /**
  * Cosmos DB container name.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container';
+export const ATTR_DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container';
 
 /**
  * CosmosDB Operation Type.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type';
 
 /**
  * RU consumed for that operation.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_REQUEST_CHARGE = 'db.cosmosdb.request_charge';
+export const ATTR_DB_COSMOSDB_REQUEST_CHARGE = 'db.cosmosdb.request_charge';
 
 /**
  * Request payload size in bytes.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_REQUEST_CONTENT_LENGTH =
+export const ATTR_DB_COSMOSDB_REQUEST_CONTENT_LENGTH =
   'db.cosmosdb.request_content_length';
 
 /**
@@ -1422,22 +1414,21 @@ export const SEMATTRS_DB_COSMOSDB_REQUEST_CONTENT_LENGTH =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_STATUS_CODE = 'db.cosmosdb.status_code';
+export const ATTR_DB_COSMOSDB_STATUS_CODE = 'db.cosmosdb.status_code';
 
 /**
  * Cosmos DB sub status code.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_COSMOSDB_SUB_STATUS_CODE =
-  'db.cosmosdb.sub_status_code';
+export const ATTR_DB_COSMOSDB_SUB_STATUS_CODE = 'db.cosmosdb.sub_status_code';
 
 /**
  * Represents the identifier of an Elasticsearch cluster.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_ELASTICSEARCH_CLUSTER_NAME =
+export const ATTR_DB_ELASTICSEARCH_CLUSTER_NAME =
   'db.elasticsearch.cluster.name';
 
 /**
@@ -1445,14 +1436,14 @@ export const SEMATTRS_DB_ELASTICSEARCH_CLUSTER_NAME =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_INSTANCE_ID = 'db.instance.id';
+export const ATTR_DB_INSTANCE_ID = 'db.instance.id';
 
 /**
  * The MongoDB collection being accessed within the database stated in `db.name`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_MONGODB_COLLECTION = 'db.mongodb.collection';
+export const ATTR_DB_MONGODB_COLLECTION = 'db.mongodb.collection';
 
 /**
  * The Microsoft SQL Server [instance name](https://docs.microsoft.com/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15) connecting to. This name is used to determine the port of a named instance.
@@ -1461,7 +1452,7 @@ export const SEMATTRS_DB_MONGODB_COLLECTION = 'db.mongodb.collection';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name';
+export const ATTR_DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name';
 
 /**
  * This attribute is used to report the name of the database being accessed. For commands that switch the database, this should be set to the target database (even if the command fails).
@@ -1470,7 +1461,7 @@ export const SEMATTRS_DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_NAME = 'db.name';
+export const ATTR_DB_NAME = 'db.name';
 
 /**
  * The name of the operation being executed, e.g. the [MongoDB command name](https://docs.mongodb.com/manual/reference/command/#database-operations) such as `findAndModify`, or the SQL keyword.
@@ -1479,14 +1470,14 @@ export const SEMATTRS_DB_NAME = 'db.name';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_OPERATION = 'db.operation';
+export const ATTR_DB_OPERATION = 'db.operation';
 
 /**
  * The index of the database being accessed as used in the [`SELECT` command](https://redis.io/commands/select), provided as an integer. To be used instead of the generic `db.name` attribute.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index';
+export const ATTR_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index';
 
 /**
  * The name of the primary table that the operation is acting upon, including the database name (if applicable).
@@ -1495,28 +1486,28 @@ export const SEMATTRS_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_SQL_TABLE = 'db.sql.table';
+export const ATTR_DB_SQL_TABLE = 'db.sql.table';
 
 /**
  * The database statement being executed.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_STATEMENT = 'db.statement';
+export const ATTR_DB_STATEMENT = 'db.statement';
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_SYSTEM = 'db.system';
+export const ATTR_DB_SYSTEM = 'db.system';
 
 /**
  * Username for accessing the database.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DB_USER = 'db.user';
+export const ATTR_DB_USER = 'db.user';
 
 /**
 * Name of the [deployment environment](https://wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
@@ -1531,7 +1522,7 @@ considered to be identifying the same service:
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
+export const ATTR_DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
 
 /**
  * Deprecated, use `server.address`, `server.port` attributes instead.
@@ -1540,7 +1531,7 @@ export const SEMATTRS_DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
  *
  * @deprecated "Replaced by `server.address` and `server.port`.".
  */
-export const SEMATTRS_DB_CONNECTION_STRING = 'db.connection_string';
+export const ATTR_DB_CONNECTION_STRING = 'db.connection_string';
 
 /**
  * Deprecated, use `db.instance.id` instead.
@@ -1549,7 +1540,7 @@ export const SEMATTRS_DB_CONNECTION_STRING = 'db.connection_string';
  *
  * @deprecated Replaced by `db.instance.id`.
  */
-export const SEMATTRS_DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
+export const ATTR_DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
 
 /**
  * Removed, no replacement at this time.
@@ -1558,7 +1549,7 @@ export const SEMATTRS_DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
  *
  * @deprecated Removed as not used.
  */
-export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname';
+export const ATTR_DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname';
 
 /**
  * Deprecated, use `network.protocol.name` instead.
@@ -1567,7 +1558,7 @@ export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname';
  *
  * @deprecated Replaced by `network.protocol.name`.
  */
-export const SEMATTRS_HTTP_FLAVOR = 'http.flavor';
+export const ATTR_HTTP_FLAVOR = 'http.flavor';
 
 /**
  * Deprecated, use `http.request.method` instead.
@@ -1576,7 +1567,7 @@ export const SEMATTRS_HTTP_FLAVOR = 'http.flavor';
  *
  * @deprecated Replaced by `http.request.method`.
  */
-export const SEMATTRS_HTTP_METHOD = 'http.method';
+export const ATTR_HTTP_METHOD = 'http.method';
 
 /**
  * Deprecated, use `http.request.header.content-length` instead.
@@ -1585,8 +1576,7 @@ export const SEMATTRS_HTTP_METHOD = 'http.method';
  *
  * @deprecated Replaced by `http.request.header.content-length`.
  */
-export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH =
-  'http.request_content_length';
+export const ATTR_HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
 
 /**
  * Deprecated, use `http.response.header.content-length` instead.
@@ -1595,8 +1585,7 @@ export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH =
  *
  * @deprecated Replaced by `http.response.header.content-length`.
  */
-export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH =
-  'http.response_content_length';
+export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
 
 /**
  * Deprecated, use `url.scheme` instead.
@@ -1605,7 +1594,7 @@ export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH =
  *
  * @deprecated Replaced by `url.scheme` instead.
  */
-export const SEMATTRS_HTTP_SCHEME = 'http.scheme';
+export const ATTR_HTTP_SCHEME = 'http.scheme';
 
 /**
  * Deprecated, use `http.response.status_code` instead.
@@ -1614,7 +1603,7 @@ export const SEMATTRS_HTTP_SCHEME = 'http.scheme';
  *
  * @deprecated Replaced by `http.response.status_code`.
  */
-export const SEMATTRS_HTTP_STATUS_CODE = 'http.status_code';
+export const ATTR_HTTP_STATUS_CODE = 'http.status_code';
 
 /**
  * Deprecated, use `url.path` and `url.query` instead.
@@ -1623,7 +1612,7 @@ export const SEMATTRS_HTTP_STATUS_CODE = 'http.status_code';
  *
  * @deprecated Split to `url.path` and `url.query.
  */
-export const SEMATTRS_HTTP_TARGET = 'http.target';
+export const ATTR_HTTP_TARGET = 'http.target';
 
 /**
  * Deprecated, use `url.full` instead.
@@ -1632,7 +1621,7 @@ export const SEMATTRS_HTTP_TARGET = 'http.target';
  *
  * @deprecated Replaced by `url.full`.
  */
-export const SEMATTRS_HTTP_URL = 'http.url';
+export const ATTR_HTTP_URL = 'http.url';
 
 /**
  * Deprecated, use `user_agent.original` instead.
@@ -1641,7 +1630,7 @@ export const SEMATTRS_HTTP_URL = 'http.url';
  *
  * @deprecated Replaced by `user_agent.original`.
  */
-export const SEMATTRS_HTTP_USER_AGENT = 'http.user_agent';
+export const ATTR_HTTP_USER_AGENT = 'http.user_agent';
 
 /**
  * &#34;Deprecated, use `messaging.destination.partition.id` instead.&#34;.
@@ -1650,7 +1639,7 @@ export const SEMATTRS_HTTP_USER_AGENT = 'http.user_agent';
  *
  * @deprecated Replaced by `messaging.destination.partition.id`.
  */
-export const SEMATTRS_MESSAGING_KAFKA_DESTINATION_PARTITION =
+export const ATTR_MESSAGING_KAFKA_DESTINATION_PARTITION =
   'messaging.kafka.destination.partition';
 
 /**
@@ -1660,7 +1649,7 @@ export const SEMATTRS_MESSAGING_KAFKA_DESTINATION_PARTITION =
  *
  * @deprecated Replaced by `server.address`.
  */
-export const SEMATTRS_NET_HOST_NAME = 'net.host.name';
+export const ATTR_NET_HOST_NAME = 'net.host.name';
 
 /**
  * Deprecated, use `server.port`.
@@ -1669,7 +1658,7 @@ export const SEMATTRS_NET_HOST_NAME = 'net.host.name';
  *
  * @deprecated Replaced by `server.port`.
  */
-export const SEMATTRS_NET_HOST_PORT = 'net.host.port';
+export const ATTR_NET_HOST_PORT = 'net.host.port';
 
 /**
  * Deprecated, use `server.address` on client spans and `client.address` on server spans.
@@ -1678,7 +1667,7 @@ export const SEMATTRS_NET_HOST_PORT = 'net.host.port';
  *
  * @deprecated Replaced by `server.address` on client spans and `client.address` on server spans.
  */
-export const SEMATTRS_NET_PEER_NAME = 'net.peer.name';
+export const ATTR_NET_PEER_NAME = 'net.peer.name';
 
 /**
  * Deprecated, use `server.port` on client spans and `client.port` on server spans.
@@ -1687,7 +1676,7 @@ export const SEMATTRS_NET_PEER_NAME = 'net.peer.name';
  *
  * @deprecated Replaced by `server.port` on client spans and `client.port` on server spans.
  */
-export const SEMATTRS_NET_PEER_PORT = 'net.peer.port';
+export const ATTR_NET_PEER_PORT = 'net.peer.port';
 
 /**
  * Deprecated, use `network.protocol.name`.
@@ -1696,7 +1685,7 @@ export const SEMATTRS_NET_PEER_PORT = 'net.peer.port';
  *
  * @deprecated Replaced by `network.protocol.name`.
  */
-export const SEMATTRS_NET_PROTOCOL_NAME = 'net.protocol.name';
+export const ATTR_NET_PROTOCOL_NAME = 'net.protocol.name';
 
 /**
  * Deprecated, use `network.protocol.version`.
@@ -1705,7 +1694,7 @@ export const SEMATTRS_NET_PROTOCOL_NAME = 'net.protocol.name';
  *
  * @deprecated Replaced by `network.protocol.version`.
  */
-export const SEMATTRS_NET_PROTOCOL_VERSION = 'net.protocol.version';
+export const ATTR_NET_PROTOCOL_VERSION = 'net.protocol.version';
 
 /**
  * Deprecated, use `network.transport` and `network.type`.
@@ -1714,7 +1703,7 @@ export const SEMATTRS_NET_PROTOCOL_VERSION = 'net.protocol.version';
  *
  * @deprecated Split to `network.transport` and `network.type`.
  */
-export const SEMATTRS_NET_SOCK_FAMILY = 'net.sock.family';
+export const ATTR_NET_SOCK_FAMILY = 'net.sock.family';
 
 /**
  * Deprecated, use `network.local.address`.
@@ -1723,7 +1712,7 @@ export const SEMATTRS_NET_SOCK_FAMILY = 'net.sock.family';
  *
  * @deprecated Replaced by `network.local.address`.
  */
-export const SEMATTRS_NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
+export const ATTR_NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
 
 /**
  * Deprecated, use `network.local.port`.
@@ -1732,7 +1721,7 @@ export const SEMATTRS_NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
  *
  * @deprecated Replaced by `network.local.port`.
  */
-export const SEMATTRS_NET_SOCK_HOST_PORT = 'net.sock.host.port';
+export const ATTR_NET_SOCK_HOST_PORT = 'net.sock.host.port';
 
 /**
  * Deprecated, use `network.peer.address`.
@@ -1741,7 +1730,7 @@ export const SEMATTRS_NET_SOCK_HOST_PORT = 'net.sock.host.port';
  *
  * @deprecated Replaced by `network.peer.address`.
  */
-export const SEMATTRS_NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
+export const ATTR_NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
 
 /**
  * Deprecated, no replacement at this time.
@@ -1750,7 +1739,7 @@ export const SEMATTRS_NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
  *
  * @deprecated Removed.
  */
-export const SEMATTRS_NET_SOCK_PEER_NAME = 'net.sock.peer.name';
+export const ATTR_NET_SOCK_PEER_NAME = 'net.sock.peer.name';
 
 /**
  * Deprecated, use `network.peer.port`.
@@ -1759,7 +1748,7 @@ export const SEMATTRS_NET_SOCK_PEER_NAME = 'net.sock.peer.name';
  *
  * @deprecated Replaced by `network.peer.port`.
  */
-export const SEMATTRS_NET_SOCK_PEER_PORT = 'net.sock.peer.port';
+export const ATTR_NET_SOCK_PEER_PORT = 'net.sock.peer.port';
 
 /**
  * Deprecated, use `network.transport`.
@@ -1768,7 +1757,7 @@ export const SEMATTRS_NET_SOCK_PEER_PORT = 'net.sock.peer.port';
  *
  * @deprecated Replaced by `network.transport`.
  */
-export const SEMATTRS_NET_TRANSPORT = 'net.transport';
+export const ATTR_NET_TRANSPORT = 'net.transport';
 
 /**
  * Deprecated, use `system.process.status` instead.
@@ -1777,7 +1766,7 @@ export const SEMATTRS_NET_TRANSPORT = 'net.transport';
  *
  * @deprecated Replaced by `system.process.status`.
  */
-export const SEMATTRS_SYSTEM_PROCESSES_STATUS = 'system.processes.status';
+export const ATTR_SYSTEM_PROCESSES_STATUS = 'system.processes.status';
 
 /**
  * Destination address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -1786,14 +1775,14 @@ export const SEMATTRS_SYSTEM_PROCESSES_STATUS = 'system.processes.status';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DESTINATION_ADDRESS = 'destination.address';
+export const ATTR_DESTINATION_ADDRESS = 'destination.address';
 
 /**
  * Destination port number.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DESTINATION_PORT = 'destination.port';
+export const ATTR_DESTINATION_PORT = 'destination.port';
 
 /**
  * A unique identifier representing the device.
@@ -1802,7 +1791,7 @@ export const SEMATTRS_DESTINATION_PORT = 'destination.port';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DEVICE_ID = 'device.id';
+export const ATTR_DEVICE_ID = 'device.id';
 
 /**
  * The name of the device manufacturer.
@@ -1811,7 +1800,7 @@ export const SEMATTRS_DEVICE_ID = 'device.id';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DEVICE_MANUFACTURER = 'device.manufacturer';
+export const ATTR_DEVICE_MANUFACTURER = 'device.manufacturer';
 
 /**
  * The model identifier for the device.
@@ -1820,7 +1809,7 @@ export const SEMATTRS_DEVICE_MANUFACTURER = 'device.manufacturer';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DEVICE_MODEL_IDENTIFIER = 'device.model.identifier';
+export const ATTR_DEVICE_MODEL_IDENTIFIER = 'device.model.identifier';
 
 /**
  * The marketing name for the device model.
@@ -1829,14 +1818,14 @@ export const SEMATTRS_DEVICE_MODEL_IDENTIFIER = 'device.model.identifier';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DEVICE_MODEL_NAME = 'device.model.name';
+export const ATTR_DEVICE_MODEL_NAME = 'device.model.name';
 
 /**
  * The disk IO operation direction.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DISK_IO_DIRECTION = 'disk.io.direction';
+export const ATTR_DISK_IO_DIRECTION = 'disk.io.direction';
 
 /**
  * The name being queried.
@@ -1845,70 +1834,70 @@ export const SEMATTRS_DISK_IO_DIRECTION = 'disk.io.direction';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_DNS_QUESTION_NAME = 'dns.question.name';
+export const ATTR_DNS_QUESTION_NAME = 'dns.question.name';
 
 /**
  * Username or client_id extracted from the access token or [Authorization](https://tools.ietf.org/html/rfc7235#section-4.2) header in the inbound request from outside the system.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_ENDUSER_ID = 'enduser.id';
+export const ATTR_ENDUSER_ID = 'enduser.id';
 
 /**
  * Actual/assumed role the client is making the request under extracted from token or application security context.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_ENDUSER_ROLE = 'enduser.role';
+export const ATTR_ENDUSER_ROLE = 'enduser.role';
 
 /**
  * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_ENDUSER_SCOPE = 'enduser.scope';
+export const ATTR_ENDUSER_SCOPE = 'enduser.scope';
 
 /**
  * A boolean that is true if the serverless function is executed for the first time (aka cold-start).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_COLDSTART = 'faas.coldstart';
+export const ATTR_FAAS_COLDSTART = 'faas.coldstart';
 
 /**
  * A string containing the schedule period as [Cron Expression](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_CRON = 'faas.cron';
+export const ATTR_FAAS_CRON = 'faas.cron';
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_DOCUMENT_COLLECTION = 'faas.document.collection';
+export const ATTR_FAAS_DOCUMENT_COLLECTION = 'faas.document.collection';
 
 /**
  * The document name/table subjected to the operation. For example, in Cloud Storage or S3 is the name of the file, and in Cosmos DB the table name.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_DOCUMENT_NAME = 'faas.document.name';
+export const ATTR_FAAS_DOCUMENT_NAME = 'faas.document.name';
 
 /**
  * Describes the type of the operation that was performed on the data.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_DOCUMENT_OPERATION = 'faas.document.operation';
+export const ATTR_FAAS_DOCUMENT_OPERATION = 'faas.document.operation';
 
 /**
  * A string containing the time when the data was accessed in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_DOCUMENT_TIME = 'faas.document.time';
+export const ATTR_FAAS_DOCUMENT_TIME = 'faas.document.time';
 
 /**
  * The execution environment ID as a string, that will be potentially reused for other invocations to the same function/function version.
@@ -1917,14 +1906,14 @@ export const SEMATTRS_FAAS_DOCUMENT_TIME = 'faas.document.time';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_INSTANCE = 'faas.instance';
+export const ATTR_FAAS_INSTANCE = 'faas.instance';
 
 /**
  * The invocation ID of the current function invocation.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_INVOCATION_ID = 'faas.invocation_id';
+export const ATTR_FAAS_INVOCATION_ID = 'faas.invocation_id';
 
 /**
  * The name of the invoked function.
@@ -1933,7 +1922,7 @@ export const SEMATTRS_FAAS_INVOCATION_ID = 'faas.invocation_id';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_INVOKED_NAME = 'faas.invoked_name';
+export const ATTR_FAAS_INVOKED_NAME = 'faas.invoked_name';
 
 /**
  * The cloud provider of the invoked function.
@@ -1942,7 +1931,7 @@ export const SEMATTRS_FAAS_INVOKED_NAME = 'faas.invoked_name';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_INVOKED_PROVIDER = 'faas.invoked_provider';
+export const ATTR_FAAS_INVOKED_PROVIDER = 'faas.invoked_provider';
 
 /**
  * The cloud region of the invoked function.
@@ -1951,7 +1940,7 @@ export const SEMATTRS_FAAS_INVOKED_PROVIDER = 'faas.invoked_provider';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_INVOKED_REGION = 'faas.invoked_region';
+export const ATTR_FAAS_INVOKED_REGION = 'faas.invoked_region';
 
 /**
  * The amount of memory available to the serverless function converted to Bytes.
@@ -1960,7 +1949,7 @@ export const SEMATTRS_FAAS_INVOKED_REGION = 'faas.invoked_region';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_MAX_MEMORY = 'faas.max_memory';
+export const ATTR_FAAS_MAX_MEMORY = 'faas.max_memory';
 
 /**
 * The name of the single function that this runtime instance executes.
@@ -1984,21 +1973,21 @@ definition of function name MUST be used for this attribute
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_FAAS_NAME = 'faas.name';
+export const ATTR_FAAS_NAME = 'faas.name';
 
 /**
  * A string containing the function invocation time in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_TIME = 'faas.time';
+export const ATTR_FAAS_TIME = 'faas.time';
 
 /**
  * Type of the trigger which caused this function invocation.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FAAS_TRIGGER = 'faas.trigger';
+export const ATTR_FAAS_TRIGGER = 'faas.trigger';
 
 /**
 * The immutable version of the function being executed.
@@ -2015,21 +2004,21 @@ export const SEMATTRS_FAAS_TRIGGER = 'faas.trigger';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_FAAS_VERSION = 'faas.version';
+export const ATTR_FAAS_VERSION = 'faas.version';
 
 /**
  * The unique identifier of the feature flag.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FEATURE_FLAG_KEY = 'feature_flag.key';
+export const ATTR_FEATURE_FLAG_KEY = 'feature_flag.key';
 
 /**
  * The name of the service provider that performs the flag evaluation.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name';
+export const ATTR_FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name';
 
 /**
 * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
@@ -2045,14 +2034,14 @@ should be determined by the implementer.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_FEATURE_FLAG_VARIANT = 'feature_flag.variant';
+export const ATTR_FEATURE_FLAG_VARIANT = 'feature_flag.variant';
 
 /**
  * Directory where the file is located. It should include the drive letter, when appropriate.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FILE_DIRECTORY = 'file.directory';
+export const ATTR_FILE_DIRECTORY = 'file.directory';
 
 /**
  * File extension, excluding the leading dot.
@@ -2061,100 +2050,98 @@ export const SEMATTRS_FILE_DIRECTORY = 'file.directory';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FILE_EXTENSION = 'file.extension';
+export const ATTR_FILE_EXTENSION = 'file.extension';
 
 /**
  * Name of the file including the extension, without the directory.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FILE_NAME = 'file.name';
+export const ATTR_FILE_NAME = 'file.name';
 
 /**
  * Full path to the file, including the file name. It should include the drive letter, when appropriate.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FILE_PATH = 'file.path';
+export const ATTR_FILE_PATH = 'file.path';
 
 /**
  * File size in bytes.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_FILE_SIZE = 'file.size';
+export const ATTR_FILE_SIZE = 'file.size';
 
 /**
  * The name of the Cloud Run [execution](https://cloud.google.com/run/docs/managing/job-executions) being run for the Job, as set by the [`CLOUD_RUN_EXECUTION`](https://cloud.google.com/run/docs/container-contract#jobs-env-vars) environment variable.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_GCP_CLOUD_RUN_JOB_EXECUTION =
-  'gcp.cloud_run.job.execution';
+export const ATTR_GCP_CLOUD_RUN_JOB_EXECUTION = 'gcp.cloud_run.job.execution';
 
 /**
  * The index for a task within an execution as provided by the [`CLOUD_RUN_TASK_INDEX`](https://cloud.google.com/run/docs/container-contract#jobs-env-vars) environment variable.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_GCP_CLOUD_RUN_JOB_TASK_INDEX =
-  'gcp.cloud_run.job.task_index';
+export const ATTR_GCP_CLOUD_RUN_JOB_TASK_INDEX = 'gcp.cloud_run.job.task_index';
 
 /**
  * The hostname of a GCE instance. This is the full value of the default or [custom hostname](https://cloud.google.com/compute/docs/instances/custom-hostname-vm).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname';
+export const ATTR_GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname';
 
 /**
  * The instance name of a GCE instance. This is the value provided by `host.name`, the visible name of the instance in the Cloud Console UI, and the prefix for the default hostname of the instance as defined by the [default internal DNS name](https://cloud.google.com/compute/docs/internal-dns#instance-fully-qualified-domain-names).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name';
+export const ATTR_GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name';
 
 /**
  * The CPU architecture the host system is running on.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_ARCH = 'host.arch';
+export const ATTR_HOST_ARCH = 'host.arch';
 
 /**
  * The amount of level 2 memory cache available to the processor (in Bytes).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
+export const ATTR_HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
 
 /**
  * Family or generation of the CPU.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_CPU_FAMILY = 'host.cpu.family';
+export const ATTR_HOST_CPU_FAMILY = 'host.cpu.family';
 
 /**
  * Model identifier. It provides more granular information about the CPU, distinguishing it from other CPUs within the same family.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_CPU_MODEL_ID = 'host.cpu.model.id';
+export const ATTR_HOST_CPU_MODEL_ID = 'host.cpu.model.id';
 
 /**
  * Model designation of the processor.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_CPU_MODEL_NAME = 'host.cpu.model.name';
+export const ATTR_HOST_CPU_MODEL_NAME = 'host.cpu.model.name';
 
 /**
  * Stepping or core revisions.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_CPU_STEPPING = 'host.cpu.stepping';
+export const ATTR_HOST_CPU_STEPPING = 'host.cpu.stepping';
 
 /**
  * Processor manufacturer identifier. A maximum 12-character string.
@@ -2163,35 +2150,35 @@ export const SEMATTRS_HOST_CPU_STEPPING = 'host.cpu.stepping';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_CPU_VENDOR_ID = 'host.cpu.vendor.id';
+export const ATTR_HOST_CPU_VENDOR_ID = 'host.cpu.vendor.id';
 
 /**
  * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For non-containerized systems, this should be the `machine-id`. See the table below for the sources to use to determine the `machine-id` based on operating system.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_ID = 'host.id';
+export const ATTR_HOST_ID = 'host.id';
 
 /**
  * VM image ID or host OS image ID. For Cloud, this value is from the provider.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_IMAGE_ID = 'host.image.id';
+export const ATTR_HOST_IMAGE_ID = 'host.image.id';
 
 /**
  * Name of the VM image or OS install the host was instantiated from.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_IMAGE_NAME = 'host.image.name';
+export const ATTR_HOST_IMAGE_NAME = 'host.image.name';
 
 /**
  * The version string of the VM image or host OS as defined in [Version Attributes](/docs/resource/README.md#version-attributes).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_IMAGE_VERSION = 'host.image.version';
+export const ATTR_HOST_IMAGE_VERSION = 'host.image.version';
 
 /**
  * Available IP addresses of the host, excluding loopback interfaces.
@@ -2200,7 +2187,7 @@ export const SEMATTRS_HOST_IMAGE_VERSION = 'host.image.version';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_IP = 'host.ip';
+export const ATTR_HOST_IP = 'host.ip';
 
 /**
  * Available MAC addresses of the host, excluding loopback interfaces.
@@ -2209,63 +2196,63 @@ export const SEMATTRS_HOST_IP = 'host.ip';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_MAC = 'host.mac';
+export const ATTR_HOST_MAC = 'host.mac';
 
 /**
  * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_NAME = 'host.name';
+export const ATTR_HOST_NAME = 'host.name';
 
 /**
  * Type of host. For Cloud, this must be the machine type.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HOST_TYPE = 'host.type';
+export const ATTR_HOST_TYPE = 'host.type';
 
 /**
  * State of the HTTP connection in the HTTP connection pool.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HTTP_CONNECTION_STATE = 'http.connection.state';
+export const ATTR_HTTP_CONNECTION_STATE = 'http.connection.state';
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HTTP_REQUEST_BODY_SIZE = 'http.request.body.size';
+export const ATTR_HTTP_REQUEST_BODY_SIZE = 'http.request.body.size';
 
 /**
  * The total size of the request in bytes. This should be the total number of bytes sent over the wire, including the request line (HTTP/1.1), framing (HTTP/2 and HTTP/3), headers, and request body if any.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HTTP_REQUEST_SIZE = 'http.request.size';
+export const ATTR_HTTP_REQUEST_SIZE = 'http.request.size';
 
 /**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length) header. For requests using transport encoding, this should be the compressed size.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HTTP_RESPONSE_BODY_SIZE = 'http.response.body.size';
+export const ATTR_HTTP_RESPONSE_BODY_SIZE = 'http.response.body.size';
 
 /**
  * The total size of the response in bytes. This should be the total number of bytes sent over the wire, including the status line (HTTP/1.1), framing (HTTP/2 and HTTP/3), headers, and response body and trailers if any.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HTTP_RESPONSE_SIZE = 'http.response.size';
+export const ATTR_HTTP_RESPONSE_SIZE = 'http.response.size';
 
 /**
  * The name of the cluster.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_CLUSTER_NAME = 'k8s.cluster.name';
+export const ATTR_K8S_CLUSTER_NAME = 'k8s.cluster.name';
 
 /**
 * A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
@@ -2295,141 +2282,140 @@ conflict.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_K8S_CLUSTER_UID = 'k8s.cluster.uid';
+export const ATTR_K8S_CLUSTER_UID = 'k8s.cluster.uid';
 
 /**
  * The name of the Container from Pod specification, must be unique within a Pod. Container runtime usually uses different globally unique name (`container.name`).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_CONTAINER_NAME = 'k8s.container.name';
+export const ATTR_K8S_CONTAINER_NAME = 'k8s.container.name';
 
 /**
  * Number of times the container was restarted. This attribute can be used to identify a particular container (running or stopped) within a container spec.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_CONTAINER_RESTART_COUNT =
-  'k8s.container.restart_count';
+export const ATTR_K8S_CONTAINER_RESTART_COUNT = 'k8s.container.restart_count';
 
 /**
  * The name of the CronJob.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_CRONJOB_NAME = 'k8s.cronjob.name';
+export const ATTR_K8S_CRONJOB_NAME = 'k8s.cronjob.name';
 
 /**
  * The UID of the CronJob.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_CRONJOB_UID = 'k8s.cronjob.uid';
+export const ATTR_K8S_CRONJOB_UID = 'k8s.cronjob.uid';
 
 /**
  * The name of the DaemonSet.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
+export const ATTR_K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
 
 /**
  * The UID of the DaemonSet.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
+export const ATTR_K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
 
 /**
  * The name of the Deployment.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
+export const ATTR_K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
 
 /**
  * The UID of the Deployment.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
+export const ATTR_K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
 
 /**
  * The name of the Job.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_JOB_NAME = 'k8s.job.name';
+export const ATTR_K8S_JOB_NAME = 'k8s.job.name';
 
 /**
  * The UID of the Job.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_JOB_UID = 'k8s.job.uid';
+export const ATTR_K8S_JOB_UID = 'k8s.job.uid';
 
 /**
  * The name of the namespace that the pod is running in.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_NAMESPACE_NAME = 'k8s.namespace.name';
+export const ATTR_K8S_NAMESPACE_NAME = 'k8s.namespace.name';
 
 /**
  * The name of the Node.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_NODE_NAME = 'k8s.node.name';
+export const ATTR_K8S_NODE_NAME = 'k8s.node.name';
 
 /**
  * The UID of the Node.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_NODE_UID = 'k8s.node.uid';
+export const ATTR_K8S_NODE_UID = 'k8s.node.uid';
 
 /**
  * The name of the Pod.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_POD_NAME = 'k8s.pod.name';
+export const ATTR_K8S_POD_NAME = 'k8s.pod.name';
 
 /**
  * The UID of the Pod.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_POD_UID = 'k8s.pod.uid';
+export const ATTR_K8S_POD_UID = 'k8s.pod.uid';
 
 /**
  * The name of the ReplicaSet.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_REPLICASET_NAME = 'k8s.replicaset.name';
+export const ATTR_K8S_REPLICASET_NAME = 'k8s.replicaset.name';
 
 /**
  * The UID of the ReplicaSet.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_REPLICASET_UID = 'k8s.replicaset.uid';
+export const ATTR_K8S_REPLICASET_UID = 'k8s.replicaset.uid';
 
 /**
  * The name of the StatefulSet.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
+export const ATTR_K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
 
 /**
  * The UID of the StatefulSet.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
+export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 
 /**
  * The number of messages sent, received, or processed in the scope of the batching operation.
@@ -2438,7 +2424,7 @@ export const SEMATTRS_K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_BATCH_MESSAGE_COUNT =
+export const ATTR_MESSAGING_BATCH_MESSAGE_COUNT =
   'messaging.batch.message_count';
 
 /**
@@ -2446,14 +2432,14 @@ export const SEMATTRS_MESSAGING_BATCH_MESSAGE_COUNT =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_CLIENT_ID = 'messaging.client_id';
+export const ATTR_MESSAGING_CLIENT_ID = 'messaging.client_id';
 
 /**
  * A boolean that is true if the message destination is anonymous (could be unnamed or have auto-generated name).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_DESTINATION_ANONYMOUS =
+export const ATTR_MESSAGING_DESTINATION_ANONYMOUS =
   'messaging.destination.anonymous';
 
 /**
@@ -2464,14 +2450,14 @@ the broker doesn&#39;t have such notion, the destination name SHOULD uniquely id
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
+export const ATTR_MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
 
 /**
  * The identifier of the partition messages are sent to or received from, unique within the `messaging.destination.name`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_DESTINATION_PARTITION_ID =
+export const ATTR_MESSAGING_DESTINATION_PARTITION_ID =
   'messaging.destination.partition.id';
 
 /**
@@ -2481,7 +2467,7 @@ export const SEMATTRS_MESSAGING_DESTINATION_PARTITION_ID =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_DESTINATION_TEMPLATE =
+export const ATTR_MESSAGING_DESTINATION_TEMPLATE =
   'messaging.destination.template';
 
 /**
@@ -2489,7 +2475,7 @@ export const SEMATTRS_MESSAGING_DESTINATION_TEMPLATE =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_DESTINATION_TEMPORARY =
+export const ATTR_MESSAGING_DESTINATION_TEMPORARY =
   'messaging.destination.temporary';
 
 /**
@@ -2497,7 +2483,7 @@ export const SEMATTRS_MESSAGING_DESTINATION_TEMPORARY =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS =
+export const ATTR_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS =
   'messaging.destination_publish.anonymous';
 
 /**
@@ -2508,7 +2494,7 @@ the broker doesn&#39;t have such notion, the original destination name SHOULD un
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_MESSAGING_DESTINATION_PUBLISH_NAME =
+export const ATTR_MESSAGING_DESTINATION_PUBLISH_NAME =
   'messaging.destination_publish.name';
 
 /**
@@ -2516,7 +2502,7 @@ export const SEMATTRS_MESSAGING_DESTINATION_PUBLISH_NAME =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_EVENTHUBS_CONSUMER_GROUP =
+export const ATTR_MESSAGING_EVENTHUBS_CONSUMER_GROUP =
   'messaging.eventhubs.consumer.group';
 
 /**
@@ -2524,7 +2510,7 @@ export const SEMATTRS_MESSAGING_EVENTHUBS_CONSUMER_GROUP =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME =
+export const ATTR_MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME =
   'messaging.eventhubs.message.enqueued_time';
 
 /**
@@ -2532,7 +2518,7 @@ export const SEMATTRS_MESSAGING_EVENTHUBS_MESSAGE_ENQUEUED_TIME =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY =
+export const ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY =
   'messaging.gcp_pubsub.message.ordering_key';
 
 /**
@@ -2540,7 +2526,7 @@ export const SEMATTRS_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP =
+export const ATTR_MESSAGING_KAFKA_CONSUMER_GROUP =
   'messaging.kafka.consumer.group';
 
 /**
@@ -2550,15 +2536,14 @@ export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_KEY =
-  'messaging.kafka.message.key';
+export const ATTR_MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message.key';
 
 /**
  * The offset of a record in the corresponding Kafka partition.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_OFFSET =
+export const ATTR_MESSAGING_KAFKA_MESSAGE_OFFSET =
   'messaging.kafka.message.offset';
 
 /**
@@ -2566,7 +2551,7 @@ export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_OFFSET =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_TOMBSTONE =
+export const ATTR_MESSAGING_KAFKA_MESSAGE_TOMBSTONE =
   'messaging.kafka.message.tombstone';
 
 /**
@@ -2577,15 +2562,14 @@ body size should be used.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_MESSAGING_MESSAGE_BODY_SIZE =
-  'messaging.message.body.size';
+export const ATTR_MESSAGING_MESSAGE_BODY_SIZE = 'messaging.message.body.size';
 
 /**
  * The conversation ID identifying the conversation to which the message belongs, represented as a string. Sometimes called &#34;Correlation ID&#34;.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_MESSAGE_CONVERSATION_ID =
+export const ATTR_MESSAGING_MESSAGE_CONVERSATION_ID =
   'messaging.message.conversation_id';
 
 /**
@@ -2596,7 +2580,7 @@ size should be used.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_MESSAGING_MESSAGE_ENVELOPE_SIZE =
+export const ATTR_MESSAGING_MESSAGE_ENVELOPE_SIZE =
   'messaging.message.envelope.size';
 
 /**
@@ -2604,7 +2588,7 @@ export const SEMATTRS_MESSAGING_MESSAGE_ENVELOPE_SIZE =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_MESSAGE_ID = 'messaging.message.id';
+export const ATTR_MESSAGING_MESSAGE_ID = 'messaging.message.id';
 
 /**
  * A string identifying the kind of messaging operation.
@@ -2613,14 +2597,14 @@ export const SEMATTRS_MESSAGING_MESSAGE_ID = 'messaging.message.id';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_OPERATION = 'messaging.operation';
+export const ATTR_MESSAGING_OPERATION = 'messaging.operation';
 
 /**
  * RabbitMQ message routing key.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY =
+export const ATTR_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY =
   'messaging.rabbitmq.destination.routing_key';
 
 /**
@@ -2628,7 +2612,7 @@ export const SEMATTRS_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG =
+export const ATTR_MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG =
   'messaging.rabbitmq.message.delivery_tag';
 
 /**
@@ -2636,7 +2620,7 @@ export const SEMATTRS_MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_CLIENT_GROUP =
+export const ATTR_MESSAGING_ROCKETMQ_CLIENT_GROUP =
   'messaging.rocketmq.client_group';
 
 /**
@@ -2644,7 +2628,7 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_CLIENT_GROUP =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL =
+export const ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL =
   'messaging.rocketmq.consumption_model';
 
 /**
@@ -2652,7 +2636,7 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL =
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL =
   'messaging.rocketmq.message.delay_time_level';
 
 /**
@@ -2660,7 +2644,7 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELAY_TIME_LEVEL =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP =
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP =
   'messaging.rocketmq.message.delivery_timestamp';
 
 /**
@@ -2668,7 +2652,7 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_DELIVERY_TIMESTAMP =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_GROUP =
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_GROUP =
   'messaging.rocketmq.message.group';
 
 /**
@@ -2676,7 +2660,7 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_GROUP =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_KEYS =
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_KEYS =
   'messaging.rocketmq.message.keys';
 
 /**
@@ -2684,7 +2668,7 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_KEYS =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_TAG =
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TAG =
   'messaging.rocketmq.message.tag';
 
 /**
@@ -2692,7 +2676,7 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_TAG =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_TYPE =
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE =
   'messaging.rocketmq.message.type';
 
 /**
@@ -2700,15 +2684,14 @@ export const SEMATTRS_MESSAGING_ROCKETMQ_MESSAGE_TYPE =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_ROCKETMQ_NAMESPACE =
-  'messaging.rocketmq.namespace';
+export const ATTR_MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace';
 
 /**
  * The name of the subscription in the topic messages are received from.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME =
+export const ATTR_MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME =
   'messaging.servicebus.destination.subscription_name';
 
 /**
@@ -2716,7 +2699,7 @@ export const SEMATTRS_MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_SERVICEBUS_DISPOSITION_STATUS =
+export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS =
   'messaging.servicebus.disposition_status';
 
 /**
@@ -2724,7 +2707,7 @@ export const SEMATTRS_MESSAGING_SERVICEBUS_DISPOSITION_STATUS =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_SERVICEBUS_MESSAGE_DELIVERY_COUNT =
+export const ATTR_MESSAGING_SERVICEBUS_MESSAGE_DELIVERY_COUNT =
   'messaging.servicebus.message.delivery_count';
 
 /**
@@ -2732,7 +2715,7 @@ export const SEMATTRS_MESSAGING_SERVICEBUS_MESSAGE_DELIVERY_COUNT =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_SERVICEBUS_MESSAGE_ENQUEUED_TIME =
+export const ATTR_MESSAGING_SERVICEBUS_MESSAGE_ENQUEUED_TIME =
   'messaging.servicebus.message.enqueued_time';
 
 /**
@@ -2740,56 +2723,56 @@ export const SEMATTRS_MESSAGING_SERVICEBUS_MESSAGE_ENQUEUED_TIME =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGING_SYSTEM = 'messaging.system';
+export const ATTR_MESSAGING_SYSTEM = 'messaging.system';
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_NETWORK_CARRIER_ICC = 'network.carrier.icc';
+export const ATTR_NETWORK_CARRIER_ICC = 'network.carrier.icc';
 
 /**
  * The mobile carrier country code.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_NETWORK_CARRIER_MCC = 'network.carrier.mcc';
+export const ATTR_NETWORK_CARRIER_MCC = 'network.carrier.mcc';
 
 /**
  * The mobile carrier network code.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_NETWORK_CARRIER_MNC = 'network.carrier.mnc';
+export const ATTR_NETWORK_CARRIER_MNC = 'network.carrier.mnc';
 
 /**
  * The name of the mobile carrier.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_NETWORK_CARRIER_NAME = 'network.carrier.name';
+export const ATTR_NETWORK_CARRIER_NAME = 'network.carrier.name';
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_NETWORK_CONNECTION_SUBTYPE = 'network.connection.subtype';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE = 'network.connection.subtype';
 
 /**
  * The internet connection type.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_NETWORK_CONNECTION_TYPE = 'network.connection.type';
+export const ATTR_NETWORK_CONNECTION_TYPE = 'network.connection.type';
 
 /**
  * The network IO operation direction.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_NETWORK_IO_DIRECTION = 'network.io.direction';
+export const ATTR_NETWORK_IO_DIRECTION = 'network.io.direction';
 
 /**
 * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
@@ -2799,169 +2782,168 @@ An example can be found in [Example Image Manifest](https://docs.docker.com/regi
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
+export const ATTR_OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 
 /**
  * Unique identifier for a particular build or compilation of the operating system.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_OS_BUILD_ID = 'os.build_id';
+export const ATTR_OS_BUILD_ID = 'os.build_id';
 
 /**
  * Human readable (not intended to be parsed) OS version information, like e.g. reported by `ver` or `lsb_release -a` commands.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_OS_DESCRIPTION = 'os.description';
+export const ATTR_OS_DESCRIPTION = 'os.description';
 
 /**
  * Human readable operating system name.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_OS_NAME = 'os.name';
+export const ATTR_OS_NAME = 'os.name';
 
 /**
  * The operating system type.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_OS_TYPE = 'os.type';
+export const ATTR_OS_TYPE = 'os.type';
 
 /**
  * The version string of the operating system as defined in [Version Attributes](/docs/resource/README.md#version-attributes).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_OS_VERSION = 'os.version';
+export const ATTR_OS_VERSION = 'os.version';
 
 /**
  * The [`service.name`](/docs/resource/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PEER_SERVICE = 'peer.service';
+export const ATTR_PEER_SERVICE = 'peer.service';
 
 /**
  * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_COMMAND = 'process.command';
+export const ATTR_PROCESS_COMMAND = 'process.command';
 
 /**
  * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_COMMAND_ARGS = 'process.command_args';
+export const ATTR_PROCESS_COMMAND_ARGS = 'process.command_args';
 
 /**
  * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_COMMAND_LINE = 'process.command_line';
+export const ATTR_PROCESS_COMMAND_LINE = 'process.command_line';
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_EXECUTABLE_NAME = 'process.executable.name';
+export const ATTR_PROCESS_EXECUTABLE_NAME = 'process.executable.name';
 
 /**
  * The full path to the process executable. On Linux based systems, can be set to the target of `proc/[pid]/exe`. On Windows, can be set to the result of `GetProcessImageFileNameW`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_EXECUTABLE_PATH = 'process.executable.path';
+export const ATTR_PROCESS_EXECUTABLE_PATH = 'process.executable.path';
 
 /**
  * The username of the user that owns the process.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_OWNER = 'process.owner';
+export const ATTR_PROCESS_OWNER = 'process.owner';
 
 /**
  * Parent Process identifier (PPID).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_PARENT_PID = 'process.parent_pid';
+export const ATTR_PROCESS_PARENT_PID = 'process.parent_pid';
 
 /**
  * Process identifier (PID).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_PID = 'process.pid';
+export const ATTR_PROCESS_PID = 'process.pid';
 
 /**
  * An additional description about the runtime of the process, for example a specific vendor customization of the runtime environment.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_RUNTIME_DESCRIPTION =
-  'process.runtime.description';
+export const ATTR_PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
 
 /**
  * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of the compiler.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_RUNTIME_NAME = 'process.runtime.name';
+export const ATTR_PROCESS_RUNTIME_NAME = 'process.runtime.name';
 
 /**
  * The version of the runtime of this process, as returned by the runtime without modification.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_PROCESS_RUNTIME_VERSION = 'process.runtime.version';
+export const ATTR_PROCESS_RUNTIME_VERSION = 'process.runtime.version';
 
 /**
  * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_GRPC_STATUS_CODE = 'rpc.grpc.status_code';
+export const ATTR_RPC_GRPC_STATUS_CODE = 'rpc.grpc.status_code';
 
 /**
  * `error.code` property of response if it is an error response.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_JSONRPC_ERROR_CODE = 'rpc.jsonrpc.error_code';
+export const ATTR_RPC_JSONRPC_ERROR_CODE = 'rpc.jsonrpc.error_code';
 
 /**
  * `error.message` property of response if it is an error response.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_JSONRPC_ERROR_MESSAGE = 'rpc.jsonrpc.error_message';
+export const ATTR_RPC_JSONRPC_ERROR_MESSAGE = 'rpc.jsonrpc.error_message';
 
 /**
  * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_JSONRPC_REQUEST_ID = 'rpc.jsonrpc.request_id';
+export const ATTR_RPC_JSONRPC_REQUEST_ID = 'rpc.jsonrpc.request_id';
 
 /**
  * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 doesn&#39;t specify this, the value can be omitted.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_JSONRPC_VERSION = 'rpc.jsonrpc.version';
+export const ATTR_RPC_JSONRPC_VERSION = 'rpc.jsonrpc.version';
 
 /**
  * The name of the (logical) method being called, must be equal to the $method part in the span name.
@@ -2970,7 +2952,7 @@ export const SEMATTRS_RPC_JSONRPC_VERSION = 'rpc.jsonrpc.version';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_METHOD = 'rpc.method';
+export const ATTR_RPC_METHOD = 'rpc.method';
 
 /**
  * The full (logical) name of the service being called, including its package name, if applicable.
@@ -2979,14 +2961,14 @@ export const SEMATTRS_RPC_METHOD = 'rpc.method';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_SERVICE = 'rpc.service';
+export const ATTR_RPC_SERVICE = 'rpc.service';
 
 /**
  * A string identifying the remoting system. See below for a list of well-known identifiers.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_RPC_SYSTEM = 'rpc.system';
+export const ATTR_RPC_SYSTEM = 'rpc.system';
 
 /**
 * The string ID of the service instance.
@@ -3020,7 +3002,7 @@ port.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_SERVICE_INSTANCE_ID = 'service.instance.id';
+export const ATTR_SERVICE_INSTANCE_ID = 'service.instance.id';
 
 /**
  * A namespace for `service.name`.
@@ -3029,21 +3011,21 @@ export const SEMATTRS_SERVICE_INSTANCE_ID = 'service.instance.id';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SERVICE_NAMESPACE = 'service.namespace';
+export const ATTR_SERVICE_NAMESPACE = 'service.namespace';
 
 /**
  * A unique id to identify a session.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SESSION_ID = 'session.id';
+export const ATTR_SESSION_ID = 'session.id';
 
 /**
  * The previous `session.id` for this user, when known.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SESSION_PREVIOUS_ID = 'session.previous_id';
+export const ATTR_SESSION_PREVIOUS_ID = 'session.previous_id';
 
 /**
  * Source address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -3052,14 +3034,14 @@ export const SEMATTRS_SESSION_PREVIOUS_ID = 'session.previous_id';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SOURCE_ADDRESS = 'source.address';
+export const ATTR_SOURCE_ADDRESS = 'source.address';
 
 /**
  * Source port number.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_SOURCE_PORT = 'source.port';
+export const ATTR_SOURCE_PORT = 'source.port';
 
 /**
 * The name of the auto instrumentation agent or distribution, if used.
@@ -3069,28 +3051,28 @@ a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentatio
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_TELEMETRY_DISTRO_NAME = 'telemetry.distro.name';
+export const ATTR_TELEMETRY_DISTRO_NAME = 'telemetry.distro.name';
 
 /**
  * The version string of the auto instrumentation agent or distribution, if used.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version';
+export const ATTR_TELEMETRY_DISTRO_VERSION = 'telemetry.distro.version';
 
 /**
  * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_THREAD_ID = 'thread.id';
+export const ATTR_THREAD_ID = 'thread.id';
 
 /**
  * Current thread name.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_THREAD_NAME = 'thread.name';
+export const ATTR_THREAD_NAME = 'thread.name';
 
 /**
  * String indicating the [cipher](https://datatracker.ietf.org/doc/html/rfc5246#appendix-A.5) used during the current connection.
@@ -3099,206 +3081,203 @@ export const SEMATTRS_THREAD_NAME = 'thread.name';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CIPHER = 'tls.cipher';
+export const ATTR_TLS_CIPHER = 'tls.cipher';
 
 /**
  * PEM-encoded stand-alone certificate offered by the client. This is usually mutually-exclusive of `client.certificate_chain` since this value also exists in that list.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_CERTIFICATE = 'tls.client.certificate';
+export const ATTR_TLS_CLIENT_CERTIFICATE = 'tls.client.certificate';
 
 /**
  * Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_CERTIFICATE_CHAIN =
-  'tls.client.certificate_chain';
+export const ATTR_TLS_CLIENT_CERTIFICATE_CHAIN = 'tls.client.certificate_chain';
 
 /**
  * Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_HASH_MD5 = 'tls.client.hash.md5';
+export const ATTR_TLS_CLIENT_HASH_MD5 = 'tls.client.hash.md5';
 
 /**
  * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_HASH_SHA1 = 'tls.client.hash.sha1';
+export const ATTR_TLS_CLIENT_HASH_SHA1 = 'tls.client.hash.sha1';
 
 /**
  * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_HASH_SHA256 = 'tls.client.hash.sha256';
+export const ATTR_TLS_CLIENT_HASH_SHA256 = 'tls.client.hash.sha256';
 
 /**
  * Distinguished name of [subject](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6) of the issuer of the x.509 certificate presented by the client.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_ISSUER = 'tls.client.issuer';
+export const ATTR_TLS_CLIENT_ISSUER = 'tls.client.issuer';
 
 /**
  * A hash that identifies clients based on how they perform an SSL/TLS handshake.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_JA3 = 'tls.client.ja3';
+export const ATTR_TLS_CLIENT_JA3 = 'tls.client.ja3';
 
 /**
  * Date/Time indicating when client certificate is no longer considered valid.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_NOT_AFTER = 'tls.client.not_after';
+export const ATTR_TLS_CLIENT_NOT_AFTER = 'tls.client.not_after';
 
 /**
  * Date/Time indicating when client certificate is first considered valid.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_NOT_BEFORE = 'tls.client.not_before';
+export const ATTR_TLS_CLIENT_NOT_BEFORE = 'tls.client.not_before';
 
 /**
  * Also called an SNI, this tells the server which hostname to which the client is attempting to connect to.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_SERVER_NAME = 'tls.client.server_name';
+export const ATTR_TLS_CLIENT_SERVER_NAME = 'tls.client.server_name';
 
 /**
  * Distinguished name of subject of the x.509 certificate presented by the client.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_SUBJECT = 'tls.client.subject';
+export const ATTR_TLS_CLIENT_SUBJECT = 'tls.client.subject';
 
 /**
  * Array of ciphers offered by the client during the client hello.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CLIENT_SUPPORTED_CIPHERS =
-  'tls.client.supported_ciphers';
+export const ATTR_TLS_CLIENT_SUPPORTED_CIPHERS = 'tls.client.supported_ciphers';
 
 /**
  * String indicating the curve used for the given cipher, when applicable.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_CURVE = 'tls.curve';
+export const ATTR_TLS_CURVE = 'tls.curve';
 
 /**
  * Boolean flag indicating if the TLS negotiation was successful and transitioned to an encrypted tunnel.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_ESTABLISHED = 'tls.established';
+export const ATTR_TLS_ESTABLISHED = 'tls.established';
 
 /**
  * String indicating the protocol being tunneled. Per the values in the [IANA registry](https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids), this string should be lower case.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_NEXT_PROTOCOL = 'tls.next_protocol';
+export const ATTR_TLS_NEXT_PROTOCOL = 'tls.next_protocol';
 
 /**
  * Normalized lowercase protocol name parsed from original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_PROTOCOL_NAME = 'tls.protocol.name';
+export const ATTR_TLS_PROTOCOL_NAME = 'tls.protocol.name';
 
 /**
  * Numeric part of the version parsed from the original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_PROTOCOL_VERSION = 'tls.protocol.version';
+export const ATTR_TLS_PROTOCOL_VERSION = 'tls.protocol.version';
 
 /**
  * Boolean flag indicating if this TLS connection was resumed from an existing TLS negotiation.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_RESUMED = 'tls.resumed';
+export const ATTR_TLS_RESUMED = 'tls.resumed';
 
 /**
  * PEM-encoded stand-alone certificate offered by the server. This is usually mutually-exclusive of `server.certificate_chain` since this value also exists in that list.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_CERTIFICATE = 'tls.server.certificate';
+export const ATTR_TLS_SERVER_CERTIFICATE = 'tls.server.certificate';
 
 /**
  * Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_CERTIFICATE_CHAIN =
-  'tls.server.certificate_chain';
+export const ATTR_TLS_SERVER_CERTIFICATE_CHAIN = 'tls.server.certificate_chain';
 
 /**
  * Certificate fingerprint using the MD5 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_HASH_MD5 = 'tls.server.hash.md5';
+export const ATTR_TLS_SERVER_HASH_MD5 = 'tls.server.hash.md5';
 
 /**
  * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_HASH_SHA1 = 'tls.server.hash.sha1';
+export const ATTR_TLS_SERVER_HASH_SHA1 = 'tls.server.hash.sha1';
 
 /**
  * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_HASH_SHA256 = 'tls.server.hash.sha256';
+export const ATTR_TLS_SERVER_HASH_SHA256 = 'tls.server.hash.sha256';
 
 /**
  * Distinguished name of [subject](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6) of the issuer of the x.509 certificate presented by the client.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_ISSUER = 'tls.server.issuer';
+export const ATTR_TLS_SERVER_ISSUER = 'tls.server.issuer';
 
 /**
  * A hash that identifies servers based on how they perform an SSL/TLS handshake.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_JA3S = 'tls.server.ja3s';
+export const ATTR_TLS_SERVER_JA3S = 'tls.server.ja3s';
 
 /**
  * Date/Time indicating when server certificate is no longer considered valid.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_NOT_AFTER = 'tls.server.not_after';
+export const ATTR_TLS_SERVER_NOT_AFTER = 'tls.server.not_after';
 
 /**
  * Date/Time indicating when server certificate is first considered valid.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_NOT_BEFORE = 'tls.server.not_before';
+export const ATTR_TLS_SERVER_NOT_BEFORE = 'tls.server.not_before';
 
 /**
  * Distinguished name of subject of the x.509 certificate presented by the server.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_TLS_SERVER_SUBJECT = 'tls.server.subject';
+export const ATTR_TLS_SERVER_SUBJECT = 'tls.server.subject';
 
 /**
  * Domain extracted from the `url.full`, such as &#34;opentelemetry.io&#34;.
@@ -3307,7 +3286,7 @@ export const SEMATTRS_TLS_SERVER_SUBJECT = 'tls.server.subject';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_URL_DOMAIN = 'url.domain';
+export const ATTR_URL_DOMAIN = 'url.domain';
 
 /**
  * The file extension extracted from the `url.full`, excluding the leading dot.
@@ -3316,7 +3295,7 @@ export const SEMATTRS_URL_DOMAIN = 'url.domain';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_URL_EXTENSION = 'url.extension';
+export const ATTR_URL_EXTENSION = 'url.extension';
 
 /**
 * Unmodified original URL as seen in the event source.
@@ -3326,14 +3305,14 @@ export const SEMATTRS_URL_EXTENSION = 'url.extension';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_URL_ORIGINAL = 'url.original';
+export const ATTR_URL_ORIGINAL = 'url.original';
 
 /**
  * Port extracted from the `url.full`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_URL_PORT = 'url.port';
+export const ATTR_URL_PORT = 'url.port';
 
 /**
  * The highest registered url domain, stripped of the subdomain.
@@ -3342,7 +3321,7 @@ export const SEMATTRS_URL_PORT = 'url.port';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_URL_REGISTERED_DOMAIN = 'url.registered_domain';
+export const ATTR_URL_REGISTERED_DOMAIN = 'url.registered_domain';
 
 /**
  * The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain. In a partially qualified domain, or if the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
@@ -3351,7 +3330,7 @@ export const SEMATTRS_URL_REGISTERED_DOMAIN = 'url.registered_domain';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_URL_SUBDOMAIN = 'url.subdomain';
+export const ATTR_URL_SUBDOMAIN = 'url.subdomain';
 
 /**
  * The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is `com`.
@@ -3360,7 +3339,7 @@ export const SEMATTRS_URL_SUBDOMAIN = 'url.subdomain';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_URL_TOP_LEVEL_DOMAIN = 'url.top_level_domain';
+export const ATTR_URL_TOP_LEVEL_DOMAIN = 'url.top_level_domain';
 
 /**
  * Name of the user-agent extracted from original. Usually refers to the browser&#39;s name.
@@ -3369,7 +3348,7 @@ export const SEMATTRS_URL_TOP_LEVEL_DOMAIN = 'url.top_level_domain';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_USER_AGENT_NAME = 'user_agent.name';
+export const ATTR_USER_AGENT_NAME = 'user_agent.name';
 
 /**
  * Version of the user-agent extracted from original. Usually refers to the browser&#39;s version.
@@ -3378,63 +3357,63 @@ export const SEMATTRS_USER_AGENT_NAME = 'user_agent.name';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_USER_AGENT_VERSION = 'user_agent.version';
+export const ATTR_USER_AGENT_VERSION = 'user_agent.version';
 
 /**
  * The ID of a running ECS task. The ID MUST be extracted from `task.arn`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_ECS_TASK_ID = 'aws.ecs.task.id';
+export const ATTR_AWS_ECS_TASK_ID = 'aws.ecs.task.id';
 
 /**
  * The ARN of an [ECS cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_ECS_CLUSTER_ARN = 'aws.ecs.cluster.arn';
+export const ATTR_AWS_ECS_CLUSTER_ARN = 'aws.ecs.cluster.arn';
 
 /**
  * The Amazon Resource Name (ARN) of an [ECS container instance](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_ECS_CONTAINER_ARN = 'aws.ecs.container.arn';
+export const ATTR_AWS_ECS_CONTAINER_ARN = 'aws.ecs.container.arn';
 
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_ECS_LAUNCHTYPE = 'aws.ecs.launchtype';
+export const ATTR_AWS_ECS_LAUNCHTYPE = 'aws.ecs.launchtype';
 
 /**
  * The ARN of a running [ECS task](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-account-settings.html#ecs-resource-ids).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_ECS_TASK_ARN = 'aws.ecs.task.arn';
+export const ATTR_AWS_ECS_TASK_ARN = 'aws.ecs.task.arn';
 
 /**
  * The family name of the [ECS task definition](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html) used to create the ECS task.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_ECS_TASK_FAMILY = 'aws.ecs.task.family';
+export const ATTR_AWS_ECS_TASK_FAMILY = 'aws.ecs.task.family';
 
 /**
  * The revision for the task definition used to create the ECS task.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_ECS_TASK_REVISION = 'aws.ecs.task.revision';
+export const ATTR_AWS_ECS_TASK_REVISION = 'aws.ecs.task.revision';
 
 /**
  * The ARN of an EKS cluster.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_EKS_CLUSTER_ARN = 'aws.eks.cluster.arn';
+export const ATTR_AWS_EKS_CLUSTER_ARN = 'aws.eks.cluster.arn';
 
 /**
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
@@ -3443,7 +3422,7 @@ export const SEMATTRS_AWS_EKS_CLUSTER_ARN = 'aws.eks.cluster.arn';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_LOG_GROUP_ARNS = 'aws.log.group.arns';
+export const ATTR_AWS_LOG_GROUP_ARNS = 'aws.log.group.arns';
 
 /**
  * The name(s) of the AWS log group(s) an application is writing to.
@@ -3452,7 +3431,7 @@ export const SEMATTRS_AWS_LOG_GROUP_ARNS = 'aws.log.group.arns';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_LOG_GROUP_NAMES = 'aws.log.group.names';
+export const ATTR_AWS_LOG_GROUP_NAMES = 'aws.log.group.names';
 
 /**
  * The ARN(s) of the AWS log stream(s).
@@ -3461,35 +3440,35 @@ export const SEMATTRS_AWS_LOG_GROUP_NAMES = 'aws.log.group.names';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_LOG_STREAM_ARNS = 'aws.log.stream.arns';
+export const ATTR_AWS_LOG_STREAM_ARNS = 'aws.log.stream.arns';
 
 /**
  * The name(s) of the AWS log stream(s) an application is writing to.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_LOG_STREAM_NAMES = 'aws.log.stream.names';
+export const ATTR_AWS_LOG_STREAM_NAMES = 'aws.log.stream.names';
 
 /**
  * Unique identifier for the application.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HEROKU_APP_ID = 'heroku.app.id';
+export const ATTR_HEROKU_APP_ID = 'heroku.app.id';
 
 /**
  * Commit hash for the current release.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HEROKU_RELEASE_COMMIT = 'heroku.release.commit';
+export const ATTR_HEROKU_RELEASE_COMMIT = 'heroku.release.commit';
 
 /**
  * Time and date the release was created.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_HEROKU_RELEASE_CREATION_TIMESTAMP =
+export const ATTR_HEROKU_RELEASE_CREATION_TIMESTAMP =
   'heroku.release.creation_timestamp';
 
 /**
@@ -3497,21 +3476,21 @@ export const SEMATTRS_HEROKU_RELEASE_CREATION_TIMESTAMP =
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_WEBENGINE_NAME = 'webengine.name';
+export const ATTR_WEBENGINE_NAME = 'webengine.name';
 
 /**
  * Additional description of the web engine (e.g. detailed version and edition information).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_WEBENGINE_DESCRIPTION = 'webengine.description';
+export const ATTR_WEBENGINE_DESCRIPTION = 'webengine.description';
 
 /**
  * The version of the web engine.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_WEBENGINE_VERSION = 'webengine.version';
+export const ATTR_WEBENGINE_VERSION = 'webengine.version';
 
 /**
  * None.
@@ -3520,7 +3499,7 @@ export const SEMATTRS_WEBENGINE_VERSION = 'webengine.version';
  *
  * @deprecated use the `otel.scope.name` attribute.
  */
-export const SEMATTRS_OTEL_LIBRARY_NAME = 'otel.library.name';
+export const ATTR_OTEL_LIBRARY_NAME = 'otel.library.name';
 
 /**
  * None.
@@ -3529,7 +3508,7 @@ export const SEMATTRS_OTEL_LIBRARY_NAME = 'otel.library.name';
  *
  * @deprecated use the `otel.scope.version` attribute.
  */
-export const SEMATTRS_OTEL_LIBRARY_VERSION = 'otel.library.version';
+export const ATTR_OTEL_LIBRARY_VERSION = 'otel.library.version';
 
 /**
  * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
@@ -3538,7 +3517,7 @@ export const SEMATTRS_OTEL_LIBRARY_VERSION = 'otel.library.version';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
+export const ATTR_AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
 
 /**
  * Parent-child Reference type.
@@ -3547,14 +3526,14 @@ export const SEMATTRS_AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_OPENTRACING_REF_TYPE = 'opentracing.ref_type';
+export const ATTR_OPENTRACING_REF_TYPE = 'opentracing.ref_type';
 
 /**
  * The AWS request ID as returned in the response headers `x-amz-request-id` or `x-amz-requestid`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_AWS_REQUEST_ID = 'aws.request_id';
+export const ATTR_AWS_REQUEST_ID = 'aws.request_id';
 
 /**
 * The S3 bucket name the request refers to. Corresponds to the `--bucket` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
@@ -3564,7 +3543,7 @@ This applies to almost all S3 operations except `list-buckets`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_AWS_S3_BUCKET = 'aws.s3.bucket';
+export const ATTR_AWS_S3_BUCKET = 'aws.s3.bucket';
 
 /**
 * The source object (in the form `bucket`/`key`) for the copy operation.
@@ -3578,7 +3557,7 @@ This applies in particular to the following operations:
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_AWS_S3_COPY_SOURCE = 'aws.s3.copy_source';
+export const ATTR_AWS_S3_COPY_SOURCE = 'aws.s3.copy_source';
 
 /**
 * The delete request container that specifies the objects to be deleted.
@@ -3589,7 +3568,7 @@ The `delete` attribute corresponds to the `--delete` parameter of the
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_AWS_S3_DELETE = 'aws.s3.delete';
+export const ATTR_AWS_S3_DELETE = 'aws.s3.delete';
 
 /**
 * The S3 object key the request refers to. Corresponds to the `--key` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
@@ -3613,7 +3592,7 @@ This applies in particular to the following operations:
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_AWS_S3_KEY = 'aws.s3.key';
+export const ATTR_AWS_S3_KEY = 'aws.s3.key';
 
 /**
 * The part number of the part being uploaded in a multipart-upload operation. This is a positive integer between 1 and 10,000.
@@ -3625,7 +3604,7 @@ The `part_number` attribute corresponds to the `--part-number` parameter of the
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_AWS_S3_PART_NUMBER = 'aws.s3.part_number';
+export const ATTR_AWS_S3_PART_NUMBER = 'aws.s3.part_number';
 
 /**
 * Upload ID that identifies the multipart upload.
@@ -3642,7 +3621,7 @@ This applies in particular to the following operations:
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
 */
-export const SEMATTRS_AWS_S3_UPLOAD_ID = 'aws.s3.upload_id';
+export const ATTR_AWS_S3_UPLOAD_ID = 'aws.s3.upload_id';
 
 /**
  * The GraphQL document being executed.
@@ -3651,28 +3630,28 @@ export const SEMATTRS_AWS_S3_UPLOAD_ID = 'aws.s3.upload_id';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_GRAPHQL_DOCUMENT = 'graphql.document';
+export const ATTR_GRAPHQL_DOCUMENT = 'graphql.document';
 
 /**
  * The name of the operation being executed.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_GRAPHQL_OPERATION_NAME = 'graphql.operation.name';
+export const ATTR_GRAPHQL_OPERATION_NAME = 'graphql.operation.name';
 
 /**
  * The type of the operation being executed.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_GRAPHQL_OPERATION_TYPE = 'graphql.operation.type';
+export const ATTR_GRAPHQL_OPERATION_TYPE = 'graphql.operation.type';
 
 /**
  * Compressed size of the message in bytes.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGE_COMPRESSED_SIZE = 'message.compressed_size';
+export const ATTR_MESSAGE_COMPRESSED_SIZE = 'message.compressed_size';
 
 /**
  * MUST be calculated as two different counters starting from `1` one for sent messages and one for received message.
@@ -3681,21 +3660,21 @@ export const SEMATTRS_MESSAGE_COMPRESSED_SIZE = 'message.compressed_size';
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGE_ID = 'message.id';
+export const ATTR_MESSAGE_ID = 'message.id';
 
 /**
  * Whether this is a received or sent message.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGE_TYPE = 'message.type';
+export const ATTR_MESSAGE_TYPE = 'message.type';
 
 /**
  * Uncompressed size of the message in bytes.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const SEMATTRS_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
+export const ATTR_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
 
 /**
  * The stream associated with the log. See below for a list of well-known values.

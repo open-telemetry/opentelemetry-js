@@ -33,7 +33,6 @@ docker run --rm --platform linux/amd64 \
   --template /templates/SemanticAttributes.ts.j2 \
   --output /output/stable.ts \
   -Dclass=SemanticAttributes \
-  -Dcls_prefix=SEMATTRS \
   -Dfilter=is_stable
 
 docker run --rm --platform linux/amd64 \
@@ -46,7 +45,6 @@ docker run --rm --platform linux/amd64 \
   --template /templates/SemanticAttributes.ts.j2 \
   --output /output/experimental.ts \
   -Dclass=SemanticAttributes \
-  -Dcls_prefix=SEMATTRS \
   -Dfilter=is_experimental
 
 # docker run --rm --platform linux/amd64 \
