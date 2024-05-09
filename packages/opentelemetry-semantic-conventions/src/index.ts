@@ -14,5 +14,10 @@
  * limitations under the License.
  */
 
+// Deprecated. These are kept around for compatibility purposes
 export * from './trace';
 export * from './resource';
+
+// Use these instead
+export * from './experimental';
+export * from './stable';

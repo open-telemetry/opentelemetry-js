@@ -4,8 +4,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # freeze the spec version to make SpanAttributess generation reproducible
-SPEC_VERSION=v1.7.0
-GENERATOR_VERSION=0.8.0
+SPEC_VERSION=v1.25.0
+GENERATOR_VERSION=0.24.0
 
 # When running on windows and your are getting references to ";C" (like Telemetry;C)
 # then this is an issue with the bash shell, so first run the following in your shell:
@@ -13,39 +13,67 @@ GENERATOR_VERSION=0.8.0
 
 cd ${SCRIPT_DIR}
 
-rm -rf opentelemetry-specification || true
-mkdir opentelemetry-specification
-cd opentelemetry-specification
+rm -rf semantic-conventions || true
+mkdir semantic-conventions
+cd semantic-conventions
 
 git init
-git remote add origin https://github.com/open-telemetry/opentelemetry-specification.git
-git fetch origin "$SPEC_VERSION" --depth=1
+git remote add origin https://github.com/open-telemetry/semantic-conventions.git
+git fetch origin "${SPEC_VERSION}" --depth=1
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
 
-docker run --rm \
-  -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/trace:/source \
+docker run --rm --platform linux/amd64 \
+  -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
   -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/trace/:/output \
+  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/:/output \
   otel/semconvgen:${GENERATOR_VERSION} \
-  -f /source \
+  --yaml-root /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/SemanticAttributes.ts \
+  --output /output/stable.ts \
   -Dclass=SemanticAttributes \
-  -Dcls_prefix=SEMATTRS
+  -Dcls_prefix=SEMATTRS \
+  -Dfilter=is_stable
 
-docker run --rm \
-  -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/resource:/source \
+docker run --rm --platform linux/amd64 \
+  -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
   -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/resource/:/output \
+  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/:/output \
   otel/semconvgen:${GENERATOR_VERSION} \
-  -f /source \
+  --yaml-root /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/SemanticResourceAttributes.ts \
-  -Dclass=SemanticResourceAttributes \
-  -Dcls_prefix=SEMRESATTRS
+  --output /output/experimental.ts \
+  -Dclass=SemanticAttributes \
+  -Dcls_prefix=SEMATTRS \
+  -Dfilter=is_experimental
+
+# docker run --rm --platform linux/amd64 \
+#   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
+#   -v ${SCRIPT_DIR}/templates:/templates \
+#   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/resource/:/output \
+#   otel/semconvgen:${GENERATOR_VERSION} \
+#   --only resource \
+#   --yaml-root /source \
+#   code \
+#   --template /templates/SemanticAttributes.ts.j2 \
+#   --output /output/SemanticResourceAttributes.ts \
+#   -Dclass=SemanticResourceAttributes \
+#   -Dcls_prefix=SEMRESATTRS
+
+# docker run --rm --platform linux/amd64 \
+#   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
+#   -v ${SCRIPT_DIR}/templates:/templates \
+#   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/metric/:/output \
+#   otel/semconvgen:${GENERATOR_VERSION} \
+#   --only metric \
+#   --yaml-root /source \
+#   code \
+#   --template /templates/SemanticAttributes.ts.j2 \
+#   --output /output/SemanticMetricAttributes.ts \
+#   -Dclass=SemanticMetricAttributes \
+#   -Dcls_prefix=SEMMTRCSATTRS
 
 # Run the automatic linting fixing task to ensure it will pass eslint
 cd "$ROOT_DIR"
