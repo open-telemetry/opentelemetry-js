@@ -13,6 +13,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(sdk-trace-node): support `xray` Propagator via `OTEL_PROPAGATORS` environment variable [#4602](https://github.com/open-telemetry/opentelemetry-js/pull/4602) @anuraags
+* feat(semconv): update semantic conventions to 1.25 and include metric names [#4690](https://github.com/open-telemetry/opentelemetry-js/pull/4690) @dyladan
 
 ### :bug: (Bug Fix)
 
