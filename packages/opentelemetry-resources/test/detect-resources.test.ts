@@ -30,7 +30,7 @@ describe('detectResourcesSync', () => {
       async detect() {
         return new Resource(
           { sync: 'fromsync' },
-          Promise.resolve({ async: 'fromasync' }).then(attrs => attrs)
+          Promise.resolve().then(() => ({ async: 'fromasync' }))
         );
       },
     };
