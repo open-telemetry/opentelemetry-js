@@ -362,40 +362,47 @@ describe('xhr', () => {
           const keys = Object.keys(attributes);
 
           assert.strictEqual(
-            attributes[keys[0]],
+            attributes[SEMATTRS_HTTP_METHOD],
             'GET',
             `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[1]],
+            attributes[SEMATTRS_HTTP_URL],
             url,
             `attributes ${SEMATTRS_HTTP_URL} is wrong`
           );
-          assert.ok(
-            (attributes[keys[2]] as number) > 0,
+          const responseContentLength = attributes[
+            SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+          ] as number;
+          assert.strictEqual(
+            responseContentLength,
+            30,
             `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
           );
           assert.strictEqual(
-            attributes[keys[3]],
+            attributes[SEMATTRS_HTTP_STATUS_CODE],
             200,
             `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[4]],
+            attributes[AttributeNames.HTTP_STATUS_TEXT],
             'OK',
             `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[5]],
+            attributes[SEMATTRS_HTTP_HOST],
             parseUrl(url).host,
             `attributes ${SEMATTRS_HTTP_HOST} is wrong`
           );
+
+          const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
           assert.ok(
-            attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+            httpScheme === 'http' || httpScheme === 'https',
             `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
           );
-          assert.ok(
-            attributes[keys[7]] !== '',
+          assert.notStrictEqual(
+            attributes[SEMATTRS_HTTP_USER_AGENT],
+            '',
             `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
           );
 
@@ -961,41 +968,47 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[keys[0]],
+              attributes[SEMATTRS_HTTP_METHOD],
               'GET',
               `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[SEMATTRS_HTTP_URL],
               url,
               `attributes ${SEMATTRS_HTTP_URL} is wrong`
             );
+            const responseContentLength = attributes[
+              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+            ] as number;
             assert.strictEqual(
-              attributes[keys[2]],
+              responseContentLength,
               0,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is wrong`
+              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} <= 0`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[SEMATTRS_HTTP_STATUS_CODE],
               400,
               `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[AttributeNames.HTTP_STATUS_TEXT],
               'Bad Request',
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[5]],
+              attributes[SEMATTRS_HTTP_HOST],
               'raw.githubusercontent.com',
               `attributes ${SEMATTRS_HTTP_HOST} is wrong`
             );
+
+            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
             assert.ok(
-              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              httpScheme === 'http' || httpScheme === 'https',
               `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
             );
-            assert.ok(
-              attributes[keys[7]] !== '',
+            assert.notStrictEqual(
+              attributes[SEMATTRS_HTTP_USER_AGENT],
+              '',
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
 
@@ -1035,36 +1048,39 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[keys[0]],
+              attributes[SEMATTRS_HTTP_METHOD],
               'GET',
               `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[SEMATTRS_HTTP_URL],
               url,
               `attributes ${SEMATTRS_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[SEMATTRS_HTTP_STATUS_CODE],
               0,
               `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[AttributeNames.HTTP_STATUS_TEXT],
               '',
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[SEMATTRS_HTTP_HOST],
               'raw.githubusercontent.com',
               `attributes ${SEMATTRS_HTTP_HOST} is wrong`
             );
+
+            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
             assert.ok(
-              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
+              httpScheme === 'http' || httpScheme === 'https',
               `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
             );
-            assert.ok(
-              attributes[keys[6]] !== '',
+            assert.notStrictEqual(
+              attributes[SEMATTRS_HTTP_USER_AGENT],
+              '',
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
 
@@ -1101,36 +1117,39 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[keys[0]],
+              attributes[SEMATTRS_HTTP_METHOD],
               'GET',
               `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[SEMATTRS_HTTP_URL],
               url,
               `attributes ${SEMATTRS_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[SEMATTRS_HTTP_STATUS_CODE],
               0,
               `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[AttributeNames.HTTP_STATUS_TEXT],
               '',
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[SEMATTRS_HTTP_HOST],
               'raw.githubusercontent.com',
               `attributes ${SEMATTRS_HTTP_HOST} is wrong`
             );
+
+            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
             assert.ok(
-              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
+              httpScheme === 'http' || httpScheme === 'https',
               `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
             );
-            assert.ok(
-              attributes[keys[6]] !== '',
+            assert.notStrictEqual(
+              attributes[SEMATTRS_HTTP_USER_AGENT],
+              '',
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
 
@@ -1167,36 +1186,39 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[keys[0]],
+              attributes[SEMATTRS_HTTP_METHOD],
               'GET',
               `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[SEMATTRS_HTTP_URL],
               url,
               `attributes ${SEMATTRS_HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[SEMATTRS_HTTP_STATUS_CODE],
               0,
               `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[AttributeNames.HTTP_STATUS_TEXT],
               '',
               `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[SEMATTRS_HTTP_HOST],
               'raw.githubusercontent.com',
               `attributes ${SEMATTRS_HTTP_HOST} is wrong`
             );
+
+            const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
             assert.ok(
-              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
+              httpScheme === 'http' || httpScheme === 'https',
               `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
             );
-            assert.ok(
-              attributes[keys[6]] !== '',
+            assert.notStrictEqual(
+              attributes[SEMATTRS_HTTP_USER_AGENT],
+              '',
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
 
