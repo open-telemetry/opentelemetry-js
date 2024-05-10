@@ -29,6 +29,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
+* docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
+
 ### :house: (Internal)
 
 ## 0.51.0
