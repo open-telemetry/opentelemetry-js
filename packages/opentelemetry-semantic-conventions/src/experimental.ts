@@ -3677,477 +3677,455 @@ export const ATTR_MESSAGE_TYPE = 'message.type';
 export const ATTR_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
 
 /**
- * The stream associated with the log. See below for a list of well-known values.
+ * Enum value 'stdout' for attribute {@link ATTR_LOG_IOSTREAM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const LOG_IOSTREAM_VALUES_STDOUT = 'stdout';
 
 /**
- * The stream associated with the log. See below for a list of well-known values.
+ * Enum value 'stderr' for attribute {@link ATTR_LOG_IOSTREAM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const LOG_IOSTREAM_VALUES_STDERR = 'stderr';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
+ * Enum value 'active' for attribute {@link ATTR_IOS_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const IOS_STATE_VALUES_ACTIVE = 'active';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
+ * Enum value 'inactive' for attribute {@link ATTR_IOS_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const IOS_STATE_VALUES_INACTIVE = 'inactive';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
+ * Enum value 'background' for attribute {@link ATTR_IOS_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const IOS_STATE_VALUES_BACKGROUND = 'background';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
+ * Enum value 'foreground' for attribute {@link ATTR_IOS_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const IOS_STATE_VALUES_FOREGROUND = 'foreground';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
+ * Enum value 'terminate' for attribute {@link ATTR_IOS_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const IOS_STATE_VALUES_TERMINATE = 'terminate';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
+ * Enum value 'created' for attribute {@link ATTR_ANDROID_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ANDROID_STATE_VALUES_CREATED = 'created';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
+ * Enum value 'background' for attribute {@link ATTR_ANDROID_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ANDROID_STATE_VALUES_BACKGROUND = 'background';
 
 /**
- * This attribute represents the state the application has transitioned into at the occurrence of the event.
- *
- * Note: The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
+ * Enum value 'foreground' for attribute {@link ATTR_ANDROID_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ANDROID_STATE_VALUES_FOREGROUND = 'foreground';
 
 /**
- * The state of a connection in the pool.
+ * Enum value 'idle' for attribute {@link ATTR_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const STATE_VALUES_IDLE = 'idle';
 
 /**
- * The state of a connection in the pool.
+ * Enum value 'used' for attribute {@link ATTR_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const STATE_VALUES_USED = 'used';
 
 /**
- * The CPU state for this data point. A process SHOULD be characterized _either_ by data points with no `state` labels, _or only_ data points with `state` labels.
+ * Enum value 'system' for attribute {@link ATTR_PROCESS_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const PROCESS_CPU_STATE_VALUES_SYSTEM = 'system';
 
 /**
- * The CPU state for this data point. A process SHOULD be characterized _either_ by data points with no `state` labels, _or only_ data points with `state` labels.
+ * Enum value 'user' for attribute {@link ATTR_PROCESS_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const PROCESS_CPU_STATE_VALUES_USER = 'user';
 
 /**
- * The CPU state for this data point. A process SHOULD be characterized _either_ by data points with no `state` labels, _or only_ data points with `state` labels.
+ * Enum value 'wait' for attribute {@link ATTR_PROCESS_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const PROCESS_CPU_STATE_VALUES_WAIT = 'wait';
 
 /**
- * Specifies whether the context switches for this data point were voluntary or involuntary.
+ * Enum value 'voluntary' for attribute {@link ATTR_PROCESS_CONTEXT_SWITCH_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const PROCESS_CONTEXT_SWITCH_TYPE_VALUES_VOLUNTARY = 'voluntary';
 
 /**
- * Specifies whether the context switches for this data point were voluntary or involuntary.
+ * Enum value 'involuntary' for attribute {@link ATTR_PROCESS_CONTEXT_SWITCH_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const PROCESS_CONTEXT_SWITCH_TYPE_VALUES_INVOLUNTARY = 'involuntary';
 
 /**
- * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+ * Enum value 'major' for attribute {@link ATTR_PROCESS_PAGING_FAULT_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const PROCESS_PAGING_FAULT_TYPE_VALUES_MAJOR = 'major';
 
 /**
- * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
+ * Enum value 'minor' for attribute {@link ATTR_PROCESS_PAGING_FAULT_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const PROCESS_PAGING_FAULT_TYPE_VALUES_MINOR = 'minor';
 
 /**
- * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
+ * Enum value 'user' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_CPU_STATE_VALUES_USER = 'user';
 
 /**
- * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
+ * Enum value 'system' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_CPU_STATE_VALUES_SYSTEM = 'system';
 
 /**
- * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
+ * Enum value 'nice' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_CPU_STATE_VALUES_NICE = 'nice';
 
 /**
- * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
+ * Enum value 'idle' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_CPU_STATE_VALUES_IDLE = 'idle';
 
 /**
- * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
+ * Enum value 'iowait' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_CPU_STATE_VALUES_IOWAIT = 'iowait';
 
 /**
- * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
+ * Enum value 'interrupt' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_CPU_STATE_VALUES_INTERRUPT = 'interrupt';
 
 /**
- * The CPU state for this data point. A system&#39;s CPU SHOULD be characterized *either* by data points with no `state` labels, *or only* data points with `state` labels.
+ * Enum value 'steal' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_CPU_STATE_VALUES_STEAL = 'steal';
 
 /**
- * The memory state.
+ * Enum value 'used' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_MEMORY_STATE_VALUES_USED = 'used';
 
 /**
- * The memory state.
+ * Enum value 'free' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_MEMORY_STATE_VALUES_FREE = 'free';
 
 /**
- * The memory state.
+ * Enum value 'shared' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_MEMORY_STATE_VALUES_SHARED = 'shared';
 
 /**
- * The memory state.
+ * Enum value 'buffers' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_MEMORY_STATE_VALUES_BUFFERS = 'buffers';
 
 /**
- * The memory state.
+ * Enum value 'cached' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_MEMORY_STATE_VALUES_CACHED = 'cached';
 
 /**
- * The paging access direction.
+ * Enum value 'in' for attribute {@link ATTR_SYSTEM_PAGING_DIRECTION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PAGING_DIRECTION_VALUES_IN = 'in';
 
 /**
- * The paging access direction.
+ * Enum value 'out' for attribute {@link ATTR_SYSTEM_PAGING_DIRECTION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PAGING_DIRECTION_VALUES_OUT = 'out';
 
 /**
- * The memory paging state.
+ * Enum value 'used' for attribute {@link ATTR_SYSTEM_PAGING_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PAGING_STATE_VALUES_USED = 'used';
 
 /**
- * The memory paging state.
+ * Enum value 'free' for attribute {@link ATTR_SYSTEM_PAGING_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PAGING_STATE_VALUES_FREE = 'free';
 
 /**
- * The memory paging type.
+ * Enum value 'major' for attribute {@link ATTR_SYSTEM_PAGING_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PAGING_TYPE_VALUES_MAJOR = 'major';
 
 /**
- * The memory paging type.
+ * Enum value 'minor' for attribute {@link ATTR_SYSTEM_PAGING_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PAGING_TYPE_VALUES_MINOR = 'minor';
 
 /**
- * The filesystem state.
+ * Enum value 'used' for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_STATE_VALUES_USED = 'used';
 
 /**
- * The filesystem state.
+ * Enum value 'free' for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_STATE_VALUES_FREE = 'free';
 
 /**
- * The filesystem state.
+ * Enum value 'reserved' for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_STATE_VALUES_RESERVED = 'reserved';
 
 /**
- * The filesystem type.
+ * Enum value 'fat32' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_TYPE_VALUES_FAT32 = 'fat32';
 
 /**
- * The filesystem type.
+ * Enum value 'exfat' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_TYPE_VALUES_EXFAT = 'exfat';
 
 /**
- * The filesystem type.
+ * Enum value 'ntfs' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_TYPE_VALUES_NTFS = 'ntfs';
 
 /**
- * The filesystem type.
+ * Enum value 'refs' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_TYPE_VALUES_REFS = 'refs';
 
 /**
- * The filesystem type.
+ * Enum value 'hfsplus' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_TYPE_VALUES_HFSPLUS = 'hfsplus';
 
 /**
- * The filesystem type.
+ * Enum value 'ext4' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_FILESYSTEM_TYPE_VALUES_EXT4 = 'ext4';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'close' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_CLOSE = 'close';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'close_wait' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_CLOSE_WAIT = 'close_wait';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'closing' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_CLOSING = 'closing';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'delete' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_DELETE = 'delete';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'established' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_ESTABLISHED = 'established';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'fin_wait_1' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_FIN_WAIT_1 = 'fin_wait_1';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'fin_wait_2' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_FIN_WAIT_2 = 'fin_wait_2';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'last_ack' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_LAST_ACK = 'last_ack';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'listen' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_LISTEN = 'listen';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'syn_recv' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_SYN_RECV = 'syn_recv';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'syn_sent' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_SYN_SENT = 'syn_sent';
 
 /**
- * A stateless protocol MUST NOT set this attribute.
+ * Enum value 'time_wait' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_NETWORK_STATE_VALUES_TIME_WAIT = 'time_wait';
 
 /**
- * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES).
+ * Enum value 'running' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PROCESS_STATUS_VALUES_RUNNING = 'running';
 
 /**
- * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES).
+ * Enum value 'sleeping' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PROCESS_STATUS_VALUES_SLEEPING = 'sleeping';
 
 /**
- * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES).
+ * Enum value 'stopped' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PROCESS_STATUS_VALUES_STOPPED = 'stopped';
 
 /**
- * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES).
+ * Enum value 'defunct' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const SYSTEM_PROCESS_STATUS_VALUES_DEFUNCT = 'defunct';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'alibaba_cloud_ecs' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'alibaba_cloud_fc' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'alibaba_cloud_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4155,45 +4133,35 @@ export const CLOUD_PLATFORM_VALUES_ALIBABA_CLOUD_OPENSHIFT =
   'alibaba_cloud_openshift';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'aws_ec2' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AWS_EC2 = 'aws_ec2';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'aws_ecs' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AWS_ECS = 'aws_ecs';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'aws_eks' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AWS_EKS = 'aws_eks';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'aws_lambda' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AWS_LAMBDA = 'aws_lambda';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'aws_elastic_beanstalk' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4201,36 +4169,28 @@ export const CLOUD_PLATFORM_VALUES_AWS_ELASTIC_BEANSTALK =
   'aws_elastic_beanstalk';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'aws_app_runner' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AWS_APP_RUNNER = 'aws_app_runner';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'aws_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AWS_OPENSHIFT = 'aws_openshift';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'azure_vm' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AZURE_VM = 'azure_vm';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'azure_container_apps' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4238,9 +4198,7 @@ export const CLOUD_PLATFORM_VALUES_AZURE_CONTAINER_APPS =
   'azure_container_apps';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'azure_container_instances' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4248,45 +4206,35 @@ export const CLOUD_PLATFORM_VALUES_AZURE_CONTAINER_INSTANCES =
   'azure_container_instances';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'azure_aks' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AZURE_AKS = 'azure_aks';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'azure_functions' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AZURE_FUNCTIONS = 'azure_functions';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'azure_app_service' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AZURE_APP_SERVICE = 'azure_app_service';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'azure_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_AZURE_OPENSHIFT = 'azure_openshift';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'gcp_bare_metal_solution' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4294,27 +4242,21 @@ export const CLOUD_PLATFORM_VALUES_GCP_BARE_METAL_SOLUTION =
   'gcp_bare_metal_solution';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'gcp_compute_engine' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'gcp_cloud_run' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_GCP_CLOUD_RUN = 'gcp_cloud_run';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'gcp_kubernetes_engine' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4322,161 +4264,147 @@ export const CLOUD_PLATFORM_VALUES_GCP_KUBERNETES_ENGINE =
   'gcp_kubernetes_engine';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'gcp_cloud_functions' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'gcp_app_engine' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_GCP_APP_ENGINE = 'gcp_app_engine';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'gcp_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_GCP_OPENSHIFT = 'gcp_openshift';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'ibm_cloud_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'tencent_cloud_cvm' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_TENCENT_CLOUD_CVM = 'tencent_cloud_cvm';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'tencent_cloud_eks' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_TENCENT_CLOUD_EKS = 'tencent_cloud_eks';
 
 /**
- * The cloud platform in use.
- *
- * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * Enum value 'tencent_cloud_scf' for attribute {@link ATTR_CLOUD_PLATFORM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PLATFORM_VALUES_TENCENT_CLOUD_SCF = 'tencent_cloud_scf';
 
 /**
- * Name of the cloud provider.
+ * Enum value 'alibaba_cloud' for attribute {@link ATTR_CLOUD_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUES_ALIBABA_CLOUD = 'alibaba_cloud';
 
 /**
- * Name of the cloud provider.
+ * Enum value 'aws' for attribute {@link ATTR_CLOUD_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUES_AWS = 'aws';
 
 /**
- * Name of the cloud provider.
+ * Enum value 'azure' for attribute {@link ATTR_CLOUD_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUES_AZURE = 'azure';
 
 /**
- * Name of the cloud provider.
+ * Enum value 'gcp' for attribute {@link ATTR_CLOUD_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUES_GCP = 'gcp';
 
 /**
- * Name of the cloud provider.
+ * Enum value 'heroku' for attribute {@link ATTR_CLOUD_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUES_HEROKU = 'heroku';
 
 /**
- * Name of the cloud provider.
+ * Enum value 'ibm_cloud' for attribute {@link ATTR_CLOUD_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUES_IBM_CLOUD = 'ibm_cloud';
 
 /**
- * Name of the cloud provider.
+ * Enum value 'tencent_cloud' for attribute {@link ATTR_CLOUD_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CLOUD_PROVIDER_VALUES_TENCENT_CLOUD = 'tencent_cloud';
 
 /**
- * The CPU state for this data point.
+ * Enum value 'user' for attribute {@link ATTR_CONTAINER_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CONTAINER_CPU_STATE_VALUES_USER = 'user';
 
 /**
- * The CPU state for this data point.
+ * Enum value 'system' for attribute {@link ATTR_CONTAINER_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CONTAINER_CPU_STATE_VALUES_SYSTEM = 'system';
 
 /**
- * The CPU state for this data point.
+ * Enum value 'kernel' for attribute {@link ATTR_CONTAINER_CPU_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const CONTAINER_CPU_STATE_VALUES_KERNEL = 'kernel';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'all' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_ALL = 'all';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'each_quorum' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_EACH_QUORUM = 'each_quorum';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'quorum' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_QUORUM = 'quorum';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'local_quorum' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4484,49 +4412,49 @@ export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_LOCAL_QUORUM =
   'local_quorum';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'one' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_ONE = 'one';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'two' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_TWO = 'two';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'three' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_THREE = 'three';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'local_one' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_LOCAL_ONE = 'local_one';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'any' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_ANY = 'any';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'serial' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_SERIAL = 'serial';
 
 /**
- * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * Enum value 'local_serial' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4534,119 +4462,119 @@ export const DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_LOCAL_SERIAL =
   'local_serial';
 
 /**
- * Cosmos client connection mode.
+ * Enum value 'gateway' for attribute {@link ATTR_DB_COSMOSDB_CONNECTION_MODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_CONNECTION_MODE_VALUES_GATEWAY = 'gateway';
 
 /**
- * Cosmos client connection mode.
+ * Enum value 'direct' for attribute {@link ATTR_DB_COSMOSDB_CONNECTION_MODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_CONNECTION_MODE_VALUES_DIRECT = 'direct';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Invalid' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_INVALID = 'Invalid';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Create' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_CREATE = 'Create';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Patch' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_PATCH = 'Patch';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Read' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_READ = 'Read';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'ReadFeed' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_READ_FEED = 'ReadFeed';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Delete' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_DELETE = 'Delete';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Replace' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_REPLACE = 'Replace';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Execute' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_EXECUTE = 'Execute';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Query' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_QUERY = 'Query';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Head' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_HEAD = 'Head';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'HeadFeed' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_HEAD_FEED = 'HeadFeed';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Upsert' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_UPSERT = 'Upsert';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'Batch' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_BATCH = 'Batch';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'QueryPlan' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_COSMOSDB_OPERATION_TYPE_VALUES_QUERY_PLAN = 'QueryPlan';
 
 /**
- * CosmosDB Operation Type.
+ * Enum value 'ExecuteJavaScript' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4654,371 +4582,371 @@ export const DB_COSMOSDB_OPERATION_TYPE_VALUES_EXECUTE_JAVASCRIPT =
   'ExecuteJavaScript';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'other_sql' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_OTHER_SQL = 'other_sql';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'mssql' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_MSSQL = 'mssql';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'mssqlcompact' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_MSSQLCOMPACT = 'mssqlcompact';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'mysql' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_MYSQL = 'mysql';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'oracle' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_ORACLE = 'oracle';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'db2' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_DB2 = 'db2';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'postgresql' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_POSTGRESQL = 'postgresql';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'redshift' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_REDSHIFT = 'redshift';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'hive' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_HIVE = 'hive';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'cloudscape' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_CLOUDSCAPE = 'cloudscape';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'hsqldb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_HSQLDB = 'hsqldb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'progress' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_PROGRESS = 'progress';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'maxdb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_MAXDB = 'maxdb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'hanadb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_HANADB = 'hanadb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'ingres' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_INGRES = 'ingres';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'firstsql' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_FIRSTSQL = 'firstsql';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'edb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_EDB = 'edb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'cache' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_CACHE = 'cache';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'adabas' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_ADABAS = 'adabas';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'firebird' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_FIREBIRD = 'firebird';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'derby' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_DERBY = 'derby';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'filemaker' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_FILEMAKER = 'filemaker';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'informix' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_INFORMIX = 'informix';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'instantdb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_INSTANTDB = 'instantdb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'interbase' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_INTERBASE = 'interbase';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'mariadb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_MARIADB = 'mariadb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'netezza' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_NETEZZA = 'netezza';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'pervasive' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_PERVASIVE = 'pervasive';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'pointbase' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_POINTBASE = 'pointbase';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'sqlite' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_SQLITE = 'sqlite';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'sybase' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_SYBASE = 'sybase';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'teradata' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_TERADATA = 'teradata';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'vertica' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_VERTICA = 'vertica';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'h2' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_H2 = 'h2';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'coldfusion' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_COLDFUSION = 'coldfusion';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'cassandra' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_CASSANDRA = 'cassandra';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'hbase' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_HBASE = 'hbase';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'mongodb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_MONGODB = 'mongodb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'redis' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_REDIS = 'redis';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'couchbase' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_COUCHBASE = 'couchbase';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'couchdb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_COUCHDB = 'couchdb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'cosmosdb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_COSMOSDB = 'cosmosdb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'dynamodb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_DYNAMODB = 'dynamodb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'neo4j' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_NEO4J = 'neo4j';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'geode' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_GEODE = 'geode';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'elasticsearch' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_ELASTICSEARCH = 'elasticsearch';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'memcached' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_MEMCACHED = 'memcached';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'cockroachdb' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_COCKROACHDB = 'cockroachdb';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'opensearch' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_OPENSEARCH = 'opensearch';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'clickhouse' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_CLICKHOUSE = 'clickhouse';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'spanner' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_SPANNER = 'spanner';
 
 /**
- * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * Enum value 'trino' for attribute {@link ATTR_DB_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DB_SYSTEM_VALUES_TRINO = 'trino';
 
 /**
- * Deprecated, use `network.protocol.name` instead.
+ * Enum value '1.0' for attribute {@link ATTR_HTTP_FLAVOR}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5027,7 +4955,7 @@ export const DB_SYSTEM_VALUES_TRINO = 'trino';
 export const HTTP_FLAVOR_VALUES_HTTP_1_0 = '1.0';
 
 /**
- * Deprecated, use `network.protocol.name` instead.
+ * Enum value '1.1' for attribute {@link ATTR_HTTP_FLAVOR}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5036,7 +4964,7 @@ export const HTTP_FLAVOR_VALUES_HTTP_1_0 = '1.0';
 export const HTTP_FLAVOR_VALUES_HTTP_1_1 = '1.1';
 
 /**
- * Deprecated, use `network.protocol.name` instead.
+ * Enum value '2.0' for attribute {@link ATTR_HTTP_FLAVOR}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5045,7 +4973,7 @@ export const HTTP_FLAVOR_VALUES_HTTP_1_1 = '1.1';
 export const HTTP_FLAVOR_VALUES_HTTP_2_0 = '2.0';
 
 /**
- * Deprecated, use `network.protocol.name` instead.
+ * Enum value '3.0' for attribute {@link ATTR_HTTP_FLAVOR}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5054,7 +4982,7 @@ export const HTTP_FLAVOR_VALUES_HTTP_2_0 = '2.0';
 export const HTTP_FLAVOR_VALUES_HTTP_3_0 = '3.0';
 
 /**
- * Deprecated, use `network.protocol.name` instead.
+ * Enum value 'SPDY' for attribute {@link ATTR_HTTP_FLAVOR}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5063,7 +4991,7 @@ export const HTTP_FLAVOR_VALUES_HTTP_3_0 = '3.0';
 export const HTTP_FLAVOR_VALUES_SPDY = 'SPDY';
 
 /**
- * Deprecated, use `network.protocol.name` instead.
+ * Enum value 'QUIC' for attribute {@link ATTR_HTTP_FLAVOR}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5072,7 +5000,7 @@ export const HTTP_FLAVOR_VALUES_SPDY = 'SPDY';
 export const HTTP_FLAVOR_VALUES_QUIC = 'QUIC';
 
 /**
- * Deprecated, use `network.transport` and `network.type`.
+ * Enum value 'inet' for attribute {@link ATTR_NET_SOCK_FAMILY}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5081,7 +5009,7 @@ export const HTTP_FLAVOR_VALUES_QUIC = 'QUIC';
 export const NET_SOCK_FAMILY_VALUES_INET = 'inet';
 
 /**
- * Deprecated, use `network.transport` and `network.type`.
+ * Enum value 'inet6' for attribute {@link ATTR_NET_SOCK_FAMILY}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5090,7 +5018,7 @@ export const NET_SOCK_FAMILY_VALUES_INET = 'inet';
 export const NET_SOCK_FAMILY_VALUES_INET6 = 'inet6';
 
 /**
- * Deprecated, use `network.transport` and `network.type`.
+ * Enum value 'unix' for attribute {@link ATTR_NET_SOCK_FAMILY}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5099,7 +5027,7 @@ export const NET_SOCK_FAMILY_VALUES_INET6 = 'inet6';
 export const NET_SOCK_FAMILY_VALUES_UNIX = 'unix';
 
 /**
- * Deprecated, use `network.transport`.
+ * Enum value 'ip_tcp' for attribute {@link ATTR_NET_TRANSPORT}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5108,7 +5036,7 @@ export const NET_SOCK_FAMILY_VALUES_UNIX = 'unix';
 export const NET_TRANSPORT_VALUES_IP_TCP = 'ip_tcp';
 
 /**
- * Deprecated, use `network.transport`.
+ * Enum value 'ip_udp' for attribute {@link ATTR_NET_TRANSPORT}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5117,7 +5045,7 @@ export const NET_TRANSPORT_VALUES_IP_TCP = 'ip_tcp';
 export const NET_TRANSPORT_VALUES_IP_UDP = 'ip_udp';
 
 /**
- * Deprecated, use `network.transport`.
+ * Enum value 'pipe' for attribute {@link ATTR_NET_TRANSPORT}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5126,7 +5054,7 @@ export const NET_TRANSPORT_VALUES_IP_UDP = 'ip_udp';
 export const NET_TRANSPORT_VALUES_PIPE = 'pipe';
 
 /**
- * Deprecated, use `network.transport`.
+ * Enum value 'inproc' for attribute {@link ATTR_NET_TRANSPORT}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5135,7 +5063,7 @@ export const NET_TRANSPORT_VALUES_PIPE = 'pipe';
 export const NET_TRANSPORT_VALUES_INPROC = 'inproc';
 
 /**
- * Deprecated, use `network.transport`.
+ * Enum value 'other' for attribute {@link ATTR_NET_TRANSPORT}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5144,7 +5072,7 @@ export const NET_TRANSPORT_VALUES_INPROC = 'inproc';
 export const NET_TRANSPORT_VALUES_OTHER = 'other';
 
 /**
- * Deprecated, use `system.process.status` instead.
+ * Enum value 'running' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5153,7 +5081,7 @@ export const NET_TRANSPORT_VALUES_OTHER = 'other';
 export const SYSTEM_PROCESSES_STATUS_VALUES_RUNNING = 'running';
 
 /**
- * Deprecated, use `system.process.status` instead.
+ * Enum value 'sleeping' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5162,7 +5090,7 @@ export const SYSTEM_PROCESSES_STATUS_VALUES_RUNNING = 'running';
 export const SYSTEM_PROCESSES_STATUS_VALUES_SLEEPING = 'sleeping';
 
 /**
- * Deprecated, use `system.process.status` instead.
+ * Enum value 'stopped' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5171,7 +5099,7 @@ export const SYSTEM_PROCESSES_STATUS_VALUES_SLEEPING = 'sleeping';
 export const SYSTEM_PROCESSES_STATUS_VALUES_STOPPED = 'stopped';
 
 /**
- * Deprecated, use `system.process.status` instead.
+ * Enum value 'defunct' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  *
@@ -5180,237 +5108,217 @@ export const SYSTEM_PROCESSES_STATUS_VALUES_STOPPED = 'stopped';
 export const SYSTEM_PROCESSES_STATUS_VALUES_DEFUNCT = 'defunct';
 
 /**
- * The disk IO operation direction.
+ * Enum value 'read' for attribute {@link ATTR_DISK_IO_DIRECTION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DISK_IO_DIRECTION_VALUES_READ = 'read';
 
 /**
- * The disk IO operation direction.
+ * Enum value 'write' for attribute {@link ATTR_DISK_IO_DIRECTION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const DISK_IO_DIRECTION_VALUES_WRITE = 'write';
 
 /**
- * Describes the type of the operation that was performed on the data.
+ * Enum value 'insert' for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_DOCUMENT_OPERATION_VALUES_INSERT = 'insert';
 
 /**
- * Describes the type of the operation that was performed on the data.
+ * Enum value 'edit' for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_DOCUMENT_OPERATION_VALUES_EDIT = 'edit';
 
 /**
- * Describes the type of the operation that was performed on the data.
+ * Enum value 'delete' for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_DOCUMENT_OPERATION_VALUES_DELETE = 'delete';
 
 /**
- * The cloud provider of the invoked function.
- *
- * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ * Enum value 'alibaba_cloud' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_INVOKED_PROVIDER_VALUES_ALIBABA_CLOUD = 'alibaba_cloud';
 
 /**
- * The cloud provider of the invoked function.
- *
- * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ * Enum value 'aws' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_INVOKED_PROVIDER_VALUES_AWS = 'aws';
 
 /**
- * The cloud provider of the invoked function.
- *
- * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ * Enum value 'azure' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_INVOKED_PROVIDER_VALUES_AZURE = 'azure';
 
 /**
- * The cloud provider of the invoked function.
- *
- * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ * Enum value 'gcp' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_INVOKED_PROVIDER_VALUES_GCP = 'gcp';
 
 /**
- * The cloud provider of the invoked function.
- *
- * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ * Enum value 'tencent_cloud' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_INVOKED_PROVIDER_VALUES_TENCENT_CLOUD = 'tencent_cloud';
 
 /**
- * Type of the trigger which caused this function invocation.
+ * Enum value 'datasource' for attribute {@link ATTR_FAAS_TRIGGER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_TRIGGER_VALUES_DATASOURCE = 'datasource';
 
 /**
- * Type of the trigger which caused this function invocation.
+ * Enum value 'http' for attribute {@link ATTR_FAAS_TRIGGER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_TRIGGER_VALUES_HTTP = 'http';
 
 /**
- * Type of the trigger which caused this function invocation.
+ * Enum value 'pubsub' for attribute {@link ATTR_FAAS_TRIGGER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_TRIGGER_VALUES_PUBSUB = 'pubsub';
 
 /**
- * Type of the trigger which caused this function invocation.
+ * Enum value 'timer' for attribute {@link ATTR_FAAS_TRIGGER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_TRIGGER_VALUES_TIMER = 'timer';
 
 /**
- * Type of the trigger which caused this function invocation.
+ * Enum value 'other' for attribute {@link ATTR_FAAS_TRIGGER}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const FAAS_TRIGGER_VALUES_OTHER = 'other';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 'amd64' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_AMD64 = 'amd64';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 'arm32' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_ARM32 = 'arm32';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 'arm64' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_ARM64 = 'arm64';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 'ia64' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_IA64 = 'ia64';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 'ppc32' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_PPC32 = 'ppc32';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 'ppc64' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_PPC64 = 'ppc64';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 's390x' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_S390X = 's390x';
 
 /**
- * The CPU architecture the host system is running on.
+ * Enum value 'x86' for attribute {@link ATTR_HOST_ARCH}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HOST_ARCH_VALUES_X86 = 'x86';
 
 /**
- * State of the HTTP connection in the HTTP connection pool.
+ * Enum value 'active' for attribute {@link ATTR_HTTP_CONNECTION_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HTTP_CONNECTION_STATE_VALUES_ACTIVE = 'active';
 
 /**
- * State of the HTTP connection in the HTTP connection pool.
+ * Enum value 'idle' for attribute {@link ATTR_HTTP_CONNECTION_STATE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const HTTP_CONNECTION_STATE_VALUES_IDLE = 'idle';
 
 /**
- * A string identifying the kind of messaging operation.
- *
- * Note: If a custom value is used, it MUST be of low cardinality.
+ * Enum value 'publish' for attribute {@link ATTR_MESSAGING_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_OPERATION_VALUES_PUBLISH = 'publish';
 
 /**
- * A string identifying the kind of messaging operation.
- *
- * Note: If a custom value is used, it MUST be of low cardinality.
+ * Enum value 'create' for attribute {@link ATTR_MESSAGING_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_OPERATION_VALUES_CREATE = 'create';
 
 /**
- * A string identifying the kind of messaging operation.
- *
- * Note: If a custom value is used, it MUST be of low cardinality.
+ * Enum value 'receive' for attribute {@link ATTR_MESSAGING_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_OPERATION_VALUES_RECEIVE = 'receive';
 
 /**
- * A string identifying the kind of messaging operation.
- *
- * Note: If a custom value is used, it MUST be of low cardinality.
+ * Enum value 'process' for attribute {@link ATTR_MESSAGING_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_OPERATION_VALUES_DELIVER = 'process';
 
 /**
- * A string identifying the kind of messaging operation.
- *
- * Note: If a custom value is used, it MUST be of low cardinality.
+ * Enum value 'settle' for attribute {@link ATTR_MESSAGING_OPERATION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_OPERATION_VALUES_SETTLE = 'settle';
 
 /**
- * Model of message consumption. This only applies to consumer spans.
+ * Enum value 'clustering' for attribute {@link ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5418,7 +5326,7 @@ export const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_VALUES_CLUSTERING =
   'clustering';
 
 /**
- * Model of message consumption. This only applies to consumer spans.
+ * Enum value 'broadcasting' for attribute {@link ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5426,35 +5334,35 @@ export const MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_VALUES_BROADCASTING =
   'broadcasting';
 
 /**
- * Type of message.
+ * Enum value 'normal' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUES_NORMAL = 'normal';
 
 /**
- * Type of message.
+ * Enum value 'fifo' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUES_FIFO = 'fifo';
 
 /**
- * Type of message.
+ * Enum value 'delay' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUES_DELAY = 'delay';
 
 /**
- * Type of message.
+ * Enum value 'transaction' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUES_TRANSACTION = 'transaction';
 
 /**
- * Describes the [settlement type](https://learn.microsoft.com/azure/service-bus-messaging/message-transfers-locks-settlement#peeklock).
+ * Enum value 'complete' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5462,14 +5370,14 @@ export const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUES_COMPLETE =
   'complete';
 
 /**
- * Describes the [settlement type](https://learn.microsoft.com/azure/service-bus-messaging/message-transfers-locks-settlement#peeklock).
+ * Enum value 'abandon' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUES_ABANDON = 'abandon';
 
 /**
- * Describes the [settlement type](https://learn.microsoft.com/azure/service-bus-messaging/message-transfers-locks-settlement#peeklock).
+ * Enum value 'dead_letter' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5477,126 +5385,126 @@ export const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUES_DEAD_LETTER =
   'dead_letter';
 
 /**
- * Describes the [settlement type](https://learn.microsoft.com/azure/service-bus-messaging/message-transfers-locks-settlement#peeklock).
+ * Enum value 'defer' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUES_DEFER = 'defer';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'activemq' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_ACTIVEMQ = 'activemq';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'aws_sqs' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_AWS_SQS = 'aws_sqs';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'eventgrid' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_EVENTGRID = 'eventgrid';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'eventhubs' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_EVENTHUBS = 'eventhubs';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'servicebus' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_SERVICEBUS = 'servicebus';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'gcp_pubsub' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_GCP_PUBSUB = 'gcp_pubsub';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'jms' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_JMS = 'jms';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'kafka' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_KAFKA = 'kafka';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'rabbitmq' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_RABBITMQ = 'rabbitmq';
 
 /**
- * An identifier for the messaging system being used. See below for a list of well-known identifiers.
+ * Enum value 'rocketmq' for attribute {@link ATTR_MESSAGING_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGING_SYSTEM_VALUES_ROCKETMQ = 'rocketmq';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'gprs' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_GPRS = 'gprs';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'edge' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_EDGE = 'edge';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'umts' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_UMTS = 'umts';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'cdma' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_CDMA = 'cdma';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'evdo_0' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_EVDO_0 = 'evdo_0';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'evdo_a' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_EVDO_A = 'evdo_a';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'cdma2000_1xrtt' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5604,245 +5512,245 @@ export const NETWORK_CONNECTION_SUBTYPE_VALUES_CDMA2000_1XRTT =
   'cdma2000_1xrtt';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'hsdpa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_HSDPA = 'hsdpa';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'hsupa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_HSUPA = 'hsupa';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'hspa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_HSPA = 'hspa';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'iden' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_IDEN = 'iden';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'evdo_b' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_EVDO_B = 'evdo_b';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'lte' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_LTE = 'lte';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'ehrpd' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_EHRPD = 'ehrpd';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'hspap' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_HSPAP = 'hspap';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'gsm' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_GSM = 'gsm';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'td_scdma' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_TD_SCDMA = 'td_scdma';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'iwlan' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_IWLAN = 'iwlan';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'nr' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_NR = 'nr';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'nrnsa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_NRNSA = 'nrnsa';
 
 /**
- * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * Enum value 'lte_ca' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_SUBTYPE_VALUES_LTE_CA = 'lte_ca';
 
 /**
- * The internet connection type.
+ * Enum value 'wifi' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_TYPE_VALUES_WIFI = 'wifi';
 
 /**
- * The internet connection type.
+ * Enum value 'wired' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_TYPE_VALUES_WIRED = 'wired';
 
 /**
- * The internet connection type.
+ * Enum value 'cell' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_TYPE_VALUES_CELL = 'cell';
 
 /**
- * The internet connection type.
+ * Enum value 'unavailable' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_TYPE_VALUES_UNAVAILABLE = 'unavailable';
 
 /**
- * The internet connection type.
+ * Enum value 'unknown' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_CONNECTION_TYPE_VALUES_UNKNOWN = 'unknown';
 
 /**
- * The network IO operation direction.
+ * Enum value 'transmit' for attribute {@link ATTR_NETWORK_IO_DIRECTION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_IO_DIRECTION_VALUES_TRANSMIT = 'transmit';
 
 /**
- * The network IO operation direction.
+ * Enum value 'receive' for attribute {@link ATTR_NETWORK_IO_DIRECTION}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const NETWORK_IO_DIRECTION_VALUES_RECEIVE = 'receive';
 
 /**
- * The operating system type.
+ * Enum value 'windows' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_WINDOWS = 'windows';
 
 /**
- * The operating system type.
+ * Enum value 'linux' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_LINUX = 'linux';
 
 /**
- * The operating system type.
+ * Enum value 'darwin' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_DARWIN = 'darwin';
 
 /**
- * The operating system type.
+ * Enum value 'freebsd' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_FREEBSD = 'freebsd';
 
 /**
- * The operating system type.
+ * Enum value 'netbsd' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_NETBSD = 'netbsd';
 
 /**
- * The operating system type.
+ * Enum value 'openbsd' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_OPENBSD = 'openbsd';
 
 /**
- * The operating system type.
+ * Enum value 'dragonflybsd' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_DRAGONFLYBSD = 'dragonflybsd';
 
 /**
- * The operating system type.
+ * Enum value 'hpux' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_HPUX = 'hpux';
 
 /**
- * The operating system type.
+ * Enum value 'aix' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_AIX = 'aix';
 
 /**
- * The operating system type.
+ * Enum value 'solaris' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_SOLARIS = 'solaris';
 
 /**
- * The operating system type.
+ * Enum value 'z_os' for attribute {@link ATTR_OS_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OS_TYPE_VALUES_Z_OS = 'z_os';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'cancelled' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_CANCELLED = 'cancelled';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'unknown' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_UNKNOWN = 'unknown';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'invalid_argument' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5850,7 +5758,7 @@ export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_INVALID_ARGUMENT =
   'invalid_argument';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'deadline_exceeded' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5858,14 +5766,14 @@ export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_DEADLINE_EXCEEDED =
   'deadline_exceeded';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'not_found' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_NOT_FOUND = 'not_found';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'already_exists' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5873,7 +5781,7 @@ export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_ALREADY_EXISTS =
   'already_exists';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'permission_denied' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5881,7 +5789,7 @@ export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_PERMISSION_DENIED =
   'permission_denied';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'resource_exhausted' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5889,7 +5797,7 @@ export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_RESOURCE_EXHAUSTED =
   'resource_exhausted';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'failed_precondition' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5897,49 +5805,49 @@ export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_FAILED_PRECONDITION =
   'failed_precondition';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'aborted' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_ABORTED = 'aborted';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'out_of_range' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_OUT_OF_RANGE = 'out_of_range';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'unimplemented' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_UNIMPLEMENTED = 'unimplemented';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'internal' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_INTERNAL = 'internal';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'unavailable' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_UNAVAILABLE = 'unavailable';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'data_loss' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_DATA_LOSS = 'data_loss';
 
 /**
- * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+ * Enum value 'unauthenticated' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5947,235 +5855,231 @@ export const RPC_CONNECT_RPC_ERROR_CODE_VALUES_UNAUTHENTICATED =
   'unauthenticated';
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 0 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_OK = 0;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 1 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_CANCELLED = 1;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 2 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_UNKNOWN = 2;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 3 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_INVALID_ARGUMENT = 3;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 4 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_DEADLINE_EXCEEDED = 4;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 5 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_NOT_FOUND = 5;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 6 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_ALREADY_EXISTS = 6;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 7 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_PERMISSION_DENIED = 7;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 8 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_RESOURCE_EXHAUSTED = 8;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 9 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_FAILED_PRECONDITION = 9;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 10 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_ABORTED = 10;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 11 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_OUT_OF_RANGE = 11;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 12 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_UNIMPLEMENTED = 12;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 13 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_INTERNAL = 13;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 14 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_UNAVAILABLE = 14;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 15 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_DATA_LOSS = 15;
 
 /**
- * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * Enum value 16 for attribute {@link ATTR_RPC_GRPC_STATUS_CODE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_GRPC_STATUS_CODE_VALUES_UNAUTHENTICATED = 16;
 
 /**
- * A string identifying the remoting system. See below for a list of well-known identifiers.
+ * Enum value 'grpc' for attribute {@link ATTR_RPC_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_SYSTEM_VALUES_GRPC = 'grpc';
 
 /**
- * A string identifying the remoting system. See below for a list of well-known identifiers.
+ * Enum value 'java_rmi' for attribute {@link ATTR_RPC_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_SYSTEM_VALUES_JAVA_RMI = 'java_rmi';
 
 /**
- * A string identifying the remoting system. See below for a list of well-known identifiers.
+ * Enum value 'dotnet_wcf' for attribute {@link ATTR_RPC_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_SYSTEM_VALUES_DOTNET_WCF = 'dotnet_wcf';
 
 /**
- * A string identifying the remoting system. See below for a list of well-known identifiers.
+ * Enum value 'apache_dubbo' for attribute {@link ATTR_RPC_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_SYSTEM_VALUES_APACHE_DUBBO = 'apache_dubbo';
 
 /**
- * A string identifying the remoting system. See below for a list of well-known identifiers.
+ * Enum value 'connect_rpc' for attribute {@link ATTR_RPC_SYSTEM}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const RPC_SYSTEM_VALUES_CONNECT_RPC = 'connect_rpc';
 
 /**
- * Normalized lowercase protocol name parsed from original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES).
+ * Enum value 'ssl' for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const TLS_PROTOCOL_NAME_VALUES_SSL = 'ssl';
 
 /**
- * Normalized lowercase protocol name parsed from original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES).
+ * Enum value 'tls' for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const TLS_PROTOCOL_NAME_VALUES_TLS = 'tls';
 
 /**
- * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
+ * Enum value 'ec2' for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const AWS_ECS_LAUNCHTYPE_VALUES_EC2 = 'ec2';
 
 /**
- * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
+ * Enum value 'fargate' for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const AWS_ECS_LAUNCHTYPE_VALUES_FARGATE = 'fargate';
 
 /**
- * Parent-child Reference type.
- *
- * Note: The causal relationship between a child Span and a parent Span.
+ * Enum value 'child_of' for attribute {@link ATTR_OPENTRACING_REF_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OPENTRACING_REF_TYPE_VALUES_CHILD_OF = 'child_of';
 
 /**
- * Parent-child Reference type.
- *
- * Note: The causal relationship between a child Span and a parent Span.
+ * Enum value 'follows_from' for attribute {@link ATTR_OPENTRACING_REF_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const OPENTRACING_REF_TYPE_VALUES_FOLLOWS_FROM = 'follows_from';
 
 /**
- * The type of the operation being executed.
+ * Enum value 'query' for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const GRAPHQL_OPERATION_TYPE_VALUES_QUERY = 'query';
 
 /**
- * The type of the operation being executed.
+ * Enum value 'mutation' for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const GRAPHQL_OPERATION_TYPE_VALUES_MUTATION = 'mutation';
 
 /**
- * The type of the operation being executed.
+ * Enum value 'subscription' for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const GRAPHQL_OPERATION_TYPE_VALUES_SUBSCRIPTION = 'subscription';
 
 /**
- * Whether this is a received or sent message.
+ * Enum value 'SENT' for attribute {@link ATTR_MESSAGE_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const MESSAGE_TYPE_VALUES_SENT = 'SENT';
 
 /**
- * Whether this is a received or sent message.
+ * Enum value 'RECEIVED' for attribute {@link ATTR_MESSAGE_TYPE}.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */

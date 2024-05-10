@@ -570,474 +570,280 @@ export const ATTR_OTEL_STATUS_CODE = 'otel.status_code';
 export const ATTR_OTEL_STATUS_DESCRIPTION = 'otel.status_description';
 
 /**
- * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
+ * Enum value 'acquired' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
  */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUES_ACQUIRED = 'acquired';
 
 /**
- * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
+ * Enum value 'endpoint_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
  */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUES_ENDPOINT_LIMITER =
   'endpoint_limiter';
 
 /**
- * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
+ * Enum value 'global_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
  */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUES_GLOBAL_LIMITER =
   'global_limiter';
 
 /**
- * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
+ * Enum value 'request_canceled' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
  */
 export const ASPNETCORE_RATE_LIMITING_RESULT_VALUES_REQUEST_CANCELED =
   'request_canceled';
 
 /**
- * Match result - success or failure.
+ * Enum value 'success' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
  */
 export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUES_SUCCESS = 'success';
 
 /**
- * Match result - success or failure.
+ * Enum value 'failure' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
  */
 export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUES_FAILURE = 'failure';
 
 /**
- * ASP.NET Core exception middleware handling result.
+ * Enum value 'handled' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUES_HANDLED = 'handled';
 
 /**
- * ASP.NET Core exception middleware handling result.
+ * Enum value 'unhandled' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUES_UNHANDLED =
   'unhandled';
 
 /**
- * ASP.NET Core exception middleware handling result.
+ * Enum value 'skipped' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUES_SKIPPED = 'skipped';
 
 /**
- * ASP.NET Core exception middleware handling result.
+ * Enum value 'aborted' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
 export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUES_ABORTED = 'aborted';
 
 /**
- * SignalR HTTP connection closure status.
+ * Enum value 'normal_closure' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
  */
 export const SIGNALR_CONNECTION_STATUS_VALUES_NORMAL_CLOSURE = 'normal_closure';
 
 /**
- * SignalR HTTP connection closure status.
+ * Enum value 'timeout' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
  */
 export const SIGNALR_CONNECTION_STATUS_VALUES_TIMEOUT = 'timeout';
 
 /**
- * SignalR HTTP connection closure status.
+ * Enum value 'app_shutdown' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
  */
 export const SIGNALR_CONNECTION_STATUS_VALUES_APP_SHUTDOWN = 'app_shutdown';
 
 /**
- * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md).
+ * Enum value 'server_sent_events' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
  */
 export const SIGNALR_TRANSPORT_VALUES_SERVER_SENT_EVENTS = 'server_sent_events';
 
 /**
- * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md).
+ * Enum value 'long_polling' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
  */
 export const SIGNALR_TRANSPORT_VALUES_LONG_POLLING = 'long_polling';
 
 /**
- * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md).
+ * Enum value 'web_sockets' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
  */
 export const SIGNALR_TRANSPORT_VALUES_WEB_SOCKETS = 'web_sockets';
 
 /**
- * The type of memory.
+ * Enum value 'heap' for attribute {@link ATTR_JVM_MEMORY_TYPE}.
  */
 export const JVM_MEMORY_TYPE_VALUES_HEAP = 'heap';
 
 /**
- * The type of memory.
+ * Enum value 'non_heap' for attribute {@link ATTR_JVM_MEMORY_TYPE}.
  */
 export const JVM_MEMORY_TYPE_VALUES_NON_HEAP = 'non_heap';
 
 /**
- * State of the thread.
+ * Enum value 'new' for attribute {@link ATTR_JVM_THREAD_STATE}.
  */
 export const JVM_THREAD_STATE_VALUES_NEW = 'new';
 
 /**
- * State of the thread.
+ * Enum value 'runnable' for attribute {@link ATTR_JVM_THREAD_STATE}.
  */
 export const JVM_THREAD_STATE_VALUES_RUNNABLE = 'runnable';
 
 /**
- * State of the thread.
+ * Enum value 'blocked' for attribute {@link ATTR_JVM_THREAD_STATE}.
  */
 export const JVM_THREAD_STATE_VALUES_BLOCKED = 'blocked';
 
 /**
- * State of the thread.
+ * Enum value 'waiting' for attribute {@link ATTR_JVM_THREAD_STATE}.
  */
 export const JVM_THREAD_STATE_VALUES_WAITING = 'waiting';
 
 /**
- * State of the thread.
+ * Enum value 'timed_waiting' for attribute {@link ATTR_JVM_THREAD_STATE}.
  */
 export const JVM_THREAD_STATE_VALUES_TIMED_WAITING = 'timed_waiting';
 
 /**
- * State of the thread.
+ * Enum value 'terminated' for attribute {@link ATTR_JVM_THREAD_STATE}.
  */
 export const JVM_THREAD_STATE_VALUES_TERMINATED = 'terminated';
 
 /**
- * Describes a class of error the operation ended with.
- *
- * Note: The `error.type` SHOULD be predictable and SHOULD have low cardinality.
-Instrumentations SHOULD document the list of errors they report.
-
-The cardinality of `error.type` within one instrumentation library SHOULD be low.
-Telemetry consumers that aggregate data from multiple instrumentation libraries and applications
-should be prepared for `error.type` to have high cardinality at query time when no
-additional filters are applied.
-
-If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.
-
-If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
-it&#39;s RECOMMENDED to:
-
-* Use a domain-specific attribute
-* Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
+ * Enum value '_OTHER' for attribute {@link ATTR_ERROR_TYPE}.
  */
 export const ERROR_TYPE_VALUES_OTHER = '_OTHER';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'CONNECT' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_CONNECT = 'CONNECT';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'DELETE' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_DELETE = 'DELETE';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'GET' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_GET = 'GET';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'HEAD' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_HEAD = 'HEAD';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'OPTIONS' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_OPTIONS = 'OPTIONS';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'PATCH' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_PATCH = 'PATCH';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'POST' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_POST = 'POST';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'PUT' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_PUT = 'PUT';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value 'TRACE' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_TRACE = 'TRACE';
 
 /**
- * HTTP request method.
- *
- * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ * Enum value '_OTHER' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
  */
 export const HTTP_REQUEST_METHOD_VALUES_OTHER = '_OTHER';
 
 /**
- * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
- *
- * Note: The value SHOULD be normalized to lowercase.
-
-Consider always setting the transport when setting a port number, since
-a port number is ambiguous without knowing the transport. For example
-different processes could be listening on TCP port 12345 and UDP port 12345.
+ * Enum value 'tcp' for attribute {@link ATTR_NETWORK_TRANSPORT}.
  */
 export const NETWORK_TRANSPORT_VALUES_TCP = 'tcp';
 
 /**
- * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
- *
- * Note: The value SHOULD be normalized to lowercase.
-
-Consider always setting the transport when setting a port number, since
-a port number is ambiguous without knowing the transport. For example
-different processes could be listening on TCP port 12345 and UDP port 12345.
+ * Enum value 'udp' for attribute {@link ATTR_NETWORK_TRANSPORT}.
  */
 export const NETWORK_TRANSPORT_VALUES_UDP = 'udp';
 
 /**
- * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
- *
- * Note: The value SHOULD be normalized to lowercase.
-
-Consider always setting the transport when setting a port number, since
-a port number is ambiguous without knowing the transport. For example
-different processes could be listening on TCP port 12345 and UDP port 12345.
+ * Enum value 'pipe' for attribute {@link ATTR_NETWORK_TRANSPORT}.
  */
 export const NETWORK_TRANSPORT_VALUES_PIPE = 'pipe';
 
 /**
- * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
- *
- * Note: The value SHOULD be normalized to lowercase.
-
-Consider always setting the transport when setting a port number, since
-a port number is ambiguous without knowing the transport. For example
-different processes could be listening on TCP port 12345 and UDP port 12345.
+ * Enum value 'unix' for attribute {@link ATTR_NETWORK_TRANSPORT}.
  */
 export const NETWORK_TRANSPORT_VALUES_UNIX = 'unix';
 
 /**
- * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
- *
- * Note: The value SHOULD be normalized to lowercase.
+ * Enum value 'ipv4' for attribute {@link ATTR_NETWORK_TYPE}.
  */
 export const NETWORK_TYPE_VALUES_IPV4 = 'ipv4';
 
 /**
- * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
- *
- * Note: The value SHOULD be normalized to lowercase.
+ * Enum value 'ipv6' for attribute {@link ATTR_NETWORK_TYPE}.
  */
 export const NETWORK_TYPE_VALUES_IPV6 = 'ipv6';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'cpp' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_CPP = 'cpp';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'dotnet' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_DOTNET = 'dotnet';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'erlang' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_ERLANG = 'erlang';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'go' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_GO = 'go';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'java' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_JAVA = 'java';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'nodejs' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_NODEJS = 'nodejs';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'php' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_PHP = 'php';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'python' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_PYTHON = 'python';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'ruby' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_RUBY = 'ruby';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'rust' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_RUST = 'rust';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'swift' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_SWIFT = 'swift';
 
 /**
- * The language of the telemetry SDK.
+ * Enum value 'webjs' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
  */
 export const TELEMETRY_SDK_LANGUAGE_VALUES_WEBJS = 'webjs';
 
 /**
- * Name of the code, either &#34;OK&#34; or &#34;ERROR&#34;. MUST NOT be set if the status code is UNSET.
+ * Enum value 'OK' for attribute {@link ATTR_OTEL_STATUS_CODE}.
  */
 export const OTEL_STATUS_CODE_VALUES_OK = 'OK';
 
 /**
- * Name of the code, either &#34;OK&#34; or &#34;ERROR&#34;. MUST NOT be set if the status code is UNSET.
+ * Enum value 'ERROR' for attribute {@link ATTR_OTEL_STATUS_CODE}.
  */
 export const OTEL_STATUS_CODE_VALUES_ERROR = 'ERROR';

@@ -80,11 +80,7 @@ export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", 
 {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
 
 /**
- * {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
-  {%- if attribute.note %}
- *
- * Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
-  {%- endif %}
+ * Enum value {{ print_value(type, member.value) }} for attribute {@link ATTR_{{ attribute.fqn | to_const_name }}}.
   {%- if (attribute.stability | string()) != "StabilityLevel.STABLE" %}
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
