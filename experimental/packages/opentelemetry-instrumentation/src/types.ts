@@ -96,7 +96,16 @@ export interface InstrumentationModuleFile {
 
   moduleExports?: unknown;
 
-  /** Supported version this file */
+  /** Supported versions for the file.
+   * 
+   * A module version is supported if one of the supportedVersions in the array satisfies the module version.
+   * The syntax ot the version is checked with the `satisfies` function of "The semantic versioner for npm", see 
+   * [`semver` package](https://www.npmjs.com/package/semver)
+   * If the version is not supported, we won't apply instrumentation patch.
+   * If omitted, all versions of the module will be patched.
+   * 
+   * Example: ['>=1.2.3 <3']
+  */
   supportedVersions: string[];
 
   /** Method to patch the instrumentation  */
@@ -118,7 +127,16 @@ export interface InstrumentationModuleDefinition {
   /** Instrumented module version */
   moduleVersion?: string;
 
-  /** Supported version of module  */
+  /** Supported version of module.
+   * 
+   * A module version is supported if one of the supportedVersions in the array satisfies the module version.
+   * The syntax ot the version is checked with the `satisfies` function of "The semantic versioner for npm", see 
+   * [`semver` package](https://www.npmjs.com/package/semver)
+   * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
+   * If omitted, all versions of the module will be patched.
+   * 
+   * Example: ['>=1.2.3 <3']
+  */
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
