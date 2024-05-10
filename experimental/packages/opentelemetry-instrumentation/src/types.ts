@@ -60,7 +60,7 @@ export interface Instrumentation<
    * All versions must be compatible with [semver](https://semver.org/spec/v2.0.0.html) format.
    * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
    * If omitted, all versions of the module will be patched.
-  */
+   */
   supportedVersions?: string[];
 }
 
@@ -104,8 +104,11 @@ export interface InstrumentationModuleFile {
    * If the version is not supported, we won't apply instrumentation patch.
    * If omitted, all versions of the module will be patched.
    * 
+   * It is recommended to always specify a range that is bound to a major version, to avoid breaking changes.
+   * New major versions should be reviewed and tested before being added to the supportedVersions array.
+   * 
    * Example: ['>=1.2.3 <3']
-  */
+   */
   supportedVersions: string[];
 
   /** Method to patch the instrumentation  */
@@ -139,7 +142,7 @@ export interface InstrumentationModuleDefinition {
    * New major versions should be reviewed and tested before being added to the supportedVersions array.
    * 
    * Example: ['>=1.2.3 <3']
-  */
+   */
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
