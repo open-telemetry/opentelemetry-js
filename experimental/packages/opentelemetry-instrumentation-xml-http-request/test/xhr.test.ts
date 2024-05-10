@@ -190,7 +190,6 @@ describe('xhr', () => {
     const testAsync = test.async;
     describe(`when async='${testAsync}'`, () => {
       let requests: any[] = [];
-      let prepareData: any;
       let clearData: any;
       let contextManager: ZoneContextManager;
 
@@ -231,7 +230,7 @@ describe('xhr', () => {
           sinon.restore();
         };
 
-        prepareData = (
+        const prepareData = (
           done: any,
           fileUrl: string,
           config?: XMLHttpRequestInstrumentationConfig
