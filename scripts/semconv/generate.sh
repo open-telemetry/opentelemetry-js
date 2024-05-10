@@ -47,32 +47,6 @@ docker run --rm --platform linux/amd64 \
   -Dclass=SemanticAttributes \
   -Dfilter=is_experimental
 
-# docker run --rm --platform linux/amd64 \
-#   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
-#   -v ${SCRIPT_DIR}/templates:/templates \
-#   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/resource/:/output \
-#   otel/semconvgen:${GENERATOR_VERSION} \
-#   --only resource \
-#   --yaml-root /source \
-#   code \
-#   --template /templates/SemanticAttributes.ts.j2 \
-#   --output /output/SemanticResourceAttributes.ts \
-#   -Dclass=SemanticResourceAttributes \
-#   -Dcls_prefix=SEMRESATTRS
-
-# docker run --rm --platform linux/amd64 \
-#   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
-#   -v ${SCRIPT_DIR}/templates:/templates \
-#   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/metric/:/output \
-#   otel/semconvgen:${GENERATOR_VERSION} \
-#   --only metric \
-#   --yaml-root /source \
-#   code \
-#   --template /templates/SemanticAttributes.ts.j2 \
-#   --output /output/SemanticMetricAttributes.ts \
-#   -Dclass=SemanticMetricAttributes \
-#   -Dcls_prefix=SEMMTRCSATTRS
-
 # Run the automatic linting fixing task to ensure it will pass eslint
 cd "$ROOT_DIR"
 
