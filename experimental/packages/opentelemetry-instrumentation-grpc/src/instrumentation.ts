@@ -53,7 +53,6 @@ import {
 } from '@opentelemetry/api';
 import {
   InstrumentationNodeModuleDefinition,
-  isWrapped,
   InstrumentationBase,
 } from '@opentelemetry/instrumentation';
 import {
@@ -102,9 +101,6 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
         '@grpc/grpc-js',
         ['1.*'],
         moduleExports => {
-          if (isWrapped(moduleExports.Server.prototype.register)) {
-            this._unwrap(moduleExports.Server.prototype, 'register');
-          }
           // Patch Server methods
           this._wrap(
             moduleExports.Server.prototype,
@@ -112,45 +108,21 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
             this._patchServer()
           );
           // Patch Client methods
-          if (isWrapped(moduleExports.makeGenericClientConstructor)) {
-            this._unwrap(moduleExports, 'makeGenericClientConstructor');
-          }
           this._wrap(
             moduleExports,
             'makeGenericClientConstructor',
             this._patchClient(moduleExports)
           );
-          if (isWrapped(moduleExports.makeClientConstructor)) {
-            this._unwrap(moduleExports, 'makeClientConstructor');
-          }
           this._wrap(
             moduleExports,
             'makeClientConstructor',
             this._patchClient(moduleExports)
           );
-          if (isWrapped(moduleExports.loadPackageDefinition)) {
-            this._unwrap(moduleExports, 'loadPackageDefinition');
-          }
           this._wrap(
             moduleExports,
             'loadPackageDefinition',
             this._patchLoadPackageDefinition(moduleExports)
           );
-          if (isWrapped(moduleExports.Client.prototype)) {
-            this._unwrap(moduleExports.Client.prototype, 'makeUnaryRequest');
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeClientStreamRequest'
-            );
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeServerStreamRequest'
-            );
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeBidiStreamRequest'
-            );
-          }
           this._wrap(
             moduleExports.Client.prototype,
             'makeUnaryRequest',
