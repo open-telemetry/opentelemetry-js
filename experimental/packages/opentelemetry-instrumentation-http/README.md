@@ -18,7 +18,7 @@ npm install --save @opentelemetry/instrumentation-http
 
 ## Supported Versions
 
-Nodejs `>=14`
+- Nodejs `>=14`
 
 ## Usage
 

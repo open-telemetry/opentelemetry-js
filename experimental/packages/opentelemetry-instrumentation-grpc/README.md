@@ -18,7 +18,7 @@ npm install --save @opentelemetry/instrumentation-grpc
 
 ## Supported Versions
 
-[`@grpc/grpc-js`](https://www.npmjs.com/package/@grpc/grpc-js) versions `^1.0.0`
+- [`@grpc/grpc-js`](https://www.npmjs.com/package/@grpc/grpc-js) versions `^1.0.0`
 
 ## Usage
 
