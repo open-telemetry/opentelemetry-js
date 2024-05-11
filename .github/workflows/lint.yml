@@ -34,11 +34,7 @@ jobs:
       - name: Lint markdown files
         uses: avto-dev/markdown-lint@v1
         with:
-          config: |
-            {
-              "default": true,
-              "MD004": { "style": "dash" }
-            }    
+          config: '.github/markdown-lint.yml'
           args: "./**/*.md"
           ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
