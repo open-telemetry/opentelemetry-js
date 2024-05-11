@@ -149,7 +149,7 @@ export abstract class InstrumentationAbstract<
   public setConfig(config: ConfigType): void {
     // copy config first level properties to ensure they are immutable.
     // nested properties are not copied, thus are mutable from the outside.
-    this._config = {...config};
+    this._config = { ...config };
   }
 
   /**
