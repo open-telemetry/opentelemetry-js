@@ -100,7 +100,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     return [
       new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
-        ['1.*'],
+        ['^1.0.0'],
         moduleExports => {
           if (isWrapped(moduleExports.Server.prototype.register)) {
             this._unwrap(moduleExports.Server.prototype, 'register');
