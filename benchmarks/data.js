@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715591553188,
+  "lastUpdate": 1715592204319,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8752,6 +8752,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.67%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "50bd46061ea54f350e30a8d685a4e5742a89e015",
+          "message": "docs(instrumentation): better docs for supportedVersions option (#4693)\n\n* docs(instrumentation): better docs for supportedVersions option\r\n\r\n* docs: add recomundation to bound major version\r\n\r\n* revert: Instrumentation class changes\r\n\r\n* docs: add recommendation in both places\r\n\r\n* docs: lint fix\r\n\r\n* chore: CHANGLOG\r\n\r\n* Update experimental/packages/opentelemetry-instrumentation/src/types.ts\r\n\r\n* Update experimental/packages/opentelemetry-instrumentation/src/types.ts\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-13T11:21:47+02:00",
+          "tree_id": "d3e3a426b74f77a8fb5b29b62c5ecb975b4e455b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/50bd46061ea54f350e30a8d685a4e5742a89e015"
+        },
+        "date": 1715592203492,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 992451,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12007,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 710112,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 645969,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
