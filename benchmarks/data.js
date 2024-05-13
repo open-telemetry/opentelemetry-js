@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715591413135,
+  "lastUpdate": 1715591553188,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8700,6 +8700,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1c6e8b2531f5d7f65448c8f307e05c62282a2fb9",
+          "message": "fix(instrumentation)!: remove unused supportedVersions from Instrumentation interface (#4694)\n\n* chore: CHANGLOG\r\n\r\n* fix(instrumentation): remove unused property from instrumentations\r\n\r\n* chore: CHANGELOG\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-13T11:10:57+02:00",
+          "tree_id": "1802d7e6e1c39dcbad762f711d07b61ec5019e66",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1c6e8b2531f5d7f65448c8f307e05c62282a2fb9"
+        },
+        "date": 1715591552331,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 928154,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11653,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 653210,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 633546,
+            "range": "±0.67%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
