@@ -29,6 +29,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix: require import-in-the-middle in order to fix an issue with bundlers [#4546](https://github.com/open-telemetry/opentelemetry-js/pull/4546) @dyladan
+
 ### :books: (Refine Doc)
 
 * docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
