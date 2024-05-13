@@ -5,7 +5,7 @@
       "groupName": "all patch versions",
       "groupSlug": "all-patch",
       "matchUpdateTypes": ["patch"],
-      "excludePackageNames": ["prettier", "import-in-the-middle"],
+      "excludePackageNames": ["prettier"],
       "schedule": ["before 3am every weekday"]
     },
     {
