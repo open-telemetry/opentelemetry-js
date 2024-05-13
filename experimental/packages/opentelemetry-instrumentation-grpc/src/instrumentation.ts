@@ -99,7 +99,7 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
     return [
       new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
-        ['1.*'],
+        ['^1.0.0'],
         moduleExports => {
           // Patch Server methods
           this._wrap(
