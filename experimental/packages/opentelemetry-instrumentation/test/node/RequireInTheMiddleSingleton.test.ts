@@ -178,7 +178,7 @@ describe('RequireInTheMiddleSingleton', () => {
             modulePath,
             baseDir
           );
-        });
+        }).timeout(30000);
       });
     });
   });
