@@ -80,7 +80,7 @@ describe('EventLogger', () => {
       assert(
         spy.calledWith(
           sinon.match({
-            severityNumber: 9,
+            severityNumber: SeverityNumber.INFO,
           })
         ),
         'severityNumber should be set to INFO'

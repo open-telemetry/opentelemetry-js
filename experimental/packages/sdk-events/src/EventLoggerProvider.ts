@@ -26,8 +26,8 @@ export class EventLoggerProvider implements api.EventLoggerProvider {
 
   getEventLogger(
     name: string,
-    version?: string | undefined,
-    options?: api.EventLoggerOptions | undefined
+    version?: string,
+    options?: api.EventLoggerOptions
   ): api.EventLogger {
     const logger = this._loggerProvider.getLogger(name, version, options);
     return new EventLogger(logger);

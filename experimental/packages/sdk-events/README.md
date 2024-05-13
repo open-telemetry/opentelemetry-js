@@ -29,7 +29,7 @@ const {
   ConsoleLogRecordExporter,
 } = require('@opentelemetry/sdk-logs');
 
-// The Events SDK has a dependency on the Logs SDK
+// The Events SDK has a dependency on the Logs SDK.
 // Any processing of events (e.g. export) is done through the Logs SDK.
 const loggerProvider = new LoggerProvider();
 loggerProvider.addLogRecordProcessor(
@@ -42,10 +42,10 @@ loggerProvider.addLogRecordProcessor(
 const eventLoggerProvider = new EventLoggerProvider(loggerProvider);
 events.setGlobalEventLoggerProvider(eventLoggerProvider);
 
-// get an EventLogger from the global EventLoggerProvider
+// Get an EventLogger from the global EventLoggerProvider
 const eventLogger = events.getEventLogger('default');
 
-// emit an event
+// Emit an event
 eventLogger.emit({
   name: 'myEvent',
   data: {
@@ -54,7 +54,7 @@ eventLogger.emit({
   }
 });
 
-// shutdown is done directly on the LoggerProvider
+// Shutdown is done directly on the LoggerProvider
 loggerProvider.shutdown();
 ```
 
