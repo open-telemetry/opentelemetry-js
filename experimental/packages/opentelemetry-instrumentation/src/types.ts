@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-import { TracerProvider, MeterProvider } from '@opentelemetry/api';
+import { TracerProvider, MeterProvider, Span } from '@opentelemetry/api';
 import { LoggerProvider } from '@opentelemetry/api-logs';
 
 /** Interface Instrumentation to apply patch. */
-export interface Instrumentation {
+export interface Instrumentation<
+  ConfigType extends InstrumentationConfig = InstrumentationConfig,
+> {
   /** Instrumentation Name  */
   instrumentationName: string;
 
@@ -48,10 +50,10 @@ export interface Instrumentation {
   setLoggerProvider?(loggerProvider: LoggerProvider): void;
 
   /** Method to set instrumentation config  */
-  setConfig(config: InstrumentationConfig): void;
+  setConfig(config: ConfigType): void;
 
   /** Method to get instrumentation config  */
-  getConfig(): InstrumentationConfig;
+  getConfig(): ConfigType;
 
   /**
    * Contains all supported versions.
@@ -62,6 +64,12 @@ export interface Instrumentation {
   supportedVersions?: string[];
 }
 
+/**
+ * Base interface for configuration options common to all instrumentations.
+ * This interface can be extended by individual instrumentations to include
+ * additional configuration options specific to that instrumentation.
+ * All configuration options must be optional.
+ */
 export interface InstrumentationConfig {
   /**
    * Whether to enable the plugin.
@@ -82,29 +90,30 @@ export interface ShimWrapped extends Function {
   __original: Function;
 }
 
-export interface InstrumentationModuleFile<T> {
+export interface InstrumentationModuleFile {
   /** Name of file to be patched with relative path */
   name: string;
 
-  moduleExports?: T;
+  moduleExports?: unknown;
 
   /** Supported version this file */
   supportedVersions: string[];
 
   /** Method to patch the instrumentation  */
-  patch(moduleExports: T, moduleVersion?: string): T;
+  patch(moduleExports: unknown, moduleVersion?: string): unknown;
 
   /** Method to patch the instrumentation  */
 
   /** Method to unpatch the instrumentation  */
-  unpatch(moduleExports?: T, moduleVersion?: string): void;
+  unpatch(moduleExports?: unknown, moduleVersion?: string): void;
 }
 
-export interface InstrumentationModuleDefinition<T> {
+export interface InstrumentationModuleDefinition {
   /** Module name or path  */
   name: string;
 
-  moduleExports?: T;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  moduleExports?: any;
 
   /** Instrumented module version */
   moduleVersion?: string;
@@ -113,15 +122,37 @@ export interface InstrumentationModuleDefinition<T> {
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  files: InstrumentationModuleFile<any>[];
+  files: InstrumentationModuleFile[];
 
   /** If set to true, the includePrerelease check will be included when calling semver.satisfies */
   includePrerelease?: boolean;
 
   /** Method to patch the instrumentation  */
-  patch?: (moduleExports: T, moduleVersion?: string) => T;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  patch?: (moduleExports: any, moduleVersion?: string) => any;
 
   /** Method to unpatch the instrumentation  */
-  unpatch?: (moduleExports: T, moduleVersion?: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  unpatch?: (moduleExports: any, moduleVersion?: string) => void;
 }
+
+/**
+ * SpanCustomizationHook is a common way for instrumentations to expose extension points
+ * where users can add custom behavior to a span based on info object passed to the hook at different times of the span lifecycle.
+ * This is an advanced feature, commonly used to add additional or non-spec-compliant attributes to the span,
+ * capture payloads, modify the span in some way, or carry some other side effect.
+ *
+ * The hook is registered with the instrumentation specific config by implementing an handler function with this signature,
+ * and if the hook is present, it will be called with the span and the event information
+ * when the event is emitted.
+ *
+ * When and under what conditions the hook is called and what data is passed
+ * in the info argument, is specific to each instrumentation and life-cycle event
+ * and should be documented where it is used.
+ *
+ * Instrumentation may define multiple hooks, for different spans, or different span life-cycle events.
+ */
+export type SpanCustomizationHook<SpanCustomizationInfoType> = (
+  span: Span,
+  info: SpanCustomizationInfoType
+) => void;

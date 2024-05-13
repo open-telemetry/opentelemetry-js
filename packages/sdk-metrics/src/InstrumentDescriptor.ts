@@ -23,6 +23,7 @@ import { equalsCaseInsensitive } from './utils';
  */
 export enum InstrumentType {
   COUNTER = 'COUNTER',
+  GAUGE = 'GAUGE',
   HISTOGRAM = 'HISTOGRAM',
   UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
   OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',

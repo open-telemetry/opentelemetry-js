@@ -118,7 +118,7 @@ export class ZipkinExporter implements SpanExporter {
 
   /**
    * if user defines getExportRequestHeaders in config then this will be called
-   * everytime before send, otherwise it will be replaced with noop in
+   * every time before send, otherwise it will be replaced with noop in
    * constructor
    * @default noop
    */

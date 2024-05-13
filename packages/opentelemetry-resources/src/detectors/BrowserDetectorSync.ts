@@ -15,16 +15,23 @@
  */
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { DetectorSync, IResource, Resource, ResourceDetectionConfig } from '..';
-import { ResourceAttributes } from '../types';
+import { DetectorSync, ResourceAttributes } from '../types';
 import { diag } from '@opentelemetry/api';
+import { ResourceDetectionConfig } from '../config';
+import { IResource } from '../IResource';
+import { Resource } from '../Resource';
 
 /**
  * BrowserDetectorSync will be used to detect the resources related to browser.
  */
 class BrowserDetectorSync implements DetectorSync {
   detect(config?: ResourceDetectionConfig): IResource {
-    const isBrowser = typeof navigator !== 'undefined';
+    const isBrowser =
+      typeof navigator !== 'undefined' &&
+      global.process?.versions?.node === undefined && // Node.js v21 adds `navigator`
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore don't have Bun types
+      global.Bun?.version === undefined; // Bun (bun.sh) defines `navigator`
     if (!isBrowser) {
       return Resource.empty();
     }

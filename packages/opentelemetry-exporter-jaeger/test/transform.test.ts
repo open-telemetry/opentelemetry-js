@@ -381,7 +381,7 @@ describe('transform', () => {
       assert.strictEqual(
         thriftSpan.tags.find(tag => tag.key === 'error'),
         undefined,
-        'If span status USET, no error tag'
+        'If span status UNSET, no error tag'
       );
 
       readableSpan.status.code = SpanStatusCode.ERROR;

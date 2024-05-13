@@ -25,8 +25,8 @@ import {
   appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  createExportMetricsServiceRequest,
-  IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse,
+  JsonMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
@@ -34,10 +34,10 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURC
 
 class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest
+  IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPMetricExporterOptions & OTLPExporterConfigBase) {
-    super(config);
+    super(config, JsonMetricsSerializer, 'application/json');
     this._headers = Object.assign(
       this._headers,
       baggageUtils.parseKeyPairsIntoRecord(
@@ -59,10 +59,6 @@ class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<
           DEFAULT_COLLECTOR_RESOURCE_PATH
         )
       : DEFAULT_COLLECTOR_URL;
-  }
-
-  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return createExportMetricsServiceRequest(metrics, { useLongBits: false });
   }
 }
 

@@ -15,10 +15,6 @@
  */
 
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
-import {
-  ServiceClientType,
-  OTLPProtoExporterNodeBase,
-} from '@opentelemetry/otlp-proto-exporter-base';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
@@ -26,10 +22,12 @@ import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
+  parseHeaders,
+  OTLPExporterNodeBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  createExportMetricsServiceRequest,
-  IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse,
+  ProtobufMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from './version';
 
@@ -39,24 +37,20 @@ const USER_AGENT = {
   'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
-class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
+class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest
+  IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config);
+    super(config, ProtobufMetricsSerializer, 'application/x-protobuf');
     this.headers = {
       ...this.headers,
       ...USER_AGENT,
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
-      ...config?.headers,
+      ...parseHeaders(config?.headers),
     };
-  }
-
-  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return createExportMetricsServiceRequest(metrics);
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase) {
@@ -72,10 +66,6 @@ class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
           DEFAULT_COLLECTOR_RESOURCE_PATH
         )
       : DEFAULT_COLLECTOR_URL;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.METRICS;
   }
 }
 

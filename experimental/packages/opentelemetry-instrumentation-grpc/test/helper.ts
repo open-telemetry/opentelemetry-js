@@ -136,7 +136,7 @@ export async function startServer(proto: any, port: number) {
   server.addService(proto.GrpcTester.service, {
     // An error is emitted every time
     // request.num <= MAX_ERROR_STATUS = (status.UNAUTHENTICATED)
-    // in those cases, erro.code = request.num
+    // in those cases, error.code = request.num
 
     // This method returns the request
     // This method returns the request

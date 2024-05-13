@@ -19,6 +19,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   CounterInstrument,
+  GaugeInstrument,
   HistogramInstrument,
   ObservableCounterInstrument,
   ObservableGaugeInstrument,
@@ -85,6 +86,18 @@ describe('Meter', () => {
       const meter = new Meter(meterSharedState);
       const observableGauge = meter.createObservableGauge(name);
       assert(observableGauge instanceof ObservableGaugeInstrument);
+    });
+  });
+
+  describe('createGauge', () => {
+    testWithNames('Gauge', name => {
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationScope
+      );
+      const meter = new Meter(meterSharedState);
+      const Gauge = meter.createGauge(name);
+      assert(Gauge instanceof GaugeInstrument);
     });
   });
 
