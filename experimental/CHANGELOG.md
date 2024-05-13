@@ -21,6 +21,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation): apply unwrap before wrap in base class [#4692](https://github.com/open-telemetry/opentelemetry-js/pull/4692)
 * feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
 * feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
@@ -29,6 +30,8 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
+
+* docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
 
 ### :house: (Internal)
 
