@@ -17,7 +17,7 @@ All notable changes to experimental packages in this project will be documented 
     * (internal) OTLPExporterBrowserBase: `RequestType` has been replaced by a `ResponseType` type-argument
     * (internal) OTLPExporterNodeBase: `ServiceRequest` has been replaced by a `ServiceResponse` type-argument
     * (internal) the `@opentelemetry/otlp-exporter-proto-base` package has been removed, and will from now on be deprecated in `npm`
-* fix(instrumentation)!: make config object required in base instrumentation [#4695](https://github.com/open-telemetry/opentelemetry-js/pull/4695): @blumamir
+* fix(instrumentation)!: remove default value for config in base instrumentation constuctor [#4695](https://github.com/open-telemetry/opentelemetry-js/pull/4695): @blumamir
 
 ### :rocket: (Enhancement)
 
