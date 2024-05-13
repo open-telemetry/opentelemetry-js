@@ -40,9 +40,7 @@ import { VERSION } from '../src/version';
 
 const logsServiceProtoPath =
   'opentelemetry/proto/collector/logs/v1/logs_service.proto';
-const includeDirs = [
-  path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
-];
+const includeDirs = [path.resolve(__dirname, '../../otlp-transformer/protos')];
 
 const httpAddr = 'https://localhost:1503';
 const udsAddr = 'unix:///tmp/otlp-logs.sock';
@@ -224,9 +222,9 @@ const testCollectorExporter = (params: TestParams) => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          assert.strictEqual(
+          assert.match(
             responseSpy.args[0][0].error.details,
-            'Deadline exceeded'
+            /Deadline exceeded.*/
           );
           done();
         }, 300);

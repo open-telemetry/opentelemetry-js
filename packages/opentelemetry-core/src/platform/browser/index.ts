@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './environment';
+export { getEnvWithoutDefaults, getEnv } from './environment';
 export * from './globalThis';
 export * from './hex-to-base64';
 export * from './RandomIdGenerator';

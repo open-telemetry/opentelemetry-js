@@ -34,12 +34,25 @@ import {
   OTLPExporterNodeConfigBase,
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  getExportRequestProto,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { Root } from 'protobufjs';
 import { VERSION } from '../../src/version';
+import * as path from 'path';
+
+const dir = path.resolve(__dirname, '../../../otlp-transformer/protos');
+const root = new Root();
+root.resolvePath = function (origin, target) {
+  return `${dir}/${target}`;
+};
+const proto = root.loadSync([
+  'opentelemetry/proto/common/v1/common.proto',
+  'opentelemetry/proto/resource/v1/resource.proto',
+  'opentelemetry/proto/trace/v1/trace.proto',
+  'opentelemetry/proto/collector/trace/v1/trace_service.proto',
+]);
+const exportRequestServiceProto = proto?.lookupType(
+  'ExportTraceServiceRequest'
+);
 
 let fakeRequest: PassThrough;
 
@@ -197,8 +210,6 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     });
 
     it('should open the connection', done => {
-      collectorExporter.export(spans, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
@@ -210,11 +221,11 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+
+      collectorExporter.export(spans, () => {});
     });
 
     it('should set custom headers', done => {
-      collectorExporter.export(spans, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
@@ -224,11 +235,11 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+
+      collectorExporter.export(spans, () => {});
     });
 
     it('should have keep alive and keepAliveMsecs option set', done => {
-      collectorExporter.export(spans, () => {});
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
@@ -239,6 +250,8 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         done();
         return fakeRequest as any;
       });
+
+      collectorExporter.export(spans, () => {});
     });
 
     it('should successfully send the spans', done => {
@@ -247,10 +260,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
 
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
-        const ExportTraceServiceRequestProto = getExportRequestProto(
-          ServiceClientType.SPANS
-        );
-        const data = ExportTraceServiceRequestProto.decode(buff);
+        const data = exportRequestServiceProto.decode(buff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
@@ -275,34 +285,34 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spyLoggerError = sinon.stub(diag, 'error');
 
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(spyLoggerError.args.length, 0);
-        done();
-      });
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockRes = new MockedResponse(200);
         cb(mockRes);
         mockRes.send('success');
         return fakeRequest as any;
       });
+
+      collectorExporter.export(spans, result => {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        assert.strictEqual(spyLoggerError.args.length, 0);
+        done();
+      });
     });
 
     it('should log the error message', done => {
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, ExportResultCode.FAILED);
-        // @ts-expect-error verify error code
-        assert.strictEqual(result.error.code, 400);
-        done();
-      });
-
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockResError = new MockedResponse(400);
         cb(mockResError);
         mockResError.send('failed');
 
         return fakeRequest as any;
+      });
+
+      collectorExporter.export(spans, result => {
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        // @ts-expect-error verify error code
+        assert.strictEqual(result.error.code, 400);
+        done();
       });
     });
   });
@@ -335,10 +345,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
-        const ExportTraceServiceRequestProto = getExportRequestProto(
-          ServiceClientType.SPANS
-        );
-        const data = ExportTraceServiceRequestProto.decode(unzippedBuff);
+        const data = exportRequestServiceProto.decode(unzippedBuff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
