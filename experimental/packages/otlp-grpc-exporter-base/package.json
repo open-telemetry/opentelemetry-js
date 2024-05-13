@@ -17,7 +17,8 @@
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc -w",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "npm run precompile",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",

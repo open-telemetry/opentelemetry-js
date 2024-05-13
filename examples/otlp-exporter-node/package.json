@@ -9,7 +9,8 @@
     "start:metrics": "node metrics.js",
     "docker:start": "cd ./docker && docker-compose down && docker-compose up",
     "docker:startd": "cd ./docker && docker-compose down && docker-compose up -d",
-    "docker:stop": "cd ./docker && docker-compose down"
+    "docker:stop": "cd ./docker && docker-compose down",
+    "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
   "repository": {
     "type": "git",

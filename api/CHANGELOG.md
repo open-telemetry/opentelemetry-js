@@ -97,13 +97,13 @@ All notable changes to this project will be documented in this file.
 
 * export tracer options ([#154](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/154)) ([b125324](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/b125324438fb2f24eb80c7c6673afc8cfc99575e))
 
-### [1.0.4](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.3...v1.0.4) (2021-12-18)
+## [1.0.4](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.3...v1.0.4) (2021-12-18)
 
 ### Bug Fixes
 
 * align globalThis fallbacks with otel-core ([#126](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/126)) ([3507de7](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/3507de7c3b95396696657c021953b0b24a63a029))
 
-### [1.0.3](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.2...v1.0.3) (2021-08-30)
+## [1.0.3](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.2...v1.0.3) (2021-08-30)
 
 ### Bug Fixes
 

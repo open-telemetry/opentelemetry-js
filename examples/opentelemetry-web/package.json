@@ -11,7 +11,8 @@
     "start-prodnc": "webpack serve --progress --color --port 8090 --config webpack.prod.config.js --hot --host 0.0.0.0 --no-compress",
     "docker:start": "cd ./docker && docker-compose down && docker-compose up",
     "docker:startd": "cd ./docker && docker-compose down && docker-compose up -d",
-    "docker:stop": "cd ./docker && docker-compose down"
+    "docker:stop": "cd ./docker && docker-compose down",
+    "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
   "repository": {
     "type": "git",
