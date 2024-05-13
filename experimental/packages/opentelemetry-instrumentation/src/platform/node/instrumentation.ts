@@ -25,7 +25,8 @@ import {
   Hooked,
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
-import ImportInTheMiddle = require('import-in-the-middle');
+// eslint-ignore-next-line @typescript-eslint/no-var-requires
+const ImportInTheMiddle = require('import-in-the-middle');
 import {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
