@@ -53,7 +53,6 @@ import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
-  isWrapped,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
@@ -111,25 +110,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
-        if (isWrapped(moduleExports.request)) {
-          this._unwrap(moduleExports, 'request');
-        }
         this._wrap(
           moduleExports,
           'request',
           this._getPatchOutgoingRequestFunction('http')
         );
-        if (isWrapped(moduleExports.get)) {
-          this._unwrap(moduleExports, 'get');
-        }
         this._wrap(
           moduleExports,
           'get',
           this._getPatchOutgoingGetFunction(moduleExports.request)
         );
-        if (isWrapped(moduleExports.Server.prototype.emit)) {
-          this._unwrap(moduleExports.Server.prototype, 'emit');
-        }
         this._wrap(
           moduleExports.Server.prototype,
           'emit',
@@ -152,25 +142,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
-        if (isWrapped(moduleExports.request)) {
-          this._unwrap(moduleExports, 'request');
-        }
         this._wrap(
           moduleExports,
           'request',
           this._getPatchHttpsOutgoingRequestFunction('https')
         );
-        if (isWrapped(moduleExports.get)) {
-          this._unwrap(moduleExports, 'get');
-        }
         this._wrap(
           moduleExports,
           'get',
           this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
         );
-        if (isWrapped(moduleExports.Server.prototype.emit)) {
-          this._unwrap(moduleExports.Server.prototype, 'emit');
-        }
         this._wrap(
           moduleExports.Server.prototype,
           'emit',
