@@ -34,6 +34,7 @@ import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
 import { Hook } from 'require-in-the-middle';
 import { readFileSync } from 'fs';
+import { isWrapped } from '../../utils';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -79,6 +80,9 @@ export abstract class InstrumentationBase<
   }
 
   protected override _wrap: typeof wrap = (moduleExports, name, wrapper) => {
+    if (isWrapped(moduleExports[name])) {
+      this._unwrap(moduleExports, name);
+    }
     if (!utilTypes.isProxy(moduleExports)) {
       return wrap(moduleExports, name, wrapper);
     } else {
