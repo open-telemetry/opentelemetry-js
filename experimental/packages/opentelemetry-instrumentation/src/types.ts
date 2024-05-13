@@ -133,7 +133,7 @@ export interface InstrumentationModuleDefinition {
   /** Supported version of module.
    *
    * A module version is supported if one of the supportedVersions in the array satisfies the module version.
-   * The syntax ot the version is checked with the `satisfies` function of "The semantic versioner for npm", see
+   * The syntax of the version is checked with the `satisfies` function of "The semantic versioner for npm", see
    * [`semver` package](https://www.npmjs.com/package/semver)
    * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
    * If omitted, all versions of the module will be patched.
