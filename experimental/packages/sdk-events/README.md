@@ -35,12 +35,11 @@ const loggerProvider = new LoggerProvider();
 loggerProvider.addLogRecordProcessor(
   new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())
 );
-logs.setGlobalLoggerProvider(loggerProvider);
 
-// Register a global EventLoggerProvider -
+// Register a global EventLoggerProvider.
 // This would be used by instrumentations, similar to how the global TracerProvider,
 // LoggerProvider and MeterProvider work.
-const eventLoggerProvider = new EventLoggerProvider();
+const eventLoggerProvider = new EventLoggerProvider(loggerProvider);
 events.setGlobalEventLoggerProvider(eventLoggerProvider);
 
 // get an EventLogger from the global EventLoggerProvider
@@ -54,16 +53,9 @@ eventLogger.emit({
     field2: 123
   }
 });
-```
 
-Alternatively, `EventLoggerProvider` can also be instantiated without registering a global
-`LoggerProvider`.
-
-```js
-const loggerProvider = new LoggerProvider();
-const eventLoggerProvider = new EventLoggerProvider({
-  loggerProvider: loggerProvider
-});
+// shutdown is done directly on the LoggerProvider
+loggerProvider.shutdown();
 ```
 
 ## Example

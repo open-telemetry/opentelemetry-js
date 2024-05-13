@@ -36,8 +36,4 @@ export class EventLoggerProvider implements api.EventLoggerProvider {
   public forceFlush(): Promise<void> {
     return this._loggerProvider.forceFlush();
   }
-
-  public shutdown(): Promise<void> {
-    return Promise.resolve();
-  }
 }
