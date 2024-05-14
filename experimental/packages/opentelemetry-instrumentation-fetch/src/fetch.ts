@@ -31,6 +31,7 @@ import {
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
 } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
@@ -319,6 +320,20 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           return original.apply(this, args);
         }
         const spanData = plugin._prepareSpanData(url);
+
+        web
+          .getFetchBodyLength(...args)
+          .then(length => {
+            if (!length) return;
+
+            createdSpan.setAttribute(
+              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+              length
+            );
+          })
+          .catch(error => {
+            plugin._diag.error('getFetchBodyLength', error);
+          });
 
         function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
