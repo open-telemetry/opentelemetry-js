@@ -31,6 +31,10 @@ import {
   SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
 
+const DIAG_LOGGER = api.diag.createComponentLogger({
+  namespace: '@opentelemetry/opentelemetry-sdk-trace-web/utils',
+});
+
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
 function getUrlNormalizingAnchor(): HTMLAnchorElement {
@@ -123,6 +127,129 @@ export function addSpanNetworkEvents(
       decodedLength
     );
   }
+}
+
+function _getBodyNonDestructively(body: ReadableStream) {
+  // can't read a ReadableStream without destroying it
+  // we CAN "tee" the body stream, which lets us split it, but that still locks the original stream
+  // so we end up needing to return one of the forks.
+  const [bodyToReturn, bodyToConsume] = body.tee();
+
+  const lengthPromise = async () => {
+    let length = 0;
+    const reader = bodyToConsume.getReader();
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const contents = await reader.read();
+      if (contents.value) {
+        length += contents.value.length;
+      }
+      if (contents.done) {
+        break;
+      }
+    }
+    return length;
+  };
+
+  return {
+    body: bodyToReturn,
+    length: lengthPromise(),
+  };
+}
+
+/**
+ * Helper function to determine payload content length for fetch requests
+ *
+ * The fetch API is kinda messy: there are a couple of ways the body can be passed in.
+ *
+ * In all cases, the body param can be some variation of ReadableStream,
+ * and ReadableStreams can only be read once! We want to avoid consuming the body here,
+ * because that would mean that the body never gets sent with the actual fetch request.
+ *
+ * Either the first arg is a Request object, which can be cloned
+ *   so we can clone that object and read the body of the clone
+ *   without disturbing the original argument
+ *   However, reading the body here can only be done async; the body() method returns a promise
+ *   this means this entire function has to return a promise
+ *
+ * OR the first arg is a url/string
+ *   in which case the second arg has type RequestInit
+ *   RequestInit is NOT cloneable, but RequestInit.body is writable
+ *   so we can chain it into ReadableStream.pipeThrough()
+ *
+ *   ReadableStream.pipeThrough() lets us process a stream and returns a new stream
+ *   So we can measure the body length as it passes through the pie, but need to attach
+ *   the new stream to the original request
+ *   so that the browser still has access to the body.
+ *
+ * @param body
+ * @returns promise that resolves to the content length of the body
+ */
+export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
+  if (args[0] instanceof URL || typeof args[0] === 'string') {
+    const requestInit = args[1];
+    if (!requestInit?.body) {
+      return Promise.resolve();
+    }
+    if (requestInit.body instanceof ReadableStream) {
+      const { body, length } = _getBodyNonDestructively(requestInit.body);
+      requestInit.body = body;
+
+      return length;
+    } else {
+      return Promise.resolve(getXHRBodyLength(requestInit.body));
+    }
+  } else {
+    const info = args[0];
+    if (!info?.body) {
+      return Promise.resolve();
+    }
+
+    return info
+      .clone()
+      .text()
+      .then(t => t.length);
+  }
+}
+
+/**
+ * Helper function to determine payload content length for XHR requests
+ * @param body
+ * @returns content length
+ */
+export function getXHRBodyLength(
+  body: Document | XMLHttpRequestBodyInit
+): number {
+  if (body instanceof Document) {
+    return new XMLSerializer().serializeToString(document).length;
+  }
+  // XMLHttpRequestBodyInit expands to the following:
+  if (body instanceof Blob) {
+    return body.size;
+  }
+
+  // ArrayBuffer | ArrayBufferView
+  if ((body as any).byteLength !== undefined) {
+    return (body as any).byteLength as number;
+  }
+
+  if (body instanceof FormData) {
+    // typescript doesn't like it when we pass FormData into URLSearchParams
+    // even though this is actually totally valid
+    return new URLSearchParams(body as any).toString().length;
+  }
+
+  if (body instanceof URLSearchParams) {
+    return body.toString().length;
+  }
+
+  if (typeof body === 'string') {
+    return body.length;
+  }
+
+  DIAG_LOGGER.warn('unknown body type');
+  return 0;
 }
 
 /**

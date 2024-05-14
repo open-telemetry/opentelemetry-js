@@ -27,12 +27,14 @@ import * as sinon from 'sinon';
 import {
   addSpanNetworkEvent,
   addSpanNetworkEvents,
+  getXHRBodyLength,
   getResource,
   normalizeUrl,
   parseUrl,
   PerformanceEntries,
   shouldPropagateTraceHeaders,
   URLLike,
+  getFetchBodyLength,
 } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 
@@ -84,6 +86,18 @@ function createResource(
     defaultResource,
     resource
   ) as PerformanceResourceTiming;
+}
+
+function textToReadableStream(msg: string): ReadableStream {
+  return new ReadableStream({
+    start: controller => {
+      controller.enqueue(msg);
+      controller.close();
+    },
+    cancel: controller => {
+      controller.close();
+    },
+  });
 }
 
 describe('utils', () => {
@@ -591,6 +605,142 @@ describe('utils', () => {
       const url = normalizeUrl('/你好');
       const urlObj = new URL(url);
       assert.strictEqual(urlObj.pathname, '/%E4%BD%A0%E5%A5%BD');
+    });
+  });
+
+  describe('getXHRBodyLength', () => {
+    it('should compute body length for Document payload', () => {
+      const doc = new DOMParser().parseFromString(
+        '<html><head><head/><body><p>hello world</p></body>',
+        'text/html'
+      );
+
+      assert.strictEqual(getXHRBodyLength(doc), 3456); // karma scripts get injected into the html :shakes_fist:
+    });
+    it('should compute body length for Blob payload', () => {
+      const blob = new Blob(['hello world'], {
+        type: 'text/plain',
+      });
+
+      assert.strictEqual(getXHRBodyLength(blob), 11);
+    });
+    it('should compute body length for ArrayBuffer/ArrayBufferView payload', () => {
+      const arrayBuffer = new Uint8Array([1, 2, 3]).buffer;
+
+      assert.strictEqual(getXHRBodyLength(arrayBuffer), 3);
+      assert.strictEqual(getXHRBodyLength(new ArrayBuffer(8)), 8);
+      assert.strictEqual(getXHRBodyLength(new ArrayBuffer(8).slice(0, 2)), 2);
+      assert.strictEqual(getXHRBodyLength(new ArrayBuffer(0)), 0);
+    });
+    it('should compute body length for FormData payload', () => {
+      const formData = new FormData();
+      formData.append('key1', 'true');
+      formData.append('key2', 'hello world');
+
+      assert.strictEqual(getXHRBodyLength(formData), 26);
+      assert.strictEqual(getXHRBodyLength(new FormData()), 0);
+    });
+    it('should compute body length for URLSearchParams payload', () => {
+      const search = new URLSearchParams({
+        key1: 'true',
+        key2: 'hello world',
+      });
+
+      assert.strictEqual(getXHRBodyLength(search), 26);
+      assert.strictEqual(getXHRBodyLength(new URLSearchParams()), 0);
+    });
+    it('should compute body length for string payload', () => {
+      const jsonString = JSON.stringify({
+        key1: 'true',
+        key2: 'hello world',
+      });
+      assert.strictEqual(getXHRBodyLength(jsonString), 36);
+      assert.strictEqual(getXHRBodyLength('hello world'), 11);
+      assert.strictEqual(getXHRBodyLength(''), 0);
+    });
+  });
+
+  describe('getFetchBodyLength', () => {
+    it('should read the body of the second param when the first param is string', async () => {
+      const jsonString = JSON.stringify({
+        key1: 'true',
+        key2: 'hello world',
+      });
+      const length = await getFetchBodyLength('https://example.com', {
+        body: jsonString,
+      });
+      assert.strictEqual(length, 36);
+    });
+
+    it('should (non-destructively) read the body stream of the second param when the first param is string', async () => {
+      const jsonString = JSON.stringify({
+        key1: 'true',
+        key2: 'hello world',
+      });
+      const requestParams = { body: textToReadableStream(jsonString) };
+      const length = await getFetchBodyLength(
+        'https://example.com',
+        requestParams
+      );
+
+      // we got the correct length
+      assert.strictEqual(length, 36);
+
+      // AND the body is still readable
+      assert.strictEqual(requestParams.body.locked, false);
+
+      // AND the body is still correct
+      const { value } = await requestParams.body.getReader().read();
+      assert.strictEqual(value, jsonString);
+    });
+
+    it('should read the body of the first param when recieving a request', async () => {
+      const bodyContent = JSON.stringify({
+        key1: 'true',
+        key2: 'hello world',
+      });
+      const req = new Request('https://example.com', {
+        method: 'POST',
+        headers: {
+          foo: 'bar',
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: bodyContent,
+      });
+
+      const length = await getFetchBodyLength(req);
+
+      // we got the correct length
+      assert.strictEqual(length, 36);
+
+      // AND the body is still readable and correct
+      const body = await req.text();
+      assert.strictEqual(body, bodyContent);
+    });
+
+    it('should read the body of the first param when recieving a request with urlparams body', async () => {
+      const body = new URLSearchParams();
+      body.append('hello', 'world');
+
+      const req = new Request('https://example.com', {
+        method: 'POST',
+        headers: {
+          foo: 'bar',
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+
+      const length = await getFetchBodyLength(req);
+
+      // we got the correct length
+      assert.strictEqual(length, 11);
+
+      // AND the body is still readable and correct
+      const requestBody = await req.text();
+      assert.strictEqual(requestBody, 'hello=world');
     });
   });
 });
