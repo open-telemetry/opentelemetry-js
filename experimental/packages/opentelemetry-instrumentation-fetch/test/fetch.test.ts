@@ -374,44 +374,55 @@ describe('fetch', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
-
-      assert.ok(
-        attributes[keys[0]] !== '',
+      assert.notStrictEqual(
+        attributes[AttributeNames.COMPONENT],
+        '',
         `attributes ${AttributeNames.COMPONENT} is not defined`
       );
+
       assert.strictEqual(
-        attributes[keys[1]],
+        attributes[SEMATTRS_HTTP_METHOD],
         'GET',
         `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
-        attributes[keys[2]],
+        attributes[SEMATTRS_HTTP_URL],
         url,
         `attributes ${SEMATTRS_HTTP_URL} is wrong`
       );
       assert.strictEqual(
-        attributes[keys[3]],
+        attributes[SEMATTRS_HTTP_STATUS_CODE],
         200,
         `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
       );
+      const statusText = attributes[AttributeNames.HTTP_STATUS_TEXT];
       assert.ok(
-        attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
+        statusText === 'OK' || statusText === '',
         `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.ok(
-        (attributes[keys[5]] as string).indexOf('localhost') === 0,
+        (attributes[SEMATTRS_HTTP_HOST] as string).indexOf(
+          'localhost'
+        ) === 0,
         `attributes ${SEMATTRS_HTTP_HOST} is wrong`
       );
+
+      const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
       assert.ok(
-        attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+        httpScheme === 'http' || httpScheme === 'https',
         `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
       );
-      assert.ok(
-        attributes[keys[7]] !== '',
+      assert.notStrictEqual(
+        attributes[SEMATTRS_HTTP_USER_AGENT],
+        '',
         `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
       );
-      assert.ok(
-        (attributes[keys[8]] as number) > 0,
+      const responseContentLength = attributes[
+        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+      ] as number;
+      assert.strictEqual(
+        responseContentLength,
+        30,
         `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
