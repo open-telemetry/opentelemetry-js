@@ -44,6 +44,7 @@ import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   SEMATTRS_HTTP_HOST,
   SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_STATUS_CODE,
@@ -70,6 +71,18 @@ const getData = (url: string, method?: string) => {
       foo: 'bar',
       Accept: 'application/json',
       'Content-Type': 'application/json',
+    },
+  });
+};
+
+const textToReadableStream = (msg: string): ReadableStream => {
+  return new ReadableStream({
+    start: controller => {
+      controller.enqueue(msg);
+      controller.close();
+    },
+    cancel: controller => {
+      controller.close();
     },
   });
 };
@@ -163,6 +176,7 @@ function testForCorrectEvents(
 describe('fetch', () => {
   let contextManager: ZoneContextManager;
   let lastResponse: any | undefined;
+  let requestBody: any | undefined;
   let webTracerWithZone: api.Tracer;
   let webTracerProviderWithZone: WebTracerProvider;
   let dummySpanExporter: DummySpanExporter;
@@ -179,6 +193,7 @@ describe('fetch', () => {
   const clearData = () => {
     sinon.restore();
     lastResponse = undefined;
+    requestBody = undefined;
   };
 
   const prepareData = async (
@@ -200,6 +215,24 @@ describe('fetch', () => {
           url: fileUrl,
         };
         response.headers = Object.assign({}, init.headers);
+
+        // get the request body
+        if (typeof input === 'string') {
+          const body = init.body;
+          if (body instanceof ReadableStream) {
+            requestBody = '';
+            const read = async () => {
+              for await (const c of body) {
+                requestBody += c;
+              }
+            };
+            read();
+          } else {
+            requestBody = init.body;
+          }
+        } else {
+          input.text().then(r => (requestBody = r));
+        }
 
         if (init instanceof Request) {
           // Passing request as 2nd argument causes missing body bug (#2411)
@@ -403,9 +436,7 @@ describe('fetch', () => {
         `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.ok(
-        (attributes[SEMATTRS_HTTP_HOST] as string).indexOf(
-          'localhost'
-        ) === 0,
+        (attributes[SEMATTRS_HTTP_HOST] as string).indexOf('localhost') === 0,
         `attributes ${SEMATTRS_HTTP_HOST} is wrong`
       );
 
@@ -418,6 +449,14 @@ describe('fetch', () => {
         attributes[SEMATTRS_HTTP_USER_AGENT],
         '',
         `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+      );
+      const requestContentLength = attributes[
+        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+      ] as number;
+      assert.strictEqual(
+        requestContentLength,
+        undefined,
+        `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
       );
       const responseContentLength = attributes[
         SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -608,6 +647,154 @@ describe('fetch', () => {
         assert.strictEqual(
           spyDebug.lastCall.args[1],
           'headers inject skipped due to CORS policy'
+        );
+      });
+    });
+  });
+
+  describe('post data', () => {
+    describe('url and config object', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () =>
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ hello: 'world' }),
+            }),
+          {}
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
+          17
+        );
+      });
+    });
+
+    describe.only('url and config object with stream', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () =>
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: textToReadableStream('{"hello":"world"}'),
+            }),
+          {}
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
+          17
+        );
+      });
+    });
+
+    describe('single request object', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () => {
+            const req = new Request(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: '{"hello":"world"}',
+            });
+            return fetch(req);
+          },
+          {}
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
+          17
+        );
+      });
+    });
+
+    describe('single request object with urlparams', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () => {
+            const body = new URLSearchParams();
+            body.append('hello', 'world');
+            const req = new Request(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body,
+            });
+            return fetch(req);
+          },
+          {}
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, 'hello=world');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
+          11
         );
       });
     });
