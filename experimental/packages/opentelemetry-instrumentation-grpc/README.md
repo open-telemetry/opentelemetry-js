@@ -16,6 +16,10 @@ For automatic instrumentation see the
 npm install --save @opentelemetry/instrumentation-grpc
 ```
 
+## Supported Versions
+
+- [`@grpc/grpc-js`](https://www.npmjs.com/package/@grpc/grpc-js) versions `^1.0.0`
+
 ## Usage
 
 OpenTelemetry gRPC Instrumentation allows the user to automatically collect trace data and export them to the backend of choice, to give observability to distributed systems when working with ([grpc-js](https://www.npmjs.com/package/@grpc/grpc-js)).
