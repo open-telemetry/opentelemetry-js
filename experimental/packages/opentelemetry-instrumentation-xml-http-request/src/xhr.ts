@@ -25,6 +25,7 @@ import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
 import {
   SEMATTRS_HTTP_HOST,
   SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
@@ -32,6 +33,7 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
+  getXHRBodyLength,
   getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
@@ -486,6 +488,14 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
+          if (args?.[0]) {
+            const body = args[0];
+            currentSpan.setAttribute(
+              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+              getXHRBodyLength(body)
+            );
+          }
+
           api.context.with(
             api.trace.setSpan(api.context.active(), currentSpan),
             () => {
