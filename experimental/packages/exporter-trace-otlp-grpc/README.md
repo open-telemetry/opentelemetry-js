@@ -116,7 +116,7 @@ Note, that this will only work if TLS is also configured on the server.
 
 The OTLPTraceExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
 
-+ To override the default timeout duration, provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
+- To override the default timeout duration, provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
 
   ```js
   const collectorOptions = {
@@ -177,9 +177,9 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 
 ## Useful links
 
-+ For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-+ For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-+ For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
