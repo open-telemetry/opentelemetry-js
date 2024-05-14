@@ -36,7 +36,7 @@ jobs:
         with:
           config: '.github/markdown-lint.yml'
           args: "./**/*.md"
-          ignore: './**/CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
+          ignore: './**/CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos'
 
       - name: Bootstrap
         run: npm ci
