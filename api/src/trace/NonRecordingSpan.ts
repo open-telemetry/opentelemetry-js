@@ -21,6 +21,7 @@ import { INVALID_SPAN_CONTEXT } from './invalid-span-constants';
 import { Span } from './span';
 import { SpanContext } from './span_context';
 import { SpanStatus } from './status';
+import { Link } from './link';
 
 /**
  * The NonRecordingSpan is the default {@link Span} that is used when no Span
@@ -49,6 +50,14 @@ export class NonRecordingSpan implements Span {
 
   // By default does nothing
   addEvent(_name: string, _attributes?: SpanAttributes): this {
+    return this;
+  }
+
+  addLink(_link: Link): this {
+    return this;
+  }
+
+  addLinks(_links: Link[]): this {
     return this;
   }
 

@@ -6,11 +6,33 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
+  * Breaking changes:
+    * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
+    * (internal) OTLPExporterNodeBase now has additional constructor parameters that are required
+    * (internal) OTLPExporterNodeBase now has an additional `ResponseType` type parameter
+* feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4581](https://github.com/open-telemetry/opentelemetry-js/pull/4581) @pichlermarc
+  * Breaking changes:
+    * (user-facing) `convert()` has been removed from all exporters
+    * (internal) OTLPExporterBrowserBase: `RequestType` has been replaced by a `ResponseType` type-argument
+    * (internal) OTLPExporterNodeBase: `ServiceRequest` has been replaced by a `ServiceResponse` type-argument
+    * (internal) the `@opentelemetry/otlp-exporter-proto-base` package has been removed, and will from now on be deprecated in `npm`
+* fix(instrumentation)!: remove unused supportedVersions from Instrumentation interface [#4694](https://github.com/open-telemetry/opentelemetry-js/pull/4694) @blumamir
+
 ### :rocket: (Enhancement)
+
+* feat(instrumentation): apply unwrap before wrap in base class [#4692](https://github.com/open-telemetry/opentelemetry-js/pull/4692)
+* feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
+* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
+* feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+* feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
+
+* docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
+* docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
 
 ### :house: (Internal)
 
@@ -40,6 +62,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-logs): log resource attributes in ConsoleLogRecordExporter [#4646](https://github.com/open-telemetry/opentelemetry-js/pull/4646) @harelmo-lumigo
 * refactor(instrumentation-grpc): move to use SEMATTRS [#4633](https://github.com/open-telemetry/opentelemetry-js/pull/4633)
 * feat(otlp-transformer): consolidate scope/resource creation in transformer [#4600](https://github.com/open-telemetry/opentelemetry-js/pull/4600)
 * feat(sdk-logs): print message when attributes are dropped due to attribute count limit [#4614](https://github.com/open-telemetry/opentelemetry-js/pull/4614) @HyunnoH

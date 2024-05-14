@@ -11,7 +11,16 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+* feat(sdk-trace-node): support `xray` Propagator via `OTEL_PROPAGATORS` environment variable [#4602](https://github.com/open-telemetry/opentelemetry-js/pull/4602) @anuraags
+
 ### :bug: (Bug Fix)
+
+* fix(core): align inconsistent behavior of `getEnv()` and `getEnvWithoutDefaults()` when a `process` polyfill is used [#4648](https://github.com/open-telemetry/opentelemetry-js/pull/4648) @pichlermarc
+  * `getEnvWithoutDefaults()` would use `process.env` if it was defined when running in a browser, while `getEnv()` would always use `_globalThis`. Now both use `_globalThis` when running in a browser.
+* fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
+  * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
+* fix(exporter-metrics-otlp-grpc): add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc [#4678](https://github.com/open-telemetry/opentelemetry-js/pull/4678) @AkselAllas
 
 ### :books: (Refine Doc)
 
@@ -39,6 +48,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * fix(sdk-trace-web): fix invalid timings in span events [#4486](https://github.com/open-telemetry/opentelemetry-js/pull/4486) @Abinet18
 * fix(resources): ensure BrowserDetector does not think Node.js v21 is a browser [#4561](https://github.com/open-telemetry/opentelemetry-js/issues/4561) @trentm
+* fix(core): align inconsistent behavior of `getEnv()` and `getEnvWithoutDefaults()` when a `process` polyfill is used [#4648](https://github.com/open-telemetry/opentelemetry-js/pull/4648) @pichlermarc
+  * `getEnvWithoutDefaults()` would use `process.env` if it was defined when running in a browser, while `getEnv()` would always use `_globalThis`. Now both use `_globalThis` when running in a browser.
 
 ## 1.23.0
 
@@ -60,6 +71,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
 * feat(context-zone-peer-dep, context-zone): support zone.js 0.13.x, 0.14.x [#4469](https://github.com/open-telemetry/opentelemetry-js/pull/4469) @pichlermarc
 * chore: Semantic Conventions export individual strings [4185](https://github.com/open-telemetry/opentelemetry-js/issues/4185)
+* feat(sdk-trace-base): allow adding span links after span creation [#4536](https://github.com/open-telemetry/opentelemetry-js/pull/4536) @seemk
 
 ### :bug: (Bug Fix)
 

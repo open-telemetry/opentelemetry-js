@@ -72,7 +72,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 /**
  * This class represents a fetch plugin for auto instrumentation
  */
-export class FetchInstrumentation extends InstrumentationBase {
+export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentationConfig> {
   readonly component: string = 'fetch';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -84,10 +84,6 @@ export class FetchInstrumentation extends InstrumentationBase {
   }
 
   init(): void {}
-
-  private _getConfig(): FetchInstrumentationConfig {
-    return this._config;
-  }
 
   /**
    * Add cors pre flight child span
@@ -105,7 +101,7 @@ export class FetchInstrumentation extends InstrumentationBase {
       },
       api.trace.setSpan(api.context.active(), span)
     );
-    if (!this._getConfig().ignoreNetworkEvents) {
+    if (!this.getConfig().ignoreNetworkEvents) {
       web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
     }
     childSpan.end(
@@ -149,7 +145,7 @@ export class FetchInstrumentation extends InstrumentationBase {
     if (
       !web.shouldPropagateTraceHeaders(
         spanUrl,
-        this._getConfig().propagateTraceHeaderCorsUrls
+        this.getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
       const headers: Partial<Record<string, unknown>> = {};
@@ -186,7 +182,7 @@ export class FetchInstrumentation extends InstrumentationBase {
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
+    if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
       performance.clearResourceTimings();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -201,7 +197,7 @@ export class FetchInstrumentation extends InstrumentationBase {
     url: string,
     options: Partial<Request | RequestInit> = {}
   ): api.Span | undefined {
-    if (core.isUrlIgnored(url, this._getConfig().ignoreUrls)) {
+    if (core.isUrlIgnored(url, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
@@ -258,7 +254,7 @@ export class FetchInstrumentation extends InstrumentationBase {
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      if (!this._getConfig().ignoreNetworkEvents) {
+      if (!this.getConfig().ignoreNetworkEvents) {
         web.addSpanNetworkEvents(span, mainRequest);
       }
     }
@@ -419,7 +415,7 @@ export class FetchInstrumentation extends InstrumentationBase {
     result: Response | FetchError
   ) {
     const applyCustomAttributesOnSpan =
-      this._getConfig().applyCustomAttributesOnSpan;
+      this.getConfig().applyCustomAttributesOnSpan;
     if (applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, request, result),

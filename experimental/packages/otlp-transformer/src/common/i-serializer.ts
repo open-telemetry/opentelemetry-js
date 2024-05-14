@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import type * as protobuf from 'protobufjs';
-
-export interface ExportType<T, R = T & { toJSON: () => unknown }> {
-  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
-  decode(reader: protobuf.Reader | Uint8Array, length?: number): R;
+/**
+ * Serializes and deserializes the OTLP request/response to and from {@link Uint8Array}
+ */
+export interface ISerializer<Request, Response> {
+  serializeRequest(request: Request): Uint8Array | undefined;
+  deserializeResponse(data: Uint8Array): Response;
 }

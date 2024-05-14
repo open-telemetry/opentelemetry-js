@@ -13,5 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { OTLPProtoExporterBrowserBase } from './OTLPProtoExporterBrowserBase';
-export { ServiceClientType } from '../types';
+
+export { AWSXRayLambdaPropagator } from './AWSXRayLambdaPropagator';

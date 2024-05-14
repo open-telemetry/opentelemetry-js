@@ -111,6 +111,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version    | Supported                                     |
 |---------------------|-----------------------------------------------|
+| Node.JS `v22`       | :heavy_check_mark:                            |
 | Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
 | Node.JS `v16`       | :heavy_check_mark:                            |
@@ -205,7 +206,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 #### Maintainers ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
 
 - [Amir Blum](https://github.com/blumamir), Keyval
-- [Chengzhong Wu](https://github.com/legendecas), Alibaba
+- [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 
