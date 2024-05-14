@@ -29,14 +29,14 @@ jobs:
           # TODO: adhere to, or overwrite above rule and uncomment rules
           # rules: "/lint/rules/changelog.js"
           config: "/lint/config/changelog.yml"
-          args: "./CHANGELOG.md"
+          args: "./**/CHANGELOG.md"
 
       - name: Lint markdown files
         uses: avto-dev/markdown-lint@v1
         with:
           config: '.github/markdown-lint.yml'
           args: "./**/*.md"
-          ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
+          ignore: './**/CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
       - name: Bootstrap
         run: npm ci
