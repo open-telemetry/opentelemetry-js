@@ -221,7 +221,7 @@ export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
 export function getXHRBodyLength(
   body: Document | XMLHttpRequestBodyInit
 ): number {
-  if (body instanceof Document) {
+  if (typeof Document !== 'undefined' && body instanceof Document) {
     return new XMLSerializer().serializeToString(document).length;
   }
   // XMLHttpRequestBodyInit expands to the following:
