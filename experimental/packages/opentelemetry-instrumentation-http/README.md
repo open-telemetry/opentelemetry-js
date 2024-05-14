@@ -16,6 +16,10 @@ For automatic instrumentation see the
 npm install --save @opentelemetry/instrumentation-http
 ```
 
+## Supported Versions
+
+- Nodejs `>=14`
+
 ## Usage
 
 OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
