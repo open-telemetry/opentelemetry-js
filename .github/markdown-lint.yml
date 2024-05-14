@@ -1,2 +1,5 @@
+# MD004 - Unordered list style
+# This rule is triggered when the symbols used in the document for unordered list items do not match the configured unordered list style
+# * Item 1 // Error: Unordered list style [Expected: dash; Actual: asterisk]
 MD004:
   style: dash
