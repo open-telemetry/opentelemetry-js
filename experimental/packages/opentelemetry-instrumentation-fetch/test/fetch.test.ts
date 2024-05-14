@@ -183,8 +183,8 @@ describe('fetch', () => {
 
   const prepareData = async (
     fileUrl: string,
+    apiCall: () => Promise<any>,
     config: FetchInstrumentationConfig,
-    method?: string,
     disablePerfObserver?: boolean,
     disableGetEntries?: boolean
   ) => {
@@ -288,7 +288,7 @@ describe('fetch', () => {
       async () => {
         fakeNow = 0;
         try {
-          const responsePromise = getData(fileUrl, method);
+          const responsePromise = apiCall();
           fakeNow = 300;
           const response = await responsePromise;
 
@@ -332,7 +332,9 @@ describe('fetch', () => {
   describe('when request is successful', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = [url];
-      await prepareData(url, { propagateTraceHeaderCorsUrls });
+      await prepareData(url, () => getData(url), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
 
     afterEach(() => {
@@ -579,7 +581,7 @@ describe('fetch', () => {
         diagLogger.debug = spyDebug;
         api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
         clearData();
-        await prepareData(url, {});
+        await prepareData(url, () => getData(url), {});
       });
       afterEach(() => {
         sinon.restore();
@@ -614,7 +616,9 @@ describe('fetch', () => {
   describe('when request is secure and successful', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = [secureUrl];
-      await prepareData(secureUrl, { propagateTraceHeaderCorsUrls });
+      await prepareData(secureUrl, () => getData(secureUrl), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
 
     afterEach(() => {
@@ -663,7 +667,7 @@ describe('fetch', () => {
     ) => {
       const propagateTraceHeaderCorsUrls = [url];
 
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         applyCustomAttributesOnSpan,
       });
@@ -731,7 +735,7 @@ describe('fetch', () => {
   describe('when url is ignored', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         ignoreUrls: [propagateTraceHeaderCorsUrls],
       });
@@ -758,7 +762,7 @@ describe('fetch', () => {
   describe('when clearTimingResources is TRUE', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         clearTimingResources: true,
       });
@@ -778,7 +782,9 @@ describe('fetch', () => {
   describe('when request is NOT successful (wrong url)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = badUrl;
-      await prepareData(badUrl, { propagateTraceHeaderCorsUrls });
+      await prepareData(badUrl, () => getData(badUrl), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
     afterEach(() => {
       clearData();
@@ -796,7 +802,9 @@ describe('fetch', () => {
   describe('when request is NOT successful (405)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, { propagateTraceHeaderCorsUrls }, 'DELETE');
+      await prepareData(url, () => getData(url, 'DELETE'), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
     afterEach(() => {
       clearData();
@@ -817,7 +825,7 @@ describe('fetch', () => {
       // All above tests test it already but just in case
       // lets explicitly turn getEntriesByType off so we can be sure
       // that the perf entries come from the observer.
-      await prepareData(url, {}, undefined, false, true);
+      await prepareData(url, () => getData(url), {}, false, true);
     });
     afterEach(() => {
       clearData();
@@ -849,7 +857,7 @@ describe('fetch', () => {
 
   describe('when fetching with relative url', () => {
     beforeEach(async () => {
-      await prepareData('/get', {}, undefined, false, true);
+      await prepareData('/get', () => getData('/get'), {}, false, true);
     });
     afterEach(() => {
       clearData();
@@ -893,7 +901,7 @@ describe('fetch', () => {
 
   describe('when PerformanceObserver is undefined', () => {
     beforeEach(async () => {
-      await prepareData(url, {}, undefined, true, false);
+      await prepareData(url, () => getData(url), {}, true, false);
     });
 
     afterEach(() => {
@@ -925,7 +933,7 @@ describe('fetch', () => {
 
   describe('when PerformanceObserver and performance.getEntriesByType are undefined', () => {
     beforeEach(async () => {
-      await prepareData(url, {}, undefined, true, true);
+      await prepareData(url, () => getData(url), {}, true, true);
     });
     afterEach(() => {
       clearData();
@@ -960,7 +968,7 @@ describe('fetch', () => {
 
   describe('when network events are ignored', () => {
     beforeEach(async () => {
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         ignoreNetworkEvents: true,
       });
     });
