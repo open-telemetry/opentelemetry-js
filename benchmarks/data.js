@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715631543797,
+  "lastUpdate": 1715761259687,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8854,6 +8854,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 662195,
             "range": "±0.65%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a479ddce4b665795c41e924a61f831c359549c5a",
+          "message": "chore: update versions to 1.24.1/0.51.1, carry over changelog adjustments (#4705)\n\n* fix(resources): prevent circular import (resource -> detector -> resource -> ...) (#4653)\r\n\r\n* fix(resources): prevent circular import (resource -> detector -> resource -> ...)\r\n\r\n* fixup! fix(resources): prevent circular import (resource -> detector -> resource -> ...)\r\n\r\n* fix(core): align inconsistent behavior of getEnv() and getEnvWithoutDefaults() when a process polyfill is used (#4649)\r\n\r\n* fix(core): align inconsistent behavior of getEnv() and getEnvWithoutDefaults() when a process polyfill is used\r\n\r\n* Update CHANGELOG.md\r\n\r\n* fix(deps): update dependency import-in-the-middle to v1.7.4 (#4667)\r\n\r\n* fix(exporter-metrics-otlp-grpc) Add explicit otlp-exporter-base depen… (#4678)\r\n\r\n* fix(exporter-metrics-otlp-grpc) Add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc\r\n\r\n* Update CHANGELOG.md\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\r\n\r\n* chore: sync package-lock.json, adapt changelog\r\n\r\n* chore: prepare release 1.24.1/0.51.1\r\n\r\n* chore: adjust changelog\r\n\r\n* chore: sync package-lock.json\r\n\r\n---------\r\n\r\nCo-authored-by: Mend Renovate <bot@renovateapp.com>\r\nCo-authored-by: Aksel Allas <allasaksel@gmail.com>",
+          "timestamp": "2024-05-15T10:19:42+02:00",
+          "tree_id": "ef2879949bf7e0f507b03e158b64a6047fff7c3b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a479ddce4b665795c41e924a61f831c359549c5a"
+        },
+        "date": 1715761258767,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 937132,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11748,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 731669,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 638091,
+            "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
