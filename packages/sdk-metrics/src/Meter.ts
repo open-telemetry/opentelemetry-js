@@ -25,7 +25,6 @@ import {
   ObservableUpDownCounter,
   BatchObservableCallback,
   Observable,
-  Gauge,
 } from '@opentelemetry/api';
 import {
   createInstrumentDescriptor,
@@ -41,6 +40,7 @@ import {
   UpDownCounterInstrument,
 } from './Instruments';
 import { MeterSharedState } from './state/MeterSharedState';
+import { Gauge } from './types';
 
 /**
  * This class implements the {@link IMeter} interface.
