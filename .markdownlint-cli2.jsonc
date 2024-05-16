@@ -1,0 +1,15 @@
+// https://github.com/DavidAnson/markdownlint-cli2#markdownlint-cli2jsonc
+{
+  "config": {
+    "MD013": false,
+    "MD024": false,
+    "MD033": false,
+    "MD041": false,
+    "MD026": false,
+    "MD004": { "style": "consistent" },
+    "MD045": false // no-alt-text: disable for now, fix in a separate change
+  },
+  "gitignore": true,
+  "noBanner": true,
+  "noProgress": true
+}
