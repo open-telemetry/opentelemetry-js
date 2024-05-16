@@ -11,7 +11,7 @@
 const fs = require('fs');
 
 const changelog = fs.readFileSync(process.argv[2]).toString();
-const firstReleaseNoteEntryExp = /(## \d+.\d+.\d\n*(.*\n)*?)(?=## )/m;
+const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?(?=^## )/ms;
 
 fs.mkdirSync('./.tmp/', {
   recursive: true
