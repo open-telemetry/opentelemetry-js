@@ -6,8 +6,7 @@
     "MD033": false,
     "MD041": false,
     "MD026": false,
-    "MD004": { "style": "consistent" },
-    "MD045": false // no-alt-text: disable for now, fix in a separate change
+    "MD004": { "style": "consistent" }
   },
   "gitignore": true,
   "noBanner": true,

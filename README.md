@@ -252,7 +252,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 #### Thanks to all the people who already contributed
 
 <a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
+  <img alt="Repo contributors" src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
 </a>
 
 ## Packages
