@@ -1917,7 +1917,7 @@ No changes
 * `opentelemetry-api`, `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`
   * [#1137](https://github.com/open-telemetry/opentelemetry-js/pull/1137) Batch observer ([@obecny](https://github.com/obecny))
 * `opentelemetry-exporter-collector`
-  * [#1256](https://github.com/open-telemetry/opentelemetry-js/pull/1256) feat: [Collector Metric Exporter][1/x] Rename CollectorExporter to CollectorTraceExporter  ([@davidwitten](https://github.com/davidwitten))
+  * [#1256](https://github.com/open-telemetry/opentelemetry-js/pull/1256) feat: Collector Metric Exporter [1/x] Rename CollectorExporter to CollectorTraceExporter  ([@davidwitten](https://github.com/davidwitten))
 
 ### :rocket: (Enhancement)
 

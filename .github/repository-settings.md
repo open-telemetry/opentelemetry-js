@@ -36,7 +36,7 @@ Our dependencies are managed by a bot which creates PRs from a fork.
 
 This is a special branch which we use to publish the automatically generated docs.
 It is exempt from most protections.
- 
+
 * "Allow force pushes from everyone" (requires write permission)
 
 ## Pages

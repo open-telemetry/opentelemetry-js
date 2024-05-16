@@ -155,7 +155,7 @@ This retry policy has the following configuration, which there is currently no w
 
 This retry policy first checks if the response has a `'Retry-After'` header. If there is a `'Retry-After'` header, the exporter will wait the amount specified in the `'Retry-After'` header before retrying. If there is no `'Retry-After'` header, the exporter will use an exponential backoff with jitter retry strategy.
 
-  > The exporter will retry exporting within the [exporter timeout configuration](#Exporter-Timeout-Configuration) time.
+  > The exporter will retry exporting within the [exporter timeout configuration](#exporter-timeout-configuration) time.
 
 ## Running opentelemetry-collector locally to see the traces
 
@@ -179,7 +179,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-grpc
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-trace-otlp-http.svg
-[opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [opentelemetry-spec-protocol-exporter]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http
