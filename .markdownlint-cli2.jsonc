@@ -6,7 +6,7 @@
     "MD033": false,
     "MD041": false,
     "MD026": false,
-    "MD004": { "style": "consistent" }
+    "MD004": { "style": "dash" } // ul-style
   },
   "gitignore": true,
   "noBanner": true,
