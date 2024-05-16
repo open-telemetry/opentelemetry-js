@@ -14,14 +14,14 @@ To get started you need to install `@opentelemetry/sdk-web`, a tracing exporter,
 ### Installation
 
 ```sh
-$ # Install the SDK
-$ npm install @opentelemetry/sdk-web
+# Install the SDK
+npm install @opentelemetry/sdk-web
 
-$ # Install exporters
-$ npm install @opentelemetry/exporter-trace-otlp-http
+# Install exporters
+npm install @opentelemetry/exporter-trace-otlp-http
 
-$ # or install all officially supported core and contrib plugins
-$ npm install @opentelemetry/auto-instrumentations-web
+# or install all officially supported core and contrib plugins
+npm install @opentelemetry/auto-instrumentations-web
 
 ```
 
