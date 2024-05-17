@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715786372457,
+  "lastUpdate": 1715934096369,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -8960,6 +8960,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4c01b33826992cfe1c352d720bafecb308be6ae7",
+          "message": "feat(instrumentation): remove default value for config in base instrumentation constructor (#4695)\n\n* fix(instrumentation)make config object required in base instrumentation\r\n\r\n* chore: CHANGELOG\r\n\r\n* fix: constructor pattern for instrumentations\r\n\r\n* chore: lint fix\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\n* Update experimental/CHANGELOG.md\r\n\r\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>\r\n\r\n* Update CHANGELOG.md\r\n\r\n---------\r\n\r\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-17T10:19:57+02:00",
+          "tree_id": "9adebcee5426a4288389395bb744c91b468b2a60",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4c01b33826992cfe1c352d720bafecb308be6ae7"
+        },
+        "date": 1715934095536,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 975901,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11818,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 684324,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 636295,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
