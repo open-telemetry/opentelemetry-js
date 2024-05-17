@@ -11,6 +11,8 @@
 const fs = require('fs');
 
 const changelog = fs.readFileSync(process.argv[2]).toString();
+// Matches everything from the first entry at h2 ('##') followed by a space and a non-prerelease semver version
+// until the next entry at h2.
 const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?(?=^## )/ms;
 
 fs.mkdirSync('./.tmp/', {
