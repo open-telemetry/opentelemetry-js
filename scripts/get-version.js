@@ -16,12 +16,12 @@ function extractVersionFromPackageJson(packageJsonPath){
   const packageJson =  JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
   if(packageJson.private === true || packageJson.private === 'true'){
-    console.log('Skipping version from private package at', packageJsonPath);
+    console.warn('Skipping version from private package at', packageJsonPath);
     return undefined;
   }
 
   if(packageJson.version == null){
-    console.log('Version in', packageJsonPath, 'was null or undefined, skipping');
+    console.warn('Version in', packageJsonPath, 'was null or undefined, skipping');
     return undefined;
   }
 
@@ -38,7 +38,7 @@ function findFirstPackageVersion(basePath){
         return version;
       }
     } catch (err) {
-      console.log('Could not get package JSON', packageJsonPath, err);
+      console.warn('Could not get package JSON', packageJsonPath, err);
     }
   }
   throw new Error('Unable to extract version from packages in ' + basePath);

@@ -56,9 +56,9 @@
     "_changelog:prepare_api": "node scripts/update-changelog.js ./api/CHANGELOG.md ./api/package.json",
     "_changelog:prepare_all": "npm run _changelog:prepare_api && npm run _changelog:prepare_experimental && npm run _changelog:prepare_stable",
     "_github:draft_release:all": "npm run _github:draft_release:api && _github:draft_release:experimental && _github:draft_release:stable",
-    "_github:draft_release:api": "node scripts/extract-latest-release-notes.js ./api/CHANGELOG.md && gh release create --draft --notes-file ./.tmp/release-notes.md --target main api/v$(node scripts/get-version.js ./api/package.json)",
-    "_github:draft_release:experimental": "node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md && gh release create --draft --notes-file ./.tmp/release-notes.md --target main api/v$(node scripts/get-version.js ./experimental/packages/)",
-    "_github:draft_release:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md && gh release create --draft --notes-file ./.tmp/release-notes.md --target main v$(node scripts/get-version.js ./packages/)"
+    "_github:draft_release:api": "node scripts/extract-latest-release-notes.js ./api/CHANGELOG.md && VERSION=$(node scripts/get-version.js ./api/package.json | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title api/v$VERSION api/v$VERSION",
+    "_github:draft_release:experimental": "node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md && VERSION=$(node scripts/get-version.js ./experimental/packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title experimental/v$VERSION experimental/v$VERSION",
+    "_github:draft_release:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md && VERSION=$(node scripts/get-version.js ./packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title v$VERSION v$VERSION"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
