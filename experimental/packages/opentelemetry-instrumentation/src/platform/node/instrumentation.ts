@@ -28,6 +28,7 @@ import type { HookFn } from 'import-in-the-middle';
 import * as ImportInTheMiddle from 'import-in-the-middle';
 import {
   InstrumentationConfig,
+  InstrumentationMetadata,
   InstrumentationModuleDefinition,
 } from '../../types';
 import { diag } from '@opentelemetry/api';
@@ -54,9 +55,10 @@ export abstract class InstrumentationBase<
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: ConfigType
+    config: ConfigType,
+    instrumentationMetadata: InstrumentationMetadata = {},
   ) {
-    super(instrumentationName, instrumentationVersion, config);
+    super(instrumentationName, instrumentationVersion, config, instrumentationMetadata);
 
     let modules = this.init();
 

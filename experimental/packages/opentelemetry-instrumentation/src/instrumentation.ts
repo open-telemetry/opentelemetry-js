@@ -32,6 +32,7 @@ import {
   Instrumentation,
   InstrumentationConfig,
   SpanCustomizationHook,
+  InstrumentationMetadata,
 } from './types';
 
 /**
@@ -51,7 +52,8 @@ export abstract class InstrumentationAbstract<
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: ConfigType
+    config: ConfigType,
+    public readonly instrumentationMetadata: InstrumentationMetadata,
   ) {
     // copy config first level properties to ensure they are immutable.
     // nested properties are not copied, thus are mutable from the outside.

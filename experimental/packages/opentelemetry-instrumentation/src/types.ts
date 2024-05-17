@@ -27,13 +27,8 @@ export interface Instrumentation<
   /** Instrumentation Version  */
   instrumentationVersion: string;
 
-  /**
-   * Instrumentation Description - please describe all useful information
-   * as Instrumentation might patch different version of different modules,
-   * or support different browsers etc.
-   */
-  instrumentationDescription?: string;
-
+  instrumentationMetadata: InstrumentationMetadata;
+  
   /** Method to disable the instrumentation  */
   disable(): void;
 
@@ -54,6 +49,24 @@ export interface Instrumentation<
 
   /** Method to get instrumentation config  */
   getConfig(): ConfigType;
+}
+
+export interface InstrumentationMetadata {
+
+  /**
+   * description targets human readers and is an opportunity to communicate the use case 
+   * for the instrumented package and its semconv namespace. 
+   * It should help users know whether the package fits their application, 
+   * which is especially helpful if the package has a shortened or obscure name.
+   * 
+   * Example: "OpenTelemetry instrumentation for `foo` database client for Foo.DB"
+   * 
+   * The value is not used directly by the instrumentation package, but can be leveraged by
+   * distributions or tools to provide more context to users.
+   * 
+   * Optional but recommended.
+   */
+  description?: string;
 }
 
 /**

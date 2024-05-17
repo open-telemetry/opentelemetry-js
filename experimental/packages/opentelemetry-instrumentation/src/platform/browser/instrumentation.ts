@@ -16,7 +16,7 @@
 
 import { InstrumentationAbstract } from '../../instrumentation';
 import * as types from '../../types';
-import { InstrumentationConfig } from '../../types';
+import { InstrumentationConfig, InstrumentationMetadata } from '../../types';
 
 /**
  * Base abstract class for instrumenting web plugins
@@ -30,9 +30,10 @@ export abstract class InstrumentationBase<
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: ConfigType
+    config: ConfigType,
+    instrumentationMetadata: InstrumentationMetadata = {},
   ) {
-    super(instrumentationName, instrumentationVersion, config);
+    super(instrumentationName, instrumentationVersion, config, instrumentationMetadata);
 
     if (this._config.enabled) {
       this.enable();
