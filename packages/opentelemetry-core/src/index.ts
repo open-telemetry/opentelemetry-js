@@ -42,7 +42,7 @@ export * from './utils/timeout';
 export * from './utils/url';
 export * from './utils/wrap';
 export * from './utils/callback';
-export * from './version';
+export { VERSION } from './version';
 import { _export } from './internal/exporter';
 export const internal = {
   _export,
