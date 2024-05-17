@@ -26,7 +26,7 @@ import * as web from '@opentelemetry/sdk-trace-web';
 import { AttributeNames } from './enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
-import { VERSION } from './version';
+import { PACKAGE_DESCRIPTION, VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
 
 // how long to wait for observer to collect information about resources
@@ -80,7 +80,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _tasksCount = 0;
 
   constructor(config: FetchInstrumentationConfig = {}) {
-    super('@opentelemetry/instrumentation-fetch', VERSION, config);
+    super('@opentelemetry/instrumentation-fetch', VERSION, config, {description: PACKAGE_DESCRIPTION});
   }
 
   init(): void {}

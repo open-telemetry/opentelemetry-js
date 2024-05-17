@@ -37,7 +37,7 @@ import {
   SendFunction,
   XhrMem,
 } from './types';
-import { VERSION } from './version';
+import { PACKAGE_DESCRIPTION, VERSION } from './version';
 import { AttributeNames } from './enums/AttributeNames';
 
 // how long to wait for observer to collect information about resources
@@ -91,7 +91,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
-    super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
+    super('@opentelemetry/instrumentation-xml-http-request', VERSION, config, { description: PACKAGE_DESCRIPTION});
   }
 
   init() {}

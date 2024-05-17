@@ -85,13 +85,13 @@ import {
   _methodIsIgnored,
 } from './utils';
 import { AttributeValues } from './enums/AttributeValues';
-import { VERSION } from './version';
+import { PACKAGE_DESCRIPTION, VERSION } from './version';
 
 export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
 
   constructor(config: GrpcInstrumentationConfig = {}) {
-    super('@opentelemetry/instrumentation-grpc', VERSION, config);
+    super('@opentelemetry/instrumentation-grpc', VERSION, config, { description: PACKAGE_DESCRIPTION });
     this._metadataCapture = this._createMetadataCapture();
   }
 
