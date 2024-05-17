@@ -44,7 +44,7 @@ import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { VERSION } from '../src/version';
 import { Root } from 'protobufjs';
 import * as path from 'path';
-import {nextTick} from "process";
+import { nextTick } from 'process';
 
 let fakeRequest: PassThrough;
 
@@ -78,10 +78,10 @@ describe('OTLPMetricExporter - node with proto over http', () => {
   });
 
   describe('default behavior for headers', () => {
-    const collectorExporter = new OTLPMetricExporter();
+    const exporter = new OTLPMetricExporter();
     it('should include user agent in header', () => {
       assert.strictEqual(
-        collectorExporter._otlpExporter.headers['User-Agent'],
+        exporter._otlpExporter['_transport']['_parameters']['headers']['User-Agent'],
         `OTel-OTLP-Exporter-JavaScript/${VERSION}`
       );
     });
@@ -179,31 +179,40 @@ describe('OTLPMetricExporter - node with proto over http', () => {
     });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'bar');
+      const exporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        exporter._otlpExporter['_transport']['_parameters']['headers']['foo'],
+        'bar'
+      );
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'boo');
-      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
+      const exporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        exporter._otlpExporter['_transport']['_parameters']['headers']['foo'],
+        'boo'
+      );
+      assert.strictEqual(
+        exporter._otlpExporter['_transport']['_parameters']['headers']['bar'],
+        'foo'
+      );
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override headers defined via env with headers defined in constructor', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const collectorExporter = new OTLPMetricExporter({
+      const exporter = new OTLPMetricExporter({
         headers: {
           foo: 'constructor',
         },
       });
       assert.strictEqual(
-        collectorExporter._otlpExporter.headers.foo,
+        exporter._otlpExporter['_transport']['_parameters']['headers']['foo'],
         'constructor'
       );
-      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
+      assert.strictEqual(exporter._otlpExporter['_transport']['_parameters']['headers']['bar'], 'foo');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
   });

@@ -44,7 +44,7 @@ const noopSerializer: ISerializer<object, object> = {
 
 describe('force flush', () => {
   it('forceFlush should flush spans and return', async () => {
-    const exporter = new Exporter({}, noopSerializer, '');
+    const exporter = new Exporter({}, noopSerializer, {});
     await exporter.forceFlush();
   });
 });

@@ -87,7 +87,7 @@ describe('OTLPLogExporter', () => {
     it('should include user-agent header by default', () => {
       const exporter = new OTLPLogExporter();
       assert.strictEqual(
-        exporter.headers['User-Agent'],
+        exporter['_transport']['_parameters']['headers']['User-Agent'],
         `OTel-OTLP-Exporter-JavaScript/${VERSION}`
       );
     });
@@ -95,7 +95,7 @@ describe('OTLPLogExporter', () => {
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=bar';
       const exporter = new OTLPLogExporter();
-      assert.strictEqual(exporter.headers.foo, 'bar');
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['foo'], 'bar');
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
     });
 
@@ -110,13 +110,13 @@ describe('OTLPLogExporter', () => {
 
     it('should override headers defined via env with headers defined in constructor', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const collectorExporter = new OTLPLogExporter({
+      const exporter = new OTLPLogExporter({
         headers: {
           foo: 'constructor',
         },
       });
-      assert.strictEqual(collectorExporter.headers.foo, 'constructor');
-      assert.strictEqual(collectorExporter.headers.bar, 'foo');
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['foo'], 'constructor');
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['bar'], 'foo');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
   });

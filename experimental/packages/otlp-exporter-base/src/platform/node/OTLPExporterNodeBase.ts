@@ -16,7 +16,6 @@
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterNodeConfigBase } from './types';
-import { parseHeaders } from '../../util';
 import { configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
@@ -32,27 +31,19 @@ export abstract class OTLPExporterNodeBase<
   ExportItem,
   ServiceResponse,
 > extends OTLPExporterBase<OTLPExporterNodeConfigBase, ExportItem> {
-  DEFAULT_HEADERS: Record<string, string> = {};
-  headers: Record<string, string>;
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
   private _transport: IExporterTransport;
 
   constructor(
     config: OTLPExporterNodeConfigBase = {},
     serializer: ISerializer<ExportItem[], ServiceResponse>,
-    contentType: string
+    signalSpecificHeaders: Record<string, string>
   ) {
     super(config);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    this.headers = Object.assign(
-      this.DEFAULT_HEADERS,
-      parseHeaders(config.headers),
-      baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS),
-      { 'Content-Type': contentType }
-    );
     this._serializer = serializer;
 
     // populate keepAlive for use with new settings
@@ -70,11 +61,18 @@ export abstract class OTLPExporterNodeBase<
         };
       }
     }
+    const nonSignalSpecificHeaders = baggageUtils.parseKeyPairsIntoRecord(
+      getEnv().OTEL_EXPORTER_OTLP_HEADERS
+    );
 
     this._transport = createHttpExporterTransport({
       agentOptions: config.httpAgentOptions ?? { keepAlive: true },
       compression: configureCompression(config.compression),
-      headers: this.headers,
+      headers: Object.assign(
+        {},
+        nonSignalSpecificHeaders,
+        signalSpecificHeaders
+      ),
       url: this.url,
       timeoutMillis: this.timeoutMillis,
     });

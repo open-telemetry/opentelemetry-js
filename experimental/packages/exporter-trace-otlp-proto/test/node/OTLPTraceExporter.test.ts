@@ -71,10 +71,10 @@ describe('OTLPTraceExporter - node with proto over http', () => {
   });
 
   describe('default behavior for headers', () => {
-    const collectorExporter = new OTLPTraceExporter();
+    const exporter = new OTLPTraceExporter();
     it('should include user agent in header', () => {
       assert.strictEqual(
-        collectorExporter.headers['User-Agent'],
+        exporter['_transport']['_parameters']['headers']['User-Agent'],
         `OTel-OTLP-Exporter-JavaScript/${VERSION}`
       );
     });
@@ -168,28 +168,28 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(collectorExporter.headers.foo, 'bar');
+      const exporter = new OTLPTraceExporter();
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['foo'], 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(collectorExporter.headers.foo, 'boo');
-      assert.strictEqual(collectorExporter.headers.bar, 'foo');
+      const exporter = new OTLPTraceExporter();
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['foo'], 'boo');
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['bar'], 'foo');
       envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override headers defined via env with headers defined in constructor', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const collectorExporter = new OTLPTraceExporter({
+      const exporter = new OTLPTraceExporter({
         headers: {
           foo: 'constructor',
         },
       });
-      assert.strictEqual(collectorExporter.headers.foo, 'constructor');
-      assert.strictEqual(collectorExporter.headers.bar, 'foo');
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['foo'], 'constructor');
+      assert.strictEqual(exporter['_transport']['_parameters']['headers']['bar'], 'foo');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
   });
