@@ -91,7 +91,9 @@ export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentation
   private _metadataCapture: metadataCaptureType;
 
   constructor(config: GrpcInstrumentationConfig = {}) {
-    super('@opentelemetry/instrumentation-grpc', VERSION, config, { description: PACKAGE_DESCRIPTION });
+    super('@opentelemetry/instrumentation-grpc', VERSION, config, {
+      description: PACKAGE_DESCRIPTION,
+    });
     this._metadataCapture = this._createMetadataCapture();
   }
 

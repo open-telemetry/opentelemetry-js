@@ -91,7 +91,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
   constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
-    super('@opentelemetry/instrumentation-xml-http-request', VERSION, config, { description: PACKAGE_DESCRIPTION});
+    super('@opentelemetry/instrumentation-xml-http-request', VERSION, config, {
+      description: PACKAGE_DESCRIPTION,
+    });
   }
 
   init() {}

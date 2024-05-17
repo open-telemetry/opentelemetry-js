@@ -53,7 +53,7 @@ export abstract class InstrumentationAbstract<
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
     config: ConfigType,
-    public readonly instrumentationMetadata: InstrumentationMetadata,
+    public readonly instrumentationMetadata: InstrumentationMetadata
   ) {
     // copy config first level properties to ensure they are immutable.
     // nested properties are not copied, thus are mutable from the outside.

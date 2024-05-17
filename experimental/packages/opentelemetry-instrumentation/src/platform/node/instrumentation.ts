@@ -56,9 +56,14 @@ export abstract class InstrumentationBase<
     instrumentationName: string,
     instrumentationVersion: string,
     config: ConfigType,
-    instrumentationMetadata: InstrumentationMetadata = {},
+    instrumentationMetadata: InstrumentationMetadata = {}
   ) {
-    super(instrumentationName, instrumentationVersion, config, instrumentationMetadata);
+    super(
+      instrumentationName,
+      instrumentationVersion,
+      config,
+      instrumentationMetadata
+    );
 
     let modules = this.init();
 

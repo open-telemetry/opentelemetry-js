@@ -80,7 +80,9 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _tasksCount = 0;
 
   constructor(config: FetchInstrumentationConfig = {}) {
-    super('@opentelemetry/instrumentation-fetch', VERSION, config, {description: PACKAGE_DESCRIPTION});
+    super('@opentelemetry/instrumentation-fetch', VERSION, config, {
+      description: PACKAGE_DESCRIPTION,
+    });
   }
 
   init(): void {}
