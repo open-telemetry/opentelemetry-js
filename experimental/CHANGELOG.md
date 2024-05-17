@@ -27,6 +27,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
+* feat: instrumentation description in base class constructor [#4716](https://github.com/open-telemetry/opentelemetry-js/pull/4716) @blumamir
 
 ### :bug: (Bug Fix)
 
