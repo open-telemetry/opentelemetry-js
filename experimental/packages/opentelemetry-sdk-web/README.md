@@ -40,13 +40,7 @@ const {
   getWebAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-web");
 
-const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
-  headers: {}, // an optional object containing custom headers to be sent with each request
-  concurrencyLimit: 10, // an optional limit on pending requests
-};
-
-const otlpTraceExporter = new OTLPTraceExporter(collectorOptions);
+const otlpTraceExporter = new OTLPTraceExporter();
 
 const sdk = new opentelemetry.WebSDK({
   // Optional - if omitted, the tracing SDK will be initialized from environment variables
