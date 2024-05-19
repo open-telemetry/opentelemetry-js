@@ -34,7 +34,6 @@ All notable changes to experimental packages in this project will be documented 
 
 * docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
 * docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
-* docs: enhanced description for instrumentations in package.json [#4715](https://github.com/open-telemetry/opentelemetry-js/pull/4715) @blumamir
 
 ### :house: (Internal)
 

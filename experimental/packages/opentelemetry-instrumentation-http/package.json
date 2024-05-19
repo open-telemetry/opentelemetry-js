@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/instrumentation-http",
   "version": "0.51.1",
-  "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server module",
+  "description": "OpenTelemetry instrumentation for `node:http` and `node:https` http client and server modules",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
