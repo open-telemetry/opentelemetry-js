@@ -25,7 +25,7 @@ import { ensureHeadersContain } from '../testHelper';
 
 describe('util - browser', () => {
   let server: any;
-  const body = '';
+  const body = new Uint8Array();
   const url = '';
   const exporterTimeout = 10000;
 

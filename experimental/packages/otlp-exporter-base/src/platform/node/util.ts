@@ -40,9 +40,9 @@ import {
  * @param onSuccess
  * @param onError
  */
-export function sendWithHttp<ExportItem, ServiceRequest>(
-  collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
-  data: string | Buffer,
+export function sendWithHttp<ExportItem, ServiceResponse>(
+  collector: OTLPExporterNodeBase<ExportItem, ServiceResponse>,
+  data: string | Uint8Array,
   contentType: string,
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
@@ -164,7 +164,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     switch (collector.compression) {
       case CompressionAlgorithm.GZIP: {
         req.setHeader('Content-Encoding', 'gzip');
-        const dataStream = readableFromBuffer(data);
+        const dataStream = readableFromUnit8Array(data);
         dataStream
           .on('error', onError)
           .pipe(zlib.createGzip())
@@ -174,14 +174,14 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
         break;
       }
       default:
-        req.end(data);
+        req.end(Buffer.from(data));
         break;
     }
   };
   sendWithRetry();
 }
 
-function readableFromBuffer(buff: string | Buffer): Readable {
+function readableFromUnit8Array(buff: string | Uint8Array): Readable {
   const readable = new Readable();
   readable.push(buff);
   readable.push(null);

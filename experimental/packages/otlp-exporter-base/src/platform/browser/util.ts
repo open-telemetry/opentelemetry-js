@@ -34,7 +34,7 @@ import {
  * @param onError
  */
 export function sendWithBeacon(
-  body: string,
+  body: Uint8Array,
   url: string,
   blobPropertyBag: BlobPropertyBag,
   onSuccess: () => void,
@@ -61,7 +61,7 @@ export function sendWithBeacon(
  * @param compressionAlgorithm
  */
 export function sendWithXhr(
-  body: string | Blob,
+  body: Uint8Array,
   url: string,
   headers: Record<string, string>,
   exporterTimeout: number,

@@ -20,6 +20,7 @@ import {
   InstrumentationBase,
   InstrumentationConfig,
   InstrumentationModuleDefinition,
+  SpanCustomizationHook,
 } from '../../src';
 
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
@@ -36,6 +37,12 @@ class TestInstrumentation extends InstrumentationBase {
   override enable() {}
   override disable() {}
   init() {}
+
+  // the runInstrumentationEventHook, so we have to invoke it from the class for testing
+  testRunHook(hookHandler?: SpanCustomizationHook<any>) {
+    const span = this.tracer.startSpan('test');
+    this._runSpanCustomizationHook(hookHandler, 'test', span, {});
+  }
 }
 
 describe('BaseInstrumentation', () => {
@@ -135,7 +142,7 @@ describe('BaseInstrumentation', () => {
   });
 
   describe('getModuleDefinitions', () => {
-    const moduleDefinition: InstrumentationModuleDefinition<unknown> = {
+    const moduleDefinition: InstrumentationModuleDefinition = {
       name: 'foo',
       patch: moduleExports => {},
       unpatch: moduleExports => {},
@@ -181,6 +188,31 @@ describe('BaseInstrumentation', () => {
       const instrumentation = new TestInstrumentation2();
 
       assert.deepStrictEqual(instrumentation.getModuleDefinitions(), []);
+    });
+
+    describe('runInstrumentationEventHook', () => {
+      it('should call the hook', () => {
+        const instrumentation = new TestInstrumentation({});
+        let called = false;
+        const hook = () => {
+          called = true;
+        };
+        instrumentation.testRunHook(hook);
+        assert.strictEqual(called, true);
+      });
+
+      it('empty hook should work', () => {
+        const instrumentation = new TestInstrumentation({});
+        instrumentation.testRunHook(undefined);
+      });
+
+      it('exception in hook should not crash', () => {
+        const instrumentation = new TestInstrumentation({});
+        const hook = () => {
+          throw new Error('test');
+        };
+        instrumentation.testRunHook(hook);
+      });
     });
   });
 });

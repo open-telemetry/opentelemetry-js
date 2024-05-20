@@ -74,12 +74,14 @@ export interface XMLHttpRequestInstrumentationConfig
   ignoreUrls?: Array<string | RegExp>;
   /** Function for adding custom attributes on the span */
   applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
+  /** Ignore adding network events as span events */
+  ignoreNetworkEvents?: boolean;
 }
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequestInstrumentationConfig> {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -88,15 +90,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(config?: XMLHttpRequestInstrumentationConfig) {
+  constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
   }
 
   init() {}
-
-  private _getConfig(): XMLHttpRequestInstrumentationConfig {
-    return this._config;
-  }
 
   /**
    * Adds custom headers to XMLHttpRequest
@@ -109,7 +107,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (
       !shouldPropagateTraceHeaders(
         url,
-        this._getConfig().propagateTraceHeaderCorsUrls
+        this.getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
       const headers: Partial<Record<string, unknown>> = {};
@@ -140,7 +138,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      if (!this.getConfig().ignoreNetworkEvents) {
+        addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      }
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -178,7 +178,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
   private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
     const applyCustomAttributesOnSpan =
-      this._getConfig().applyCustomAttributesOnSpan;
+      this.getConfig().applyCustomAttributesOnSpan;
     if (typeof applyCustomAttributesOnSpan === 'function') {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, xhr),
@@ -240,7 +240,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
+    if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
       (otperformance as unknown as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
@@ -292,7 +292,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      addSpanNetworkEvents(span, mainRequest);
+      if (!this.getConfig().ignoreNetworkEvents) {
+        addSpanNetworkEvents(span, mainRequest);
+      }
     }
   }
 
@@ -325,7 +327,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     url: string,
     method: string
   ): api.Span | undefined {
-    if (isUrlIgnored(url, this._getConfig().ignoreUrls)) {
+    if (isUrlIgnored(url, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }

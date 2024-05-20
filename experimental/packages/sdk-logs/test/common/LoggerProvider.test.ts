@@ -28,7 +28,7 @@ import { Logger } from '../../src/Logger';
 describe('LoggerProvider', () => {
   let envSource: Record<string, any>;
 
-  if (typeof process === 'undefined') {
+  if (global.process?.versions?.node === undefined) {
     envSource = globalThis as unknown as Record<string, any>;
   } else {
     envSource = process.env as Record<string, any>;
@@ -61,6 +61,16 @@ describe('LoggerProvider', () => {
         const provider = new LoggerProvider();
         const { resource } = provider['_sharedState'];
         assert.deepStrictEqual(resource, Resource.default());
+      });
+
+      it('should fallback to default resource attrs', () => {
+        const passedInResource = new Resource({ foo: 'bar' });
+        const provider = new LoggerProvider({ resource: passedInResource });
+        const { resource } = provider['_sharedState'];
+        assert.deepStrictEqual(
+          resource,
+          Resource.default().merge(passedInResource)
+        );
       });
 
       it('should have default forceFlushTimeoutMillis if not pass', () => {
