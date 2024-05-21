@@ -171,7 +171,7 @@ export function sendWithXhr(
       ...headers,
     });
   } else {
-    compressContent(body, compressionAlgorithm)
+    compressContent(new Blob([body.buffer]), compressionAlgorithm)
       .then(compressedContent => {
         sendWithRetry(compressedContent, {
           ...commonHeaders,
