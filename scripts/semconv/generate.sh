@@ -32,7 +32,6 @@ docker run --rm --platform linux/amd64 \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
   --output /output/stable.ts \
-  -Dclass=SemanticAttributes \
   -Dfilter=is_stable
 
 docker run --rm --platform linux/amd64 \
@@ -44,7 +43,6 @@ docker run --rm --platform linux/amd64 \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
   --output /output/experimental.ts \
-  -Dclass=SemanticAttributes \
   -Dfilter=is_experimental
 
 # Run the automatic linting fixing task to ensure it will pass eslint
