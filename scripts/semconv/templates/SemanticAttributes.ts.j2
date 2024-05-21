@@ -26,6 +26,7 @@
 {%- set filtered_metrics = metrics | select(filter) | list %}
 
 {%- for metric in filtered_metrics %}
+
 /**
 * {% filter escape %}{{metric.brief | to_doc_brief}}.{% endfilter %}
   {%- if metric.note %}
