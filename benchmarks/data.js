@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1716294987366,
+  "lastUpdate": 1716295106951,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -9114,6 +9114,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 608079,
             "range": "±0.75%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bac68fc7d474a61ff3e89f1f8406ac04593b0b5f",
+          "message": "feat: add api release preparation scripts, github release creation scripts (#4704)\n\n* feat: add more scripts for release creation\r\n\r\n* Update scripts/extract-latest-release-notes.js\r\n\r\n* fix: replace console.log() with console.warn(), ensure get-version.js is a version by checking against a regex\r\n\r\n* chore: add comment to describe the regex",
+          "timestamp": "2024-05-21T14:36:43+02:00",
+          "tree_id": "891c9508694d26a742e2a97d8c732928e062a92e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bac68fc7d474a61ff3e89f1f8406ac04593b0b5f"
+        },
+        "date": 1716295106108,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 924194,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11613,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 679624,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 652662,
+            "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
