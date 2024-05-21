@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/instrumentation-grpc",
   "version": "0.51.1",
-  "description": "OpenTelemetry grpc automatic instrumentation package.",
+  "description": "OpenTelemetry instrumentation for `@grpc/grpc-js` rpc client and server for gRPC framework",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
