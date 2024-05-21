@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1716295106951,
+  "lastUpdate": 1716295536589,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -9168,6 +9168,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e49c4c7f42c6c444da3f802687cfa4f2d6983f46",
+          "message": "chore(lint): refactor Markdown linting to use markdownlint-cli2 (#4713)\n\n* chore(lint): refactor Markdown linting to use markdownlint-cli2\r\n\r\n- first commit is just config changes; lint updates will follow\r\n\r\n* lint fixes\r\n\r\n* fix markdownlint for rule MD045/no-alt-text\r\n\r\n* lint config changes for prefering 'dash' style for rule MD004/ul-style\r\n\r\n* lint:markdown:fix changes for MD004/ul-style\r\n\r\n* manually apply this h3->h2 fix that Amir had in his #4703 PR\r\n\r\n* mention markdown linting in the Linting section of the contributor guide\r\n\r\n* add link to rules docs\r\n\r\n---------\r\n\r\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-05-21T14:44:23+02:00",
+          "tree_id": "85c5a6fccac291788f2b864d28ac24d1c3de2264",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e49c4c7f42c6c444da3f802687cfa4f2d6983f46"
+        },
+        "date": 1716295535765,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 942220,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11429,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 700793,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 671601,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
