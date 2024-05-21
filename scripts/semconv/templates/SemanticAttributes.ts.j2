@@ -28,10 +28,10 @@
 {%- for metric in filtered_metrics %}
 
 /**
-* {% filter escape %}{{metric.brief | to_doc_brief}}.{% endfilter %}
+* {% filter escape %}{{metric.brief | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
   {%- if metric.note %}
 *
-* Note: {% filter escape %}{{metric.note | to_doc_brief}}.{% endfilter %}
+* Note: {% filter escape %}{{metric.note | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
   {%- endif %}
   {%- if (metric.stability | string()) != "StabilityLevel.STABLE" %}
  *
@@ -39,7 +39,7 @@
   {%- endif %}
   {%- if metric.deprecated %}
 *
-* @deprecated {{metric.deprecated | to_doc_brief}}.
+* @deprecated {{metric.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
   {%- endif %}
 */
 export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("string", metric.metric_name) }};
@@ -49,10 +49,10 @@ export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("st
 {%- for attribute in filtered_attributes if attribute.is_local and not attribute.ref %}
 
 /**
-* {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
+* {% filter escape %}{{attribute.brief | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
   {%- if attribute.note %}
 *
-* Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
+* Note: {% filter escape %}{{attribute.note | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
   {%- endif %}
   {%- if (attribute.stability | string()) != "StabilityLevel.STABLE" %}
  *
@@ -60,7 +60,7 @@ export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("st
   {%- endif %}
   {%- if attribute.deprecated %}
 *
-* @deprecated {{attribute.deprecated | to_doc_brief}}.
+* @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
   {%- endif %}
 */
 export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", attribute.fqn) }};
@@ -84,7 +84,7 @@ export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", 
   {%- endif %}
   {%- if attribute.deprecated %}
  *
- * @deprecated {{attribute.deprecated | to_doc_brief}}.
+ * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
   {%- endif %}
  */
 export const {{class_name}}_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }};

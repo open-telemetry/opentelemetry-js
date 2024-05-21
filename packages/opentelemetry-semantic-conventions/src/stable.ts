@@ -59,15 +59,15 @@ export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_LEASE_DURATION =
   'aspnetcore.rate_limiting.request_lease.duration';
 
 /**
-* Number of requests that tried to acquire a rate limiting lease.
-*
-* Note: Requests could be:
-
-* Rejected by global or endpoint rate limiting policies
-* Canceled while waiting for the lease.
-
-Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
-*/
+ * Number of requests that tried to acquire a rate limiting lease.
+ *
+ * Note: Requests could be:
+ *
+ * * Rejected by global or endpoint rate limiting policies
+ * * Canceled while waiting for the lease.
+ *
+ * Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
+ */
 export const METRIC_ASPNETCORE_RATE_LIMITING_REQUESTS =
   'aspnetcore.rate_limiting.requests';
 
@@ -191,11 +191,11 @@ export const METRIC_KESTREL_QUEUED_CONNECTIONS = 'kestrel.queued_connections';
 export const METRIC_KESTREL_QUEUED_REQUESTS = 'kestrel.queued_requests';
 
 /**
-* Number of connections rejected by the server.
-*
-* Note: Connections are rejected when the currently active count exceeds the value configured with `MaxConcurrentConnections`.
-Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
-*/
+ * Number of connections rejected by the server.
+ *
+ * Note: Connections are rejected when the currently active count exceeds the value configured with `MaxConcurrentConnections`.
+ * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
+ */
 export const METRIC_KESTREL_REJECTED_CONNECTIONS =
   'kestrel.rejected_connections';
 
@@ -208,12 +208,12 @@ export const METRIC_KESTREL_TLS_HANDSHAKE_DURATION =
   'kestrel.tls_handshake.duration';
 
 /**
-* Number of connections that are currently upgraded (WebSockets). .
-*
-* Note: The counter only tracks HTTP/1.1 connections.
-
-Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
-*/
+ * Number of connections that are currently upgraded (WebSockets). .
+ *
+ * Note: The counter only tracks HTTP/1.1 connections.
+ *
+ * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
+ */
 export const METRIC_KESTREL_UPGRADED_CONNECTIONS =
   'kestrel.upgraded_connections';
 
@@ -336,46 +336,46 @@ export const ATTR_CLIENT_ADDRESS = 'client.address';
 export const ATTR_CLIENT_PORT = 'client.port';
 
 /**
-* Describes a class of error the operation ended with.
-*
-* Note: The `error.type` SHOULD be predictable and SHOULD have low cardinality.
-Instrumentations SHOULD document the list of errors they report.
-
-The cardinality of `error.type` within one instrumentation library SHOULD be low.
-Telemetry consumers that aggregate data from multiple instrumentation libraries and applications
-should be prepared for `error.type` to have high cardinality at query time when no
-additional filters are applied.
-
-If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.
-
-If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
-it&#39;s RECOMMENDED to:
-
-* Use a domain-specific attribute
-* Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
-*/
+ * Describes a class of error the operation ended with.
+ *
+ * Note: The `error.type` SHOULD be predictable and SHOULD have low cardinality.
+ * Instrumentations SHOULD document the list of errors they report.
+ *
+ * The cardinality of `error.type` within one instrumentation library SHOULD be low.
+ * Telemetry consumers that aggregate data from multiple instrumentation libraries and applications
+ * should be prepared for `error.type` to have high cardinality at query time when no
+ * additional filters are applied.
+ *
+ * If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.
+ *
+ * If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
+ * it&#39;s RECOMMENDED to:
+ *
+ * * Use a domain-specific attribute
+ * * Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
+ */
 export const ATTR_ERROR_TYPE = 'error.type';
 
 /**
-* SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
-*
-* Note: An exception is considered to have escaped (or left) the scope of a span,
-if that span is ended while the exception is still logically &#34;in flight&#34;.
-This may be actually &#34;in flight&#34; in some languages (e.g. if the exception
-is passed to a Context manager&#39;s `__exit__` method in Python) but will
-usually be caught at the point of recording the exception in most languages.
-
-It is usually not possible to determine at the point where an exception is thrown
-whether it will escape the scope of a span.
-However, it is trivial to know that an exception
-will escape, if one checks for an active exception just before ending the span,
-as done in the [example for recording span exceptions](#recording-an-exception).
-
-It follows that an exception may still escape the scope of the span
-even if the `exception.escaped` attribute was not set or set to false,
-since the event might have been recorded at a time where it was not
-clear whether the exception will escape.
-*/
+ * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+ *
+ * Note: An exception is considered to have escaped (or left) the scope of a span,
+ * if that span is ended while the exception is still logically &#34;in flight&#34;.
+ * This may be actually &#34;in flight&#34; in some languages (e.g. if the exception
+ * is passed to a Context manager&#39;s `__exit__` method in Python) but will
+ * usually be caught at the point of recording the exception in most languages.
+ *
+ * It is usually not possible to determine at the point where an exception is thrown
+ * whether it will escape the scope of a span.
+ * However, it is trivial to know that an exception
+ * will escape, if one checks for an active exception just before ending the span,
+ * as done in the [example for recording span exceptions](#recording-an-exception).
+ *
+ * It follows that an exception may still escape the scope of the span
+ * even if the `exception.escaped` attribute was not set or set to false,
+ * since the event might have been recorded at a time where it was not
+ * clear whether the exception will escape.
+ */
 export const ATTR_EXCEPTION_ESCAPED = 'exception.escaped';
 
 /**
@@ -394,23 +394,23 @@ export const ATTR_EXCEPTION_STACKTRACE = 'exception.stacktrace';
 export const ATTR_EXCEPTION_TYPE = 'exception.type';
 
 /**
-* HTTP request method.
-*
-* Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
-By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
-and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
-
-If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
-
-If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
-the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
-OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
-(this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
-
-HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
-Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
-Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
-*/
+ * HTTP request method.
+ *
+ * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
+ * By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
+ * and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
+ *
+ * If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
+ *
+ * If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
+ * the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
+ * OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
+ * (this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
+ *
+ * HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
+ * Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
+ * Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
+ */
 export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method';
 
 /**
@@ -431,11 +431,11 @@ export const ATTR_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count';
 export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 
 /**
-* The matched route, that is, the path template in the format used by the respective server framework.
-*
-* Note: MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
-SHOULD include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
-*/
+ * The matched route, that is, the path template in the format used by the respective server framework.
+ *
+ * Note: MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
+ * SHOULD include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
+ */
 export const ATTR_HTTP_ROUTE = 'http.route';
 
 /**
@@ -473,14 +473,14 @@ export const ATTR_NETWORK_PROTOCOL_NAME = 'network.protocol.name';
 export const ATTR_NETWORK_PROTOCOL_VERSION = 'network.protocol.version';
 
 /**
-* [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
-*
-* Note: The value SHOULD be normalized to lowercase.
-
-Consider always setting the transport when setting a port number, since
-a port number is ambiguous without knowing the transport. For example
-different processes could be listening on TCP port 12345 and UDP port 12345.
-*/
+ * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
+ *
+ * Note: The value SHOULD be normalized to lowercase.
+ *
+ * Consider always setting the transport when setting a port number, since
+ * a port number is ambiguous without knowing the transport. For example
+ * different processes could be listening on TCP port 12345 and UDP port 12345.
+ */
 export const ATTR_NETWORK_TRANSPORT = 'network.transport';
 
 /**
@@ -522,15 +522,15 @@ export const ATTR_SERVICE_VERSION = 'service.version';
 export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
 
 /**
-* The name of the telemetry SDK as defined above.
-*
-* Note: The OpenTelemetry SDK MUST set the `telemetry.sdk.name` attribute to `opentelemetry`.
-If another SDK, like a fork or a vendor-provided implementation, is used, this SDK MUST set the
-`telemetry.sdk.name` attribute to the fully-qualified class or module name of this SDK&#39;s main entry point
-or another suitable identifier depending on the language.
-The identifier `opentelemetry` is reserved and MUST NOT be used in this case.
-All custom identifiers SHOULD be stable across different versions of an implementation.
-*/
+ * The name of the telemetry SDK as defined above.
+ *
+ * Note: The OpenTelemetry SDK MUST set the `telemetry.sdk.name` attribute to `opentelemetry`.
+ * If another SDK, like a fork or a vendor-provided implementation, is used, this SDK MUST set the
+ * `telemetry.sdk.name` attribute to the fully-qualified class or module name of this SDK&#39;s main entry point
+ * or another suitable identifier depending on the language.
+ * The identifier `opentelemetry` is reserved and MUST NOT be used in this case.
+ * All custom identifiers SHOULD be stable across different versions of an implementation.
+ */
 export const ATTR_TELEMETRY_SDK_NAME = 'telemetry.sdk.name';
 
 /**
@@ -544,12 +544,12 @@ export const ATTR_TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
 export const ATTR_URL_FRAGMENT = 'url.fragment';
 
 /**
-* Absolute URL describing a network resource according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986).
-*
-* Note: For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
-`url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password SHOULD be redacted and attribute&#39;s value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
-`url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed). Sensitive content provided in `url.full` SHOULD be scrubbed when instrumentations can identify it.
-*/
+ * Absolute URL describing a network resource according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986).
+ *
+ * Note: For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
+ * `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password SHOULD be redacted and attribute&#39;s value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
+ * `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed). Sensitive content provided in `url.full` SHOULD be scrubbed when instrumentations can identify it.
+ */
 export const ATTR_URL_FULL = 'url.full';
 
 /**

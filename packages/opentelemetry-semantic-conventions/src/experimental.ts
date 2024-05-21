@@ -424,15 +424,15 @@ export const METRIC_PROCESS_PAGING_FAULTS = 'process.paging.faults';
 export const METRIC_PROCESS_THREAD_COUNT = 'process.thread.count';
 
 /**
-* Measures the duration of outbound RPC.
-*
-* Note: While streaming RPCs may record this metric as start-of-batch
-to end-of-batch, it&#39;s hard to interpret in practice.
-
-**Streaming**: N/A.
+ * Measures the duration of outbound RPC.
+ *
+ * Note: While streaming RPCs may record this metric as start-of-batch
+ * to end-of-batch, it&#39;s hard to interpret in practice.
+ *
+ * **Streaming**: N/A.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_RPC_CLIENT_DURATION = 'rpc.client.duration';
 
 /**
@@ -445,14 +445,14 @@ export const METRIC_RPC_CLIENT_DURATION = 'rpc.client.duration';
 export const METRIC_RPC_CLIENT_REQUEST_SIZE = 'rpc.client.request.size';
 
 /**
-* Measures the number of messages received per RPC.
-*
-* Note: Should be 1 for all non-streaming RPCs.
-
-**Streaming**: This metric is required for server and client streaming RPCs.
+ * Measures the number of messages received per RPC.
+ *
+ * Note: Should be 1 for all non-streaming RPCs.
+ *
+ * **Streaming**: This metric is required for server and client streaming RPCs.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_RPC_CLIENT_REQUESTS_PER_RPC = 'rpc.client.requests_per_rpc';
 
 /**
@@ -465,27 +465,27 @@ export const METRIC_RPC_CLIENT_REQUESTS_PER_RPC = 'rpc.client.requests_per_rpc';
 export const METRIC_RPC_CLIENT_RESPONSE_SIZE = 'rpc.client.response.size';
 
 /**
-* Measures the number of messages sent per RPC.
-*
-* Note: Should be 1 for all non-streaming RPCs.
-
-**Streaming**: This metric is required for server and client streaming RPCs.
+ * Measures the number of messages sent per RPC.
+ *
+ * Note: Should be 1 for all non-streaming RPCs.
+ *
+ * **Streaming**: This metric is required for server and client streaming RPCs.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_RPC_CLIENT_RESPONSES_PER_RPC =
   'rpc.client.responses_per_rpc';
 
 /**
-* Measures the duration of inbound RPC.
-*
-* Note: While streaming RPCs may record this metric as start-of-batch
-to end-of-batch, it&#39;s hard to interpret in practice.
-
-**Streaming**: N/A.
+ * Measures the duration of inbound RPC.
+ *
+ * Note: While streaming RPCs may record this metric as start-of-batch
+ * to end-of-batch, it&#39;s hard to interpret in practice.
+ *
+ * **Streaming**: N/A.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_RPC_SERVER_DURATION = 'rpc.server.duration';
 
 /**
@@ -498,14 +498,14 @@ export const METRIC_RPC_SERVER_DURATION = 'rpc.server.duration';
 export const METRIC_RPC_SERVER_REQUEST_SIZE = 'rpc.server.request.size';
 
 /**
-* Measures the number of messages received per RPC.
-*
-* Note: Should be 1 for all non-streaming RPCs.
-
-**Streaming** : This metric is required for server and client streaming RPCs.
+ * Measures the number of messages received per RPC.
+ *
+ * Note: Should be 1 for all non-streaming RPCs.
+ *
+ * **Streaming** : This metric is required for server and client streaming RPCs.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_RPC_SERVER_REQUESTS_PER_RPC = 'rpc.server.requests_per_rpc';
 
 /**
@@ -518,14 +518,14 @@ export const METRIC_RPC_SERVER_REQUESTS_PER_RPC = 'rpc.server.requests_per_rpc';
 export const METRIC_RPC_SERVER_RESPONSE_SIZE = 'rpc.server.response.size';
 
 /**
-* Measures the number of messages sent per RPC.
-*
-* Note: Should be 1 for all non-streaming RPCs.
-
-**Streaming**: This metric is required for server and client streaming RPCs.
+ * Measures the number of messages sent per RPC.
+ *
+ * Note: Should be 1 for all non-streaming RPCs.
+ *
+ * **Streaming**: This metric is required for server and client streaming RPCs.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_RPC_SERVER_RESPONSES_PER_RPC =
   'rpc.server.responses_per_rpc';
 
@@ -572,17 +572,17 @@ export const METRIC_SYSTEM_CPU_UTILIZATION = 'system.cpu.utilization';
 export const METRIC_SYSTEM_DISK_IO = 'system.disk.io';
 
 /**
-* Time disk spent activated.
-*
-* Note: The real elapsed time (&#34;wall clock&#34;) used in the I/O path (time from operations running in parallel are not counted). Measured as:
-
-- Linux: Field 13 from [procfs-diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
-- Windows: The complement of
-  [&#34;Disk\% Idle Time&#34;](https://learn.microsoft.com/archive/blogs/askcore/windows-performance-monitor-disk-counters-explained#windows-performance-monitor-disk-counters-explained)
-  performance counter: `uptime * (100 - &#34;Disk\% Idle Time&#34;) / 100`.
+ * Time disk spent activated.
+ *
+ * Note: The real elapsed time (&#34;wall clock&#34;) used in the I/O path (time from operations running in parallel are not counted). Measured as:
+ *
+ * - Linux: Field 13 from [procfs-diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
+ * - Windows: The complement of
+ *   [&#34;Disk\% Idle Time&#34;](https://learn.microsoft.com/archive/blogs/askcore/windows-performance-monitor-disk-counters-explained#windows-performance-monitor-disk-counters-explained)
+ *   performance counter: `uptime * (100 - &#34;Disk\% Idle Time&#34;) / 100`.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_SYSTEM_DISK_IO_TIME = 'system.disk.io_time';
 
 /**
@@ -593,15 +593,15 @@ export const METRIC_SYSTEM_DISK_IO_TIME = 'system.disk.io_time';
 export const METRIC_SYSTEM_DISK_MERGED = 'system.disk.merged';
 
 /**
-* Sum of the time each operation took to complete.
-*
-* Note: Because it is the sum of time each request took, parallel-issued requests each contribute to make the count grow. Measured as:
-
-- Linux: Fields 7 &amp; 11 from [procfs-diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
-- Windows: &#34;Avg. Disk sec/Read&#34; perf counter multiplied by &#34;Disk Reads/sec&#34; perf counter (similar for Writes).
+ * Sum of the time each operation took to complete.
+ *
+ * Note: Because it is the sum of time each request took, parallel-issued requests each contribute to make the count grow. Measured as:
+ *
+ * - Linux: Fields 7 &amp; 11 from [procfs-diskstats](https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats)
+ * - Windows: &#34;Avg. Disk sec/Read&#34; perf counter multiplied by &#34;Disk Reads/sec&#34; perf counter (similar for Writes).
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_SYSTEM_DISK_OPERATION_TIME = 'system.disk.operation_time';
 
 /**
@@ -627,16 +627,16 @@ export const METRIC_SYSTEM_FILESYSTEM_UTILIZATION =
   'system.filesystem.utilization';
 
 /**
-* An estimate of how much memory is available for starting new applications, without causing swapping.
-*
-* Note: This is an alternative to `system.memory.usage` metric with `state=free`.
-Linux starting from 3.14 exports &#34;available&#34; memory. It takes &#34;free&#34; memory as a baseline, and then factors in kernel-specific values.
-This is supposed to be more accurate than just &#34;free&#34; memory.
-For reference, see the calculations [here](https://superuser.com/a/980821).
-See also `MemAvailable` in [/proc/meminfo](https://man7.org/linux/man-pages/man5/proc.5.html).
+ * An estimate of how much memory is available for starting new applications, without causing swapping.
+ *
+ * Note: This is an alternative to `system.memory.usage` metric with `state=free`.
+ * Linux starting from 3.14 exports &#34;available&#34; memory. It takes &#34;free&#34; memory as a baseline, and then factors in kernel-specific values.
+ * This is supposed to be more accurate than just &#34;free&#34; memory.
+ * For reference, see the calculations [here](https://superuser.com/a/980821).
+ * See also `MemAvailable` in [/proc/meminfo](https://man7.org/linux/man-pages/man5/proc.5.html).
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_SYSTEM_LINUX_MEMORY_AVAILABLE =
   'system.linux.memory.available';
 
@@ -650,13 +650,13 @@ export const METRIC_SYSTEM_LINUX_MEMORY_AVAILABLE =
 export const METRIC_SYSTEM_MEMORY_LIMIT = 'system.memory.limit';
 
 /**
-* Reports memory in use by state.
-*
-* Note: The sum over all `system.memory.state` values SHOULD equal the total memory
-available on the system, that is `system.memory.limit`.
+ * Reports memory in use by state.
+ *
+ * Note: The sum over all `system.memory.state` values SHOULD equal the total memory
+ * available on the system, that is `system.memory.limit`.
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_SYSTEM_MEMORY_USAGE = 'system.memory.usage';
 
 /**
@@ -674,29 +674,29 @@ export const METRIC_SYSTEM_MEMORY_UTILIZATION = 'system.memory.utilization';
 export const METRIC_SYSTEM_NETWORK_CONNECTIONS = 'system.network.connections';
 
 /**
-* Count of packets that are dropped or discarded even though there was no error.
-*
-* Note: Measured as:
-
-- Linux: the `drop` column in `/proc/dev/net` ([source](https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html))
-- Windows: [`InDiscards`/`OutDiscards`](https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2)
-  from [`GetIfEntry2`](https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2).
+ * Count of packets that are dropped or discarded even though there was no error.
+ *
+ * Note: Measured as:
+ *
+ * - Linux: the `drop` column in `/proc/dev/net` ([source](https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html))
+ * - Windows: [`InDiscards`/`OutDiscards`](https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2)
+ *   from [`GetIfEntry2`](https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2).
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_SYSTEM_NETWORK_DROPPED = 'system.network.dropped';
 
 /**
-* Count of network errors detected.
-*
-* Note: Measured as:
-
-- Linux: the `errs` column in `/proc/dev/net` ([source](https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html)).
-- Windows: [`InErrors`/`OutErrors`](https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2)
-  from [`GetIfEntry2`](https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2).
+ * Count of network errors detected.
+ *
+ * Note: Measured as:
+ *
+ * - Linux: the `errs` column in `/proc/dev/net` ([source](https://web.archive.org/web/20180321091318/http://www.onlamp.com/pub/a/linux/2000/11/16/LinuxAdmin.html)).
+ * - Windows: [`InErrors`/`OutErrors`](https://docs.microsoft.com/windows/win32/api/netioapi/ns-netioapi-mib_if_row2)
+ *   from [`GetIfEntry2`](https://docs.microsoft.com/windows/win32/api/netioapi/nf-netioapi-getifentry2).
  *
  * @experimental this metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const METRIC_SYSTEM_NETWORK_ERRORS = 'system.network.errors';
 
 /**
@@ -765,13 +765,13 @@ export const METRIC_SYSTEM_PROCESS_CREATED = 'system.process.created';
 export const ATTR_EVENT_NAME = 'event.name';
 
 /**
-* A unique identifier for the Log Record.
-*
-* Note: If an id is provided, other log records with the same id will be considered duplicates and can be removed safely. This means, that two distinguishable log records MUST have different values.
-The id MAY be an [Universally Unique Lexicographically Sortable Identifier (ULID)](https://github.com/ulid/spec), but other identifiers (e.g. UUID) may be used as needed.
+ * A unique identifier for the Log Record.
+ *
+ * Note: If an id is provided, other log records with the same id will be considered duplicates and can be removed safely. This means, that two distinguishable log records MUST have different values.
+ * The id MAY be an [Universally Unique Lexicographically Sortable Identifier (ULID)](https://github.com/ulid/spec), but other identifiers (e.g. UUID) may be used as needed.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_LOG_RECORD_UID = 'log.record.uid';
 
 /**
@@ -1161,13 +1161,13 @@ export const ATTR_BROWSER_LANGUAGE = 'browser.language';
 export const ATTR_BROWSER_MOBILE = 'browser.mobile';
 
 /**
-* The platform on which the browser is running.
-*
-* Note: This value is intended to be taken from the [UA client hints API](https://wicg.github.io/ua-client-hints/#interface) (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
-The list of possible values is defined in the [W3C User-Agent Client Hints specification](https://wicg.github.io/ua-client-hints/#sec-ch-ua-platform). Note that some (but not all) of these values can overlap with values in the [`os.type` and `os.name` attributes](./os.md). However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
+ * The platform on which the browser is running.
+ *
+ * Note: This value is intended to be taken from the [UA client hints API](https://wicg.github.io/ua-client-hints/#interface) (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the values to be consistent.
+ * The list of possible values is defined in the [W3C User-Agent Client Hints specification](https://wicg.github.io/ua-client-hints/#sec-ch-ua-platform). Note that some (but not all) of these values can overlap with values in the [`os.type` and `os.name` attributes](./os.md). However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_BROWSER_PLATFORM = 'browser.platform';
 
 /**
@@ -1212,28 +1212,28 @@ export const ATTR_CLOUD_PROVIDER = 'cloud.provider';
 export const ATTR_CLOUD_REGION = 'cloud.region';
 
 /**
-* Cloud provider-specific native identifier of the monitored cloud resource (e.g. an [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) on AWS, a [fully qualified resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) on Azure, a [full resource name](https://cloud.google.com/apis/design/resource_names#full_resource_name) on GCP).
-*
-* Note: On some cloud providers, it may not be possible to determine the full ID at startup,
-so it may be necessary to set `cloud.resource_id` as a span attribute instead.
-
-The exact value to use for `cloud.resource_id` depends on the cloud provider.
-The following well-known definitions MUST be used if you set this attribute and they apply:
-
-* **AWS Lambda:** The function [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
-  Take care not to use the &#34;invoked ARN&#34; directly but replace any
-  [alias suffix](https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html)
-  with the resolved function version, as the same runtime instance may be invokable with
-  multiple different aliases.
-* **GCP:** The [URI of the resource](https://cloud.google.com/iam/docs/full-resource-names)
-* **Azure:** The [Fully Qualified Resource ID](https://docs.microsoft.com/rest/api/resources/resources/get-by-id) of the invoked function,
-  *not* the function app, having the form
-  `/subscriptions/&lt;SUBSCIPTION_GUID&gt;/resourceGroups/&lt;RG&gt;/providers/Microsoft.Web/sites/&lt;FUNCAPP&gt;/functions/&lt;FUNC&gt;`.
-  This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
-  a TracerProvider.
+ * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) on AWS, a [fully qualified resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) on Azure, a [full resource name](https://cloud.google.com/apis/design/resource_names#full_resource_name) on GCP).
+ *
+ * Note: On some cloud providers, it may not be possible to determine the full ID at startup,
+ * so it may be necessary to set `cloud.resource_id` as a span attribute instead.
+ *
+ * The exact value to use for `cloud.resource_id` depends on the cloud provider.
+ * The following well-known definitions MUST be used if you set this attribute and they apply:
+ *
+ * * **AWS Lambda:** The function [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html).
+ *   Take care not to use the &#34;invoked ARN&#34; directly but replace any
+ *   [alias suffix](https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html)
+ *   with the resolved function version, as the same runtime instance may be invokable with
+ *   multiple different aliases.
+ * * **GCP:** The [URI of the resource](https://cloud.google.com/iam/docs/full-resource-names)
+ * * **Azure:** The [Fully Qualified Resource ID](https://docs.microsoft.com/rest/api/resources/resources/get-by-id) of the invoked function,
+ *   *not* the function app, having the form
+ *   `/subscriptions/&lt;SUBSCIPTION_GUID&gt;/resourceGroups/&lt;RG&gt;/providers/Microsoft.Web/sites/&lt;FUNCAPP&gt;/functions/&lt;FUNC&gt;`.
+ *   This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
+ *   a TracerProvider.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_CLOUD_RESOURCE_ID = 'cloud.resource_id';
 
 /**
@@ -1352,14 +1352,14 @@ export const ATTR_CONTAINER_CPU_STATE = 'container.cpu.state';
 export const ATTR_CONTAINER_ID = 'container.id';
 
 /**
-* Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
-*
-* Note: Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect [API](https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerInspect) endpoint.
-K8s defines a link to the container registry repository with digest `&#34;imageID&#34;: &#34;registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625&#34;`.
-The ID is assinged by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
+ * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
+ *
+ * Note: Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect [API](https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerInspect) endpoint.
+ * K8s defines a link to the container registry repository with digest `&#34;imageID&#34;: &#34;registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625&#34;`.
+ * The ID is assinged by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_CONTAINER_IMAGE_ID = 'container.image.id';
 
 /**
@@ -1596,18 +1596,18 @@ export const ATTR_DB_SYSTEM = 'db.system';
 export const ATTR_DB_USER = 'db.user';
 
 /**
-* Name of the [deployment environment](https://wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
-*
-* Note: `deployment.environment` does not affect the uniqueness constraints defined through
-the `service.namespace`, `service.name` and `service.instance.id` resource attributes.
-This implies that resources carrying the following attribute combinations MUST be
-considered to be identifying the same service:
-
-* `service.name=frontend`, `deployment.environment=production`
-* `service.name=frontend`, `deployment.environment=staging`.
+ * Name of the [deployment environment](https://wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
+ *
+ * Note: `deployment.environment` does not affect the uniqueness constraints defined through
+ * the `service.namespace`, `service.name` and `service.instance.id` resource attributes.
+ * This implies that resources carrying the following attribute combinations MUST be
+ * considered to be identifying the same service:
+ *
+ * * `service.name=frontend`, `deployment.environment=production`
+ * * `service.name=frontend`, `deployment.environment=staging`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
 
 /**
@@ -2038,27 +2038,27 @@ export const ATTR_FAAS_INVOKED_REGION = 'faas.invoked_region';
 export const ATTR_FAAS_MAX_MEMORY = 'faas.max_memory';
 
 /**
-* The name of the single function that this runtime instance executes.
-*
-* Note: This is the name of the function as configured/deployed on the FaaS
-platform and is usually different from the name of the callback
-function (which may be stored in the
-[`code.namespace`/`code.function`](/docs/general/attributes.md#source-code-attributes)
-span attributes).
-
-For some cloud providers, the above definition is ambiguous. The following
-definition of function name MUST be used for this attribute
-(and consequently the span name) for the listed cloud providers/products:
-
-* **Azure:**  The full name `&lt;FUNCAPP&gt;/&lt;FUNC&gt;`, i.e., function app name
-  followed by a forward slash followed by the function name (this form
-  can also be seen in the resource JSON for the function).
-  This means that a span attribute MUST be used, as an Azure function
-  app can host multiple functions that would usually share
-  a TracerProvider (see also the `cloud.resource_id` attribute).
+ * The name of the single function that this runtime instance executes.
+ *
+ * Note: This is the name of the function as configured/deployed on the FaaS
+ * platform and is usually different from the name of the callback
+ * function (which may be stored in the
+ * [`code.namespace`/`code.function`](/docs/general/attributes.md#source-code-attributes)
+ * span attributes).
+ *
+ * For some cloud providers, the above definition is ambiguous. The following
+ * definition of function name MUST be used for this attribute
+ * (and consequently the span name) for the listed cloud providers/products:
+ *
+ * * **Azure:**  The full name `&lt;FUNCAPP&gt;/&lt;FUNC&gt;`, i.e., function app name
+ *   followed by a forward slash followed by the function name (this form
+ *   can also be seen in the resource JSON for the function).
+ *   This means that a span attribute MUST be used, as an Azure function
+ *   app can host multiple functions that would usually share
+ *   a TracerProvider (see also the `cloud.resource_id` attribute).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_FAAS_NAME = 'faas.name';
 
 /**
@@ -2076,20 +2076,20 @@ export const ATTR_FAAS_TIME = 'faas.time';
 export const ATTR_FAAS_TRIGGER = 'faas.trigger';
 
 /**
-* The immutable version of the function being executed.
-*
-* Note: Depending on the cloud provider and platform, use:
-
-* **AWS Lambda:** The [function version](https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html)
-  (an integer represented as a decimal string).
-* **Google Cloud Run (Services):** The [revision](https://cloud.google.com/run/docs/managing/revisions)
-  (i.e., the function name plus the revision suffix).
-* **Google Cloud Functions:** The value of the
-  [`K_REVISION` environment variable](https://cloud.google.com/functions/docs/env-var#runtime_environment_variables_set_automatically).
-* **Azure Functions:** Not applicable. Do not set this attribute.
+ * The immutable version of the function being executed.
+ *
+ * Note: Depending on the cloud provider and platform, use:
+ *
+ * * **AWS Lambda:** The [function version](https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html)
+ *   (an integer represented as a decimal string).
+ * * **Google Cloud Run (Services):** The [revision](https://cloud.google.com/run/docs/managing/revisions)
+ *   (i.e., the function name plus the revision suffix).
+ * * **Google Cloud Functions:** The value of the
+ *   [`K_REVISION` environment variable](https://cloud.google.com/functions/docs/env-var#runtime_environment_variables_set_automatically).
+ * * **Azure Functions:** Not applicable. Do not set this attribute.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_FAAS_VERSION = 'faas.version';
 
 /**
@@ -2107,19 +2107,19 @@ export const ATTR_FEATURE_FLAG_KEY = 'feature_flag.key';
 export const ATTR_FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name';
 
 /**
-* SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
-*
-* Note: A semantic identifier, commonly referred to as a variant, provides a means
-for referring to a value without including the value itself. This can
-provide additional context for understanding the meaning behind a value.
-For example, the variant `red` maybe be used for the value `#c05543`.
-
-A stringified version of the value can be used in situations where a
-semantic identifier is unavailable. String representation of the value
-should be determined by the implementer.
+ * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
+ *
+ * Note: A semantic identifier, commonly referred to as a variant, provides a means
+ * for referring to a value without including the value itself. This can
+ * provide additional context for understanding the meaning behind a value.
+ * For example, the variant `red` maybe be used for the value `#c05543`.
+ *
+ * A stringified version of the value can be used in situations where a
+ * semantic identifier is unavailable. String representation of the value
+ * should be determined by the implementer.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_FEATURE_FLAG_VARIANT = 'feature_flag.variant';
 
 /**
@@ -2341,33 +2341,33 @@ export const ATTR_HTTP_RESPONSE_SIZE = 'http.response.size';
 export const ATTR_K8S_CLUSTER_NAME = 'k8s.cluster.name';
 
 /**
-* A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
-*
-* Note: K8s doesn&#39;t have support for obtaining a cluster ID. If this is ever
-added, we will recommend collecting the `k8s.cluster.uid` through the
-official APIs. In the meantime, we are able to use the `uid` of the
-`kube-system` namespace as a proxy for cluster ID. Read on for the
-rationale.
-
-Every object created in a K8s cluster is assigned a distinct UID. The
-`kube-system` namespace is used by Kubernetes itself and will exist
-for the lifetime of the cluster. Using the `uid` of the `kube-system`
-namespace is a reasonable proxy for the K8s ClusterID as it will only
-change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
-UUIDs as standardized by
-[ISO/IEC 9834-8 and ITU-T X.667](https://www.itu.int/ITU-T/studygroups/com17/oid.html).
-Which states:
-
-&gt; If generated according to one of the mechanisms defined in Rec.
-  ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
-  different from all other UUIDs generated before 3603 A.D., or is
-  extremely likely to be different (depending on the mechanism chosen).
-
-Therefore, UIDs between clusters should be extremely unlikely to
-conflict.
+ * A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
+ *
+ * Note: K8s doesn&#39;t have support for obtaining a cluster ID. If this is ever
+ * added, we will recommend collecting the `k8s.cluster.uid` through the
+ * official APIs. In the meantime, we are able to use the `uid` of the
+ * `kube-system` namespace as a proxy for cluster ID. Read on for the
+ * rationale.
+ *
+ * Every object created in a K8s cluster is assigned a distinct UID. The
+ * `kube-system` namespace is used by Kubernetes itself and will exist
+ * for the lifetime of the cluster. Using the `uid` of the `kube-system`
+ * namespace is a reasonable proxy for the K8s ClusterID as it will only
+ * change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
+ * UUIDs as standardized by
+ * [ISO/IEC 9834-8 and ITU-T X.667](https://www.itu.int/ITU-T/studygroups/com17/oid.html).
+ * Which states:
+ *
+ * &gt; If generated according to one of the mechanisms defined in Rec.
+ *   ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
+ *   different from all other UUIDs generated before 3603 A.D., or is
+ *   extremely likely to be different (depending on the mechanism chosen).
+ *
+ * Therefore, UIDs between clusters should be extremely unlikely to
+ * conflict.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_K8S_CLUSTER_UID = 'k8s.cluster.uid';
 
 /**
@@ -2529,13 +2529,13 @@ export const ATTR_MESSAGING_DESTINATION_ANONYMOUS =
   'messaging.destination.anonymous';
 
 /**
-* The message destination name.
-*
-* Note: Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
-the broker doesn&#39;t have such notion, the destination name SHOULD uniquely identify the broker.
+ * The message destination name.
+ *
+ * Note: Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
+ * the broker doesn&#39;t have such notion, the destination name SHOULD uniquely identify the broker.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_MESSAGING_DESTINATION_NAME = 'messaging.destination.name';
 
 /**
@@ -2573,13 +2573,13 @@ export const ATTR_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS =
   'messaging.destination_publish.anonymous';
 
 /**
-* The name of the original destination the message was published to.
-*
-* Note: The name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
-the broker doesn&#39;t have such notion, the original destination name SHOULD uniquely identify the broker.
+ * The name of the original destination the message was published to.
+ *
+ * Note: The name SHOULD uniquely identify a specific queue, topic, or other entity within the broker. If
+ * the broker doesn&#39;t have such notion, the original destination name SHOULD uniquely identify the broker.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_MESSAGING_DESTINATION_PUBLISH_NAME =
   'messaging.destination_publish.name';
 
@@ -2641,13 +2641,13 @@ export const ATTR_MESSAGING_KAFKA_MESSAGE_TOMBSTONE =
   'messaging.kafka.message.tombstone';
 
 /**
-* The size of the message body in bytes.
-*
-* Note: This can refer to both the compressed or uncompressed body size. If both sizes are known, the uncompressed
-body size should be used.
+ * The size of the message body in bytes.
+ *
+ * Note: This can refer to both the compressed or uncompressed body size. If both sizes are known, the uncompressed
+ * body size should be used.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_MESSAGING_MESSAGE_BODY_SIZE = 'messaging.message.body.size';
 
 /**
@@ -2659,13 +2659,13 @@ export const ATTR_MESSAGING_MESSAGE_CONVERSATION_ID =
   'messaging.message.conversation_id';
 
 /**
-* The size of the message body and metadata in bytes.
-*
-* Note: This can refer to both the compressed or uncompressed size. If both sizes are known, the uncompressed
-size should be used.
+ * The size of the message body and metadata in bytes.
+ *
+ * Note: This can refer to both the compressed or uncompressed size. If both sizes are known, the uncompressed
+ * size should be used.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_MESSAGING_MESSAGE_ENVELOPE_SIZE =
   'messaging.message.envelope.size';
 
@@ -2861,13 +2861,13 @@ export const ATTR_NETWORK_CONNECTION_TYPE = 'network.connection.type';
 export const ATTR_NETWORK_IO_DIRECTION = 'network.io.direction';
 
 /**
-* The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
-*
-* Note: Follows [OCI Image Manifest Specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md), and specifically the [Digest property](https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests).
-An example can be found in [Example Image Manifest](https://docs.docker.com/registry/spec/manifest-v2-2/#example-image-manifest).
+ * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
+ *
+ * Note: Follows [OCI Image Manifest Specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md), and specifically the [Digest property](https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests).
+ * An example can be found in [Example Image Manifest](https://docs.docker.com/registry/spec/manifest-v2-2/#example-image-manifest).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 
 /**
@@ -3057,37 +3057,37 @@ export const ATTR_RPC_SERVICE = 'rpc.service';
 export const ATTR_RPC_SYSTEM = 'rpc.system';
 
 /**
-* The string ID of the service instance.
-*
-* Note: MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words
-`service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to
-distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled
-service).
-
-Implementations, such as SDKs, are recommended to generate a random Version 1 or Version 4 [RFC
-4122](https://www.ietf.org/rfc/rfc4122.txt) UUID, but are free to use an inherent unique ID as the source of
-this value if stability is desirable. In that case, the ID SHOULD be used as source of a UUID Version 5 and
-SHOULD use the following UUID as the namespace: `4d63009a-8d0f-11ee-aad7-4c796ed8e320`.
-
-UUIDs are typically recommended, as only an opaque value for the purposes of identifying a service instance is
-needed. Similar to what can be seen in the man page for the
-[`/etc/machine-id`](https://www.freedesktop.org/software/systemd/man/machine-id.html) file, the underlying
-data, such as pod name and namespace should be treated as confidential, being the user&#39;s choice to expose it
-or not via another resource attribute.
-
-For applications running behind an application server (like unicorn), we do not recommend using one identifier
-for all processes participating in the application. Instead, it&#39;s recommended each division (e.g. a worker
-thread in unicorn) to have its own instance.id.
-
-It&#39;s not recommended for a Collector to set `service.instance.id` if it can&#39;t unambiguously determine the
-service instance that is generating that telemetry. For instance, creating an UUID based on `pod.name` will
-likely be wrong, as the Collector might not know from which container within that pod the telemetry originated.
-However, Collectors can set the `service.instance.id` if they can unambiguously determine the service instance
-for that telemetry. This is typically the case for scraping receivers, as they know the target address and
-port.
+ * The string ID of the service instance.
+ *
+ * Note: MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words
+ * `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to
+ * distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled
+ * service).
+ *
+ * Implementations, such as SDKs, are recommended to generate a random Version 1 or Version 4 [RFC
+ * 4122](https://www.ietf.org/rfc/rfc4122.txt) UUID, but are free to use an inherent unique ID as the source of
+ * this value if stability is desirable. In that case, the ID SHOULD be used as source of a UUID Version 5 and
+ * SHOULD use the following UUID as the namespace: `4d63009a-8d0f-11ee-aad7-4c796ed8e320`.
+ *
+ * UUIDs are typically recommended, as only an opaque value for the purposes of identifying a service instance is
+ * needed. Similar to what can be seen in the man page for the
+ * [`/etc/machine-id`](https://www.freedesktop.org/software/systemd/man/machine-id.html) file, the underlying
+ * data, such as pod name and namespace should be treated as confidential, being the user&#39;s choice to expose it
+ * or not via another resource attribute.
+ *
+ * For applications running behind an application server (like unicorn), we do not recommend using one identifier
+ * for all processes participating in the application. Instead, it&#39;s recommended each division (e.g. a worker
+ * thread in unicorn) to have its own instance.id.
+ *
+ * It&#39;s not recommended for a Collector to set `service.instance.id` if it can&#39;t unambiguously determine the
+ * service instance that is generating that telemetry. For instance, creating an UUID based on `pod.name` will
+ * likely be wrong, as the Collector might not know from which container within that pod the telemetry originated.
+ * However, Collectors can set the `service.instance.id` if they can unambiguously determine the service instance
+ * for that telemetry. This is typically the case for scraping receivers, as they know the target address and
+ * port.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_SERVICE_INSTANCE_ID = 'service.instance.id';
 
 /**
@@ -3130,13 +3130,13 @@ export const ATTR_SOURCE_ADDRESS = 'source.address';
 export const ATTR_SOURCE_PORT = 'source.port';
 
 /**
-* The name of the auto instrumentation agent or distribution, if used.
-*
-* Note: Official auto instrumentation agents and distributions SHOULD set the `telemetry.distro.name` attribute to
-a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
+ * The name of the auto instrumentation agent or distribution, if used.
+ *
+ * Note: Official auto instrumentation agents and distributions SHOULD set the `telemetry.distro.name` attribute to
+ * a string starting with `opentelemetry-`, e.g. `opentelemetry-java-instrumentation`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_TELEMETRY_DISTRO_NAME = 'telemetry.distro.name';
 
 /**
@@ -3384,13 +3384,13 @@ export const ATTR_URL_DOMAIN = 'url.domain';
 export const ATTR_URL_EXTENSION = 'url.extension';
 
 /**
-* Unmodified original URL as seen in the event source.
-*
-* Note: In network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
-`url.original` might contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case password and username SHOULD NOT be redacted and attribute&#39;s value SHOULD remain the same.
+ * Unmodified original URL as seen in the event source.
+ *
+ * Note: In network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
+ * `url.original` might contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case password and username SHOULD NOT be redacted and attribute&#39;s value SHOULD remain the same.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_URL_ORIGINAL = 'url.original';
 
 /**
@@ -3622,91 +3622,91 @@ export const ATTR_OPENTRACING_REF_TYPE = 'opentracing.ref_type';
 export const ATTR_AWS_REQUEST_ID = 'aws.request_id';
 
 /**
-* The S3 bucket name the request refers to. Corresponds to the `--bucket` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
-*
-* Note: The `bucket` attribute is applicable to all S3 operations that reference a bucket, i.e. that require the bucket name as a mandatory parameter.
-This applies to almost all S3 operations except `list-buckets`.
+ * The S3 bucket name the request refers to. Corresponds to the `--bucket` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
+ *
+ * Note: The `bucket` attribute is applicable to all S3 operations that reference a bucket, i.e. that require the bucket name as a mandatory parameter.
+ * This applies to almost all S3 operations except `list-buckets`.
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_AWS_S3_BUCKET = 'aws.s3.bucket';
 
 /**
-* The source object (in the form `bucket`/`key`) for the copy operation.
-*
-* Note: The `copy_source` attribute applies to S3 copy operations and corresponds to the `--copy-source` parameter
-of the [copy-object operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html).
-This applies in particular to the following operations:
-
-- [copy-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html)
-- [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
+ * The source object (in the form `bucket`/`key`) for the copy operation.
+ *
+ * Note: The `copy_source` attribute applies to S3 copy operations and corresponds to the `--copy-source` parameter
+ * of the [copy-object operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html).
+ * This applies in particular to the following operations:
+ *
+ * - [copy-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html)
+ * - [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_AWS_S3_COPY_SOURCE = 'aws.s3.copy_source';
 
 /**
-* The delete request container that specifies the objects to be deleted.
-*
-* Note: The `delete` attribute is only applicable to the [delete-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html) operation.
-The `delete` attribute corresponds to the `--delete` parameter of the
-[delete-objects operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-objects.html).
+ * The delete request container that specifies the objects to be deleted.
+ *
+ * Note: The `delete` attribute is only applicable to the [delete-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html) operation.
+ * The `delete` attribute corresponds to the `--delete` parameter of the
+ * [delete-objects operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-objects.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_AWS_S3_DELETE = 'aws.s3.delete';
 
 /**
-* The S3 object key the request refers to. Corresponds to the `--key` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
-*
-* Note: The `key` attribute is applicable to all object-related S3 operations, i.e. that require the object key as a mandatory parameter.
-This applies in particular to the following operations:
-
-- [copy-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html)
-- [delete-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html)
-- [get-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html)
-- [head-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/head-object.html)
-- [put-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object.html)
-- [restore-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/restore-object.html)
-- [select-object-content](https://docs.aws.amazon.com/cli/latest/reference/s3api/select-object-content.html)
-- [abort-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html)
-- [complete-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html)
-- [create-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/create-multipart-upload.html)
-- [list-parts](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html)
-- [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
-- [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
+ * The S3 object key the request refers to. Corresponds to the `--key` parameter of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) operations.
+ *
+ * Note: The `key` attribute is applicable to all object-related S3 operations, i.e. that require the object key as a mandatory parameter.
+ * This applies in particular to the following operations:
+ *
+ * - [copy-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html)
+ * - [delete-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html)
+ * - [get-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html)
+ * - [head-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/head-object.html)
+ * - [put-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object.html)
+ * - [restore-object](https://docs.aws.amazon.com/cli/latest/reference/s3api/restore-object.html)
+ * - [select-object-content](https://docs.aws.amazon.com/cli/latest/reference/s3api/select-object-content.html)
+ * - [abort-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html)
+ * - [complete-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html)
+ * - [create-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/create-multipart-upload.html)
+ * - [list-parts](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html)
+ * - [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
+ * - [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_AWS_S3_KEY = 'aws.s3.key';
 
 /**
-* The part number of the part being uploaded in a multipart-upload operation. This is a positive integer between 1 and 10,000.
-*
-* Note: The `part_number` attribute is only applicable to the [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
-and [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html) operations.
-The `part_number` attribute corresponds to the `--part-number` parameter of the
-[upload-part operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html).
+ * The part number of the part being uploaded in a multipart-upload operation. This is a positive integer between 1 and 10,000.
+ *
+ * Note: The `part_number` attribute is only applicable to the [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
+ * and [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html) operations.
+ * The `part_number` attribute corresponds to the `--part-number` parameter of the
+ * [upload-part operation within the S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_AWS_S3_PART_NUMBER = 'aws.s3.part_number';
 
 /**
-* Upload ID that identifies the multipart upload.
-*
-* Note: The `upload_id` attribute applies to S3 multipart-upload operations and corresponds to the `--upload-id` parameter
-of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) multipart operations.
-This applies in particular to the following operations:
-
-- [abort-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html)
-- [complete-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html)
-- [list-parts](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html)
-- [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
-- [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
+ * Upload ID that identifies the multipart upload.
+ *
+ * Note: The `upload_id` attribute applies to S3 multipart-upload operations and corresponds to the `--upload-id` parameter
+ * of the [S3 API](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html) multipart operations.
+ * This applies in particular to the following operations:
+ *
+ * - [abort-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html)
+ * - [complete-multipart-upload](https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html)
+ * - [list-parts](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html)
+ * - [upload-part](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html)
+ * - [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html).
  *
  * @experimental this attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
-*/
+ */
 export const ATTR_AWS_S3_UPLOAD_ID = 'aws.s3.upload_id';
 
 /**
