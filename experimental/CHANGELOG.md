@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD004 -->
 # CHANGELOG
 
 All notable changes to experimental packages in this project will be documented in this file.

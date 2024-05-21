@@ -1,0 +1,15 @@
+// https://github.com/DavidAnson/markdownlint-cli2#markdownlint-cli2jsonc
+{
+  "config": {
+    // https://github.com/DavidAnson/markdownlint/blob/main/README.md#rules--aliases
+    "MD013": false,
+    "MD024": false,
+    "MD033": false,
+    "MD041": false,
+    "MD026": false,
+    "MD004": { "style": "dash" } // ul-style
+  },
+  "gitignore": true,
+  "noBanner": true,
+  "noProgress": true
+}
