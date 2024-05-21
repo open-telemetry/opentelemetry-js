@@ -22,7 +22,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
 * feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
-* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamirs
+* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 
