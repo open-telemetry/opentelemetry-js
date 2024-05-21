@@ -16,7 +16,6 @@ function startServer() {
   server.addService(services.GreeterService, { sayHello });
   server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), () => {
     console.log(`binding server on 0.0.0.0:${PORT}`);
-    server.start();
   });
 }
 
