@@ -5,7 +5,8 @@
   "description": "Example of using @opentelemetry/sdk-metrics and @opentelemetry/exporter-prometheus",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",

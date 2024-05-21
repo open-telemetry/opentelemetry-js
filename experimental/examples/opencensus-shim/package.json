@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "client": "node -r @opentelemetry/shim-opencensus/register ./client.js",
-    "server": "node -r @opentelemetry/shim-opencensus/register ./server.js"
+    "server": "node -r @opentelemetry/shim-opencensus/register ./server.js",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "repository": {
     "type": "git",

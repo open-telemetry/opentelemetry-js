@@ -3,7 +3,8 @@
   "version": "0.51.1",
   "private": true,
   "scripts": {
-    "start": "ts-node index.ts"
+    "start": "ts-node index.ts",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.7.0",

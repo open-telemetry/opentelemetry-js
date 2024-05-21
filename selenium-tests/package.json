@@ -12,7 +12,8 @@
     "local:bs:xhr": "node scripts/local.runner.js --test ./tests/xhr/xhr.js --parallel --env browserstack.local_chrome,browserstack.local_firefox,browserstack.local_ie,browserstack.local_safari",
     "local:fetch": "nightwatch ./tests/fetch/fetch.js --env selenium.chrome",
     "local:xhr": "nightwatch ./tests/xhr/xhr.js --env selenium.chrome",
-    "server": "webpack serve --progress --port 8090 --config webpack.dev.js --hot --host 0.0.0.0"
+    "server": "webpack serve --progress --port 8090 --config webpack.dev.js --hot --host 0.0.0.0",
+    "align-api-deps": "node ../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",

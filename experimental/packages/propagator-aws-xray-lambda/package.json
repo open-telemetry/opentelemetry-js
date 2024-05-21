@@ -15,7 +15,9 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
-    "prepublishOnly": "npm run compile"
+    "prepublishOnly": "npm run compile",
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",
