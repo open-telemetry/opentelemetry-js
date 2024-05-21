@@ -90,7 +90,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(config?: XMLHttpRequestInstrumentationConfig) {
+  constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
   }
 

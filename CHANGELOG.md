@@ -16,15 +16,19 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.24.1
+
+### :bug: (Bug Fix)
+
 * fix(core): align inconsistent behavior of `getEnv()` and `getEnvWithoutDefaults()` when a `process` polyfill is used [#4648](https://github.com/open-telemetry/opentelemetry-js/pull/4648) @pichlermarc
   * `getEnvWithoutDefaults()` would use `process.env` if it was defined when running in a browser, while `getEnv()` would always use `_globalThis`. Now both use `_globalThis` when running in a browser.
 * fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
   * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
 * fix(exporter-metrics-otlp-grpc): add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc [#4678](https://github.com/open-telemetry/opentelemetry-js/pull/4678) @AkselAllas
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 1.24.0
 
