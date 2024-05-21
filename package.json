@@ -41,6 +41,7 @@
     "comment_prepare_3": "echo sdk preparation scripts prepare all stable and experimental packages",
     "prepare_release:sdk:patch": "npm run _check:no_changes && npm run _backup:package-json && npm run _lerna:remove_api && npm run _lerna:version_patch && npm run _restore:package-json && npm run _changelog:prepare_experimental && npm run _changelog:prepare_stable",
     "prepare_release:sdk:minor": "npm run _check:no_changes && npm run _backup:package-json && npm run _lerna:remove_api && npm run _lerna:version_minor && npm run _restore:package-json && npm run _changelog:prepare_experimental && npm run _changelog:prepare_stable",
+    "prepare_release:all:minor": "npm run _check:no_changes && npm run _backup:package-json && npm run _lerna:remove_api && npm run _lerna:version_minor && cd api/ && npm version minor && cd .. && lerna run align-api-deps && npm run _restore:package-json && npm run _changelog:prepare_all",
     "release:publish": "lerna publish from-package --no-push --no-private --no-git-tag-version --no-verify-access",
     "comment_internal": "echo scripts below this line are for internal use",
     "_check:no_changes": "if [ ! -z \"$(git status -uall --porcelain)\" ]; then echo Please ensure all changes are committed; exit 1; fi",
@@ -51,7 +52,13 @@
     "_lerna:version_patch": "npx lerna version patch --exact --no-git-tag-version --no-push --yes",
     "_lerna:version_minor": "npx lerna version minor --exact --no-git-tag-version --no-push --yes",
     "_changelog:prepare_experimental": "node scripts/update-changelog.js ./experimental/CHANGELOG.md ./experimental/packages/",
-    "_changelog:prepare_stable": "node scripts/update-changelog.js ./CHANGELOG.md ./packages/"
+    "_changelog:prepare_stable": "node scripts/update-changelog.js ./CHANGELOG.md ./packages/",
+    "_changelog:prepare_api": "node scripts/update-changelog.js ./api/CHANGELOG.md ./api/package.json",
+    "_changelog:prepare_all": "npm run _changelog:prepare_api && npm run _changelog:prepare_experimental && npm run _changelog:prepare_stable",
+    "_github:draft_release:all": "npm run _github:draft_release:api && _github:draft_release:experimental && _github:draft_release:stable",
+    "_github:draft_release:api": "node scripts/extract-latest-release-notes.js ./api/CHANGELOG.md && VERSION=$(node scripts/get-version.js ./api/package.json | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title api/v$VERSION api/v$VERSION",
+    "_github:draft_release:experimental": "node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md && VERSION=$(node scripts/get-version.js ./experimental/packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title experimental/v$VERSION experimental/v$VERSION",
+    "_github:draft_release:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md && VERSION=$(node scripts/get-version.js ./packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title v$VERSION v$VERSION"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [

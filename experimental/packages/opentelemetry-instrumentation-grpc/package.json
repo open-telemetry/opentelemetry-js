@@ -19,7 +19,8 @@
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "protos:generate": "cd test/fixtures && buf generate"
+    "protos:generate": "cd test/fixtures && buf generate",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",

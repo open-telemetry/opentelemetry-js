@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test:backcompat": "tsc --noEmit index.ts && tsc --noEmit --esModuleInterop index.ts",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "dependencies": {
     "@opentelemetry/sdk-node": "0.51.1",

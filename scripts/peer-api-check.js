@@ -34,7 +34,17 @@ function checkPackage(package) {
 
   const peerVersion = pjson.peerDependencies && pjson.peerDependencies[package];
   const devVersion = pjson.devDependencies && pjson.devDependencies[package];
+
+  if(devVersion) {
+    if(devVersion.match(/^((>=\d+\.\d+\.\d+ <\d+\.\d+\.\d+)|(\^?\d+\.\d+\.\d+))$/) == null) {
+      throw new Error(`Package ${pjson.name} does not match required pattern '>=A.B.C <X.Y.Z', '^A.B.C' or 'A.B.C`);
+    }
+  }
+
   if (peerVersion) {
+    if(peerVersion.match(/^((>=\d+\.\d+\.\d+ <\d+\.\d+\.\d+)|(\^\d+\.\d+\.\d+))$/) == null) {
+      throw new Error(`Package ${pjson.name} does not match required pattern '>=A.B.C <X.Y.Z' or '^A.B.C'`);
+    }
     if (!semver.subset(devVersion, peerVersion)) {
       throw new Error(
         `Package ${pjson.name} depends on peer API version ${peerVersion} but version ${devVersion} in development`
