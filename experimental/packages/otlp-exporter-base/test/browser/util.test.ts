@@ -15,6 +15,10 @@
  */
 
 import * as sinon from 'sinon';
+import { _globalThis } from '@opentelemetry/core';
+import * as assert from 'assert';
+
+import { CompressionAlgorithm } from '../../src/types';
 import { sendWithXhr } from '../../src/platform/browser/util';
 import { nextTick } from 'process';
 import { ensureHeadersContain } from '../testHelper';
@@ -23,6 +27,7 @@ describe('util - browser', () => {
   let server: any;
   const body = new Uint8Array();
   const url = '';
+  const exporterTimeout = 10000;
 
   let onSuccessStub: sinon.SinonStub;
   let onErrorStub: sinon.SinonStub;
@@ -57,12 +62,12 @@ describe('util - browser', () => {
         const explicitContentType = {
           'Content-Type': 'application/json',
         };
-        const exporterTimeout = 10000;
         sendWithXhr(
           body,
           url,
           explicitContentType,
           exporterTimeout,
+          CompressionAlgorithm.NONE,
           onSuccessStub,
           onErrorStub
         );
@@ -88,13 +93,12 @@ describe('util - browser', () => {
     describe('and empty headers are set', () => {
       beforeEach(() => {
         const emptyHeaders = {};
-        // use default exporter timeout
-        const exporterTimeout = 10000;
         sendWithXhr(
           body,
           url,
           emptyHeaders,
           exporterTimeout,
+          CompressionAlgorithm.NONE,
           onSuccessStub,
           onErrorStub
         );
@@ -120,12 +124,12 @@ describe('util - browser', () => {
       let customHeaders: Record<string, string>;
       beforeEach(() => {
         customHeaders = { aHeader: 'aValue', bHeader: 'bValue' };
-        const exporterTimeout = 10000;
         sendWithXhr(
           body,
           url,
           customHeaders,
           exporterTimeout,
+          CompressionAlgorithm.NONE,
           onSuccessStub,
           onErrorStub
         );
@@ -150,6 +154,100 @@ describe('util - browser', () => {
         nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, customHeaders);
+          clock.restore();
+          done();
+        });
+      });
+    });
+    describe('and gzip compression is supported', () => {
+      beforeEach(() => {
+        sendWithXhr(
+          body,
+          url,
+          {},
+          exporterTimeout,
+          CompressionAlgorithm.GZIP,
+          onSuccessStub,
+          onErrorStub
+        );
+      });
+
+      it('should set "Content-Encoding" header to "gzip"', done => {
+        nextTick(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, { 'Content-Encoding': 'gzip' });
+          clock.restore();
+          done();
+        });
+      });
+    });
+    describe('when CompressionStreams API is not supported', () => {
+      let originalCompressionStreams: any;
+
+      beforeEach(() => {
+        // Save the original CompressionStreams API
+        originalCompressionStreams = _globalThis.CompressionStream;
+        // Simulate the absence of CompressionStreams API
+        globalThis.CompressionStream = undefined as any;
+      });
+      afterEach(() => {
+        // Restore the original CompressionStreams API
+        globalThis.CompressionStream = originalCompressionStreams;
+      });
+
+      it('should skip compression and send data via xhr', done => {
+        sendWithXhr(
+          body,
+          url,
+          {},
+          exporterTimeout,
+          CompressionAlgorithm.GZIP,
+          onSuccessStub,
+          onErrorStub
+        );
+
+        nextTick(() => {
+          const { requestHeaders, requestBody } = server.requests[0];
+          // Check that the 'Content-Encoding' header is not set to 'gzip'
+          assert.notStrictEqual(requestHeaders['Content-Encoding'], 'gzip');
+          // Check that the other headers are set correctly
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          // Check that the request body is the original uncompressed data
+          assert.strictEqual(requestBody, body);
+          clock.restore();
+          done();
+        });
+      });
+    });
+
+    describe('when an unsupported compression algorithm is used with CompressionStreams API', () => {
+      it('should send data uncompressed when the compressionAlgorithm is not supported', done => {
+        let expectedHeaders: Record<string, string>;
+        const unsupportedAlgorithm = 'unsupportedAlgorithm';
+
+        sendWithXhr(
+          body,
+          url,
+          {},
+          exporterTimeout,
+          unsupportedAlgorithm as CompressionAlgorithm,
+          onSuccessStub,
+          onErrorStub
+        );
+
+        nextTick(() => {
+          expectedHeaders = {
+            // ;charset=utf-8 is applied by sinon.fakeServer
+            'Content-Type': 'application/json;charset=utf-8',
+            Accept: 'application/json',
+          };
+          const { requestHeaders, requestBody } = server.requests[0];
+          // Check that the 'Content-Encoding' header is not set to 'gzip'
+          assert.notStrictEqual(requestHeaders['Content-Encoding'], 'gzip');
+          // Check that the other headers are set correctly
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          // Check that the request body is the original uncompressed data
+          assert.strictEqual(requestBody, body);
           clock.restore();
           done();
         });

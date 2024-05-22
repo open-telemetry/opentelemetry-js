@@ -18,7 +18,8 @@ import type * as http from 'http';
 import type * as https from 'https';
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
+import { OTLPExporterNodeConfigBase } from './types';
+import { CompressionAlgorithm } from '../../types';
 import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { createHttpAgent, sendWithHttp, configureCompression } from './util';

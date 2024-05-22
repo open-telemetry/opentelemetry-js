@@ -10,6 +10,9 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* feat(otlp-exporter-base)!: added support for sending gzip compressed content in the OTLP exporter for browser [#4493](https://github.com/open-telemetry/opentelemetry-js/pull/4493)
+  * The function signature for `sendWithXhr` has changed.
+
 ### :rocket: (Enhancement)
 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan

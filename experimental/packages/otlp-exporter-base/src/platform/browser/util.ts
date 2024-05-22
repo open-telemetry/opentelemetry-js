@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import { diag } from '@opentelemetry/api';
-import { OTLPExporterError } from '../../types';
+import { CompressionAlgorithm, OTLPExporterError } from '../../types';
+
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
   DEFAULT_EXPORT_INITIAL_BACKOFF,
@@ -54,14 +55,17 @@ export function sendWithBeacon(
  * @param body
  * @param url
  * @param headers
+ * @param exporterTimeout
  * @param onSuccess
  * @param onError
+ * @param compressionAlgorithm
  */
 export function sendWithXhr(
   body: Uint8Array,
   url: string,
   headers: Record<string, string>,
   exporterTimeout: number,
+  compressionAlgorithm: CompressionAlgorithm,
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
 ): void {
@@ -82,30 +86,22 @@ export function sendWithXhr(
   }, exporterTimeout);
 
   const sendWithRetry = (
+    innerBody: string | Blob | Uint8Array,
+    headers: Record<string, string>,
     retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
     minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
   ) => {
     xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
-    const defaultHeaders = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    };
-
-    Object.entries({
-      ...defaultHeaders,
-      ...headers,
-    }).forEach(([k, v]) => {
+    Object.entries(headers).forEach(([k, v]) => {
       xhr.setRequestHeader(k, v);
     });
-
-    xhr.send(body);
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === false) {
         if (xhr.status >= 200 && xhr.status <= 299) {
-          diag.debug('xhr success', body);
+          diag.debug('xhr success', innerBody);
           onSuccess();
           clearTimeout(exporterTimer);
           clearTimeout(retryTimer);
@@ -126,7 +122,7 @@ export function sendWithXhr(
           }
 
           retryTimer = setTimeout(() => {
-            sendWithRetry(retries - 1, minDelay);
+            sendWithRetry(innerBody, headers, retries - 1, minDelay);
           }, retryTime);
         } else {
           const error = new OTLPExporterError(
@@ -157,7 +153,85 @@ export function sendWithXhr(
       clearTimeout(exporterTimer);
       clearTimeout(retryTimer);
     };
+
+    xhr.send(innerBody);
   };
 
-  sendWithRetry();
+  const commonHeaders = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  if (
+    compressionAlgorithm === CompressionAlgorithm.NONE ||
+    typeof CompressionStream === 'undefined'
+  ) {
+    sendWithRetry(body, {
+      ...commonHeaders,
+      ...headers,
+    });
+  } else {
+    compressContent(new Blob([body.buffer]), compressionAlgorithm)
+      .then(compressedContent => {
+        sendWithRetry(compressedContent, {
+          ...commonHeaders,
+          ...headers,
+          'Content-Encoding': compressionAlgorithm,
+        });
+      })
+      .catch(_error => {
+        sendWithRetry(body, {
+          ...commonHeaders,
+          ...headers,
+        });
+      });
+  }
+}
+
+async function compressContent(
+  content: string | Blob,
+  compressionAlgorithm: string
+): Promise<Uint8Array> {
+  const compressionStream = new CompressionStream(
+    compressionAlgorithm as CompressionFormat
+  );
+
+  const reader =
+    typeof content === 'string'
+      ? new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode(content));
+            controller.close();
+          },
+        })
+      : content.stream();
+
+  const compressedStream = reader.pipeThrough(compressionStream);
+
+  let totalLength = 0;
+  const compressedChunks: Uint8Array[] = [];
+
+  const readerStream = compressedStream.getReader();
+  try {
+    let readResult = await readerStream.read();
+    while (!readResult.done) {
+      const value = readResult.value;
+      if (value instanceof Uint8Array) {
+        compressedChunks.push(value);
+        totalLength += value.length;
+      }
+      readResult = await readerStream.read();
+    }
+  } finally {
+    readerStream.releaseLock();
+  }
+
+  const compressedData = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of compressedChunks) {
+    compressedData.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return compressedData;
 }

@@ -19,6 +19,7 @@ export {
   OTLPExporterError,
   OTLPExporterConfigBase,
   ExportServiceError,
+  CompressionAlgorithm,
 } from './types';
 export {
   parseHeaders,
