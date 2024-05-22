@@ -131,8 +131,18 @@ export function addSpanNetworkEvents(
 
 function _getBodyNonDestructively(body: ReadableStream) {
   // can't read a ReadableStream without destroying it
-  // we CAN "tee" the body stream, which lets us split it, but that still locks the original stream
-  // so we end up needing to return one of the forks.
+  // on most platforms, we CAN tee the body stream, which lets us split it,
+  // but that still locks the original stream, so we end up needing to return one of the forks.
+  //
+  // some (older) platforms don't expose the tee method and in that scenario, we're out of luck;
+  //   there's no way to read the stream without consuming it.
+  if (!body.tee) {
+    return {
+      body,
+      length: Promise.resolve(null),
+    };
+  }
+
   const [bodyToReturn, bodyToConsume] = body.tee();
 
   const lengthPromise = async () => {
