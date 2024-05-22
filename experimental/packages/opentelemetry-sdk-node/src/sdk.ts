@@ -37,7 +37,16 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
+import {
+  LogRecordProcessor,
+  LoggerProvider,
+  BatchLogRecordProcessor,
+  ConsoleLogRecordExporter,
+  LogRecordExporter,
+} from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter as OTLPHttpLogExporter} from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
@@ -50,10 +59,11 @@ import {
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
-import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import { ENVIRONMENT, getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   parseInstrumentationOptions,
+  filterBlanksAndNulls,
 } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -73,7 +83,7 @@ export type LoggerProviderConfig = {
   /**
    * Reference to the LoggerRecordProcessor instance by the NodeSDK
    */
-  logRecordProcessor: LogRecordProcessor;
+  logRecordProcessors: LogRecordProcessor[];
 };
 
 export class NodeSDK {
@@ -177,10 +187,12 @@ export class NodeSDK {
       };
     }
 
-    if (configuration.logRecordProcessor) {
+    if (configuration.logRecordProcessor || configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
-        logRecordProcessor: configuration.logRecordProcessor,
+        logRecordProcessors: configuration.logRecordProcessors ? configuration.logRecordProcessors : [configuration.logRecordProcessor!]
       };
+    } else {
+      this.configureLoggerProviderFromEnv(envWithoutDefaults);
     }
 
     if (configuration.metricReader || configuration.views) {
@@ -262,9 +274,10 @@ export class NodeSDK {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
       });
-      loggerProvider.addLogRecordProcessor(
-        this._loggerProviderConfig.logRecordProcessor
-      );
+
+      for (const logRecordProcessor of this._loggerProviderConfig.logRecordProcessors) {
+        loggerProvider.addLogRecordProcessor(logRecordProcessor);
+      }
 
       this._loggerProvider = loggerProvider;
 
@@ -314,5 +327,58 @@ export class NodeSDK {
         // return void instead of the array from Promise.all
         .then(() => {})
     );
+  }
+
+  private configureLoggerProviderFromEnv(envWithoutDefaults: ENVIRONMENT): void {
+    const logsExporter = envWithoutDefaults.OTEL_LOGS_EXPORTER;
+    if (logsExporter) {
+      const exporters: LogRecordExporter[] = [];
+      const enabledLogExporters = filterBlanksAndNulls(logsExporter.split(','));
+
+      if (enabledLogExporters.includes('none')) {
+        diag.warn(
+          `Logs will not be exported.`
+        );
+        return;
+      }
+
+      enabledLogExporters.forEach((exporter) => {
+        if (exporter === 'otlp') {
+          const protocol = envWithoutDefaults.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ?? envWithoutDefaults.OTEL_EXPORTER_OTLP_PROTOCOL;
+          switch (protocol?.trim()) { //FIXME trim?
+            case 'grpc':
+              exporters.push(new OTLPGrpcLogExporter());
+              break;
+            case 'http/json':
+              exporters.push(new OTLPHttpLogExporter());
+              break;
+            case 'http/protobuf':
+              exporters.push(new OTLPProtoLogExporter());
+              break;
+            default:
+              diag.warn(
+                `Unsupported or undefined OTLP logs protocol. Using http/protobuf.`
+              );
+              exporters.push(new OTLPProtoLogExporter());
+          }
+        } else if (exporter === 'console') {
+          exporters.push(new ConsoleLogRecordExporter());
+        } else {
+          diag.warn(
+            `Unsupported log exporter: ${exporter}. Logs will not be exported.`
+          );
+        }
+      });
+
+      if (exporters.length > 0) {
+        this._loggerProviderConfig = {
+          logRecordProcessors: exporters.map((exporter) => new BatchLogRecordProcessor(exporter))
+        };
+      }
+    } else {
+      diag.warn(
+        `No log exporter specified. Logs will not be exported.`
+      );
+    }
   }
 }

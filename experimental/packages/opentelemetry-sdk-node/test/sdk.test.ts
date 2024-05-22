@@ -70,7 +70,11 @@ import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
   LoggerProvider,
+  ConsoleLogRecordExporter,
 } from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
+import { OTLPLogExporter as OTLPHttpLogExporter} from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import {
   SEMRESATTRS_HOST_NAME,
   SEMRESATTRS_PROCESS_PID,
@@ -91,6 +95,7 @@ describe('Node SDK', () => {
     trace.disable();
     propagation.disable();
     metrics.disable();
+    logs.disable();
 
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
@@ -324,6 +329,11 @@ describe('Node SDK', () => {
       assert.ok(logs.getLoggerProvider() instanceof LoggerProvider);
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
+    });
+
+    it('should register a logger provider if multiple log record processors are provided', async () => {
+      //FIXME
+      assert.ok(false);
     });
   });
 
@@ -834,6 +844,97 @@ describe('Node SDK', () => {
       await sdk.shutdown();
     });
   });
+
+  describe('configuring logger provider from env', () => {
+    let stubLogger = Sinon.stub(diag, 'warn');
+
+    afterEach(() => {
+      stubLogger.reset();
+    });
+
+    it('should log a warning if OTEL_LOGS_EXPORTER not set', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+
+      assert.strictEqual(
+        stubLogger.args[0][0],
+        'No log exporter specified. Logs will not be exported.'
+      );
+
+      await sdk.shutdown();
+    });
+
+    it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
+      assert(true);
+    });
+
+    it('should set up all allowed exporters', async () => {
+      env.OTEL_LOGS_EXPORTER = 'console,otlp';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert(sharedState.registeredLogRecordProcessors.length === 2);
+      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof ConsoleLogRecordExporter);
+      // defaults to http/protobuf
+      assert(sharedState.registeredLogRecordProcessors[1]._exporter instanceof OTLPProtoLogExporter);
+      // FIXME check that BatchLogProcessor is used
+      delete env.OTEL_LOGS_EXPORTER;
+      await sdk.shutdown();
+    });
+
+    it('should use OTEL_EXPORTER_OTLP_LOGS_PROTOCOL for otlp protocol', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert(sharedState.registeredLogRecordProcessors.length === 1);
+      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof OTLPGrpcLogExporter);
+      delete env.OTEL_LOGS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
+      await sdk.shutdown();
+    });
+
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert(sharedState.registeredLogRecordProcessors.length === 1);
+      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof OTLPGrpcLogExporter);
+
+      delete env.OTEL_LOGS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
+      await sdk.shutdown();
+    });
+
+    it('should fall back to http/protobuf if invalid protocol is set', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'grpc2';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert(sharedState.registeredLogRecordProcessors.length === 1);
+      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof OTLPProtoLogExporter);
+
+      delete env.OTEL_LOGS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
+      await sdk.shutdown();
+    });
+  });
 });
 
 describe('setup exporter from env', () => {
@@ -967,7 +1068,7 @@ describe('setup exporter from env', () => {
     sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[0][0],
+      stubLoggerError.args[1][0],
       'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
     );
     delete env.OTEL_TRACES_EXPORTER;
@@ -1018,7 +1119,7 @@ describe('setup exporter from env', () => {
     sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[0][0],
+      stubLoggerError.args[1][0],
       'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
     );
     delete env.OTEL_TRACES_EXPORTER;
@@ -1030,12 +1131,12 @@ describe('setup exporter from env', () => {
     sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[0][0],
+      stubLoggerError.args[1][0],
       'Unrecognized OTEL_TRACES_EXPORTER value: invalid.'
     );
 
     assert.strictEqual(
-      stubLoggerError.args[1][0],
+      stubLoggerError.args[2][0],
       'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
     );
 
