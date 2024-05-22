@@ -699,6 +699,34 @@ describe('utils', () => {
       assert.strictEqual(value, jsonString);
     });
 
+    it('should handle readablestream objects without a tee method', async () => {
+      const jsonString = JSON.stringify({
+        key1: 'true',
+        key2: 'hello world',
+      });
+      const stream = textToReadableStream(jsonString);
+
+      // remove the .tee() method to mimic older environments where this method isn't available
+      // @ts-expect-error
+      stream.tee = undefined;
+
+      const requestParams = { body: stream };
+      const length = await getFetchBodyLength(
+        'https://example.com',
+        requestParams
+      );
+
+      // we got the correct length
+      assert.strictEqual(length, null);
+
+      // AND the body is still readable
+      assert.strictEqual(requestParams.body.locked, false);
+
+      // AND the body is still correct
+      const { value } = await requestParams.body.getReader().read();
+      assert.strictEqual(value, jsonString);
+    });
+
     it('should read the body of the first param when recieving a request', async () => {
       const bodyContent = JSON.stringify({
         key1: 'true',
