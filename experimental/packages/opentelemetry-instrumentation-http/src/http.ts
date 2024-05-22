@@ -69,7 +69,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   private _httpServerDurationHistogram!: Histogram;
   private _httpClientDurationHistogram!: Histogram;
 
-  constructor(config?: HttpInstrumentationConfig) {
+  constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
   }
