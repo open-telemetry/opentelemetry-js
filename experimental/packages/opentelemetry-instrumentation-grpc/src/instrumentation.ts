@@ -90,7 +90,7 @@ import { VERSION } from './version';
 export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
 
-  constructor(config?: GrpcInstrumentationConfig) {
+  constructor(config: GrpcInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
   }
