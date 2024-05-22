@@ -6,6 +6,39 @@
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
+  "exports": {
+    ".": {
+      "module": "./build/esm/index.js",
+      "esnext": "./build/esnext/index.js",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
+    },
+    "./experimental": {
+      "module": "./build/esm/index-experimental.js",
+      "esnext": "./build/esnext/index-experimental.js",
+      "types": "./build/src/index-experimental.d.ts",
+      "default": "./build/src/index-experimental.js"
+    },
+    "./stable": {
+      "module": "./build/esm/stable.js",
+      "esnext": "./build/esnext/stable.js",
+      "types": "./build/src/stable.d.ts",
+      "default": "./build/src/stable.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/src/index.d.ts"
+      ],
+      "experimental": [
+        "./build/src/index-experimental.d.ts"
+      ],
+      "stable": [
+        "./build/src/stable.d.ts"
+      ]
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

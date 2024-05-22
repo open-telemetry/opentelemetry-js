@@ -19,5 +19,4 @@ export * from './trace';
 export * from './resource';
 
 // Use these instead
-export * from './experimental';
 export * from './stable';
