@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1716391663598,
+  "lastUpdate": 1716392409782,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -9272,6 +9272,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.62%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bertranpir@gmail.com",
+            "name": "Pierre Bertrand",
+            "username": "pbnPierre"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4e778b1257c8e8b7fbeb33e8eeba22b78ac33dd6",
+          "message": "docs: fix instrumentation-graphql package name in documentation (#4723)",
+          "timestamp": "2024-05-22T08:38:32-07:00",
+          "tree_id": "b3199462c56e3943334eba320524058e1769b807",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4e778b1257c8e8b7fbeb33e8eeba22b78ac33dd6"
+        },
+        "date": 1716392408993,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 937797,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11722,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 688316,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 641921,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
