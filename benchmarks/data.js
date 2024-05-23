@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1716469956305,
+  "lastUpdate": 1716470068419,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -9426,6 +9426,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 651414,
             "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "195e5efb4ea8f1fde14952c0a609b4e5b4affd52",
+          "message": "chore(deps): update dependency @types/superagent to v8 (#4679)",
+          "timestamp": "2024-05-23T13:11:33Z",
+          "tree_id": "4deaa35713e15d58865d98d6fb1e8e0fae325ae6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/195e5efb4ea8f1fde14952c0a609b4e5b4affd52"
+        },
+        "date": 1716470067541,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 982340,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12138,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 679370,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 675838,
+            "range": "±0.44%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
