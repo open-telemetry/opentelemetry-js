@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD004 -->
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
@@ -12,7 +13,14 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
-* feat(sdk-trace-node): support `xray` Propagator via `OTEL_PROPAGATORS` environment variable [#4602](https://github.com/open-telemetry/opentelemetry-js/pull/4602) @anuraags
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.24.1
 
 ### :bug: (Bug Fix)
 
@@ -21,10 +29,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
   * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
 * fix(exporter-metrics-otlp-grpc): add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc [#4678](https://github.com/open-telemetry/opentelemetry-js/pull/4678) @AkselAllas
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 1.24.0
 
@@ -1913,7 +1917,7 @@ No changes
 * `opentelemetry-api`, `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`
   * [#1137](https://github.com/open-telemetry/opentelemetry-js/pull/1137) Batch observer ([@obecny](https://github.com/obecny))
 * `opentelemetry-exporter-collector`
-  * [#1256](https://github.com/open-telemetry/opentelemetry-js/pull/1256) feat: [Collector Metric Exporter][1/x] Rename CollectorExporter to CollectorTraceExporter  ([@davidwitten](https://github.com/davidwitten))
+  * [#1256](https://github.com/open-telemetry/opentelemetry-js/pull/1256) feat: Collector Metric Exporter [1/x] Rename CollectorExporter to CollectorTraceExporter  ([@davidwitten](https://github.com/davidwitten))
 
 ### :rocket: (Enhancement)
 
