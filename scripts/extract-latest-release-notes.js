@@ -10,14 +10,19 @@
 
 const fs = require('fs');
 
-const changelog = fs.readFileSync(process.argv[2]).toString();
-// Matches everything from the first entry at h2 ('##') followed by a space and a non-prerelease semver version
-// until the next entry at h2.
-const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?(?=^## )/ms;
+function extractLatestChangelog(changelogPath) {
+  const changelog = fs.readFileSync(changelogPath).toString();
+  // Matches everything from the first entry at h2 ('##') followed by a space and a non-prerelease semver version
+  // until the next entry at h2.
+  const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?(?=^## )/ms;
+
+  return changelog.match(firstReleaseNoteEntryExp)[0];
+}
 
 fs.mkdirSync('./.tmp/', {
   recursive: true
 });
 
 const notesFile = './.tmp/release-notes.md'
-fs.writeFileSync(notesFile, changelog.match(firstReleaseNoteEntryExp)[0]);
+const changelogFilePaths = process.argv.slice(2);
+fs.writeFileSync(notesFile, changelogFilePaths.map(filePath => extractLatestChangelog(filePath)).join('\n'));
