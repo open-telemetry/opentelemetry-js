@@ -42,7 +42,7 @@
 * @deprecated {{metric.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
   {%- endif %}
 */
-export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("string", metric.metric_name) }};
+export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("string", metric.metric_name) }} as const;
 
 {%- endfor %}
 
@@ -63,7 +63,7 @@ export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("st
 * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
   {%- endif %}
 */
-export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", attribute.fqn) }};
+export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", attribute.fqn) }} as const;
 
 {%- endfor %}
 
@@ -87,7 +87,7 @@ export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", 
  * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
   {%- endif %}
  */
-export const {{class_name}}_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }};
+export const {{class_name}}_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }} as const;
 
 {%- endfor %}
 
