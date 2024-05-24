@@ -35,7 +35,7 @@ export interface NodeSDKConfiguration {
   logRecordProcessor: LogRecordProcessor;
   metricReader: MetricReader;
   views: View[];
-  instrumentations: Instrumentation[];
+  instrumentations: (Instrumentation | Instrumentation[])[];
   resource: IResource;
   resourceDetectors: Array<Detector | DetectorSync>;
   sampler: Sampler;

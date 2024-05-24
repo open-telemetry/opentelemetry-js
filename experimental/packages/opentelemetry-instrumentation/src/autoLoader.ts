@@ -34,17 +34,16 @@ export function registerInstrumentations(
   const tracerProvider = options.tracerProvider || trace.getTracerProvider();
   const meterProvider = options.meterProvider || metrics.getMeterProvider();
   const loggerProvider = options.loggerProvider || logs.getLoggerProvider();
+  const instrumentations = options.instrumentations?.flat() ?? [];
 
   enableInstrumentations(
-    options.instrumentations ?? [],
+    instrumentations,
     tracerProvider,
     meterProvider,
     loggerProvider
   );
 
   return () => {
-    if (options.instrumentations != null) {
-      disableInstrumentations(options.instrumentations);
-    }
+    disableInstrumentations(instrumentations);
   };
 }

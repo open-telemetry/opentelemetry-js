@@ -23,7 +23,7 @@ export interface AutoLoaderResult {
 }
 
 export interface AutoLoaderOptions {
-  instrumentations?: Instrumentation[];
+  instrumentations?: (Instrumentation | Instrumentation[])[];
   tracerProvider?: TracerProvider;
   meterProvider?: MeterProvider;
   loggerProvider?: LoggerProvider;

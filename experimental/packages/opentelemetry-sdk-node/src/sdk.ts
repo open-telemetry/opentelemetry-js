@@ -193,7 +193,7 @@ export class NodeSDK {
       this._meterProviderConfig = meterProviderConfig;
     }
 
-    this._instrumentations = configuration.instrumentations ?? [];
+    this._instrumentations = configuration.instrumentations?.flat() ?? [];
   }
 
   /**

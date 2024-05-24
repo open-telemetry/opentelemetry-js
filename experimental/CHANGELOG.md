@@ -22,12 +22,11 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation)!: simplify `registerInstrumentations()` API
   * Breaking changes:
     * removes `InstrumentationOptions` type
-    * occurrences of `InstrumentationOptions` are now replaced by `Instrumentation[]`
+    * occurrences of `InstrumentationOptions` are now replaced by `(Instrumentation | Instrumentation[])[]`
       * migrate usages of `registerInstrumentations({instrumentations: fooInstrumentation})` to `registerInstrumentations({instrumentations: [fooInstrumentation]})`
-      * migrate usages of `registerInstrumentations({instrumentations: [fooInstrumentation, [barInstrumentation]]})` to `registerInstrumentations({instrumentations: [fooInstrumentation, barInstrumentation]})`
 * feat(sdk-node)!: simplify type of `instrumentations` option
   * Breaking changes:
-    * replaces `InstrumentationOptions` with `Instrumentation[]`
+    * replaces `InstrumentationOptions` with `(Instrumentation | Instrumentation[])[]`
 
 ### :rocket: (Enhancement)
 
