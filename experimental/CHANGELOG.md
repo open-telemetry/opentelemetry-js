@@ -17,6 +17,8 @@ All notable changes to experimental packages in this project will be documented 
     * (internal) OTLPExporterBrowserBase: `RequestType` has been replaced by a `ResponseType` type-argument
     * (internal) OTLPExporterNodeBase: `ServiceRequest` has been replaced by a `ServiceResponse` type-argument
     * (internal) the `@opentelemetry/otlp-exporter-proto-base` package has been removed, and will from now on be deprecated in `npm`
+* feat(instrumentation): remove default value for config in base instrumentation constructor [#4695](https://github.com/open-telemetry/opentelemetry-js/pull/4695): @blumamir
+* fix(instrumentation)!: remove unused supportedVersions from Instrumentation interface [#4694](https://github.com/open-telemetry/opentelemetry-js/pull/4694) @blumamir
 * feat(instrumentation)!: simplify `registerInstrumentations()` API
   * Breaking changes:
     * removes `InstrumentationOptions` type
@@ -29,6 +31,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation): apply unwrap before wrap in base class [#4692](https://github.com/open-telemetry/opentelemetry-js/pull/4692)
+* feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
+* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 
@@ -36,7 +41,16 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
+* docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
+* docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
+
 ### :house: (Internal)
+
+## 0.51.1
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): update import-in-the-middle to 1.7.4
 
 ## 0.51.0
 

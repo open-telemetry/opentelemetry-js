@@ -185,7 +185,7 @@ This is an alternative to programmatically configuring an exporter or span proce
 
 | Environment variable | Description |
 |----------------------|-------------|
-| OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `jaeger`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter.
+| OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `jaeger`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
 
 ### OTLP Exporter
 
