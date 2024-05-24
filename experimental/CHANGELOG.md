@@ -24,6 +24,7 @@ All notable changes to experimental packages in this project will be documented 
     * removes `InstrumentationOptions` type
     * occurrences of `InstrumentationOptions` are now replaced by `(Instrumentation | Instrumentation[])[]`
       * migrate usages of `registerInstrumentations({instrumentations: fooInstrumentation})` to `registerInstrumentations({instrumentations: [fooInstrumentation]})`
+      * passing Instrumentation classes to `registerInstrumentations()` is now not possible anymore.
 * feat(sdk-node)!: simplify type of `instrumentations` option
   * Breaking changes:
     * replaces `InstrumentationOptions` with `(Instrumentation | Instrumentation[])[]`
