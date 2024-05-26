@@ -20,6 +20,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* refactor(tsconfig): enable exactOptionalPropertyTypes #4733
+
 ## 1.24.1
 
 ### :bug: (Bug Fix)
