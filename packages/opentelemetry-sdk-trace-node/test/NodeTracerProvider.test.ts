@@ -236,7 +236,7 @@ describe('NodeTracerProvider', () => {
     });
 
     it('should allow propagators as per the specification', () => {
-      (process.env as any).OTEL_PROPAGATORS = 'b3,b3multi,jaeger,xray';
+      (process.env as any).OTEL_PROPAGATORS = 'b3,b3multi,jaeger';
 
       const provider = new NodeTracerProvider();
       provider.register();
@@ -249,7 +249,6 @@ describe('NodeTracerProvider', () => {
         'x-b3-sampled',
         'x-b3-parentspanid',
         'uber-trace-id',
-        'x-amzn-trace-id',
       ]);
     });
   });

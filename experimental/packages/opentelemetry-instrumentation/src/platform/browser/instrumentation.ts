@@ -30,7 +30,7 @@ export abstract class InstrumentationBase<
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: ConfigType = {} as ConfigType // The cast here may be wrong as ConfigType may contain required fields
+    config: ConfigType
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
