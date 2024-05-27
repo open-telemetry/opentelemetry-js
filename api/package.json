@@ -27,7 +27,7 @@
     }
   },
   "typesVersions": {
-    "<4.9": {
+   "*": {
       "*": [
         "./build/src/index.d.ts"
       ],
