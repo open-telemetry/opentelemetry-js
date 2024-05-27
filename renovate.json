@@ -25,6 +25,7 @@
     "enabled": true,
     "schedule": ["before 3am on Monday"]
   },
+  "rebaseWhen": "conflicted",
   "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0", "@types/node"],
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
   "labels": ["dependencies"]
