@@ -44,7 +44,7 @@ import {
   ConsoleLogRecordExporter,
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
-import { OTLPLogExporter as OTLPHttpLogExporter} from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
@@ -59,7 +59,11 @@ import {
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
-import { ENVIRONMENT, getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
+import {
+  ENVIRONMENT,
+  getEnv,
+  getEnvWithoutDefaults,
+} from '@opentelemetry/core';
 import {
   getResourceDetectorsFromEnv,
   parseInstrumentationOptions,
@@ -189,7 +193,9 @@ export class NodeSDK {
 
     if (configuration.logRecordProcessor || configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
-        logRecordProcessors: configuration.logRecordProcessors ? configuration.logRecordProcessors : [configuration.logRecordProcessor!]
+        logRecordProcessors: configuration.logRecordProcessors
+          ? configuration.logRecordProcessors
+          : [configuration.logRecordProcessor!],
       };
     } else {
       this.configureLoggerProviderFromEnv(envWithoutDefaults);
@@ -275,7 +281,8 @@ export class NodeSDK {
         resource: this._resource,
       });
 
-      for (const logRecordProcessor of this._loggerProviderConfig.logRecordProcessors) {
+      for (const logRecordProcessor of this._loggerProviderConfig
+        .logRecordProcessors) {
         loggerProvider.addLogRecordProcessor(logRecordProcessor);
       }
 
@@ -329,23 +336,30 @@ export class NodeSDK {
     );
   }
 
-  private configureLoggerProviderFromEnv(envWithoutDefaults: ENVIRONMENT): void {
-    const logsExporter = envWithoutDefaults.OTEL_LOGS_EXPORTER;
-    if (logsExporter) {
+  private configureLoggerProviderFromEnv(
+    envWithoutDefaults: ENVIRONMENT
+  ): void {
+    const logExportersList = envWithoutDefaults.OTEL_LOGS_EXPORTER;
+    if (logExportersList) {
       const exporters: LogRecordExporter[] = [];
-      const enabledLogExporters = filterBlanksAndNulls(logsExporter.split(','));
+      const enabledExporters = filterBlanksAndNulls(
+        logExportersList.split(',')
+      );
 
-      if (enabledLogExporters.includes('none')) {
+      if (enabledExporters.includes('none')) {
         diag.warn(
-          `Logs will not be exported.`
+          `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
         );
         return;
       }
 
-      enabledLogExporters.forEach((exporter) => {
+      enabledExporters.forEach(exporter => {
         if (exporter === 'otlp') {
-          const protocol = envWithoutDefaults.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ?? envWithoutDefaults.OTEL_EXPORTER_OTLP_PROTOCOL;
-          switch (protocol?.trim()) { //FIXME trim?
+          const protocol = (
+            envWithoutDefaults.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
+            envWithoutDefaults.OTEL_EXPORTER_OTLP_PROTOCOL
+          )?.trim();
+          switch (protocol) {
             case 'grpc':
               exporters.push(new OTLPGrpcLogExporter());
               break;
@@ -372,13 +386,13 @@ export class NodeSDK {
 
       if (exporters.length > 0) {
         this._loggerProviderConfig = {
-          logRecordProcessors: exporters.map((exporter) => new BatchLogRecordProcessor(exporter))
+          logRecordProcessors: exporters.map(
+            exporter => new BatchLogRecordProcessor(exporter)
+          ),
         };
       }
     } else {
-      diag.warn(
-        `No log exporter specified. Logs will not be exported.`
-      );
+      diag.warn(`No log exporters specified. Logs will not be exported.`);
     }
   }
 }

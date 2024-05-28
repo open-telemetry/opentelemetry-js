@@ -65,15 +65,16 @@ import {
   serviceInstanceIdDetectorSync,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs } from '@opentelemetry/api-logs';
+import { logs, NoopLoggerProvider } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
   LoggerProvider,
   ConsoleLogRecordExporter,
+  BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { OTLPLogExporter as OTLPHttpLogExporter} from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import {
   SEMRESATTRS_HOST_NAME,
@@ -332,8 +333,41 @@ describe('Node SDK', () => {
     });
 
     it('should register a logger provider if multiple log record processors are provided', async () => {
-      //FIXME
-      assert.ok(false);
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const simpleLogRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
+      const batchLogRecordProcessor = new BatchLogRecordProcessor(
+        logRecordExporter
+      );
+      const sdk = new NodeSDK({
+        logRecordProcessors: [
+          simpleLogRecordProcessor,
+          batchLogRecordProcessor,
+        ],
+      });
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert(sharedState.registeredLogRecordProcessors.length === 2);
+      assert(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          InMemoryLogRecordExporter
+      );
+      assert(
+        sharedState.registeredLogRecordProcessors[0] instanceof
+          SimpleLogRecordProcessor
+      );
+      assert(
+        sharedState.registeredLogRecordProcessors[1]._exporter instanceof
+          InMemoryLogRecordExporter
+      );
+      assert(
+        sharedState.registeredLogRecordProcessors[1] instanceof
+          BatchLogRecordProcessor
+      );
     });
   });
 
@@ -846,7 +880,11 @@ describe('Node SDK', () => {
   });
 
   describe('configuring logger provider from env', () => {
-    let stubLogger = Sinon.stub(diag, 'warn');
+    let stubLogger: Sinon.SinonStub;
+
+    beforeEach(() => {
+      stubLogger = Sinon.stub(diag, 'warn');
+    });
 
     afterEach(() => {
       stubLogger.reset();
@@ -858,14 +896,23 @@ describe('Node SDK', () => {
 
       assert.strictEqual(
         stubLogger.args[0][0],
-        'No log exporter specified. Logs will not be exported.'
+        'No log exporters specified. Logs will not be exported.'
       );
 
       await sdk.shutdown();
     });
 
     it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
-      assert(true);
+      env.OTEL_LOGS_EXPORTER = 'console,none';
+      const sdk = new NodeSDK();
+      sdk.start();
+      assert.strictEqual(
+        stubLogger.args[0][0],
+        'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
+      );
+
+      assert(logs.getLoggerProvider() instanceof NoopLoggerProvider);
+      await sdk.shutdown();
     });
 
     it('should set up all allowed exporters', async () => {
@@ -877,10 +924,23 @@ describe('Node SDK', () => {
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
       assert(sharedState.registeredLogRecordProcessors.length === 2);
-      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof ConsoleLogRecordExporter);
+      assert(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          ConsoleLogRecordExporter
+      );
+      assert(
+        sharedState.registeredLogRecordProcessors[0] instanceof
+          BatchLogRecordProcessor
+      );
       // defaults to http/protobuf
-      assert(sharedState.registeredLogRecordProcessors[1]._exporter instanceof OTLPProtoLogExporter);
-      // FIXME check that BatchLogProcessor is used
+      assert(
+        sharedState.registeredLogRecordProcessors[1]._exporter instanceof
+          OTLPProtoLogExporter
+      );
+      assert(
+        sharedState.registeredLogRecordProcessors[1] instanceof
+          BatchLogRecordProcessor
+      );
       delete env.OTEL_LOGS_EXPORTER;
       await sdk.shutdown();
     });
@@ -895,7 +955,29 @@ describe('Node SDK', () => {
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
       assert(sharedState.registeredLogRecordProcessors.length === 1);
-      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof OTLPGrpcLogExporter);
+      assert(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPGrpcLogExporter
+      );
+      delete env.OTEL_LOGS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
+      await sdk.shutdown();
+    });
+
+    it('should use OTLPHttpLogExporter when http/json is set', async () => {
+      env.OTEL_LOGS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL = 'http/json';
+      const sdk = new NodeSDK();
+
+      sdk.start();
+
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert(sharedState.registeredLogRecordProcessors.length === 1);
+      assert(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPHttpLogExporter
+      );
       delete env.OTEL_LOGS_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
       await sdk.shutdown();
@@ -911,7 +993,10 @@ describe('Node SDK', () => {
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
       assert(sharedState.registeredLogRecordProcessors.length === 1);
-      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof OTLPGrpcLogExporter);
+      assert(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPGrpcLogExporter
+      );
 
       delete env.OTEL_LOGS_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
@@ -928,7 +1013,10 @@ describe('Node SDK', () => {
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
       assert(sharedState.registeredLogRecordProcessors.length === 1);
-      assert(sharedState.registeredLogRecordProcessors[0]._exporter instanceof OTLPProtoLogExporter);
+      assert(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPProtoLogExporter
+      );
 
       delete env.OTEL_LOGS_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
