@@ -13,6 +13,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+* feat(context-zone*): support zone.js 0.12.x [#4376](https://github.com/open-telemetry/opentelemetry-js/pull/4736) @maldago
 
 ### :bug: (Bug Fix)
 
