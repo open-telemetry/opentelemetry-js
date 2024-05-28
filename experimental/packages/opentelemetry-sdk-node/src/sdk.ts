@@ -191,11 +191,13 @@ export class NodeSDK {
       };
     }
 
-    if (configuration.logRecordProcessor || configuration.logRecordProcessors) {
+    if (configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
-        logRecordProcessors: configuration.logRecordProcessors
-          ? configuration.logRecordProcessors
-          : [configuration.logRecordProcessor!],
+        logRecordProcessors: configuration.logRecordProcessors,
+      };
+    } else if (configuration.logRecordProcessor) {
+      this._loggerProviderConfig = {
+        logRecordProcessors: [configuration.logRecordProcessor],
       };
     } else {
       this.configureLoggerProviderFromEnv(envWithoutDefaults);
@@ -340,59 +342,58 @@ export class NodeSDK {
     envWithoutDefaults: ENVIRONMENT
   ): void {
     const logExportersList = envWithoutDefaults.OTEL_LOGS_EXPORTER;
-    if (logExportersList) {
-      const exporters: LogRecordExporter[] = [];
-      const enabledExporters = filterBlanksAndNulls(
-        logExportersList.split(',')
-      );
-
-      if (enabledExporters.includes('none')) {
-        diag.warn(
-          `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
-        );
-        return;
-      }
-
-      enabledExporters.forEach(exporter => {
-        if (exporter === 'otlp') {
-          const protocol = (
-            envWithoutDefaults.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
-            envWithoutDefaults.OTEL_EXPORTER_OTLP_PROTOCOL
-          )?.trim();
-          switch (protocol) {
-            case 'grpc':
-              exporters.push(new OTLPGrpcLogExporter());
-              break;
-            case 'http/json':
-              exporters.push(new OTLPHttpLogExporter());
-              break;
-            case 'http/protobuf':
-              exporters.push(new OTLPProtoLogExporter());
-              break;
-            default:
-              diag.warn(
-                `Unsupported or undefined OTLP logs protocol. Using http/protobuf.`
-              );
-              exporters.push(new OTLPProtoLogExporter());
-          }
-        } else if (exporter === 'console') {
-          exporters.push(new ConsoleLogRecordExporter());
-        } else {
-          diag.warn(
-            `Unsupported log exporter: ${exporter}. Logs will not be exported.`
-          );
-        }
-      });
-
-      if (exporters.length > 0) {
-        this._loggerProviderConfig = {
-          logRecordProcessors: exporters.map(
-            exporter => new BatchLogRecordProcessor(exporter)
-          ),
-        };
-      }
-    } else {
+    if (!logExportersList) {
       diag.warn(`No log exporters specified. Logs will not be exported.`);
+      return;
+    }
+
+    const exporters: LogRecordExporter[] = [];
+    const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
+
+    if (enabledExporters.includes('none')) {
+      diag.warn(
+        `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
+      );
+      return;
+    }
+
+    enabledExporters.forEach(exporter => {
+      if (exporter === 'otlp') {
+        const protocol = (
+          envWithoutDefaults.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
+          envWithoutDefaults.OTEL_EXPORTER_OTLP_PROTOCOL
+        )?.trim();
+        switch (protocol) {
+          case 'grpc':
+            exporters.push(new OTLPGrpcLogExporter());
+            break;
+          case 'http/json':
+            exporters.push(new OTLPHttpLogExporter());
+            break;
+          case 'http/protobuf':
+            exporters.push(new OTLPProtoLogExporter());
+            break;
+          default:
+            diag.debug(
+              `Unsupported or undefined OTLP logs protocol. Using http/protobuf.`
+            );
+            exporters.push(new OTLPProtoLogExporter());
+        }
+      } else if (exporter === 'console') {
+        exporters.push(new ConsoleLogRecordExporter());
+      } else {
+        diag.warn(
+          `Unsupported log exporter: ${exporter}. Supported exporters are: otlp, console.`
+        );
+      }
+    });
+
+    if (exporters.length > 0) {
+      this._loggerProviderConfig = {
+        logRecordProcessors: exporters.map(
+          exporter => new BatchLogRecordProcessor(exporter)
+        ),
+      };
     }
   }
 }
