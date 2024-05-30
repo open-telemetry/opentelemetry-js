@@ -706,8 +706,7 @@ describe('utils', () => {
       });
       const stream = textToReadableStream(jsonString);
 
-      // remove the .tee() method to mimic older environments where this method isn't available
-      // @ts-expect-error
+      // @ts-expect-error intentionally remove the .tee() method to mimic older environments where this method isn't available
       stream.tee = undefined;
 
       const requestParams = { body: stream };
