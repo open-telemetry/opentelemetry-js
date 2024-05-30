@@ -52,3 +52,5 @@ npm run lint:fix:changed
 
 # Run the size checks for the generated files
 cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
+npm run lint:fix
+npm run compile
