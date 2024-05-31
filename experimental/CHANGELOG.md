@@ -20,6 +20,10 @@ All notable changes to experimental packages in this project will be documented 
     * (internal) the `@opentelemetry/otlp-exporter-proto-base` package has been removed, and will from now on be deprecated in `npm`
 * feat(instrumentation): remove default value for config in base instrumentation constructor [#4695](https://github.com/open-telemetry/opentelemetry-js/pull/4695): @blumamir
 * fix(instrumentation)!: remove unused supportedVersions from Instrumentation interface [#4694](https://github.com/open-telemetry/opentelemetry-js/pull/4694) @blumamir
+* feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * (user-facing) `headers` was intended for internal use has been removed from all exporters
+  * (user-facing) `compression` was intended for internal use and has been removed from all exporters
+  * (user-facing) `hostname` was intended for use in tests and is not used by any exporters, it will be removed in a future release
 
 ### :rocket: (Enhancement)
 
