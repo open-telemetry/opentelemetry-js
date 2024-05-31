@@ -343,7 +343,9 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
       const exporter = new OTLPMetricExporter();
       assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters']['headers']['foo'],
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['foo'],
         'bar'
       );
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
@@ -351,7 +353,9 @@ describe('OTLPMetricExporter - node with json over http', () => {
     it('should include user agent in header', () => {
       const exporter = new OTLPMetricExporter();
       assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters']['headers']['User-Agent'],
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['User-Agent'],
         `OTel-OTLP-Exporter-JavaScript/${VERSION}`
       );
     });
@@ -360,11 +364,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
       const exporter = new OTLPMetricExporter();
       assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters']['headers']['foo'],
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['foo'],
         'boo'
       );
       assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters']['headers']['bar'],
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['bar'],
         'foo'
       );
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
@@ -378,11 +386,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
         },
       });
       assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters']['headers']['foo'],
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['foo'],
         'constructor'
       );
       assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters']['headers']['bar'],
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['bar'],
         'foo'
       );
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
