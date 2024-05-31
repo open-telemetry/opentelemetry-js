@@ -23,6 +23,7 @@ import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExporterTransport } from '../../exporter-transport';
 import { createHttpExporterTransport } from './http-exporter-transport';
 import { OTLPExporterError } from '../../types';
+import { createRetryingTransport } from '../../retryable-transport';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -65,16 +66,18 @@ export abstract class OTLPExporterNodeBase<
       getEnv().OTEL_EXPORTER_OTLP_HEADERS
     );
 
-    this._transport = createHttpExporterTransport({
-      agentOptions: config.httpAgentOptions ?? { keepAlive: true },
-      compression: configureCompression(config.compression),
-      headers: Object.assign(
-        {},
-        nonSignalSpecificHeaders,
-        signalSpecificHeaders
-      ),
-      url: this.url,
-      timeoutMillis: this.timeoutMillis,
+    this._transport = createRetryingTransport({
+      transport: createHttpExporterTransport({
+        agentOptions: config.httpAgentOptions ?? { keepAlive: true },
+        compression: configureCompression(config.compression),
+        headers: Object.assign(
+          {},
+          nonSignalSpecificHeaders,
+          signalSpecificHeaders
+        ),
+        url: this.url,
+        timeoutMillis: this.timeoutMillis,
+      }),
     });
   }
 
