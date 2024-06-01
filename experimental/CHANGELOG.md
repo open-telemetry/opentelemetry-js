@@ -30,6 +30,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 
 ### :bug: (Bug Fix)
+* fix(instrumentation): Update `import-in-the-middle` to fix numerous bugs [#4745]
 
 ### :books: (Refine Doc)
 
