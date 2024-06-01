@@ -310,7 +310,7 @@ export abstract class InstrumentationBase<
 
       this._hooks.push(hook);
       const esmHook =
-        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
+        new ((ImportInTheMiddle as unknown as { Hook: typeof ImportInTheMiddle.default }).Hook)(
           [module.name],
           { internals: false },
           <HookFn>hookFn
