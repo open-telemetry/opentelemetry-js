@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-logs",
-  "version": "0.51.0",
+  "version": "0.51.1",
   "publishConfig": {
     "access": "public"
   },
@@ -43,7 +43,8 @@
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",
@@ -71,18 +72,18 @@
     "@opentelemetry/api": ">=1.4.0 <1.9.0"
   },
   "devDependencies": {
-    "@babel/core": "7.23.6",
-    "@babel/preset-env": "7.22.20",
+    "@babel/core": "7.24.6",
+    "@babel/preset-env": "7.24.6",
     "@opentelemetry/api": ">=1.4.0 <1.9.0",
-    "@opentelemetry/api-logs": "0.51.0",
+    "@opentelemetry/api-logs": "0.51.1",
     "@opentelemetry/resources_1.9.0": "npm:@opentelemetry/resources@1.9.0",
     "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
-    "@types/sinon": "10.0.20",
+    "@types/sinon": "17.0.3",
     "babel-plugin-istanbul": "6.1.1",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "karma": "6.4.2",
+    "karma": "6.4.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
@@ -92,7 +93,7 @@
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
-    "ts-loader": "8.4.0",
+    "ts-loader": "9.5.1",
     "ts-mocha": "10.0.0",
     "typescript": "4.4.4",
     "webpack": "5.89.0",
