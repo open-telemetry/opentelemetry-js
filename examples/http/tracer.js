@@ -15,7 +15,7 @@ const EXPORTER = process.env.EXPORTER || '';
 module.exports = (serviceName) => {
   const provider = new NodeTracerProvider({
     resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
+      [SEMRESATTRS_SERVICE_NAME]: serviceName,
     }),
   });
 
