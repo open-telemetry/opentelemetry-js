@@ -39,7 +39,7 @@ import {
   SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
 
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
@@ -152,9 +152,7 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
       assert.ok(span.resource instanceof Resource);
       assert.equal(
-        span.resource.attributes[
-          SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE
-        ],
+        span.resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
         'nodejs'
       );
     });
