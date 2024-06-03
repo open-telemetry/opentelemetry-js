@@ -44,7 +44,7 @@ events.setGlobalEventLoggerProvider(eventLoggerProvider);
 // emit a log record
 const eventLogger = events.getEventLogger('example');
 eventLogger.emit({
-  name: 'my-event',
+  name: 'my-domain.my-event',
   data: {
     a: 1,
     b: 'hello',

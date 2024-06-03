@@ -47,7 +47,7 @@ const eventLogger = events.getEventLogger('default');
 
 // Emit an event
 eventLogger.emit({
-  name: 'myEvent',
+  name: 'my-domain.my-event',
   data: {
     field1: 'abc',
     field2: 123
