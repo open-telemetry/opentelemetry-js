@@ -55,8 +55,8 @@ import {
   SEMRESATTRS_WEBENGINE_DESCRIPTION,
   SEMRESATTRS_WEBENGINE_NAME,
   SEMRESATTRS_WEBENGINE_VERSION,
-  SemanticResourceAttributes,
 } from '@opentelemetry/semantic-conventions';
+import * as semconv from '@opentelemetry/semantic-conventions';
 
 /**
  * Test utility method to validate a cloud resource
@@ -407,29 +407,28 @@ export const assertEmptyResource = (resource: IResource) => {
   assert.strictEqual(Object.keys(resource.attributes).length, 0);
 };
 
+/**
+ * Assert that the `resource` has at least one known attribute with the given
+ * `prefix`. By "known", we mean it is an attribute defined in semconv.
+ */
 const assertHasOneLabel = (prefix: string, resource: IResource): void => {
-  const hasOne = Object.entries(SemanticResourceAttributes).find(
-    ([key, value]) => {
-      return (
-        key.startsWith(prefix) &&
-        Object.prototype.hasOwnProperty.call(resource.attributes, value)
-      );
-    }
+  const semconvModPrefix = `SEMRESATTRS_${prefix.toUpperCase()}_`;
+  const knownAttrs: Set<string> = new Set(
+    Object.entries(semconv)
+      .filter(
+        ([k, v]) => typeof v === 'string' && k.startsWith(semconvModPrefix)
+      )
+      .map(([, v]) => v as string)
   );
-
+  const hasAttrs = Object.keys(resource.attributes).filter(k =>
+    knownAttrs.has(k)
+  );
   assert.ok(
-    hasOne,
+    hasAttrs.length > 0,
     'Must have one Resource(s) starting with [' +
       prefix +
       '] matching the following attributes: ' +
-      Object.entries(SemanticResourceAttributes)
-        .reduce((result, [key, value]) => {
-          if (key.startsWith(prefix)) {
-            result.push(value);
-          }
-          return result;
-        })
-        .join(', ') +
-      JSON.stringify(Object.keys(SemanticResourceAttributes))
+      Array.from(knownAttrs).join(', ') +
+      JSON.stringify(Object.keys(semconv))
   );
 };
