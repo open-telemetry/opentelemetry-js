@@ -89,7 +89,7 @@
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
-    "linkinator": "6.0.4",
+    "linkinator": "6.0.5",
     "markdownlint-cli2": "0.13.0",
     "prettier": "3.0.3",
     "process": "0.11.10",
