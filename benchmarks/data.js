@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717407596627,
+  "lastUpdate": 1717407702042,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -10000,6 +10000,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.72%",
             "unit": "ops/sec",
             "extra": "90 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "66320475+JohannesHuster@users.noreply.github.com",
+            "name": "Johannes Huster",
+            "username": "JohannesHuster"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7e72f1cccf577c115e44a1c0266962596d9c9030",
+          "message": "refactor(sdk-trace-node): Use tree-shakeable string constants for semconv (#4748)\n\n* refactor(sdk-trace-node): Use tree-shakeable string constants for semconv\n\n* Update changelog\n\n---------\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-06-03T09:39:15Z",
+          "tree_id": "a23a856fcaa128254af3d649596c7fd429ebcff6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7e72f1cccf577c115e44a1c0266962596d9c9030"
+        },
+        "date": 1717407700991,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 908806,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11456,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 712798,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 635962,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
