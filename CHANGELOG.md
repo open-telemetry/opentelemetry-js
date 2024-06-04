@@ -24,6 +24,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :books: (Refine Doc)
 
+* refactor(examples): use new exported string constants for semconv in examples/http [#4750](https://github.com/open-telemetry/opentelemetry-js/pull/4750) @Zen-cronic
+
 ### :house: (Internal)
 
 ## 1.24.1
