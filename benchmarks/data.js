@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717486671524,
+  "lastUpdate": 1717486786441,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -10312,6 +10312,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "83657429+Zen-cronic@users.noreply.github.com",
+            "name": "Kaung Zin Hein",
+            "username": "Zen-cronic"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0ce7d94e3eb2c5d3dcbe3f79e3e5f36ae19bc614",
+          "message": "refactor(examples/https): use new exported string constants for semconv (#4753)\n\n* refactor(examples/https): use new exported string constants for semconv\n\n* refactor(examples/https): use new exported string constants for semconv in the https example",
+          "timestamp": "2024-06-04T07:37:22Z",
+          "tree_id": "6a3055800905819ea7027b876eaa959db7be19d4",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0ce7d94e3eb2c5d3dcbe3f79e3e5f36ae19bc614"
+        },
+        "date": 1717486785549,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 981238,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11822,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 700177,
+            "range": "±0.71%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 682487,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
