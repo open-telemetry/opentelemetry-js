@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD004 -->
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
@@ -11,9 +12,25 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
-* feat(sdk-trace-node): support `xray` Propagator via `OTEL_PROPAGATORS` environment variable [#4602](https://github.com/open-telemetry/opentelemetry-js/pull/4602) @anuraags
+* feat(context-zone*): support zone.js 0.12.x [#4376](https://github.com/open-telemetry/opentelemetry-js/pull/4736) @maldago
+* refactor(core): Use tree-shakeable string constants for semconv [#4739](https://github.com/open-telemetry/opentelemetry-js/pull/4739) @JohannesHuster
+* refactor(shim-opentracing): Use tree-shakeable string constants for semconv [#4746](https://github.com/open-telemetry/opentelemetry-js/pull/4746) @JohannesHuster
+* refactor(sdk-trace-web): Use tree-shakeable string constants for semconv [#4747](https://github.com/open-telemetry/opentelemetry-js/pull/4747) @JohannesHuster
+* refactor(sdk-trace-node): Use tree-shakeable string constants for semconv [#4748](https://github.com/open-telemetry/opentelemetry-js/pull/4748) @JohannesHuster
+* refactor(sdk-trace-base): Use tree-shakeable string constants for semconv [#4749](https://github.com/open-telemetry/opentelemetry-js/pull/4749) @JohannesHuster
+* refactor(resources): update deprecated semconv to use exported strings [#4755](https://github.com/open-telemetry/opentelemetry-js/pull/#4755) @JamieDanielson
+* refactor(exporters): update deprecated semconv to use exported strings [#4756](https://github.com/open-telemetry/opentelemetry-js/pull/#4756) @JamieDanielson
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+* refactor(examples): use new exported string constants for semconv in examples/http [#4750](https://github.com/open-telemetry/opentelemetry-js/pull/4750) @Zen-cronic
+
+### :house: (Internal)
+
+## 1.24.1
 
 ### :bug: (Bug Fix)
 
@@ -21,10 +38,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
   * `getEnvWithoutDefaults()` would use `process.env` if it was defined when running in a browser, while `getEnv()` would always use `_globalThis`. Now both use `_globalThis` when running in a browser.
 * fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
   * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(exporter-metrics-otlp-grpc): add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc [#4678](https://github.com/open-telemetry/opentelemetry-js/pull/4678) @AkselAllas
 
 ## 1.24.0
 
@@ -61,6 +75,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat(instrumentation): Make `init()` method public [#4418](https://github.com/open-telemetry/opentelemetry-js/pull/4418)
 * feat(context-zone-peer-dep, context-zone): support zone.js 0.13.x, 0.14.x [#4469](https://github.com/open-telemetry/opentelemetry-js/pull/4469) @pichlermarc
 * chore: Semantic Conventions export individual strings [4185](https://github.com/open-telemetry/opentelemetry-js/issues/4185)
+* feat(sdk-trace-base): allow adding span links after span creation [#4536](https://github.com/open-telemetry/opentelemetry-js/pull/4536) @seemk
 
 ### :bug: (Bug Fix)
 
@@ -1912,7 +1927,7 @@ No changes
 * `opentelemetry-api`, `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`
   * [#1137](https://github.com/open-telemetry/opentelemetry-js/pull/1137) Batch observer ([@obecny](https://github.com/obecny))
 * `opentelemetry-exporter-collector`
-  * [#1256](https://github.com/open-telemetry/opentelemetry-js/pull/1256) feat: [Collector Metric Exporter][1/x] Rename CollectorExporter to CollectorTraceExporter  ([@davidwitten](https://github.com/davidwitten))
+  * [#1256](https://github.com/open-telemetry/opentelemetry-js/pull/1256) feat: Collector Metric Exporter [1/x] Rename CollectorExporter to CollectorTraceExporter  ([@davidwitten](https://github.com/davidwitten))
 
 ### :rocket: (Enhancement)
 
