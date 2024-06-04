@@ -19,6 +19,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
+* refactor(examples): use new exported string constants for semconv in examples/esm-http-ts [#4758](https://github.com/open-telemetry/opentelemetry-js/pull/4758) @Zen-cronic
 
 ### :house: (Internal)
 
