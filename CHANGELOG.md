@@ -27,6 +27,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :books: (Refine Doc)
 
 * refactor(examples): use new exported string constants for semconv in examples/http [#4750](https://github.com/open-telemetry/opentelemetry-js/pull/4750) @Zen-cronic
+* refactor(examples): added usage of @opentelemetry/semantic-conventions and @opentelemetry/resources to the examples in examples/opentelemetry-web for maintaining consistency across all examples. [#4764](https://github.com/open-telemetry/opentelemetry-js/pull/4764) @Zen-cronic
+
 
 ### :house: (Internal)
 
