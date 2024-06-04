@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717489443410,
+  "lastUpdate": 1717489597734,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -10520,6 +10520,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.55%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "prashkulshrestha@gmail.com",
+            "name": "Prashansa Kulshrestha",
+            "username": "Prashansa-K"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "315239da676ba54f7b709f99dcea36ebd982b9e1",
+          "message": "refactor(instrumentation-xhr): use exported strings for semantic attr… (#4681)\n\n* refactor(instrumentation-xhr): use exported strings for semantic attributes\n\nSigned-off-by: Prashansa Kulshrestha <prashkulshrestha@gmail.com>\n\n* Updated changelog entry with PR id and link\n\nSigned-off-by: Prashansa Kulshrestha <prashkulshrestha@gmail.com>\n\n* Changed normal string to template string and replaced old HTTP_RESPONSE_CONTENT_SIZE to new exported string\n\nSigned-off-by: Prashansa Kulshrestha <prashkulshrestha@gmail.com>\n\n---------\n\nSigned-off-by: Prashansa Kulshrestha <prashkulshrestha@gmail.com>\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-06-04T08:24:09Z",
+          "tree_id": "31c8b8d3dc8f15bdfd649f0f8a27e54d3ad0b71c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/315239da676ba54f7b709f99dcea36ebd982b9e1"
+        },
+        "date": 1717489596888,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 955294,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11889,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 657097,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 649006,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
