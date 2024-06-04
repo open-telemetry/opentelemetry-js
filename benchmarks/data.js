@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717486786441,
+  "lastUpdate": 1717489106102,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -10364,6 +10364,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jamieedanielson@gmail.com",
+            "name": "Jamie Danielson",
+            "username": "JamieDanielson"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c66b65f6101d7bbb862b7dd88b08a2991379a2bd",
+          "message": "chore(exporters): updated deprecated semconv to use exported strings (#4756)\n\n* chore(exporter-zipkin) update deprecated semconv to use exported strings\n\n* chore(exporter-jaeger) update deprecated semconv to use exported strings\n\n* chore(exporter-prometheus): update deprecated semconv to use exported strings\n\n* add changelog\n\n* Update CHANGELOG.md\n\n---------\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-06-04T08:16:01Z",
+          "tree_id": "6c9c53ffc18a44295cf41f59aef72e6b783948b0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c66b65f6101d7bbb862b7dd88b08a2991379a2bd"
+        },
+        "date": 1717489105262,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 970860,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12022,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 680974,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648517,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
