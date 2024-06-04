@@ -19,6 +19,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * refactor(sdk-trace-web): Use tree-shakeable string constants for semconv [#4747](https://github.com/open-telemetry/opentelemetry-js/pull/4747) @JohannesHuster
 * refactor(sdk-trace-node): Use tree-shakeable string constants for semconv [#4748](https://github.com/open-telemetry/opentelemetry-js/pull/4748) @JohannesHuster
 * refactor(sdk-trace-base): Use tree-shakeable string constants for semconv [#4749](https://github.com/open-telemetry/opentelemetry-js/pull/4749) @JohannesHuster
+* refactor(resources): update deprecated semconv to use exported strings [#4755](https://github.com/open-telemetry/opentelemetry-js/pull/#4755) @JamieDanielson
 * refactor(exporters): update deprecated semconv to use exported strings [#4756](https://github.com/open-telemetry/opentelemetry-js/pull/#4756) @JamieDanielson
 
 ### :bug: (Bug Fix)
