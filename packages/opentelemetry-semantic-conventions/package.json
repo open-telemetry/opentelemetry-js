@@ -18,12 +18,6 @@
       "esnext": "./build/esnext/index-experimental.js",
       "types": "./build/src/index-experimental.d.ts",
       "default": "./build/src/index-experimental.js"
-    },
-    "./1.25": {
-      "module": "./build/esm/1.25/stable.js",
-      "esnext": "./build/esnext/1.25/stable.js",
-      "types": "./build/src/1.25/stable.d.ts",
-      "default": "./build/src/1.25/stable.js"
     }
   },
   "typesVersions": {
