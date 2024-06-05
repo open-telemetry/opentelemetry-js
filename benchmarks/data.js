@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717572897293,
+  "lastUpdate": 1717573161979,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -10624,6 +10624,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.29%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "deb2001-github@yahoo.de",
+            "name": "Gerhard Stöbich",
+            "username": "Flarna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9d3bc18f7d5e493a09f8c1a30be513a981c1b1f0",
+          "message": "chore: move flarna from approver to emeritus (#4757)",
+          "timestamp": "2024-06-05T07:36:53Z",
+          "tree_id": "e488f635ff492f9a296e9c120fbbec653186a219",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9d3bc18f7d5e493a09f8c1a30be513a981c1b1f0"
+        },
+        "date": 1717573161085,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 953397,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11460,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 656072,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 634087,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
