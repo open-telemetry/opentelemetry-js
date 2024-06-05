@@ -224,12 +224,13 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 - [Trent Mick](https://github.com/trentm), Elastic
+- [David Luna](https://github.com/david-luna), Elastic
 
 *Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
 #### Triager ([@open-telemetry/javascript-triagers](https://github.com/orgs/open-telemetry/teams/javascript-triagers))
 
-- [David Luna](https://github.com/david-luna), Elastic
+- N/A
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
