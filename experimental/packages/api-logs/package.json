@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-logs",
-  "version": "0.51.1",
+  "version": "0.52.0",
   "description": "Public logs API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -27,7 +27,8 @@
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "prewatch": "node ../../../scripts/version-update.js"
+    "prewatch": "node ../../../scripts/version-update.js",
+    "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",
@@ -70,7 +71,7 @@
     "babel-plugin-istanbul": "6.1.1",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "karma": "6.4.2",
+    "karma": "6.4.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",

@@ -11,8 +11,8 @@ The definition of the `ContextManager` interface and the problem it solves can b
 
 Two `ContextManager` implementations are exported:
 
-* `AsyncLocalStorageContextManager`, based on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage)
-* `AsyncHooksContextManager`, based on [`AsyncHook`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynchook)
+- `AsyncLocalStorageContextManager`, based on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage)
+- `AsyncHooksContextManager`, based on [`AsyncHook`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynchook)
 
 The former should be preferred over the latter as its implementation is substantially simpler than the latter's, and according to [Node.js docs](https://github.com/nodejs/node/blame/v17.1.0/doc/api/async_context.md#L42-L45),
 
@@ -30,16 +30,16 @@ async_hooks is still seeing significant correctness and performance fixes, it's 
 
 Context propagation is a big subject when talking about tracing in Node.js. If you want more information about it here are some resources:
 
-* <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
-* Datadog's own implementation for their JavaScript tracer: [here][dd-js-tracer-scope]
-* OpenTracing implementation: [here][opentracing-scope]
-* Discussion about context propagation by the Node.js Diagnostics Working Group: [here][diag-team-scope-discussion]
+- <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
+- Datadog's own implementation for their JavaScript tracer: [here][dd-js-tracer-scope]
+- OpenTracing implementation: [here][opentracing-scope]
+- Discussion about context propagation by the Node.js Diagnostics Working Group: [here][diag-team-scope-discussion]
 
 ## Useful links
 
-* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-* For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 

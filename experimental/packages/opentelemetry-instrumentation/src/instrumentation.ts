@@ -51,8 +51,10 @@ export abstract class InstrumentationAbstract<
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: ConfigType = {} as ConfigType // assuming ConfigType is an object with optional fields only
+    config: ConfigType
   ) {
+    // copy config first level properties to ensure they are immutable.
+    // nested properties are not copied, thus are mutable from the outside.
     this._config = {
       enabled: true,
       ...config,
@@ -144,10 +146,10 @@ export abstract class InstrumentationAbstract<
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: ConfigType = {} as ConfigType): void {
-    // the assertion that {} is compatible with ConfigType may not be correct,
-    // ConfigType should contain only optional fields, but there is no enforcement in place for that
-    this._config = Object.assign({}, config);
+  public setConfig(config: ConfigType): void {
+    // copy config first level properties to ensure they are immutable.
+    // nested properties are not copied, thus are mutable from the outside.
+    this._config = { ...config };
   }
 
   /**

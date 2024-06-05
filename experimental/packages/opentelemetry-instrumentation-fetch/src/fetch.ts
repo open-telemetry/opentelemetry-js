@@ -79,7 +79,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _tasksCount = 0;
 
-  constructor(config?: FetchInstrumentationConfig) {
+  constructor(config: FetchInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-fetch', VERSION, config);
   }
 
