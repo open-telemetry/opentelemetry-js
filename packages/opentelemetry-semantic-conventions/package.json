@@ -14,10 +14,10 @@
       "default": "./build/src/index.js"
     },
     "./1.7": {
-      "module": "./build/esm/index-experimental.js",
-      "esnext": "./build/esnext/index-experimental.js",
-      "types": "./build/src/index-experimental.d.ts",
-      "default": "./build/src/index-experimental.js"
+      "module": "./build/esm/1.7/index.js",
+      "esnext": "./build/esnext/1.7/index.js",
+      "types": "./build/src/1.7/index.d.ts",
+      "default": "./build/src/1.7/index.js"
     }
   },
   "typesVersions": {
@@ -25,10 +25,7 @@
       "*": [
         "./build/src/index.d.ts"
       ],
-      "experimental": [
-        "./build/src/index-experimental.d.ts"
-      ],
-      "stable": [
+      "1.7": [
         "./build/src/stable.d.ts"
       ]
     }
