@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717573161979,
+  "lastUpdate": 1717574468730,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -10676,6 +10676,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7c808e31177f6baa34fbdd8ba9a3c5302b4044c5",
+          "message": "add Events SDK (#4629)\n\n* feat(sdk-events): add Events SDK\n\n* updated changelog\n\n* markdown lint\n\n* updated changelog with changes to the events API\n\n* added missing implements\n\n* set defaults for severityNumber and timestamp\n\n* added OTLP exporter to example\n\n* updated package-lock.json\n\n* updated versions\n\n* pinned api-logs and api-events versions\n\n* removed getting global LoggerProvider\n\n* updated example version\n\n* removed unnecessary constant\n\n* lint\n\n* updated events example\n\n* pinned api-logs version for logs sdk\n\n* updated package-lock\n\n* removed unused configuration\n\n* added forceFlush and shutdown to EventLoggerProvider\n\n* updated package-lock.json\n\n* updated tsconfig files\n\n* fixed package-lock.json\n\n* removed shutdown method, updated example\n\n* cleanup\n\n* added domain to examples\n\n* updated versions\n\n* fix browser tests",
+          "timestamp": "2024-06-05T07:59:05Z",
+          "tree_id": "246ff0257033c2f4c1d6df80a04349d2faf1c2fa",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7c808e31177f6baa34fbdd8ba9a3c5302b4044c5"
+        },
+        "date": 1717574467881,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 952687,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12156,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 690236,
+            "range": "±0.14%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 649699,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
