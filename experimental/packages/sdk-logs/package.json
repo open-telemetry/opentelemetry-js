@@ -69,8 +69,7 @@
   ],
   "sideEffects": false,
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.4.0 <1.9.0",
-    "@opentelemetry/api-logs": ">=0.39.1"
+    "@opentelemetry/api": ">=1.4.0 <1.9.0"
   },
   "devDependencies": {
     "@babel/core": "7.24.6",
@@ -102,7 +101,8 @@
     "webpack-merge": "5.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.24.1",
-    "@opentelemetry/resources": "1.24.1"
+    "@opentelemetry/api-logs": "0.51.0",
+    "@opentelemetry/core": "1.24.0",
+    "@opentelemetry/resources": "1.24.0"
   }
 }

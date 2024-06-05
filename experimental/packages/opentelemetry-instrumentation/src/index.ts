@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './autoLoader';
+export { registerInstrumentations } from './autoLoader';
 export { InstrumentationBase } from './platform/index';
 export { InstrumentationNodeModuleDefinition } from './instrumentationNodeModuleDefinition';
 export { InstrumentationNodeModuleFile } from './instrumentationNodeModuleFile';
