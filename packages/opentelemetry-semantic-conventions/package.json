@@ -26,7 +26,7 @@
         "./build/src/index.d.ts"
       ],
       "1.7": [
-        "./build/src/stable.d.ts"
+        "./build/src/1.7/index.d.ts"
       ]
     }
   },
