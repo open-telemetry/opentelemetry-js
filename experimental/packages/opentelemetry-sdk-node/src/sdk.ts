@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
 import {
-  InstrumentationOption,
+  Instrumentation,
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
@@ -51,10 +51,7 @@ import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import {
-  getResourceDetectorsFromEnv,
-  parseInstrumentationOptions,
-} from './utils';
+import { getResourceDetectorsFromEnv } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -85,7 +82,7 @@ export class NodeSDK {
   };
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
-  private _instrumentations: InstrumentationOption[];
+  private _instrumentations: Instrumentation[];
 
   private _resource: IResource;
   private _resourceDetectors: Array<Detector | DetectorSync>;
@@ -196,11 +193,7 @@ export class NodeSDK {
       this._meterProviderConfig = meterProviderConfig;
     }
 
-    let instrumentations: InstrumentationOption[] = [];
-    if (configuration.instrumentations) {
-      instrumentations = configuration.instrumentations;
-    }
-    this._instrumentations = instrumentations;
+    this._instrumentations = configuration.instrumentations?.flat() ?? [];
   }
 
   /**
@@ -289,9 +282,7 @@ export class NodeSDK {
       // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
       // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
       // This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
-      for (const instrumentation of parseInstrumentationOptions(
-        this._instrumentations
-      )) {
+      for (const instrumentation of this._instrumentations) {
         instrumentation.setMeterProvider(metrics.getMeterProvider());
       }
     }

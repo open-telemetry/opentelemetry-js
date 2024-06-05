@@ -26,7 +26,10 @@ import {
   timeInputToHrTime,
   urlMatches,
 } from '@opentelemetry/core';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+} from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
@@ -110,16 +113,13 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
   const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
   if (encodedLength !== undefined) {
-    span.setAttribute(
-      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
-      encodedLength
-    );
+    span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
   }
   const decodedLength = resource[PTN.DECODED_BODY_SIZE];
   // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
   if (decodedLength !== undefined && encodedLength !== decodedLength) {
     span.setAttribute(
-      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
       decodedLength
     );
   }
