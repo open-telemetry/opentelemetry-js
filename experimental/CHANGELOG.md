@@ -73,6 +73,7 @@ All notable changes to experimental packages in this project will be documented 
     * `InstrumentationBase`
     * `InstrumentationNodeModuleDefinition`
     * `InstrumentationNodeModuleFile`
+* feat(api-events): removed traceId and spanId from Event interface, added context and severityNumber [#4629](https://github.com/open-telemetry/opentelemetry-js/pull/4629)
 
 ### :rocket: (Enhancement)
 
@@ -85,6 +86,7 @@ All notable changes to experimental packages in this project will be documented 
   * The value can be overwritten by
     * merging a resource containing the `service.instance.id` attribute
     * using another resource detector which writes `service.instance.id`
+* feat(sdk-events): add Events SDK [#4629](https://github.com/open-telemetry/opentelemetry-js/pull/4629)
 
 ### :bug: (Bug Fix)
 
