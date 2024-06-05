@@ -12,6 +12,16 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.25.0
+
+### :rocket: (Enhancement)
+
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(context-zone*): support zone.js 0.12.x [#4376](https://github.com/open-telemetry/opentelemetry-js/pull/4736) @maldago
 * refactor(core): Use tree-shakeable string constants for semconv [#4739](https://github.com/open-telemetry/opentelemetry-js/pull/4739) @JohannesHuster
@@ -22,8 +32,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * refactor(resources): update deprecated semconv to use exported strings [#4755](https://github.com/open-telemetry/opentelemetry-js/pull/#4755) @JamieDanielson
 * refactor(exporters): update deprecated semconv to use exported strings [#4756](https://github.com/open-telemetry/opentelemetry-js/pull/#4756) @JamieDanielson
 
-### :bug: (Bug Fix)
-
 ### :books: (Refine Doc)
 
 * refactor(examples): use new exported string constants for semconv in examples/esm-http-ts [#4758](https://github.com/open-telemetry/opentelemetry-js/pull/4758) @Zen-cronic
@@ -32,8 +40,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * refactor(examples): use new exported string constants for semconv in examples/grpc-js [#4760](https://github.com/open-telemetry/opentelemetry-js/pull/4760#pull) @Zen-cronic
 * refactor(examples): use new exported string constants for semconv in examples/otlp-exporter-node [#4762](https://github.com/open-telemetry/opentelemetry-js/pull/4762) @Zen-cronic
 * refactor(examples): use new exported string constants for semconv in examples/opentracing-shim [#4761](https://github.com/open-telemetry/opentelemetry-js/pull/4761) @Zen-cronic
-
-### :house: (Internal)
 
 ## 1.24.1
 
