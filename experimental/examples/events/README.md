@@ -14,7 +14,7 @@ npm start
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on OpenTelemetry logs, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs>
+- For more information on OpenTelemetry logs, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-events>
 
 ## LICENSE
 

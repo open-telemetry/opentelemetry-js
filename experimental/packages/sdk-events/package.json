@@ -1,23 +1,17 @@
 {
-  "name": "@opentelemetry/sdk-logs",
+  "name": "@opentelemetry/sdk-events",
   "version": "0.51.1",
   "publishConfig": {
     "access": "public"
   },
-  "description": "OpenTelemetry logs SDK",
+  "description": "OpenTelemetry events SDK",
   "author": "OpenTelemetry Authors",
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-events",
   "license": "Apache-2.0",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
@@ -29,27 +23,28 @@
     "node": ">=14"
   },
   "scripts": {
-    "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
-    "test:browser": "karma start --single-run",
-    "tdd": "npm run test -- --watch-extensions ts --watch",
-    "tdd:browser": "karma start",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "version": "node ../../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "prepublishOnly": "npm run compile",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "prewatch": "npm run precompile",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test:browser": "karma start --single-run",
+    "version": "node ../../../scripts/version-update.js",
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json"
   },
   "keywords": [
     "opentelemetry",
     "nodejs",
-    "logs",
+    "browser",
+    "events",
     "stats",
     "profiling"
   ],
@@ -72,14 +67,15 @@
     "@opentelemetry/api": ">=1.4.0 <1.9.0"
   },
   "devDependencies": {
-    "@babel/core": "7.24.6",
-    "@babel/preset-env": "7.24.6",
-    "@opentelemetry/api": ">=1.4.0 <1.9.0",
+    "@babel/core": "7.22.20",
+    "@opentelemetry/api": "1.8.0",
     "@opentelemetry/api-logs": "0.51.1",
-    "@opentelemetry/resources_1.9.0": "npm:@opentelemetry/resources@1.9.0",
+    "@opentelemetry/api-events": "0.51.1",
     "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
-    "@types/sinon": "17.0.3",
+    "@types/sinon": "10.0.20",
+    "@types/webpack-env": "1.16.3",
+    "babel-loader": "8.3.0",
     "babel-plugin-istanbul": "6.1.1",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
@@ -101,8 +97,8 @@
     "webpack-merge": "5.10.0"
   },
   "dependencies": {
-    "@opentelemetry/api-logs": "0.51.0",
-    "@opentelemetry/core": "1.24.0",
-    "@opentelemetry/resources": "1.24.0"
+    "@opentelemetry/api-logs": "0.51.1",
+    "@opentelemetry/api-events": "0.51.1",
+    "@opentelemetry/sdk-logs": "0.51.1"
   }
 }
