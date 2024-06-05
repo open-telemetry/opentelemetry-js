@@ -25,7 +25,7 @@ import { createConstMap } from '../internal/utils';
 //----------------------------------------------------------------------------------------------------------
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
 const TMP_DB_SYSTEM = 'db.system';
 const TMP_DB_CONNECTION_STRING = 'db.connection_string';
@@ -172,26 +172,31 @@ const TMP_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
  * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
  *
  * Note: This may be different from `faas.id` if an alias is involved.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_LAMBDA_INVOKED_ARN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_LAMBDA_INVOKED_ARN = TMP_AWS_LAMBDA_INVOKED_ARN;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_SYSTEM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_SYSTEM = TMP_DB_SYSTEM;
 
 /**
  * The connection string used to connect to the database. It is recommended to remove embedded credentials.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CONNECTION_STRING } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CONNECTION_STRING = TMP_DB_CONNECTION_STRING;
 
 /**
  * Username for accessing the database.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_USER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_USER = TMP_DB_USER;
 
 /**
  * The fully-qualified class name of the [Java Database Connectivity (JDBC)](https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/) driver used to connect.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_JDBC_DRIVER_CLASSNAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
 
@@ -199,6 +204,7 @@ export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
  * If no [tech-specific attribute](#call-level-attributes-for-specific-technologies) is defined, this attribute is used to report the name of the database being accessed. For commands that switch the database, this should be set to the target database (even if the command fails).
  *
  * Note: In some SQL databases, the database name to be used is called &#34;schema name&#34;.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_NAME = TMP_DB_NAME;
 
@@ -206,6 +212,7 @@ export const SEMATTRS_DB_NAME = TMP_DB_NAME;
  * The database statement being executed.
  *
  * Note: The value may be sanitized to exclude sensitive information.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_STATEMENT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
 
@@ -213,6 +220,7 @@ export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
  * The name of the operation being executed, e.g. the [MongoDB command name](https://docs.mongodb.com/manual/reference/command/#database-operations) such as `findAndModify`, or the SQL keyword.
  *
  * Note: When setting this to an SQL keyword, it is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if the operation name is provided by the library being instrumented. If the SQL statement has an ambiguous operation, or performs more than one operation, this value may be omitted.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_OPERATION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
 
@@ -220,21 +228,25 @@ export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
  * The Microsoft SQL Server [instance name](https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15) connecting to. This name is used to determine the port of a named instance.
  *
  * Note: If setting a `db.mssql.instance_name`, `net.peer.port` is no longer required (but still recommended if non-standard).
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_MSSQL_INSTANCE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_MSSQL_INSTANCE_NAME = TMP_DB_MSSQL_INSTANCE_NAME;
 
 /**
  * The name of the keyspace being accessed. To be used instead of the generic `db.name` attribute.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_KEYSPACE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_KEYSPACE = TMP_DB_CASSANDRA_KEYSPACE;
 
 /**
  * The fetch size used for paging, i.e. how many rows will be returned at once.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_PAGE_SIZE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_PAGE_SIZE = TMP_DB_CASSANDRA_PAGE_SIZE;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
   TMP_DB_CASSANDRA_CONSISTENCY_LEVEL;
@@ -243,44 +255,52 @@ export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
  * The name of the primary table that the operation is acting upon, including the schema name (if applicable).
  *
  * Note: This mirrors the db.sql.table attribute but references cassandra rather than sql. It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_TABLE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_TABLE = TMP_DB_CASSANDRA_TABLE;
 
 /**
  * Whether or not the query is idempotent.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_IDEMPOTENCE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_IDEMPOTENCE = TMP_DB_CASSANDRA_IDEMPOTENCE;
 
 /**
  * The number of times a query was speculatively executed. Not set or `0` if the query was not executed speculatively.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
   TMP_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT;
 
 /**
  * The ID of the coordinating node for a query.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_COORDINATOR_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_COORDINATOR_ID =
   TMP_DB_CASSANDRA_COORDINATOR_ID;
 
 /**
  * The data center of the coordinating node for a query.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_CASSANDRA_COORDINATOR_DC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_CASSANDRA_COORDINATOR_DC =
   TMP_DB_CASSANDRA_COORDINATOR_DC;
 
 /**
  * The [HBase namespace](https://hbase.apache.org/book.html#_namespace) being accessed. To be used instead of the generic `db.name` attribute.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_HBASE_NAMESPACE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_HBASE_NAMESPACE = TMP_DB_HBASE_NAMESPACE;
 
 /**
  * The index of the database being accessed as used in the [`SELECT` command](https://redis.io/commands/select), provided as an integer. To be used instead of the generic `db.name` attribute.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_REDIS_DATABASE_INDEX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_REDIS_DATABASE_INDEX = TMP_DB_REDIS_DATABASE_INDEX;
 
 /**
  * The collection being accessed within the database stated in `db.name`.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_MONGODB_COLLECTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
 
@@ -288,21 +308,25 @@ export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
  * The name of the primary table that the operation is acting upon, including the schema name (if applicable).
  *
  * Note: It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
+ * @deprecated please import desired version directly like `import { SEMATTRS_DB_SQL_TABLE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_DB_SQL_TABLE = TMP_DB_SQL_TABLE;
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
+ * @deprecated please import desired version directly like `import { SEMATTRS_EXCEPTION_TYPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_EXCEPTION_TYPE = TMP_EXCEPTION_TYPE;
 
 /**
  * The exception message.
+ * @deprecated please import desired version directly like `import { SEMATTRS_EXCEPTION_MESSAGE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_EXCEPTION_MESSAGE = TMP_EXCEPTION_MESSAGE;
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+ * @deprecated please import desired version directly like `import { SEMATTRS_EXCEPTION_STACKTRACE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_EXCEPTION_STACKTRACE = TMP_EXCEPTION_STACKTRACE;
 
@@ -325,51 +349,61 @@ It follows that an exception may still escape the scope of the span
 even if the `exception.escaped` attribute was not set or set to false,
 since the event might have been recorded at a time where it was not
 clear whether the exception will escape.
+ * @deprecated please import desired version directly like `import { SEMATTRS_EXCEPTION_ESCAPED } from '@opentelemetry/semantic-conventions/1.7';`
 */
 export const SEMATTRS_EXCEPTION_ESCAPED = TMP_EXCEPTION_ESCAPED;
 
 /**
  * Type of the trigger on which the function is executed.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_TRIGGER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_TRIGGER = TMP_FAAS_TRIGGER;
 
 /**
  * The execution ID of the current function execution.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_EXECUTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_EXECUTION = TMP_FAAS_EXECUTION;
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_DOCUMENT_COLLECTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_DOCUMENT_COLLECTION = TMP_FAAS_DOCUMENT_COLLECTION;
 
 /**
  * Describes the type of the operation that was performed on the data.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_DOCUMENT_OPERATION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_DOCUMENT_OPERATION = TMP_FAAS_DOCUMENT_OPERATION;
 
 /**
  * A string containing the time when the data was accessed in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_DOCUMENT_TIME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_DOCUMENT_TIME = TMP_FAAS_DOCUMENT_TIME;
 
 /**
  * The document name/table subjected to the operation. For example, in Cloud Storage or S3 is the name of the file, and in Cosmos DB the table name.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_DOCUMENT_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_DOCUMENT_NAME = TMP_FAAS_DOCUMENT_NAME;
 
 /**
  * A string containing the function invocation time in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_TIME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_TIME = TMP_FAAS_TIME;
 
 /**
  * A string containing the schedule period as [Cron Expression](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm).
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_CRON } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_CRON = TMP_FAAS_CRON;
 
 /**
  * A boolean that is true if the serverless function is executed for the first time (aka cold-start).
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_COLDSTART } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
 
@@ -377,6 +411,7 @@ export const SEMATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
  * The name of the invoked function.
  *
  * Note: SHOULD be equal to the `faas.name` resource attribute of the invoked function.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_INVOKED_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
 
@@ -384,6 +419,7 @@ export const SEMATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
  * The cloud provider of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_INVOKED_PROVIDER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
 
@@ -391,127 +427,152 @@ export const SEMATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
  * The cloud region of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.region` resource attribute of the invoked function.
+ * @deprecated please import desired version directly like `import { SEMATTRS_FAAS_INVOKED_REGION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_FAAS_INVOKED_REGION = TMP_FAAS_INVOKED_REGION;
 
 /**
  * Transport protocol used. See note below.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_TRANSPORT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_TRANSPORT = TMP_NET_TRANSPORT;
 
 /**
  * Remote address of the peer (dotted decimal for IPv4 or [RFC5952](https://tools.ietf.org/html/rfc5952) for IPv6).
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_PEER_IP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_PEER_IP = TMP_NET_PEER_IP;
 
 /**
  * Remote port number.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_PEER_PORT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_PEER_PORT = TMP_NET_PEER_PORT;
 
 /**
  * Remote hostname or similar, see note below.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_PEER_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_PEER_NAME = TMP_NET_PEER_NAME;
 
 /**
  * Like `net.peer.ip` but for the host IP. Useful in case of a multi-IP host.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_IP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_IP = TMP_NET_HOST_IP;
 
 /**
  * Like `net.peer.port` but for the host port.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_PORT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_PORT = TMP_NET_HOST_PORT;
 
 /**
  * Local hostname or similar, see note below.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_NAME = TMP_NET_HOST_NAME;
 
 /**
  * The internet connection type currently being used by the host.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_CONNECTION_TYPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_CONNECTION_TYPE = TMP_NET_HOST_CONNECTION_TYPE;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_CONNECTION_SUBTYPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_CONNECTION_SUBTYPE =
   TMP_NET_HOST_CONNECTION_SUBTYPE;
 
 /**
  * The name of the mobile carrier.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_CARRIER_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_CARRIER_NAME = TMP_NET_HOST_CARRIER_NAME;
 
 /**
  * The mobile carrier country code.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_CARRIER_MCC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_CARRIER_MCC = TMP_NET_HOST_CARRIER_MCC;
 
 /**
  * The mobile carrier network code.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_CARRIER_MNC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_CARRIER_MNC = TMP_NET_HOST_CARRIER_MNC;
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
+ * @deprecated please import desired version directly like `import { SEMATTRS_NET_HOST_CARRIER_ICC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_NET_HOST_CARRIER_ICC = TMP_NET_HOST_CARRIER_ICC;
 
 /**
  * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
+ * @deprecated please import desired version directly like `import { SEMATTRS_PEER_SERVICE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_PEER_SERVICE = TMP_PEER_SERVICE;
 
 /**
  * Username or client_id extracted from the access token or [Authorization](https://tools.ietf.org/html/rfc7235#section-4.2) header in the inbound request from outside the system.
+ * @deprecated please import desired version directly like `import { SEMATTRS_ENDUSER_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_ENDUSER_ID = TMP_ENDUSER_ID;
 
 /**
  * Actual/assumed role the client is making the request under extracted from token or application security context.
+ * @deprecated please import desired version directly like `import { SEMATTRS_ENDUSER_ROLE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_ENDUSER_ROLE = TMP_ENDUSER_ROLE;
 
 /**
  * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
+ * @deprecated please import desired version directly like `import { SEMATTRS_ENDUSER_SCOPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_ENDUSER_SCOPE = TMP_ENDUSER_SCOPE;
 
 /**
  * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
+ * @deprecated please import desired version directly like `import { SEMATTRS_THREAD_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_THREAD_ID = TMP_THREAD_ID;
 
 /**
  * Current thread name.
+ * @deprecated please import desired version directly like `import { SEMATTRS_THREAD_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_THREAD_NAME = TMP_THREAD_NAME;
 
 /**
  * The method or function name, or equivalent (usually rightmost part of the code unit&#39;s name).
+ * @deprecated please import desired version directly like `import { SEMATTRS_CODE_FUNCTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_CODE_FUNCTION = TMP_CODE_FUNCTION;
 
 /**
  * The &#34;namespace&#34; within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
+ * @deprecated please import desired version directly like `import { SEMATTRS_CODE_NAMESPACE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_CODE_NAMESPACE = TMP_CODE_NAMESPACE;
 
 /**
  * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
+ * @deprecated please import desired version directly like `import { SEMATTRS_CODE_FILEPATH } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_CODE_FILEPATH = TMP_CODE_FILEPATH;
 
 /**
  * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
+ * @deprecated please import desired version directly like `import { SEMATTRS_CODE_LINENO } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_CODE_LINENO = TMP_CODE_LINENO;
 
 /**
  * HTTP request method.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_METHOD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
 
@@ -519,11 +580,13 @@ export const SEMATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
  * Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]`. Usually the fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
  *
  * Note: `http.url` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case the attribute&#39;s value should be `https://www.example.com/`.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_URL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_URL = TMP_HTTP_URL;
 
 /**
  * The full request target as passed in a HTTP request line or equivalent.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_TARGET } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
 
@@ -531,16 +594,19 @@ export const SEMATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
  * The value of the [HTTP host header](https://tools.ietf.org/html/rfc7230#section-5.4). An empty Host header should also be reported, see note.
  *
  * Note: When the header is present but empty the attribute SHOULD be set to the empty string. Note that this is a valid situation that is expected in certain cases, according the aforementioned [section of RFC 7230](https://tools.ietf.org/html/rfc7230#section-5.4). When the header is not set the attribute MUST NOT be set.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_HOST } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_HOST = TMP_HTTP_HOST;
 
 /**
  * The URI scheme identifying the used protocol.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_SCHEME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_SCHEME = TMP_HTTP_SCHEME;
 
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_STATUS_CODE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
 
@@ -548,34 +614,40 @@ export const SEMATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
  * Kind of HTTP protocol used.
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_FLAVOR } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_FLAVOR = TMP_HTTP_FLAVOR;
 
 /**
  * Value of the [HTTP User-Agent](https://tools.ietf.org/html/rfc7231#section-5.5.3) header sent by the client.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_USER_AGENT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_USER_AGENT = TMP_HTTP_USER_AGENT;
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH =
   TMP_HTTP_REQUEST_CONTENT_LENGTH;
 
 /**
  * The size of the uncompressed request payload body after transport decoding. Not set if transport encoding not used.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED =
   TMP_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED;
 
 /**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH =
   TMP_HTTP_RESPONSE_CONTENT_LENGTH;
 
 /**
  * The size of the uncompressed response payload body after transport decoding. Not set if transport encoding not used.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
   TMP_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED;
@@ -584,11 +656,13 @@ export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
  * The primary server name of the matched virtual host. This should be obtained via configuration. If no such configuration can be obtained, this attribute MUST NOT be set ( `net.host.name` should be used instead).
  *
  * Note: `http.url` is usually not readily available on the server side but would have to be assembled in a cumbersome and sometimes lossy process from other information (see e.g. open-telemetry/opentelemetry-python/pull/148). It is thus preferred to supply the raw data that is available.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_SERVER_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_SERVER_NAME = TMP_HTTP_SERVER_NAME;
 
 /**
  * The matched route (path template).
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_ROUTE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_HTTP_ROUTE = TMP_HTTP_ROUTE;
 
@@ -606,204 +680,241 @@ comes from a proxy, reverse proxy, or the actual client. Setting
 `http.client_ip` when it&#39;s the same as `net.peer.ip` means that
 one is at least somewhat confident that the address is not that of
 the closest proxy.
+ * @deprecated please import desired version directly like `import { SEMATTRS_HTTP_CLIENT_IP } from '@opentelemetry/semantic-conventions/1.7';`
 */
 export const SEMATTRS_HTTP_CLIENT_IP = TMP_HTTP_CLIENT_IP;
 
 /**
  * The keys in the `RequestItems` object field.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_TABLE_NAMES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_TABLE_NAMES = TMP_AWS_DYNAMODB_TABLE_NAMES;
 
 /**
  * The JSON-serialized value of each item in the `ConsumedCapacity` response field.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY =
   TMP_AWS_DYNAMODB_CONSUMED_CAPACITY;
 
 /**
  * The JSON-serialized value of the `ItemCollectionMetrics` response field.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
   TMP_AWS_DYNAMODB_ITEM_COLLECTION_METRICS;
 
 /**
  * The value of the `ProvisionedThroughput.ReadCapacityUnits` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
   TMP_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY;
 
 /**
  * The value of the `ProvisionedThroughput.WriteCapacityUnits` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
   TMP_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY;
 
 /**
  * The value of the `ConsistentRead` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_CONSISTENT_READ } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_CONSISTENT_READ =
   TMP_AWS_DYNAMODB_CONSISTENT_READ;
 
 /**
  * The value of the `ProjectionExpression` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_PROJECTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_PROJECTION = TMP_AWS_DYNAMODB_PROJECTION;
 
 /**
  * The value of the `Limit` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_LIMIT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_LIMIT = TMP_AWS_DYNAMODB_LIMIT;
 
 /**
  * The value of the `AttributesToGet` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET =
   TMP_AWS_DYNAMODB_ATTRIBUTES_TO_GET;
 
 /**
  * The value of the `IndexName` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_INDEX_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_INDEX_NAME = TMP_AWS_DYNAMODB_INDEX_NAME;
 
 /**
  * The value of the `Select` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_SELECT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_SELECT = TMP_AWS_DYNAMODB_SELECT;
 
 /**
  * The JSON-serialized value of each item of the `GlobalSecondaryIndexes` request field.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
   TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES;
 
 /**
  * The JSON-serialized value of each item of the `LocalSecondaryIndexes` request field.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
   TMP_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES;
 
 /**
  * The value of the `ExclusiveStartTableName` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
   TMP_AWS_DYNAMODB_EXCLUSIVE_START_TABLE;
 
 /**
  * The the number of items in the `TableNames` response parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_TABLE_COUNT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_TABLE_COUNT = TMP_AWS_DYNAMODB_TABLE_COUNT;
 
 /**
  * The value of the `ScanIndexForward` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_SCAN_FORWARD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_SCAN_FORWARD = TMP_AWS_DYNAMODB_SCAN_FORWARD;
 
 /**
  * The value of the `Segment` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_SEGMENT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_SEGMENT = TMP_AWS_DYNAMODB_SEGMENT;
 
 /**
  * The value of the `TotalSegments` request parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS =
   TMP_AWS_DYNAMODB_TOTAL_SEGMENTS;
 
 /**
  * The value of the `Count` response parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_COUNT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_COUNT = TMP_AWS_DYNAMODB_COUNT;
 
 /**
  * The value of the `ScannedCount` response parameter.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_SCANNED_COUNT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_SCANNED_COUNT =
   TMP_AWS_DYNAMODB_SCANNED_COUNT;
 
 /**
  * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
   TMP_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS;
 
 /**
  * The JSON-serialized value of each item in the the `GlobalSecondaryIndexUpdates` request field.
+ * @deprecated please import desired version directly like `import { SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
   TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES;
 
 /**
  * A string identifying the messaging system.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_SYSTEM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_SYSTEM = TMP_MESSAGING_SYSTEM;
 
 /**
  * The message destination name. This might be equal to the span name but is required nevertheless.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_DESTINATION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_DESTINATION = TMP_MESSAGING_DESTINATION;
 
 /**
  * The kind of message destination.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_DESTINATION_KIND } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_DESTINATION_KIND =
   TMP_MESSAGING_DESTINATION_KIND;
 
 /**
  * A boolean that is true if the message destination is temporary.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_TEMP_DESTINATION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_TEMP_DESTINATION =
   TMP_MESSAGING_TEMP_DESTINATION;
 
 /**
  * The name of the transport protocol.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_PROTOCOL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_PROTOCOL = TMP_MESSAGING_PROTOCOL;
 
 /**
  * The version of the transport protocol.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_PROTOCOL_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_PROTOCOL_VERSION =
   TMP_MESSAGING_PROTOCOL_VERSION;
 
 /**
  * Connection string.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_URL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_URL = TMP_MESSAGING_URL;
 
 /**
  * A value used by the messaging system as an identifier for the message, represented as a string.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_MESSAGE_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_MESSAGE_ID = TMP_MESSAGING_MESSAGE_ID;
 
 /**
  * The [conversation ID](#conversations) identifying the conversation to which the message belongs, represented as a string. Sometimes called &#34;Correlation ID&#34;.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_CONVERSATION_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_CONVERSATION_ID = TMP_MESSAGING_CONVERSATION_ID;
 
 /**
  * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES =
   TMP_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES;
 
 /**
  * The compressed size of the message payload in bytes.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES =
   TMP_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES;
 
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_OPERATION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_OPERATION = TMP_MESSAGING_OPERATION;
 
 /**
  * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer_group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer_group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_CONSUMER_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_CONSUMER_ID = TMP_MESSAGING_CONSUMER_ID;
 
 /**
  * RabbitMQ message routing key.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY =
   TMP_MESSAGING_RABBITMQ_ROUTING_KEY;
@@ -812,33 +923,39 @@ export const SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY =
  * Message keys in Kafka are used for grouping alike messages to ensure they&#39;re processed on the same partition. They differ from `messaging.message_id` in that they&#39;re not unique. If the key is `null`, the attribute MUST NOT be set.
  *
  * Note: If the key type is not string, it&#39;s string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don&#39;t include its value.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_KAFKA_MESSAGE_KEY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_KEY =
   TMP_MESSAGING_KAFKA_MESSAGE_KEY;
 
 /**
  * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP =
   TMP_MESSAGING_KAFKA_CONSUMER_GROUP;
 
 /**
  * Client Id for the Consumer or Producer that is handling the message.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_KAFKA_CLIENT_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_KAFKA_CLIENT_ID = TMP_MESSAGING_KAFKA_CLIENT_ID;
 
 /**
  * Partition the message is sent to.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_KAFKA_PARTITION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_KAFKA_PARTITION = TMP_MESSAGING_KAFKA_PARTITION;
 
 /**
  * A boolean that is true if the message is a tombstone.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGING_KAFKA_TOMBSTONE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGING_KAFKA_TOMBSTONE = TMP_MESSAGING_KAFKA_TOMBSTONE;
 
 /**
  * A string identifying the remoting system.
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_SYSTEM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
 
@@ -846,6 +963,7 @@ export const SEMATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
  * The full (logical) name of the service being called, including its package name, if applicable.
  *
  * Note: This is the logical name of the service from the RPC interface perspective, which can be different from the name of any implementing class. The `code.namespace` attribute may be used to store the latter (despite the attribute name, it may include a class name; e.g., class with method actually executing the call on the server side, RPC client stub class on the client side).
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_SERVICE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
 
@@ -853,36 +971,43 @@ export const SEMATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
  * The name of the (logical) method being called, must be equal to the $method part in the span name.
  *
  * Note: This is the logical name of the method from the RPC interface perspective, which can be different from the name of any implementing method/function. The `code.function` attribute may be used to store the latter (e.g., method actually executing the call on the server side, RPC client stub method on the client side).
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_METHOD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_METHOD = TMP_RPC_METHOD;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_GRPC_STATUS_CODE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_GRPC_STATUS_CODE = TMP_RPC_GRPC_STATUS_CODE;
 
 /**
  * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 does not specify this, the value can be omitted.
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_JSONRPC_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_JSONRPC_VERSION = TMP_RPC_JSONRPC_VERSION;
 
 /**
  * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_JSONRPC_REQUEST_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_JSONRPC_REQUEST_ID = TMP_RPC_JSONRPC_REQUEST_ID;
 
 /**
  * `error.code` property of response if it is an error response.
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_JSONRPC_ERROR_CODE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_JSONRPC_ERROR_CODE = TMP_RPC_JSONRPC_ERROR_CODE;
 
 /**
  * `error.message` property of response if it is an error response.
+ * @deprecated please import desired version directly like `import { SEMATTRS_RPC_JSONRPC_ERROR_MESSAGE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_RPC_JSONRPC_ERROR_MESSAGE = TMP_RPC_JSONRPC_ERROR_MESSAGE;
 
 /**
  * Whether this is a received or sent message.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGE_TYPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
 
@@ -890,16 +1015,19 @@ export const SEMATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
  * MUST be calculated as two different counters starting from `1` one for sent messages and one for received message.
  *
  * Note: This way we guarantee that the values will be consistent between different implementations.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGE_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGE_ID = TMP_MESSAGE_ID;
 
 /**
  * Compressed size of the message in bytes.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGE_COMPRESSED_SIZE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGE_COMPRESSED_SIZE = TMP_MESSAGE_COMPRESSED_SIZE;
 
 /**
  * Uncompressed size of the message in bytes.
+ * @deprecated please import desired version directly like `import { SEMATTRS_MESSAGE_UNCOMPRESSED_SIZE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMATTRS_MESSAGE_UNCOMPRESSED_SIZE = TMP_MESSAGE_UNCOMPRESSED_SIZE;
 
@@ -909,6 +1037,7 @@ export const SEMATTRS_MESSAGE_UNCOMPRESSED_SIZE = TMP_MESSAGE_UNCOMPRESSED_SIZE;
  * constants SemanticAttributes_XXXXX rather than the exported constant map. As any single reference
  * to a constant map value will result in all strings being included into your bundle.
  * @deprecated Use the SEMATTRS_XXXXX constants rather than the SemanticAttributes.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { SEMATTRS_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type SemanticAttributes = {
   /**
@@ -1619,7 +1748,6 @@ the closest proxy.
 
 /**
  * Create exported Value Map for SemanticAttributes values
- * @deprecated Use the SEMATTRS_XXXXX constants rather than the SemanticAttributes.XXXXX for bundle minification
  */
 export const SemanticAttributes: SemanticAttributes =
   /*#__PURE__*/ createConstMap<SemanticAttributes>([
@@ -1760,7 +1888,7 @@ export const SemanticAttributes: SemanticAttributes =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_DBSYSTEMVALUES_OTHER_SQL = 'other_sql';
 const TMP_DBSYSTEMVALUES_MSSQL = 'mssql';
 const TMP_DBSYSTEMVALUES_MYSQL = 'mysql';
@@ -1811,236 +1939,330 @@ const TMP_DBSYSTEMVALUES_COCKROACHDB = 'cockroachdb';
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_OTHER_SQL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_OTHER_SQL = TMP_DBSYSTEMVALUES_OTHER_SQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_MSSQL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_MSSQL = TMP_DBSYSTEMVALUES_MSSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_MYSQL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_MYSQL = TMP_DBSYSTEMVALUES_MYSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_ORACLE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_ORACLE = TMP_DBSYSTEMVALUES_ORACLE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_DB2 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_DB2 = TMP_DBSYSTEMVALUES_DB2;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_POSTGRESQL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_POSTGRESQL = TMP_DBSYSTEMVALUES_POSTGRESQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_REDSHIFT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_REDSHIFT = TMP_DBSYSTEMVALUES_REDSHIFT;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_HIVE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_HIVE = TMP_DBSYSTEMVALUES_HIVE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_CLOUDSCAPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_CLOUDSCAPE = TMP_DBSYSTEMVALUES_CLOUDSCAPE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_HSQLDB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_HSQLDB = TMP_DBSYSTEMVALUES_HSQLDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_PROGRESS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_PROGRESS = TMP_DBSYSTEMVALUES_PROGRESS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_MAXDB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_MAXDB = TMP_DBSYSTEMVALUES_MAXDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_HANADB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_HANADB = TMP_DBSYSTEMVALUES_HANADB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_INGRES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_INGRES = TMP_DBSYSTEMVALUES_INGRES;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_FIRSTSQL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_FIRSTSQL = TMP_DBSYSTEMVALUES_FIRSTSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_EDB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_EDB = TMP_DBSYSTEMVALUES_EDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_CACHE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_CACHE = TMP_DBSYSTEMVALUES_CACHE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_ADABAS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_ADABAS = TMP_DBSYSTEMVALUES_ADABAS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_FIREBIRD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_FIREBIRD = TMP_DBSYSTEMVALUES_FIREBIRD;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_DERBY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_DERBY = TMP_DBSYSTEMVALUES_DERBY;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_FILEMAKER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_FILEMAKER = TMP_DBSYSTEMVALUES_FILEMAKER;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_INFORMIX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_INFORMIX = TMP_DBSYSTEMVALUES_INFORMIX;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_INSTANTDB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_INSTANTDB = TMP_DBSYSTEMVALUES_INSTANTDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_INTERBASE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_INTERBASE = TMP_DBSYSTEMVALUES_INTERBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_MARIADB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_MARIADB = TMP_DBSYSTEMVALUES_MARIADB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_NETEZZA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_NETEZZA = TMP_DBSYSTEMVALUES_NETEZZA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_PERVASIVE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_PERVASIVE = TMP_DBSYSTEMVALUES_PERVASIVE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_POINTBASE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_POINTBASE = TMP_DBSYSTEMVALUES_POINTBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_SQLITE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_SQLITE = TMP_DBSYSTEMVALUES_SQLITE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_SYBASE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_SYBASE = TMP_DBSYSTEMVALUES_SYBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_TERADATA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_TERADATA = TMP_DBSYSTEMVALUES_TERADATA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_VERTICA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_VERTICA = TMP_DBSYSTEMVALUES_VERTICA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_H2 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_H2 = TMP_DBSYSTEMVALUES_H2;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_COLDFUSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_COLDFUSION = TMP_DBSYSTEMVALUES_COLDFUSION;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_CASSANDRA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_CASSANDRA = TMP_DBSYSTEMVALUES_CASSANDRA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_HBASE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_HBASE = TMP_DBSYSTEMVALUES_HBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_MONGODB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_MONGODB = TMP_DBSYSTEMVALUES_MONGODB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_REDIS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_REDIS = TMP_DBSYSTEMVALUES_REDIS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_COUCHBASE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_COUCHBASE = TMP_DBSYSTEMVALUES_COUCHBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_COUCHDB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_COUCHDB = TMP_DBSYSTEMVALUES_COUCHDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_COSMOSDB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_COSMOSDB = TMP_DBSYSTEMVALUES_COSMOSDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_DYNAMODB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_DYNAMODB = TMP_DBSYSTEMVALUES_DYNAMODB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_NEO4J } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_NEO4J = TMP_DBSYSTEMVALUES_NEO4J;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_GEODE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_GEODE = TMP_DBSYSTEMVALUES_GEODE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_ELASTICSEARCH } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_ELASTICSEARCH = TMP_DBSYSTEMVALUES_ELASTICSEARCH;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_MEMCACHED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_MEMCACHED = TMP_DBSYSTEMVALUES_MEMCACHED;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
+ *
+ * @deprecated please import desired version directly like `import { DBSYSTEMVALUES_COCKROACHDB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBSYSTEMVALUES_COCKROACHDB = TMP_DBSYSTEMVALUES_COCKROACHDB;
 
@@ -2049,6 +2271,7 @@ export const DBSYSTEMVALUES_COCKROACHDB = TMP_DBSYSTEMVALUES_COCKROACHDB;
  *
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  * @deprecated Use the DBSYSTEMVALUES_XXXXX constants rather than the DbSystemValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { DBSYSTEMVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type DbSystemValues = {
   /** Some other SQL database. Fallback only. See notes. */
@@ -2195,7 +2418,6 @@ export type DbSystemValues = {
 
 /**
  * The constant map of values for DbSystemValues.
- * @deprecated Use the DBSYSTEMVALUES_XXXXX constants rather than the DbSystemValues.XXXXX for bundle minification.
  */
 export const DbSystemValues: DbSystemValues =
   /*#__PURE__*/ createConstMap<DbSystemValues>([
@@ -2255,7 +2477,7 @@ export const DbSystemValues: DbSystemValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ALL = 'all';
 const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM = 'each_quorum';
 const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM = 'quorum';
@@ -2270,66 +2492,88 @@ const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL = 'local_serial';
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_ALL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ALL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ALL;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_ONE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ONE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ONE;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_TWO } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_TWO =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_TWO;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_THREE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_THREE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_THREE;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_ANY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ANY =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ANY;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+ *
+ * @deprecated please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL;
@@ -2339,6 +2583,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL =
  *
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  * @deprecated Use the DBCASSANDRACONSISTENCYLEVELVALUES_XXXXX constants rather than the DbCassandraConsistencyLevelValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { DBCASSANDRACONSISTENCYLEVELVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type DbCassandraConsistencyLevelValues = {
   /** all. */
@@ -2377,7 +2622,6 @@ export type DbCassandraConsistencyLevelValues = {
 
 /**
  * The constant map of values for DbCassandraConsistencyLevelValues.
- * @deprecated Use the DBCASSANDRACONSISTENCYLEVELVALUES_XXXXX constants rather than the DbCassandraConsistencyLevelValues.XXXXX for bundle minification.
  */
 export const DbCassandraConsistencyLevelValues: DbCassandraConsistencyLevelValues =
   /*#__PURE__*/ createConstMap<DbCassandraConsistencyLevelValues>([
@@ -2401,7 +2645,7 @@ export const DbCassandraConsistencyLevelValues: DbCassandraConsistencyLevelValue
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_FAASTRIGGERVALUES_DATASOURCE = 'datasource';
 const TMP_FAASTRIGGERVALUES_HTTP = 'http';
 const TMP_FAASTRIGGERVALUES_PUBSUB = 'pubsub';
@@ -2410,26 +2654,36 @@ const TMP_FAASTRIGGERVALUES_OTHER = 'other';
 
 /**
  * Type of the trigger on which the function is executed.
+ *
+ * @deprecated please import desired version directly like `import { FAASTRIGGERVALUES_DATASOURCE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASTRIGGERVALUES_DATASOURCE = TMP_FAASTRIGGERVALUES_DATASOURCE;
 
 /**
  * Type of the trigger on which the function is executed.
+ *
+ * @deprecated please import desired version directly like `import { FAASTRIGGERVALUES_HTTP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASTRIGGERVALUES_HTTP = TMP_FAASTRIGGERVALUES_HTTP;
 
 /**
  * Type of the trigger on which the function is executed.
+ *
+ * @deprecated please import desired version directly like `import { FAASTRIGGERVALUES_PUBSUB } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASTRIGGERVALUES_PUBSUB = TMP_FAASTRIGGERVALUES_PUBSUB;
 
 /**
  * Type of the trigger on which the function is executed.
+ *
+ * @deprecated please import desired version directly like `import { FAASTRIGGERVALUES_TIMER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASTRIGGERVALUES_TIMER = TMP_FAASTRIGGERVALUES_TIMER;
 
 /**
  * Type of the trigger on which the function is executed.
+ *
+ * @deprecated please import desired version directly like `import { FAASTRIGGERVALUES_OTHER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASTRIGGERVALUES_OTHER = TMP_FAASTRIGGERVALUES_OTHER;
 
@@ -2438,6 +2692,7 @@ export const FAASTRIGGERVALUES_OTHER = TMP_FAASTRIGGERVALUES_OTHER;
  *
  * Type of the trigger on which the function is executed.
  * @deprecated Use the FAASTRIGGERVALUES_XXXXX constants rather than the FaasTriggerValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { FAASTRIGGERVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type FaasTriggerValues = {
   /** A response to some data source operation such as a database or filesystem read/write. */
@@ -2458,7 +2713,6 @@ export type FaasTriggerValues = {
 
 /**
  * The constant map of values for FaasTriggerValues.
- * @deprecated Use the FAASTRIGGERVALUES_XXXXX constants rather than the FaasTriggerValues.XXXXX for bundle minification.
  */
 export const FaasTriggerValues: FaasTriggerValues =
   /*#__PURE__*/ createConstMap<FaasTriggerValues>([
@@ -2476,25 +2730,31 @@ export const FaasTriggerValues: FaasTriggerValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_FAASDOCUMENTOPERATIONVALUES_INSERT = 'insert';
 const TMP_FAASDOCUMENTOPERATIONVALUES_EDIT = 'edit';
 const TMP_FAASDOCUMENTOPERATIONVALUES_DELETE = 'delete';
 
 /**
  * Describes the type of the operation that was performed on the data.
+ *
+ * @deprecated please import desired version directly like `import { FAASDOCUMENTOPERATIONVALUES_INSERT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASDOCUMENTOPERATIONVALUES_INSERT =
   TMP_FAASDOCUMENTOPERATIONVALUES_INSERT;
 
 /**
  * Describes the type of the operation that was performed on the data.
+ *
+ * @deprecated please import desired version directly like `import { FAASDOCUMENTOPERATIONVALUES_EDIT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASDOCUMENTOPERATIONVALUES_EDIT =
   TMP_FAASDOCUMENTOPERATIONVALUES_EDIT;
 
 /**
  * Describes the type of the operation that was performed on the data.
+ *
+ * @deprecated please import desired version directly like `import { FAASDOCUMENTOPERATIONVALUES_DELETE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASDOCUMENTOPERATIONVALUES_DELETE =
   TMP_FAASDOCUMENTOPERATIONVALUES_DELETE;
@@ -2504,6 +2764,7 @@ export const FAASDOCUMENTOPERATIONVALUES_DELETE =
  *
  * Describes the type of the operation that was performed on the data.
  * @deprecated Use the FAASDOCUMENTOPERATIONVALUES_XXXXX constants rather than the FaasDocumentOperationValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { FAASDOCUMENTOPERATIONVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type FaasDocumentOperationValues = {
   /** When a new object is created. */
@@ -2518,7 +2779,6 @@ export type FaasDocumentOperationValues = {
 
 /**
  * The constant map of values for FaasDocumentOperationValues.
- * @deprecated Use the FAASDOCUMENTOPERATIONVALUES_XXXXX constants rather than the FaasDocumentOperationValues.XXXXX for bundle minification.
  */
 export const FaasDocumentOperationValues: FaasDocumentOperationValues =
   /*#__PURE__*/ createConstMap<FaasDocumentOperationValues>([
@@ -2536,7 +2796,7 @@ export const FaasDocumentOperationValues: FaasDocumentOperationValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD = 'alibaba_cloud';
 const TMP_FAASINVOKEDPROVIDERVALUES_AWS = 'aws';
 const TMP_FAASINVOKEDPROVIDERVALUES_AZURE = 'azure';
@@ -2546,6 +2806,8 @@ const TMP_FAASINVOKEDPROVIDERVALUES_GCP = 'gcp';
  * The cloud provider of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ *
+ * @deprecated please import desired version directly like `import { FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD =
   TMP_FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD;
@@ -2554,6 +2816,8 @@ export const FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD =
  * The cloud provider of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ *
+ * @deprecated please import desired version directly like `import { FAASINVOKEDPROVIDERVALUES_AWS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASINVOKEDPROVIDERVALUES_AWS = TMP_FAASINVOKEDPROVIDERVALUES_AWS;
 
@@ -2561,6 +2825,8 @@ export const FAASINVOKEDPROVIDERVALUES_AWS = TMP_FAASINVOKEDPROVIDERVALUES_AWS;
  * The cloud provider of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ *
+ * @deprecated please import desired version directly like `import { FAASINVOKEDPROVIDERVALUES_AZURE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASINVOKEDPROVIDERVALUES_AZURE =
   TMP_FAASINVOKEDPROVIDERVALUES_AZURE;
@@ -2569,6 +2835,8 @@ export const FAASINVOKEDPROVIDERVALUES_AZURE =
  * The cloud provider of the invoked function.
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ *
+ * @deprecated please import desired version directly like `import { FAASINVOKEDPROVIDERVALUES_GCP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const FAASINVOKEDPROVIDERVALUES_GCP = TMP_FAASINVOKEDPROVIDERVALUES_GCP;
 
@@ -2579,6 +2847,7 @@ export const FAASINVOKEDPROVIDERVALUES_GCP = TMP_FAASINVOKEDPROVIDERVALUES_GCP;
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  * @deprecated Use the FAASINVOKEDPROVIDERVALUES_XXXXX constants rather than the FaasInvokedProviderValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { FAASINVOKEDPROVIDERVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type FaasInvokedProviderValues = {
   /** Alibaba Cloud. */
@@ -2596,7 +2865,6 @@ export type FaasInvokedProviderValues = {
 
 /**
  * The constant map of values for FaasInvokedProviderValues.
- * @deprecated Use the FAASINVOKEDPROVIDERVALUES_XXXXX constants rather than the FaasInvokedProviderValues.XXXXX for bundle minification.
  */
 export const FaasInvokedProviderValues: FaasInvokedProviderValues =
   /*#__PURE__*/ createConstMap<FaasInvokedProviderValues>([
@@ -2613,7 +2881,7 @@ export const FaasInvokedProviderValues: FaasInvokedProviderValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_NETTRANSPORTVALUES_IP_TCP = 'ip_tcp';
 const TMP_NETTRANSPORTVALUES_IP_UDP = 'ip_udp';
 const TMP_NETTRANSPORTVALUES_IP = 'ip';
@@ -2624,36 +2892,50 @@ const TMP_NETTRANSPORTVALUES_OTHER = 'other';
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated please import desired version directly like `import { NETTRANSPORTVALUES_IP_TCP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETTRANSPORTVALUES_IP_TCP = TMP_NETTRANSPORTVALUES_IP_TCP;
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated please import desired version directly like `import { NETTRANSPORTVALUES_IP_UDP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETTRANSPORTVALUES_IP_UDP = TMP_NETTRANSPORTVALUES_IP_UDP;
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated please import desired version directly like `import { NETTRANSPORTVALUES_IP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETTRANSPORTVALUES_IP = TMP_NETTRANSPORTVALUES_IP;
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated please import desired version directly like `import { NETTRANSPORTVALUES_UNIX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETTRANSPORTVALUES_UNIX = TMP_NETTRANSPORTVALUES_UNIX;
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated please import desired version directly like `import { NETTRANSPORTVALUES_PIPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETTRANSPORTVALUES_PIPE = TMP_NETTRANSPORTVALUES_PIPE;
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated please import desired version directly like `import { NETTRANSPORTVALUES_INPROC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETTRANSPORTVALUES_INPROC = TMP_NETTRANSPORTVALUES_INPROC;
 
 /**
  * Transport protocol used. See note below.
+ *
+ * @deprecated please import desired version directly like `import { NETTRANSPORTVALUES_OTHER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETTRANSPORTVALUES_OTHER = TMP_NETTRANSPORTVALUES_OTHER;
 
@@ -2662,6 +2944,7 @@ export const NETTRANSPORTVALUES_OTHER = TMP_NETTRANSPORTVALUES_OTHER;
  *
  * Transport protocol used. See note below.
  * @deprecated Use the NETTRANSPORTVALUES_XXXXX constants rather than the NetTransportValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { NETTRANSPORTVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type NetTransportValues = {
   /** ip_tcp. */
@@ -2688,7 +2971,6 @@ export type NetTransportValues = {
 
 /**
  * The constant map of values for NetTransportValues.
- * @deprecated Use the NETTRANSPORTVALUES_XXXXX constants rather than the NetTransportValues.XXXXX for bundle minification.
  */
 export const NetTransportValues: NetTransportValues =
   /*#__PURE__*/ createConstMap<NetTransportValues>([
@@ -2708,7 +2990,7 @@ export const NetTransportValues: NetTransportValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_NETHOSTCONNECTIONTYPEVALUES_WIFI = 'wifi';
 const TMP_NETHOSTCONNECTIONTYPEVALUES_WIRED = 'wired';
 const TMP_NETHOSTCONNECTIONTYPEVALUES_CELL = 'cell';
@@ -2717,30 +2999,40 @@ const TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN = 'unknown';
 
 /**
  * The internet connection type currently being used by the host.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONTYPEVALUES_WIFI } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIFI =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIFI;
 
 /**
  * The internet connection type currently being used by the host.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONTYPEVALUES_WIRED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIRED =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIRED;
 
 /**
  * The internet connection type currently being used by the host.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONTYPEVALUES_CELL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONTYPEVALUES_CELL =
   TMP_NETHOSTCONNECTIONTYPEVALUES_CELL;
 
 /**
  * The internet connection type currently being used by the host.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE;
 
 /**
  * The internet connection type currently being used by the host.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONTYPEVALUES_UNKNOWN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNKNOWN =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN;
@@ -2750,6 +3042,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_UNKNOWN =
  *
  * The internet connection type currently being used by the host.
  * @deprecated Use the NETHOSTCONNECTIONTYPEVALUES_XXXXX constants rather than the NetHostConnectionTypeValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { NETHOSTCONNECTIONTYPEVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type NetHostConnectionTypeValues = {
   /** wifi. */
@@ -2770,7 +3063,6 @@ export type NetHostConnectionTypeValues = {
 
 /**
  * The constant map of values for NetHostConnectionTypeValues.
- * @deprecated Use the NETHOSTCONNECTIONTYPEVALUES_XXXXX constants rather than the NetHostConnectionTypeValues.XXXXX for bundle minification.
  */
 export const NetHostConnectionTypeValues: NetHostConnectionTypeValues =
   /*#__PURE__*/ createConstMap<NetHostConnectionTypeValues>([
@@ -2788,7 +3080,7 @@ export const NetHostConnectionTypeValues: NetHostConnectionTypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GPRS = 'gprs';
 const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EDGE = 'edge';
 const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_UMTS = 'umts';
@@ -2813,126 +3105,168 @@ const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA = 'lte_ca';
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_GPRS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GPRS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GPRS;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_EDGE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EDGE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EDGE;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_UMTS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_UMTS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_UMTS;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_CDMA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_HSPA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPA;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_IDEN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IDEN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IDEN;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_LTE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_GSM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GSM =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GSM;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_NR } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NR =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NR;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+ *
+ * @deprecated please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA;
@@ -2942,6 +3276,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA =
  *
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  * @deprecated Use the NETHOSTCONNECTIONSUBTYPEVALUES_XXXXX constants rather than the NetHostConnectionSubtypeValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { NETHOSTCONNECTIONSUBTYPEVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type NetHostConnectionSubtypeValues = {
   /** GPRS. */
@@ -3010,7 +3345,6 @@ export type NetHostConnectionSubtypeValues = {
 
 /**
  * The constant map of values for NetHostConnectionSubtypeValues.
- * @deprecated Use the NETHOSTCONNECTIONSUBTYPEVALUES_XXXXX constants rather than the NetHostConnectionSubtypeValues.XXXXX for bundle minification.
  */
 export const NetHostConnectionSubtypeValues: NetHostConnectionSubtypeValues =
   /*#__PURE__*/ createConstMap<NetHostConnectionSubtypeValues>([
@@ -3046,7 +3380,7 @@ export const NetHostConnectionSubtypeValues: NetHostConnectionSubtypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_HTTPFLAVORVALUES_HTTP_1_0 = '1.0';
 const TMP_HTTPFLAVORVALUES_HTTP_1_1 = '1.1';
 const TMP_HTTPFLAVORVALUES_HTTP_2_0 = '2.0';
@@ -3057,6 +3391,8 @@ const TMP_HTTPFLAVORVALUES_QUIC = 'QUIC';
  * Kind of HTTP protocol used.
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
+ *
+ * @deprecated please import desired version directly like `import { HTTPFLAVORVALUES_HTTP_1_0 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HTTPFLAVORVALUES_HTTP_1_0 = TMP_HTTPFLAVORVALUES_HTTP_1_0;
 
@@ -3064,6 +3400,8 @@ export const HTTPFLAVORVALUES_HTTP_1_0 = TMP_HTTPFLAVORVALUES_HTTP_1_0;
  * Kind of HTTP protocol used.
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
+ *
+ * @deprecated please import desired version directly like `import { HTTPFLAVORVALUES_HTTP_1_1 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HTTPFLAVORVALUES_HTTP_1_1 = TMP_HTTPFLAVORVALUES_HTTP_1_1;
 
@@ -3071,6 +3409,8 @@ export const HTTPFLAVORVALUES_HTTP_1_1 = TMP_HTTPFLAVORVALUES_HTTP_1_1;
  * Kind of HTTP protocol used.
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
+ *
+ * @deprecated please import desired version directly like `import { HTTPFLAVORVALUES_HTTP_2_0 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HTTPFLAVORVALUES_HTTP_2_0 = TMP_HTTPFLAVORVALUES_HTTP_2_0;
 
@@ -3078,6 +3418,8 @@ export const HTTPFLAVORVALUES_HTTP_2_0 = TMP_HTTPFLAVORVALUES_HTTP_2_0;
  * Kind of HTTP protocol used.
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
+ *
+ * @deprecated please import desired version directly like `import { HTTPFLAVORVALUES_SPDY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HTTPFLAVORVALUES_SPDY = TMP_HTTPFLAVORVALUES_SPDY;
 
@@ -3085,6 +3427,8 @@ export const HTTPFLAVORVALUES_SPDY = TMP_HTTPFLAVORVALUES_SPDY;
  * Kind of HTTP protocol used.
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
+ *
+ * @deprecated please import desired version directly like `import { HTTPFLAVORVALUES_QUIC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HTTPFLAVORVALUES_QUIC = TMP_HTTPFLAVORVALUES_QUIC;
 
@@ -3095,6 +3439,7 @@ export const HTTPFLAVORVALUES_QUIC = TMP_HTTPFLAVORVALUES_QUIC;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  * @deprecated Use the HTTPFLAVORVALUES_XXXXX constants rather than the HttpFlavorValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { HTTPFLAVORVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type HttpFlavorValues = {
   /** HTTP 1.0. */
@@ -3115,7 +3460,6 @@ export type HttpFlavorValues = {
 
 /**
  * The constant map of values for HttpFlavorValues.
- * @deprecated Use the HTTPFLAVORVALUES_XXXXX constants rather than the HttpFlavorValues.XXXXX for bundle minification.
  */
 export const HttpFlavorValues: HttpFlavorValues = {
   HTTP_1_0: TMP_HTTPFLAVORVALUES_HTTP_1_0,
@@ -3132,18 +3476,22 @@ export const HttpFlavorValues: HttpFlavorValues = {
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_MESSAGINGDESTINATIONKINDVALUES_QUEUE = 'queue';
 const TMP_MESSAGINGDESTINATIONKINDVALUES_TOPIC = 'topic';
 
 /**
  * The kind of message destination.
+ *
+ * @deprecated please import desired version directly like `import { MESSAGINGDESTINATIONKINDVALUES_QUEUE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const MESSAGINGDESTINATIONKINDVALUES_QUEUE =
   TMP_MESSAGINGDESTINATIONKINDVALUES_QUEUE;
 
 /**
  * The kind of message destination.
+ *
+ * @deprecated please import desired version directly like `import { MESSAGINGDESTINATIONKINDVALUES_TOPIC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const MESSAGINGDESTINATIONKINDVALUES_TOPIC =
   TMP_MESSAGINGDESTINATIONKINDVALUES_TOPIC;
@@ -3153,6 +3501,7 @@ export const MESSAGINGDESTINATIONKINDVALUES_TOPIC =
  *
  * The kind of message destination.
  * @deprecated Use the MESSAGINGDESTINATIONKINDVALUES_XXXXX constants rather than the MessagingDestinationKindValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { MESSAGINGDESTINATIONKINDVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type MessagingDestinationKindValues = {
   /** A message sent to a queue. */
@@ -3164,7 +3513,6 @@ export type MessagingDestinationKindValues = {
 
 /**
  * The constant map of values for MessagingDestinationKindValues.
- * @deprecated Use the MESSAGINGDESTINATIONKINDVALUES_XXXXX constants rather than the MessagingDestinationKindValues.XXXXX for bundle minification.
  */
 export const MessagingDestinationKindValues: MessagingDestinationKindValues =
   /*#__PURE__*/ createConstMap<MessagingDestinationKindValues>([
@@ -3179,18 +3527,22 @@ export const MessagingDestinationKindValues: MessagingDestinationKindValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_MESSAGINGOPERATIONVALUES_RECEIVE = 'receive';
 const TMP_MESSAGINGOPERATIONVALUES_PROCESS = 'process';
 
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
+ *
+ * @deprecated please import desired version directly like `import { MESSAGINGOPERATIONVALUES_RECEIVE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const MESSAGINGOPERATIONVALUES_RECEIVE =
   TMP_MESSAGINGOPERATIONVALUES_RECEIVE;
 
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
+ *
+ * @deprecated please import desired version directly like `import { MESSAGINGOPERATIONVALUES_PROCESS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const MESSAGINGOPERATIONVALUES_PROCESS =
   TMP_MESSAGINGOPERATIONVALUES_PROCESS;
@@ -3200,6 +3552,7 @@ export const MESSAGINGOPERATIONVALUES_PROCESS =
  *
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  * @deprecated Use the MESSAGINGOPERATIONVALUES_XXXXX constants rather than the MessagingOperationValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { MESSAGINGOPERATIONVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type MessagingOperationValues = {
   /** receive. */
@@ -3211,7 +3564,6 @@ export type MessagingOperationValues = {
 
 /**
  * The constant map of values for MessagingOperationValues.
- * @deprecated Use the MESSAGINGOPERATIONVALUES_XXXXX constants rather than the MessagingOperationValues.XXXXX for bundle minification.
  */
 export const MessagingOperationValues: MessagingOperationValues =
   /*#__PURE__*/ createConstMap<MessagingOperationValues>([
@@ -3226,7 +3578,7 @@ export const MessagingOperationValues: MessagingOperationValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_RPCGRPCSTATUSCODEVALUES_OK = 0;
 const TMP_RPCGRPCSTATUSCODEVALUES_CANCELLED = 1;
 const TMP_RPCGRPCSTATUSCODEVALUES_UNKNOWN = 2;
@@ -3247,101 +3599,135 @@ const TMP_RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED = 16;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_OK } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_OK = TMP_RPCGRPCSTATUSCODEVALUES_OK;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_CANCELLED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_CANCELLED =
   TMP_RPCGRPCSTATUSCODEVALUES_CANCELLED;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_UNKNOWN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_UNKNOWN =
   TMP_RPCGRPCSTATUSCODEVALUES_UNKNOWN;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT =
   TMP_RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED =
   TMP_RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_NOT_FOUND } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_NOT_FOUND =
   TMP_RPCGRPCSTATUSCODEVALUES_NOT_FOUND;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS =
   TMP_RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED =
   TMP_RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED =
   TMP_RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION =
   TMP_RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_ABORTED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_ABORTED =
   TMP_RPCGRPCSTATUSCODEVALUES_ABORTED;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE =
   TMP_RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED =
   TMP_RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_INTERNAL } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_INTERNAL =
   TMP_RPCGRPCSTATUSCODEVALUES_INTERNAL;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_UNAVAILABLE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_UNAVAILABLE =
   TMP_RPCGRPCSTATUSCODEVALUES_UNAVAILABLE;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_DATA_LOSS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_DATA_LOSS =
   TMP_RPCGRPCSTATUSCODEVALUES_DATA_LOSS;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
+ *
+ * @deprecated please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED =
   TMP_RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED;
@@ -3351,6 +3737,7 @@ export const RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED =
  *
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  * @deprecated Use the RPCGRPCSTATUSCODEVALUES_XXXXX constants rather than the RpcGrpcStatusCodeValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { RPCGRPCSTATUSCODEVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type RpcGrpcStatusCodeValues = {
   /** OK. */
@@ -3407,7 +3794,6 @@ export type RpcGrpcStatusCodeValues = {
 
 /**
  * The constant map of values for RpcGrpcStatusCodeValues.
- * @deprecated Use the RPCGRPCSTATUSCODEVALUES_XXXXX constants rather than the RpcGrpcStatusCodeValues.XXXXX for bundle minification.
  */
 export const RpcGrpcStatusCodeValues: RpcGrpcStatusCodeValues = {
   OK: TMP_RPCGRPCSTATUSCODEVALUES_OK,
@@ -3436,17 +3822,21 @@ export const RpcGrpcStatusCodeValues: RpcGrpcStatusCodeValues = {
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_MESSAGETYPEVALUES_SENT = 'SENT';
 const TMP_MESSAGETYPEVALUES_RECEIVED = 'RECEIVED';
 
 /**
  * Whether this is a received or sent message.
+ *
+ * @deprecated please import desired version directly like `import { MESSAGETYPEVALUES_SENT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const MESSAGETYPEVALUES_SENT = TMP_MESSAGETYPEVALUES_SENT;
 
 /**
  * Whether this is a received or sent message.
+ *
+ * @deprecated please import desired version directly like `import { MESSAGETYPEVALUES_RECEIVED } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const MESSAGETYPEVALUES_RECEIVED = TMP_MESSAGETYPEVALUES_RECEIVED;
 
@@ -3455,6 +3845,7 @@ export const MESSAGETYPEVALUES_RECEIVED = TMP_MESSAGETYPEVALUES_RECEIVED;
  *
  * Whether this is a received or sent message.
  * @deprecated Use the MESSAGETYPEVALUES_XXXXX constants rather than the MessageTypeValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { MESSAGETYPEVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type MessageTypeValues = {
   /** sent. */
@@ -3466,7 +3857,6 @@ export type MessageTypeValues = {
 
 /**
  * The constant map of values for MessageTypeValues.
- * @deprecated Use the MESSAGETYPEVALUES_XXXXX constants rather than the MessageTypeValues.XXXXX for bundle minification.
  */
 export const MessageTypeValues: MessageTypeValues =
   /*#__PURE__*/ createConstMap<MessageTypeValues>([

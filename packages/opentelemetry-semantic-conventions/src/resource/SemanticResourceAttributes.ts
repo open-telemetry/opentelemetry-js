@@ -25,7 +25,7 @@ import { createConstMap } from '../internal/utils';
 //----------------------------------------------------------------------------------------------------------
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_CLOUD_PROVIDER = 'cloud.provider';
 const TMP_CLOUD_ACCOUNT_ID = 'cloud.account.id';
 const TMP_CLOUD_REGION = 'cloud.region';
@@ -110,16 +110,19 @@ const TMP_WEBENGINE_DESCRIPTION = 'webengine.description';
 
 /**
  * Name of the cloud provider.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CLOUD_PROVIDER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CLOUD_PROVIDER = TMP_CLOUD_PROVIDER;
 
 /**
  * The cloud account ID the resource is assigned to.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CLOUD_ACCOUNT_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CLOUD_ACCOUNT_ID = TMP_CLOUD_ACCOUNT_ID;
 
 /**
  * The geographical region the resource is running. Refer to your provider&#39;s docs to see the available regions, for example [Alibaba Cloud regions](https://www.alibabacloud.com/help/doc-detail/40654.htm), [AWS regions](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/), [Azure regions](https://azure.microsoft.com/en-us/global-infrastructure/geographies/), or [Google Cloud regions](https://cloud.google.com/about/locations).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CLOUD_REGION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CLOUD_REGION = TMP_CLOUD_REGION;
 
@@ -127,6 +130,7 @@ export const SEMRESATTRS_CLOUD_REGION = TMP_CLOUD_REGION;
  * Cloud regions often have multiple, isolated locations known as zones to increase availability. Availability zone represents the zone where the resource is running.
  *
  * Note: Availability zones are called &#34;zones&#34; on Alibaba Cloud and Google Cloud.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CLOUD_AVAILABILITY_ZONE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CLOUD_AVAILABILITY_ZONE = TMP_CLOUD_AVAILABILITY_ZONE;
 
@@ -134,41 +138,49 @@ export const SEMRESATTRS_CLOUD_AVAILABILITY_ZONE = TMP_CLOUD_AVAILABILITY_ZONE;
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CLOUD_PLATFORM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CLOUD_PLATFORM = TMP_CLOUD_PLATFORM;
 
 /**
  * The Amazon Resource Name (ARN) of an [ECS container instance](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_ECS_CONTAINER_ARN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_ECS_CONTAINER_ARN = TMP_AWS_ECS_CONTAINER_ARN;
 
 /**
  * The ARN of an [ECS cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_ECS_CLUSTER_ARN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_ECS_CLUSTER_ARN = TMP_AWS_ECS_CLUSTER_ARN;
 
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_ECS_LAUNCHTYPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_ECS_LAUNCHTYPE = TMP_AWS_ECS_LAUNCHTYPE;
 
 /**
  * The ARN of an [ECS task definition](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_ECS_TASK_ARN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_ECS_TASK_ARN = TMP_AWS_ECS_TASK_ARN;
 
 /**
  * The task definition family this task definition is a member of.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_ECS_TASK_FAMILY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_ECS_TASK_FAMILY = TMP_AWS_ECS_TASK_FAMILY;
 
 /**
  * The revision for this task definition.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_ECS_TASK_REVISION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_ECS_TASK_REVISION = TMP_AWS_ECS_TASK_REVISION;
 
 /**
  * The ARN of an EKS cluster.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_EKS_CLUSTER_ARN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_EKS_CLUSTER_ARN = TMP_AWS_EKS_CLUSTER_ARN;
 
@@ -176,6 +188,7 @@ export const SEMRESATTRS_AWS_EKS_CLUSTER_ARN = TMP_AWS_EKS_CLUSTER_ARN;
  * The name(s) of the AWS log group(s) an application is writing to.
  *
  * Note: Multiple log groups must be supported for cases like multi-container applications, where a single application has sidecar containers, and each write to their own log group.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_LOG_GROUP_NAMES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_LOG_GROUP_NAMES = TMP_AWS_LOG_GROUP_NAMES;
 
@@ -183,11 +196,13 @@ export const SEMRESATTRS_AWS_LOG_GROUP_NAMES = TMP_AWS_LOG_GROUP_NAMES;
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
  *
  * Note: See the [log group ARN format documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_LOG_GROUP_ARNS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_LOG_GROUP_ARNS = TMP_AWS_LOG_GROUP_ARNS;
 
 /**
  * The name(s) of the AWS log stream(s) an application is writing to.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_LOG_STREAM_NAMES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_LOG_STREAM_NAMES = TMP_AWS_LOG_STREAM_NAMES;
 
@@ -195,36 +210,43 @@ export const SEMRESATTRS_AWS_LOG_STREAM_NAMES = TMP_AWS_LOG_STREAM_NAMES;
  * The ARN(s) of the AWS log stream(s).
  *
  * Note: See the [log stream ARN format documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format). One log group can contain several log streams, so these ARNs necessarily identify both a log group and a log stream.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_AWS_LOG_STREAM_ARNS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_AWS_LOG_STREAM_ARNS = TMP_AWS_LOG_STREAM_ARNS;
 
 /**
  * Container name.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CONTAINER_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CONTAINER_NAME = TMP_CONTAINER_NAME;
 
 /**
  * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/reference/run/#container-identification). The UUID might be abbreviated.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CONTAINER_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CONTAINER_ID = TMP_CONTAINER_ID;
 
 /**
  * The container runtime managing this container.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CONTAINER_RUNTIME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CONTAINER_RUNTIME = TMP_CONTAINER_RUNTIME;
 
 /**
  * Name of the image the container was built on.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CONTAINER_IMAGE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CONTAINER_IMAGE_NAME = TMP_CONTAINER_IMAGE_NAME;
 
 /**
  * Container image tag.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_CONTAINER_IMAGE_TAG } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_CONTAINER_IMAGE_TAG = TMP_CONTAINER_IMAGE_TAG;
 
 /**
  * Name of the [deployment environment](https://en.wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_DEPLOYMENT_ENVIRONMENT } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_DEPLOYMENT_ENVIRONMENT = TMP_DEPLOYMENT_ENVIRONMENT;
 
@@ -232,6 +254,7 @@ export const SEMRESATTRS_DEPLOYMENT_ENVIRONMENT = TMP_DEPLOYMENT_ENVIRONMENT;
  * A unique identifier representing the device.
  *
  * Note: The device identifier MUST only be defined using the values outlined below. This value is not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this value MUST be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_DEVICE_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_DEVICE_ID = TMP_DEVICE_ID;
 
@@ -239,6 +262,7 @@ export const SEMRESATTRS_DEVICE_ID = TMP_DEVICE_ID;
  * The model identifier for the device.
  *
  * Note: It&#39;s recommended this value represents a machine readable version of the model identifier rather than the market or consumer-friendly name of the device.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_DEVICE_MODEL_IDENTIFIER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_DEVICE_MODEL_IDENTIFIER = TMP_DEVICE_MODEL_IDENTIFIER;
 
@@ -246,6 +270,7 @@ export const SEMRESATTRS_DEVICE_MODEL_IDENTIFIER = TMP_DEVICE_MODEL_IDENTIFIER;
  * The marketing name for the device model.
  *
  * Note: It&#39;s recommended this value represents a human readable version of the device model rather than a machine readable alternative.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_DEVICE_MODEL_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_DEVICE_MODEL_NAME = TMP_DEVICE_MODEL_NAME;
 
@@ -253,6 +278,7 @@ export const SEMRESATTRS_DEVICE_MODEL_NAME = TMP_DEVICE_MODEL_NAME;
  * The name of the single function that this runtime instance executes.
  *
  * Note: This is the name of the function as configured/deployed on the FaaS platform and is usually different from the name of the callback function (which may be stored in the [`code.namespace`/`code.function`](../../trace/semantic_conventions/span-general.md#source-code-attributes) span attributes).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_FAAS_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_FAAS_NAME = TMP_FAAS_NAME;
 
@@ -273,6 +299,7 @@ which is why this field cannot be made required. For example, on AWS the account
 part of the ARN is not available without calling another AWS API
 which may be deemed too slow for a short-running lambda function.
 As an alternative, consider setting `faas.id` as a span attribute instead.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_FAAS_ID } from '@opentelemetry/semantic-conventions/1.7';`
 */
 export const SEMRESATTRS_FAAS_ID = TMP_FAAS_ID;
 
@@ -288,6 +315,7 @@ export const SEMRESATTRS_FAAS_ID = TMP_FAAS_ID;
 * **Google Cloud Functions:** The value of the
   [`K_REVISION` environment variable](https://cloud.google.com/functions/docs/env-var#runtime_environment_variables_set_automatically).
 * **Azure Functions:** Not applicable. Do not set this attribute.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_FAAS_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
 */
 export const SEMRESATTRS_FAAS_VERSION = TMP_FAAS_VERSION;
 
@@ -295,6 +323,7 @@ export const SEMRESATTRS_FAAS_VERSION = TMP_FAAS_VERSION;
  * The execution environment ID as a string, that will be potentially reused for other invocations to the same function/function version.
  *
  * Note: * **AWS Lambda:** Use the (full) log stream name.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_FAAS_INSTANCE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_FAAS_INSTANCE = TMP_FAAS_INSTANCE;
 
@@ -302,206 +331,247 @@ export const SEMRESATTRS_FAAS_INSTANCE = TMP_FAAS_INSTANCE;
  * The amount of memory available to the serverless function in MiB.
  *
  * Note: It&#39;s recommended to set this attribute since e.g. too little memory can easily stop a Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable `AWS_LAMBDA_FUNCTION_MEMORY_SIZE` provides this information.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_FAAS_MAX_MEMORY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_FAAS_MAX_MEMORY = TMP_FAAS_MAX_MEMORY;
 
 /**
  * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_HOST_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_HOST_ID = TMP_HOST_ID;
 
 /**
  * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully qualified hostname, or another name specified by the user.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_HOST_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_HOST_NAME = TMP_HOST_NAME;
 
 /**
  * Type of host. For Cloud, this must be the machine type.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_HOST_TYPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_HOST_TYPE = TMP_HOST_TYPE;
 
 /**
  * The CPU architecture the host system is running on.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_HOST_ARCH } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_HOST_ARCH = TMP_HOST_ARCH;
 
 /**
  * Name of the VM image or OS install the host was instantiated from.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_HOST_IMAGE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_HOST_IMAGE_NAME = TMP_HOST_IMAGE_NAME;
 
 /**
  * VM image ID. For Cloud, this value is from the provider.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_HOST_IMAGE_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_HOST_IMAGE_ID = TMP_HOST_IMAGE_ID;
 
 /**
  * The version string of the VM image as defined in [Version Attributes](README.md#version-attributes).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_HOST_IMAGE_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_HOST_IMAGE_VERSION = TMP_HOST_IMAGE_VERSION;
 
 /**
  * The name of the cluster.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_CLUSTER_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_CLUSTER_NAME = TMP_K8S_CLUSTER_NAME;
 
 /**
  * The name of the Node.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_NODE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_NODE_NAME = TMP_K8S_NODE_NAME;
 
 /**
  * The UID of the Node.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_NODE_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_NODE_UID = TMP_K8S_NODE_UID;
 
 /**
  * The name of the namespace that the pod is running in.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_NAMESPACE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_NAMESPACE_NAME = TMP_K8S_NAMESPACE_NAME;
 
 /**
  * The UID of the Pod.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_POD_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_POD_UID = TMP_K8S_POD_UID;
 
 /**
  * The name of the Pod.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_POD_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_POD_NAME = TMP_K8S_POD_NAME;
 
 /**
  * The name of the Container in a Pod template.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_CONTAINER_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_CONTAINER_NAME = TMP_K8S_CONTAINER_NAME;
 
 /**
  * The UID of the ReplicaSet.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_REPLICASET_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_REPLICASET_UID = TMP_K8S_REPLICASET_UID;
 
 /**
  * The name of the ReplicaSet.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_REPLICASET_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_REPLICASET_NAME = TMP_K8S_REPLICASET_NAME;
 
 /**
  * The UID of the Deployment.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_DEPLOYMENT_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_DEPLOYMENT_UID = TMP_K8S_DEPLOYMENT_UID;
 
 /**
  * The name of the Deployment.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_DEPLOYMENT_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_DEPLOYMENT_NAME = TMP_K8S_DEPLOYMENT_NAME;
 
 /**
  * The UID of the StatefulSet.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_STATEFULSET_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_STATEFULSET_UID = TMP_K8S_STATEFULSET_UID;
 
 /**
  * The name of the StatefulSet.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_STATEFULSET_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_STATEFULSET_NAME = TMP_K8S_STATEFULSET_NAME;
 
 /**
  * The UID of the DaemonSet.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_DAEMONSET_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_DAEMONSET_UID = TMP_K8S_DAEMONSET_UID;
 
 /**
  * The name of the DaemonSet.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_DAEMONSET_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_DAEMONSET_NAME = TMP_K8S_DAEMONSET_NAME;
 
 /**
  * The UID of the Job.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_JOB_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_JOB_UID = TMP_K8S_JOB_UID;
 
 /**
  * The name of the Job.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_JOB_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_JOB_NAME = TMP_K8S_JOB_NAME;
 
 /**
  * The UID of the CronJob.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_CRONJOB_UID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_CRONJOB_UID = TMP_K8S_CRONJOB_UID;
 
 /**
  * The name of the CronJob.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_K8S_CRONJOB_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_K8S_CRONJOB_NAME = TMP_K8S_CRONJOB_NAME;
 
 /**
  * The operating system type.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_OS_TYPE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_OS_TYPE = TMP_OS_TYPE;
 
 /**
  * Human readable (not intended to be parsed) OS version information, like e.g. reported by `ver` or `lsb_release -a` commands.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_OS_DESCRIPTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_OS_DESCRIPTION = TMP_OS_DESCRIPTION;
 
 /**
  * Human readable operating system name.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_OS_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_OS_NAME = TMP_OS_NAME;
 
 /**
  * The version string of the operating system as defined in [Version Attributes](../../resource/semantic_conventions/README.md#version-attributes).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_OS_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_OS_VERSION = TMP_OS_VERSION;
 
 /**
  * Process identifier (PID).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_PID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_PID = TMP_PROCESS_PID;
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_EXECUTABLE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_EXECUTABLE_NAME = TMP_PROCESS_EXECUTABLE_NAME;
 
 /**
  * The full path to the process executable. On Linux based systems, can be set to the target of `proc/[pid]/exe`. On Windows, can be set to the result of `GetProcessImageFileNameW`.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_EXECUTABLE_PATH } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_EXECUTABLE_PATH = TMP_PROCESS_EXECUTABLE_PATH;
 
 /**
  * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_COMMAND } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_COMMAND = TMP_PROCESS_COMMAND;
 
 /**
  * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_COMMAND_LINE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_COMMAND_LINE = TMP_PROCESS_COMMAND_LINE;
 
 /**
  * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_COMMAND_ARGS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_COMMAND_ARGS = TMP_PROCESS_COMMAND_ARGS;
 
 /**
  * The username of the user that owns the process.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_OWNER } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_OWNER = TMP_PROCESS_OWNER;
 
 /**
  * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of the compiler.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_RUNTIME_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_RUNTIME_NAME = TMP_PROCESS_RUNTIME_NAME;
 
 /**
  * The version of the runtime of this process, as returned by the runtime without modification.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_RUNTIME_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_RUNTIME_VERSION = TMP_PROCESS_RUNTIME_VERSION;
 
 /**
  * An additional description about the runtime of the process, for example a specific vendor customization of the runtime environment.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION =
   TMP_PROCESS_RUNTIME_DESCRIPTION;
@@ -510,6 +580,7 @@ export const SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION =
  * Logical name of the service.
  *
  * Note: MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md#process), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_SERVICE_NAME = TMP_SERVICE_NAME;
 
@@ -517,6 +588,7 @@ export const SEMRESATTRS_SERVICE_NAME = TMP_SERVICE_NAME;
  * A namespace for `service.name`.
  *
  * Note: A string value having a meaning that helps to distinguish a group of services, for example the team name that owns a group of services. `service.name` is expected to be unique within the same namespace. If `service.namespace` is not specified in the Resource then `service.name` is expected to be unique for all services that have no explicit namespace defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length namespace string is assumed equal to unspecified namespace.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_SERVICE_NAMESPACE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_SERVICE_NAMESPACE = TMP_SERVICE_NAMESPACE;
 
@@ -524,46 +596,55 @@ export const SEMRESATTRS_SERVICE_NAMESPACE = TMP_SERVICE_NAMESPACE;
  * The string ID of the service instance.
  *
  * Note: MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words `service.namespace,service.name,service.instance.id` triplet MUST be globally unique). The ID helps to distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled service). It is preferable for the ID to be persistent and stay the same for the lifetime of the service instance, however it is acceptable that the ID is ephemeral and changes during important lifetime events for the service (e.g. service restarts). If the service has no inherent unique ID that can be used as the value of this attribute it is recommended to generate a random Version 1 or Version 4 RFC 4122 UUID (services aiming for reproducible UUIDs may also use Version 5, see RFC 4122 for more recommendations).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_SERVICE_INSTANCE_ID = TMP_SERVICE_INSTANCE_ID;
 
 /**
  * The version string of the service API or implementation.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_SERVICE_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_SERVICE_VERSION = TMP_SERVICE_VERSION;
 
 /**
  * The name of the telemetry SDK as defined above.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_TELEMETRY_SDK_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_TELEMETRY_SDK_NAME = TMP_TELEMETRY_SDK_NAME;
 
 /**
  * The language of the telemetry SDK.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_TELEMETRY_SDK_LANGUAGE = TMP_TELEMETRY_SDK_LANGUAGE;
 
 /**
  * The version string of the telemetry SDK.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_TELEMETRY_SDK_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_TELEMETRY_SDK_VERSION = TMP_TELEMETRY_SDK_VERSION;
 
 /**
  * The version string of the auto instrumentation agent, if used.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_TELEMETRY_AUTO_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_TELEMETRY_AUTO_VERSION = TMP_TELEMETRY_AUTO_VERSION;
 
 /**
  * The name of the web engine.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_WEBENGINE_NAME } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_WEBENGINE_NAME = TMP_WEBENGINE_NAME;
 
 /**
  * The version of the web engine.
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_WEBENGINE_VERSION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_WEBENGINE_VERSION = TMP_WEBENGINE_VERSION;
 
 /**
  * Additional description of the web engine (e.g. detailed version and edition information).
+ * @deprecated please import desired version directly like `import { SEMRESATTRS_WEBENGINE_DESCRIPTION } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const SEMRESATTRS_WEBENGINE_DESCRIPTION = TMP_WEBENGINE_DESCRIPTION;
 
@@ -573,6 +654,7 @@ export const SEMRESATTRS_WEBENGINE_DESCRIPTION = TMP_WEBENGINE_DESCRIPTION;
  * constants SemanticResourceAttributes_XXXXX rather than the exported constant map. As any single reference
  * to a constant map value will result in all strings being included into your bundle.
  * @deprecated Use the SEMRESATTRS_XXXXX constants rather than the SemanticResourceAttributes.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { SEMRESATTRS_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type SemanticResourceAttributes = {
   /**
@@ -1036,7 +1118,6 @@ As an alternative, consider setting `faas.id` as a span attribute instead.
 
 /**
  * Create exported Value Map for SemanticResourceAttributes values
- * @deprecated Use the SEMRESATTRS_XXXXX constants rather than the SemanticResourceAttributes.XXXXX for bundle minification
  */
 export const SemanticResourceAttributes: SemanticResourceAttributes =
   /*#__PURE__*/ createConstMap<SemanticResourceAttributes>([
@@ -1130,7 +1211,7 @@ export const SemanticResourceAttributes: SemanticResourceAttributes =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD = 'alibaba_cloud';
 const TMP_CLOUDPROVIDERVALUES_AWS = 'aws';
 const TMP_CLOUDPROVIDERVALUES_AZURE = 'azure';
@@ -1138,22 +1219,30 @@ const TMP_CLOUDPROVIDERVALUES_GCP = 'gcp';
 
 /**
  * Name of the cloud provider.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPROVIDERVALUES_ALIBABA_CLOUD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPROVIDERVALUES_ALIBABA_CLOUD =
   TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD;
 
 /**
  * Name of the cloud provider.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPROVIDERVALUES_AWS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPROVIDERVALUES_AWS = TMP_CLOUDPROVIDERVALUES_AWS;
 
 /**
  * Name of the cloud provider.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPROVIDERVALUES_AZURE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPROVIDERVALUES_AZURE = TMP_CLOUDPROVIDERVALUES_AZURE;
 
 /**
  * Name of the cloud provider.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPROVIDERVALUES_GCP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPROVIDERVALUES_GCP = TMP_CLOUDPROVIDERVALUES_GCP;
 
@@ -1162,6 +1251,7 @@ export const CLOUDPROVIDERVALUES_GCP = TMP_CLOUDPROVIDERVALUES_GCP;
  *
  * Name of the cloud provider.
  * @deprecated Use the CLOUDPROVIDERVALUES_XXXXX constants rather than the CloudProviderValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { CLOUDPROVIDERVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type CloudProviderValues = {
   /** Alibaba Cloud. */
@@ -1179,7 +1269,6 @@ export type CloudProviderValues = {
 
 /**
  * The constant map of values for CloudProviderValues.
- * @deprecated Use the CLOUDPROVIDERVALUES_XXXXX constants rather than the CloudProviderValues.XXXXX for bundle minification.
  */
 export const CloudProviderValues: CloudProviderValues =
   /*#__PURE__*/ createConstMap<CloudProviderValues>([
@@ -1198,7 +1287,7 @@ export const CloudProviderValues: CloudProviderValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
 const TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
 const TMP_CLOUDPLATFORMVALUES_AWS_EC2 = 'aws_ec2';
@@ -1222,6 +1311,8 @@ const TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE = 'gcp_app_engine';
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS =
   TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS;
@@ -1230,6 +1321,8 @@ export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC =
   TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC;
@@ -1238,6 +1331,8 @@ export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AWS_EC2 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AWS_EC2 = TMP_CLOUDPLATFORMVALUES_AWS_EC2;
 
@@ -1245,6 +1340,8 @@ export const CLOUDPLATFORMVALUES_AWS_EC2 = TMP_CLOUDPLATFORMVALUES_AWS_EC2;
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AWS_ECS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AWS_ECS = TMP_CLOUDPLATFORMVALUES_AWS_ECS;
 
@@ -1252,6 +1349,8 @@ export const CLOUDPLATFORMVALUES_AWS_ECS = TMP_CLOUDPLATFORMVALUES_AWS_ECS;
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AWS_EKS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AWS_EKS = TMP_CLOUDPLATFORMVALUES_AWS_EKS;
 
@@ -1259,6 +1358,8 @@ export const CLOUDPLATFORMVALUES_AWS_EKS = TMP_CLOUDPLATFORMVALUES_AWS_EKS;
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AWS_LAMBDA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AWS_LAMBDA =
   TMP_CLOUDPLATFORMVALUES_AWS_LAMBDA;
@@ -1267,6 +1368,8 @@ export const CLOUDPLATFORMVALUES_AWS_LAMBDA =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK =
   TMP_CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK;
@@ -1275,6 +1378,8 @@ export const CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AZURE_VM } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AZURE_VM = TMP_CLOUDPLATFORMVALUES_AZURE_VM;
 
@@ -1282,6 +1387,8 @@ export const CLOUDPLATFORMVALUES_AZURE_VM = TMP_CLOUDPLATFORMVALUES_AZURE_VM;
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES =
   TMP_CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES;
@@ -1290,6 +1397,8 @@ export const CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AZURE_AKS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AZURE_AKS = TMP_CLOUDPLATFORMVALUES_AZURE_AKS;
 
@@ -1297,6 +1406,8 @@ export const CLOUDPLATFORMVALUES_AZURE_AKS = TMP_CLOUDPLATFORMVALUES_AZURE_AKS;
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AZURE_FUNCTIONS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AZURE_FUNCTIONS =
   TMP_CLOUDPLATFORMVALUES_AZURE_FUNCTIONS;
@@ -1305,6 +1416,8 @@ export const CLOUDPLATFORMVALUES_AZURE_FUNCTIONS =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_AZURE_APP_SERVICE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_AZURE_APP_SERVICE =
   TMP_CLOUDPLATFORMVALUES_AZURE_APP_SERVICE;
@@ -1313,6 +1426,8 @@ export const CLOUDPLATFORMVALUES_AZURE_APP_SERVICE =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE =
   TMP_CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE;
@@ -1321,6 +1436,8 @@ export const CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_GCP_CLOUD_RUN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_GCP_CLOUD_RUN =
   TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_RUN;
@@ -1329,6 +1446,8 @@ export const CLOUDPLATFORMVALUES_GCP_CLOUD_RUN =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE =
   TMP_CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE;
@@ -1337,6 +1456,8 @@ export const CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS =
   TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS;
@@ -1345,6 +1466,8 @@ export const CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS =
  * The cloud platform in use.
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
+ *
+ * @deprecated please import desired version directly like `import { CLOUDPLATFORMVALUES_GCP_APP_ENGINE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const CLOUDPLATFORMVALUES_GCP_APP_ENGINE =
   TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE;
@@ -1356,6 +1479,7 @@ export const CLOUDPLATFORMVALUES_GCP_APP_ENGINE =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  * @deprecated Use the CLOUDPLATFORMVALUES_XXXXX constants rather than the CloudPlatformValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { CLOUDPLATFORMVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type CloudPlatformValues = {
   /** Alibaba Cloud Elastic Compute Service. */
@@ -1412,7 +1536,6 @@ export type CloudPlatformValues = {
 
 /**
  * The constant map of values for CloudPlatformValues.
- * @deprecated Use the CLOUDPLATFORMVALUES_XXXXX constants rather than the CloudPlatformValues.XXXXX for bundle minification.
  */
 export const CloudPlatformValues: CloudPlatformValues =
   /*#__PURE__*/ createConstMap<CloudPlatformValues>([
@@ -1442,17 +1565,21 @@ export const CloudPlatformValues: CloudPlatformValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_AWSECSLAUNCHTYPEVALUES_EC2 = 'ec2';
 const TMP_AWSECSLAUNCHTYPEVALUES_FARGATE = 'fargate';
 
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
+ *
+ * @deprecated please import desired version directly like `import { AWSECSLAUNCHTYPEVALUES_EC2 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const AWSECSLAUNCHTYPEVALUES_EC2 = TMP_AWSECSLAUNCHTYPEVALUES_EC2;
 
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
+ *
+ * @deprecated please import desired version directly like `import { AWSECSLAUNCHTYPEVALUES_FARGATE } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const AWSECSLAUNCHTYPEVALUES_FARGATE =
   TMP_AWSECSLAUNCHTYPEVALUES_FARGATE;
@@ -1462,6 +1589,7 @@ export const AWSECSLAUNCHTYPEVALUES_FARGATE =
  *
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
  * @deprecated Use the AWSECSLAUNCHTYPEVALUES_XXXXX constants rather than the AwsEcsLaunchtypeValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { AWSECSLAUNCHTYPEVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type AwsEcsLaunchtypeValues = {
   /** ec2. */
@@ -1473,7 +1601,6 @@ export type AwsEcsLaunchtypeValues = {
 
 /**
  * The constant map of values for AwsEcsLaunchtypeValues.
- * @deprecated Use the AWSECSLAUNCHTYPEVALUES_XXXXX constants rather than the AwsEcsLaunchtypeValues.XXXXX for bundle minification.
  */
 export const AwsEcsLaunchtypeValues: AwsEcsLaunchtypeValues =
   /*#__PURE__*/ createConstMap<AwsEcsLaunchtypeValues>([
@@ -1488,7 +1615,7 @@ export const AwsEcsLaunchtypeValues: AwsEcsLaunchtypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_HOSTARCHVALUES_AMD64 = 'amd64';
 const TMP_HOSTARCHVALUES_ARM32 = 'arm32';
 const TMP_HOSTARCHVALUES_ARM64 = 'arm64';
@@ -1499,36 +1626,50 @@ const TMP_HOSTARCHVALUES_X86 = 'x86';
 
 /**
  * The CPU architecture the host system is running on.
+ *
+ * @deprecated please import desired version directly like `import { HOSTARCHVALUES_AMD64 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HOSTARCHVALUES_AMD64 = TMP_HOSTARCHVALUES_AMD64;
 
 /**
  * The CPU architecture the host system is running on.
+ *
+ * @deprecated please import desired version directly like `import { HOSTARCHVALUES_ARM32 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HOSTARCHVALUES_ARM32 = TMP_HOSTARCHVALUES_ARM32;
 
 /**
  * The CPU architecture the host system is running on.
+ *
+ * @deprecated please import desired version directly like `import { HOSTARCHVALUES_ARM64 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HOSTARCHVALUES_ARM64 = TMP_HOSTARCHVALUES_ARM64;
 
 /**
  * The CPU architecture the host system is running on.
+ *
+ * @deprecated please import desired version directly like `import { HOSTARCHVALUES_IA64 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HOSTARCHVALUES_IA64 = TMP_HOSTARCHVALUES_IA64;
 
 /**
  * The CPU architecture the host system is running on.
+ *
+ * @deprecated please import desired version directly like `import { HOSTARCHVALUES_PPC32 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HOSTARCHVALUES_PPC32 = TMP_HOSTARCHVALUES_PPC32;
 
 /**
  * The CPU architecture the host system is running on.
+ *
+ * @deprecated please import desired version directly like `import { HOSTARCHVALUES_PPC64 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HOSTARCHVALUES_PPC64 = TMP_HOSTARCHVALUES_PPC64;
 
 /**
  * The CPU architecture the host system is running on.
+ *
+ * @deprecated please import desired version directly like `import { HOSTARCHVALUES_X86 } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const HOSTARCHVALUES_X86 = TMP_HOSTARCHVALUES_X86;
 
@@ -1537,6 +1678,7 @@ export const HOSTARCHVALUES_X86 = TMP_HOSTARCHVALUES_X86;
  *
  * The CPU architecture the host system is running on.
  * @deprecated Use the HOSTARCHVALUES_XXXXX constants rather than the HostArchValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { HOSTARCHVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type HostArchValues = {
   /** AMD64. */
@@ -1563,7 +1705,6 @@ export type HostArchValues = {
 
 /**
  * The constant map of values for HostArchValues.
- * @deprecated Use the HOSTARCHVALUES_XXXXX constants rather than the HostArchValues.XXXXX for bundle minification.
  */
 export const HostArchValues: HostArchValues =
   /*#__PURE__*/ createConstMap<HostArchValues>([
@@ -1583,7 +1724,7 @@ export const HostArchValues: HostArchValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_OSTYPEVALUES_WINDOWS = 'windows';
 const TMP_OSTYPEVALUES_LINUX = 'linux';
 const TMP_OSTYPEVALUES_DARWIN = 'darwin';
@@ -1598,56 +1739,78 @@ const TMP_OSTYPEVALUES_Z_OS = 'z_os';
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_WINDOWS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_WINDOWS = TMP_OSTYPEVALUES_WINDOWS;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_LINUX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_LINUX = TMP_OSTYPEVALUES_LINUX;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_DARWIN } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_DARWIN = TMP_OSTYPEVALUES_DARWIN;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_FREEBSD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_FREEBSD = TMP_OSTYPEVALUES_FREEBSD;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_NETBSD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_NETBSD = TMP_OSTYPEVALUES_NETBSD;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_OPENBSD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_OPENBSD = TMP_OSTYPEVALUES_OPENBSD;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_DRAGONFLYBSD } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_DRAGONFLYBSD = TMP_OSTYPEVALUES_DRAGONFLYBSD;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_HPUX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_HPUX = TMP_OSTYPEVALUES_HPUX;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_AIX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_AIX = TMP_OSTYPEVALUES_AIX;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_SOLARIS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_SOLARIS = TMP_OSTYPEVALUES_SOLARIS;
 
 /**
  * The operating system type.
+ *
+ * @deprecated please import desired version directly like `import { OSTYPEVALUES_Z_OS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const OSTYPEVALUES_Z_OS = TMP_OSTYPEVALUES_Z_OS;
 
@@ -1656,6 +1819,7 @@ export const OSTYPEVALUES_Z_OS = TMP_OSTYPEVALUES_Z_OS;
  *
  * The operating system type.
  * @deprecated Use the OSTYPEVALUES_XXXXX constants rather than the OsTypeValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { OSTYPEVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type OsTypeValues = {
   /** Microsoft Windows. */
@@ -1694,7 +1858,6 @@ export type OsTypeValues = {
 
 /**
  * The constant map of values for OsTypeValues.
- * @deprecated Use the OSTYPEVALUES_XXXXX constants rather than the OsTypeValues.XXXXX for bundle minification.
  */
 export const OsTypeValues: OsTypeValues =
   /*#__PURE__*/ createConstMap<OsTypeValues>([
@@ -1718,7 +1881,7 @@ export const OsTypeValues: OsTypeValues =
  * ---------------------------------------------------------------------------------------------------------- */
 
 // Temporary local constants to assign to the individual exports and the namespaced version
-// Required to avoid the namespace exports using the unminifable export names for some package types
+// Required to avoid the namespace exports using the unminifiable export names for some package types
 const TMP_TELEMETRYSDKLANGUAGEVALUES_CPP = 'cpp';
 const TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET = 'dotnet';
 const TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG = 'erlang';
@@ -1732,59 +1895,79 @@ const TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS = 'webjs';
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_CPP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_CPP =
   TMP_TELEMETRYSDKLANGUAGEVALUES_CPP;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_DOTNET } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_DOTNET =
   TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_ERLANG } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_ERLANG =
   TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_GO } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_GO = TMP_TELEMETRYSDKLANGUAGEVALUES_GO;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_JAVA } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_JAVA =
   TMP_TELEMETRYSDKLANGUAGEVALUES_JAVA;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_NODEJS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_NODEJS =
   TMP_TELEMETRYSDKLANGUAGEVALUES_NODEJS;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_PHP } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_PHP =
   TMP_TELEMETRYSDKLANGUAGEVALUES_PHP;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_PYTHON } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_PYTHON =
   TMP_TELEMETRYSDKLANGUAGEVALUES_PYTHON;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_RUBY } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_RUBY =
   TMP_TELEMETRYSDKLANGUAGEVALUES_RUBY;
 
 /**
  * The language of the telemetry SDK.
+ *
+ * @deprecated please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_WEBJS } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const TELEMETRYSDKLANGUAGEVALUES_WEBJS =
   TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS;
@@ -1794,6 +1977,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_WEBJS =
  *
  * The language of the telemetry SDK.
  * @deprecated Use the TELEMETRYSDKLANGUAGEVALUES_XXXXX constants rather than the TelemetrySdkLanguageValues.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { TELEMETRYSDKLANGUAGEVALUES_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type TelemetrySdkLanguageValues = {
   /** cpp. */
@@ -1829,7 +2013,6 @@ export type TelemetrySdkLanguageValues = {
 
 /**
  * The constant map of values for TelemetrySdkLanguageValues.
- * @deprecated Use the TELEMETRYSDKLANGUAGEVALUES_XXXXX constants rather than the TelemetrySdkLanguageValues.XXXXX for bundle minification.
  */
 export const TelemetrySdkLanguageValues: TelemetrySdkLanguageValues =
   /*#__PURE__*/ createConstMap<TelemetrySdkLanguageValues>([
