@@ -47,6 +47,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
 * docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
+* refactor(examples): use new exported string constants for semconv in experimental/examples/opencensus-shim [#4763](https://github.com/open-telemetry/opentelemetry-js/pull/4763#pull) @Zen-cronic
 
 ### :house: (Internal)
 
