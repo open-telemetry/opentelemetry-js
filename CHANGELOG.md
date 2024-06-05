@@ -27,7 +27,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :books: (Refine Doc)
 
 * refactor(examples): use new exported string constants for semconv in examples/http [#4750](https://github.com/open-telemetry/opentelemetry-js/pull/4750) @Zen-cronic
-* refactor(examples): use new exported string constants for semconv in examples/opentracing-shim-semconv [#4761](https://github.com/open-telemetry/opentelemetry-js/pull/4761) @Zen-cronic
+* refactor(examples): use new exported string constants for semconv in examples/otlp-exporter-node [#4762](https://github.com/open-telemetry/opentelemetry-js/pull/4762) @Zen-cronic
+* refactor(examples): use new exported string constants for semconv in examples/opentracing-shim [#4761](https://github.com/open-telemetry/opentelemetry-js/pull/4761) @Zen-cronic
 
 ### :house: (Internal)
 
