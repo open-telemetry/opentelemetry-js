@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
@@ -52,5 +54,4 @@ npm run lint:fix:changed
 
 # Run the size checks for the generated files
 cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
-npm run lint:fix
 npm run compile

@@ -23,73 +23,64 @@
  *
  * Note: Meter name: `Microsoft.AspNetCore.Diagnostics`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_DIAGNOSTICS_EXCEPTIONS =
-  'aspnetcore.diagnostics.exceptions' as const;
+export const METRIC_ASPNETCORE_DIAGNOSTICS_EXCEPTIONS = 'aspnetcore.diagnostics.exceptions' as const;
 
 /**
  * Number of requests that are currently active on the server that hold a rate limiting lease.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_ACTIVE_REQUEST_LEASES =
-  'aspnetcore.rate_limiting.active_request_leases' as const;
+export const METRIC_ASPNETCORE_RATE_LIMITING_ACTIVE_REQUEST_LEASES = 'aspnetcore.rate_limiting.active_request_leases' as const;
 
 /**
  * Number of requests that are currently queued, waiting to acquire a rate limiting lease.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_QUEUED_REQUESTS =
-  'aspnetcore.rate_limiting.queued_requests' as const;
+export const METRIC_ASPNETCORE_RATE_LIMITING_QUEUED_REQUESTS = 'aspnetcore.rate_limiting.queued_requests' as const;
 
 /**
  * The time the request spent in a queue waiting to acquire a rate limiting lease.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_TIME_IN_QUEUE =
-  'aspnetcore.rate_limiting.request.time_in_queue' as const;
+export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_TIME_IN_QUEUE = 'aspnetcore.rate_limiting.request.time_in_queue' as const;
 
 /**
  * The duration of rate limiting lease held by requests on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_LEASE_DURATION =
-  'aspnetcore.rate_limiting.request_lease.duration' as const;
+export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_LEASE_DURATION = 'aspnetcore.rate_limiting.request_lease.duration' as const;
 
 /**
  * Number of requests that tried to acquire a rate limiting lease.
  *
  * Note: Requests could be:
- *
+ * 
  * * Rejected by global or endpoint rate limiting policies
  * * Canceled while waiting for the lease.
- *
+ * 
  * Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_REQUESTS =
-  'aspnetcore.rate_limiting.requests' as const;
+export const METRIC_ASPNETCORE_RATE_LIMITING_REQUESTS = 'aspnetcore.rate_limiting.requests' as const;
 
 /**
  * Number of requests that were attempted to be matched to an endpoint.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Routing`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_ROUTING_MATCH_ATTEMPTS =
-  'aspnetcore.routing.match_attempts' as const;
+export const METRIC_ASPNETCORE_ROUTING_MATCH_ATTEMPTS = 'aspnetcore.routing.match_attempts' as const;
 
 /**
  * Duration of HTTP client requests.
  */
-export const METRIC_HTTP_CLIENT_REQUEST_DURATION =
-  'http.client.request.duration' as const;
+export const METRIC_HTTP_CLIENT_REQUEST_DURATION = 'http.client.request.duration' as const;
 
 /**
  * Duration of HTTP server requests.
  */
-export const METRIC_HTTP_SERVER_REQUEST_DURATION =
-  'http.server.request.duration' as const;
+export const METRIC_HTTP_SERVER_REQUEST_DURATION = 'http.server.request.duration' as const;
 
 /**
  * Number of classes currently loaded.
@@ -116,8 +107,7 @@ export const METRIC_JVM_CPU_COUNT = 'jvm.cpu.count' as const;
  *
  * Note: The value range is [0.0,1.0]. This utilization is not defined as being for the specific interval since last measurement (unlike `system.cpu.utilization`). [Reference](https://docs.oracle.com/en/java/javase/17/docs/api/jdk.management/com/sun/management/OperatingSystemMXBean.html#getProcessCpuLoad()).
  */
-export const METRIC_JVM_CPU_RECENT_UTILIZATION =
-  'jvm.cpu.recent_utilization' as const;
+export const METRIC_JVM_CPU_RECENT_UTILIZATION = 'jvm.cpu.recent_utilization' as const;
 
 /**
  * CPU time used by the process as reported by the JVM.
@@ -147,8 +137,7 @@ export const METRIC_JVM_MEMORY_USED = 'jvm.memory.used' as const;
 /**
  * Measure of memory used, as measured after the most recent garbage collection event on this pool.
  */
-export const METRIC_JVM_MEMORY_USED_AFTER_LAST_GC =
-  'jvm.memory.used_after_last_gc' as const;
+export const METRIC_JVM_MEMORY_USED_AFTER_LAST_GC = 'jvm.memory.used_after_last_gc' as const;
 
 /**
  * Number of executing platform threads.
@@ -160,40 +149,35 @@ export const METRIC_JVM_THREAD_COUNT = 'jvm.thread.count' as const;
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_ACTIVE_CONNECTIONS =
-  'kestrel.active_connections' as const;
+export const METRIC_KESTREL_ACTIVE_CONNECTIONS = 'kestrel.active_connections' as const;
 
 /**
  * Number of TLS handshakes that are currently in progress on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_ACTIVE_TLS_HANDSHAKES =
-  'kestrel.active_tls_handshakes' as const;
+export const METRIC_KESTREL_ACTIVE_TLS_HANDSHAKES = 'kestrel.active_tls_handshakes' as const;
 
 /**
  * The duration of connections on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_CONNECTION_DURATION =
-  'kestrel.connection.duration' as const;
+export const METRIC_KESTREL_CONNECTION_DURATION = 'kestrel.connection.duration' as const;
 
 /**
  * Number of connections that are currently queued and are waiting to start.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_QUEUED_CONNECTIONS =
-  'kestrel.queued_connections' as const;
+export const METRIC_KESTREL_QUEUED_CONNECTIONS = 'kestrel.queued_connections' as const;
 
 /**
  * Number of HTTP requests on multiplexed connections (HTTP/2 and HTTP/3) that are currently queued and are waiting to start.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_QUEUED_REQUESTS =
-  'kestrel.queued_requests' as const;
+export const METRIC_KESTREL_QUEUED_REQUESTS = 'kestrel.queued_requests' as const;
 
 /**
  * Number of connections rejected by the server.
@@ -201,90 +185,77 @@ export const METRIC_KESTREL_QUEUED_REQUESTS =
  * Note: Connections are rejected when the currently active count exceeds the value configured with `MaxConcurrentConnections`.
  * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_REJECTED_CONNECTIONS =
-  'kestrel.rejected_connections' as const;
+export const METRIC_KESTREL_REJECTED_CONNECTIONS = 'kestrel.rejected_connections' as const;
 
 /**
  * The duration of TLS handshakes on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_TLS_HANDSHAKE_DURATION =
-  'kestrel.tls_handshake.duration' as const;
+export const METRIC_KESTREL_TLS_HANDSHAKE_DURATION = 'kestrel.tls_handshake.duration' as const;
 
 /**
  * Number of connections that are currently upgraded (WebSockets). .
  *
  * Note: The counter only tracks HTTP/1.1 connections.
- *
+ * 
  * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_UPGRADED_CONNECTIONS =
-  'kestrel.upgraded_connections' as const;
+export const METRIC_KESTREL_UPGRADED_CONNECTIONS = 'kestrel.upgraded_connections' as const;
 
 /**
  * Number of connections that are currently active on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Http.Connections`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_SIGNALR_SERVER_ACTIVE_CONNECTIONS =
-  'signalr.server.active_connections' as const;
+export const METRIC_SIGNALR_SERVER_ACTIVE_CONNECTIONS = 'signalr.server.active_connections' as const;
 
 /**
  * The duration of connections on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Http.Connections`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_SIGNALR_SERVER_CONNECTION_DURATION =
-  'signalr.server.connection.duration' as const;
+export const METRIC_SIGNALR_SERVER_CONNECTION_DURATION = 'signalr.server.connection.duration' as const;
 
 /**
  * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
  */
-export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT =
-  'aspnetcore.rate_limiting.result' as const;
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result' as const;
 
 /**
  * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
  */
-export const ATTR_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE =
-  'aspnetcore.diagnostics.handler.type' as const;
+export const ATTR_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = 'aspnetcore.diagnostics.handler.type' as const;
 
 /**
  * Rate limiting policy name.
  */
-export const ATTR_ASPNETCORE_RATE_LIMITING_POLICY =
-  'aspnetcore.rate_limiting.policy' as const;
+export const ATTR_ASPNETCORE_RATE_LIMITING_POLICY = 'aspnetcore.rate_limiting.policy' as const;
 
 /**
  * Flag indicating if request was handled by the application pipeline.
  */
-export const ATTR_ASPNETCORE_REQUEST_IS_UNHANDLED =
-  'aspnetcore.request.is_unhandled' as const;
+export const ATTR_ASPNETCORE_REQUEST_IS_UNHANDLED = 'aspnetcore.request.is_unhandled' as const;
 
 /**
  * A value that indicates whether the matched route is a fallback route.
  */
-export const ATTR_ASPNETCORE_ROUTING_IS_FALLBACK =
-  'aspnetcore.routing.is_fallback' as const;
+export const ATTR_ASPNETCORE_ROUTING_IS_FALLBACK = 'aspnetcore.routing.is_fallback' as const;
 
 /**
  * Match result - success or failure.
  */
-export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS =
-  'aspnetcore.routing.match_status' as const;
+export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status' as const;
 
 /**
  * ASP.NET Core exception middleware handling result.
  */
-export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT =
-  'aspnetcore.diagnostics.exception.result' as const;
+export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = 'aspnetcore.diagnostics.exception.result' as const;
 
 /**
  * SignalR HTTP connection closure status.
  */
-export const ATTR_SIGNALR_CONNECTION_STATUS =
-  'signalr.connection.status' as const;
+export const ATTR_SIGNALR_CONNECTION_STATUS = 'signalr.connection.status' as const;
 
 /**
  * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md).
@@ -346,17 +317,17 @@ export const ATTR_CLIENT_PORT = 'client.port' as const;
  *
  * Note: The `error.type` SHOULD be predictable and SHOULD have low cardinality.
  * Instrumentations SHOULD document the list of errors they report.
- *
+ * 
  * The cardinality of `error.type` within one instrumentation library SHOULD be low.
  * Telemetry consumers that aggregate data from multiple instrumentation libraries and applications
  * should be prepared for `error.type` to have high cardinality at query time when no
  * additional filters are applied.
- *
+ * 
  * If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.
- *
+ * 
  * If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
  * it&#39;s RECOMMENDED to:
- *
+ * 
  * * Use a domain-specific attribute
  * * Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
  */
@@ -370,13 +341,13 @@ export const ATTR_ERROR_TYPE = 'error.type' as const;
  * This may be actually &#34;in flight&#34; in some languages (e.g. if the exception
  * is passed to a Context manager&#39;s `__exit__` method in Python) but will
  * usually be caught at the point of recording the exception in most languages.
- *
+ * 
  * It is usually not possible to determine at the point where an exception is thrown
  * whether it will escape the scope of a span.
  * However, it is trivial to know that an exception
  * will escape, if one checks for an active exception just before ending the span,
  * as done in the [example for recording span exceptions](#recording-an-exception).
- *
+ * 
  * It follows that an exception may still escape the scope of the span
  * even if the `exception.escaped` attribute was not set or set to false,
  * since the event might have been recorded at a time where it was not
@@ -405,14 +376,14 @@ export const ATTR_EXCEPTION_TYPE = 'exception.type' as const;
  * Note: HTTP request method value SHOULD be &#34;known&#34; to the instrumentation.
  * By default, this convention defines &#34;known&#34; methods as the ones listed in [RFC9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-methods)
  * and the PATCH method defined in [RFC5789](https://www.rfc-editor.org/rfc/rfc5789.html).
- *
+ * 
  * If the HTTP request method is not known to instrumentation, it MUST set the `http.request.method` attribute to `_OTHER`.
- *
+ * 
  * If the HTTP instrumentation could end up converting valid HTTP request methods to `_OTHER`, then it MUST provide a way to override
  * the list of known HTTP methods. If this override is done via environment variable, then the environment variable MUST be named
  * OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and support a comma-separated list of case-sensitive known HTTP methods
  * (this list MUST be a full override of the default known method, it is not a list of known methods in addition to the defaults).
- *
+ * 
  * HTTP method names are case-sensitive and `http.request.method` attribute value MUST match a known HTTP method name exactly.
  * Instrumentations for specific web frameworks that consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent.
  * Tracing instrumentations that do so, MUST also set `http.request.method_original` to the original value.
@@ -422,22 +393,19 @@ export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method' as const;
 /**
  * Original HTTP method sent by the client in the request line.
  */
-export const ATTR_HTTP_REQUEST_METHOD_ORIGINAL =
-  'http.request.method_original' as const;
+export const ATTR_HTTP_REQUEST_METHOD_ORIGINAL = 'http.request.method_original' as const;
 
 /**
  * The ordinal number of request resending attempt (for any reason, including redirects).
  *
  * Note: The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
  */
-export const ATTR_HTTP_REQUEST_RESEND_COUNT =
-  'http.request.resend_count' as const;
+export const ATTR_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count' as const;
 
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
  */
-export const ATTR_HTTP_RESPONSE_STATUS_CODE =
-  'http.response.status_code' as const;
+export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code' as const;
 
 /**
  * The matched route, that is, the path template in the format used by the respective server framework.
@@ -479,14 +447,13 @@ export const ATTR_NETWORK_PROTOCOL_NAME = 'network.protocol.name' as const;
  *
  * Note: If protocol version is subject to negotiation (for example using [ALPN](https://www.rfc-editor.org/rfc/rfc7301.html)), this attribute SHOULD be set to the negotiated version. If the actual protocol version is not known, this attribute SHOULD NOT be set.
  */
-export const ATTR_NETWORK_PROTOCOL_VERSION =
-  'network.protocol.version' as const;
+export const ATTR_NETWORK_PROTOCOL_VERSION = 'network.protocol.version' as const;
 
 /**
  * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
  *
  * Note: The value SHOULD be normalized to lowercase.
- *
+ * 
  * Consider always setting the transport when setting a port number, since
  * a port number is ambiguous without knowing the transport. For example
  * different processes could be listening on TCP port 12345 and UDP port 12345.
@@ -614,20 +581,17 @@ export const VAL_ASPNETCORE_RATE_LIMITING_RESULT_ACQUIRED = 'acquired' as const;
 /**
  * Enum value 'endpoint_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
  */
-export const VAL_ASPNETCORE_RATE_LIMITING_RESULT_ENDPOINT_LIMITER =
-  'endpoint_limiter' as const;
+export const VAL_ASPNETCORE_RATE_LIMITING_RESULT_ENDPOINT_LIMITER = 'endpoint_limiter' as const;
 
 /**
  * Enum value 'global_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
  */
-export const VAL_ASPNETCORE_RATE_LIMITING_RESULT_GLOBAL_LIMITER =
-  'global_limiter' as const;
+export const VAL_ASPNETCORE_RATE_LIMITING_RESULT_GLOBAL_LIMITER = 'global_limiter' as const;
 
 /**
  * Enum value 'request_canceled' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
  */
-export const VAL_ASPNETCORE_RATE_LIMITING_RESULT_REQUEST_CANCELED =
-  'request_canceled' as const;
+export const VAL_ASPNETCORE_RATE_LIMITING_RESULT_REQUEST_CANCELED = 'request_canceled' as const;
 
 /**
  * Enum value 'success' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
@@ -642,32 +606,27 @@ export const VAL_ASPNETCORE_ROUTING_MATCH_STATUS_FAILURE = 'failure' as const;
 /**
  * Enum value 'handled' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
-export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_HANDLED =
-  'handled' as const;
+export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_HANDLED = 'handled' as const;
 
 /**
  * Enum value 'unhandled' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
-export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_UNHANDLED =
-  'unhandled' as const;
+export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_UNHANDLED = 'unhandled' as const;
 
 /**
  * Enum value 'skipped' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
-export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_SKIPPED =
-  'skipped' as const;
+export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_SKIPPED = 'skipped' as const;
 
 /**
  * Enum value 'aborted' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
  */
-export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_ABORTED =
-  'aborted' as const;
+export const VAL_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_ABORTED = 'aborted' as const;
 
 /**
  * Enum value 'normal_closure' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
  */
-export const VAL_SIGNALR_CONNECTION_STATUS_NORMAL_CLOSURE =
-  'normal_closure' as const;
+export const VAL_SIGNALR_CONNECTION_STATUS_NORMAL_CLOSURE = 'normal_closure' as const;
 
 /**
  * Enum value 'timeout' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
@@ -677,14 +636,12 @@ export const VAL_SIGNALR_CONNECTION_STATUS_TIMEOUT = 'timeout' as const;
 /**
  * Enum value 'app_shutdown' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
  */
-export const VAL_SIGNALR_CONNECTION_STATUS_APP_SHUTDOWN =
-  'app_shutdown' as const;
+export const VAL_SIGNALR_CONNECTION_STATUS_APP_SHUTDOWN = 'app_shutdown' as const;
 
 /**
  * Enum value 'server_sent_events' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
  */
-export const VAL_SIGNALR_TRANSPORT_SERVER_SENT_EVENTS =
-  'server_sent_events' as const;
+export const VAL_SIGNALR_TRANSPORT_SERVER_SENT_EVENTS = 'server_sent_events' as const;
 
 /**
  * Enum value 'long_polling' for attribute {@link ATTR_SIGNALR_TRANSPORT}.

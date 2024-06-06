@@ -28,20 +28,20 @@
 {%- for metric in filtered_metrics %}
 
 /**
-* {% filter escape %}{{metric.brief | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
+ * {% filter escape %}{{metric.brief | to_doc_brief | replace("\n", "\n * ") }}.{% endfilter %}
   {%- if metric.note %}
-*
-* Note: {% filter escape %}{{metric.note | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
+ *
+ * Note: {% filter escape %}{{metric.note | to_doc_brief | replace("\n", "\n * ") }}.{% endfilter %}
   {%- endif %}
   {%- if (metric.stability | string()) != "StabilityLevel.STABLE" %}
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
   {%- endif %}
   {%- if metric.deprecated %}
-*
-* @deprecated {{metric.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
+ *
+ * @deprecated {{metric.deprecated | to_doc_brief | replace("\n", "\n * ") }}.
   {%- endif %}
-*/
+ */
 export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("string", metric.metric_name) }} as const;
 
 {%- endfor %}
@@ -49,20 +49,20 @@ export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("st
 {%- for attribute in filtered_attributes if attribute.is_local and not attribute.ref %}
 
 /**
-* {% filter escape %}{{attribute.brief | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
+ * {% filter escape %}{{attribute.brief | to_doc_brief | replace("\n", "\n * ") }}.{% endfilter %}
   {%- if attribute.note %}
-*
-* Note: {% filter escape %}{{attribute.note | to_doc_brief | replace("\n", "\n* ") }}.{% endfilter %}
+ *
+ * Note: {% filter escape %}{{attribute.note | to_doc_brief | replace("\n", "\n * ") }}.{% endfilter %}
   {%- endif %}
   {%- if (attribute.stability | string()) != "StabilityLevel.STABLE" %}
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
   {%- endif %}
   {%- if attribute.deprecated %}
-*
-* @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
+ *
+ * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n * ") }}.
   {%- endif %}
-*/
+ */
 export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", attribute.fqn) }} as const;
 
 {%- endfor %}
@@ -71,9 +71,7 @@ export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", 
 {%- if attribute.is_enum %}
 {%- set class_name = attribute.fqn | to_const_name %}
 {%- set type = attribute.attr_type.enum_type %}
-
 {%- if attribute.attr_type.members is defined and attribute.attr_type.members|length > 0 %}
-
 {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
 
 /**
@@ -84,14 +82,12 @@ export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", 
   {%- endif %}
   {%- if attribute.deprecated %}
  *
- * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n* ") }}.
+ * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n * ") }}.
   {%- endif %}
  */
 export const VAL_{{class_name}}_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }} as const;
-
+{%- endfor %}
+{%- endif %}
+{%- endif %}
 {%- endfor %}
 
-{% endif %}
-{% endif %}
-
-{%- endfor %}
