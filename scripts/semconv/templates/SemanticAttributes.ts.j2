@@ -18,7 +18,7 @@
   {{ "'" if type == "string"}}{{value}}{{ "'" if type == "string"}}
 {%- endmacro %}
 {%- macro to_const_name_2(attr_name) %}
-{{- attr_name | replace("_", "") | replace(".", "_") | to_const_name }}
+{{- attr_name | replace("_", "") | replace(".", "_") | upper }}
 {%- endmacro %}
 
 //----------------------------------------------------------------------------------------------------------
