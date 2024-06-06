@@ -80,12 +80,12 @@ Attributes collected:
 
 | Attribute                                   | Short Description                                                              |
 | ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `HTTP_STATUS_CODE`                          | HTTP response status cod                                                       |
-| `HTTP_HOST`                                 | The value of the HTTP host header                                              |
-| `HTTP_USER_AGENT`                           | Value of the HTTP User-Agent header sent by the client                         |
-| `HTTP_SCHEME`                               | The URI scheme identifying the used protocol                                   |
-| `HTTP_URL`                                  | Full HTTP request URL                                                          |
-| `HTTP_METHOD`                               | HTTP request method                                                            |
+| `http.status_code`                          | HTTP response status code                                                       |
+| `http.host`                                 | The value of the HTTP host header                                              |
+| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
+| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
+| `http.url`                                  | Full HTTP request URL                                                          |
+| `http.method`                               | HTTP request method                                                            |
 
 ## Useful links
 
