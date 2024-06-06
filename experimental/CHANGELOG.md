@@ -7,6 +7,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.52.0
+
+### :boom: Breaking Change
+
 * feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
   * Breaking changes:
     * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
@@ -48,8 +60,6 @@ All notable changes to experimental packages in this project will be documented 
 * docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
 * docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
 * refactor(examples): use new exported string constants for semconv in experimental/examples/opencensus-shim [#4763](https://github.com/open-telemetry/opentelemetry-js/pull/4763#pull) @Zen-cronic
-
-### :house: (Internal)
 
 ## 0.51.1
 
