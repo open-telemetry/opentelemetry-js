@@ -30,28 +30,28 @@ export const METRIC_ASPNETCORE_DIAGNOSTICS_EXCEPTIONS = 'aspnetcore.diagnostics.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_ACTIVE_REQUEST_LEASES = 'aspnetcore.rate_limiting.active_request_leases' as const;
+export const METRIC_ASPNETCORE_RATELIMITING_ACTIVEREQUESTLEASES = 'aspnetcore.rate_limiting.active_request_leases' as const;
 
 /**
  * Number of requests that are currently queued, waiting to acquire a rate limiting lease.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_QUEUED_REQUESTS = 'aspnetcore.rate_limiting.queued_requests' as const;
+export const METRIC_ASPNETCORE_RATELIMITING_QUEUEDREQUESTS = 'aspnetcore.rate_limiting.queued_requests' as const;
 
 /**
  * The time the request spent in a queue waiting to acquire a rate limiting lease.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_TIME_IN_QUEUE = 'aspnetcore.rate_limiting.request.time_in_queue' as const;
+export const METRIC_ASPNETCORE_RATELIMITING_REQUEST_TIMEINQUEUE = 'aspnetcore.rate_limiting.request.time_in_queue' as const;
 
 /**
  * The duration of rate limiting lease held by requests on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_LEASE_DURATION = 'aspnetcore.rate_limiting.request_lease.duration' as const;
+export const METRIC_ASPNETCORE_RATELIMITING_REQUESTLEASE_DURATION = 'aspnetcore.rate_limiting.request_lease.duration' as const;
 
 /**
  * Number of requests that tried to acquire a rate limiting lease.
@@ -63,14 +63,14 @@ export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_LEASE_DURATION = 'aspnetcor
  * 
  * Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_RATE_LIMITING_REQUESTS = 'aspnetcore.rate_limiting.requests' as const;
+export const METRIC_ASPNETCORE_RATELIMITING_REQUESTS = 'aspnetcore.rate_limiting.requests' as const;
 
 /**
  * Number of requests that were attempted to be matched to an endpoint.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Routing`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_ASPNETCORE_ROUTING_MATCH_ATTEMPTS = 'aspnetcore.routing.match_attempts' as const;
+export const METRIC_ASPNETCORE_ROUTING_MATCHATTEMPTS = 'aspnetcore.routing.match_attempts' as const;
 
 /**
  * Duration of HTTP client requests.
@@ -107,7 +107,7 @@ export const METRIC_JVM_CPU_COUNT = 'jvm.cpu.count' as const;
  *
  * Note: The value range is [0.0,1.0]. This utilization is not defined as being for the specific interval since last measurement (unlike `system.cpu.utilization`). [Reference](https://docs.oracle.com/en/java/javase/17/docs/api/jdk.management/com/sun/management/OperatingSystemMXBean.html#getProcessCpuLoad()).
  */
-export const METRIC_JVM_CPU_RECENT_UTILIZATION = 'jvm.cpu.recent_utilization' as const;
+export const METRIC_JVM_CPU_RECENTUTILIZATION = 'jvm.cpu.recent_utilization' as const;
 
 /**
  * CPU time used by the process as reported by the JVM.
@@ -137,7 +137,7 @@ export const METRIC_JVM_MEMORY_USED = 'jvm.memory.used' as const;
 /**
  * Measure of memory used, as measured after the most recent garbage collection event on this pool.
  */
-export const METRIC_JVM_MEMORY_USED_AFTER_LAST_GC = 'jvm.memory.used_after_last_gc' as const;
+export const METRIC_JVM_MEMORY_USEDAFTERLASTGC = 'jvm.memory.used_after_last_gc' as const;
 
 /**
  * Number of executing platform threads.
@@ -149,14 +149,14 @@ export const METRIC_JVM_THREAD_COUNT = 'jvm.thread.count' as const;
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_ACTIVE_CONNECTIONS = 'kestrel.active_connections' as const;
+export const METRIC_KESTREL_ACTIVECONNECTIONS = 'kestrel.active_connections' as const;
 
 /**
  * Number of TLS handshakes that are currently in progress on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_ACTIVE_TLS_HANDSHAKES = 'kestrel.active_tls_handshakes' as const;
+export const METRIC_KESTREL_ACTIVETLSHANDSHAKES = 'kestrel.active_tls_handshakes' as const;
 
 /**
  * The duration of connections on the server.
@@ -170,14 +170,14 @@ export const METRIC_KESTREL_CONNECTION_DURATION = 'kestrel.connection.duration' 
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_QUEUED_CONNECTIONS = 'kestrel.queued_connections' as const;
+export const METRIC_KESTREL_QUEUEDCONNECTIONS = 'kestrel.queued_connections' as const;
 
 /**
  * Number of HTTP requests on multiplexed connections (HTTP/2 and HTTP/3) that are currently queued and are waiting to start.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_QUEUED_REQUESTS = 'kestrel.queued_requests' as const;
+export const METRIC_KESTREL_QUEUEDREQUESTS = 'kestrel.queued_requests' as const;
 
 /**
  * Number of connections rejected by the server.
@@ -185,14 +185,14 @@ export const METRIC_KESTREL_QUEUED_REQUESTS = 'kestrel.queued_requests' as const
  * Note: Connections are rejected when the currently active count exceeds the value configured with `MaxConcurrentConnections`.
  * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_REJECTED_CONNECTIONS = 'kestrel.rejected_connections' as const;
+export const METRIC_KESTREL_REJECTEDCONNECTIONS = 'kestrel.rejected_connections' as const;
 
 /**
  * The duration of TLS handshakes on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_TLS_HANDSHAKE_DURATION = 'kestrel.tls_handshake.duration' as const;
+export const METRIC_KESTREL_TLSHANDSHAKE_DURATION = 'kestrel.tls_handshake.duration' as const;
 
 /**
  * Number of connections that are currently upgraded (WebSockets). .
@@ -201,14 +201,14 @@ export const METRIC_KESTREL_TLS_HANDSHAKE_DURATION = 'kestrel.tls_handshake.dura
  * 
  * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_KESTREL_UPGRADED_CONNECTIONS = 'kestrel.upgraded_connections' as const;
+export const METRIC_KESTREL_UPGRADEDCONNECTIONS = 'kestrel.upgraded_connections' as const;
 
 /**
  * Number of connections that are currently active on the server.
  *
  * Note: Meter name: `Microsoft.AspNetCore.Http.Connections`; Added in: ASP.NET Core 8.0.
  */
-export const METRIC_SIGNALR_SERVER_ACTIVE_CONNECTIONS = 'signalr.server.active_connections' as const;
+export const METRIC_SIGNALR_SERVER_ACTIVECONNECTIONS = 'signalr.server.active_connections' as const;
 
 /**
  * The duration of connections on the server.
@@ -220,7 +220,7 @@ export const METRIC_SIGNALR_SERVER_CONNECTION_DURATION = 'signalr.server.connect
 /**
  * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason.
  */
-export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result' as const;
+export const ATTR_ASPNETCORE_RATELIMITING_RESULT = 'aspnetcore.rate_limiting.result' as const;
 
 /**
  * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
@@ -230,22 +230,22 @@ export const ATTR_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = 'aspnetcore.diagnostics.
 /**
  * Rate limiting policy name.
  */
-export const ATTR_ASPNETCORE_RATE_LIMITING_POLICY = 'aspnetcore.rate_limiting.policy' as const;
+export const ATTR_ASPNETCORE_RATELIMITING_POLICY = 'aspnetcore.rate_limiting.policy' as const;
 
 /**
  * Flag indicating if request was handled by the application pipeline.
  */
-export const ATTR_ASPNETCORE_REQUEST_IS_UNHANDLED = 'aspnetcore.request.is_unhandled' as const;
+export const ATTR_ASPNETCORE_REQUEST_ISUNHANDLED = 'aspnetcore.request.is_unhandled' as const;
 
 /**
  * A value that indicates whether the matched route is a fallback route.
  */
-export const ATTR_ASPNETCORE_ROUTING_IS_FALLBACK = 'aspnetcore.routing.is_fallback' as const;
+export const ATTR_ASPNETCORE_ROUTING_ISFALLBACK = 'aspnetcore.routing.is_fallback' as const;
 
 /**
  * Match result - success or failure.
  */
-export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status' as const;
+export const ATTR_ASPNETCORE_ROUTING_MATCHSTATUS = 'aspnetcore.routing.match_status' as const;
 
 /**
  * ASP.NET Core exception middleware handling result.
@@ -393,19 +393,19 @@ export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method' as const;
 /**
  * Original HTTP method sent by the client in the request line.
  */
-export const ATTR_HTTP_REQUEST_METHOD_ORIGINAL = 'http.request.method_original' as const;
+export const ATTR_HTTP_REQUEST_METHODORIGINAL = 'http.request.method_original' as const;
 
 /**
  * The ordinal number of request resending attempt (for any reason, including redirects).
  *
  * Note: The resend count SHOULD be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
  */
-export const ATTR_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count' as const;
+export const ATTR_HTTP_REQUEST_RESENDCOUNT = 'http.request.resend_count' as const;
 
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
  */
-export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code' as const;
+export const ATTR_HTTP_RESPONSE_STATUSCODE = 'http.response.status_code' as const;
 
 /**
  * The matched route, that is, the path template in the format used by the respective server framework.
@@ -551,7 +551,7 @@ export const ATTR_URL_SCHEME = 'url.scheme' as const;
 /**
  * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
  */
-export const ATTR_USER_AGENT_ORIGINAL = 'user_agent.original' as const;
+export const ATTR_USERAGENT_ORIGINAL = 'user_agent.original' as const;
 
 /**
  * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
@@ -566,42 +566,42 @@ export const ATTR_OTEL_SCOPE_VERSION = 'otel.scope.version' as const;
 /**
  * Name of the code, either &#34;OK&#34; or &#34;ERROR&#34;. MUST NOT be set if the status code is UNSET.
  */
-export const ATTR_OTEL_STATUS_CODE = 'otel.status_code' as const;
+export const ATTR_OTEL_STATUSCODE = 'otel.status_code' as const;
 
 /**
  * Description of the Status if it has a value, otherwise not set.
  */
-export const ATTR_OTEL_STATUS_DESCRIPTION = 'otel.status_description' as const;
+export const ATTR_OTEL_STATUSDESCRIPTION = 'otel.status_description' as const;
 
 /**
- * Enum value 'acquired' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ * Enum value 'acquired' for attribute {@link ATTR_ASPNETCORE_RATELIMITING_RESULT}.
  */
-export const ENUM_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ACQUIRED = 'acquired' as const;
+export const ENUM_ASPNETCORE_RATELIMITING_RESULT_VALUE_ACQUIRED = 'acquired' as const;
 
 /**
- * Enum value 'endpoint_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ * Enum value 'endpoint_limiter' for attribute {@link ATTR_ASPNETCORE_RATELIMITING_RESULT}.
  */
-export const ENUM_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ENDPOINT_LIMITER = 'endpoint_limiter' as const;
+export const ENUM_ASPNETCORE_RATELIMITING_RESULT_VALUE_ENDPOINTLIMITER = 'endpoint_limiter' as const;
 
 /**
- * Enum value 'global_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ * Enum value 'global_limiter' for attribute {@link ATTR_ASPNETCORE_RATELIMITING_RESULT}.
  */
-export const ENUM_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = 'global_limiter' as const;
+export const ENUM_ASPNETCORE_RATELIMITING_RESULT_VALUE_GLOBALLIMITER = 'global_limiter' as const;
 
 /**
- * Enum value 'request_canceled' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+ * Enum value 'request_canceled' for attribute {@link ATTR_ASPNETCORE_RATELIMITING_RESULT}.
  */
-export const ENUM_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = 'request_canceled' as const;
+export const ENUM_ASPNETCORE_RATELIMITING_RESULT_VALUE_REQUESTCANCELED = 'request_canceled' as const;
 
 /**
- * Enum value 'success' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
+ * Enum value 'success' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCHSTATUS}.
  */
-export const ENUM_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = 'success' as const;
+export const ENUM_ASPNETCORE_ROUTING_MATCHSTATUS_VALUE_SUCCESS = 'success' as const;
 
 /**
- * Enum value 'failure' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
+ * Enum value 'failure' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCHSTATUS}.
  */
-export const ENUM_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_FAILURE = 'failure' as const;
+export const ENUM_ASPNETCORE_ROUTING_MATCHSTATUS_VALUE_FAILURE = 'failure' as const;
 
 /**
  * Enum value 'handled' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
@@ -626,7 +626,7 @@ export const ENUM_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_ABORTED = 'abort
 /**
  * Enum value 'normal_closure' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
  */
-export const ENUM_SIGNALR_CONNECTION_STATUS_VALUE_NORMAL_CLOSURE = 'normal_closure' as const;
+export const ENUM_SIGNALR_CONNECTION_STATUS_VALUE_NORMALCLOSURE = 'normal_closure' as const;
 
 /**
  * Enum value 'timeout' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
@@ -636,22 +636,22 @@ export const ENUM_SIGNALR_CONNECTION_STATUS_VALUE_TIMEOUT = 'timeout' as const;
 /**
  * Enum value 'app_shutdown' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
  */
-export const ENUM_SIGNALR_CONNECTION_STATUS_VALUE_APP_SHUTDOWN = 'app_shutdown' as const;
+export const ENUM_SIGNALR_CONNECTION_STATUS_VALUE_APPSHUTDOWN = 'app_shutdown' as const;
 
 /**
  * Enum value 'server_sent_events' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
  */
-export const ENUM_SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = 'server_sent_events' as const;
+export const ENUM_SIGNALR_TRANSPORT_VALUE_SERVERSENTEVENTS = 'server_sent_events' as const;
 
 /**
  * Enum value 'long_polling' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
  */
-export const ENUM_SIGNALR_TRANSPORT_VALUE_LONG_POLLING = 'long_polling' as const;
+export const ENUM_SIGNALR_TRANSPORT_VALUE_LONGPOLLING = 'long_polling' as const;
 
 /**
  * Enum value 'web_sockets' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
  */
-export const ENUM_SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = 'web_sockets' as const;
+export const ENUM_SIGNALR_TRANSPORT_VALUE_WEBSOCKETS = 'web_sockets' as const;
 
 /**
  * Enum value 'heap' for attribute {@link ATTR_JVM_MEMORY_TYPE}.
@@ -661,7 +661,7 @@ export const ENUM_JVM_MEMORY_TYPE_VALUE_HEAP = 'heap' as const;
 /**
  * Enum value 'non_heap' for attribute {@link ATTR_JVM_MEMORY_TYPE}.
  */
-export const ENUM_JVM_MEMORY_TYPE_VALUE_NON_HEAP = 'non_heap' as const;
+export const ENUM_JVM_MEMORY_TYPE_VALUE_NONHEAP = 'non_heap' as const;
 
 /**
  * Enum value 'new' for attribute {@link ATTR_JVM_THREAD_STATE}.
@@ -686,7 +686,7 @@ export const ENUM_JVM_THREAD_STATE_VALUE_WAITING = 'waiting' as const;
 /**
  * Enum value 'timed_waiting' for attribute {@link ATTR_JVM_THREAD_STATE}.
  */
-export const ENUM_JVM_THREAD_STATE_VALUE_TIMED_WAITING = 'timed_waiting' as const;
+export const ENUM_JVM_THREAD_STATE_VALUE_TIMEDWAITING = 'timed_waiting' as const;
 
 /**
  * Enum value 'terminated' for attribute {@link ATTR_JVM_THREAD_STATE}.
@@ -839,11 +839,11 @@ export const ENUM_TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = 'swift' as const;
 export const ENUM_TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = 'webjs' as const;
 
 /**
- * Enum value 'OK' for attribute {@link ATTR_OTEL_STATUS_CODE}.
+ * Enum value 'OK' for attribute {@link ATTR_OTEL_STATUSCODE}.
  */
-export const ENUM_OTEL_STATUS_CODE_VALUE_OK = 'OK' as const;
+export const ENUM_OTEL_STATUSCODE_VALUE_OK = 'OK' as const;
 
 /**
- * Enum value 'ERROR' for attribute {@link ATTR_OTEL_STATUS_CODE}.
+ * Enum value 'ERROR' for attribute {@link ATTR_OTEL_STATUSCODE}.
  */
-export const ENUM_OTEL_STATUS_CODE_VALUE_ERROR = 'ERROR' as const;
+export const ENUM_OTEL_STATUSCODE_VALUE_ERROR = 'ERROR' as const;

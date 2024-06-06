@@ -17,6 +17,9 @@
 {%- macro print_value(type, value) -%}
   {{ "'" if type == "string"}}{{value}}{{ "'" if type == "string"}}
 {%- endmacro %}
+{%- macro to_const_name_2(attr_name) %}
+{{- attr_name | replace("_", "") | replace(".", "_") | to_const_name }}
+{%- endmacro %}
 
 //----------------------------------------------------------------------------------------------------------
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/{{template}}
@@ -42,7 +45,7 @@
  * @deprecated {{metric.deprecated | to_doc_brief | replace("\n", "\n * ") }}.
   {%- endif %}
  */
-export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("string", metric.metric_name) }} as const;
+export const METRIC_{{to_const_name_2(metric.metric_name)}} = {{ print_value ("string", metric.metric_name) }} as const;
 
 {%- endfor %}
 
@@ -63,19 +66,19 @@ export const METRIC_{{metric.metric_name | to_const_name}} = {{ print_value ("st
  * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n * ") }}.
   {%- endif %}
  */
-export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", attribute.fqn) }} as const;
+export const ATTR_{{ to_const_name_2(attribute.fqn) }} = {{ print_value ("string", attribute.fqn) }} as const;
 
 {%- endfor %}
 
 {%- for attribute in filtered_attributes if attribute.is_local and not attribute.ref %}
 {%- if attribute.is_enum %}
-{%- set class_name = attribute.fqn | to_const_name %}
+{%- set class_name = to_const_name_2(attribute.fqn) %}
 {%- set type = attribute.attr_type.enum_type %}
 {%- if attribute.attr_type.members is defined and attribute.attr_type.members|length > 0 %}
 {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
 
 /**
- * Enum value {{ print_value(type, member.value) }} for attribute {@link ATTR_{{ attribute.fqn | to_const_name }}}.
+ * Enum value {{ print_value(type, member.value) }} for attribute {@link ATTR_{{ class_name }}}.
   {%- if (attribute.stability | string()) != "StabilityLevel.STABLE" %}
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
@@ -85,7 +88,7 @@ export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", 
  * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n * ") }}.
   {%- endif %}
  */
-export const ENUM_{{class_name}}_VALUE_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }} as const;
+export const ENUM_{{class_name}}_VALUE_{{ to_const_name_2(member.member_id) }} = {{ print_value(type, member.value) }} as const;
 {%- endfor %}
 {%- endif %}
 {%- endif %}
