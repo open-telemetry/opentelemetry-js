@@ -85,7 +85,7 @@ export const ATTR_{{attribute.fqn | to_const_name}} = {{ print_value ("string", 
  * @deprecated {{attribute.deprecated | to_doc_brief | replace("\n", "\n * ") }}.
   {%- endif %}
  */
-export const VAL_{{class_name}}_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }} as const;
+export const ENUM_{{class_name}}_VALUE_{{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }} as const;
 {%- endfor %}
 {%- endif %}
 {%- endif %}
