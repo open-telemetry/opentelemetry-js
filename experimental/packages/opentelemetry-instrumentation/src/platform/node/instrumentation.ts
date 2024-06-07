@@ -34,6 +34,7 @@ import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
 import { Hook } from 'require-in-the-middle';
 import { readFileSync } from 'fs';
+import { isWrapped } from '../../utils';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -53,7 +54,7 @@ export abstract class InstrumentationBase<
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: ConfigType = {} as ConfigType // The cast here may be wrong as ConfigType may contain required fields
+    config: ConfigType
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
@@ -79,6 +80,9 @@ export abstract class InstrumentationBase<
   }
 
   protected override _wrap: typeof wrap = (moduleExports, name, wrapper) => {
+    if (isWrapped(moduleExports[name])) {
+      this._unwrap(moduleExports, name);
+    }
     if (!utilTypes.isProxy(moduleExports)) {
       return wrap(moduleExports, name, wrapper);
     } else {
@@ -305,12 +309,11 @@ export abstract class InstrumentationBase<
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      const esmHook =
-        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
-          [module.name],
-          { internals: false },
-          <HookFn>hookFn
-        );
+      const esmHook = new (
+        ImportInTheMiddle as unknown as {
+          Hook: typeof ImportInTheMiddle.default;
+        }
+      ).Hook([module.name], { internals: false }, <HookFn>hookFn);
       this._hooks.push(esmHook);
     }
   }

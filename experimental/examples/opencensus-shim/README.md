@@ -64,7 +64,7 @@ Go to Jaeger with your browser <http://localhost:16686/> and click on the "Servi
     - A child for the sleep operation. This was manually instrumented with OpenTelemetry.
       Notice this span is correctly recorded as a child of the OpenCensus instrumentation.
 
-<p align="center"><img src="./images/jaeger-trace.png"/></p>
+<p align="center"><img alt="Jaeger UI showing a trace" src="./images/jaeger-trace.png"/></p>
 
 ## Check the Prometheus metrics
 
@@ -72,7 +72,7 @@ Load the Prometheus metrics endpoint of the server at <http://localhost:9464/met
 browser. You should see the `opencensus_io_http_server_*` related metrics in
 the output.
 
-<p align="center"><img src="./images/prom-metrics.png"/></p>
+<p align="center"><img alt="Screenshot showing Prometheus raw metrics" src="./images/prom-metrics.png"/></p>
 
 ## Useful links
 

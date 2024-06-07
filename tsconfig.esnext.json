@@ -51,6 +51,9 @@
       "path": "experimental/packages/propagator-aws-xray-lambda/tsconfig.esnext.json"
     },
     {
+      "path": "experimental/packages/sdk-events/tsconfig.esnext.json"
+    },
+    {
       "path": "experimental/packages/sdk-logs/tsconfig.esnext.json"
     },
     {
