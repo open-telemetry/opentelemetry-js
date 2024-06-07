@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717660458086,
+  "lastUpdate": 1717749277277,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -11248,6 +11248,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.49%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "66320475+JohannesHuster@users.noreply.github.com",
+            "name": "Johannes Huster",
+            "username": "JohannesHuster"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bd053932b7c8c7c9dff4d8360487a0f39dbc4bda",
+          "message": "refactor(sdk-node): Use tree-shakeable string constants for semconv (#4767)\n\n* refactor(sdk-node): Use tree-shakeable string constants for semconv\n\n* Update changelog",
+          "timestamp": "2024-06-07T08:32:03Z",
+          "tree_id": "796d27c1b8fe6641fe880ff288d7d16d3416d425",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bd053932b7c8c7c9dff4d8360487a0f39dbc4bda"
+        },
+        "date": 1717749276254,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 990532,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11733,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 653455,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 657451,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
