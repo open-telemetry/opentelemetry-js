@@ -214,7 +214,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 #### Approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
-- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
@@ -247,6 +246,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace, Approver
+- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco, Approver
 
 *Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
 
