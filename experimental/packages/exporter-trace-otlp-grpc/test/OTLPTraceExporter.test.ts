@@ -22,7 +22,7 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 
 import * as assert from 'assert';
-import { X509Certificate } from 'crypto';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
@@ -150,7 +150,7 @@ const testCollectorExporter = (params: TestParams) => {
       sinon.restore();
     });
 
-    if (useTLS) {
+    if (useTLS && crypto.X509Certificate) {
       it('test certs are valid', () => {
         const certPaths = [
           './test/certs/ca.crt',
@@ -158,7 +158,7 @@ const testCollectorExporter = (params: TestParams) => {
           './test/certs/server.crt',
         ];
         certPaths.forEach(certPath => {
-          const cert = new X509Certificate(fs.readFileSync(certPath));
+          const cert = new crypto.X509Certificate(fs.readFileSync(certPath));
           const now = new Date();
           assert.ok(
             new Date(cert.validTo) > now,
