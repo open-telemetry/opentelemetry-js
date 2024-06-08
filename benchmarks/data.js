@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717752453054,
+  "lastUpdate": 1717805906351,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -11352,6 +11352,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "55876749+mmouru@users.noreply.github.com",
+            "name": "mmouru",
+            "username": "mmouru"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2e42181ff07003b1dcae2eaa392e681d43d27ea3",
+          "message": "refactor(instr-fetch): move fetch to use SEMATRR (#4632)\n\n* refactor(instr-fetch): move fetch to use SEMATRR\n\n* Update experimental/CHANGELOG.md\n\nCo-authored-by: Trent Mick <trentm@gmail.com>\n\n* Apply suggestions from code review\r\n\r\nupdate readme table to use attribute strings\n\n* move changelog entry to unreleased\n\n---------\n\nCo-authored-by: Trent Mick <trentm@gmail.com>\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>",
+          "timestamp": "2024-06-08T00:15:51Z",
+          "tree_id": "6ebbf4ccd9f617326324e3fbb7ba9310b6da90d5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/2e42181ff07003b1dcae2eaa392e681d43d27ea3"
+        },
+        "date": 1717805905322,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 918805,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11795,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 701826,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 658797,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
