@@ -127,15 +127,15 @@ describe('GrpcExporterTransport', function () {
 
     describe('createSslCredentials', function () {
       it('test certs are valid', () => {
-        const certPaths = [
-          './test/certs/ca.crt',
-          './test/certs/server.crt'
-        ];
+        const certPaths = ['./test/certs/ca.crt', './test/certs/server.crt'];
         certPaths.forEach(certPath => {
           const cert = new X509Certificate(fs.readFileSync(certPath));
           const now = new Date();
-          assert.ok(new Date(cert.validTo) > now, `TLS cert "${certPath}" is still valid: cert.validTo="${cert.validTo}" (if this fails use 'npm run maint:regenerate-test-certs')`);
-        })
+          assert.ok(
+            new Date(cert.validTo) > now,
+            `TLS cert "${certPath}" is still valid: cert.validTo="${cert.validTo}" (if this fails use 'npm run maint:regenerate-test-certs')`
+          );
+        });
       });
 
       it('creates SSL grpc credentials', function () {

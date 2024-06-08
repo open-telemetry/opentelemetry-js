@@ -17,6 +17,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* test: add `npm run maint:regenerate-test-certs` maintenance script and regenerate recently expired test certs [#4777](https://github.com/open-telemetry/opentelemetry-js/pull/4777)
+
 ## 0.52.0
 
 ### :boom: Breaking Change
