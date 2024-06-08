@@ -19,7 +19,8 @@
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
-    "align-api-deps": "node ../../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../../../scripts/align-api-deps.js",
+    "maint:regenerate-test-certs": "cd test/certs && ./regenerate.sh"
   },
   "keywords": [
     "opentelemetry",
