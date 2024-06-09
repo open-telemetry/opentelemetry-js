@@ -9,6 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
 * feat: add Web SDK package [4325](https://github.com/open-telemetry/opentelemetry-js/pull/4325)
 
 ### :bug: (Bug Fix)
