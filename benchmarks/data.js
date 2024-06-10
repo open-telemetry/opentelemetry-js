@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1717805906351,
+  "lastUpdate": 1718017043893,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -11404,6 +11404,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.28%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "01664ddf873f2d0f37bc1a378863197a497520bd",
+          "message": "tests: regenerate recently-expired test TLS certs (#4777)\n\n* tests: regenerate recently-expired test TLS certs\n\nTests started failing yesterday because the various TLS certs in\nthe repo used for TLS testing had expired\n\n$ openssl x509 -noout -enddate -in experimental/packages/exporter-logs-otlp-grpc/test/certs/ca.crt\nnotAfter=Jun  7 16:44:23 2024 GMT\n\nThis change regenerates all the TLS certs used for testing and\nexamples/https. It also adds a test case in each relevant package\nthat will fail with an obvious message when these certs expire\nnext time (certs are generated with a 1y expiry).\n\nThis also adds a comment 'npm run main:regenerate-test-certs'\nthat can be used to run the maintenance task.\n\n* lint:fix, add changelog entry\n\n* skip cert expiry test on node v14, because crypto.X509Certificate came in node v15",
+          "timestamp": "2024-06-10T10:54:49Z",
+          "tree_id": "8a5b62834ce2c7f67b470f3526d5959dfa5e9d2e",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/01664ddf873f2d0f37bc1a378863197a497520bd"
+        },
+        "date": 1718017042865,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 994062,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12201,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 683244,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 652778,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
