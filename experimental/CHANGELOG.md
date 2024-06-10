@@ -9,11 +9,15 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* test: add `npm run maint:regenerate-test-certs` maintenance script and regenerate recently expired test certs [#4777](https://github.com/open-telemetry/opentelemetry-js/pull/4777)
 
 ## 0.52.0
 
@@ -54,6 +58,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 * refactor(instrumentation-xml-http-request): use exported strings for semantic attributes. [#4681](https://github.com/open-telemetry/opentelemetry-js/pull/4681/files)
+* refactor(sdk-node): Use tree-shakeable string constants for semconv [#4767](https://github.com/open-telemetry/opentelemetry-js/pull/4767) @JohannesHuster
 
 ### :bug: (Bug Fix)
 
