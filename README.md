@@ -105,12 +105,13 @@ The above example will emit auto-instrumented telemetry about your Node.js appli
 
 ## Library Author
 
-If you are a library author looking to build OpenTelemetry into your library, please see [the documentation][docs]. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an [Application Owner](#application-owner) uses a different SDK implementation.
+If you are a library author looking to build OpenTelemetry into your library, please see [the documentation][docs]. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an application owner uses a different SDK implementation.
 
 ## Supported Runtimes
 
 | Platform Version    | Supported                                     |
 |---------------------|-----------------------------------------------|
+| Node.JS `v22`       | :heavy_check_mark:                            |
 | Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
 | Node.JS `v16`       | :heavy_check_mark:                            |
@@ -204,8 +205,8 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 #### Maintainers ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))
 
-- [Amir Blum](https://github.com/blumamir), Keyval
-- [Chengzhong Wu](https://github.com/legendecas), Alibaba
+- [Amir Blum](https://github.com/blumamir), Odigos
+- [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 
@@ -213,8 +214,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 #### Approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
-- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
-- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
@@ -224,12 +223,13 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 - [Trent Mick](https://github.com/trentm), Elastic
+- [David Luna](https://github.com/david-luna), Elastic
 
 *Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
 #### Triager ([@open-telemetry/javascript-triagers](https://github.com/orgs/open-telemetry/teams/javascript-triagers))
 
-- [David Luna](https://github.com/david-luna), Elastic
+- N/A
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
@@ -245,13 +245,15 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [John Bley](https://github.com/johnbley), Splunk, Approver
 - [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
+- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace, Approver
+- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco, Approver
 
 *Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
 
 #### Thanks to all the people who already contributed
 
 <a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
+  <img alt="Repo contributors" src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
 </a>
 
 ## Packages
@@ -348,6 +350,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
-[otel-propagator-b3]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3
 
 [spec-versioning]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md

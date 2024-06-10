@@ -16,10 +16,6 @@
 
 import { diag } from '@opentelemetry/api';
 import {
-  Instrumentation,
-  InstrumentationOption,
-} from '@opentelemetry/instrumentation';
-import {
   DetectorSync,
   envDetectorSync,
   hostDetectorSync,
@@ -27,29 +23,6 @@ import {
   processDetectorSync,
   serviceInstanceIdDetectorSync,
 } from '@opentelemetry/resources';
-
-// TODO: This part of a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
-// If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
-// This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
-export function parseInstrumentationOptions(
-  options: InstrumentationOption[] = []
-): Instrumentation[] {
-  let instrumentations: Instrumentation[] = [];
-  for (let i = 0, j = options.length; i < j; i++) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const option = options[i] as any;
-    if (Array.isArray(option)) {
-      const results = parseInstrumentationOptions(option);
-      instrumentations = instrumentations.concat(results);
-    } else if (typeof option === 'function') {
-      instrumentations.push(new option());
-    } else if ((option as Instrumentation).instrumentationName) {
-      instrumentations.push(option);
-    }
-  }
-
-  return instrumentations;
-}
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';

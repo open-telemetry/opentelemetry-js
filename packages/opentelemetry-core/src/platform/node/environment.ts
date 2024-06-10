@@ -28,3 +28,7 @@ export function getEnv(): Required<ENVIRONMENT> {
   const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
   return Object.assign({}, DEFAULT_ENVIRONMENT, processEnv);
 }
+
+export function getEnvWithoutDefaults(): ENVIRONMENT {
+  return parseEnvironment(process.env as RAW_ENVIRONMENT);
+}

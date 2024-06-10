@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/resources",
-  "version": "1.23.0",
+  "version": "1.25.0",
   "description": "OpenTelemetry SDK resources",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -9,7 +9,11 @@
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
     "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
     "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js",
+    "./src/detectors/platform/index.ts": "./src/detectors/platform/browser/index.ts",
+    "./build/esm/detectors/platform/index.js": "./build/esm/detectors/platform/browser/index.js",
+    "./build/esnext/detectors/platform/index.js": "./build/esnext/detectors/platform/browser/index.js",
+    "./build/src/detectors/platform/index.js": "./build/src/detectors/platform/browser/index.js"
   },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -29,7 +33,8 @@
     "version": "node ../../scripts/version-update.js",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",
@@ -61,21 +66,21 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.9.0",
+    "@opentelemetry/api": ">=1.0.0 <1.10.0",
     "@opentelemetry/resources_1.9.0": "npm:@opentelemetry/resources@1.9.0",
     "@types/mocha": "10.0.6",
     "@types/node": "18.6.5",
-    "@types/sinon": "10.0.20",
+    "@types/sinon": "17.0.3",
     "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
-    "karma": "6.4.2",
+    "karma": "6.4.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
     "karma-mocha": "2.0.1",
     "karma-mocha-webworker": "1.3.0",
     "karma-spec-reporter": "0.0.36",
-    "karma-webpack": "4.0.2",
+    "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
     "mocha": "10.2.0",
     "nock": "13.3.8",
@@ -88,11 +93,11 @@
     "webpack-merge": "5.10.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.9.0"
+    "@opentelemetry/api": ">=1.0.0 <1.10.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.23.0",
-    "@opentelemetry/semantic-conventions": "1.23.0"
+    "@opentelemetry/core": "1.25.0",
+    "@opentelemetry/semantic-conventions": "1.25.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-resources",
   "sideEffects": false

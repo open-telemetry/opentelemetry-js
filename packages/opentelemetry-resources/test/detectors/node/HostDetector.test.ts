@@ -16,7 +16,11 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMRESATTRS_HOST_ARCH,
+  SEMRESATTRS_HOST_ID,
+  SEMRESATTRS_HOST_NAME,
+} from '@opentelemetry/semantic-conventions';
 import { describeNode } from '../../util';
 import { hostDetector, IResource } from '../../../src';
 
@@ -27,7 +31,7 @@ describeNode('hostDetector() on Node.js', () => {
 
   it('should return resource information about the host', async () => {
     const os = require('os');
-    const mid = require('../../../src/platform/node/machine-id/getMachineId');
+    const mid = require('../../../src/detectors/platform/node/machine-id/getMachineId');
 
     const expectedHostId = 'f2c668b579780554f70f72a063dc0864';
 
@@ -39,15 +43,12 @@ describeNode('hostDetector() on Node.js', () => {
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_NAME],
+      resource.attributes[SEMRESATTRS_HOST_NAME],
       'opentelemetry-test'
     );
+    assert.strictEqual(resource.attributes[SEMRESATTRS_HOST_ARCH], 'amd64');
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_ARCH],
-      'amd64'
-    );
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_ID],
+      resource.attributes[SEMRESATTRS_HOST_ID],
       expectedHostId
     );
   });
@@ -60,14 +61,14 @@ describeNode('hostDetector() on Node.js', () => {
     const resource: IResource = await hostDetector.detect();
 
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_ARCH],
+      resource.attributes[SEMRESATTRS_HOST_ARCH],
       'some-unknown-arch'
     );
   });
 
   it('should handle missing machine id', async () => {
     const os = require('os');
-    const mid = require('../../../src/platform/node/machine-id/getMachineId');
+    const mid = require('../../../src/detectors/platform/node/machine-id/getMachineId');
 
     sinon.stub(os, 'arch').returns('x64');
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
@@ -77,16 +78,10 @@ describeNode('hostDetector() on Node.js', () => {
     await resource.waitForAsyncAttributes?.();
 
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_NAME],
+      resource.attributes[SEMRESATTRS_HOST_NAME],
       'opentelemetry-test'
     );
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_ARCH],
-      'amd64'
-    );
-    assert.strictEqual(
-      false,
-      SemanticResourceAttributes.HOST_ID in resource.attributes
-    );
+    assert.strictEqual(resource.attributes[SEMRESATTRS_HOST_ARCH], 'amd64');
+    assert.strictEqual(false, SEMRESATTRS_HOST_ID in resource.attributes);
   });
 });
