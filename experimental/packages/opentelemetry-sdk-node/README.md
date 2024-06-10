@@ -93,7 +93,7 @@ Use a custom propagator. Default: [CompositePropagator](../../../packages/opente
 
 ### logRecordProcessor
 
-Deprecated, please use [logRecordProcessors](#logRecordProcessors) instead.
+Deprecated, please use [logRecordProcessors](#logrecordprocessors) instead.
 
 ### logRecordProcessors
 

@@ -10,6 +10,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
+* feat(sdk-node): Automatically configure logs exporter [#4740](https://github.com/open-telemetry/opentelemetry-js/pull/4740)
 
 ### :bug: (Bug Fix)
 
