@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718021180666,
+  "lastUpdate": 1718090856352,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -11508,6 +11508,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "05e2699089fa73870e62432fe32f5f429cf45360",
+          "message": "fix(sdk-node): register context manager if no tracer options are provided (#4781)\n\n* fix(sdk-node): register context manager if no tracer options are provided\n\n* chore: add changelog entry",
+          "timestamp": "2024-06-11T07:25:06Z",
+          "tree_id": "4a0d41e46c30f4b51a7d4157e82b6744b8456d78",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/05e2699089fa73870e62432fe32f5f429cf45360"
+        },
+        "date": 1718090855498,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 966536,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11667,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 717562,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 674265,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
