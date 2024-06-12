@@ -18,6 +18,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* refactor(context-async-hooks): use explicit exports [#4785](https://github.com/open-telemetry/opentelemetry-js/pull/4786) @pichlermarc
+
 ## 1.25.0
 
 ### :rocket: (Enhancement)
