@@ -32,7 +32,6 @@ import { PassThrough, Stream } from 'stream';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
 import { VERSION } from '../../src/version';
-import { nextTick } from 'process';
 
 let fakeRequest: PassThrough;
 
@@ -167,7 +166,7 @@ describe('OTLPLogExporter', () => {
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -182,7 +181,7 @@ describe('OTLPLogExporter', () => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -199,7 +198,7 @@ describe('OTLPLogExporter', () => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -246,7 +245,7 @@ describe('OTLPLogExporter', () => {
       const spyLoggerError = sinon.stub(diag, 'error');
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -263,7 +262,7 @@ describe('OTLPLogExporter', () => {
 
     it('should log the error message', done => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(400);
           cb(mockRes);
           mockRes.send(Buffer.from('failure'));

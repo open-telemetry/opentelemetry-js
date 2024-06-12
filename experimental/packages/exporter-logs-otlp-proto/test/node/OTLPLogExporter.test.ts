@@ -38,7 +38,6 @@ import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { VERSION } from '../../src/version';
 import { Root } from 'protobufjs';
 import * as path from 'path';
-import { nextTick } from 'process';
 
 let fakeRequest: PassThrough;
 
@@ -230,7 +229,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -245,7 +244,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -261,7 +260,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -307,7 +306,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
       const spyLoggerError = sinon.stub(diag, 'error');
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           cb(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -324,7 +323,7 @@ describe('OTLPLogExporter - node with proto over http', () => {
 
     it('should log the error message', done => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(400);
           cb(mockRes);
           mockRes.send(Buffer.from('failure'));

@@ -33,7 +33,6 @@ import {
   ensureSpanIsCorrect,
   mockedReadableSpan,
 } from '../traceHelper';
-import { nextTick } from 'process';
 import { MockedResponse } from './nodeHelpers';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../src/version';
@@ -242,7 +241,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
       setTimeout(() => {
         const args = stubRequest.args[0];
         const callback = args[1];
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           callback(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -262,7 +261,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
       setTimeout(() => {
         const args = stubRequest.args[0];
         const callback = args[1];
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           callback(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -280,7 +279,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
       setTimeout(() => {
         const args = stubRequest.args[0];
         const callback = args[1];
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           callback(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -299,7 +298,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         const args = stubRequest.args[0];
         const callback = args[1];
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           callback(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -321,14 +320,14 @@ describe('OTLPTraceExporter - node with json over http', () => {
       const callback = args[1];
       const mockRes = new MockedResponse(200);
 
-      nextTick(() => {
+      queueMicrotask(() => {
         callback(mockRes);
         mockRes.send(Buffer.from('success'));
       });
 
       clock.restore();
 
-      nextTick(() => {
+      queueMicrotask(() => {
         const clock = sinon.useFakeTimers();
         collectorExporter.export(spans, () => {});
 
@@ -388,7 +387,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         const args = stubRequest.args[0];
         const callback = args[1];
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(200);
           callback(mockRes);
           mockRes.send(Buffer.from('success'));
@@ -413,7 +412,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         const args = stubRequest.args[0];
         const callback = args[1];
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const mockRes = new MockedResponse(400);
           callback(mockRes);
           mockRes.send(Buffer.from('failure'));
