@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718109294930,
+  "lastUpdate": 1718218268513,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -11612,6 +11612,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.23%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "b5409d7acd919d73c4e87929c60300a7b90c91b3",
+          "message": " refactor(otlp-transformer): use explicit exports (#4785)\n\n* refactor(otlp-transformer): use explicit exports\n\n* chore: add changelog entry\n\n* Update experimental/CHANGELOG.md\n\n* Update experimental/CHANGELOG.md",
+          "timestamp": "2024-06-12T18:48:44Z",
+          "tree_id": "a61493d8af6ca222179eeb6a6123bfda90e474d5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b5409d7acd919d73c4e87929c60300a7b90c91b3"
+        },
+        "date": 1718218267667,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 960595,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11554,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 663032,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 646509,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
