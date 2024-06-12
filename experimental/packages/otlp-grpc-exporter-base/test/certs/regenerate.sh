@@ -1,10 +1,9 @@
 #!/usr/bin/env sh
 #
-# Usage: regenerate.sh
+# Regenerate certificates that are used for tests using TLS.
+# Certs are generated with a one year expiry, so periodic regen is required.
 #
-# regenerate.sh regenerates certificates that are used to test gRPC with TLS
-# Make sure you run it in test/certs directory.
-# It also serves as a documentation on how existing certificates were generated.
+# Usage: npm run maint:regenerate-test-certs
 
 rm ca.crt ca.key client.crt client.csr client.key server.crt server.csr server.key
 
