@@ -7,8 +7,14 @@ const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentati
 const { ZoneContextManager } = require( '@opentelemetry/context-zone');
 const { B3Propagator } = require( '@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
+const { Resource } = require('@opentelemetry/resources');
+const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
-const provider = new WebTracerProvider();
+const provider = new WebTracerProvider({
+  resource: new Resource({
+    [SEMRESATTRS_SERVICE_NAME]: 'fetch-xhr-b3-web-service'
+  })
+});
 
 // Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
 // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the

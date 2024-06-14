@@ -16,7 +16,12 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :books: (Refine Doc)
 
+* refactor(examples): added usage of @opentelemetry/semantic-conventions and @opentelemetry/resources to the examples in examples/opentelemetry-web for maintaining consistency across all examples. [#4764](https://github.com/open-telemetry/opentelemetry-js/pull/4764) @Zen-cronic
+
 ### :house: (Internal)
+
+* refactor(context-zone-peer-dep): use explicit exports [#4785](https://github.com/open-telemetry/opentelemetry-js/pull/4787) @pichlermarc
+* refactor(context-async-hooks): use explicit exports [#4785](https://github.com/open-telemetry/opentelemetry-js/pull/4786) @pichlermarc
 
 ## 1.25.0
 
