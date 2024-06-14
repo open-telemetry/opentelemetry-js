@@ -34,6 +34,7 @@
     "lint:markdown:fix": "markdownlint-cli2 --fix $(git ls-files '*.md')",
     "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix",
     "update-ts-configs": "node scripts/update-ts-configs.js",
+    "maint:regenerate-test-certs": "npm run --if-present --workspaces maint:regenerate-test-certs",
     "comment_prepare_1": "echo scripts in this section automatically prepare releases. Intended for use by maintainers only.",
     "comment_prepare_2": "echo experimental preparation scripts only prepare experimental packages",
     "prepare_release:experimental:patch": "npm run _check:no_changes && npm run _backup:package-json && npm run _lerna:remove_api && npm run _lerna:remove_stable && npm run _lerna:version_patch && npm run _restore:package-json && npm run _changelog:prepare_experimental",

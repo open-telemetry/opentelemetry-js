@@ -214,8 +214,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 #### Approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
-- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
-- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
 - [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
@@ -225,12 +223,13 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 - [Trent Mick](https://github.com/trentm), Elastic
+- [David Luna](https://github.com/david-luna), Elastic
 
 *Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
 #### Triager ([@open-telemetry/javascript-triagers](https://github.com/orgs/open-telemetry/teams/javascript-triagers))
 
-- [David Luna](https://github.com/david-luna), Elastic
+- N/A
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
@@ -246,6 +245,8 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [John Bley](https://github.com/johnbley), Splunk, Approver
 - [Mark Wolff](https://github.com/markwolff), Microsoft, Approver
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal, Approver
+- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace, Approver
+- [Haddas Bronfman](https://github.com/haddasbronfman), Cisco, Approver
 
 *Find more about the emeritus role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager).*
 

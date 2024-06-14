@@ -7,6 +7,25 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+* refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
+* refactor(otlp-transformer): use explicit exports [#4785](https://github.com/open-telemetry/opentelemetry-js/pull/4785) @pichlermarc
+
+### :bug: (Bug Fix)
+
+* fix(sdk-node): register context manager if no tracer options are provided [#4781](https://github.com/open-telemetry/opentelemetry-js/pull/4781) @pichlermarc
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+* test: add `npm run maint:regenerate-test-certs` maintenance script and regenerate recently expired test certs [#4777](https://github.com/open-telemetry/opentelemetry-js/pull/4777)
+
+## 0.52.0
+
+### :boom: Breaking Change
+
 * feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
   * Breaking changes:
     * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
@@ -38,15 +57,17 @@ All notable changes to experimental packages in this project will be documented 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 * refactor(instrumentation-xml-http-request): use exported strings for semantic attributes. [#4681](https://github.com/open-telemetry/opentelemetry-js/pull/4681/files)
+* refactor(sdk-node): Use tree-shakeable string constants for semconv [#4767](https://github.com/open-telemetry/opentelemetry-js/pull/4767) @JohannesHuster
 
 ### :bug: (Bug Fix)
+
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/pull/91) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
 
 ### :books: (Refine Doc)
 
 * docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
 * docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
-
-### :house: (Internal)
+* refactor(examples): use new exported string constants for semconv in experimental/examples/opencensus-shim [#4763](https://github.com/open-telemetry/opentelemetry-js/pull/4763#pull) @Zen-cronic
 
 ## 0.51.1
 
@@ -71,6 +92,7 @@ All notable changes to experimental packages in this project will be documented 
     * `InstrumentationBase`
     * `InstrumentationNodeModuleDefinition`
     * `InstrumentationNodeModuleFile`
+* feat(api-events): removed traceId and spanId from Event interface, added context and severityNumber [#4629](https://github.com/open-telemetry/opentelemetry-js/pull/4629)
 
 ### :rocket: (Enhancement)
 
@@ -83,6 +105,7 @@ All notable changes to experimental packages in this project will be documented 
   * The value can be overwritten by
     * merging a resource containing the `service.instance.id` attribute
     * using another resource detector which writes `service.instance.id`
+* feat(sdk-events): add Events SDK [#4629](https://github.com/open-telemetry/opentelemetry-js/pull/4629)
 
 ### :bug: (Bug Fix)
 
