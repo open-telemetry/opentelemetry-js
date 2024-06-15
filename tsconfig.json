@@ -49,7 +49,8 @@
       "packages/sdk-metrics",
       "integrated-benchmarks/http",
       "integrated-benchmarks/http-otel",
-      "integrated-benchmarks/express"
+      "integrated-benchmarks/express",
+      "integrated-benchmarks/express-otel"
     ],
     "out": "docs",
     "exclude": [
@@ -202,6 +203,9 @@
     },
     {
       "path": "integrated-benchmarks/express"
+    },
+    {
+      "path": "integrated-benchmarks/express-otel"
     }
   ]
 }

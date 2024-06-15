@@ -3,16 +3,22 @@
   lang: Node.js
   run:
     cmd: node
-    args: ['./build/index.js']
+    args: ['./build/src/index.js']
 - id: http-otel
   name: http-otel
   lang: Node.js
   run:
     cmd: node
-    args: ['./build/index.js']
+    args: ['./build/src/index.js']
 - id: express
   name: express
   lang: Node.js
   run:
     cmd: node
-    args: ['./build/index.js']
+    args: ['./build/src/index.js']
+- id: express-otel
+  name: express-otel
+  lang: Node.js
+  run:
+    cmd: node
+    args: ['./build/src/index.js']

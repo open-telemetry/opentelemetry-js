@@ -9,18 +9,6 @@ benchmarks = Array(Benchmark).from_yaml ECR.render("benchmarks.yaml")
 
 shards_mut = Mutex.new
 
-ch = Channel(Nil).new
-benchmarks.map do |b|
-  spawn do
-    dir = Path[Dir.current, b.id]
-    run("npm", ["start", "--silent"], dir, true) if File.exists? dir.join("package.json")
-    ch.send(nil)
-  rescue ex
-    puts ex.message
-    exit 1
-  end
-end.each { |_| ch.receive }
-
 benchmarks.each_with_index do |b, i|
   if port_bound?
     # a TERM signal doesn't always end all processes
