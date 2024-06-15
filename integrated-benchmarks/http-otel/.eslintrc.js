@@ -2,5 +2,5 @@ module.exports = {
   env: {
     node: true,
   },
-  ...require('../eslint.base.js'),
+  ...require('../../eslint.base.js'),
 };
