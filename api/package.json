@@ -97,7 +97,7 @@
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
-    "memfs": "3.5.3",
+    "memfs": "4.9.3",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
