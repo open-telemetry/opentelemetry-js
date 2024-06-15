@@ -1,0 +1,9 @@
+<!-- README.md is generated from README.ecr, do not edit -->
+
+# Benchmarks
+
+| Name                          |  Latency avg      | Requests      |
+| ----------------------------  |  ---------------- | ------------- |
+<%- benchmarks.each do |b| -%>
+| <%= b.name %>| <%= b.latency %> | <%= b.reqs %> |
+<%- end -%>

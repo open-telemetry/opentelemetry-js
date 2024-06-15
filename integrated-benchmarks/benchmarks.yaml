@@ -1,0 +1,12 @@
+- id: http
+  name: http
+  lang: Node.js
+  run:
+    cmd: node
+    args: ['./build/index.js']
+- id: http-otel
+  name: http-otel
+  lang: Node.js
+  run:
+    cmd: node
+    args: ['./build/index.js']
