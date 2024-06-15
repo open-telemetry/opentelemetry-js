@@ -2,7 +2,7 @@ import cluster from 'cluster';
 import { cpus } from 'os';
 import { createServer } from 'http';
 
-if (cluster.isPrimary) {
+if (cluster?.isPrimary) {
   for (let i = 0; i < cpus().length; i++) {
     cluster.fork();
   }

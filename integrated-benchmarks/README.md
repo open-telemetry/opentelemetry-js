@@ -18,7 +18,15 @@ With these benchmarks users can see how OpenTelemetry affects the performance of
 
 ## How to run benchmarks
 
-TODO
+To run the benchmarks locally, you will need to have [Nix](https://nixos.org/) installed. Once you have Nix installed, you can run the following command to run the benchmarks:
+
+- https://nixos.org/download/
+
+```sh
+cd ./integrated-benchmarks && nix-shell --quiet --run ./run.cr
+```
+
+> Its best to use the pipeline to run the benchmarks, as it will ensure that the benchmarks are run in the same environment as CI. Running locally may give different results and consume all your resources.
 
 ## How to add a new benchmark
 

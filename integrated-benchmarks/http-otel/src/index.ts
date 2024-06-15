@@ -22,7 +22,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
 
-if (cluster.isPrimary) {
+if (cluster?.isPrimary) {
   for (let i = 0; i < cpus().length; i++) {
     cluster.fork();
   }

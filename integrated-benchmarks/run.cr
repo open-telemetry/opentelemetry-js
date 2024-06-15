@@ -13,12 +13,7 @@ ch = Channel(Nil).new
 benchmarks.map do |b|
   spawn do
     dir = Path[Dir.current, b.id]
-    if File.exists? dir.join("shard.yml")
-      shards_mut.synchronize do
-        run("shards", ["install", "-q", "--frozen"], dir, true)
-      end
-    end
-    run("npm", ["ci", "--silent"], dir, true) if File.exists? dir.join("package.json")
+    run("npm", ["start", "--silent"], dir, true) if File.exists? dir.join("package.json")
     ch.send(nil)
   rescue ex
     puts ex.message
