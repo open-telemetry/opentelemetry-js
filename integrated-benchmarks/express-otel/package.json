@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/integrated-benchmarks-express-otel",
   "version": "1.25.0",
-  "description": "OpenTelemetry Integrated HTTP Server Benchmarks",
+  "description": "OpenTelemetry Integrated Express Server Benchmarks",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",

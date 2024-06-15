@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/integrated-benchmarks-http",
   "version": "1.25.0",
-  "description": "OpenTelemetry Isolated HTTP Server Benchmarks",
+  "description": "Isolated HTTP Server Benchmarks",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
