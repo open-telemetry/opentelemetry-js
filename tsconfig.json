@@ -48,7 +48,8 @@
       "packages/propagator-aws-xray",
       "packages/sdk-metrics",
       "integrated-benchmarks/http",
-      "integrated-benchmarks/http-otel"
+      "integrated-benchmarks/http-otel",
+      "integrated-benchmarks/express"
     ],
     "out": "docs",
     "exclude": [
@@ -198,6 +199,9 @@
     },
     {
       "path": "integrated-benchmarks/http-otel"
+    },
+    {
+      "path": "integrated-benchmarks/express"
     }
   ]
 }

@@ -10,3 +10,9 @@
   run:
     cmd: node
     args: ['./build/index.js']
+- id: express
+  name: express
+  lang: Node.js
+  run:
+    cmd: node
+    args: ['./build/index.js']
