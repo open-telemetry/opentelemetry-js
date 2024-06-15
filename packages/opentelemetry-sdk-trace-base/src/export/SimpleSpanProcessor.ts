@@ -33,6 +33,8 @@ import { Resource } from '@opentelemetry/resources';
  * to {@link ReadableSpan} and passes it to the configured exporter.
  *
  * Only spans that are sampled are converted.
+ *
+ * @warning This may not be the preferred processor to use in production. See https://github.com/open-telemetry/opentelemetry-js/issues/4741
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
