@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/integrated-benchmarks",
+  "name": "@opentelemetry/integrated-benchmarks-http-otel",
   "version": "1.25.0",
   "description": "OpenTelemetry Integrated HTTP Server Benchmarks",
   "main": "build/src/index.js",
