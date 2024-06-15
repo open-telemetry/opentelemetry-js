@@ -4,7 +4,7 @@
 
 | Name                          |  Latency avg      | Requests      |
 | ----------------------------  |  ---------------- | ------------- |
-| http| 5.41ms | 92kps |
-| http-otel| 5.83ms | 86kps |
-| express| 7.58ms | 66kps |
-| express-otel| 8.99ms | 56kps |
+| http | 6.13ms | 82kps |
+| http-otel | 6.18ms | 81kps |
+| express | 7.18ms | 70kps |
+| express-otel | 7.90ms | 63kps |
