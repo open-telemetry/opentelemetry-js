@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718703041425,
+  "lastUpdate": 1718711589505,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -11924,6 +11924,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.54%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "danielstarns@hotmail.com",
+            "name": "Daniel Starns",
+            "username": "danstarns"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3cbc9c72e940eabffec1ce560b6173194042d1d7",
+          "message": "docs: add SimpleSpanProcessor warning (#4798)\n\n* docs: add SimpleSpanProcessor warning\n\n* Update packages/opentelemetry-sdk-trace-base/src/export/SimpleSpanProcessor.ts\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\n\n---------\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-06-18T11:50:44Z",
+          "tree_id": "4491df41211bbf82ab8472b21530e06c0aa6a361",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3cbc9c72e940eabffec1ce560b6173194042d1d7"
+        },
+        "date": 1718711588659,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 964266,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11811,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 693080,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 651125,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
