@@ -80,4 +80,10 @@ export {
 
 export { View, ViewOptions } from './view/View';
 
+export {
+  IAttributesProcessor,
+  createAllowListAttributesProcessor,
+  createDenyListAttributesProcessor,
+} from './view/AttributesProcessor';
+
 export { TimeoutError } from './utils';

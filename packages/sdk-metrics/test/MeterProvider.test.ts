@@ -32,6 +32,7 @@ import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
 import { View } from '../src/view/View';
 import { Meter } from '../src/Meter';
+import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -200,7 +201,7 @@ describe('MeterProvider', () => {
       );
     });
 
-    it('with attributeKeys should drop non-listed attributes', async () => {
+    it('with allowListProcessor should drop non-listed attributes', async () => {
       const reader = new TestMetricReader();
 
       // Add view to drop all attributes except 'attrib1'
@@ -208,7 +209,9 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         views: [
           new View({
-            attributeKeys: ['attrib1'],
+            attributesProcessors: [
+              createAllowListAttributesProcessor(['attrib1']),
+            ],
             instrumentName: 'non-renamed-instrument',
           }),
         ],
