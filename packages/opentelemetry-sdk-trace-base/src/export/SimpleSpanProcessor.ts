@@ -34,7 +34,7 @@ import { Resource } from '@opentelemetry/resources';
  *
  * Only spans that are sampled are converted.
  *
- * @warning This may not be the preferred processor to use in production. See https://github.com/open-telemetry/opentelemetry-js/issues/4741
+ * NOTE: This {@link SpanProcessor} exports every ended span individually instead of batching spans together, which causes significant performance overhead with most exporters. For production use, please consider using the {@link BatchSpanProcessor} instead.
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
