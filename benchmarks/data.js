@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718351870209,
+  "lastUpdate": 1718702766567,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -11818,6 +11818,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 622538,
             "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "danielstarns@hotmail.com",
+            "name": "Daniel Starns",
+            "username": "danstarns"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "dd83751f19531bc7265d3745c06884179fed8a1c",
+          "message": "docs: change to SEMRESATTRS_SERVICE_NAME (#4797)",
+          "timestamp": "2024-06-18T09:23:34Z",
+          "tree_id": "3559e3d5e35e617fa7e97a6169ba795931cec2a5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/dd83751f19531bc7265d3745c06884179fed8a1c"
+        },
+        "date": 1718702765718,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 952777,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11469,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 650380,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648569,
+            "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "100 samples"
           }
