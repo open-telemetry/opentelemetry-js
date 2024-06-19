@@ -46,7 +46,11 @@
       "packages/opentelemetry-semantic-conventions",
       "packages/opentelemetry-shim-opentracing",
       "packages/propagator-aws-xray",
-      "packages/sdk-metrics"
+      "packages/sdk-metrics",
+      "integrated-benchmarks/http",
+      "integrated-benchmarks/http-otel",
+      "integrated-benchmarks/express",
+      "integrated-benchmarks/express-otel"
     ],
     "out": "docs",
     "exclude": [
@@ -190,6 +194,18 @@
     },
     {
       "path": "packages/template"
+    },
+    {
+      "path": "integrated-benchmarks/http"
+    },
+    {
+      "path": "integrated-benchmarks/http-otel"
+    },
+    {
+      "path": "integrated-benchmarks/express"
+    },
+    {
+      "path": "integrated-benchmarks/express-otel"
     }
   ]
 }
