@@ -309,7 +309,11 @@ export abstract class InstrumentationBase<
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      const esmHook = new HookImport([module.name], { internals: false }, <HookFn>hookFn);
+      const esmHook = new HookImport(
+        [module.name],
+        { internals: false },
+        <HookFn>hookFn
+      );
       this._hooks.push(esmHook);
     }
   }
