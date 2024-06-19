@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718797112275,
+  "lastUpdate": 1718812851008,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12132,6 +12132,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.38%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "tim@timfish.uk",
+            "name": "Tim Fish",
+            "username": "timfish"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cdd5284dc375ba30168cd98a2ec943f2b807977e",
+          "message": "feat(instrumentation): Use a caret version for `import-in-the-middle` dependency (#4810)\n\n* feat(instrumentation): Use a caret version for `import-in-the-middle`\n\n* update changelog",
+          "timestamp": "2024-06-19T15:58:44Z",
+          "tree_id": "5a7dc9cf7e85f47aee081a31c1ae71adc74aae03",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/cdd5284dc375ba30168cd98a2ec943f2b807977e"
+        },
+        "date": 1718812850090,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 941869,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11940,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 658910,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 647801,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
