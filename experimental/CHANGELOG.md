@@ -15,6 +15,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): register context manager if no tracer options are provided [#4781](https://github.com/open-telemetry/opentelemetry-js/pull/4781) @pichlermarc
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.1) [#4806](https://github.com/open-telemetry/opentelemetry-js/pull/4806) @timfish
 
 ### :books: (Refine Doc)
 
@@ -61,7 +62,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/pull/91) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.0) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
 
 ### :books: (Refine Doc)
 
