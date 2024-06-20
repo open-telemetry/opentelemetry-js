@@ -169,6 +169,7 @@ export abstract class InstrumentationBase<
   }
 
   private _extractPackageVersion(baseDir: string): string | undefined {
+    console.log('XXX _extractPackageVersion(baseDir=%s)', baseDir); // curious if we are doing this unnecessarily
     try {
       const json = readFileSync(path.join(baseDir, 'package.json'), {
         encoding: 'utf8',
@@ -183,58 +184,58 @@ export abstract class InstrumentationBase<
   }
 
   private _onRequire<T>(
-    module: InstrumentationModuleDefinition,
+    imd: InstrumentationModuleDefinition,
     exports: T,
     name: string,
     baseDir?: string | void
   ): T {
     if (!baseDir) {
-      if (typeof module.patch === 'function') {
-        module.moduleExports = exports;
+      if (typeof imd.patch === 'function') {
+        imd.moduleExports = exports;
         if (this._enabled) {
           this._diag.debug(
             'Applying instrumentation patch for nodejs core module on require hook',
             {
-              module: module.name,
+              module: imd.name,
             }
           );
-          return module.patch(exports);
+          return imd.patch(exports);
         }
       }
       return exports;
     }
 
     const version = this._extractPackageVersion(baseDir);
-    module.moduleVersion = version;
-    if (module.name === name) {
+    imd.moduleVersion = version;
+    if (imd.name === name) {
       // main module
       if (
-        isSupported(module.supportedVersions, version, module.includePrerelease)
+        isSupported(imd.supportedVersions, version, imd.includePrerelease)
       ) {
-        if (typeof module.patch === 'function') {
-          module.moduleExports = exports;
+        if (typeof imd.patch === 'function') {
+          imd.moduleExports = exports;
           if (this._enabled) {
             this._diag.debug(
               'Applying instrumentation patch for module on require hook',
               {
-                module: module.name,
-                version: module.moduleVersion,
+                module: imd.name,
+                version: imd.moduleVersion,
                 baseDir,
               }
             );
-            return module.patch(exports, module.moduleVersion);
+            return imd.patch(exports, imd.moduleVersion);
           }
         }
       }
       return exports;
     }
     // internal file
-    const files = module.files ?? [];
+    const files = imd.files ?? [];
     const normalizedName = path.normalize(name);
     const supportedFileInstrumentations = files
       .filter(f => f.name === normalizedName)
       .filter(f =>
-        isSupported(f.supportedVersions, version, module.includePrerelease)
+        isSupported(f.supportedVersions, version, imd.includePrerelease)
       );
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
@@ -242,15 +243,15 @@ export abstract class InstrumentationBase<
         this._diag.debug(
           'Applying instrumentation patch for nodejs module file on require hook',
           {
-            module: module.name,
-            version: module.moduleVersion,
+            module: imd.name,
+            version: imd.moduleVersion,
             fileName: file.name,
             baseDir,
           }
         );
 
         // patch signature is not typed, so we cast it assuming it's correct
-        return file.patch(patchedExports, module.moduleVersion) as T;
+        return file.patch(patchedExports, imd.moduleVersion) as T;
       }
       return patchedExports;
     }, exports);
