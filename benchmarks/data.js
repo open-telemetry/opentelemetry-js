@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718812851008,
+  "lastUpdate": 1718872070284,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12184,6 +12184,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.20%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0608f405573901e54db01e44c533009cf28be262",
+          "message": "chore: prepare release 1.25.1/0.52.1 (#4809)\n\n* chore: prepare release 1.25.1/0.52.1\n\n* Update experimental/CHANGELOG.md",
+          "timestamp": "2024-06-20T08:25:48Z",
+          "tree_id": "0ff372115e2530b9325390365b6f8a37ef9e286d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0608f405573901e54db01e44c533009cf28be262"
+        },
+        "date": 1718872069383,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 958395,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11464,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 709572,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662227,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
