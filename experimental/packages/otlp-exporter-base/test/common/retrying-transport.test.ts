@@ -152,8 +152,8 @@ describe('RetryingTransport', function () {
 
     it('does retry 5 times, then resolves as retryable', async function () {
       // arrange
-      // make random return low values so that it does not actually need to wait long for the backoff.
-      Math.random = sinon.stub().returns(0.001);
+      // make random return a negative value so that what's passed to setTimeout() is negative and therefore gets executed immediately.
+      Math.random = sinon.stub().returns(-Infinity);
 
       const retryResponse: ExportResponse = {
         status: 'retryable',

@@ -21,6 +21,14 @@ const MAX_ATTEMPTS = 5;
 const INITIAL_BACKOFF = 1000;
 const MAX_BACKOFF = 5000;
 const BACKOFF_MULTIPLIER = 1.5;
+const JITTER = 0.2;
+
+/**
+ * Get a pseudo-random jitter that falls in the range of [-JITTER, +JITTER]
+ */
+function getJitter() {
+  return Math.random() * (2 * JITTER) - JITTER;
+}
 
 class RetryingTransport implements IExporterTransport {
   constructor(private _transport: IExporterTransport) {}
@@ -38,11 +46,9 @@ class RetryingTransport implements IExporterTransport {
     let attempts = MAX_ATTEMPTS;
     let nextBackoff = INITIAL_BACKOFF;
 
-    // TODO: I'm not 100% sure this is correct, please review in-depth.
     while (result.status === 'retryable' && attempts > 0) {
       attempts--;
-      const upperBound = Math.min(nextBackoff, MAX_BACKOFF);
-      const backoff = Math.random() * upperBound;
+      const backoff = Math.min(nextBackoff, MAX_BACKOFF) + getJitter();
       nextBackoff = nextBackoff * BACKOFF_MULTIPLIER;
       result = await this.retry(data, result.retryInMillis ?? backoff);
     }
