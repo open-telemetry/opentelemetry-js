@@ -59,7 +59,14 @@
     "_github:draft_release:all": "npm run _github:draft_release:api && _github:draft_release:experimental && _github:draft_release:stable",
     "_github:draft_release:api": "node scripts/extract-latest-release-notes.js ./api/CHANGELOG.md && VERSION=$(node scripts/get-version.js ./api/package.json | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title api/v$VERSION api/v$VERSION",
     "_github:draft_release:experimental": "node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md && VERSION=$(node scripts/get-version.js ./experimental/packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title experimental/v$VERSION experimental/v$VERSION",
-    "_github:draft_release:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md && VERSION=$(node scripts/get-version.js ./packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title v$VERSION v$VERSION"
+    "_github:draft_release:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md && VERSION=$(node scripts/get-version.js ./packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title v$VERSION v$VERSION",
+    "_github:update_release_pr_body_from_file": "gh pr edit $RELEASE_PR_OWNER:release/next-version --body-file ./.tmp/release-notes.md",
+    "_github:update_release_pr_body:all": "node scripts/extract-latest-release-notes.js api/CHANGELOG.md ./CHANGELOG.md experimental/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
+    "_github:update_release_pr_body:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md experimental/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
+    "_github:update_release_pr_body:experimental": "node scripts/extract-latest-release-notes.js experimental/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
+    "_verify_release_kind": "echo $RELEASE_KIND | grep -oP '^(all|sdk|experimental):(minor|patch)$'",
+    "_verify_release_remote": "git remote get-url $RELEASE_PR_REMOTE",
+    "_github:update_release_branch": "npm run _verify_release_kind && npm run _verify_release_remote && (git checkout main && git pull upstream main && git branch -D release/next-version; git checkout -b release/next-version && npm run prepare_release:$RELEASE_KIND && git commit -am \"chore: prepare release\" && git push $RELEASE_PR_REMOTE --force release/next-version)"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
