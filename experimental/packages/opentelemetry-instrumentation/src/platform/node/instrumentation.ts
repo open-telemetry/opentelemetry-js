@@ -299,7 +299,8 @@ export abstract class InstrumentationBase<
 
     this._warnOnPreloadedModules();
 
-    const imdFromHookPath: Map<string, InstrumentationModuleDefinition> = new Map();
+    const imdFromHookPath: Map<string, InstrumentationModuleDefinition> =
+      new Map();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
         return this._onRequire<typeof exports>(module, exports, name, baseDir);
@@ -324,7 +325,7 @@ export abstract class InstrumentationBase<
       this._hooks.push(esmHook);
 
       imdFromHookPath.set(module.name, module);
-      for (let file of module.files) {
+      for (const file of module.files) {
         imdFromHookPath.set(file.name, module);
       }
     }
@@ -336,11 +337,16 @@ export abstract class InstrumentationBase<
       // a loaded module to this instrumentation via the well-known
       // `otel:bundle:load` diagnostics channel message. The message includes
       // the module exports, that can be patched in-place.
-      subscribe("otel:bundle:load", (message_, name) => {
+      subscribe('otel:bundle:load', message_ => {
         const message = message_ as OTelBundleLoadMessage; // XXX TS advice
-        if (typeof message.name !== 'string' || typeof message.version !== 'string') {
-          this._diag.debug('skipping invalid "otel:bundle:load" diagch message');
-          return
+        if (
+          typeof message.name !== 'string' ||
+          typeof message.version !== 'string'
+        ) {
+          this._diag.debug(
+            'skipping invalid "otel:bundle:load" diagch message'
+          );
+          return;
         }
         const imd = imdFromHookPath.get(message.name);
         if (!imd) {

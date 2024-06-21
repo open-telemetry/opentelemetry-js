@@ -36,7 +36,10 @@ export interface AutoLoaderOptions {
  * Node.js
  */
 type DiagChChannelListener = (message: unknown, name: string | symbol) => void;
-export type DiagChSubscribe = (name: string | symbol, onMessage: DiagChChannelListener) => void;
+export type DiagChSubscribe = (
+  name: string | symbol,
+  onMessage: DiagChChannelListener
+) => void;
 
 /**
  * The shape of a `otel:bundle:load` diagnostics_channel message.
