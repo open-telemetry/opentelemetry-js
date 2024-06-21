@@ -28,3 +28,21 @@ export interface AutoLoaderOptions {
   meterProvider?: MeterProvider;
   loggerProvider?: LoggerProvider;
 }
+
+/**
+ * A subset of types for Node.js `diagnostics_channel`.
+ * `diagnostics_channel.subscribe` was added in Node.js v18.7.0, v16.17.0.
+ * The current `@types/node` dependency is for an earlier version (v14) of
+ * Node.js
+ */
+type DiagChChannelListener = (message: unknown, name: string | symbol) => void;
+export type DiagChSubscribe = (name: string | symbol, onMessage: DiagChChannelListener) => void;
+
+/**
+ * The shape of a `otel:bundle:load` diagnostics_channel message.
+ */
+export type OTelBundleLoadMessage = {
+  name: string;
+  version: string;
+  exports: any;
+};
