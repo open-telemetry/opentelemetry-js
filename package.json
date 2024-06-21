@@ -61,7 +61,7 @@
     "_github:draft_release:experimental": "node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md && VERSION=$(node scripts/get-version.js ./experimental/packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title experimental/v$VERSION experimental/v$VERSION",
     "_github:draft_release:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md && VERSION=$(node scripts/get-version.js ./packages/ | grep -oP '^\\d+\\.\\d+\\.\\d+$') && gh release create --draft --notes-file ./.tmp/release-notes.md --target main --title v$VERSION v$VERSION",
     "_github:update_release_pr_body_from_file": "gh pr edit $RELEASE_PR_OWNER:release/next-version --body-file ./.tmp/release-notes.md",
-    "_github:update_release_pr_body:api": "node scripts/extract-latest-release-notes.js api/CHANGELOG.md ./CHANGELOG.md experimental/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
+    "_github:update_release_pr_body:all": "node scripts/extract-latest-release-notes.js api/CHANGELOG.md ./CHANGELOG.md experimental/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
     "_github:update_release_pr_body:stable": "node scripts/extract-latest-release-notes.js ./CHANGELOG.md experimental/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
     "_github:update_release_pr_body:experimental": "node scripts/extract-latest-release-notes.js experimental/CHANGELOG.md && npm run _github:update_release_pr_body_from_file",
     "_verify_release_kind": "echo $RELEASE_KIND | grep -oP '^(all|sdk|experimental):(minor|patch)$'",
