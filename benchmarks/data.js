@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1718872070284,
+  "lastUpdate": 1718961003814,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12236,6 +12236,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.23%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "86019e0ff6ad86b955b91b4c3ea4bb6bea9bdb90",
+          "message": "feat: add release-pr update chores as scripts to package.json (#4793)\n\n* feat: add release-pr update chores as scripts to package.json\n\n* fix: use all instead of api\n\n* docs: update usage comment for extract-latest-release-node.js",
+          "timestamp": "2024-06-21T09:07:36Z",
+          "tree_id": "c01a9eaf717e98e63d48184c87b69cb658cd7304",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/86019e0ff6ad86b955b91b4c3ea4bb6bea9bdb90"
+        },
+        "date": 1718961000751,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 961671,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11673,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 690292,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 656434,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
