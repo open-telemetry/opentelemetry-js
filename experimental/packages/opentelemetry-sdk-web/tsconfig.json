@@ -35,10 +35,19 @@
       "path": "../../../packages/opentelemetry-semantic-conventions"
     },
     {
+      "path": "../api-events"
+    },
+    {
       "path": "../opentelemetry-browser-detector"
     },
     {
       "path": "../opentelemetry-instrumentation"
+    },
+    {
+      "path": "../sdk-events"
+    },
+    {
+      "path": "../sdk-logs"
     }
   ]
 }

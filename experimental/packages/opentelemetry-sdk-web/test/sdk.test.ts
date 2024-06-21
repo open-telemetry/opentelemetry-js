@@ -42,7 +42,9 @@ import {
   SEMRESATTRS_PROCESS_RUNTIME_VERSION,
   SEMRESATTRS_SERVICE_NAME,
 } from '@opentelemetry/semantic-conventions';
-import sinon = require('sinon');
+import { events } from '@opentelemetry/api-events';
+import { EventLoggerProvider } from '@opentelemetry/sdk-events';
+import { ConsoleLogRecordExporter, InMemoryLogRecordExporter, SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
 
 describe('Web SDK', () => {
   let ctxManager: any;
@@ -65,7 +67,7 @@ describe('Web SDK', () => {
   });
 
   describe('Basic Registration', () => {
-    it('should not set global traceprovider if not configured', async () => {
+    it('should not register any unconfigured SDK components', async () => {
       const sdk = new WebSDK({
         autoDetectResources: false,
       });
@@ -77,6 +79,8 @@ describe('Web SDK', () => {
         delegate,
         'tracer provider should not have changed'
       );
+
+      assert.ok(!(events.getEventLoggerProvider() instanceof EventLoggerProvider));
 
       await sdk.shutdown();
     });
@@ -122,6 +126,36 @@ describe('Web SDK', () => {
       assert(listOfProcessors[0] instanceof NoopSpanProcessor);
       assert(listOfProcessors[1] instanceof SimpleSpanProcessor);
       assert(listOfProcessors[2] instanceof BatchSpanProcessor);
+
+      await sdk.shutdown();
+    });
+
+    it('should register an EventLoggerProvider if an exporter is provided', async () => {
+      const sdk = new WebSDK({
+        eventsLogRecordExporter: new ConsoleLogRecordExporter(),
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.ok(events.getEventLoggerProvider() instanceof EventLoggerProvider);
+
+      await sdk.shutdown();
+    });
+
+    it('should register an EventLoggerProvider if a log record processor is provided', async () => {
+      const logRecordExporter = new InMemoryLogRecordExporter();
+      const logRecordProcessor = new SimpleLogRecordProcessor(
+        logRecordExporter
+      );
+      const sdk = new WebSDK({
+        eventsLogRecordProcessors: [logRecordProcessor],
+        autoDetectResources: false,
+      });
+
+      sdk.start();
+
+      assert.ok(events.getEventLoggerProvider() instanceof EventLoggerProvider);
 
       await sdk.shutdown();
     });
@@ -172,12 +206,12 @@ describe('Web SDK', () => {
 
   describe('detectResources', async () => {
     afterEach(() => {
-      sinon.restore();
+      Sinon.restore();
     });
 
     describe('default resource detectors', () => {
       it('default detectors populate values properly', async () => {
-        sinon.stub(globalThis, 'navigator').value({
+        Sinon.stub(globalThis, 'navigator').value({
           userAgent: 'abcd',
           language: 'en-US',
           userAgentData: {
@@ -256,7 +290,7 @@ describe('Web SDK', () => {
 
     describe('with a buggy detector', () => {
       it('returns a merged resource', async () => {
-        sinon.stub(globalThis, 'navigator').value({
+        Sinon.stub(globalThis, 'navigator').value({
           userAgent: 'abcd',
         });
 

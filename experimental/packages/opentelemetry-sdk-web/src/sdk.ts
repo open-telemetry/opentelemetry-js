@@ -15,6 +15,7 @@
  */
 
 import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import { events } from '@opentelemetry/api-events';
 import {
   Instrumentation,
   registerInstrumentations,
@@ -39,6 +40,8 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { WebSDKConfiguration } from './types';
+import { BatchLogRecordProcessor, LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
+import { EventLoggerProvider } from '@opentelemetry/sdk-events';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Web SDK */
 export class WebSDK {
@@ -48,6 +51,11 @@ export class WebSDK {
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
+ 
+  private _eventLoggerProviderConfig?: {
+    logRecordProcessors: LogRecordProcessor[];
+  }
+  
   private _instrumentations: Instrumentation[];
 
   private _resource: IResource;
@@ -56,6 +64,7 @@ export class WebSDK {
   private _autoDetectResources: boolean;
 
   private _tracerProvider?: WebTracerProvider;
+  private _loggerProviderForEvents?: LoggerProvider;
   private _serviceName?: string;
 
   /**
@@ -95,6 +104,16 @@ export class WebSDK {
         contextManager: configuration.contextManager,
         textMapPropagator: configuration.textMapPropagator,
       };
+    }
+    
+    if (configuration.eventsLogRecordProcessors || configuration.eventsLogRecordExporter) {
+      const logRecordProcessors = configuration.eventsLogRecordProcessors ?? [
+        new BatchLogRecordProcessor(configuration.eventsLogRecordExporter!)
+      ]
+
+      this._eventLoggerProviderConfig = {
+        logRecordProcessors: logRecordProcessors
+      }
     }
 
     this._instrumentations = configuration.instrumentations?.flat() ?? [];
@@ -142,12 +161,30 @@ export class WebSDK {
         propagator: this._tracerProviderConfig?.textMapPropagator,
       });
     }
+
+    if (this._eventLoggerProviderConfig) {
+      const loggerProvider = new LoggerProvider({
+        resource: this._resource
+      });
+      
+      this._loggerProviderForEvents = loggerProvider;
+      for (const logRecordProcessor of this._eventLoggerProviderConfig.logRecordProcessors) {
+        loggerProvider.addLogRecordProcessor(logRecordProcessor);
+      }
+
+      const eventLoggerProvider = new EventLoggerProvider(loggerProvider);
+      events.setGlobalEventLoggerProvider(eventLoggerProvider);
+    }
   }
 
   public shutdown(): Promise<void> {
     const promises: Promise<unknown>[] = [];
     if (this._tracerProvider) {
       promises.push(this._tracerProvider.shutdown());
+    }
+
+    if (this._loggerProviderForEvents) {
+      promises.push(this._loggerProviderForEvents.shutdown());
     }
 
     return (
