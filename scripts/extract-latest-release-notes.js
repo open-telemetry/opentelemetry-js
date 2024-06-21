@@ -1,11 +1,13 @@
 /**
- * This extracts the latest (non-"Unreleased") notes from a CHANGELOG.md and saves them to `./.tmp/release-notes.md`
+ * This extracts the latest (non-"Unreleased") notes from CHANGELOG.md files and saves them to `./.tmp/release-notes.md`.
+ * Concatenates the output when multiple paths are passed as arguments.
  *
  * Usage (from project root):
- * - node scripts/extract-latest-release-notes.js [PATH TO CHANGELOG]
+ * - node scripts/extract-latest-release-notes.js [PATH TO CHANGELOG]...
  * Examples:
  * - node scripts/extract-latest-release-notes.js ./packages/CHANGELOG.md
  * - node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md
+ * - node scripts/extract-latest-release-notes.js ./api/CHANGELOG.md ./packages/CHANGELOG.md ./experimental/CHANGELOG.md
  */
 
 const fs = require('fs');
