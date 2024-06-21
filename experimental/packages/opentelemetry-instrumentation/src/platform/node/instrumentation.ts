@@ -185,23 +185,23 @@ export abstract class InstrumentationBase<
   }
 
   private _onRequire<T>(
-    imd: InstrumentationModuleDefinition,
+    module: InstrumentationModuleDefinition,
     exports: T,
     name: string,
     baseDir?: string | void,
     version?: string
   ): T {
     if (!version && !baseDir) {
-      if (typeof imd.patch === 'function') {
-        imd.moduleExports = exports;
+      if (typeof module.patch === 'function') {
+        module.moduleExports = exports;
         if (this._enabled) {
           this._diag.debug(
             'Applying instrumentation patch for nodejs core module on require hook',
             {
-              module: imd.name,
+              module: module.name,
             }
           );
-          return imd.patch(exports);
+          return module.patch(exports);
         }
       }
       return exports;
@@ -210,36 +210,36 @@ export abstract class InstrumentationBase<
     if (!version && baseDir) {
       version = this._extractPackageVersion(baseDir);
     }
-    imd.moduleVersion = version;
-    if (imd.name === name) {
+    module.moduleVersion = version;
+    if (module.name === name) {
       // main module
       if (
-        isSupported(imd.supportedVersions, version, imd.includePrerelease)
+        isSupported(module.supportedVersions, version, module.includePrerelease)
       ) {
-        if (typeof imd.patch === 'function') {
-          imd.moduleExports = exports;
+        if (typeof module.patch === 'function') {
+          module.moduleExports = exports;
           if (this._enabled) {
             this._diag.debug(
               'Applying instrumentation patch for module on require hook',
               {
-                module: imd.name,
-                version: imd.moduleVersion,
+                module: module.name,
+                version: module.moduleVersion,
                 baseDir,
               }
             );
-            return imd.patch(exports, imd.moduleVersion);
+            return module.patch(exports, module.moduleVersion);
           }
         }
       }
       return exports;
     }
     // internal file
-    const files = imd.files ?? [];
+    const files = module.files ?? [];
     const normalizedName = path.normalize(name);
     const supportedFileInstrumentations = files
       .filter(f => f.name === normalizedName)
       .filter(f =>
-        isSupported(f.supportedVersions, version, imd.includePrerelease)
+        isSupported(f.supportedVersions, version, module.includePrerelease)
       );
     return supportedFileInstrumentations.reduce<T>((patchedExports, file) => {
       file.moduleExports = patchedExports;
@@ -247,15 +247,15 @@ export abstract class InstrumentationBase<
         this._diag.debug(
           'Applying instrumentation patch for nodejs module file on require hook',
           {
-            module: imd.name,
-            version: imd.moduleVersion,
+            module: module.name,
+            version: module.moduleVersion,
             fileName: file.name,
             baseDir,
           }
         );
 
         // patch signature is not typed, so we cast it assuming it's correct
-        return file.patch(patchedExports, imd.moduleVersion) as T;
+        return file.patch(patchedExports, module.moduleVersion) as T;
       }
       return patchedExports;
     }, exports);
