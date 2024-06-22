@@ -40,7 +40,11 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { WebSDKConfiguration } from './types';
-import { BatchLogRecordProcessor, LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
+import {
+  BatchLogRecordProcessor,
+  LogRecordProcessor,
+  LoggerProvider,
+} from '@opentelemetry/sdk-logs';
 import { EventLoggerProvider } from '@opentelemetry/sdk-events';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Web SDK */
@@ -51,11 +55,11 @@ export class WebSDK {
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
- 
+
   private _eventLoggerProviderConfig?: {
     logRecordProcessors: LogRecordProcessor[];
-  }
-  
+  };
+
   private _instrumentations: Instrumentation[];
 
   private _resource: IResource;
@@ -105,15 +109,18 @@ export class WebSDK {
         textMapPropagator: configuration.textMapPropagator,
       };
     }
-    
-    if (configuration.eventsLogRecordProcessors || configuration.eventsLogRecordExporter) {
+
+    if (
+      configuration.eventsLogRecordProcessors ||
+      configuration.eventsLogRecordExporter
+    ) {
       const logRecordProcessors = configuration.eventsLogRecordProcessors ?? [
-        new BatchLogRecordProcessor(configuration.eventsLogRecordExporter!)
-      ]
+        new BatchLogRecordProcessor(configuration.eventsLogRecordExporter!),
+      ];
 
       this._eventLoggerProviderConfig = {
-        logRecordProcessors: logRecordProcessors
-      }
+        logRecordProcessors: logRecordProcessors,
+      };
     }
 
     this._instrumentations = configuration.instrumentations?.flat() ?? [];
@@ -164,11 +171,12 @@ export class WebSDK {
 
     if (this._eventLoggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
-        resource: this._resource
+        resource: this._resource,
       });
-      
+
       this._loggerProviderForEvents = loggerProvider;
-      for (const logRecordProcessor of this._eventLoggerProviderConfig.logRecordProcessors) {
+      for (const logRecordProcessor of this._eventLoggerProviderConfig
+        .logRecordProcessors) {
         loggerProvider.addLogRecordProcessor(logRecordProcessor);
       }
 

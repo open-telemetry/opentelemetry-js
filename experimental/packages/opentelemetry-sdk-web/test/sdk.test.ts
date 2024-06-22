@@ -44,7 +44,11 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { events } from '@opentelemetry/api-events';
 import { EventLoggerProvider } from '@opentelemetry/sdk-events';
-import { ConsoleLogRecordExporter, InMemoryLogRecordExporter, SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
+import {
+  ConsoleLogRecordExporter,
+  InMemoryLogRecordExporter,
+  SimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
 
 describe('Web SDK', () => {
   let ctxManager: any;
@@ -80,7 +84,9 @@ describe('Web SDK', () => {
         'tracer provider should not have changed'
       );
 
-      assert.ok(!(events.getEventLoggerProvider() instanceof EventLoggerProvider));
+      assert.ok(
+        !(events.getEventLoggerProvider() instanceof EventLoggerProvider)
+      );
 
       await sdk.shutdown();
     });

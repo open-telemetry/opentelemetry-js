@@ -25,7 +25,7 @@ import {
   SpanProcessor,
   IdGenerator,
 } from '@opentelemetry/sdk-trace-base';
-import { LogRecordProcessor, LogRecordExporter } from '@opentelemetry/sdk-logs'; 
+import { LogRecordProcessor, LogRecordExporter } from '@opentelemetry/sdk-logs';
 
 export interface WebSDKConfiguration {
   autoDetectResources: boolean;
