@@ -51,7 +51,7 @@ export abstract class OTLPExporterBrowserBase<
     this._contentType = contentType;
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (config.headers && typeof config.headers === 'function') {
+    if (typeof config.headers === 'function') {
       this._getHeaders = config.headers;
     }
     if (this._useXHR) {
