@@ -86,15 +86,14 @@ export abstract class OTLPExporterBrowserBase<
 
     const promise = new Promise<void>((resolve, reject) => {
       if (this._useXHR) {
-        const headers =
-          this._getDynamicHeaders
-             ? { ...this._headers, ...parseHeaders(this._getDynamicHeaders()) }
-             : this._headers;
+        const enrichedHeaders = this._getDynamicHeaders
+          ? { ...this._headers, ...parseHeaders(this._getDynamicHeaders()) }
+          : this._headers;
         sendWithXhr(
           body,
           this.url,
           {
-            ...headers,
+            ...enrichedHeaders,
             'Content-Type': this._contentType,
           },
           this.timeoutMillis,
