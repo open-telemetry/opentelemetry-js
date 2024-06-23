@@ -31,7 +31,7 @@ export abstract class OTLPExporterBrowserBase<
   ServiceResponse,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem> {
   protected _headers: Record<string, string>;
-  private _getHeaders?: () => Record<string, string>;
+  private _getDynamicHeaders?: () => Record<string, string>;
   private _useXHR: boolean = false;
   private _contentType: string;
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
@@ -52,7 +52,7 @@ export abstract class OTLPExporterBrowserBase<
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
     if (typeof config.headers === 'function') {
-      this._getHeaders = config.headers;
+      this._getDynamicHeaders = config.headers;
     }
     if (this._useXHR) {
       this._headers = Object.assign(
@@ -87,8 +87,8 @@ export abstract class OTLPExporterBrowserBase<
     const promise = new Promise<void>((resolve, reject) => {
       if (this._useXHR) {
         const headers =
-          this._getHeaders
-             ? { ...this._headers, ...parseHeaders(this._getHeaders()) }
+          this._getDynamicHeaders
+             ? { ...this._headers, ...parseHeaders(this._getDynamicHeaders()) }
              : this._headers;
         sendWithXhr(
           body,
