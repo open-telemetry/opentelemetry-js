@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export * from './ZoneContextManager';
-export * from './types';
+export { ZoneContextManager } from './ZoneContextManager';
+export { Func, TargetWithEvents } from './types';

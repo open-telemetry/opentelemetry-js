@@ -23,9 +23,7 @@ import {
   OTLPExporterNodeBase,
   parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
-import { ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import {
-  IExportTraceServiceRequest,
   IExportTraceServiceResponse,
   ProtobufTraceSerializer,
 } from '@opentelemetry/otlp-transformer';
@@ -41,11 +39,7 @@ const USER_AGENT = {
  * Collector Trace Exporter for Node with protobuf
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<
-    ReadableSpan,
-    IExportTraceServiceRequest,
-    IExportTraceServiceResponse
-  >
+  extends OTLPExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
@@ -71,9 +65,5 @@ export class OTLPTraceExporter
           DEFAULT_COLLECTOR_RESOURCE_PATH
         )
       : DEFAULT_COLLECTOR_URL;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.SPANS;
   }
 }

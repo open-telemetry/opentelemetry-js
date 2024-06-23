@@ -41,8 +41,8 @@ import {
  * @param onSuccess
  * @param onError
  */
-export function sendWithHttp<ExportItem, ServiceRequest, ServiceResponse>(
-  collector: OTLPExporterNodeBase<ExportItem, ServiceRequest, ServiceResponse>,
+export function sendWithHttp<ExportItem, ServiceResponse>(
+  collector: OTLPExporterNodeBase<ExportItem, ServiceResponse>,
   data: string | Uint8Array,
   contentType: string,
   onSuccess: () => void,

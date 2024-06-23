@@ -22,7 +22,14 @@ import {
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_HTTP_HOST,
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_SCHEME,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_URL,
+  SEMATTRS_HTTP_USER_AGENT,
+} from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
   getResource,
@@ -81,7 +88,7 @@ export interface XMLHttpRequestInstrumentationConfig
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestInstrumentation extends InstrumentationBase {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequestInstrumentationConfig> {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -90,15 +97,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(config?: XMLHttpRequestInstrumentationConfig) {
+  constructor(config: XMLHttpRequestInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-xml-http-request', VERSION, config);
   }
 
   init() {}
-
-  private _getConfig(): XMLHttpRequestInstrumentationConfig {
-    return this._config;
-  }
 
   /**
    * Adds custom headers to XMLHttpRequest
@@ -111,7 +114,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
     if (
       !shouldPropagateTraceHeaders(
         url,
-        this._getConfig().propagateTraceHeaderCorsUrls
+        this.getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
       const headers: Partial<Record<string, unknown>> = {};
@@ -142,7 +145,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      if (!this._getConfig().ignoreNetworkEvents) {
+      if (!this.getConfig().ignoreNetworkEvents) {
         addSpanNetworkEvents(childSpan, corsPreFlightRequest);
       }
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
@@ -160,29 +163,26 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
       if (xhrMem.status !== undefined) {
-        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, xhrMem.status);
+        span.setAttribute(SEMATTRS_HTTP_STATUS_CODE, xhrMem.status);
       }
       if (xhrMem.statusText !== undefined) {
         span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
       }
-      span.setAttribute(SemanticAttributes.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(SEMATTRS_HTTP_HOST, parsedUrl.host);
       span.setAttribute(
-        SemanticAttributes.HTTP_SCHEME,
+        SEMATTRS_HTTP_SCHEME,
         parsedUrl.protocol.replace(':', '')
       );
 
       // @TODO do we want to collect this or it will be collected earlier once only or
       //    maybe when parent span is not available ?
-      span.setAttribute(
-        SemanticAttributes.HTTP_USER_AGENT,
-        navigator.userAgent
-      );
+      span.setAttribute(SEMATTRS_HTTP_USER_AGENT, navigator.userAgent);
     }
   }
 
   private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
     const applyCustomAttributesOnSpan =
-      this._getConfig().applyCustomAttributesOnSpan;
+      this.getConfig().applyCustomAttributesOnSpan;
     if (typeof applyCustomAttributesOnSpan === 'function') {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, xhr),
@@ -244,7 +244,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
+    if (this._tasksCount === 0 && this.getConfig().clearTimingResources) {
       (otperformance as unknown as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
@@ -296,7 +296,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      if (!this._getConfig().ignoreNetworkEvents) {
+      if (!this.getConfig().ignoreNetworkEvents) {
         addSpanNetworkEvents(span, mainRequest);
       }
     }
@@ -331,7 +331,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
     url: string,
     method: string
   ): api.Span | undefined {
-    if (isUrlIgnored(url, this._getConfig().ignoreUrls)) {
+    if (isUrlIgnored(url, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
@@ -340,8 +340,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase {
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [SemanticAttributes.HTTP_METHOD]: method,
-        [SemanticAttributes.HTTP_URL]: parseUrl(url).toString(),
+        [SEMATTRS_HTTP_METHOD]: method,
+        [SEMATTRS_HTTP_URL]: parseUrl(url).toString(),
       },
     });
 
