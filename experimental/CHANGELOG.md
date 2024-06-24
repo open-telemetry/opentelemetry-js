@@ -21,6 +21,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :house: (Internal)
 
 * test: add `npm run maint:regenerate-test-certs` maintenance script and regenerate recently expired test certs [#4777](https://github.com/open-telemetry/opentelemetry-js/pull/4777)
+* refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
 
 ## 0.52.0
 
