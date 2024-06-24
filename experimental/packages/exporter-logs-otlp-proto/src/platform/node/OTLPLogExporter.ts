@@ -45,15 +45,14 @@ export class OTLPLogExporter
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config, ProtobufLogsSerializer, 'application/x-protobuf');
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
+    super(config, ProtobufLogsSerializer, {
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
       ),
       ...parseHeaders(config?.headers),
-    };
+      ...USER_AGENT,
+      'Content-Type': 'application/x-protobuf',
+    });
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {

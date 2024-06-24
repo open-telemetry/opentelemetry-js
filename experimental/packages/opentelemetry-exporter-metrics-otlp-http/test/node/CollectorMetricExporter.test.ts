@@ -74,6 +74,9 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
   afterEach(async () => {
     fakeRequest = new Stream.PassThrough();
+    Object.defineProperty(fakeRequest, 'setTimeout', {
+      value: function (_timeout: number) {},
+    });
     await shutdown();
     sinon.restore();
   });
@@ -337,38 +340,62 @@ describe('OTLPMetricExporter - node with json over http', () => {
     });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'bar');
+      const exporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['foo'],
+        'bar'
+      );
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should include user agent in header', () => {
-      const collectorExporter = new OTLPMetricExporter();
+      const exporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter._otlpExporter.headers['User-Agent'],
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['User-Agent'],
         `OTel-OTLP-Exporter-JavaScript/${VERSION}`
       );
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'boo');
-      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
+      const exporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['foo'],
+        'boo'
+      );
+      assert.strictEqual(
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['bar'],
+        'foo'
+      );
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override headers defined via env with headers defined in constructor', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const collectorExporter = new OTLPMetricExporter({
+      const exporter = new OTLPMetricExporter({
         headers: {
           foo: 'constructor',
         },
       });
       assert.strictEqual(
-        collectorExporter._otlpExporter.headers.foo,
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['foo'],
         'constructor'
       );
-      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
+      assert.strictEqual(
+        exporter._otlpExporter['_transport']['_transport']['_parameters'][
+          'headers'
+        ]['bar'],
+        'foo'
+      );
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should use delta temporality defined via env', () => {
@@ -468,11 +495,13 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
         const options = args[0];
 
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -486,11 +515,14 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
+
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
@@ -501,11 +533,14 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
         const options = args[0];
         const agent = options.agent;
         assert.strictEqual(agent.keepAlive, true);
@@ -584,7 +619,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       const callback = args[1];
 
       callback(mockRes);
-      mockRes.send('success');
+      mockRes.send(Buffer.from('success'));
     });
 
     it('should log the successful message', done => {
@@ -595,11 +630,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('success');
+
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          callback(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
+
         setTimeout(() => {
           assert.strictEqual(stubLoggerError.args.length, 0);
           assert.strictEqual(
@@ -619,18 +658,20 @@ describe('OTLPMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
-        const mockRes = new MockedResponse(400);
         const args = stubRequest.args[0];
         const callback = args[1];
-        callback(mockRes);
-        mockRes.send('failed');
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(400);
+          callback(mockRes);
+          mockRes.send(Buffer.from('failure'));
+        });
+
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
           const error = result.error as OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
-          assert.strictEqual(error.data, 'failed');
           done();
         });
       });

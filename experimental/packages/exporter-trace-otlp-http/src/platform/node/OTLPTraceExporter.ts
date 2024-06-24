@@ -43,15 +43,14 @@ export class OTLPTraceExporter
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    super(config, JsonTraceSerializer, 'application/json');
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
+    super(config, JsonTraceSerializer, {
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
       ),
       ...parseHeaders(config?.headers),
-    };
+      ...USER_AGENT,
+      'Content-Type': 'application/json',
+    });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {

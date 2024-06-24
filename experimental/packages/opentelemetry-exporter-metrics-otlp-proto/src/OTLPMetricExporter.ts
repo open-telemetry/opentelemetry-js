@@ -42,15 +42,14 @@ class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<
   IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config, ProtobufMetricsSerializer, 'application/x-protobuf');
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
+    super(config, ProtobufMetricsSerializer, {
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
       ...parseHeaders(config?.headers),
-    };
+      ...USER_AGENT,
+      'Content-Type': 'application/x-protobuf',
+    });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase) {

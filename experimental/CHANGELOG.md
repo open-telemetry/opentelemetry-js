@@ -7,6 +7,13 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * (user-facing) `headers` was intended for internal use has been removed from all exporters
+  * (user-facing) `compression` was intended for internal use and has been removed from all exporters
+  * (user-facing) `hostname` was intended for use in tests and is not used by any exporters, it will be removed in a future release
+* fix(exporter-*-otlp-*)!: ensure `User-Agent` header cannot be overwritten by the user [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * allowing overrides of the `User-Agent` header was not specification compliant.
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)

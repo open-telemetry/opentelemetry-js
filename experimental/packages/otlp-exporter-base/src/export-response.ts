@@ -24,4 +24,12 @@ export interface ExportResponseFailure {
   error: Error;
 }
 
-export type ExportResponse = ExportResponseSuccess | ExportResponseFailure;
+export interface ExportResponseRetryable {
+  status: 'retryable';
+  retryInMillis?: number;
+}
+
+export type ExportResponse =
+  | ExportResponseSuccess
+  | ExportResponseFailure
+  | ExportResponseRetryable;
