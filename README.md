@@ -229,7 +229,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 #### Triager ([@open-telemetry/javascript-triagers](https://github.com/orgs/open-telemetry/teams/javascript-triagers))
 
-- N/A
+- [Marylia Gutierrez](https://github.com/maryliag), Grafana
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
