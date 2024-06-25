@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1719240086497,
+  "lastUpdate": 1719301550229,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12392,6 +12392,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "danielstarns@hotmail.com",
+            "name": "Daniel Starns",
+            "username": "danstarns"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3fdadd516e37728833f9abae772ef3b937e66298",
+          "message": "refactor: reduce and simplify usage of getEnv() (#4799)\n\n* refactor: reduce and simplify usage of getEnv()\n\n* docs: update CHANGELOG\n\n* fixup! docs: update CHANGELOG\n\n---------\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-06-25T07:43:19Z",
+          "tree_id": "a9fccc765a40324e10636d1d6a5500b4207bf94f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3fdadd516e37728833f9abae772ef3b937e66298"
+        },
+        "date": 1719301549380,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 920550,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11625,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 664350,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 633380,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
