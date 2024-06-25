@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1719301550229,
+  "lastUpdate": 1719326836533,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12442,6 +12442,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 633380,
             "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f99e7d9c2c37376e752f746308affa74fc7c30d2",
+          "message": "chore: add @maryliag to triagers (#4821)\n\n* chore: add @maryliag to triagers\n\n* chore: alphabetically order approvers\n\n* chore: it's grafana labs, not grafana",
+          "timestamp": "2024-06-25T14:44:48Z",
+          "tree_id": "ec44e42b842d63f9a6f99e4e84ad5aca179f0b8d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f99e7d9c2c37376e752f746308affa74fc7c30d2"
+        },
+        "date": 1719326835475,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 991731,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11889,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 672956,
+            "range": "±0.64%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 643305,
+            "range": "±0.50%",
             "unit": "ops/sec",
             "extra": "95 samples"
           }
