@@ -15,6 +15,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+
 ## 0.52.1
 
 ### :rocket: (Enhancement)
