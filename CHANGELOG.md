@@ -16,6 +16,12 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :books: (Refine Doc)
 
+### :house: (Internal)
+
+## 1.25.1
+
+### :books: (Refine Doc)
+
 * refactor(examples): added usage of @opentelemetry/semantic-conventions and @opentelemetry/resources to the examples in examples/opentelemetry-web for maintaining consistency across all examples. [#4764](https://github.com/open-telemetry/opentelemetry-js/pull/4764) @Zen-cronic
 
 ### :house: (Internal)
