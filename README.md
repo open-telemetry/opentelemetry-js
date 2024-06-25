@@ -208,6 +208,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Amir Blum](https://github.com/blumamir), Odigos
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Trent Mick](https://github.com/trentm), Elastic
 
@@ -216,7 +217,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 #### Approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
-- [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
