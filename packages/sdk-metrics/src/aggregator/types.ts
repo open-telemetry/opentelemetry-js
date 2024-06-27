@@ -49,7 +49,7 @@ export interface Histogram {
    *
    * buckets: {
    *	boundaries: [10, 20, 30],
-   *	counts: [3, 3, 1, 2],
+   *	counts: [3, 3, 2, 1],
    * }
    */
   buckets: {
