@@ -136,11 +136,15 @@ export interface InstrumentationModuleDefinition {
 
   /** Method to patch the instrumentation  */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  patch?: (moduleExports: any, moduleVersion?: string) => any;
+  patch?:
+    | ((moduleExports: any, moduleVersion?: string | undefined) => any)
+    | undefined;
 
   /** Method to unpatch the instrumentation  */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  unpatch?: (moduleExports: any, moduleVersion?: string) => void;
+  unpatch?:
+    | ((moduleExports: any, moduleVersion?: string | undefined) => void)
+    | undefined;
 }
 
 /**
