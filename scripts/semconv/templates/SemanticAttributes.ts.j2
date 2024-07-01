@@ -51,10 +51,7 @@ const TMP_{{attribute.fqn | to_const_name}} = {{ print_value ("string", attribut
 *
 * Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
   {%- endif %}
-  {%- if attribute.deprecated %}
-*
-* @deprecated {{attribute.deprecated | to_doc_brief}}.
-  {%- endif %}
+ * @deprecated please import desired version directly like `import { {{cls_prefix}}_{{attribute.fqn | to_const_name}} } from '@opentelemetry/semantic-conventions/1.7';`
 */
 export const {{cls_prefix}}_{{attribute.fqn | to_const_name}} = TMP_{{attribute.fqn | to_const_name}};
 
@@ -66,6 +63,7 @@ export const {{cls_prefix}}_{{attribute.fqn | to_const_name}} = TMP_{{attribute.
  * constants {{class}}_XXXXX rather than the exported constant map. As any single reference
  * to a constant map value will result in all strings being included into your bundle.
  * @deprecated Use the {{cls_prefix}}_XXXXX constants rather than the {{class}}.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { {{cls_prefix}}_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export type {{class}} = {
   {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
@@ -87,7 +85,6 @@ export type {{class}} = {
 
 /**
  * Create exported Value Map for {{class}} values
- * @deprecated Use the {{cls_prefix}}_XXXXX constants rather than the {{class}}.XXXXX for bundle minification
  */
 export const {{class}}:{{class}} = /*#__PURE__*/createConstMap<{{class}}>([
   {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
@@ -130,10 +127,8 @@ const TMP_{{class_name|upper}}_{{ member.member_id | to_const_name }} = {{ print
  *
  * Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
   {%- endif %}
-  {%- if attribute.deprecated %}
  *
- * @deprecated {{attribute.deprecated | to_doc_brief}}.
-  {%- endif %}
+ * @deprecated please import desired version directly like `import { {{class_name|upper}}_{{ member.member_id | to_const_name }} } from '@opentelemetry/semantic-conventions/1.7';`
  */
 export const {{class_name|upper}}_{{ member.member_id | to_const_name }} = TMP_{{class_name|upper}}_{{ member.member_id | to_const_name }};
 
@@ -152,6 +147,7 @@ export const {{class_name|upper}}_{{ member.member_id | to_const_name }} = TMP_{
  * @deprecated {{attribute.deprecated | to_doc_brief}}.  Use the {{class_name | upper}}_XXXXX constants rather than the {{class_name}}.XXXXX for bundle minification.
  {%- else %}
  * @deprecated Use the {{class_name | upper}}_XXXXX constants rather than the {{class_name}}.XXXXX for bundle minification.
+ *             Also, please import desired version directly like `import { {{class_name | upper}}_XXXXX } from '@opentelemetry/semantic-conventions/1.7';`
  {%- endif %}
  */
 export type {{class_name}} = {
@@ -174,7 +170,6 @@ export type {{class_name}} = {
 
 /**
  * The constant map of values for {{class_name}}.
- * @deprecated Use the {{class_name | upper}}_XXXXX constants rather than the {{class_name}}.XXXXX for bundle minification.
  */
 {%- if enumMap.useCreateConst == true %}
 export const {{class_name}}:{{class_name}} = /*#__PURE__*/createConstMap<{{class_name}}>([

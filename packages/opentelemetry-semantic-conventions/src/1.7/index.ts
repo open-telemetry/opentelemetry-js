@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export * from './trace/SemanticAttributes';
-export * from './resource/SemanticResourceAttributes';
+export * from './trace';
+export * from './resource';
