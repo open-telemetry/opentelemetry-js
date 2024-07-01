@@ -35,6 +35,7 @@ export abstract class OTLPExporterNodeBase<
 > extends OTLPExporterBase<OTLPExporterNodeConfigBase, ExportItem> {
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
+  getHeaders?: () => Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
   compression: CompressionAlgorithm;
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
@@ -51,9 +52,13 @@ export abstract class OTLPExporterNodeBase<
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
+    if (config.headers && typeof config.headers === 'function') {
+      this.getHeaders = config.headers;
+    }
+
     this.headers = Object.assign(
       this.DEFAULT_HEADERS,
-      parseHeaders(config.headers),
+      typeof config.headers === 'function' ? {} : parseHeaders(config.headers),
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
     );
     this.agent = createHttpAgent(config);

@@ -9,6 +9,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(exporter-trace-otlp-http): allow dynamic headers in HTTP exporter [#3662](https://github.com/open-telemetry/opentelemetry-js/pull/3662/files)
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)

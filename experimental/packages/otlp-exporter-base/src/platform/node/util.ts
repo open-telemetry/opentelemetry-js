@@ -76,6 +76,7 @@ export function sendWithHttp<ExportItem, ServiceResponse>(
     headers: {
       'Content-Type': contentType,
       ...collector.headers,
+      ...(collector.getHeaders ? collector.getHeaders() : {}),
     },
     agent: collector.agent,
   };

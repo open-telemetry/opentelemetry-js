@@ -408,6 +408,45 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
   });
 
+  describe('export - with dynamic headers', () => {
+    let count = 0;
+    beforeEach(() => {
+      collectorExporterConfig = {
+        headers: () => ({
+          foo: `dynamic-${count}`,
+        }),
+        hostname: 'foo',
+        url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
+      };
+      collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+    });
+
+    it('should set dynamic custom headers', done => {
+      setTimeout(() => {
+        for (let i = 2; i < 5; i++) {
+          fakeRequest = new Stream.PassThrough();
+          sinon.restore();
+          stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+          count = i;
+          collectorExporter.export(spans, () => {});
+          const mockRes = new MockedResponse(200);
+          const args = stubRequest.args[0];
+          const callback = args[1];
+          callback(mockRes);
+          mockRes.send('success');
+
+          const options = args[0];
+          assert.strictEqual(options.headers['foo'], `dynamic-${i}`);
+        }
+        done();
+      });
+    });
+  });
+
   describe('export - with compression', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
