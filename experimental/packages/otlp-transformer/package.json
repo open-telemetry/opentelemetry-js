@@ -22,7 +22,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test": "nyc mocha 'test/**/*.test.ts'",
     "test:browser": "karma start --single-run",
     "test:bench": "node test/performance/benchmark/index.js | tee .benchmark-results.txt",
     "prewatch": "node ../../../scripts/version-update.js",
@@ -79,7 +79,6 @@
     "nyc": "15.1.0",
     "protobufjs-cli": "1.1.2",
     "ts-loader": "9.5.1",
-    "ts-mocha": "10.0.0",
     "typescript": "4.4.4",
     "webpack": "5.89.0"
   },

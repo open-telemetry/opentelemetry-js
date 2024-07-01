@@ -11,7 +11,7 @@
     "prewatch": "npm run precompile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc mocha test/**/*.test.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
@@ -60,7 +60,6 @@
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
-    "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
   },
   "dependencies": {
