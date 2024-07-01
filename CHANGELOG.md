@@ -36,6 +36,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+* feat(sdk-trace-node): support `xray` Propagator via `OTEL_PROPAGATORS` environment variable [#4602](https://github.com/open-telemetry/opentelemetry-js/pull/4602) @anuraags
 * feat(context-zone*): support zone.js 0.12.x [#4376](https://github.com/open-telemetry/opentelemetry-js/pull/4736) @maldago
 * refactor(core): Use tree-shakeable string constants for semconv [#4739](https://github.com/open-telemetry/opentelemetry-js/pull/4739) @JohannesHuster
 * refactor(shim-opentracing): Use tree-shakeable string constants for semconv [#4746](https://github.com/open-telemetry/opentelemetry-js/pull/4746) @JohannesHuster
@@ -44,6 +45,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * refactor(sdk-trace-base): Use tree-shakeable string constants for semconv [#4749](https://github.com/open-telemetry/opentelemetry-js/pull/4749) @JohannesHuster
 * refactor(resources): update deprecated semconv to use exported strings [#4755](https://github.com/open-telemetry/opentelemetry-js/pull/#4755) @JamieDanielson
 * refactor(exporters): update deprecated semconv to use exported strings [#4756](https://github.com/open-telemetry/opentelemetry-js/pull/#4756) @JamieDanielson
+* feat(semconv): update semantic conventions to 1.25 and include metric names [#4690](https://github.com/open-telemetry/opentelemetry-js/pull/4690) @dyladan
 
 ### :books: (Refine Doc)
 
