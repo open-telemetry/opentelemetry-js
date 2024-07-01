@@ -65,7 +65,7 @@ import {
   serviceInstanceIdDetectorSync,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs, NoopLoggerProvider } from '@opentelemetry/api-logs';
+import { logs } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
@@ -899,7 +899,7 @@ describe('Node SDK', () => {
     let stubLogger: Sinon.SinonStub;
 
     beforeEach(() => {
-      stubLogger = Sinon.stub(diag, 'warn');
+      stubLogger = Sinon.stub(diag, 'info');
     });
 
     afterEach(() => {
@@ -919,6 +919,7 @@ describe('Node SDK', () => {
     });
 
     it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
+      const logsAPIStub = Sinon.spy(logs, 'setGlobalLoggerProvider');
       env.OTEL_LOGS_EXPORTER = 'console,none';
       const sdk = new NodeSDK();
       sdk.start();
@@ -927,7 +928,7 @@ describe('Node SDK', () => {
         'OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.'
       );
 
-      assert(logs.getLoggerProvider() instanceof NoopLoggerProvider);
+      Sinon.assert.notCalled(logsAPIStub);
       await sdk.shutdown();
     });
 
@@ -1172,7 +1173,7 @@ describe('setup exporter from env', () => {
     sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[1][0],
+      stubLoggerError.args[0][0],
       'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
     );
     delete env.OTEL_TRACES_EXPORTER;
@@ -1223,7 +1224,7 @@ describe('setup exporter from env', () => {
     sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[1][0],
+      stubLoggerError.args[0][0],
       'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
     );
     delete env.OTEL_TRACES_EXPORTER;
@@ -1235,12 +1236,12 @@ describe('setup exporter from env', () => {
     sdk.start();
 
     assert.strictEqual(
-      stubLoggerError.args[1][0],
+      stubLoggerError.args[0][0],
       'Unrecognized OTEL_TRACES_EXPORTER value: invalid.'
     );
 
     assert.strictEqual(
-      stubLoggerError.args[2][0],
+      stubLoggerError.args[1][0],
       'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
     );
 

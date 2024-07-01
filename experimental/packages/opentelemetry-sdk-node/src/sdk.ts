@@ -59,11 +59,7 @@ import {
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
-import {
-  ENVIRONMENT,
-  getEnv,
-  getEnvWithoutDefaults,
-} from '@opentelemetry/core';
+import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 import { getResourceDetectorsFromEnv, filterBlanksAndNulls } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -196,7 +192,7 @@ export class NodeSDK {
         logRecordProcessors: [configuration.logRecordProcessor],
       };
     } else {
-      this.configureLoggerProviderFromEnv(envWithoutDefaults);
+      this.configureLoggerProviderFromEnv();
     }
 
     if (configuration.metricReader || configuration.views) {
@@ -331,12 +327,10 @@ export class NodeSDK {
     );
   }
 
-  private configureLoggerProviderFromEnv(
-    envWithoutDefaults: ENVIRONMENT
-  ): void {
-    const logExportersList = envWithoutDefaults.OTEL_LOGS_EXPORTER;
+  private configureLoggerProviderFromEnv(): void {
+    const logExportersList = process.env.OTEL_LOGS_EXPORTER;
     if (!logExportersList) {
-      diag.warn(`No log exporters specified. Logs will not be exported.`);
+      diag.info(`No log exporters specified. Logs will not be exported.`);
       return;
     }
 
@@ -344,7 +338,7 @@ export class NodeSDK {
     const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
 
     if (enabledExporters.includes('none')) {
-      diag.warn(
+      diag.info(
         `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
       );
       return;
@@ -353,8 +347,8 @@ export class NodeSDK {
     enabledExporters.forEach(exporter => {
       if (exporter === 'otlp') {
         const protocol = (
-          envWithoutDefaults.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
-          envWithoutDefaults.OTEL_EXPORTER_OTLP_PROTOCOL
+          process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
+          process.env.OTEL_EXPORTER_OTLP_PROTOCOL
         )?.trim();
         switch (protocol) {
           case 'grpc':
