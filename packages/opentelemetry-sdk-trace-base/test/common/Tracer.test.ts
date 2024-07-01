@@ -207,13 +207,14 @@ describe('Tracer', () => {
     });
   });
 
-  it('should use traceId, spanId and traceState from parent', () => {
+  it('should use traceId, spanId and traceState and is_remote from parent', () => {
     const traceState = createTraceState();
     const parent: SpanContext = {
       traceId: '00112233445566778899001122334455',
       spanId: '0011223344556677',
       traceFlags: TraceFlags.SAMPLED,
       traceState,
+      isRemote: true,
     };
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
@@ -228,6 +229,38 @@ describe('Tracer', () => {
     assert.strictEqual((span as Span).parentSpanId, parent.spanId);
     assert.strictEqual(span.spanContext().traceId, parent.traceId);
     assert.strictEqual(span.spanContext().traceState, traceState);
+    assert.strictEqual(
+      span.spanContext().traceFlags,
+      TraceFlags.SAMPLED & TraceFlags.HAS_IS_REMOTE & TraceFlags.IS_REMOTE
+    );
+  });
+
+  it('should not set is_remote for local parents', () => {
+    const traceState = createTraceState();
+    const parent: SpanContext = {
+      traceId: '00112233445566778899001122334455',
+      spanId: '0011223344556677',
+      traceFlags: TraceFlags.SAMPLED,
+      traceState,
+      isRemote: false,
+    };
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
+    const span = tracer.startSpan(
+      'aSpan',
+      undefined,
+      trace.setSpanContext(ROOT_CONTEXT, parent)
+    );
+    assert.strictEqual((span as Span).parentSpanId, parent.spanId);
+    assert.strictEqual(span.spanContext().traceId, parent.traceId);
+    assert.strictEqual(span.spanContext().traceState, traceState);
+    assert.strictEqual(
+      span.spanContext().traceFlags,
+      TraceFlags.SAMPLED & TraceFlags.HAS_IS_REMOTE
+    );
   });
 
   it('should not use spanId from invalid parent', () => {

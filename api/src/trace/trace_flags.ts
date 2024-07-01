@@ -18,4 +18,8 @@ export enum TraceFlags {
   NONE = 0x0,
   /** Bit to represent whether trace is sampled in trace flags. */
   SAMPLED = 0x1 << 0,
+  /** Bit to represent whether this SDK understands the "is remote" flag */
+  HAS_IS_REMOTE = 0x100 << 0,
+  /** Bit to represent the parent span is remote */
+  IS_REMOTE = 0x200 << 0,
 }

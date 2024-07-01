@@ -79,6 +79,7 @@ describe('ConsoleSpanExporter', () => {
           'attributes',
           'duration',
           'events',
+          'flags',
           'id',
           'kind',
           'links',
