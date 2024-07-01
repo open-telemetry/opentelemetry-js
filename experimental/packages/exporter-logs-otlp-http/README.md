@@ -58,7 +58,7 @@ import {
   LoggerProvider,
   BatchLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
-import { OTLPLogsExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 
 // exporter options. see all options in OTLPExporterNodeConfigBase
 const collectorOptions = {

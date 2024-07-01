@@ -266,7 +266,10 @@ export class NodeSDK {
     }
 
     tracerProvider.register({
-      contextManager: this._tracerProviderConfig?.contextManager,
+      contextManager:
+        this._tracerProviderConfig?.contextManager ??
+        // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
+        this._configuration?.contextManager,
       propagator: this._tracerProviderConfig?.textMapPropagator,
     });
 
