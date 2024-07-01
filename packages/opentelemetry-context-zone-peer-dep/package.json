@@ -77,7 +77,6 @@
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
-    "ts-mocha": "10.0.0",
     "typescript": "4.4.4",
     "webpack": "5.89.0",
     "webpack-cli": "5.1.4",
