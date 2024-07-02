@@ -32,6 +32,7 @@ import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/expo
 import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+import { filterBlanksAndNulls } from './utils';
 
 export class TracerProviderWithEnvExporters extends NodeTracerProvider {
   private _configuredExporters: SpanExporter[] = [];
@@ -94,7 +95,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
 
   public constructor(config: NodeTracerConfig = {}) {
     super(config);
-    let traceExportersList = this.filterBlanksAndNulls(
+    let traceExportersList = filterBlanksAndNulls(
       Array.from(new Set(getEnv().OTEL_TRACES_EXPORTER.split(',')))
     );
 
@@ -174,9 +175,5 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
         return new BatchSpanProcessor(exporter);
       }
     });
-  }
-
-  private filterBlanksAndNulls(list: string[]): string[] {
-    return list.map(item => item.trim()).filter(s => s !== 'null' && s !== '');
   }
 }
