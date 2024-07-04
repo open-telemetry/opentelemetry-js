@@ -30,8 +30,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.1) [#4806](https://github.com/open-telemetry/opentelemetry-js/pull/4806) @timfish
 * chore(instrumentation): Use a caret version for `import-in-the-middle` dependency [#4810](https://github.com/open-telemetry/opentelemetry-js/pull/4810) @timfish
 
-* docs(opentelemetry-browser-detector): Use tree-shakeable string constants for semconv in Readme [#4768](https://github.com/open-telemetry/opentelemetry-js/pull/4768) @JohannesHuster
-
 ### :house: (Internal)
 
 * test: add `npm run maint:regenerate-test-certs` maintenance script and regenerate recently expired test certs [#4777](https://github.com/open-telemetry/opentelemetry-js/pull/4777)
