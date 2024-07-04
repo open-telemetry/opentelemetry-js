@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-grpc-exporter-base",
-  "version": "0.52.0",
+  "version": "0.52.1",
   "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -13,7 +13,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test": "nyc mocha 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc -w",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
@@ -48,9 +48,9 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/resources": "1.25.0",
-    "@opentelemetry/sdk-trace-base": "1.25.0",
-    "@types/mocha": "10.0.6",
+    "@opentelemetry/resources": "1.25.1",
+    "@opentelemetry/sdk-trace-base": "1.25.1",
+    "@types/mocha": "10.0.7",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.3",
     "codecov": "3.8.3",
@@ -60,7 +60,6 @@
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
-    "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
   },
   "peerDependencies": {
@@ -68,9 +67,9 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
-    "@opentelemetry/core": "1.25.0",
-    "@opentelemetry/otlp-exporter-base": "0.52.0",
-    "@opentelemetry/otlp-transformer": "0.52.0"
+    "@opentelemetry/core": "1.25.1",
+    "@opentelemetry/otlp-exporter-base": "0.52.1",
+    "@opentelemetry/otlp-transformer": "0.52.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base",
   "sideEffects": false
