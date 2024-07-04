@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-events",
-  "version": "0.52.0",
+  "version": "0.52.1",
   "publishConfig": {
     "access": "public"
   },
@@ -35,7 +35,7 @@
     "prewatch": "npm run precompile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc mocha test/**/*.test.ts",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
@@ -72,7 +72,7 @@
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/api-events": "0.52.0",
     "@opentelemetry/api-logs": "0.52.0",
-    "@types/mocha": "10.0.6",
+    "@types/mocha": "10.0.7",
     "@types/node": "18.6.5",
     "@types/sinon": "10.0.20",
     "@types/webpack-env": "1.16.3",
@@ -91,15 +91,14 @@
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
-    "ts-mocha": "10.0.0",
     "typescript": "4.4.4",
     "webpack": "5.89.0",
     "webpack-cli": "5.1.4",
     "webpack-merge": "5.10.0"
   },
   "dependencies": {
-    "@opentelemetry/api-events": "0.52.0",
-    "@opentelemetry/api-logs": "0.52.0",
-    "@opentelemetry/sdk-logs": "0.52.0"
+    "@opentelemetry/api-events": "0.52.1",
+    "@opentelemetry/api-logs": "0.52.1",
+    "@opentelemetry/sdk-logs": "0.52.1"
   }
 }

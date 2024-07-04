@@ -7,6 +7,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
 * feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
   * (user-facing) `headers` was intended for internal use has been removed from all exporters
   * (user-facing) `compression` was intended for internal use and has been removed from all exporters
@@ -16,13 +17,26 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+* refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+
+## 0.52.1
+
+### :rocket: (Enhancement)
+
 * refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
+* refactor(otlp-transformer): use explicit exports [#4785](https://github.com/open-telemetry/opentelemetry-js/pull/4785) @pichlermarc
 
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): register context manager if no tracer options are provided [#4781](https://github.com/open-telemetry/opentelemetry-js/pull/4781) @pichlermarc
-
-### :books: (Refine Doc)
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.1) [#4806](https://github.com/open-telemetry/opentelemetry-js/pull/4806) @timfish
+* chore(instrumentation): Use a caret version for `import-in-the-middle` dependency [#4810](https://github.com/open-telemetry/opentelemetry-js/pull/4810) @timfish
 
 ### :house: (Internal)
 

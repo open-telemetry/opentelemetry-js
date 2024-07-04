@@ -25,14 +25,14 @@ import {
   Hooked,
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
-import * as ImportInTheMiddle from 'import-in-the-middle';
+import { Hook as HookImport } from 'import-in-the-middle';
 import {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
 } from '../../types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
-import { Hook } from 'require-in-the-middle';
+import { Hook as HookRequire } from 'require-in-the-middle';
 import { readFileSync } from 'fs';
 import { isWrapped } from '../../utils';
 
@@ -46,7 +46,7 @@ export abstract class InstrumentationBase<
   implements types.Instrumentation<ConfigType>
 {
   private _modules: InstrumentationModuleDefinition[];
-  private _hooks: (Hooked | Hook)[] = [];
+  private _hooks: (Hooked | HookRequire)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
   private _enabled = false;
@@ -305,15 +305,15 @@ export abstract class InstrumentationBase<
       // For an absolute paths, we must create a separate instance of the
       // require-in-the-middle `Hook`.
       const hook = path.isAbsolute(module.name)
-        ? new Hook([module.name], { internals: true }, onRequire)
+        ? new HookRequire([module.name], { internals: true }, onRequire)
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      const esmHook = new (
-        ImportInTheMiddle as unknown as {
-          Hook: typeof ImportInTheMiddle.default;
-        }
-      ).Hook([module.name], { internals: false }, <HookFn>hookFn);
+      const esmHook = new HookImport(
+        [module.name],
+        { internals: false },
+        <HookFn>hookFn
+      );
       this._hooks.push(esmHook);
     }
   }
