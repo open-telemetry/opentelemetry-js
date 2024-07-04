@@ -23,8 +23,8 @@ import {
   OTLPExporterBrowserBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  createExportTraceServiceRequest,
-  IExportTraceServiceRequest,
+  IExportTraceServiceResponse,
+  JsonTraceSerializer,
 } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
@@ -34,35 +34,39 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURC
  * Collector Trace Exporter for Web
  */
 export class OTLPTraceExporter
-  extends OTLPExporterBrowserBase<ReadableSpan, IExportTraceServiceRequest>
+  extends OTLPExporterBrowserBase<ReadableSpan, IExportTraceServiceResponse>
   implements SpanExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config);
+    super(config, JsonTraceSerializer, 'application/json');
+    const env = getEnv();
     this._headers = Object.assign(
       this._headers,
       baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
+        env.OTEL_EXPORTER_OTLP_TRACES_HEADERS
       )
     );
   }
-  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans, {
-      useHex: true,
-      useLongBits: false,
-    });
-  }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
+    if (typeof config.url === 'string') {
+      return config.url;
+    }
+
+    const env = getEnv();
+    if (env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0) {
+      return appendRootPathToUrlIfNeeded(
+        env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      );
+    }
+
+    if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
+      return appendResourcePathToUrl(
+        env.OTEL_EXPORTER_OTLP_ENDPOINT,
+        DEFAULT_COLLECTOR_RESOURCE_PATH
+      );
+    }
+
+    return DEFAULT_COLLECTOR_URL;
   }
 }

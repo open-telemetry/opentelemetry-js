@@ -25,22 +25,28 @@ import {
   Hooked,
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
-import * as ImportInTheMiddle from 'import-in-the-middle';
-import { InstrumentationModuleDefinition } from '../../types';
+import { Hook as HookImport } from 'import-in-the-middle';
+import {
+  InstrumentationConfig,
+  InstrumentationModuleDefinition,
+} from '../../types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
-import { Hook } from 'require-in-the-middle';
+import { Hook as HookRequire } from 'require-in-the-middle';
 import { readFileSync } from 'fs';
+import { isWrapped } from '../../utils';
 
 /**
  * Base abstract class for instrumenting node plugins
  */
-export abstract class InstrumentationBase
-  extends InstrumentationAbstract
-  implements types.Instrumentation
+export abstract class InstrumentationBase<
+    ConfigType extends InstrumentationConfig = InstrumentationConfig,
+  >
+  extends InstrumentationAbstract<ConfigType>
+  implements types.Instrumentation<ConfigType>
 {
   private _modules: InstrumentationModuleDefinition[];
-  private _hooks: (Hooked | Hook)[] = [];
+  private _hooks: (Hooked | HookRequire)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
   private _enabled = false;
@@ -48,7 +54,7 @@ export abstract class InstrumentationBase
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: types.InstrumentationConfig = {}
+    config: ConfigType
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
@@ -74,6 +80,9 @@ export abstract class InstrumentationBase
   }
 
   protected override _wrap: typeof wrap = (moduleExports, name, wrapper) => {
+    if (isWrapped(moduleExports[name])) {
+      this._unwrap(moduleExports, name);
+    }
     if (!utilTypes.isProxy(moduleExports)) {
       return wrap(moduleExports, name, wrapper);
     } else {
@@ -296,16 +305,15 @@ export abstract class InstrumentationBase
       // For an absolute paths, we must create a separate instance of the
       // require-in-the-middle `Hook`.
       const hook = path.isAbsolute(module.name)
-        ? new Hook([module.name], { internals: true }, onRequire)
+        ? new HookRequire([module.name], { internals: true }, onRequire)
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      const esmHook =
-        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
-          [module.name],
-          { internals: false },
-          <HookFn>hookFn
-        );
+      const esmHook = new HookImport(
+        [module.name],
+        { internals: false },
+        <HookFn>hookFn
+      );
       this._hooks.push(esmHook);
     }
   }

@@ -53,7 +53,6 @@ import {
 } from '@opentelemetry/api';
 import {
   InstrumentationNodeModuleDefinition,
-  isWrapped,
   InstrumentationBase,
 } from '@opentelemetry/instrumentation';
 import {
@@ -88,10 +87,10 @@ import {
 import { AttributeValues } from './enums/AttributeValues';
 import { VERSION } from './version';
 
-export class GrpcInstrumentation extends InstrumentationBase {
+export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
 
-  constructor(config?: GrpcInstrumentationConfig) {
+  constructor(config: GrpcInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
   }
@@ -100,11 +99,8 @@ export class GrpcInstrumentation extends InstrumentationBase {
     return [
       new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
-        ['1.*'],
+        ['^1.0.0'],
         moduleExports => {
-          if (isWrapped(moduleExports.Server.prototype.register)) {
-            this._unwrap(moduleExports.Server.prototype, 'register');
-          }
           // Patch Server methods
           this._wrap(
             moduleExports.Server.prototype,
@@ -112,45 +108,21 @@ export class GrpcInstrumentation extends InstrumentationBase {
             this._patchServer()
           );
           // Patch Client methods
-          if (isWrapped(moduleExports.makeGenericClientConstructor)) {
-            this._unwrap(moduleExports, 'makeGenericClientConstructor');
-          }
           this._wrap(
             moduleExports,
             'makeGenericClientConstructor',
             this._patchClient(moduleExports)
           );
-          if (isWrapped(moduleExports.makeClientConstructor)) {
-            this._unwrap(moduleExports, 'makeClientConstructor');
-          }
           this._wrap(
             moduleExports,
             'makeClientConstructor',
             this._patchClient(moduleExports)
           );
-          if (isWrapped(moduleExports.loadPackageDefinition)) {
-            this._unwrap(moduleExports, 'loadPackageDefinition');
-          }
           this._wrap(
             moduleExports,
             'loadPackageDefinition',
             this._patchLoadPackageDefinition(moduleExports)
           );
-          if (isWrapped(moduleExports.Client.prototype)) {
-            this._unwrap(moduleExports.Client.prototype, 'makeUnaryRequest');
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeClientStreamRequest'
-            );
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeServerStreamRequest'
-            );
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeBidiStreamRequest'
-            );
-          }
           this._wrap(
             moduleExports.Client.prototype,
             'makeUnaryRequest',
@@ -195,16 +167,7 @@ export class GrpcInstrumentation extends InstrumentationBase {
     ];
   }
 
-  /**
-   * @internal
-   * Public reference to the protected BaseInstrumentation `_config` instance to be used by this
-   * plugin's external helper functions
-   */
-  override getConfig(): GrpcInstrumentationConfig {
-    return super.getConfig();
-  }
-
-  override setConfig(config?: GrpcInstrumentationConfig): void {
+  override setConfig(config: GrpcInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._metadataCapture = this._createMetadataCapture();
   }
