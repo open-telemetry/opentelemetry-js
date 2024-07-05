@@ -46,7 +46,7 @@ We aim to eventually automate this process as much as possible.
 
 
 > [!IMPORTANT]
-> Delete the token once you're don publishing
+> Delete the token once you're done publishing
 
 ## Create GitHub Releases
 
