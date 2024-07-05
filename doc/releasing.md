@@ -5,7 +5,7 @@ We aim to eventually automate this process as much as possible.
 
 ## Create a release PR
 
-1. Go to https://github.com/open-telemetry/opentelemetry-js/actions/workflows/create-or-update-release.yml
+1. Go to the [Release PR Workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/create-or-update-release.yml)
 2. Click "Run workflow"
 3. For `Release Type`, select if you want to create a release PR for a new `minor` or `patch` version.
 4. For `Release Scope`, select if you want to release
@@ -43,7 +43,6 @@ We aim to eventually automate this process as much as possible.
 3. run `npm ci`
 4. run `npm run compile`
 5. run `NODE_AUTH_TOKEN=<token generated earlier> npm run release:publish`
-
 
 > [!IMPORTANT]
 > Delete the token once you're done publishing
