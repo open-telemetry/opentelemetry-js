@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1720086694605,
+  "lastUpdate": 1720216955913,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12704,6 +12704,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.39%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "66320475+JohannesHuster@users.noreply.github.com",
+            "name": "Johannes Huster",
+            "username": "JohannesHuster"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "539d94265b32e545093ab4e4033138decff2d5c0",
+          "message": "docs(opentelemetry-browser-detector): Use tree-shakeable string constants for semconv in Readme (#4768)\n\n* docs(opentelemetry-browser-detector): Use tree-shakeable string constants for semconv in Readme\n\n* Update changelog\n\n* Uninstall unused semantic-conventions package from browser-detector package\n\n* Move changelog entry to Unreleased section\n\n* rm changelog entry, I don't think it is necessary for a small docs update\n\n---------\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2024-07-05T22:00:32Z",
+          "tree_id": "6c6a85f5f6530e7adf88c341761a91fad21fb655",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/539d94265b32e545093ab4e4033138decff2d5c0"
+        },
+        "date": 1720216955057,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 953756,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11791,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 684548,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648267,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
