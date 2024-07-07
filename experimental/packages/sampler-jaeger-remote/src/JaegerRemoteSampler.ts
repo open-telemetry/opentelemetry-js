@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
+import { Link, SpanKind, Attributes, diag, Context } from '@opentelemetry/api';
 import {
   Sampler,
   SamplingResult,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
-import { SpanKind } from '@opentelemetry/api';
-import { Link } from '@opentelemetry/api';
 import axios from 'axios';
 import { PerOperationSampler } from './PerOperationSampler';
 import { SamplingStrategyResponse, StrategyType } from './types';
-import { Attributes, diag } from '@opentelemetry/api';
 
 interface JaegerRemoteSamplerOptions {
   /** Address of a service that implements the Remote Sampling API, such as Jaeger Collector or OpenTelemetry Collector */
@@ -91,12 +88,12 @@ export class JaegerRemoteSampler implements Sampler {
     } poolingInterval=${this._poolingInterval}, sampler=${this._sampler}}`;
   }
 
-  async getAndUpdateSampler() {
+  private async getAndUpdateSampler() {
     const newConfig = await this.getSamplerConfig(this._serviceName);
     this._sampler = await this.convertSamplingResponseToSampler(newConfig);
   }
 
-  convertSamplingResponseToSampler(
+  private convertSamplingResponseToSampler(
     newConfig: SamplingStrategyResponse
   ): Sampler {
     const perOperationStrategies =
@@ -129,7 +126,7 @@ export class JaegerRemoteSampler implements Sampler {
     }
   }
 
-  async getSamplerConfig(
+  private async getSamplerConfig(
     serviceName?: string
   ): Promise<SamplingStrategyResponse> {
     const response = await axios.get<SamplingStrategyResponse>(

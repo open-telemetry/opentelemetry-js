@@ -54,7 +54,7 @@ describe('JaegerRemoteSampler', () => {
 
     beforeEach(() => {
       getAndUpdateSamplerStub = sinon
-        .stub(JaegerRemoteSampler.prototype, 'getAndUpdateSampler')
+        .stub(JaegerRemoteSampler.prototype, 'getAndUpdateSampler' as any)
         .resolves();
     });
 
@@ -140,10 +140,10 @@ describe('JaegerRemoteSampler', () => {
 
     beforeEach(() => {
       getSamplerConfigStub = sinon
-        .stub(JaegerRemoteSampler.prototype, 'getSamplerConfig')
+        .stub(JaegerRemoteSampler.prototype, 'getSamplerConfig' as any)
         .resolves(sampleSamplingStrategyResponse);
       convertSamplingResponseToSamplerStub = sinon
-        .stub(JaegerRemoteSampler.prototype, 'convertSamplingResponseToSampler')
+        .stub(JaegerRemoteSampler.prototype, 'convertSamplingResponseToSampler' as any)
         .resolves(alwaysOffSampler);
     });
 
@@ -198,7 +198,7 @@ describe('JaegerRemoteSampler', () => {
     beforeEach(() => {
       getSamplerConfigStub = sinon.stub(
         JaegerRemoteSampler.prototype,
-        'getSamplerConfig'
+        'getSamplerConfig' as any
       );
     });
 
@@ -438,7 +438,7 @@ describe('JaegerRemoteSampler', () => {
     beforeEach(() => {
       getSamplerConfigStub = sinon.stub(
         JaegerRemoteSampler.prototype,
-        'getSamplerConfig'
+        'getSamplerConfig' as any
       );
     });
 

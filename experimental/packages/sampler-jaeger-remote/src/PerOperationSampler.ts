@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
+import { Context, SpanKind, Link, SpanAttributes } from '@opentelemetry/api';
 import {
   Sampler,
   SamplingResult,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
-import { SpanKind } from '@opentelemetry/api';
-import { Link } from '@opentelemetry/api';
-import { SpanAttributes } from '@opentelemetry/api';
 import { PerOperationStrategy } from './types';
 
 interface PerOperationSamplerOptions {
