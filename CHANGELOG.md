@@ -14,6 +14,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
+* deps(opentelemetry-instrumentation): Bump `shimmer` types to 1.2.0 [#4854](https://github.com/open-telemetry/opentelemetry-js/pull/4854) @lforst
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
