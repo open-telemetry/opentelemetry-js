@@ -27,6 +27,7 @@ import {
   ObservableCounter,
   Counter,
   ObservableUpDownCounter,
+  Gauge,
 } from '../../../src';
 import {
   NoopHistogramMetric,
@@ -122,6 +123,7 @@ describe('ProxyMeter', () => {
   describe('when delegate is set after getMeter', () => {
     let meter: Meter;
     let delegate: MeterProvider;
+    let delegateGauge: Gauge;
     let delegateHistogram: Histogram;
     let delegateCounter: Counter;
     let delegateUpDownCounter: UpDownCounter;
@@ -133,6 +135,9 @@ describe('ProxyMeter', () => {
     beforeEach(() => {
       delegateHistogram = new NoopHistogramMetric();
       delegateMeter = {
+        createGauge() {
+          return delegateGauge;
+        },
         createHistogram() {
           return delegateHistogram;
         },
@@ -163,6 +168,11 @@ describe('ProxyMeter', () => {
         },
       };
       provider.setDelegate(delegate);
+    });
+
+    it('should create gauges using the delegate meter', () => {
+      const instrument = meter.createGauge('test');
+      assert.strictEqual(instrument, delegateGauge);
     });
 
     it('should create histograms using the delegate meter', () => {

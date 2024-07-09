@@ -26,6 +26,7 @@ import {
   ObservableUpDownCounter,
   UpDownCounter,
   Observable,
+  Gauge,
 } from './Metric';
 
 const NOOP_METER = new NoopMeter();
@@ -43,6 +44,13 @@ export class ProxyMeter implements Meter {
     public readonly version?: string,
     public readonly options?: MeterOptions
   ) {}
+
+  /**
+   * @see {@link Meter.createGauge}
+   */
+  createGauge(_name: string, _options?: MetricOptions): Gauge {
+    return this._getMeter().createGauge(_name, _options);
+  }
 
   /**
    * @see {@link Meter.createUpDownCounter}
