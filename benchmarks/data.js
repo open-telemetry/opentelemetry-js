@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1720216955913,
+  "lastUpdate": 1720559934817,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12754,6 +12754,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 648267,
             "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "oliver@plancraft.de",
+            "name": "Oliver Sand",
+            "username": "Fox32"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "54b14fbbe33e0cf38115ee8c5c934a4e27786186",
+          "message": "docs(opentelemtry-instrumentation): fix reversed jsdoc comment (#4855)\n\nSigned-off-by: Oliver Sand <oliver@plancraft.de>",
+          "timestamp": "2024-07-09T21:16:23Z",
+          "tree_id": "05cd73a912c2e1d5fab98cfd8b1699bbb08f6685",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/54b14fbbe33e0cf38115ee8c5c934a4e27786186"
+        },
+        "date": 1720559933950,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 972122,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11824,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 694001,
+            "range": "±1.44%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 656915,
+            "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
