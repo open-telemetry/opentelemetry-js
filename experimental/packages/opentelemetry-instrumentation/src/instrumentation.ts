@@ -168,10 +168,10 @@ export abstract class InstrumentationAbstract<
     return this._tracer;
   }
 
-  /* Disable plugin */
+  /* Enable plugin */
   public abstract enable(): void;
 
-  /* Enable plugin */
+  /* Disable plugin */
   public abstract disable(): void;
 
   /**
