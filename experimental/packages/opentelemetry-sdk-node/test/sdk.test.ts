@@ -134,7 +134,6 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
-      assert.ok(!(logs.getLoggerProvider() instanceof LoggerProvider));
       delete env.OTEL_TRACES_EXPORTER;
       await sdk.shutdown();
     });
@@ -906,18 +905,6 @@ describe('Node SDK', () => {
       stubLogger.reset();
     });
 
-    it('should log a warning if OTEL_LOGS_EXPORTER not set', async () => {
-      const sdk = new NodeSDK();
-      sdk.start();
-
-      assert.strictEqual(
-        stubLogger.args[0][0],
-        'No log exporters specified. Logs will not be exported.'
-      );
-
-      await sdk.shutdown();
-    });
-
     it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
       const logsAPIStub = Sinon.spy(logs, 'setGlobalLoggerProvider');
       env.OTEL_LOGS_EXPORTER = 'console,none';
@@ -947,7 +934,7 @@ describe('Node SDK', () => {
       );
       assert(
         sharedState.registeredLogRecordProcessors[0] instanceof
-          BatchLogRecordProcessor
+          SimpleLogRecordProcessor
       );
       // defaults to http/protobuf
       assert(

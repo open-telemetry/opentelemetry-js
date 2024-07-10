@@ -43,6 +43,7 @@ import {
   BatchLogRecordProcessor,
   ConsoleLogRecordExporter,
   LogRecordExporter,
+  SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
@@ -191,6 +192,9 @@ export class NodeSDK {
       this._loggerProviderConfig = {
         logRecordProcessors: [configuration.logRecordProcessor],
       };
+      diag.warn(
+        "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
+      );
     } else {
       this.configureLoggerProviderFromEnv();
     }
@@ -328,14 +332,13 @@ export class NodeSDK {
   }
 
   private configureLoggerProviderFromEnv(): void {
-    const logExportersList = process.env.OTEL_LOGS_EXPORTER;
-    if (!logExportersList) {
-      diag.info(`No log exporters specified. Logs will not be exported.`);
-      return;
-    }
-
-    const exporters: LogRecordExporter[] = [];
+    const logExportersList = process.env.OTEL_LOGS_EXPORTER ?? '';
     const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
+
+    if (enabledExporters.length === 0) {
+      diag.info('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
+      enabledExporters.push('otlp');
+    }
 
     if (enabledExporters.includes('none')) {
       diag.info(
@@ -344,12 +347,15 @@ export class NodeSDK {
       return;
     }
 
+    const exporters: LogRecordExporter[] = [];
+
     enabledExporters.forEach(exporter => {
       if (exporter === 'otlp') {
         const protocol = (
           process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
           process.env.OTEL_EXPORTER_OTLP_PROTOCOL
         )?.trim();
+
         switch (protocol) {
           case 'grpc':
             exporters.push(new OTLPGrpcLogExporter());
@@ -360,10 +366,13 @@ export class NodeSDK {
           case 'http/protobuf':
             exporters.push(new OTLPProtoLogExporter());
             break;
+          case undefined:
+          case '':
+            diag.info(`OTLP logs protocol is not set. Using http/protobuf.`);
+            exporters.push(new OTLPProtoLogExporter());
+            break;
           default:
-            diag.debug(
-              `Unsupported or undefined OTLP logs protocol. Using http/protobuf.`
-            );
+            diag.warn(`Unsupported OTLP logs protocol. Using http/protobuf.`);
             exporters.push(new OTLPProtoLogExporter());
         }
       } else if (exporter === 'console') {
@@ -377,9 +386,13 @@ export class NodeSDK {
 
     if (exporters.length > 0) {
       this._loggerProviderConfig = {
-        logRecordProcessors: exporters.map(
-          exporter => new BatchLogRecordProcessor(exporter)
-        ),
+        logRecordProcessors: exporters.map(exporter => {
+          if (exporter instanceof ConsoleLogRecordExporter) {
+            return new SimpleLogRecordProcessor(exporter);
+          } else {
+            return new BatchLogRecordProcessor(exporter);
+          }
+        }),
       };
     }
   }
