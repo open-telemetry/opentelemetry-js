@@ -156,7 +156,7 @@ jobs:
         working-directory: ./api
         run: |
           npm install --ignore-scripts
-          npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
+          npm install @types/mocha@^7 mocha@^7 ts-loader@^8
           node ../scripts/version-update.js
           npx tsc --build tsconfig.json tsconfig.esm.json
 
