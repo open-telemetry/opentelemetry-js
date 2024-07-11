@@ -21,6 +21,8 @@ export * from './types/LoggerOptions';
 export * from './types/AnyValue';
 export * from './NoopLogger';
 export * from './NoopLoggerProvider';
+export * from './ProxyLogger';
+export * from './ProxyLoggerProvider';
 
 import { LogsAPI } from './api/logs';
 export const logs = LogsAPI.getInstance();
