@@ -10,6 +10,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* feat(api): Add delegating no-op logger provider [#4861](https://github.com/open-telemetry/opentelemetry-js/pull/4861) @hectorhdzg
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
