@@ -27,13 +27,6 @@ export interface Instrumentation<
   /** Instrumentation Version  */
   instrumentationVersion: string;
 
-  /**
-   * Instrumentation Description - please describe all useful information
-   * as Instrumentation might patch different version of different modules,
-   * or support different browsers etc.
-   */
-  instrumentationDescription?: string;
-
   /** Method to disable the instrumentation  */
   disable(): void;
 
