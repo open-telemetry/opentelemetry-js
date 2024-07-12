@@ -26,8 +26,6 @@ export type ShutdownOptions = CommonReaderOptions;
 export type ForceFlushOptions = CommonReaderOptions;
 
 /**
- * @experimental
- *
  * This is intentionally not using the API's type as it's only available from @opentelemetry/api 1.9.0 and up.
  * In SDK 2.0 we'll be able to bump the minimum API version and remove this workaround.
  */

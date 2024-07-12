@@ -35,7 +35,7 @@
     "@opentelemetry/instrumentation": "^0.27.0",
     "@opentelemetry/instrumentation-grpc": "^0.27.0",
     "@opentelemetry/resources": "^1.0.1",
-    "@opentelemetry/semantic-conventions": "^1.0.1",
+    "@opentelemetry/semantic-conventions": "^1.22.0",
     "@opentelemetry/sdk-trace-base": "^1.0.1",
     "@opentelemetry/sdk-trace-node": "^1.0.1",
     "google-protobuf": "^3.9.2"

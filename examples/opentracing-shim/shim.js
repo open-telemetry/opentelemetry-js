@@ -1,6 +1,6 @@
 'use strict';
 
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 const { Resource } = require('@opentelemetry/resources');
 const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
@@ -10,7 +10,7 @@ const { TracerShim } = require('@opentelemetry/shim-opentracing');
 
 function shim(serviceName) {
   const provider = new NodeTracerProvider({
-    resource: new Resource({ [SemanticResourceAttributes.SERVICE_NAME]: serviceName }),
+    resource: new Resource({ [SEMRESATTRS_SERVICE_NAME]: serviceName }),
   });
 
   provider.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));

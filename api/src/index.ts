@@ -43,6 +43,7 @@ export { MeterProvider } from './metrics/MeterProvider';
 export {
   ValueType,
   Counter,
+  Gauge,
   Histogram,
   MetricOptions,
   Observable,

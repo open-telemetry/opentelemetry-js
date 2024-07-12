@@ -91,3 +91,6 @@ package.json.lerna_backup
 
 # non-aggregated benchmark results
 .benchmark-results.txt
+
+# release notes for release creation
+.tmp/

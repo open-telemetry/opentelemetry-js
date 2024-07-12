@@ -16,33 +16,7 @@
 
 import { TracerProvider, MeterProvider } from '@opentelemetry/api';
 import { Instrumentation } from './types';
-import { AutoLoaderResult, InstrumentationOption } from './types_internal';
 import { LoggerProvider } from '@opentelemetry/api-logs';
-
-/**
- * Parses the options and returns instrumentations, node plugins and
- *   web plugins
- * @param options
- */
-export function parseInstrumentationOptions(
-  options: InstrumentationOption[] = []
-): AutoLoaderResult {
-  let instrumentations: Instrumentation[] = [];
-  for (let i = 0, j = options.length; i < j; i++) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const option = options[i] as any;
-    if (Array.isArray(option)) {
-      const results = parseInstrumentationOptions(option);
-      instrumentations = instrumentations.concat(results.instrumentations);
-    } else if (typeof option === 'function') {
-      instrumentations.push(new option());
-    } else if ((option as Instrumentation).instrumentationName) {
-      instrumentations.push(option);
-    }
-  }
-
-  return { instrumentations };
-}
 
 /**
  * Enable instrumentations

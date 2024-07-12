@@ -78,32 +78,32 @@ This package uses `@opentelemetry/semantic-conventions` version `1.22+`, which i
 
 Attributes collected:
 
-| Attribute                                   | Short Description                                                              | Notes                                                     |
-| ------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------- |
-| `ip_tcp`                                    | Transport protocol used                                                        | Key: `NETTRANSPORTVALUES_IP_TCP`                          |
-| `ip_udp`                                    | Transport protocol used                                                        | Key: `NETTRANSPORTVALUES_IP_UDP`                          |
-| `http.client_ip`                            | The IP address of the original client behind all proxies, if known             | Key: `SEMATTRS_HTTP_CLIENT_IP`                            |
-| `http.flavor`                               | Kind of HTTP protocol used                                                     | Key: `SEMATTRS_HTTP_FLAVOR`                               |
-| `http.host`                                 | The value of the HTTP host header                                              | Key: `SEMATTRS_HTTP_HOST`                                 |
-| `http.method`                               | HTTP request method                                                            | Key: `SEMATTRS_HTTP_METHOD`                               |
-| `http.request_content_length`               | The size of the request payload body in bytes                                  | Key: `SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH`               |
-| `http.request_content_length_uncompressed`  | The size of the uncompressed request payload body after transport decoding     | Key: `SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED`  |
-| `http.response_content_length`              | The size of the response payload body in bytes                                 | Key: `SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH`              |
-| `http.response_content_length_uncompressed` | The size of the uncompressed response payload body after transport decoding    | Key: `SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED` |
-| `http.route`                                | The matched route (path template).                                             | Key: `SEMATTRS_HTTP_ROUTE`                                |
-| `http.scheme`                               | The URI scheme identifying the used protocol                                   | Key: `SEMATTRS_HTTP_SCHEME`                               |
-| `http.server_name`                          | The primary server name of the matched virtual host                            | Key: `SEMATTRS_HTTP_SERVER_NAME`                          |
-| `http.status_code`                          | HTTP response status code                                                      | Key: `SEMATTRS_HTTP_STATUS_CODE`                          |
-| `http.target`                               | The full request target as passed in a HTTP request line or equivalent         | Key: `SEMATTRS_HTTP_TARGET`                               |
-| `http.url`                                  | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]` | Key: `SEMATTRS_HTTP_URL`                                  |
-| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         | Key: `SEMATTRS_HTTP_USER_AGENT`                           |
-| `net.host.ip`                               | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host        | Key: `SEMATTRS_NET_HOST_IP`                               |
-| `net.host.name`                             | Local hostname or similar                                                      | Key: `SEMATTRS_NET_HOST_NAME`                             |
-| `net.host.port`                             | Like net.peer.port but for the host port                                       | Key: `SEMATTRS_NET_HOST_PORT`                             |
-| `net.peer.ip.`                              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)       | Key: `SEMATTRS_NET_PEER_IP`                               |
-| `net.peer.name`                             | Remote hostname or similar                                                     | Key: `SEMATTRS_NET_PEER_NAME`                             |
-| `net.peer.port`                             | Remote port number                                                             | Key: `SEMATTRS_NET_PEER_PORT`                             |
-| `net.transport`                             | Transport protocol used                                                        | Key: `SEMATTRS_NET_TRANSPORT`                             |
+| Attribute                                   | Short Description                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| `ip_tcp`                                    | Transport protocol used                                                        |
+| `ip_udp`                                    | Transport protocol used                                                        |
+| `http.client_ip`                            | The IP address of the original client behind all proxies, if known             |
+| `http.flavor`                               | Kind of HTTP protocol used                                                     |
+| `http.host`                                 | The value of the HTTP host header                                              |
+| `http.method`                               | HTTP request method                                                            |
+| `http.request_content_length`               | The size of the request payload body in bytes                                  |
+| `http.request_content_length_uncompressed`  | The size of the uncompressed request payload body after transport decoding     |
+| `http.response_content_length`              | The size of the response payload body in bytes                                 |
+| `http.response_content_length_uncompressed` | The size of the uncompressed response payload body after transport decoding    |
+| `http.route`                                | The matched route (path template).                                             |
+| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
+| `http.server_name`                          | The primary server name of the matched virtual host                            |
+| `http.status_code`                          | HTTP response status code                                                      |
+| `http.target`                               | The full request target as passed in a HTTP request line or equivalent         |
+| `http.url`                                  | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]` |
+| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
+| `net.host.ip`                               | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host        |
+| `net.host.name`                             | Local hostname or similar                                                      |
+| `net.host.port`                             | Like net.peer.port but for the host port                                       |
+| `net.peer.ip.`                              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)       |
+| `net.peer.name`                             | Remote hostname or similar                                                     |
+| `net.peer.port`                             | Remote port number                                                             |
+| `net.transport`                             | Transport protocol used                                                        |
 
 ## Useful links
 

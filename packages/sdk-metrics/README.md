@@ -27,10 +27,10 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics');
 // To create an instrument, you first need to initialize the Meter provider.
 // NOTE: The default OpenTelemetry meter provider does not record any metric instruments.
 //       Registering a working meter provider allows the API methods to record instruments.
-opentelemetry.setGlobalMeterProvider(new MeterProvider());
+opentelemetry.metrics.setGlobalMeterProvider(new MeterProvider());
 
 // To record a metric event, we used the global singleton meter to create an instrument.
-const counter = opentelemetry.getMeter('default').createCounter('foo');
+const counter = opentelemetry.metrics.getMeter('default').createCounter('foo');
 
 // record a metric event.
 counter.add(1, { attributeKey: 'attribute-value' });
@@ -40,7 +40,7 @@ In conditions, we may need to setup an async instrument to observe costly events
 
 ```js
 // Creating an async instrument, similar to synchronous instruments
-const observableCounter = opentelemetry.getMeter('default')
+const observableCounter = opentelemetry.metrics.getMeter('default')
   .createObservableCounter('observable-counter');
 
 // Register a single-instrument callback to the async instrument.
@@ -50,7 +50,7 @@ observableCounter.addCallback(async (observableResult) => {
 });
 
 // Register a multi-instrument callback and associate it with a set of async instruments.
-opentelemetry.getMeter('default')
+opentelemetry.metrics.getMeter('default')
   .addBatchObservableCallback(batchObservableCallback, [ observableCounter ]);
 async function batchObservableCallback(batchObservableResult) {
   // ... do async stuff

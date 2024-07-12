@@ -27,7 +27,7 @@ const {
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const { Resource } = require('@opentelemetry/resources');
 const {
-  SemanticResourceAttributes,
+  SEMRESATTRS_SERVICE_NAME,
 } = require('@opentelemetry/semantic-conventions');
 const { OpenCensusMetricProducer } = require('@opentelemetry/shim-opencensus');
 const instrumentationHttp = require('@opencensus/instrumentation-http');
@@ -46,7 +46,7 @@ module.exports = function setup(serviceName) {
   tracing.tracer = new oc.CoreTracer();
 
   const resource = new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
+    [SEMRESATTRS_SERVICE_NAME]: serviceName,
   });
   const tracerProvider = new NodeTracerProvider({ resource });
   tracerProvider.addSpanProcessor(

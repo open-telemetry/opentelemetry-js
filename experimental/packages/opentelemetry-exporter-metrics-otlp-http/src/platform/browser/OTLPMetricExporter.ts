@@ -38,27 +38,35 @@ class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<
 > {
   constructor(config?: OTLPMetricExporterOptions & OTLPExporterConfigBase) {
     super(config, JsonMetricsSerializer, 'application/json');
+    const env = getEnv();
     this._headers = Object.assign(
       this._headers,
       baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
+        env.OTEL_EXPORTER_OTLP_METRICS_HEADERS
       )
     );
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(
-          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-        )
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
+    if (typeof config.url === 'string') {
+      return config.url;
+    }
+
+    const env = getEnv();
+    if (env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0) {
+      return appendRootPathToUrlIfNeeded(
+        env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      );
+    }
+
+    if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
+      return appendResourcePathToUrl(
+        env.OTEL_EXPORTER_OTLP_ENDPOINT,
+        DEFAULT_COLLECTOR_RESOURCE_PATH
+      );
+    }
+
+    return DEFAULT_COLLECTOR_URL;
   }
 }
 

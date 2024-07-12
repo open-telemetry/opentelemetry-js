@@ -230,8 +230,8 @@ As the ESM module loader from Node.js is experimental, so is our support for it.
 
 Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call or `import` statement. Therefore following conditions need to be met that this mechanism can work:
 
-* Instrumentations are registered **before** the module to instrument is `require`ed (CJS only)
-* modules are not included in a bundle. Tools like `esbuild`, `webpack`, ... usually have some mechanism to exclude specific modules from bundling
+- Instrumentations are registered **before** the module to instrument is `require`ed (CJS only)
+- modules are not included in a bundle. Tools like `esbuild`, `webpack`, ... usually have some mechanism to exclude specific modules from bundling
 
 ## License
 
@@ -239,8 +239,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 ## Useful links
 
-* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE

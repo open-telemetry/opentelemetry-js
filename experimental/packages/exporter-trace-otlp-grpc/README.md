@@ -116,7 +116,7 @@ Note, that this will only work if TLS is also configured on the server.
 
 The OTLPTraceExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
 
-+ To override the default timeout duration, provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
+- To override the default timeout duration, provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
 
   ```js
   const collectorOptions = {
@@ -177,9 +177,9 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 
 ## Useful links
 
-+ For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-+ For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-+ For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
@@ -190,6 +190,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-grpc
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-trace-otlp-grpc.svg
-[opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
 [metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc

@@ -15,7 +15,17 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMRESATTRS_PROCESS_COMMAND,
+  SEMRESATTRS_PROCESS_COMMAND_ARGS,
+  SEMRESATTRS_PROCESS_EXECUTABLE_NAME,
+  SEMRESATTRS_PROCESS_EXECUTABLE_PATH,
+  SEMRESATTRS_PROCESS_OWNER,
+  SEMRESATTRS_PROCESS_PID,
+  SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION,
+  SEMRESATTRS_PROCESS_RUNTIME_NAME,
+  SEMRESATTRS_PROCESS_RUNTIME_VERSION,
+} from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';
@@ -29,27 +39,26 @@ import * as os from 'os';
 class ProcessDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): IResource {
     const attributes: ResourceAttributes = {
-      [SemanticResourceAttributes.PROCESS_PID]: process.pid,
-      [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title,
-      [SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH]: process.execPath,
-      [SemanticResourceAttributes.PROCESS_COMMAND_ARGS]: [
+      [SEMRESATTRS_PROCESS_PID]: process.pid,
+      [SEMRESATTRS_PROCESS_EXECUTABLE_NAME]: process.title,
+      [SEMRESATTRS_PROCESS_EXECUTABLE_PATH]: process.execPath,
+      [SEMRESATTRS_PROCESS_COMMAND_ARGS]: [
         process.argv[0],
         ...process.execArgv,
         ...process.argv.slice(1),
       ],
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]:
-        process.versions.node,
-      [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
+      [SEMRESATTRS_PROCESS_RUNTIME_VERSION]: process.versions.node,
+      [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'nodejs',
+      [SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
     };
 
     if (process.argv.length > 1) {
-      attributes[SemanticResourceAttributes.PROCESS_COMMAND] = process.argv[1];
+      attributes[SEMRESATTRS_PROCESS_COMMAND] = process.argv[1];
     }
 
     try {
       const userInfo = os.userInfo();
-      attributes[SemanticResourceAttributes.PROCESS_OWNER] = userInfo.username;
+      attributes[SEMRESATTRS_PROCESS_OWNER] = userInfo.username;
     } catch (e) {
       diag.debug(`error obtaining process owner: ${e}`);
     }

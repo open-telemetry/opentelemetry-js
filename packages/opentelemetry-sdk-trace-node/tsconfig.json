@@ -32,9 +32,6 @@
     },
     {
       "path": "../opentelemetry-semantic-conventions"
-    },
-    {
-      "path": "../propagator-aws-xray"
     }
   ]
 }

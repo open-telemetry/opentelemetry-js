@@ -21,6 +21,7 @@ import {
   GrpcExporterTransportParameters,
 } from '../src/grpc-exporter-transport';
 import * as assert from 'assert';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import sinon = require('sinon');
 import { Metadata, Server, ServerCredentials } from '@grpc/grpc-js';
@@ -125,6 +126,20 @@ describe('GrpcExporterTransport', function () {
     });
 
     describe('createSslCredentials', function () {
+      if (crypto.X509Certificate) {
+        it('test certs are valid', () => {
+          const certPaths = ['./test/certs/ca.crt', './test/certs/server.crt'];
+          certPaths.forEach(certPath => {
+            const cert = new crypto.X509Certificate(fs.readFileSync(certPath));
+            const now = new Date();
+            assert.ok(
+              new Date(cert.validTo) > now,
+              `TLS cert "${certPath}" is still valid: cert.validTo="${cert.validTo}" (if this fails use 'npm run maint:regenerate-test-certs')`
+            );
+          });
+        });
+      }
+
       it('creates SSL grpc credentials', function () {
         const credentials = createSslCredentials(
           Buffer.from(fs.readFileSync('./test/certs/ca.crt')),

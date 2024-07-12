@@ -44,8 +44,8 @@ The prometheus client will be available at <http://localhost:9090>.
 
 Note: It may take some time for the application metrics to appear on the Prometheus dashboard.
 
-<p align="center"><img src="../prometheus/images/prom-counter.png?raw=true"/></p>
-<p align="center"><img src="../prometheus/images/prom-updowncounter.png?raw=true"/></p>
+<p align="center"><img alt="Prometheus UI showing a charted Counter" src="../../experimental/examples/prometheus/images/prom-counter.png?raw=true"/></p>
+<p align="center"><img alt="Prometheus UI showing a charted UpDownCounter" src="../../experimental/examples/prometheus/images/prom-updowncounter.png?raw=true"/></p>
 
 ## Useful links
 

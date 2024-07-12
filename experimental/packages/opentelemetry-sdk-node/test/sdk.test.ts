@@ -325,6 +325,22 @@ describe('Node SDK', () => {
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
     });
+
+    it('should register a context manager if only a context manager is provided', async () => {
+      // arrange
+      const expectedContextManager = new AsyncHooksContextManager();
+      const sdk = new NodeSDK({
+        contextManager: expectedContextManager,
+      });
+
+      // act
+      sdk.start();
+
+      // assert
+      const actualContextManager = context['_getContextManager']();
+      assert.equal(actualContextManager, expectedContextManager);
+      await sdk.shutdown();
+    });
   });
 
   async function waitForNumberOfMetrics(

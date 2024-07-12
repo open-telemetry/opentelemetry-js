@@ -36,23 +36,23 @@ const DEFAULT_RATIO = 1;
 // object needs to be wrapped in this function and called when needed otherwise
 // envs are parsed before tests are ran - causes tests using these envs to fail
 export function loadDefaultConfig() {
+  const _env = getEnv();
+
   return {
     sampler: buildSamplerFromEnv(env),
     forceFlushTimeoutMillis: 30000,
     generalLimits: {
-      attributeValueLengthLimit: getEnv().OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: getEnv().OTEL_ATTRIBUTE_COUNT_LIMIT,
+      attributeValueLengthLimit: _env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeCountLimit: _env.OTEL_ATTRIBUTE_COUNT_LIMIT,
     },
     spanLimits: {
-      attributeValueLengthLimit:
-        getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
-      linkCountLimit: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
-      eventCountLimit: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
+      attributeValueLengthLimit: _env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeCountLimit: _env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
+      linkCountLimit: _env.OTEL_SPAN_LINK_COUNT_LIMIT,
+      eventCountLimit: _env.OTEL_SPAN_EVENT_COUNT_LIMIT,
       attributePerEventCountLimit:
-        getEnv().OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT,
-      attributePerLinkCountLimit:
-        getEnv().OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
+        _env.OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT,
+      attributePerLinkCountLimit: _env.OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
     },
   };
 }

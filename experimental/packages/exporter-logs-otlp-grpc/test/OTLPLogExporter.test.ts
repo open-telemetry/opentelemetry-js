@@ -18,6 +18,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
 
 import * as assert from 'assert';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
@@ -141,6 +142,24 @@ const testCollectorExporter = (params: TestParams) => {
       reqMetadata = undefined;
       sinon.restore();
     });
+
+    if (useTLS && crypto.X509Certificate) {
+      it('test certs are valid', () => {
+        const certPaths = [
+          './test/certs/ca.crt',
+          './test/certs/client.crt',
+          './test/certs/server.crt',
+        ];
+        certPaths.forEach(certPath => {
+          const cert = new crypto.X509Certificate(fs.readFileSync(certPath));
+          const now = new Date();
+          assert.ok(
+            new Date(cert.validTo) > now,
+            `TLS cert "${certPath}" is still valid: cert.validTo="${cert.validTo}" (if this fails use 'npm run maint:regenerate-test-certs')`
+          );
+        });
+      });
+    }
 
     describe('instance', () => {
       it('should warn about headers when using grpc', () => {

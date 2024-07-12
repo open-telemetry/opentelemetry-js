@@ -39,7 +39,7 @@ npm install --save @opentelemetry/sdk-trace-node
 # Install instrumentation plugins
 npm install --save @opentelemetry/instrumentation-http
 # and for example one additional
-npm install --save instrumentation-graphql
+npm install --save @opentelemetry/instrumentation-graphql
 ```
 
 ## Usage

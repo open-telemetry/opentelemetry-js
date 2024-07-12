@@ -41,7 +41,15 @@ import {
   FetchCustomAttributeFunction,
 } from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_HTTP_HOST,
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+  SEMATTRS_HTTP_SCHEME,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_URL,
+  SEMATTRS_HTTP_USER_AGENT,
+} from '@opentelemetry/semantic-conventions';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -374,17 +382,17 @@ describe('fetch', () => {
       assert.strictEqual(
         attributes[keys[1]],
         'GET',
-        `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
+        `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
         attributes[keys[2]],
         url,
-        `attributes ${SemanticAttributes.HTTP_URL} is wrong`
+        `attributes ${SEMATTRS_HTTP_URL} is wrong`
       );
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
+        `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
       );
       assert.ok(
         attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
@@ -392,19 +400,19 @@ describe('fetch', () => {
       );
       assert.ok(
         (attributes[keys[5]] as string).indexOf('localhost') === 0,
-        `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
+        `attributes ${SEMATTRS_HTTP_HOST} is wrong`
       );
       assert.ok(
         attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-        `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
+        `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
       );
       assert.ok(
         attributes[keys[7]] !== '',
-        `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
+        `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
       );
       assert.ok(
         (attributes[keys[8]] as number) > 0,
-        `attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+        `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
       assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
@@ -865,9 +873,9 @@ describe('fetch', () => {
       const attributes = span.attributes;
 
       assert.strictEqual(
-        attributes[SemanticAttributes.HTTP_URL],
+        attributes[SEMATTRS_HTTP_URL],
         location.origin + '/get',
-        `attributes ${SemanticAttributes.HTTP_URL} is wrong`
+        `attributes ${SEMATTRS_HTTP_URL} is wrong`
       );
     });
   });
@@ -934,7 +942,7 @@ describe('fetch', () => {
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `Missing basic attribute ${SemanticAttributes.HTTP_STATUS_CODE}`
+        `Missing basic attribute ${SEMATTRS_HTTP_STATUS_CODE}`
       );
     });
   });

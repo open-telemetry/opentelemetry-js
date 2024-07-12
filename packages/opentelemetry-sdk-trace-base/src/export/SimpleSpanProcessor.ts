@@ -33,6 +33,8 @@ import { Resource } from '@opentelemetry/resources';
  * to {@link ReadableSpan} and passes it to the configured exporter.
  *
  * Only spans that are sampled are converted.
+ *
+ * NOTE: This {@link SpanProcessor} exports every ended span individually instead of batching spans together, which causes significant performance overhead with most exporters. For production use, please consider using the {@link BatchSpanProcessor} instead.
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;

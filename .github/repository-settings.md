@@ -10,8 +10,8 @@ No changes
 
 ## Collaborators and Teams
 
-* There is currently no `javascript-triagers` role
-* `javascript-maintainers` has `Admin` permission
+- There is currently no `javascript-triagers` role
+- `javascript-maintainers` has `Admin` permission
 
 ## Branches
 
@@ -19,13 +19,13 @@ No changes
 
 ### `main`
 
-* Uncheck "Restrict who can push to matching branches"
-* Check "Require merge queue"
-  * Build concurrency: 5
-  * Minimum pull requests to merge: 1 or after 5 minutes
-  * Maximum pull requests to merge: 5
-  * Check "Only merge non-failing pull requests"
-  * Status check timeout: 60 minutes
+- Uncheck "Restrict who can push to matching branches"
+- Check "Require merge queue"
+  - Build concurrency: 5
+  - Minimum pull requests to merge: 1 or after 5 minutes
+  - Maximum pull requests to merge: 5
+  - Check "Only merge non-failing pull requests"
+  - Status check timeout: 60 minutes
 
 ### `dependabot/**/**`
 
@@ -36,10 +36,10 @@ Our dependencies are managed by a bot which creates PRs from a fork.
 
 This is a special branch which we use to publish the automatically generated docs.
 It is exempt from most protections.
- 
-* "Allow force pushes from everyone" (requires write permission)
+
+- "Allow force pushes from everyone" (requires write permission)
 
 ## Pages
 
-* Source: Deploy from a branch
-* Branch: `gh-pages` `/ (root)`
+- Source: Deploy from a branch
+- Branch: `gh-pages` `/ (root)`

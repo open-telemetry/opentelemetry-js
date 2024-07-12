@@ -112,6 +112,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/api/LICENSE
-[license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [docs-tracing]: https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/tracing.md
 [docs-sdk-registration]: https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/sdk-registration.md

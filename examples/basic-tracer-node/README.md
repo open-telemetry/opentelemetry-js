@@ -24,13 +24,13 @@ npm start
 
 Open the Jaeger UI in your browser [http://localhost:16686](http://localhost:16686)
 
-<p align="center"><img src="images/jaeger-ui-list.png?raw=true"/></p>
+<p align="center"><img alt="Jaeger UI showing list of traces" src="images/jaeger-ui-list.png?raw=true"/></p>
 
 Select `basic-service` under *Service Name* and click on *Find Traces*.
 
 Click on the trace to view its details.
 
-<p align="center"><img src="./images/jaeger-ui-detail.png?raw=true"/></p>
+<p align="center"><img alt="Jaeger UI showing a trace" src="./images/jaeger-ui-detail.png?raw=true"/></p>
 
 ## Useful links
 

@@ -15,9 +15,6 @@
     },
     {
       "path": "../../../packages/opentelemetry-resources"
-    },
-    {
-      "path": "../../../packages/opentelemetry-semantic-conventions"
     }
   ]
 }

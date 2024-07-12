@@ -247,6 +247,13 @@ cd packages/opentelemetry-module-name
 npm run lint:fix
 ```
 
+Similarly, Markdown files (such as README.md files) can be linted:
+
+```sh
+npm run lint:markdown
+npm run lint:markdown:fix # can automatically fix some Markdown rules
+```
+
 ### Generating docs
 
 We use [typedoc](https://www.npmjs.com/package/typedoc) to generate the api documentation.

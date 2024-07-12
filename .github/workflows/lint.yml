@@ -21,22 +21,6 @@ jobs:
             package-lock.json
           node-version: '20'
 
-      - name: Lint changelog file
-        uses: avto-dev/markdown-lint@v1
-        with:
-          # Commenting due to
-          # https://github.com/avto-dev/markdown-lint/blob/aab9be9823fcd706f6da3e6ad6c64874c23fbd4c/lint/rules/changelog.js#L51-L71
-          # TODO: adhere to, or overwrite above rule and uncomment rules
-          # rules: "/lint/rules/changelog.js"
-          config: "/lint/config/changelog.yml"
-          args: "./CHANGELOG.md"
-
-      - name: Lint markdown files
-        uses: avto-dev/markdown-lint@v1
-        with:
-          args: "./**/*.md"
-          ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
-
       - name: Bootstrap
         run: npm ci
 
@@ -44,6 +28,7 @@ jobs:
         run: |
           npm run lint
           npm run lint:examples
+          npm run lint:markdown
 
       - name: Lint doc files
         run: |
