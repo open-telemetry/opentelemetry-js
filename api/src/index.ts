@@ -102,6 +102,19 @@ export {
 } from './trace/invalid-span-constants';
 export type { TraceAPI } from './api/trace';
 
+// Logs
+export { Logger } from './experimental/logs';
+export { LoggerProvider } from './experimental/logs';
+export { LogRecord } from './experimental/logs';
+export { LogBody } from './experimental/logs';
+export { SeverityNumber } from './experimental/logs';
+export { LoggerOptions } from './experimental/logs';
+export { AnyValue } from './experimental/logs';
+export { AnyValueMap } from './experimental/logs';
+export { NoopLogger } from './experimental/logs';
+export { NoopLoggerProvider } from './experimental/logs';
+export type { LogsAPI } from './experimental/logs';
+
 // Split module-level variable definition into separate files to allow
 // tree-shaking on each api instance.
 import { context } from './context-api';
@@ -109,9 +122,10 @@ import { diag } from './diag-api';
 import { metrics } from './metrics-api';
 import { propagation } from './propagation-api';
 import { trace } from './trace-api';
+import { logs } from './experimental/logs';
 
 // Named export.
-export { context, diag, metrics, propagation, trace };
+export { context, diag, metrics, propagation, trace, logs };
 // Default export.
 export default {
   context,
@@ -119,4 +133,5 @@ export default {
   metrics,
   propagation,
   trace,
+  logs,
 };
