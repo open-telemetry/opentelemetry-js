@@ -12,7 +12,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
-* feat: print instrumentation library info with console span exporter [#4848](https://github.com/open-telemetry/opentelemetry-js/pull/4848) @blumamir
+* feat: include instrumentation scope info in console span and log record exporters [#4848](https://github.com/open-telemetry/opentelemetry-js/pull/4848) @blumamir
 
 ### :bug: (Bug Fix)
 
