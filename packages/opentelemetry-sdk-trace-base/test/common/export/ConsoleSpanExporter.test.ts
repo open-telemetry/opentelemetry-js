@@ -55,9 +55,12 @@ describe('ConsoleSpanExporter', () => {
           new SimpleSpanProcessor(consoleExporter)
         );
 
-        const instrumentationLibraryName = '@opentelemetry/sdk-trace-base/test';
-        const instrumentationLibraryVersion = '1.2.3';
-        const tracer = basicTracerProvider.getTracer(instrumentationLibraryName, instrumentationLibraryVersion);
+        const instrumentationScopeName = '@opentelemetry/sdk-trace-base/test';
+        const instrumentationScopeVersion = '1.2.3';
+        const tracer = basicTracerProvider.getTracer(
+          instrumentationScopeName,
+          instrumentationScopeVersion
+        );
         const context: SpanContext = {
           traceId: 'a3cda95b652f4a1592b449d5929fda1b',
           spanId: '5e0c63257de34c92',
@@ -82,7 +85,7 @@ describe('ConsoleSpanExporter', () => {
           'duration',
           'events',
           'id',
-          'instrumentationLibrary',
+          'instrumentationScope',
           'kind',
           'links',
           'name',
@@ -98,8 +101,13 @@ describe('ConsoleSpanExporter', () => {
         assert.ok(firstEvent.name === 'foobar');
         assert.ok(consoleSpan.id === firstSpan.spanContext().spanId);
         assert.ok(keys === expectedKeys, 'expectedKeys');
-        assert.ok(firstSpan.instrumentationLibrary.name === instrumentationLibraryName);
-        assert.ok(firstSpan.instrumentationLibrary.version === instrumentationLibraryVersion);
+        assert.ok(
+          firstSpan.instrumentationLibrary.name === instrumentationScopeName
+        );
+        assert.ok(
+          firstSpan.instrumentationLibrary.version ===
+            instrumentationScopeVersion
+        );
 
         assert.ok(spyExport.calledOnce);
       });

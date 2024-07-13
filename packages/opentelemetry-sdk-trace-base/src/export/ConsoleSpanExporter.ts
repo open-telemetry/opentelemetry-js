@@ -65,7 +65,7 @@ export class ConsoleSpanExporter implements SpanExporter {
       resource: {
         attributes: span.resource.attributes,
       },
-      instrumentationLibrary: span.instrumentationLibrary,
+      instrumentationScope: span.instrumentationLibrary,
       traceId: span.spanContext().traceId,
       parentId: span.parentSpanId,
       traceState: span.spanContext().traceState?.serialize(),
