@@ -10,7 +10,7 @@
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "test:cjs": "nyc mocha test/**/*.test.ts",
-    "test:esm": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../node_modules/.bin/mocha 'test/**/*.test.mjs'",
+    "test:esm": "nyc node --experimental-loader=@opentelemetry/instrumentation/hook.mjs ../../../node_modules/mocha/bin/mocha 'test/**/*.test.mjs'",
     "test": "npm run test:cjs && npm run test:esm",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
