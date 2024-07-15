@@ -85,6 +85,8 @@ export interface XMLHttpRequestInstrumentationConfig
   applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
   /** Ignore adding network events as span events */
   ignoreNetworkEvents?: boolean;
+  /** Measure outgoing request size */
+  measureRequestSize?: boolean;
 }
 
 /**
@@ -488,7 +490,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
-          if (args?.[0]) {
+          if (plugin.getConfig().measureRequestSize && args?.[0]) {
             const body = args[0];
             currentSpan.setAttribute(
               SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
