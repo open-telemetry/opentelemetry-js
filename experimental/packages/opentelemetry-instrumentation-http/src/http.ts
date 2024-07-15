@@ -110,15 +110,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
-        this._wrap(
+        const patchedRequest = this._wrap(
           moduleExports,
           'request',
           this._getPatchOutgoingRequestFunction('http')
-        );
+        ) as unknown as Func<http.ClientRequest>;
         this._wrap(
           moduleExports,
           'get',
-          this._getPatchOutgoingGetFunction(moduleExports.request)
+          this._getPatchOutgoingGetFunction(patchedRequest)
         );
         this._wrap(
           moduleExports.Server.prototype,
@@ -142,16 +142,17 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
-        this._wrap(
+        const patchedRequest = this._wrap(
           moduleExports,
           'request',
           this._getPatchHttpsOutgoingRequestFunction('https')
-        );
+        ) as unknown as Func<http.ClientRequest>;
         this._wrap(
           moduleExports,
           'get',
-          this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
+          this._getPatchHttpsOutgoingGetFunction(patchedRequest)
         );
+
         this._wrap(
           moduleExports.Server.prototype,
           'emit',
