@@ -347,7 +347,10 @@ describe('xhr', () => {
 
         beforeEach(done => {
           const propagateTraceHeaderCorsUrls = [window.location.origin];
-          prepareData(done, url, { propagateTraceHeaderCorsUrls });
+          prepareData(done, url, {
+            propagateTraceHeaderCorsUrls,
+            measureRequestSize: true,
+          });
         });
 
         afterEach(() => {
@@ -1527,7 +1530,10 @@ describe('xhr', () => {
 
         beforeEach(done => {
           const propagateTraceHeaderCorsUrls = [window.location.origin];
-          prepareData(done, url, { propagateTraceHeaderCorsUrls });
+          prepareData(done, url, {
+            propagateTraceHeaderCorsUrls,
+            measureRequestSize: true,
+          });
         });
 
         afterEach(() => {
@@ -2203,8 +2209,8 @@ describe('xhr', () => {
             ] as number;
             assert.strictEqual(
               requestContentLength,
-              19,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} !== 19`
+              undefined,
+              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2241,7 +2247,7 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
 
-            assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
@@ -2317,8 +2323,8 @@ describe('xhr', () => {
             ] as number;
             assert.strictEqual(
               requestContentLength,
-              19,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} !== 19`
+              undefined,
+              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2329,7 +2335,7 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
-            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
@@ -2402,8 +2408,8 @@ describe('xhr', () => {
             ] as number;
             assert.strictEqual(
               requestContentLength,
-              19,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} !== 19`
+              undefined,
+              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2414,7 +2420,7 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
-            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
@@ -2487,8 +2493,8 @@ describe('xhr', () => {
             ] as number;
             assert.strictEqual(
               requestContentLength,
-              19,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} !== 19`
+              undefined,
+              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2499,7 +2505,7 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is defined`
             );
 
-            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {

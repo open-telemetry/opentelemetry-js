@@ -653,7 +653,7 @@ describe('fetch', () => {
   });
 
   describe('post data', () => {
-    describe('url and config object', () => {
+    describe('url and config object when request body measurement is disabled', () => {
       beforeEach(async () => {
         await prepareData(
           url,
@@ -683,12 +683,49 @@ describe('fetch', () => {
 
         assert.strictEqual(
           attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
+          undefined
+        );
+      });
+    });
+
+    describe('url and config object', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () =>
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ hello: 'world' }),
+            }),
+          {
+            measureRequestSize: true,
+          }
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
           17
         );
       });
     });
 
-    describe.only('url and config object with stream', () => {
+    describe('url and config object with stream', () => {
       beforeEach(async () => {
         await prepareData(
           url,
@@ -702,7 +739,9 @@ describe('fetch', () => {
               },
               body: textToReadableStream('{"hello":"world"}'),
             }),
-          {}
+          {
+            measureRequestSize: true,
+          }
         );
       });
 
@@ -739,7 +778,9 @@ describe('fetch', () => {
             });
             return fetch(req);
           },
-          {}
+          {
+            measureRequestSize: true,
+          }
         );
       });
 
@@ -778,7 +819,9 @@ describe('fetch', () => {
             });
             return fetch(req);
           },
-          {}
+          {
+            measureRequestSize: true,
+          }
         );
       });
 

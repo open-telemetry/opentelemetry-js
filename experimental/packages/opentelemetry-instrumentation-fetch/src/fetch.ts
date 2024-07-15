@@ -75,6 +75,8 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
   // Ignore adding network events as span events
   ignoreNetworkEvents?: boolean;
+  /** Measure outgoing request size */
+  measureRequestSize?: boolean;
 }
 
 /**
@@ -321,19 +323,21 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         }
         const spanData = plugin._prepareSpanData(url);
 
-        web
-          .getFetchBodyLength(...args)
-          .then(length => {
-            if (!length) return;
+        if (plugin.getConfig().measureRequestSize) {
+          web
+            .getFetchBodyLength(...args)
+            .then(length => {
+              if (!length) return;
 
-            createdSpan.setAttribute(
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
-              length
-            );
-          })
-          .catch(error => {
-            plugin._diag.error('getFetchBodyLength', error);
-          });
+              createdSpan.setAttribute(
+                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+                length
+              );
+            })
+            .catch(error => {
+              plugin._diag.error('getFetchBodyLength', error);
+            });
+        }
 
         function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
