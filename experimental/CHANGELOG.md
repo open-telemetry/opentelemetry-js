@@ -7,6 +7,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
@@ -14,6 +16,25 @@ All notable changes to experimental packages in this project will be documented 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+
+## 0.52.1
+
+### :rocket: (Enhancement)
+
+* refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
+* refactor(otlp-transformer): use explicit exports [#4785](https://github.com/open-telemetry/opentelemetry-js/pull/4785) @pichlermarc
+
+### :bug: (Bug Fix)
+
+* fix(sdk-node): register context manager if no tracer options are provided [#4781](https://github.com/open-telemetry/opentelemetry-js/pull/4781) @pichlermarc
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.1) [#4806](https://github.com/open-telemetry/opentelemetry-js/pull/4806) @timfish
+* chore(instrumentation): Use a caret version for `import-in-the-middle` dependency [#4810](https://github.com/open-telemetry/opentelemetry-js/pull/4810) @timfish
+
+### :house: (Internal)
+
+* test: add `npm run maint:regenerate-test-certs` maintenance script and regenerate recently expired test certs [#4777](https://github.com/open-telemetry/opentelemetry-js/pull/4777)
 
 ## 0.52.0
 
@@ -50,10 +71,11 @@ All notable changes to experimental packages in this project will be documented 
 * feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 * feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
 * refactor(instrumentation-xml-http-request): use exported strings for semantic attributes. [#4681](https://github.com/open-telemetry/opentelemetry-js/pull/4681/files)
+* refactor(sdk-node): Use tree-shakeable string constants for semconv [#4767](https://github.com/open-telemetry/opentelemetry-js/pull/4767) @JohannesHuster
 
 ### :bug: (Bug Fix)
 
-* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/pull/91) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.0) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
 
 ### :books: (Refine Doc)
 

@@ -1,8 +1,15 @@
 const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { WebTracerProvider } = require('@opentelemetry/sdk-trace-web');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+const { Resource } = require('@opentelemetry/resources');
+const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-conventions');
 
-const provider = new WebTracerProvider();
+const provider = new WebTracerProvider({
+  resource: new Resource({
+    [SEMRESATTRS_SERVICE_NAME]: 'zipkin-web-service'
+  })
+});
+
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({
   // testing interceptor
