@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1720559934817,
+  "lastUpdate": 1721195755657,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12808,6 +12808,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "amirgiraffe@gmail.com",
+            "name": "Amir Blum",
+            "username": "blumamir"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "8d88c36dcb785b50075a5942a8d3972f5be9bb00",
+          "message": "feat: include instrumentation scope info in console span and log record exporters (#4848)\n\n* feat: print instrumentation library info with console span exporter\n\n* chore: add changelog\n\n* test: fix tests for console span exporter\n\n* feat: instrumentation scope for both logs and spans\n\n* chore: update changelog",
+          "timestamp": "2024-07-17T05:53:18Z",
+          "tree_id": "d846b5b916a2b5857e9dda10290355e7435ba885",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8d88c36dcb785b50075a5942a8d3972f5be9bb00"
+        },
+        "date": 1721195754826,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 920091,
+            "range": "±0.74%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11630,
+            "range": "±0.67%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 659504,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 635591,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
