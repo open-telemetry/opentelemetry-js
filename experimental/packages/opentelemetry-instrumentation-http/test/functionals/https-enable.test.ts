@@ -718,7 +718,7 @@ describe('HttpsInstrumentation', () => {
 
       it('allows to disable outgoing request instrumentation', () => {
         instrumentation.setConfig({
-          instrumentOutgoingRequests: false,
+          disableOutgoingRequestInstrumentation: true,
         });
         instrumentation.enable();
         server = https.createServer(
@@ -740,7 +740,7 @@ describe('HttpsInstrumentation', () => {
 
       it('allows to disable incoming request instrumentation', () => {
         instrumentation.setConfig({
-          instrumentIncomingRequests: false,
+          disableIncomingRequestInstrumentation: true,
         });
         instrumentation.enable();
         server = https.createServer(

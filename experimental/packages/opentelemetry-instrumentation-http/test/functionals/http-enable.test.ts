@@ -242,7 +242,7 @@ describe('HttpInstrumentation', () => {
         instrumentation.disable();
 
         instrumentation.setConfig({
-          instrumentOutgoingRequests: false,
+          disableOutgoingRequestInstrumentation: true,
         });
         instrumentation.enable();
         server = http.createServer((_request, response) => {
@@ -261,7 +261,7 @@ describe('HttpInstrumentation', () => {
         instrumentation.disable();
 
         instrumentation.setConfig({
-          instrumentIncomingRequests: false,
+          disableIncomingRequestInstrumentation: true,
         });
         instrumentation.enable();
         server = http.createServer((_request, response) => {

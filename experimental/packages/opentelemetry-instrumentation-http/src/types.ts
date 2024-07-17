@@ -98,10 +98,10 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   ignoreOutgoingUrls?: IgnoreMatcher[];
   /** Not trace all outgoing requests that matched with custom function */
   ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
-  /** If set to false, incoming requests will not be instrumented at all. */
-  instrumentIncomingRequests?: boolean;
-  /** If set to false, outgoing requests will not be instrumented at all. */
-  instrumentOutgoingRequests?: boolean;
+  /** If set to true, incoming requests will not be instrumented at all. */
+  disableIncomingRequestInstrumentation?: boolean;
+  /** If set to true, outgoing requests will not be instrumented at all. */
+  disableOutgoingRequestInstrumentation?: boolean;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
   /** Function for adding custom attributes before request is handled */

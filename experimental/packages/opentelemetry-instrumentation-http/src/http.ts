@@ -109,32 +109,20 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return new InstrumentationNodeModuleDefinition(
       'http',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for http@${version}`);
-        if (this._getConfig().instrumentOutgoingRequests !== false) {
-          if (isWrapped(moduleExports.request)) {
-            this._unwrap(moduleExports, 'request');
-          }
-
+      (moduleExports: Http): Http => {
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           this._wrap(
             moduleExports,
             'request',
             this._getPatchOutgoingRequestFunction('http')
           );
-
-          if (isWrapped(moduleExports.get)) {
-            this._unwrap(moduleExports, 'get');
-          }
           this._wrap(
             moduleExports,
             'get',
             this._getPatchOutgoingGetFunction(moduleExports.request)
           );
-          if (isWrapped(moduleExports.Server.prototype.emit)) {
-            this._unwrap(moduleExports.Server.prototype, 'emit');
-          }
         }
-        if (this._getConfig().instrumentIncomingRequests !== false) {
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._wrap(
             moduleExports.Server.prototype,
             'emit',
@@ -146,11 +134,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       (moduleExports: Http) => {
         if (moduleExports === undefined) return;
 
-        if (this._getConfig().instrumentOutgoingRequests !== false) {
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           this._unwrap(moduleExports, 'request');
           this._unwrap(moduleExports, 'get');
         }
-        if (this._getConfig().instrumentIncomingRequests !== false) {
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._unwrap(moduleExports.Server.prototype, 'emit');
         }
       }
@@ -161,30 +149,21 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     return new InstrumentationNodeModuleDefinition(
       'https',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for https@${version}`);
-        if (this._getConfig().instrumentOutgoingRequests !== false) {
-          if (isWrapped(moduleExports.request)) {
-            this._unwrap(moduleExports, 'request');
-          }
+      (moduleExports: Https): Https => {
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           this._wrap(
             moduleExports,
             'request',
             this._getPatchHttpsOutgoingRequestFunction('https')
           );
-          if (isWrapped(moduleExports.get)) {
-            this._unwrap(moduleExports, 'get');
-          }
+
           this._wrap(
             moduleExports,
             'get',
             this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
           );
         }
-        if (this._getConfig().instrumentIncomingRequests !== false) {
-          if (isWrapped(moduleExports.Server.prototype.emit)) {
-            this._unwrap(moduleExports.Server.prototype, 'emit');
-          }
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._wrap(
             moduleExports.Server.prototype,
             'emit',
@@ -196,11 +175,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       (moduleExports: Https) => {
         if (moduleExports === undefined) return;
 
-        if (this._getConfig().instrumentOutgoingRequests !== false) {
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           this._unwrap(moduleExports, 'request');
           this._unwrap(moduleExports, 'get');
         }
-        if (this._getConfig().instrumentIncomingRequests !== false) {
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._unwrap(moduleExports.Server.prototype, 'emit');
         }
       }
