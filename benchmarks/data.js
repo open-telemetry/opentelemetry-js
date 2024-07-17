@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1721195755657,
+  "lastUpdate": 1721252630990,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12860,6 +12860,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.36%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "luca.forstner@gmail.com",
+            "name": "Luca Forstner",
+            "username": "lforst"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a6020fb113a60ae6abc1aa925fa6744880e7fa15",
+          "message": "deps(opentelemetry-instrumentation): Bump shimmer types to 1.2.0 (#4865)\n\n* deps(opentelemetry-instrumentation): Bump shimmer types to 1.2.0\n\n* changelog",
+          "timestamp": "2024-07-17T21:40:04Z",
+          "tree_id": "ba65b3dc03a8c44fece63eb812d75b29d4ae1611",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a6020fb113a60ae6abc1aa925fa6744880e7fa15"
+        },
+        "date": 1721252630132,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 999882,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12039,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 650120,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 638657,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
