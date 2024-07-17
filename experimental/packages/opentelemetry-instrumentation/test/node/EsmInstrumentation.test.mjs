@@ -56,7 +56,6 @@ class TestInstrumentationMasswrapFn extends InstrumentationBase {
     super('test-esm-instrumentation', '0.0.1', config);
   }
   init() {
-    console.log('test-esm-instrumentation initialized!');
     return new InstrumentationNodeModuleDefinition(
       'test-esm-module',
       ['*'],
@@ -86,7 +85,6 @@ class TestInstrumentationSimple extends InstrumentationBase {
     super('test-esm-instrumentation', '0.0.1', config);
   }
   init() {
-    console.log('test-esm-instrumentation initialized!');
     return new InstrumentationNodeModuleDefinition(
       'test-esm-module',
       ['*'],
