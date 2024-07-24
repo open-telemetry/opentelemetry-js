@@ -238,6 +238,12 @@ As the module loading mechanism for ESM is different than CJS, you need to selec
 
 ### Initializing the SDK
 
+Instrumentation setup and configuration must be run before your application code.
+If the SDK is initialized in a separate file (recommended), ensure it is imported first in application startup, or use the `--require` or `--import` flag during startup to preload the module.
+
+For CJS, the `NODE_OPTIONS` for the startup command should include `--require ./instrumentation.js`.
+For ESM, replace `--require` with `--import`.
+
 ### Instrumentation Hook
 
 ### TypeScript
