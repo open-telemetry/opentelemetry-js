@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1721252630990,
+  "lastUpdate": 1721797870942,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -12912,6 +12912,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.45%",
             "unit": "ops/sec",
             "extra": "93 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d4035eb9733c101d53780033a4e58caebec73619",
+          "message": "fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code (#4866)\n\n* fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code\n\nThe issue was that the `_wrap`ing of `http.get` was getting the\njust-wrapped `http.request` by accessing `moduleExports.request`.\nHowever, when wrapping an ES module the `moduleExports` object from IITM\nis a Proxy object that allows setting a property, but *not* re-getting\nthat set property.\n\nThe fix is to use the wrapped `http.request` from the `this._wrap` call.\nThat required fixing a bug in the IITM code-path of\n`InstrumentationBase.prototype._wrap` to return the wrapped property.\n(The previous code was doing `return Object.defineProperty(...)`, which\nreturns the moduleExports, not the defined property.)\n\nFixes: #4857\n\n* correct typo in the changelog message\n\n* does this fix the test:esm script running on windows?\n\n* remove other console.logs (presumably dev leftovers) from tests in this file\n\n* test name suggestion\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\n\n* test name suggestion\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\n\n* test name suggestion\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\n\n* test name suggestion\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\n\n* var naming suggestion: expand cres and creq, the abbrev isn't obvious\n\n---------\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>",
+          "timestamp": "2024-07-24T05:08:41Z",
+          "tree_id": "6ccee968730441e0f367a4a1b9e74b870310ffa9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/d4035eb9733c101d53780033a4e58caebec73619"
+        },
+        "date": 1721797870053,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 948399,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11840,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 649819,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 643808,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
