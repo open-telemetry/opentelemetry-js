@@ -75,15 +75,15 @@ describe('HttpInstrumentation ESM Integration tests', () => {
     };
 
     await new Promise(resolve => {
-      const creq = http.request(
+      const clientReq = http.request(
         `http://127.0.0.1:${port}/http.request`,
-        cres => {
-          spanValidations.resHeaders = cres.headers;
-          cres.resume();
-          cres.on('end', resolve);
+        clientRes => {
+          spanValidations.resHeaders = clientRes.headers;
+          clientRes.resume();
+          clientRes.on('end', resolve);
         }
       );
-      creq.end();
+      clientReq.end();
     });
 
     let spans = memoryExporter.getFinishedSpans();
@@ -103,10 +103,10 @@ describe('HttpInstrumentation ESM Integration tests', () => {
     };
 
     await new Promise(resolve => {
-      http.get(`http://127.0.0.1:${port}/http.get`, cres => {
-        spanValidations.resHeaders = cres.headers;
-        cres.resume();
-        cres.on('end', resolve);
+      http.get(`http://127.0.0.1:${port}/http.get`, clientRes => {
+        spanValidations.resHeaders = clientRes.headers;
+        clientRes.resume();
+        clientRes.on('end', resolve);
       });
     });
 
@@ -166,18 +166,18 @@ describe('HttpsInstrumentation ESM Integration tests', () => {
     };
 
     await new Promise(resolve => {
-      const creq = https.request(
+      const clientReq = https.request(
         `https://127.0.0.1:${port}/https.request`,
         {
           rejectUnauthorized: false,
         },
-        cres => {
-          spanValidations.resHeaders = cres.headers;
-          cres.resume();
-          cres.on('end', resolve);
+        clientRes => {
+          spanValidations.resHeaders = clientRes.headers;
+          clientRes.resume();
+          clientRes.on('end', resolve);
         }
       );
-      creq.end();
+      clientReq.end();
     });
 
     let spans = memoryExporter.getFinishedSpans();
@@ -202,10 +202,10 @@ describe('HttpsInstrumentation ESM Integration tests', () => {
         {
           rejectUnauthorized: false,
         },
-        cres => {
-          spanValidations.resHeaders = cres.headers;
-          cres.resume();
-          cres.on('end', resolve);
+        clientRes => {
+          spanValidations.resHeaders = clientRes.headers;
+          clientRes.resume();
+          clientRes.on('end', resolve);
         }
       );
     });
