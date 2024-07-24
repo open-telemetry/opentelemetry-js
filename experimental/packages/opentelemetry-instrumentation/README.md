@@ -221,20 +221,18 @@ to avoid leaking information from one provider to the other because there are a 
 
 ## Instrumentation for ECMAScript Modules (ESM) in Node.js (experimental)
 
-As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the ESM module it want to patch. To do so, you must provide the `--experimental-loader=@opentelemetry/instrumentation/hook.mjs` flag to the `node` binary. Alternatively you can set the `NODE_OPTIONS` environment variable to `NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs"`.
+Node.js uses a different module loader for ECMAScript Modules (ESM) vs. CommonJS (CJS).
+A `require()` statement will cause Node.js to use the CommonJS module loader.
+An `import()` statement will cause Node.js to use the ECMAScript module loader.
 
-| Node.js Version | ESM / CJS | NODE_OPTIONS                                                                                  | Note                       |
-| --------------- | --------- | --------------------------------------------------------------------------------------------- | -------------------------- |
-| 14.x            | CJS       | `--require ./instrumentation.js`                                                              |                            |
-| 14.x            | ESM       | n/a                                                                                           | import tracing at app init |
-| 16.x            | CJS       | `--require ./instrumentation.js`                                                              |                            |
-| 16.x            | ESM       | `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`                               | import tracing at app init |
-| 18.x            | CJS       | `--require ./instrumentation.js`                                                              |                            |
-| 18.x            | ESM       | `--import ./instrumentation.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |                            |
-| 20.x            | CJS       | `--require ./instrumentation.js`                                                              |                            |
-| 20.x            | ESM       | `--import ./instrumentation.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |                            |
-| 22.x            | CJS       | `--require ./instrumentation.js`                                                              |                            |
-| 22.x            | ESM       | `--import ./instrumentation.js --import=@opentelemetry/instrumentation/hook.mjs`              |                            |
+### TypeScript
+
+Many TypeScript projects today are written using ESM syntax, regardless of how they are compiled.
+In the `tsconfig.json`, there is an option to compile to ESM or CJS.
+If the compiled code is ESM, those import statements will remain the same (e.g. `import { foo } from 'bar';`).
+If the compiled code is CJS, those import statements will become `require()` statements (e.g. `const { foo } = require('bar');`)
+
+For more explanation about CJS and ESM, see the [Node.js docs](https://nodejs.org/dist/latest-v18.x/docs/api/modules.html#enabling).
 
 ### Initializing the SDK
 
