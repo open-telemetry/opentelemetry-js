@@ -246,11 +246,20 @@ For ESM, replace `--require` with `--import`.
 
 ### Instrumentation Hook
 
-### TypeScript
+If your application is written in JavaScript as ESM, or it must compile to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
+The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
+This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
 
-For many projects, transpiling TypeScript code to CommonJS (even if written as ESM) is the most reliable and adaptable approach.
-This requires a `tsconfig.json` that emits `module:commonjs`.
-If the application must transpile to ESM, then a loader hook is needed to ensure instrumentation can patch properly.
+For SDK initialization and instrumentation hooking, the entire startup command should include the following `NODE_OPTIONS`:
+
+| Node.js Version   | NODE_OPTIONS                                                                                    |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| >=16.0.0          | `--require ./instrumentation.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
+| 18.0.0            | ?                                                                                               |
+| >=18.1.0 <18.19.0 | `--require ./instrumentation.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
+| >=18.19.0         | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
+| 20.x              | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
+| 22.x              | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 
 ## Limitations
 
