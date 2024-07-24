@@ -156,7 +156,7 @@ describe('HttpsInstrumentation ESM Integration tests', () => {
     memoryExporter.reset();
   });
 
-  it('https.request', async () => {
+  it('should instrument https requests using https.request', async () => {
     const spanValidations = {
       httpStatusCode: 200,
       httpMethod: 'GET',
