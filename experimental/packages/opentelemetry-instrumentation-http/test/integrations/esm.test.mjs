@@ -187,7 +187,7 @@ describe('HttpsInstrumentation ESM Integration tests', () => {
     assertSpan(span, SpanKind.CLIENT, spanValidations);
   });
 
-  it('https.get', async () => {
+  it('should instrument http requests using https.get', async () => {
     const spanValidations = {
       httpStatusCode: 200,
       httpMethod: 'GET',
