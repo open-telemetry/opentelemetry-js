@@ -77,7 +77,20 @@ provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
 }));
 
 provider.register();
+```
 
+## Dynamic headers
+
+If you need to send a dynamic header to the collector service, perhaps a bearer
+token for authentication that is periodically updated, you can provide the
+headers as a function, for example:
+
+```js
+const collectorOptions = {
+  headers: () => {
+    return { 'authorization': `Bearer ${bearerToken}` }
+  },
+};
 ```
 
 ## GRPC
