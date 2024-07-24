@@ -70,8 +70,9 @@ XHR instrumentation plugin has few options available to choose from. You can set
 
 | Options                                                                                                                                                                           | Type                         | Description                                                                             |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|-----------------------------------------------------------------------------------------|
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L76) | `XHRCustomAttributeFunction` | Function for adding custom attributes                                                   |
-| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L78)         | `boolean`                    | Disable network events being added as span events (network events are added by default) |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L85) | `XHRCustomAttributeFunction` | Function for adding custom attributes                                                   |
+| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L87)         | `boolean`                    | Disable network events being added as span events (network events are added by default) |
+| [`measureRequestSize`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L89)          | `boolean`                    | Measure outgoing request length (outgoing request length is not measured by default)    |
 
 ## Example Screenshots
 
