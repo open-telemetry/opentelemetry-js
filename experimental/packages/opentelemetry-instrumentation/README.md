@@ -259,6 +259,19 @@ For SDK initialization and instrumentation hooking, the entire startup command s
 | 20.x              | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 | 22.x              | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 
+A note on `--experimental-loader` per [Node.js docs](https://nodejs.org/api/cli.html#--experimental-loadermodule):
+
+> This flag is discouraged and may be removed in a future version of Node.js. Please use `--import` with `register()` instead.
+
+Experimental loader is intended to be deprecated, and will be replaced with something like `--import=@opentelemetry/instrumentation/hook.mjs`
+
+<!--
+TODO
+import * as module from 'module'
+
+module.register('import-in-the-middle/hook.mjs', import.meta.url)
+ -->
+
 ## Limitations
 
 Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call or `import` statement. Therefore following conditions need to be met that this mechanism can work:
