@@ -608,7 +608,7 @@ describe('Node SDK', () => {
             info: Sinon.fake(),
             debug: Sinon.fake(),
             verbose: Sinon.fake(),
-          }
+          };
           diag.setLogger(diagMocks, DiagLogLevel.DEBUG);
 
           const sdk1 = new NodeSDK({

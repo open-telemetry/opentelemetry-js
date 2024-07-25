@@ -123,7 +123,7 @@ export class NodeSDK {
     this._resource = configuration.resource ?? new Resource({});
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
-      this._resourceDetectors = []
+      this._resourceDetectors = [];
     } else if (configuration.resourceDetectors != null) {
       this._resourceDetectors = configuration.resourceDetectors;
     } else if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
