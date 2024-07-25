@@ -110,29 +110,37 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
-        const patchedRequest = this._wrap(
-          moduleExports,
-          'request',
-          this._getPatchOutgoingRequestFunction('http')
-        ) as unknown as Func<http.ClientRequest>;
-        this._wrap(
-          moduleExports,
-          'get',
-          this._getPatchOutgoingGetFunction(patchedRequest)
-        );
-        this._wrap(
-          moduleExports.Server.prototype,
-          'emit',
-          this._getPatchIncomingRequestFunction('http')
-        );
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          const patchedRequest = this._wrap(
+            moduleExports,
+            'request',
+            this._getPatchOutgoingRequestFunction('http')
+          ) as unknown as Func<http.ClientRequest>;
+          this._wrap(
+            moduleExports,
+            'get',
+            this._getPatchOutgoingGetFunction(patchedRequest)
+          );
+        }
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._wrap(
+            moduleExports.Server.prototype,
+            'emit',
+            this._getPatchIncomingRequestFunction('http')
+          );
+        }
         return moduleExports;
       },
       (moduleExports: Http) => {
         if (moduleExports === undefined) return;
 
-        this._unwrap(moduleExports, 'request');
-        this._unwrap(moduleExports, 'get');
-        this._unwrap(moduleExports.Server.prototype, 'emit');
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          this._unwrap(moduleExports, 'request');
+          this._unwrap(moduleExports, 'get');
+        }
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._unwrap(moduleExports.Server.prototype, 'emit');
+        }
       }
     );
   }
@@ -142,30 +150,37 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
-        const patchedRequest = this._wrap(
-          moduleExports,
-          'request',
-          this._getPatchHttpsOutgoingRequestFunction('https')
-        ) as unknown as Func<http.ClientRequest>;
-        this._wrap(
-          moduleExports,
-          'get',
-          this._getPatchHttpsOutgoingGetFunction(patchedRequest)
-        );
-
-        this._wrap(
-          moduleExports.Server.prototype,
-          'emit',
-          this._getPatchIncomingRequestFunction('https')
-        );
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          const patchedRequest = this._wrap(
+            moduleExports,
+            'request',
+            this._getPatchHttpsOutgoingRequestFunction('https')
+          ) as unknown as Func<http.ClientRequest>;
+          this._wrap(
+            moduleExports,
+            'get',
+            this._getPatchHttpsOutgoingGetFunction(patchedRequest)
+          );
+        }
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._wrap(
+            moduleExports.Server.prototype,
+            'emit',
+            this._getPatchIncomingRequestFunction('https')
+          );
+        }
         return moduleExports;
       },
       (moduleExports: Https) => {
         if (moduleExports === undefined) return;
 
-        this._unwrap(moduleExports, 'request');
-        this._unwrap(moduleExports, 'get');
-        this._unwrap(moduleExports.Server.prototype, 'emit');
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          this._unwrap(moduleExports, 'request');
+          this._unwrap(moduleExports, 'get');
+        }
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._unwrap(moduleExports.Server.prototype, 'emit');
+        }
       }
     );
   }
