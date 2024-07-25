@@ -111,15 +111,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       ['*'],
       (moduleExports: Http): Http => {
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
-          this._wrap(
+          const patchedRequest = this._wrap(
             moduleExports,
             'request',
             this._getPatchOutgoingRequestFunction('http')
-          );
+          ) as unknown as Func<http.ClientRequest>;
           this._wrap(
             moduleExports,
             'get',
-            this._getPatchOutgoingGetFunction(moduleExports.request)
+            this._getPatchOutgoingGetFunction(patchedRequest)
           );
         }
         if (!this.getConfig().disableIncomingRequestInstrumentation) {
@@ -151,16 +151,15 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       ['*'],
       (moduleExports: Https): Https => {
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
-          this._wrap(
+          const patchedRequest = this._wrap(
             moduleExports,
             'request',
             this._getPatchHttpsOutgoingRequestFunction('https')
-          );
-
+          ) as unknown as Func<http.ClientRequest>;
           this._wrap(
             moduleExports,
             'get',
-            this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
+            this._getPatchHttpsOutgoingGetFunction(patchedRequest)
           );
         }
         if (!this.getConfig().disableIncomingRequestInstrumentation) {
