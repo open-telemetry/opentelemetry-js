@@ -1,0 +1,74 @@
+{%- macro acronyms() -%}
+["http", "url", "tls", "rpc", "os", "oci", "gcp", "faas", "dns", "db", "aws"]
+{%- endmacro -%}
+
+{%- macro func_name(text) -%}
+  {{ text | snake_case_const }}
+{%- endmacro -%}
+
+{%- macro to_atom(text) -%}
+{% if text | split_id | length > 1 -%}:"{{ text }}"{%- else -%}:{{ text }}{%- endif %}
+{%- endmacro -%}
+
+{% macro to_elixir_type(member) -%}
+  {%- if member.id == member.value -%}
+    {{ to_atom(member.value) }}
+  {%- else -%}
+  {{ member }}
+    {{ member.type | type_mapping }}
+  {%- endif -%}
+{%- endmacro %}
+
+{%- macro enum_value_to_elixir_type(value) -%}
+  {%- if value is string %}{{ to_atom(value) }}{% else -%}{{ value }}{%- endif %}
+{%- endmacro -%}
+
+{%- macro enum_value_return_type(value) -%}
+  {%- if value is string -%}
+  atom() | String.t()
+  {%- elif value is integer -%}
+  integer()
+  {%- else -%}
+  NOT_MAPPED
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro enum_value_return_type_example(value) -%}
+  {%- if value is string -%}
+  :custom_value
+  {%- elif value is integer -%}
+  27
+  {%- else -%}
+  NOT_MAPPED
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro erlang_enum_value_return_type_example(value) -%}
+  {%- if value is string -%}
+  custom_value
+  {%- elif value is integer -%}
+  27
+  {%- else -%}
+  NOT_MAPPED
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro enum_to_map(members) -%}
+  {% raw %}%{{% endraw %}
+  {% for member in members %}
+    {{ to_atom(member.id) }} => {{ enum_value_to_elixir_type(member.value) }}{% if not loop.last %},{% endif %}
+  {% endfor %}
+  {% raw %}}{% endraw %}
+{%- endmacro -%}
+
+{%- macro strong_reqs(string) -%}
+  {{ string | replace(" MUST ", " **MUST** ") | replace(" MUST NOT ", " **MUST NOT** ") | replace(" SHOULD ", " **SHOULD** ") | replace(" SHOULD NOT ", " **SHOULD NOT** ") |  replace(" MAY ", " **MAY** ") | replace(" NOT ", " **NOT** ") }}
+{%- endmacro -%}
+
+{%- macro format_acronym(value, acronyms) -%}
+  {%- if value | lower in acronyms -%}
+  {{ value | upper }}
+  {%- else -%}
+  {{ value }}
+  {%- endif -%}
+{%- endmacro -%}

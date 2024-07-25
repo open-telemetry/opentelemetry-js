@@ -19,4 +19,5 @@ export * from './trace';
 export * from './resource';
 
 // Use these instead
-export * from './stable';
+export * from './stable_attributes';
+export * from './stable_metrics';

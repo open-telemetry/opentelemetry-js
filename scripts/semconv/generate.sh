@@ -7,7 +7,7 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # freeze the spec version to make SpanAttributess generation reproducible
 SPEC_VERSION=v1.25.0
-GENERATOR_VERSION=0.24.0
+GENERATOR_VERSION=0.7.0
 
 # When running on windows and your are getting references to ";C" (like Telemetry;C)
 # then this is an issue with the bash shell, so first run the following in your shell:
@@ -27,30 +27,18 @@ cd ${SCRIPT_DIR}
 
 docker run --rm --platform linux/amd64 \
   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
+  -v ${SCRIPT_DIR}/templates:/weaver/templates \
   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/:/output \
-  otel/semconvgen:${GENERATOR_VERSION} \
-  --yaml-root /source \
-  code \
-  --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/stable.ts \
-  -Dfilter=is_stable
+  otel/weaver:$GENERATOR_VERSION \
+  registry generate \
+  --registry=/source \
+  --templates=/weaver/templates \
+  stable \
+  /output/
 
-docker run --rm --platform linux/amd64 \
-  -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/:/output \
-  otel/semconvgen:${GENERATOR_VERSION} \
-  --yaml-root /source \
-  code \
-  --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/experimental.ts \
-  -Dfilter=is_experimental
-
-# Run the automatic linting fixing task to ensure it will pass eslint
-cd "$ROOT_DIR"
-
-npm run lint:fix:changed
+# Run lint checks
+# cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
+# npm run lint
 
 # Run the size checks for the generated files
 cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"

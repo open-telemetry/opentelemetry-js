@@ -1,0 +1,36 @@
+params:
+  excluded_attributes: ["messaging.client_id"]
+
+templates:
+  - pattern: stable_attributes.ts.j2
+    filter: >
+      semconv_attributes({
+        "exclude_stability": ["experimental"]
+      })
+    application_mode: single
+  - pattern: stable_metrics.ts.j2
+    filter: >
+      semconv_metrics({
+        "exclude_stability": ["experimental"]
+      })
+    application_mode: single
+  - pattern: experimental_attributes.ts.j2
+    filter: >
+      semconv_attributes({
+        "exclude_stability": ["stable"]
+      })
+    application_mode: single
+  - pattern: experimental_metrics.ts.j2
+    filter: >
+      semconv_metrics({
+        "exclude_stability": ["stable"]
+      })
+    application_mode: single
+
+text_maps:
+  js_types:
+    int: number
+    double: number
+    boolean: boolean
+    string: string
+    string[]: string[]
