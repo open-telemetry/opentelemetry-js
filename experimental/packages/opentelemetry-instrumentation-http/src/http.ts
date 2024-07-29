@@ -807,6 +807,19 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
     // Record metrics
     const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
+    if (this.getConfig().applyCustomAttributesOnMetric) {
+      safeExecuteInTheMiddle(
+        () =>
+          this.getConfig().applyCustomAttributesOnMetric!(
+            span,
+            spanKind,
+            metricAttributes
+          ),
+        () => {},
+        true
+      );
+    }
+
     if (spanKind === SpanKind.SERVER) {
       this._httpServerDurationHistogram.record(duration, metricAttributes);
     } else if (spanKind === SpanKind.CLIENT) {
