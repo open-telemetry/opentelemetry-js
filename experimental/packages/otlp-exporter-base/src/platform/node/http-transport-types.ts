@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-export {
-  OTLPExporterNodeBase,
-  OTLPExporterNodeConfigBase,
-  CompressionAlgorithm,
-} from './node';
-export { OTLPExporterBrowserBase, sendWithXhr } from './browser';
+import type * as http from 'http';
+import type * as https from 'https';
+import { ExportResponse } from '../../export-response';
+
+export type sendWithHttp = (
+  params: HttpRequestParameters,
+  agent: http.Agent | https.Agent,
+  data: Uint8Array,
+  onDone: (response: ExportResponse) => void
+) => void;
+
+export interface HttpRequestParameters {
+  timeoutMillis: number;
+  url: string;
+  headers: Record<string, string>;
+  compression: 'gzip' | 'none';
+  agentOptions: http.AgentOptions | https.AgentOptions;
+}

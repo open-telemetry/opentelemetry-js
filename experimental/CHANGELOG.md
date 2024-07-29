@@ -8,6 +8,12 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
+* feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * (user-facing) `headers` was intended for internal use has been removed from all exporters
+  * (user-facing) `compression` was intended for internal use and has been removed from all exporters
+  * (user-facing) `hostname` was intended for use in tests and is not used by any exporters, it will be removed in a future release
+* fix(exporter-*-otlp-*)!: ensure `User-Agent` header cannot be overwritten by the user [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * allowing overrides of the `User-Agent` header was not specification compliant.
 
 ### :rocket: (Enhancement)
 
@@ -79,7 +85,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.0) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/pull/91) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
 
 ### :books: (Refine Doc)
 
