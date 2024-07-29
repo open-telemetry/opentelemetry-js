@@ -42,8 +42,7 @@ jobs:
           node-version: 22
       - run: npm install -g npm@latest
 
-      - name: Bootstrap
-        run: npm ci
+      - run: npm ci
 
       - name: Create/Update Release PR
         run: |
