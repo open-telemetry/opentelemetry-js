@@ -39,7 +39,7 @@ We aim to eventually automate this process as much as possible.
 ### Publishing
 
 1. Check out the commit created by merging the release PR
-2. run `git clean --ffdx --exclude <whatever you want to keep, e.g. .idea, .vscode>`
+2. run `git clean -fdx --exclude <whatever you want to keep, e.g. .idea, .vscode>`
 3. run `npm ci`
 4. run `npm run compile`
 5. run `NODE_AUTH_TOKEN=<token generated earlier> npm run release:publish`
