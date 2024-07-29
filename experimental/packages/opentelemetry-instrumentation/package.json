@@ -49,7 +49,7 @@
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test:cjs": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
-    "test:esm": "nyc node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs' test/node/*.test.mjs",
+    "test:esm": "nyc node --experimental-loader=./hook.mjs ../../../node_modules/mocha/bin/mocha 'test/node/*.test.mjs'",
     "test": "npm run test:cjs && npm run test:esm",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
@@ -73,7 +73,7 @@
   },
   "dependencies": {
     "@opentelemetry/api-logs": "0.52.1",
-    "@types/shimmer": "^1.0.2",
+    "@types/shimmer": "^1.2.0",
     "import-in-the-middle": "^1.8.1",
     "require-in-the-middle": "^7.1.1",
     "semver": "^7.5.2",
