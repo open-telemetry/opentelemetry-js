@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Fork
         run: gh repo fork open-telemetry/opentelemetry-js
+        env:
+          GITHUB_TOKEN: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
