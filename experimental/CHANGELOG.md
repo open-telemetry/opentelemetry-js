@@ -7,15 +7,22 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
+
 ### :rocket: (Enhancement)
 
 * feat(otlp-transformer): Do not limit @opentelemetry/api upper range peerDependency [#4816](https://github.com/open-telemetry/opentelemetry-js/pull/4816) @mydea
+* feat(instrumentation-http): Allow to opt-out of instrumenting incoming/outgoing requests [#4643](https://github.com/open-telemetry/opentelemetry-js/pull/4643) @mydea
 
 ### :bug: (Bug Fix)
+
+* fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
 
 ## 0.52.1
 

@@ -11,7 +11,7 @@
     "prewatch": "npm run precompile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc mocha test/**/*.test.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
@@ -45,10 +45,10 @@
     "@opentelemetry/api": ">=1.3.0 <1.10.0"
   },
   "devDependencies": {
-    "@babel/core": "7.24.7",
+    "@babel/core": "7.24.9",
     "@babel/preset-env": "7.24.7",
     "@opentelemetry/api": "1.9.0",
-    "@types/mocha": "10.0.6",
+    "@types/mocha": "10.0.7",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.3",
     "babel-loader": "8.3.0",
@@ -60,7 +60,6 @@
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
-    "ts-mocha": "10.0.0",
     "typescript": "4.4.4"
   },
   "dependencies": {
