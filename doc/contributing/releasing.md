@@ -57,4 +57,5 @@ We aim to eventually automate this process as much as possible.
 3. Verify that the contents of the created draft releases (title, changelog, selected commit)
 4. Publish the releases
    - uncheck `Set as a pre-release` for all releases
-   - uncheck `Set as the latest release` for all releases except for the `stable` SDK release
+   - uncheck `Set as the latest release` for all releases except for the `stable` SDK release. This will ensure that the
+     `stable` SDK release consistently shows up as latest under `Releases` when navigating to the project page.
