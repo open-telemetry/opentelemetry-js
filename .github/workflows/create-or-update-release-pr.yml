@@ -21,6 +21,8 @@ jobs:
   create-or-update-release-pr:
     runs-on: ubuntu-latest
     steps:
+      - name: Fork
+        run: gh repo fork open-telemetry/opentelemetry-js
       - name: Checkout
         uses: actions/checkout@v4
         with:
