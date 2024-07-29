@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1722266439729,
+  "lastUpdate": 1722266706319,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -13120,6 +13120,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d91dbe1b1decea41cfce55213b545e45e9ef67ef",
+          "message": "feat(exporters)!: use transport interface in node.js exporters (#4743)\n\n* feat(exporters)!: use transport interface in node.js exporters\n\n* feat(exporters): hide compression property\n\n* feat(otlp-exporter-base)!: remove header property\n\n* feat(otlp-exporter-base): add retrying transport\n\n* fix: lint\n\n* chore: add changelog entry\n\n* fix: use queueMicrotask over nextTick\n\n* chore: move changelog entry to unreleased\n\n* chore: note that user-agent cannot be overwritten by users anymore\n\n* fix: export missing ExportResponseRetryable\n\n* fix: retry jitter",
+          "timestamp": "2024-07-29T14:54:01Z",
+          "tree_id": "c8506018f0e1751bbb53f95620933e2bddc9cac8",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/d91dbe1b1decea41cfce55213b545e45e9ef67ef"
+        },
+        "date": 1722266705404,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 935868,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11431,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 694716,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 654380,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
