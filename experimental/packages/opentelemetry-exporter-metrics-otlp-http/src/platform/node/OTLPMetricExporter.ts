@@ -42,16 +42,14 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
   IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config, JsonMetricsSerializer, 'application/json');
-    const env = getEnv();
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
+    super(config, JsonMetricsSerializer, {
       ...baggageUtils.parseKeyPairsIntoRecord(
-        env.OTEL_EXPORTER_OTLP_METRICS_HEADERS
+        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
       ...parseHeaders(config?.headers),
-    };
+      ...USER_AGENT,
+      'Content-Type': 'application/json',
+    });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
