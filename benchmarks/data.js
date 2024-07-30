@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1722266706319,
+  "lastUpdate": 1722325784899,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -13172,6 +13172,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.48%",
             "unit": "ops/sec",
             "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "3f2c707adeffb2a6c9409aaabeaae55f72d57f59",
+          "message": "fix(sdk-node): avoid spurious diag errors for unknown OTEL_NODE_RESOURCE_DETECTORS values (#4879)\n\n* fix(sdk-node): avoid spurious diag errors for unknown OTEL_NODE_RESOURCE_DETECTORS values\n\nWhen NodeSDK is configured with explicit 'resourceDetectors' or\nwith 'autoDetectResources: false', then it should not emit diag\nerrors about unknown values in OTEL_NODE_RESOURCE_DETECTORS.\nThis can happen when that envvar is used with\n@opentelemetry/auto-instrumentation-node\n\nCloses: https://github.com/open-telemetry/opentelemetry-js-contrib/issues/2311\n\n* add a changelog entry\n\n* lint:fix",
+          "timestamp": "2024-07-30T07:47:22Z",
+          "tree_id": "dbffbdae61c3c2f6997e1250f98c24aa0e64124c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/3f2c707adeffb2a6c9409aaabeaae55f72d57f59"
+        },
+        "date": 1722325783959,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 971377,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11907,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 647370,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 652472,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
