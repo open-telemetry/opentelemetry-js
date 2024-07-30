@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1722325998495,
+  "lastUpdate": 1722326692498,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -13328,6 +13328,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "08942ba126b7ce8cf03e286fcfd1d57992994004",
+          "message": "chore(deps): update dependency babel-plugin-istanbul to v7 (#4852)",
+          "timestamp": "2024-07-30T08:02:49Z",
+          "tree_id": "c892672c6888acf1777eecf166c913eb521ecd31",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/08942ba126b7ce8cf03e286fcfd1d57992994004"
+        },
+        "date": 1722326691693,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 974251,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12253,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 657046,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 649275,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
