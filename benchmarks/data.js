@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1722325857970,
+  "lastUpdate": 1722325998495,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -13276,6 +13276,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.37%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "francesconovy@gmail.com",
+            "name": "Francesco Novy",
+            "username": "mydea"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1cf193964168c040fddf116d3cff13f932a46fc9",
+          "message": "feat(otlp-transformer): Do not limit `@opentelemetry/api` upper range peerDependency (#4816)\n\n* feat: Do not limit `@opentelemetry/api` upper range peerDependency\n\n* Revert \"feat: Do not limit `@opentelemetry/api` upper range peerDependency\"\n\nThis reverts commit d0dd3d577b01dac52b5921a2618253a458ee0f13.\n\n* only unclamp otlp-transformer\n\n* Add changelog entry\n\n---------\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-07-30T07:50:33Z",
+          "tree_id": "0d10a8b07ed8be4f3a0bb2e9fb2434e967b93eff",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1cf193964168c040fddf116d3cff13f932a46fc9"
+        },
+        "date": 1722325997697,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 962202,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11560,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 662554,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648593,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
