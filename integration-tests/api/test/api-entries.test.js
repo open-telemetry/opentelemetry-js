@@ -45,4 +45,14 @@ describe('@opentelemetry/api entries', () => {
     const mod = require('@opentelemetry/api/experimental');
     assert.ok(mod.wrapTracer != null);
   });
+
+  it('should import baggage utils', async () => {
+    const mod = await import('@opentelemetry/core');
+    assert.ok(mod.baggageUtils.getKeyPairs != null);
+  });
+
+  it('should require baggage utils', () => {
+    const mod = require('@opentelemetry/core');
+    assert.ok(mod.baggageUtils.getKeyPairs != null);
+  });
 });
