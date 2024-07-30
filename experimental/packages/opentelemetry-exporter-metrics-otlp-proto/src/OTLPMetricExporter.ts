@@ -15,10 +15,6 @@
  */
 
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
-import {
-  ServiceClientType,
-  OTLPProtoExporterNodeBase,
-} from '@opentelemetry/otlp-proto-exporter-base';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
@@ -26,10 +22,12 @@ import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
+  parseHeaders,
+  OTLPExporterNodeBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  createExportMetricsServiceRequest,
-  IExportMetricsServiceRequest,
+  IExportMetricsServiceResponse,
+  ProtobufMetricsSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from './version';
 
@@ -39,43 +37,41 @@ const USER_AGENT = {
   'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
-class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<
+class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<
   ResourceMetrics,
-  IExportMetricsServiceRequest
+  IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(config);
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
+    super(config, ProtobufMetricsSerializer, {
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       ),
-      ...config?.headers,
-    };
+      ...parseHeaders(config?.headers),
+      ...USER_AGENT,
+      'Content-Type': 'application/x-protobuf',
+    });
   }
 
-  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
-    return createExportMetricsServiceRequest(metrics);
-  }
+  getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
+    if (typeof config.url === 'string') {
+      return config.url;
+    }
 
-  getDefaultUrl(config: OTLPExporterNodeConfigBase) {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(
-          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-        )
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
-  }
+    const env = getEnv();
+    if (env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0) {
+      return appendRootPathToUrlIfNeeded(
+        env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      );
+    }
 
-  getServiceClientType() {
-    return ServiceClientType.METRICS;
+    if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
+      return appendResourcePathToUrl(
+        env.OTEL_EXPORTER_OTLP_ENDPOINT,
+        DEFAULT_COLLECTOR_RESOURCE_PATH
+      );
+    }
+
+    return DEFAULT_COLLECTOR_URL;
   }
 }
 

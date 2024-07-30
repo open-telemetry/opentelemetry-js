@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD004 -->
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
@@ -13,6 +14,15 @@ All notable changes to this project will be documented in this file.
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.9.0
+
+### :rocket: (Enhancement)
+
+* feat(metrics): added synchronous gauge [#4528](https://github.com/open-telemetry/opentelemetry-js/pull/4528) @clintonb
+* feat(api): allow adding span links after span creation [#4536](https://github.com/open-telemetry/opentelemetry-js/pull/4536) @seemk
+  * This change is non-breaking for end-users, but breaking for Trace SDK implmentations in accordance with the [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/a03382ada8afa9415266a84dafac0510ec8c160f/specification/upgrading.md?plain=1#L97-L122) as new features need to be implemented.
+* feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
 
 ## 1.8.0
 
@@ -93,13 +103,13 @@ All notable changes to this project will be documented in this file.
 
 * export tracer options ([#154](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/154)) ([b125324](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/b125324438fb2f24eb80c7c6673afc8cfc99575e))
 
-### [1.0.4](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.3...v1.0.4) (2021-12-18)
+## [1.0.4](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.3...v1.0.4) (2021-12-18)
 
 ### Bug Fixes
 
 * align globalThis fallbacks with otel-core ([#126](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/126)) ([3507de7](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/3507de7c3b95396696657c021953b0b24a63a029))
 
-### [1.0.3](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.2...v1.0.3) (2021-08-30)
+## [1.0.3](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.2...v1.0.3) (2021-08-30)
 
 ### Bug Fixes
 

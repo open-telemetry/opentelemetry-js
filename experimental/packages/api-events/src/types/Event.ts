@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+import { Attributes, Context, TimeInput } from '@opentelemetry/api';
+import { AnyValue, SeverityNumber } from '@opentelemetry/api-logs';
 
 export interface Event {
   /**
    * The time when the event occurred as UNIX Epoch time in nanoseconds.
    */
-  timestamp?: number;
+  timestamp?: TimeInput;
 
   /**
    * The name of the event.
@@ -28,22 +29,23 @@ export interface Event {
   name: string;
 
   /**
+   * Data that describes the event.
+   * Intended to be used by instrumentation libraries.
+   */
+  data?: AnyValue;
+
+  /**
    * Additional attributes that describe the event.
    */
   attributes?: Attributes;
 
   /**
-   * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
+   * Numerical value of the severity.
    */
-  traceFlags?: number;
+  severityNumber?: SeverityNumber;
 
   /**
-   * A unique identifier for a trace.
+   * The Context associated with the Event.
    */
-  traceId?: string;
-
-  /**
-   * A unique identifier for a span within a trace.
-   */
-  spanId?: string;
+  context?: Context;
 }

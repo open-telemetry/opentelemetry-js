@@ -33,9 +33,11 @@ import { configureExporterTimeout } from './util';
 export abstract class OTLPExporterBase<
   T extends OTLPExporterConfigBase,
   ExportItem,
-  ServiceRequest,
 > {
   public readonly url: string;
+  /**
+   * @deprecated scheduled for removal. This is only used in tests.
+   */
   public readonly hostname: string | undefined;
   public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
@@ -143,5 +145,4 @@ export abstract class OTLPExporterBase<
     onError: (error: OTLPExporterError) => void
   ): void;
   abstract getDefaultUrl(config: T): string;
-  abstract convert(objects: ExportItem[]): ServiceRequest;
 }

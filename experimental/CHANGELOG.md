@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD004 -->
 # CHANGELOG
 
 All notable changes to experimental packages in this project will be documented in this file.
@@ -6,13 +7,171 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
+* feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * (user-facing) `headers` was intended for internal use has been removed from all exporters
+  * (user-facing) `compression` was intended for internal use and has been removed from all exporters
+  * (user-facing) `hostname` was intended for use in tests and is not used by any exporters, it will be removed in a future release
+* fix(exporter-*-otlp-*)!: ensure `User-Agent` header cannot be overwritten by the user [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
+  * allowing overrides of the `User-Agent` header was not specification compliant.
+
 ### :rocket: (Enhancement)
 
+* feat(otlp-transformer): Do not limit @opentelemetry/api upper range peerDependency [#4816](https://github.com/open-telemetry/opentelemetry-js/pull/4816) @mydea
+* feat(instrumentation-http): Allow to opt-out of instrumenting incoming/outgoing requests [#4643](https://github.com/open-telemetry/opentelemetry-js/pull/4643) @mydea
+
 ### :bug: (Bug Fix)
+
+* fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+
+## 0.52.1
+
+### :rocket: (Enhancement)
+
+* refactor(instrumentation-fetch): move fetch to use SEMATRR [#4632](https://github.com/open-telemetry/opentelemetry-js/pull/4632)
+* refactor(otlp-transformer): use explicit exports [#4785](https://github.com/open-telemetry/opentelemetry-js/pull/4785) @pichlermarc
+
+### :bug: (Bug Fix)
+
+* fix(sdk-node): register context manager if no tracer options are provided [#4781](https://github.com/open-telemetry/opentelemetry-js/pull/4781) @pichlermarc
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/releases/tag/v1.8.1) [#4806](https://github.com/open-telemetry/opentelemetry-js/pull/4806) @timfish
+* chore(instrumentation): Use a caret version for `import-in-the-middle` dependency [#4810](https://github.com/open-telemetry/opentelemetry-js/pull/4810) @timfish
+
+### :house: (Internal)
+
+* test: add `npm run maint:regenerate-test-certs` maintenance script and regenerate recently expired test certs [#4777](https://github.com/open-telemetry/opentelemetry-js/pull/4777)
+
+## 0.52.0
+
+### :boom: Breaking Change
+
+* feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4542](https://github.com/open-telemetry/opentelemetry-js/pull/4542) @pichlermarc
+  * Breaking changes:
+    * (user-facing) `convert()` now returns an empty object and will be removed in a follow-up
+    * (internal) OTLPExporterNodeBase now has additional constructor parameters that are required
+    * (internal) OTLPExporterNodeBase now has an additional `ResponseType` type parameter
+* feat(exporter-*-otlp-*)!: move serialization for Node.js exporters to `@opentelemetry/otlp-transformer` [#4581](https://github.com/open-telemetry/opentelemetry-js/pull/4581) @pichlermarc
+  * Breaking changes:
+    * (user-facing) `convert()` has been removed from all exporters
+    * (internal) OTLPExporterBrowserBase: `RequestType` has been replaced by a `ResponseType` type-argument
+    * (internal) OTLPExporterNodeBase: `ServiceRequest` has been replaced by a `ServiceResponse` type-argument
+    * (internal) the `@opentelemetry/otlp-exporter-proto-base` package has been removed, and will from now on be deprecated in `npm`
+* feat(instrumentation): remove default value for config in base instrumentation constructor [#4695](https://github.com/open-telemetry/opentelemetry-js/pull/4695): @blumamir
+* fix(instrumentation)!: remove unused supportedVersions from Instrumentation interface [#4694](https://github.com/open-telemetry/opentelemetry-js/pull/4694) @blumamir
+* feat(instrumentation)!: simplify `registerInstrumentations()` API
+  * Breaking changes:
+    * removes `InstrumentationOptions` type
+    * occurrences of `InstrumentationOptions` are now replaced by `(Instrumentation | Instrumentation[])[]`
+      * migrate usages of `registerInstrumentations({instrumentations: fooInstrumentation})` to `registerInstrumentations({instrumentations: [fooInstrumentation]})`
+      * passing Instrumentation classes to `registerInstrumentations()` is now not possible anymore.
+* feat(sdk-node)!: simplify type of `instrumentations` option
+  * Breaking changes:
+    * replaces `InstrumentationOptions` with `(Instrumentation | Instrumentation[])[]`
+
+### :rocket: (Enhancement)
+
+* feat(instrumentation): apply unwrap before wrap in base class [#4692](https://github.com/open-telemetry/opentelemetry-js/pull/4692)
+* feat(instrumentation): add util to execute span customization hook in base class [#4663](https://github.com/open-telemetry/opentelemetry-js/pull/4663) @blumamir
+* feat(instrumentation): generic config type in instrumentation base [#4659](https://github.com/open-telemetry/opentelemetry-js/pull/4659) @blumamir
+* feat: support node 22 [#4666](https://github.com/open-telemetry/opentelemetry-js/pull/4666) @dyladan
+* feat(propagator-aws-xray-lambda): add AWS Xray Lambda propagator [4554](https://github.com/open-telemetry/opentelemetry-js/pull/4554)
+* refactor(instrumentation-xml-http-request): use exported strings for semantic attributes. [#4681](https://github.com/open-telemetry/opentelemetry-js/pull/4681/files)
+* refactor(sdk-node): Use tree-shakeable string constants for semconv [#4767](https://github.com/open-telemetry/opentelemetry-js/pull/4767) @JohannesHuster
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): Update `import-in-the-middle` to fix [numerous bugs](https://github.com/DataDog/import-in-the-middle/pull/91) [#4745](https://github.com/open-telemetry/opentelemetry-js/pull/4745) @timfish
+
+### :books: (Refine Doc)
+
+* docs(instrumentation): better docs for supportedVersions option [#4693](https://github.com/open-telemetry/opentelemetry-js/pull/4693) @blumamir
+* docs: align all supported versions to a common format [#4696](https://github.com/open-telemetry/opentelemetry-js/pull/4696) @blumamir
+* refactor(examples): use new exported string constants for semconv in experimental/examples/opencensus-shim [#4763](https://github.com/open-telemetry/opentelemetry-js/pull/4763#pull) @Zen-cronic
+
+## 0.51.1
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): update import-in-the-middle to 1.7.4
+
+## 0.51.0
+
+### :boom: Breaking Change
+
+* feat(sdk-node)!: remove long deprecated methods in favor of constructor options [#4606](https://github.com/open-telemetry/opentelemetry-js/pull/4606) @pichlermarc
+  * `NodeSDK.configureTracerProvider()`, please use constructor options instead
+  * `NodeSDK.configureMeterProvider()`, please use constructor options instead
+  * `NodeSDK.configureLoggerProvider()`, please use constructor options instead
+  * `NodeSDK.addResource()`, please use constructor options instead
+  * `NodeSDK.detectResources()`, this is not necessary anymore, resources are now auto-detected on `NodeSDK.start()` if the constructor option `autoDetectResources` is unset, `undefined` or `true`.
+* feat(instrumentation): add patch and unpatch diag log messages [#4641](https://github.com/open-telemetry/opentelemetry-js/pull/4641)
+  * Instrumentations should not log patch and unpatch messages to diag channel.
+* feat!(instrumentation): remove moduleExports generic type from instrumentation registration [#4598](https://github.com/open-telemetry/opentelemetry-js/pull/4598) @blumamir
+  * breaking for instrumentation authors that depend on
+    * `InstrumentationBase`
+    * `InstrumentationNodeModuleDefinition`
+    * `InstrumentationNodeModuleFile`
+* feat(api-events): removed traceId and spanId from Event interface, added context and severityNumber [#4629](https://github.com/open-telemetry/opentelemetry-js/pull/4629)
+
+### :rocket: (Enhancement)
+
+* feat(sdk-logs): log resource attributes in ConsoleLogRecordExporter [#4646](https://github.com/open-telemetry/opentelemetry-js/pull/4646) @harelmo-lumigo
+* refactor(instrumentation-grpc): move to use SEMATTRS [#4633](https://github.com/open-telemetry/opentelemetry-js/pull/4633)
+* feat(otlp-transformer): consolidate scope/resource creation in transformer [#4600](https://github.com/open-telemetry/opentelemetry-js/pull/4600)
+* feat(sdk-logs): print message when attributes are dropped due to attribute count limit [#4614](https://github.com/open-telemetry/opentelemetry-js/pull/4614) @HyunnoH
+* feat(sdk-node): add usage for the detector ServiceInstanceIdDetectorSync. [#4626](https://github.com/open-telemetry/opentelemetry-js/pull/4626) @maryliag
+  * The resource detector can be added to default resource detector list by adding the value `serviceinstance` to the list of resource detectors on the environment variable `OTEL_NODE_RESOURCE_DETECTORS`, e.g `OTEL_NODE_RESOURCE_DETECTORS=env,host,os,serviceinstance`
+  * The value can be overwritten by
+    * merging a resource containing the `service.instance.id` attribute
+    * using another resource detector which writes `service.instance.id`
+* feat(sdk-events): add Events SDK [#4629](https://github.com/open-telemetry/opentelemetry-js/pull/4629)
+
+### :bug: (Bug Fix)
+
+* fix(otlp-grpc-exporter-base): avoid TypeError on exporter shutdown [#4612](https://github.com/open-telemetry/opentelemetry-js/pull/4612) @pichlermarc
+* fix(instrumentation): Don't use `require` to load `package.json` files [#4593](https://github.com/open-telemetry/opentelemetry-js/pull/4593) @timfish
+
+## 0.50.0
+
+### :boom: Breaking Change
+
+* fix(exporter-*-otlp-grpc)!: lazy load gRPC to improve compatibility with `@opentelemetry/instrumenation-grpc` [#4432](https://github.com/open-telemetry/opentelemetry-js/pull/4432) @pichlermarc
+  * Fixes a bug where requiring up the gRPC exporter before enabling the instrumentation from `@opentelemetry/instrumentation-grpc` would lead to missing telemetry
+  * Breaking changes, removes several functions and properties that were used internally and were not intended for end-users
+    * `getServiceClientType()`
+      * this returned a static enum value that would denote the export type (`SPAN`, `METRICS`, `LOGS`)
+    * `getServiceProtoPath()`
+      * this returned a static enum value that would correspond to the gRPC service path
+    * `metadata`
+      * was used internally to access metadata, but as a side effect allowed end-users to modify metadata on runtime.
+    * `serviceClient`
+      * was used internally to keep track of the service client used by the exporter, as a side effect it allowed end-users to modify the gRPC service client that was used
+    * `compression`
+      * was used internally to keep track of the compression to use but was unintentionally exposed to the users. It allowed to read and write the value, writing, however, would have no effect.
+
+### :rocket: (Enhancement)
+
+* feat(instrumentation-xhr): optionally ignore network events [#4571](https://github.com/open-telemetry/opentelemetry-js/pull/4571/) @mustafahaddara
+* refactor(instrumentation-http): use exported strings for semconv [#4573](https://github.com/open-telemetry/opentelemetry-js/pull/4573/) @JamieDanielson
+* perf(instrumentation-http): remove obvious temp allocations [#4576](https://github.com/open-telemetry/opentelemetry-js/pull/4576) @Samuron
+* feat(sdk-node): add `HostDetector` as default resource detector [#4566](https://github.com/open-telemetry/opentelemetry-js/pull/4566) @maryliag
+* feat(api-events): added data field to the Event interface [#4575](https://github.com/open-telemetry/opentelemetry-js/pull/4575) @martinkuba
+
+### :bug: (Bug Fix)
+
+* fix(exporter-*-otlp-*): use parseHeaders() to ensure header-values are not 'undefined' #4540
+  * Fixes a bug where passing `undefined` as a header value would crash the end-user app after the export timeout elapsed.
+* fix(sdk-logs): ensure default resource attributes are used as fallbacks when a resource is passed to LoggerProvider.
+
+### :books: (Refine Doc)
+
+* docs(instrumentation-http): document semantic conventions and attributes in use. [#4587](https://github.com/open-telemetry/opentelemetry-js/pull/4587/) @JamieDanielson
 
 ## 0.49.1
 
@@ -59,19 +218,6 @@ All notable changes to experimental packages in this project will be documented 
   * This breaking change only affects users that are using the *experimental* `@opentelemetry/instrumentation/hook.mjs` loader hook AND Node.js 18.19 or later:
     * This reverts back to an older version of `import-in-the-middle` due to <https://github.com/DataDog/import-in-the-middle/issues/57>
     * This version does not support Node.js 18.19 or later
-* fix(exporter-*-otlp-grpc)!: lazy load gRPC to improve compatibility with `@opentelemetry/instrumenation-grpc` [#4432](https://github.com/open-telemetry/opentelemetry-js/pull/4432) @pichlermarc
-  * Fixes a bug where requiring up the gRPC exporter before enabling the instrumentation from `@opentelemetry/instrumentation-grpc` would lead to missing telemetry
-  * Breaking changes, removes several functions and properties that were used internally and were not intended for end-users
-    * `getServiceClientType()`
-      * this returned a static enum value that would denote the export type (`SPAN`, `METRICS`, `LOGS`)
-    * `getServiceProtoPath()`
-      * this returned a static enum value that would correspond to the gRPC service path
-    * `metadata`
-      * was used internally to access metadata, but as a side effect allowed end-users to modify metadata on runtime.
-    * `serviceClient`
-      * was used internally to keep track of the service client used by the exporter, as a side effect it allowed end-users to modify the gRPC service client that was used
-    * `compression`
-      * was used internally to keep track of the compression to use but was unintentionally exposed to the users. It allowed to read and write the value, writing, however, would have no effect.
 
 ### :bug: (Bug Fix)
 

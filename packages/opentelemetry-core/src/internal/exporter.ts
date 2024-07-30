@@ -24,7 +24,7 @@ export interface Exporter<T> {
 
 /**
  * @internal
- * Shared functionality used by Exporters while exporting data, including suppresion of Traces.
+ * Shared functionality used by Exporters while exporting data, including suppression of Traces.
  */
 export function _export<T>(
   exporter: Exporter<T>,

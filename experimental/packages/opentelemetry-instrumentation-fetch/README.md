@@ -6,7 +6,7 @@
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
 This module provides auto instrumentation for web using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/fetch).
-(Note: This instrumentation does **not** instrument [Node.js' fetch](https://nodejs.org/api/globals.html#fetch). See [this issue](https://github.com/open-telemetry/opentelemetry-js/issues/4333).)
+(Note: This instrumentation does **not** instrument [Node.js' fetch](https://nodejs.org/api/globals.html#fetch). See [`@opentelemetry/instrumentation-undici`](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/instrumentation-undici/) for that.)
 
 ## Installation
 
@@ -71,6 +71,21 @@ Fetch instrumentation plugin has few options available to choose from. You can s
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------------------------------|
 | [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L64) | `HttpCustomAttributeFunction` | Function for adding custom attributes                                                   |
 | [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L67)                      | `boolean`                     | Disable network events being added as span events (network events are added by default) |
+
+## Semantic Conventions
+
+This package uses `@opentelemetry/semantic-conventions` version `1.22+`, which implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md)
+
+Attributes collected:
+
+| Attribute                                   | Short Description                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| `http.status_code`                          | HTTP response status code                                                       |
+| `http.host`                                 | The value of the HTTP host header                                              |
+| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
+| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
+| `http.url`                                  | Full HTTP request URL                                                          |
+| `http.method`                               | HTTP request method                                                            |
 
 ## Useful links
 

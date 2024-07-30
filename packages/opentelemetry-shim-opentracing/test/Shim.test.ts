@@ -36,7 +36,11 @@ import {
 import { performance } from 'perf_hooks';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_EXCEPTION_MESSAGE,
+  SEMATTRS_EXCEPTION_STACKTRACE,
+  SEMATTRS_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
@@ -378,7 +382,7 @@ describe('OpenTracing Shim', () => {
           span.logEvent('error', payload);
           assert.strictEqual(otSpan.events[0].name, 'exception');
           const expectedAttributes = {
-            [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+            [SEMATTRS_EXCEPTION_MESSAGE]: 'boom',
           };
           assert.deepStrictEqual(
             otSpan.events[0].attributes,
@@ -397,9 +401,9 @@ describe('OpenTracing Shim', () => {
           assert.strictEqual(otSpan.events[0].name, 'exception');
           const expectedAttributes = {
             fault: 'meow',
-            [SemanticAttributes.EXCEPTION_TYPE]: 'boom',
-            [SemanticAttributes.EXCEPTION_MESSAGE]: 'oh no!',
-            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes',
+            [SEMATTRS_EXCEPTION_TYPE]: 'boom',
+            [SEMATTRS_EXCEPTION_MESSAGE]: 'oh no!',
+            [SEMATTRS_EXCEPTION_STACKTRACE]: 'pancakes',
           };
           assert.deepStrictEqual(
             otSpan.events[0].attributes,
@@ -446,7 +450,7 @@ describe('OpenTracing Shim', () => {
             Math.trunc(tomorrow / 1000)
           );
           const expectedAttributes = {
-            [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+            [SEMATTRS_EXCEPTION_MESSAGE]: 'boom',
           };
           assert.deepStrictEqual(
             otSpan.events[0].attributes,
@@ -471,9 +475,9 @@ describe('OpenTracing Shim', () => {
           const expectedAttributes = {
             event: 'error',
             fault: 'meow',
-            [SemanticAttributes.EXCEPTION_TYPE]: 'boom',
-            [SemanticAttributes.EXCEPTION_MESSAGE]: 'oh no!',
-            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes',
+            [SEMATTRS_EXCEPTION_TYPE]: 'boom',
+            [SEMATTRS_EXCEPTION_MESSAGE]: 'oh no!',
+            [SEMATTRS_EXCEPTION_STACKTRACE]: 'pancakes',
           };
           assert.deepStrictEqual(
             otSpan.events[0].attributes,

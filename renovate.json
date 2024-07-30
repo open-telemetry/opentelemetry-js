@@ -5,7 +5,7 @@
       "groupName": "all patch versions",
       "groupSlug": "all-patch",
       "matchUpdateTypes": ["patch"],
-      "excludePackageNames": ["prettier", "import-in-the-middle"],
+      "excludePackageNames": ["prettier"],
       "schedule": ["before 3am every weekday"]
     },
     {
@@ -21,6 +21,11 @@
       "dependencyDashboardApproval": true
     }
   ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 3am on Monday"]
+  },
+  "rebaseWhen": "conflicted",
   "ignoreDeps": ["@opentelemetry/api", "@opentelemetry/resources_1.9.0", "@types/node"],
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@pichlermarc"],
   "labels": ["dependencies"]

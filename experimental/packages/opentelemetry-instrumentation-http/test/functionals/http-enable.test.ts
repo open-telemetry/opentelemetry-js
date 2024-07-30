@@ -30,8 +30,14 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
-  NetTransportValues,
-  SemanticAttributes,
+  NETTRANSPORTVALUES_IP_TCP,
+  SEMATTRS_HTTP_CLIENT_IP,
+  SEMATTRS_HTTP_FLAVOR,
+  SEMATTRS_HTTP_ROUTE,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_NET_HOST_PORT,
+  SEMATTRS_NET_PEER_PORT,
+  SEMATTRS_NET_TRANSPORT,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as nock from 'nock';
@@ -211,13 +217,62 @@ describe('HttpInstrumentation', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[SemanticAttributes.NET_HOST_PORT],
+          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SemanticAttributes.NET_PEER_PORT],
+          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
           serverPort
         );
+      });
+    });
+
+    describe('partially disable instrumentation', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('allows to disable outgoing request instrumentation', () => {
+        server.close();
+        instrumentation.disable();
+
+        instrumentation.setConfig({
+          disableOutgoingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = http.createServer((_request, response) => {
+          response.end('Test Server Response');
+        });
+
+        server.listen(serverPort);
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), true);
+        assert.strictEqual(isWrapped(http.get), false);
+        assert.strictEqual(isWrapped(http.request), false);
+      });
+
+      it('allows to disable incoming request instrumentation', () => {
+        server.close();
+        instrumentation.disable();
+
+        instrumentation.setConfig({
+          disableIncomingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = http.createServer((_request, response) => {
+          response.end('Test Server Response');
+        });
+
+        server.listen(serverPort);
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), false);
+        assert.strictEqual(isWrapped(http.get), true);
+        assert.strictEqual(isWrapped(http.request), true);
       });
     });
 
@@ -329,28 +384,25 @@ describe('HttpInstrumentation', () => {
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[SemanticAttributes.HTTP_CLIENT_IP],
+          incomingSpan.attributes[SEMATTRS_HTTP_CLIENT_IP],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[SemanticAttributes.NET_HOST_PORT],
+          incomingSpan.attributes[SEMATTRS_NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[SemanticAttributes.NET_PEER_PORT],
+          outgoingSpan.attributes[SEMATTRS_NET_PEER_PORT],
           serverPort
         );
         [
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
+          assert.strictEqual(span.attributes[SEMATTRS_HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[SemanticAttributes.HTTP_FLAVOR],
-            '1.1'
-          );
-          assert.strictEqual(
-            span.attributes[SemanticAttributes.NET_TRANSPORT],
-            NetTransportValues.IP_TCP
+            span.attributes[SEMATTRS_NET_TRANSPORT],
+            NETTRANSPORTVALUES_IP_TCP
           );
           assertSpan(span, kind, validations);
         });
@@ -363,10 +415,7 @@ describe('HttpInstrumentation', () => {
         const span = memoryExporter.getFinishedSpans()[0];
 
         assert.strictEqual(span.kind, SpanKind.SERVER);
-        assert.strictEqual(
-          span.attributes[SemanticAttributes.HTTP_ROUTE],
-          'TheRoute'
-        );
+        assert.strictEqual(span.attributes[SEMATTRS_HTTP_ROUTE], 'TheRoute');
         assert.strictEqual(span.name, 'GET TheRoute');
       });
 
@@ -555,7 +604,7 @@ describe('HttpInstrumentation', () => {
       });
 
       for (const arg of ['string', {}, new Date()]) {
-        it(`should be tracable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
+        it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
@@ -796,10 +845,7 @@ describe('HttpInstrumentation', () => {
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
-            assert.strictEqual(
-              span.attributes[SemanticAttributes.HTTP_STATUS_CODE],
-              404
-            );
+            assert.strictEqual(span.attributes[SEMATTRS_HTTP_STATUS_CODE], 404);
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
@@ -1101,10 +1147,10 @@ describe('HttpInstrumentation', () => {
 
       it('should set rpc metadata for incoming http request', async () => {
         server = http.createServer((request, response) => {
-          const rpcMemadata = getRPCMetadata(context.active());
-          assert(typeof rpcMemadata !== 'undefined');
-          assert(rpcMemadata.type === RPCType.HTTP);
-          assert(rpcMemadata.span.setAttribute('key', 'value'));
+          const rpcMetadata = getRPCMetadata(context.active());
+          assert(typeof rpcMetadata !== 'undefined');
+          assert(rpcMetadata.type === RPCType.HTTP);
+          assert(rpcMetadata.span.setAttribute('key', 'value'));
           response.end('Test Server Response');
         });
         await new Promise<void>(resolve => server.listen(serverPort, resolve));

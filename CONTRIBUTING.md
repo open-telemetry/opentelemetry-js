@@ -104,7 +104,7 @@ An entry into `CHANGELOG.md` or `experimental/CHANGELOG.md` is required for the 
 - Changes to default settings
 - New components being added
 
-It is reasonable to omit an entry to the changelog under these circuimstances:
+It is reasonable to omit an entry to the changelog under these circumstances:
 
 - Updating test to remove flakiness or improve coverage
 - Updates to the CI/CD process
@@ -245,6 +245,13 @@ npm run lint:fix
 # Lint a single module, fixing errors
 cd packages/opentelemetry-module-name
 npm run lint:fix
+```
+
+Similarly, Markdown files (such as README.md files) can be linted:
+
+```sh
+npm run lint:markdown
+npm run lint:markdown:fix # can automatically fix some Markdown rules
 ```
 
 ### Generating docs

@@ -18,11 +18,37 @@ import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { IResource, Resource } from '@opentelemetry/resources';
 import {
+  SEMRESATTRS_CLOUD_ACCOUNT_ID,
+  SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
+  SEMRESATTRS_CLOUD_PROVIDER,
+  SEMRESATTRS_CLOUD_REGION,
+  SEMRESATTRS_CONTAINER_ID,
+  SEMRESATTRS_CONTAINER_IMAGE_NAME,
+  SEMRESATTRS_CONTAINER_IMAGE_TAG,
+  SEMRESATTRS_CONTAINER_NAME,
+  SEMRESATTRS_HOST_ID,
+  SEMRESATTRS_HOST_IMAGE_ID,
+  SEMRESATTRS_HOST_IMAGE_NAME,
+  SEMRESATTRS_HOST_IMAGE_VERSION,
+  SEMRESATTRS_HOST_NAME,
+  SEMRESATTRS_HOST_TYPE,
+  SEMRESATTRS_K8S_CLUSTER_NAME,
+  SEMRESATTRS_K8S_DEPLOYMENT_NAME,
+  SEMRESATTRS_K8S_NAMESPACE_NAME,
+  SEMRESATTRS_K8S_POD_NAME,
+  SEMRESATTRS_PROCESS_COMMAND,
+  SEMRESATTRS_PROCESS_COMMAND_LINE,
+  SEMRESATTRS_PROCESS_EXECUTABLE_NAME,
+  SEMRESATTRS_PROCESS_PID,
+  SEMRESATTRS_SERVICE_INSTANCE_ID,
+  SEMRESATTRS_SERVICE_NAME,
+  SEMRESATTRS_SERVICE_NAMESPACE,
+  SEMRESATTRS_SERVICE_VERSION,
   SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
   SEMRESATTRS_TELEMETRY_SDK_NAME,
   SEMRESATTRS_TELEMETRY_SDK_VERSION,
-  SemanticResourceAttributes,
 } from '@opentelemetry/semantic-conventions';
+import * as semconv from '@opentelemetry/semantic-conventions';
 
 /**
  * Test utility method to validate a cloud resource
@@ -42,22 +68,22 @@ export const assertCloudResource = (
   assertHasOneLabel('CLOUD', resource);
   if (validations.provider)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CLOUD_PROVIDER],
+      resource.attributes[SEMRESATTRS_CLOUD_PROVIDER],
       validations.provider
     );
   if (validations.accountId)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CLOUD_ACCOUNT_ID],
+      resource.attributes[SEMRESATTRS_CLOUD_ACCOUNT_ID],
       validations.accountId
     );
   if (validations.region)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CLOUD_REGION],
+      resource.attributes[SEMRESATTRS_CLOUD_REGION],
       validations.region
     );
   if (validations.zone)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CLOUD_AVAILABILITY_ZONE],
+      resource.attributes[SEMRESATTRS_CLOUD_AVAILABILITY_ZONE],
       validations.zone
     );
 };
@@ -80,22 +106,22 @@ export const assertContainerResource = (
   assertHasOneLabel('CONTAINER', resource);
   if (validations.name)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CONTAINER_NAME],
+      resource.attributes[SEMRESATTRS_CONTAINER_NAME],
       validations.name
     );
   if (validations.id)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CONTAINER_ID],
+      resource.attributes[SEMRESATTRS_CONTAINER_ID],
       validations.id
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CONTAINER_IMAGE_NAME],
+      resource.attributes[SEMRESATTRS_CONTAINER_IMAGE_NAME],
       validations.imageName
     );
   if (validations.imageTag)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.CONTAINER_IMAGE_TAG],
+      resource.attributes[SEMRESATTRS_CONTAINER_IMAGE_TAG],
       validations.imageTag
     );
 };
@@ -121,32 +147,32 @@ export const assertHostResource = (
   assertHasOneLabel('HOST', resource);
   if (validations.id)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_ID],
+      resource.attributes[SEMRESATTRS_HOST_ID],
       validations.id
     );
   if (validations.name)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_NAME],
+      resource.attributes[SEMRESATTRS_HOST_NAME],
       validations.name
     );
   if (validations.hostType)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_TYPE],
+      resource.attributes[SEMRESATTRS_HOST_TYPE],
       validations.hostType
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_IMAGE_NAME],
+      resource.attributes[SEMRESATTRS_HOST_IMAGE_NAME],
       validations.imageName
     );
   if (validations.imageId)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_IMAGE_ID],
+      resource.attributes[SEMRESATTRS_HOST_IMAGE_ID],
       validations.imageId
     );
   if (validations.imageVersion)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.HOST_IMAGE_VERSION],
+      resource.attributes[SEMRESATTRS_HOST_IMAGE_VERSION],
       validations.imageVersion
     );
 };
@@ -169,22 +195,22 @@ export const assertK8sResource = (
   assertHasOneLabel('K8S', resource);
   if (validations.clusterName)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.K8S_CLUSTER_NAME],
+      resource.attributes[SEMRESATTRS_K8S_CLUSTER_NAME],
       validations.clusterName
     );
   if (validations.namespaceName)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.K8S_NAMESPACE_NAME],
+      resource.attributes[SEMRESATTRS_K8S_NAMESPACE_NAME],
       validations.namespaceName
     );
   if (validations.podName)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.K8S_POD_NAME],
+      resource.attributes[SEMRESATTRS_K8S_POD_NAME],
       validations.podName
     );
   if (validations.deploymentName)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.K8S_DEPLOYMENT_NAME],
+      resource.attributes[SEMRESATTRS_K8S_DEPLOYMENT_NAME],
       validations.deploymentName
     );
 };
@@ -212,17 +238,17 @@ export const assertTelemetrySDKResource = (
 
   if (validations.name)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME],
+      resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
       validations.name
     );
   if (validations.language)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
+      resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
       validations.language
     );
   if (validations.version)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION],
+      resource.attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION],
       validations.version
     );
 };
@@ -243,21 +269,21 @@ export const assertServiceResource = (
   }
 ) => {
   assert.strictEqual(
-    resource.attributes[SemanticResourceAttributes.SERVICE_NAME],
+    resource.attributes[SEMRESATTRS_SERVICE_NAME],
     validations.name
   );
   assert.strictEqual(
-    resource.attributes[SemanticResourceAttributes.SERVICE_INSTANCE_ID],
+    resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID],
     validations.instanceId
   );
   if (validations.namespace)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.SERVICE_NAMESPACE],
+      resource.attributes[SEMRESATTRS_SERVICE_NAMESPACE],
       validations.namespace
     );
   if (validations.version)
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.SERVICE_VERSION],
+      resource.attributes[SEMRESATTRS_SERVICE_VERSION],
       validations.version
     );
 };
@@ -278,24 +304,24 @@ export const assertProcessResource = (
   }
 ) => {
   assert.strictEqual(
-    resource.attributes[SemanticResourceAttributes.PROCESS_PID],
+    resource.attributes[SEMRESATTRS_PROCESS_PID],
     validations.pid
   );
   if (validations.name) {
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME],
+      resource.attributes[SEMRESATTRS_PROCESS_EXECUTABLE_NAME],
       validations.name
     );
   }
   if (validations.command) {
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND],
+      resource.attributes[SEMRESATTRS_PROCESS_COMMAND],
       validations.command
     );
   }
   if (validations.commandLine) {
     assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND_LINE],
+      resource.attributes[SEMRESATTRS_PROCESS_COMMAND_LINE],
       validations.commandLine
     );
   }
@@ -310,29 +336,39 @@ export const assertEmptyResource = (resource: Resource) => {
   assert.strictEqual(Object.keys(resource.attributes).length, 0);
 };
 
+/**
+ * Assert that the `resource` has at least one known attribute with the given
+ * `prefix`. By "known", we mean it is an attribute defined in semconv.
+ */
 const assertHasOneLabel = (prefix: string, resource: Resource): void => {
-  const hasOne = Object.entries(SemanticResourceAttributes).find(
-    ([key, value]) => {
-      return (
-        key.startsWith(prefix) &&
-        Object.prototype.hasOwnProperty.call(resource.attributes, value)
-      );
-    }
+  const semconvModPrefix = `SEMRESATTRS_${prefix.toUpperCase()}_`;
+  const knownAttrs: Set<string> = new Set(
+    Object.entries(semconv)
+      .filter(
+        ([k, v]) => typeof v === 'string' && k.startsWith(semconvModPrefix)
+      )
+      .map(([, v]) => v as string)
   );
-
+  const hasAttrs = Object.keys(resource.attributes).filter(k =>
+    knownAttrs.has(k)
+  );
   assert.ok(
-    hasOne,
-    'Must have one node Resource(s) starting with [' +
+    hasAttrs.length > 0,
+    'Must have one Resource(s) starting with [' +
       prefix +
       '] matching the following attributes: ' +
-      Object.entries(SemanticResourceAttributes)
-        .reduce((result, [key, value]) => {
-          if (key.startsWith(prefix)) {
-            result.push(value);
-          }
-          return result;
-        })
-        .join(', ') +
-      JSON.stringify(Object.keys(SemanticResourceAttributes))
+      Array.from(knownAttrs).join(', ') +
+      JSON.stringify(Object.keys(semconv))
+  );
+};
+
+export const assertServiceInstanceIdIsUUID = (resource: Resource): void => {
+  const UUID_REGEX =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  assert.equal(
+    UUID_REGEX.test(
+      resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID]?.toString() || ''
+    ),
+    true
   );
 };

@@ -77,7 +77,7 @@ export class ShimTracer implements oc.Tracer {
   onStartSpan(): void {}
   onEndSpan(): void {}
   setCurrentRootSpan() {
-    // This can't be correctly overriden since OTel context does not provide a way to set
+    // This can't be correctly overridden since OTel context does not provide a way to set
     // context without a callback. Leave noop for now.
   }
 

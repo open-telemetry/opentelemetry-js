@@ -19,22 +19,20 @@ import * as assert from 'assert';
 import { OTLPGRPCExporterNodeBase } from '../src/OTLPGRPCExporterNodeBase';
 import { OTLPGRPCExporterConfigNode } from '../src/types';
 import { mockedReadableSpan } from './traceHelper';
-import { ExportResponse, ExportResponseSuccess } from '../src/export-response';
-import { IExporterTransport } from '../src/exporter-transport';
-import { ISerializer } from '../src';
+import {
+  ExportResponse,
+  ExportResponseSuccess,
+  IExporterTransport,
+} from '@opentelemetry/otlp-exporter-base';
+import { ISerializer } from '@opentelemetry/otlp-transformer';
 import sinon = require('sinon');
 
 class MockCollectorExporter extends OTLPGRPCExporterNodeBase<
   ReadableSpan,
-  ReadableSpan[],
   any
 > {
   getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {
     return '';
-  }
-
-  convert(spans: ReadableSpan[]): ReadableSpan[] {
-    return spans;
   }
 
   getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {

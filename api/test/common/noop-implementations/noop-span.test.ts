@@ -36,6 +36,14 @@ describe('NonRecordingSpan', () => {
       my_number_attribute: 123,
     });
 
+    const linkContext = {
+      traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+      spanId: '7e0c63257de34c92',
+      traceFlags: TraceFlags.SAMPLED,
+    };
+    span.addLink({ context: linkContext });
+    span.addLinks([{ context: linkContext }]);
+
     span.addEvent('sent');
     span.addEvent('sent', { id: '42', key: 'value' });
 

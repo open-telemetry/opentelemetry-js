@@ -40,7 +40,7 @@ export interface ExemplarReservoir {
    *
    * @param pointAttributes The attributes associated with metric point.
    *
-   * @returns a list of {@link Exemplar}s. Retuned exemplars contain the attributes that were filtered out by the
+   * @returns a list of {@link Exemplar}s. Returned exemplars contain the attributes that were filtered out by the
    * aggregator, but recorded alongside the original measurement.
    */
   collect(pointAttributes: MetricAttributes): Exemplar[];

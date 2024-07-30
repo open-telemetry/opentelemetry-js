@@ -17,7 +17,7 @@ See the example how to use it.
 OpenTelemetry comes with a growing number of instrumentations for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom instrumentations (see [the instrumentation developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md)).
 
 Web Tracer currently supports one plugin for document load.
-Unlike Node Tracer (`NodeTracerProvider`), the plugins needs to be initialised and passed in configuration.
+Unlike Node Tracer (`NodeTracerProvider`), the plugins needs to be initialized and passed in configuration.
 The reason is to give user full control over which plugin will be bundled into web page.
 
 You can choose to use the `ZoneContextManager` if you want to trace asynchronous operations. Please note that the `ZoneContextManager` does not work with JS code targeting `ES2017+`. In order to use the `ZoneContextManager`, please transpile back to `ES2015`.

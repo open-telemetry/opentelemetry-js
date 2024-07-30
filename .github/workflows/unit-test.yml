@@ -14,6 +14,7 @@ jobs:
         node_version:
           - "18"
           - "20"
+          - "22"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -130,8 +131,6 @@ jobs:
           - "8"
           - "10"
           - "12"
-          - "14"
-          - "16"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -148,7 +147,7 @@ jobs:
         working-directory: ./api
         run: |
           npm install --ignore-scripts
-          npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
+          npm install @types/mocha@^7 mocha@^7 ts-loader@^8
           node ../scripts/version-update.js
           npx tsc --build tsconfig.json tsconfig.esm.json
 

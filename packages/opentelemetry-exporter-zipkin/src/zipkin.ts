@@ -24,7 +24,7 @@ import {
   defaultStatusCodeTagName,
   defaultStatusErrorTagName,
 } from './transform';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { prepareGetHeaders } from './utils';
 
 /**
@@ -67,7 +67,7 @@ export class ZipkinExporter implements SpanExporter {
   ): void {
     const serviceName = String(
       this._serviceName ||
-        spans[0].resource.attributes[SemanticResourceAttributes.SERVICE_NAME] ||
+        spans[0].resource.attributes[SEMRESATTRS_SERVICE_NAME] ||
         this.DEFAULT_SERVICE_NAME
     );
 
@@ -118,7 +118,7 @@ export class ZipkinExporter implements SpanExporter {
 
   /**
    * if user defines getExportRequestHeaders in config then this will be called
-   * everytime before send, otherwise it will be replaced with noop in
+   * every time before send, otherwise it will be replaced with noop in
    * constructor
    * @default noop
    */
@@ -140,8 +140,8 @@ export class ZipkinExporter implements SpanExporter {
       toZipkinSpan(
         span,
         String(
-          span.attributes[SemanticResourceAttributes.SERVICE_NAME] ||
-            span.resource.attributes[SemanticResourceAttributes.SERVICE_NAME] ||
+          span.attributes[SEMRESATTRS_SERVICE_NAME] ||
+            span.resource.attributes[SEMRESATTRS_SERVICE_NAME] ||
             serviceName
         ),
         this._statusCodeTagName,

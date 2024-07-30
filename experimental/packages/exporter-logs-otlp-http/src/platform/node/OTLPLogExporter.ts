@@ -19,10 +19,13 @@ import type {
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import type { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
+import type { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
-import { createExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  OTLPExporterNodeBase,
+  parseHeaders,
+} from '@opentelemetry/otlp-exporter-base';
+import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
 
 import { getDefaultUrl } from '../config';
 import { VERSION } from '../../version';
@@ -35,30 +38,26 @@ const USER_AGENT = {
  * Collector Logs Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPExporterNodeBase<ReadableLogRecord, IExportLogsServiceRequest>
+  extends OTLPExporterNodeBase<ReadableLogRecord, IExportLogsServiceResponse>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     // load  OTEL_EXPORTER_OTLP_LOGS_TIMEOUT env
-    super({
-      timeoutMillis: getEnv().OTEL_EXPORTER_OTLP_LOGS_TIMEOUT,
-      ...config,
-    });
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-      ),
-      ...config.headers,
-    };
-  }
-
-  convert(logRecords: ReadableLogRecord[]): IExportLogsServiceRequest {
-    return createExportLogsServiceRequest(logRecords, {
-      useHex: true,
-      useLongBits: false,
-    });
+    super(
+      {
+        timeoutMillis: getEnv().OTEL_EXPORTER_OTLP_LOGS_TIMEOUT,
+        ...config,
+      },
+      JsonLogsSerializer,
+      {
+        ...baggageUtils.parseKeyPairsIntoRecord(
+          getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
+        ),
+        ...parseHeaders(config?.headers),
+        ...USER_AGENT,
+        'Content-Type': 'application/json',
+      }
+    );
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
