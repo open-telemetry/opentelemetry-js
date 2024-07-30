@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD004 -->
+
 ## 2.0
 
 ### :boom: Breaking Change
