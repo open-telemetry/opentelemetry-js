@@ -27,6 +27,8 @@ import { createConstMap } from '../internal/utils';
 // Temporary local constants to assign to the individual exports and the namespaced version
 // Required to avoid the namespace exports using the unminifable export names for some package types
 const TMP_AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
+const TMP_CLIENT_CONNECTION_POOL_NAME = 'db.client.connection.pool.name';
+const TMP_CLIENT_CONNECTION_STATE = 'db.client.connection.state';
 const TMP_DB_SYSTEM = 'db.system';
 const TMP_DB_CONNECTION_STRING = 'db.connection_string';
 const TMP_DB_USER = 'db.user';
@@ -34,6 +36,9 @@ const TMP_DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname';
 const TMP_DB_NAME = 'db.name';
 const TMP_DB_STATEMENT = 'db.statement';
 const TMP_DB_OPERATION = 'db.operation';
+const TMP_DB_COLLECTION_NAME = 'db.collection.name';
+const TMP_DB_NAMESPACE = 'db.namespace';
+const TMP_DB_OPERATION_NAME = 'db.operation.name';
 const TMP_DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name';
 const TMP_DB_CASSANDRA_KEYSPACE = 'db.cassandra.keyspace';
 const TMP_DB_CASSANDRA_PAGE_SIZE = 'db.cassandra.page_size';
@@ -48,6 +53,7 @@ const TMP_DB_HBASE_NAMESPACE = 'db.hbase.namespace';
 const TMP_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index';
 const TMP_DB_MONGODB_COLLECTION = 'db.mongodb.collection';
 const TMP_DB_SQL_TABLE = 'db.sql.table';
+const TMP_ERROR_TYPE = 'error.type';
 const TMP_EXCEPTION_TYPE = 'exception.type';
 const TMP_EXCEPTION_MESSAGE = 'exception.message';
 const TMP_EXCEPTION_STACKTRACE = 'exception.stacktrace';
@@ -77,10 +83,14 @@ const TMP_NET_HOST_CARRIER_NAME = 'net.host.carrier.name';
 const TMP_NET_HOST_CARRIER_MCC = 'net.host.carrier.mcc';
 const TMP_NET_HOST_CARRIER_MNC = 'net.host.carrier.mnc';
 const TMP_NET_HOST_CARRIER_ICC = 'net.host.carrier.icc';
+const TMP_NETWORK_PEER_ADDRESS = 'network.peer.address';
+const TMP_NETWORK_PEER_PORT = 'network.peer.port';
 const TMP_PEER_SERVICE = 'peer.service';
 const TMP_ENDUSER_ID = 'enduser.id';
 const TMP_ENDUSER_ROLE = 'enduser.role';
 const TMP_ENDUSER_SCOPE = 'enduser.scope';
+const TMP_SERVER_ADDRESS = 'server.address';
+const TMP_SERVER_PORT = 'server.port';
 const TMP_THREAD_ID = 'thread.id';
 const TMP_THREAD_NAME = 'thread.name';
 const TMP_CODE_FUNCTION = 'code.function';
@@ -176,6 +186,17 @@ const TMP_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
 export const SEMATTRS_AWS_LAMBDA_INVOKED_ARN = TMP_AWS_LAMBDA_INVOKED_ARN;
 
 /**
+ * The name of the connection pool; unique within the instrumented application.
+ */
+export const SEMATTRS_CLIENT_CONNECTION_POOL_NAME =
+  TMP_CLIENT_CONNECTION_POOL_NAME;
+
+/**
+ * The state of a connection in the pool.
+ */
+export const SEMATTRS_CLIENT_CONNECTION_STATE = TMP_CLIENT_CONNECTION_STATE;
+
+/**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  */
 export const SEMATTRS_DB_SYSTEM = TMP_DB_SYSTEM;
@@ -215,6 +236,27 @@ export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
  * Note: When setting this to an SQL keyword, it is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if the operation name is provided by the library being instrumented. If the SQL statement has an ambiguous operation, or performs more than one operation, this value may be omitted.
  */
 export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
+
+/**
+ * The name of a collection (table, container) within the database.
+ *
+ * Note: It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization. If the collection name is parsed from the query text, it SHOULD be the first collection name found in the query and it SHOULD match the value provided in the query text including any schema and database name prefix. For batch operations, if the individual operations are known to have the same collection name then that collection name SHOULD be used, otherwise db.collection.name SHOULD NOT be captured.
+ */
+export const SEMATTRS_DB_COLLECTION_NAME = TMP_DB_COLLECTION_NAME;
+
+/**
+ * The name of the database, fully qualified within the server address and port.
+ *
+ * Note: If a database system has multiple namespace components, they SHOULD be concatenated (potentially using database system specific conventions) from most general to most specific namespace component, and more specific namespaces SHOULD NOT be captured without the more general namespaces, to ensure that "startswith" queries for the more general namespaces will be valid. Semantic conventions for individual database systems SHOULD document what db.namespace means in the context of that system. It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
+ */
+export const SEMATTRS_DB_NAMESPACE = TMP_DB_NAMESPACE;
+
+/**
+ * The name of the operation or command being executed.
+ *
+ * Note: It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization. If the operation name is parsed from the query text, it SHOULD be the first operation name found in the query. For batch operations, if the individual operations are known to have the same operation name then that operation name SHOULD be used prepended by BATCH , otherwise db.operation.name SHOULD be BATCH or some other database system specific term if more applicable.
+ */
+export const SEMATTRS_DB_OPERATION_NAME = TMP_DB_OPERATION_NAME;
 
 /**
  * The Microsoft SQL Server [instance name](https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15) connecting to. This name is used to determine the port of a named instance.
@@ -290,6 +332,13 @@ export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
  * Note: It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
  */
 export const SEMATTRS_DB_SQL_TABLE = TMP_DB_SQL_TABLE;
+
+/**
+ * Describes a class of error the operation ended with.
+ *
+ * Note: The error.type SHOULD match the error code returned by the database or the client library, the canonical name of exception that occurred, or another low-cardinality error identifier.
+ */
+export const SEMATTRS_ERROR_TYPE = TMP_ERROR_TYPE;
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
@@ -461,6 +510,18 @@ export const SEMATTRS_NET_HOST_CARRIER_MNC = TMP_NET_HOST_CARRIER_MNC;
 export const SEMATTRS_NET_HOST_CARRIER_ICC = TMP_NET_HOST_CARRIER_ICC;
 
 /**
+ * Peer address of the database node where the operation was performed.
+ *
+ * Note: If a database operation involved multiple network calls (for example retries), the address of the last contacted node SHOULD be used.
+ */
+export const SEMATTRS_NETWORK_PEER_ADDRESS = TMP_NETWORK_PEER_ADDRESS;
+
+/**
+ * Peer port number of the network connection.
+ */
+export const SEMATTRS_NETWORK_PEER_PORT = TMP_NETWORK_PEER_PORT;
+
+/**
  * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
  */
 export const SEMATTRS_PEER_SERVICE = TMP_PEER_SERVICE;
@@ -479,6 +540,20 @@ export const SEMATTRS_ENDUSER_ROLE = TMP_ENDUSER_ROLE;
  * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
  */
 export const SEMATTRS_ENDUSER_SCOPE = TMP_ENDUSER_SCOPE;
+
+/**
+ * Name of the database host.
+ *
+ * Note: When observed from the client side, and when communicating through an intermediary, server.address SHOULD represent the server address behind any intermediaries, for example proxies, if it's available.
+ */
+export const SEMATTRS_SERVER_ADDRESS = TMP_SERVER_ADDRESS;
+
+/**
+ * Server port number.
+ *
+ * Note: When observed from the client side, and when communicating through an intermediary, server.port SHOULD represent the server port behind any intermediaries, for example proxies, if it's available.
+ */
+export const SEMATTRS_SERVER_PORT = TMP_SERVER_PORT;
 
 /**
  * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
