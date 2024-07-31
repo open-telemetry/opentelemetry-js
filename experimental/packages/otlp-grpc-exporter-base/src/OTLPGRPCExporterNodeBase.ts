@@ -28,7 +28,7 @@ import {
 } from './grpc-exporter-transport';
 import { configureCompression, configureCredentials } from './util';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { IExporterTransport } from './exporter-transport';
+import { IExporterTransport } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Exporter abstract base class

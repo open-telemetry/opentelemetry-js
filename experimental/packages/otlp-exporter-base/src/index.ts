@@ -31,3 +31,12 @@ export {
   configureExporterTimeout,
   invalidTimeout,
 } from './util';
+
+export {
+  ExportResponse,
+  ExportResponseFailure,
+  ExportResponseSuccess,
+  ExportResponseRetryable,
+} from './export-response';
+
+export { IExporterTransport } from './exporter-transport';

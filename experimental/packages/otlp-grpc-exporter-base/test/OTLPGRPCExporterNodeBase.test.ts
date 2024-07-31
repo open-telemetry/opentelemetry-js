@@ -19,8 +19,11 @@ import * as assert from 'assert';
 import { OTLPGRPCExporterNodeBase } from '../src/OTLPGRPCExporterNodeBase';
 import { OTLPGRPCExporterConfigNode } from '../src/types';
 import { mockedReadableSpan } from './traceHelper';
-import { ExportResponse, ExportResponseSuccess } from '../src/export-response';
-import { IExporterTransport } from '../src/exporter-transport';
+import {
+  ExportResponse,
+  ExportResponseSuccess,
+  IExporterTransport,
+} from '@opentelemetry/otlp-exporter-base';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import sinon = require('sinon');
 
