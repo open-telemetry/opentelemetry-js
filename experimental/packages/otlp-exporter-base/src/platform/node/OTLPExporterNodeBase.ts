@@ -14,46 +14,71 @@
  * limitations under the License.
  */
 
-import type * as http from 'http';
-import type * as https from 'https';
-
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
-import * as otlpTypes from '../../types';
-import { parseHeaders } from '../../util';
-import { createHttpAgent, sendWithHttp, configureCompression } from './util';
+import { OTLPExporterNodeConfigBase } from './types';
+import { configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { ISerializer } from '@opentelemetry/otlp-transformer';
+import { IExporterTransport } from '../../exporter-transport';
+import { createHttpExporterTransport } from './http-exporter-transport';
+import { OTLPExporterError } from '../../types';
+import { createRetryingTransport } from '../../retryable-transport';
 
 /**
  * Collector Metric Exporter abstract base class
  */
 export abstract class OTLPExporterNodeBase<
   ExportItem,
-  ServiceRequest,
-> extends OTLPExporterBase<
-  OTLPExporterNodeConfigBase,
-  ExportItem,
-  ServiceRequest
-> {
-  DEFAULT_HEADERS: Record<string, string> = {};
-  headers: Record<string, string>;
-  agent: http.Agent | https.Agent | undefined;
-  compression: CompressionAlgorithm;
+  ServiceResponse,
+> extends OTLPExporterBase<OTLPExporterNodeConfigBase, ExportItem> {
+  private _serializer: ISerializer<ExportItem[], ServiceResponse>;
+  private _transport: IExporterTransport;
 
-  constructor(config: OTLPExporterNodeConfigBase = {}) {
+  constructor(
+    config: OTLPExporterNodeConfigBase = {},
+    serializer: ISerializer<ExportItem[], ServiceResponse>,
+    signalSpecificHeaders: Record<string, string>
+  ) {
     super(config);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    this.headers = Object.assign(
-      this.DEFAULT_HEADERS,
-      parseHeaders(config.headers),
-      baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
+    this._serializer = serializer;
+
+    // populate keepAlive for use with new settings
+    if (config?.keepAlive != null) {
+      if (config.httpAgentOptions != null) {
+        if (config.httpAgentOptions.keepAlive == null) {
+          // specific setting is not set, populate with non-specific setting.
+          config.httpAgentOptions.keepAlive = config.keepAlive;
+        }
+        // do nothing, use specific setting otherwise
+      } else {
+        // populate specific option if AgentOptions does not exist.
+        config.httpAgentOptions = {
+          keepAlive: config.keepAlive,
+        };
+      }
+    }
+    const nonSignalSpecificHeaders = baggageUtils.parseKeyPairsIntoRecord(
+      getEnv().OTEL_EXPORTER_OTLP_HEADERS
     );
-    this.agent = createHttpAgent(config);
-    this.compression = configureCompression(config.compression);
+
+    this._transport = createRetryingTransport({
+      transport: createHttpExporterTransport({
+        agentOptions: config.httpAgentOptions ?? { keepAlive: true },
+        compression: configureCompression(config.compression),
+        headers: Object.assign(
+          {},
+          nonSignalSpecificHeaders,
+          signalSpecificHeaders
+        ),
+        url: this.url,
+        timeoutMillis: this.timeoutMillis,
+      }),
+    });
   }
 
   onInit(_config: OTLPExporterNodeConfigBase): void {}
@@ -61,23 +86,30 @@ export abstract class OTLPExporterNodeBase<
   send(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: otlpTypes.OTLPExporterError) => void
+    onError: (error: OTLPExporterError) => void
   ): void {
     if (this._shutdownOnce.isCalled) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
-    const serviceRequest = this.convert(objects);
 
-    const promise = new Promise<void>((resolve, reject) => {
-      sendWithHttp(
-        this,
-        JSON.stringify(serviceRequest),
-        'application/json',
-        resolve,
-        reject
-      );
-    }).then(onSuccess, onError);
+    const data = this._serializer.serializeRequest(objects);
+
+    if (data == null) {
+      onError(new Error('Could not serialize message'));
+      return;
+    }
+
+    const promise = this._transport.send(data).then(response => {
+      if (response.status === 'success') {
+        onSuccess();
+        return;
+      }
+      if (response.status === 'failure' && response.error) {
+        onError(response.error);
+      }
+      onError(new OTLPExporterError('Export failed with unknown error'));
+    }, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {

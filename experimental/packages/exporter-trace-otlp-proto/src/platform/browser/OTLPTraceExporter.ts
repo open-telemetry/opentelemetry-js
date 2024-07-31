@@ -15,19 +15,13 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 import {
   OTLPExporterConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
+  OTLPExporterBrowserBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  OTLPProtoExporterBrowserBase,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
-import {
-  createExportTraceServiceRequest,
-  IExportTraceServiceRequest,
+  IExportTraceServiceResponse,
+  ProtobufTraceSerializer,
 } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
@@ -37,36 +31,18 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURC
  * Collector Trace Exporter for Web
  */
 export class OTLPTraceExporter
-  extends OTLPProtoExporterBrowserBase<ReadableSpan, IExportTraceServiceRequest>
+  extends OTLPExporterBrowserBase<ReadableSpan, IExportTraceServiceResponse>
   implements SpanExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config);
-    this._headers = Object.assign(
-      this._headers,
-      baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
-      )
-    );
-  }
-  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans);
+    super(config, ProtobufTraceSerializer, 'application/x-protobuf');
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
-  }
+    if (typeof config.url === 'string') {
+      return config.url;
+    }
 
-  getServiceClientType() {
-    return ServiceClientType.SPANS;
+    return DEFAULT_COLLECTOR_URL;
   }
 }

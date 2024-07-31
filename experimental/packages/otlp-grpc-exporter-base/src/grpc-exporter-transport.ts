@@ -22,8 +22,10 @@ import type {
   ChannelCredentials,
   Client,
 } from '@grpc/grpc-js';
-import { ExportResponse } from './export-response';
-import { IExporterTransport } from './exporter-transport';
+import {
+  ExportResponse,
+  IExporterTransport,
+} from '@opentelemetry/otlp-exporter-base';
 
 // values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;

@@ -59,6 +59,7 @@ import { env } from 'process';
 import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExporter';
 import {
   envDetector,
+  envDetectorSync,
   processDetector,
   hostDetector,
   Resource,
@@ -325,6 +326,22 @@ describe('Node SDK', () => {
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
     });
+
+    it('should register a context manager if only a context manager is provided', async () => {
+      // arrange
+      const expectedContextManager = new AsyncHooksContextManager();
+      const sdk = new NodeSDK({
+        contextManager: expectedContextManager,
+      });
+
+      // act
+      sdk.start();
+
+      // assert
+      const actualContextManager = context['_getContextManager']();
+      assert.equal(actualContextManager, expectedContextManager);
+      await sdk.shutdown();
+    });
   });
 
   async function waitForNumberOfMetrics(
@@ -512,7 +529,7 @@ describe('Node SDK', () => {
       });
     });
 
-    describe('with a debug logger', () => {
+    describe('with a diag logger', () => {
       // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
       // Needed because of race condition with parallel detectors.
       const callArgsContains = (
@@ -564,6 +581,53 @@ describe('Node SDK', () => {
           )
         );
         await sdk.shutdown();
+      });
+
+      describe('with unknown OTEL_NODE_RESOURCE_DETECTORS value', () => {
+        before(() => {
+          process.env.OTEL_NODE_RESOURCE_DETECTORS = 'env,os,no-such-detector';
+        });
+
+        after(() => {
+          delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
+        });
+
+        // 1. If not auto-detecting resources, then NodeSDK should not
+        //    complain about `OTEL_NODE_RESOURCE_DETECTORS` values.
+        // 2. If given resourceDetectors, then NodeSDK should not complain
+        //    about `OTEL_NODE_RESOURCE_DETECTORS` values.
+        //
+        // Practically, these tests help ensure that there is no spurious
+        // diag error message when using OTEL_NODE_RESOURCE_DETECTORS with
+        // @opentelemetry/auto-instrumentations-node, which supports more values
+        // than this package (e.g. 'gcp').
+        it('does not diag.warn when not using the envvar', async () => {
+          const diagMocks = {
+            error: Sinon.fake(),
+            warn: Sinon.fake(),
+            info: Sinon.fake(),
+            debug: Sinon.fake(),
+            verbose: Sinon.fake(),
+          };
+          diag.setLogger(diagMocks, DiagLogLevel.DEBUG);
+
+          const sdk1 = new NodeSDK({
+            autoDetectResources: false,
+          });
+          sdk1.start();
+          await sdk1.shutdown();
+
+          const sdk2 = new NodeSDK({
+            resourceDetectors: [envDetectorSync],
+          });
+          sdk2.start();
+          await sdk2.shutdown();
+
+          assert.ok(
+            !callArgsMatches(diagMocks.error, /no-such-detector/),
+            'diag.error() messages do not mention "no-such-detector"'
+          );
+        });
       });
 
       describe('with a faulty environment variable', () => {

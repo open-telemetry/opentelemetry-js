@@ -195,7 +195,10 @@ describe('OTLPTraceExporter - web', () => {
           assert.strictEqual(request.url, 'http://foo.bar.com');
 
           const body = request.requestBody;
-          const json = JSON.parse(body) as IExportTraceServiceRequest;
+          const decoder = new TextDecoder();
+          const json = JSON.parse(
+            decoder.decode(body)
+          ) as IExportTraceServiceRequest;
           const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
@@ -484,102 +487,6 @@ describe('OTLPTraceExporter - browser (getDefaultUrl)', () => {
       assert.strictEqual(collectorExporter['url'], url);
       done();
     });
-  });
-});
-
-describe('when configuring via environment', () => {
-  const envSource = window as any;
-  it('should use url defined in env that ends with root path and append version and signal path', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/traces`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use url defined in env without checking if path is already present', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/traces';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use url defined in env and append version and signal', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should add root path when signal url defined in env contains no path and no root path', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}/`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains root path but no path', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains path', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains path and ends in /', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should use headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-    const collectorExporter = new OTLPTraceExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'bar');
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-  it('should override global headers config with signal headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
-    const collectorExporter = new OTLPTraceExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'boo');
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.bar, 'foo');
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });
 
