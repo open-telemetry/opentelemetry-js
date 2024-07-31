@@ -14,6 +14,8 @@ All notable changes to experimental packages in this project will be documented 
   * (user-facing) `hostname` was intended for use in tests and is not used by any exporters, it will be removed in a future release
 * fix(exporter-*-otlp-*)!: ensure `User-Agent` header cannot be overwritten by the user [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
   * allowing overrides of the `User-Agent` header was not specification compliant.
+* feat(exporter-*-otlp*)!: remove environment-variable specific code from browser exporters
+  * (user-facing) removes the ability to configure browser exporters by using `process.env` polyfills
 
 ### :rocket: (Enhancement)
 
