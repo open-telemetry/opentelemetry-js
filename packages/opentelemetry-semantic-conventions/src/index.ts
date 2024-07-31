@@ -14,5 +14,8 @@
  * limitations under the License.
  */
 
+/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
+ * TODO: Replace export * with named exports before next major version
+ */
 export * from './trace';
 export * from './resource';

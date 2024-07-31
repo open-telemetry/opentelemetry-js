@@ -13,4 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
+ * TODO: Replace export * with named exports before next major version
+ */
 export * from './SemanticResourceAttributes';
