@@ -97,7 +97,6 @@ export abstract class OTLPGRPCExporterNodeBase<
       grpcName: grpcName,
       grpcPath: grpcPath,
       metadata: metadataProvider,
-      timeoutMillis: this.timeoutMillis,
     });
   }
 
@@ -126,16 +125,18 @@ export abstract class OTLPGRPCExporterNodeBase<
       return;
     }
 
-    const promise = this._transport.send(data).then(response => {
-      if (response.status === 'success') {
-        onSuccess();
-        return;
-      }
-      if (response.status === 'failure' && response.error) {
-        onError(response.error);
-      }
-      onError(new OTLPExporterError('Export failed with unknown error'));
-    }, onError);
+    const promise = this._transport
+      .send(data, this.timeoutMillis)
+      .then(response => {
+        if (response.status === 'success') {
+          onSuccess();
+          return;
+        }
+        if (response.status === 'failure' && response.error) {
+          onError(response.error);
+        }
+        onError(new OTLPExporterError('Export failed with unknown error'));
+      }, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {
