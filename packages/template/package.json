@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.22.0",
+  "version": "1.25.1",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -32,12 +32,13 @@
     "clean": "tsc --build --clean",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
   "Add these to scripts": {
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc mocha test/**/*.test.ts",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -89,8 +90,7 @@
     "codecov": "3.8.3",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "sinon": "15.0.0",
-    "ts-mocha": "10.0.0"
+    "sinon": "15.0.0"
   },
   "Add these to devDependencies if browser is targeted": {
     "@types/webpack-env": "1.16.0",

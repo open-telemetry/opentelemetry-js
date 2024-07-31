@@ -53,10 +53,15 @@ import {
 } from '@opentelemetry/api';
 import {
   InstrumentationNodeModuleDefinition,
-  isWrapped,
   InstrumentationBase,
 } from '@opentelemetry/instrumentation';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_NET_PEER_NAME,
+  SEMATTRS_NET_PEER_PORT,
+  SEMATTRS_RPC_METHOD,
+  SEMATTRS_RPC_SERVICE,
+  SEMATTRS_RPC_SYSTEM,
+} from '@opentelemetry/semantic-conventions';
 
 import {
   shouldNotTraceServerCall,
@@ -82,24 +87,20 @@ import {
 import { AttributeValues } from './enums/AttributeValues';
 import { VERSION } from './version';
 
-export class GrpcInstrumentation extends InstrumentationBase {
+export class GrpcInstrumentation extends InstrumentationBase<GrpcInstrumentationConfig> {
   private _metadataCapture: metadataCaptureType;
 
-  constructor(config?: GrpcInstrumentationConfig) {
+  constructor(config: GrpcInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-grpc', VERSION, config);
     this._metadataCapture = this._createMetadataCapture();
   }
 
   init() {
     return [
-      new InstrumentationNodeModuleDefinition<any>(
+      new InstrumentationNodeModuleDefinition(
         '@grpc/grpc-js',
-        ['1.*'],
-        (moduleExports, version) => {
-          this._diag.debug(`Applying patch for @grpc/grpc-js@${version}`);
-          if (isWrapped(moduleExports.Server.prototype.register)) {
-            this._unwrap(moduleExports.Server.prototype, 'register');
-          }
+        ['^1.0.0'],
+        moduleExports => {
           // Patch Server methods
           this._wrap(
             moduleExports.Server.prototype,
@@ -107,45 +108,21 @@ export class GrpcInstrumentation extends InstrumentationBase {
             this._patchServer()
           );
           // Patch Client methods
-          if (isWrapped(moduleExports.makeGenericClientConstructor)) {
-            this._unwrap(moduleExports, 'makeGenericClientConstructor');
-          }
           this._wrap(
             moduleExports,
             'makeGenericClientConstructor',
             this._patchClient(moduleExports)
           );
-          if (isWrapped(moduleExports.makeClientConstructor)) {
-            this._unwrap(moduleExports, 'makeClientConstructor');
-          }
           this._wrap(
             moduleExports,
             'makeClientConstructor',
             this._patchClient(moduleExports)
           );
-          if (isWrapped(moduleExports.loadPackageDefinition)) {
-            this._unwrap(moduleExports, 'loadPackageDefinition');
-          }
           this._wrap(
             moduleExports,
             'loadPackageDefinition',
             this._patchLoadPackageDefinition(moduleExports)
           );
-          if (isWrapped(moduleExports.Client.prototype)) {
-            this._unwrap(moduleExports.Client.prototype, 'makeUnaryRequest');
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeClientStreamRequest'
-            );
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeServerStreamRequest'
-            );
-            this._unwrap(
-              moduleExports.Client.prototype,
-              'makeBidiStreamRequest'
-            );
-          }
           this._wrap(
             moduleExports.Client.prototype,
             'makeUnaryRequest',
@@ -168,9 +145,8 @@ export class GrpcInstrumentation extends InstrumentationBase {
           );
           return moduleExports;
         },
-        (moduleExports, version) => {
+        moduleExports => {
           if (moduleExports === undefined) return;
-          this._diag.debug(`Removing patch for @grpc/grpc-js@${version}`);
 
           this._unwrap(moduleExports.Server.prototype, 'register');
           this._unwrap(moduleExports, 'makeClientConstructor');
@@ -191,16 +167,7 @@ export class GrpcInstrumentation extends InstrumentationBase {
     ];
   }
 
-  /**
-   * @internal
-   * Public reference to the protected BaseInstrumentation `_config` instance to be used by this
-   * plugin's external helper functions
-   */
-  override getConfig(): GrpcInstrumentationConfig {
-    return super.getConfig();
-  }
-
-  override setConfig(config?: GrpcInstrumentationConfig): void {
+  override setConfig(config: GrpcInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._metadataCapture = this._createMetadataCapture();
   }
@@ -274,10 +241,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [SemanticAttributes.RPC_SYSTEM]:
-                        AttributeValues.RPC_SYSTEM,
-                      [SemanticAttributes.RPC_METHOD]: method,
-                      [SemanticAttributes.RPC_SERVICE]: service,
+                      [SEMATTRS_RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
+                      [SEMATTRS_RPC_METHOD]: method,
+                      [SEMATTRS_RPC_SERVICE]: service,
                     });
 
                   instrumentation._metadataCapture.server.captureRequestMetadata(
@@ -469,9 +435,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
         const span = instrumentation.tracer
           .startSpan(name, { kind: SpanKind.CLIENT })
           .setAttributes({
-            [SemanticAttributes.RPC_SYSTEM]: 'grpc',
-            [SemanticAttributes.RPC_METHOD]: method,
-            [SemanticAttributes.RPC_SERVICE]: service,
+            [SEMATTRS_RPC_SYSTEM]: 'grpc',
+            [SEMATTRS_RPC_METHOD]: method,
+            [SEMATTRS_RPC_SERVICE]: service,
           });
         instrumentation.extractNetMetadata(this, span);
 
@@ -514,9 +480,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
     const span = this.tracer
       .startSpan(name, { kind: SpanKind.CLIENT })
       .setAttributes({
-        [SemanticAttributes.RPC_SYSTEM]: 'grpc',
-        [SemanticAttributes.RPC_METHOD]: methodAttributeValue,
-        [SemanticAttributes.RPC_SERVICE]: service,
+        [SEMATTRS_RPC_SYSTEM]: 'grpc',
+        [SEMATTRS_RPC_METHOD]: methodAttributeValue,
+        [SEMATTRS_RPC_SERVICE]: service,
       });
 
     if (metadata != null) {
@@ -529,12 +495,9 @@ export class GrpcInstrumentation extends InstrumentationBase {
     // set net.peer.* from target (e.g., "dns:otel-productcatalogservice:8080") as a hint to APMs
     const parsedUri = URI_REGEX.exec(client.getChannel().getTarget());
     if (parsedUri != null && parsedUri.groups != null) {
+      span.setAttribute(SEMATTRS_NET_PEER_NAME, parsedUri.groups['name']);
       span.setAttribute(
-        SemanticAttributes.NET_PEER_NAME,
-        parsedUri.groups['name']
-      );
-      span.setAttribute(
-        SemanticAttributes.NET_PEER_PORT,
+        SEMATTRS_NET_PEER_PORT,
         parseInt(parsedUri.groups['port'])
       );
     }

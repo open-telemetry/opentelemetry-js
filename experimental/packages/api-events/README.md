@@ -28,18 +28,18 @@ If you are writing an instrumentation library, or prefer to call the API methods
 ```javascript
 const api = require("@opentelemetry/api-events");
 
-/* A specific implementation of EventEmitterProvider comes from an SDK */
-const eventEmitterProvider = createEventEmitterProvider();
+/* A specific implementation of EventLoggerProvider comes from an SDK */
+const eventLoggerProvider = createEventLoggerProvider();
 
-/* Initialize EventEmitterProvider */
-api.events.setGlobalEventEmitterProvider(eventEmitterProvider);
-/* returns eventEmitterProvider (no-op if a working provider has not been initialized) */
-api.events.getEventEmitterProvider();
-/* returns an event emitter from the registered global event emitter provider (no-op if a working provider has not been initialized) */
-const eventEmitter = api.events.getEventEmitter(name, version);
+/* Initialize EventLoggerProvider */
+api.events.setGlobalEventLoggerProvider(eventLoggerProvider);
+/* returns eventLoggerProvider (no-op if a working provider has not been initialized) */
+api.events.getEventLoggerProvider();
+/* returns an event logger from the registered global event logger provider (no-op if a working provider has not been initialized) */
+const eventLogger = api.events.getEventLogger(name, version);
 
 // logging an event in an instrumentation library
-eventEmitter.emit({ name: 'event-name', domain: 'event-domain' });
+eventLogger.emit({ name: 'event-name' });
 ```
 
 ## Useful links
@@ -57,4 +57,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/api-logs
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fapi-logs.svg
-[logs-api-docs]: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_api_logs.html
+[events-api-docs]: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_api_events.html

@@ -26,7 +26,10 @@ import {
   timeInputToHrTime,
   urlMatches,
 } from '@opentelemetry/core';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+} from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
@@ -56,17 +59,30 @@ export function hasKey<O extends object>(
  * @param span
  * @param performanceName name of performance entry for time start
  * @param entries
+ * @param refPerfName name of performance entry to use for reference
  */
 export function addSpanNetworkEvent(
   span: api.Span,
   performanceName: string,
-  entries: PerformanceEntries
+  entries: PerformanceEntries,
+  refPerfName?: string
 ): api.Span | undefined {
+  let perfTime = undefined;
+  let refTime = undefined;
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
   ) {
-    span.addEvent(performanceName, entries[performanceName]);
+    perfTime = entries[performanceName];
+  }
+  const refName = refPerfName || PTN.FETCH_START;
+  // Use a reference time which is the earliest possible value so that the performance timings that are earlier should not be added
+  // using FETCH START time in case no reference is provided
+  if (hasKey(entries, refName) && typeof entries[refName] === 'number') {
+    refTime = entries[refName];
+  }
+  if (perfTime !== undefined && refTime !== undefined && perfTime >= refTime) {
+    span.addEvent(performanceName, perfTime);
     return span;
   }
   return undefined;
@@ -97,16 +113,13 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
   const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
   if (encodedLength !== undefined) {
-    span.setAttribute(
-      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
-      encodedLength
-    );
+    span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
   }
   const decodedLength = resource[PTN.DECODED_BODY_SIZE];
   // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
   if (decodedLength !== undefined && encodedLength !== decodedLength) {
     span.setAttribute(
-      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
       decodedLength
     );
   }

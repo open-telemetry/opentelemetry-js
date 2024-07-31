@@ -8,18 +8,18 @@ OpenTelemetry Jaeger propagator provides HTTP header propagation for systems tha
 Format:
 {trace-id}:{span-id}:{parent-span-id}:{flags}
 
-* {trace-id}
-  * 64-bit or 128-bit random number in base16 format.
-  * Can be variable length, shorter values are 0-padded on the left.
-  * Value of 0 is invalid.
+- {trace-id}
+  - 64-bit or 128-bit random number in base16 format.
+  - Can be variable length, shorter values are 0-padded on the left.
+  - Value of 0 is invalid.
 
-* {span-id}
-  * 64-bit random number in base16 format.
+- {span-id}
+  - 64-bit random number in base16 format.
 
-* {parent-span-id}
-  * Set to 0 because this field is deprecated.
-* {flags}
-  * One byte bitmap, as two hex digits.
+- {parent-span-id}
+  - Set to 0 because this field is deprecated.
+- {flags}
+  - One byte bitmap, as two hex digits.
 
 Example of usage:
 
@@ -43,9 +43,9 @@ Jeager Baggage is represented as multiple headers where the names are carrier de
 
 ## Useful links
 
-* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-* For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 

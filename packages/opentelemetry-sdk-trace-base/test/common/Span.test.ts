@@ -34,7 +34,11 @@ import {
   hrTimeToNanoseconds,
   otperformance as performance,
 } from '@opentelemetry/core';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_EXCEPTION_MESSAGE,
+  SEMATTRS_EXCEPTION_STACKTRACE,
+  SEMATTRS_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
@@ -771,30 +775,6 @@ describe('Span', () => {
     });
   });
 
-  it('should set a link', () => {
-    const spanContext: SpanContext = {
-      traceId: 'a3cda95b652f4a1592b449d5929fda1b',
-      spanId: '5e0c63257de34c92',
-      traceFlags: TraceFlags.SAMPLED,
-    };
-    const linkContext: SpanContext = {
-      traceId: 'b3cda95b652f4a1592b449d5929fda1b',
-      spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.SAMPLED,
-    };
-    const attributes = { attr1: 'value', attr2: 123, attr3: true };
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
-      spanContext,
-      SpanKind.CLIENT,
-      '12345',
-      [{ context: linkContext }, { context: linkContext, attributes }]
-    );
-    span.end();
-  });
-
   it('should drop extra events', () => {
     const span = new Span(
       tracer,
@@ -957,6 +937,58 @@ describe('Span', () => {
     ]);
 
     span.end();
+  });
+
+  it('should be possible to add a link after span creation', () => {
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.CONSUMER
+    );
+
+    span.addLink({ context: linkContext });
+
+    span.end();
+
+    assert.strictEqual(span.links.length, 1);
+    assert.deepStrictEqual(span.links, [
+      {
+        context: linkContext,
+      },
+    ]);
+  });
+
+  it('should be possible to add multiple links after span creation', () => {
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.CONSUMER
+    );
+
+    span.addLinks([
+      { context: linkContext },
+      {
+        context: linkContext,
+        attributes: { attr1: 'value', attr2: 123, attr3: true },
+      },
+    ]);
+
+    span.end();
+
+    assert.strictEqual(span.links.length, 2);
+    assert.deepStrictEqual(span.links, [
+      {
+        context: linkContext,
+      },
+      {
+        attributes: { attr1: 'value', attr2: 123, attr3: true },
+        context: linkContext,
+      },
+    ]);
   });
 
   it('should return ReadableSpan with events', () => {
@@ -1222,11 +1254,10 @@ describe('Span', () => {
 
           assert.ok(event.attributes);
 
-          const type = event.attributes[SemanticAttributes.EXCEPTION_TYPE];
-          const message =
-            event.attributes[SemanticAttributes.EXCEPTION_MESSAGE];
+          const type = event.attributes[SEMATTRS_EXCEPTION_TYPE];
+          const message = event.attributes[SEMATTRS_EXCEPTION_MESSAGE];
           const stacktrace = String(
-            event.attributes[SemanticAttributes.EXCEPTION_STACKTRACE]
+            event.attributes[SEMATTRS_EXCEPTION_STACKTRACE]
           );
           assert.strictEqual(type, 'Error');
           assert.strictEqual(message, 'boom');
@@ -1266,7 +1297,7 @@ describe('Span', () => {
         span.recordException({ code: 12 });
         const event = span.events[0];
         assert.deepStrictEqual(event.attributes, {
-          [SemanticAttributes.EXCEPTION_TYPE]: '12',
+          [SEMATTRS_EXCEPTION_TYPE]: '12',
         });
       });
     });

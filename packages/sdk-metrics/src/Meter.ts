@@ -32,6 +32,7 @@ import {
 } from './InstrumentDescriptor';
 import {
   CounterInstrument,
+  GaugeInstrument,
   HistogramInstrument,
   ObservableCounterInstrument,
   ObservableGaugeInstrument,
@@ -39,12 +40,26 @@ import {
   UpDownCounterInstrument,
 } from './Instruments';
 import { MeterSharedState } from './state/MeterSharedState';
+import { Gauge } from './types';
 
 /**
  * This class implements the {@link IMeter} interface.
  */
 export class Meter implements IMeter {
   constructor(private _meterSharedState: MeterSharedState) {}
+
+  /**
+   * Create a {@link Gauge} instrument.
+   */
+  createGauge(name: string, options?: MetricOptions): Gauge {
+    const descriptor = createInstrumentDescriptor(
+      name,
+      InstrumentType.GAUGE,
+      options
+    );
+    const storage = this._meterSharedState.registerMetricStorage(descriptor);
+    return new GaugeInstrument(storage, descriptor);
+  }
 
   /**
    * Create a {@link Histogram} instrument.

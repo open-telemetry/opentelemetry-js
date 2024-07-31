@@ -36,7 +36,7 @@ export class MyInstrumentation extends InstrumentationBase {
    *   the plugin should patch multiple modules or versions.
    */
   protected init() {
-    const module = new InstrumentationNodeModuleDefinition<typeof module_name_to_be_patched>(
+    const module = new InstrumentationNodeModuleDefinition(
       'module_name_to_be_patched',
       ['1.*'],
        this._onPatchMain,
@@ -63,8 +63,8 @@ export class MyInstrumentation extends InstrumentationBase {
     this._unwrap(moduleExports, 'mainMethodName');
   }
 
-  private _addPatchingMethod(): InstrumentationNodeModuleFile<typeof module_name_to_be_patched> {
-    const file = new InstrumentationNodeModuleFile<typeof module_name_to_be_patched>(
+  private _addPatchingMethod(): InstrumentationNodeModuleFile {
+    const file = new InstrumentationNodeModuleFile(
       'module_name_to_be_patched/src/some_file.js',
       this._onPatchMethodName,
       this._onUnPatchMethodName,
@@ -216,13 +216,13 @@ registerInstrumentations({
 The `registerInstrumentations()` API allows to specify which `TracerProvider` and/or `MeterProvider` to use by the given options object.
 If nothing is specified the global registered provider is used. Usually this is what most users want therefore it's recommended to keep this default.
 
-There might be usecase where someone has the need for more providers within an application. Please note that special care must be takes in such setups
+There might be use case where someone has the need for more providers within an application. Please note that special care must be takes in such setups
 to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
-## Instrumentation for ES Modules In NodeJS (experimental)
+## Instrumentation for ES Modules In Node.js (experimental)
 
-As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the esm module it want to patch. To do so, you must provide the `--experimental-loader=@opentelemetry/instrumentation/hook.mjs` flag to the `node` binary. Alternatively you can set the `NODE_OPTIONS` environment variable to `NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs"`.
-As the ESM module loader from NodeJS is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
+As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the ESM module it want to patch. To do so, you must provide the `--experimental-loader=@opentelemetry/instrumentation/hook.mjs` flag to the `node` binary. Alternatively you can set the `NODE_OPTIONS` environment variable to `NODE_OPTIONS="--experimental-loader=@opentelemetry/instrumentation/hook.mjs"`.
+As the ESM module loader from Node.js is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
 
 **Note**: ESM Instrumentation is not yet supported for Node 20.
 
@@ -230,8 +230,8 @@ As the ESM module loader from NodeJS is experimental, so is our support for it. 
 
 Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call or `import` statement. Therefore following conditions need to be met that this mechanism can work:
 
-* Instrumentations are registered **before** the module to instrument is `require`ed (CJS only)
-* modules are not included in a bundle. Tools like `esbuild`, `webpack`, ... usually have some mechanism to exclude specific modules from bundling
+- Instrumentations are registered **before** the module to instrument is `require`ed (CJS only)
+- modules are not included in a bundle. Tools like `esbuild`, `webpack`, ... usually have some mechanism to exclude specific modules from bundling
 
 ## License
 
@@ -239,8 +239,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 ## Useful links
 
-* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE

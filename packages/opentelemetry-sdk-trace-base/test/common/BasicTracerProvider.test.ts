@@ -61,7 +61,7 @@ describe('BasicTracerProvider', () => {
   let envSource: Record<string, any>;
   let setGlobalPropagatorStub: sinon.SinonSpy<[TextMapPropagator], boolean>;
 
-  if (typeof process === 'undefined') {
+  if (global.process?.versions?.node === undefined) {
     envSource = globalThis as unknown as Record<string, any>;
   } else {
     envSource = process.env as Record<string, any>;
@@ -247,7 +247,7 @@ describe('BasicTracerProvider', () => {
           delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
           delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
         });
-        it('should have span attribute value length limit as deafult of Infinity', () => {
+        it('should have span attribute value length limit as default of Infinity', () => {
           envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
           envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
           const tracer = new BasicTracerProvider().getTracer('default');

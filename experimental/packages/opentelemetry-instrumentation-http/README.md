@@ -16,6 +16,10 @@ For automatic instrumentation see the
 npm install --save @opentelemetry/instrumentation-http
 ```
 
+## Supported Versions
+
+- Nodejs `>=14`
+
 ## Usage
 
 OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
@@ -57,6 +61,8 @@ Http instrumentation has few options available to choose from. You can set the f
 | [`startOutgoingSpanHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L99) | `StartOutgoingSpanCustomAttributeFunction` | Function for adding custom attributes before a span is started in outgoingRequest |
 | `ignoreIncomingRequestHook` | `IgnoreIncomingRequestFunction` | Http instrumentation will not trace all incoming requests that matched with custom function |
 | `ignoreOutgoingRequestHook` | `IgnoreOutgoingRequestFunction` | Http instrumentation will not trace all outgoing requests that matched with custom function |
+| `disableOutgoingRequestInstrumentation` | `boolean` | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests. |
+| `disableIncomingRequestInstrumentation` | `boolean` | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests. |
 | [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L101) | `string` | The primary server name of the matched virtual host. |
 | [`requireParentforOutgoingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L103) | Boolean | Require that is a parent span to create new span for outgoing requests. |
 | [`requireParentforIncomingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L105) | Boolean | Require that is a parent span to create new span for incoming requests. |
@@ -67,7 +73,39 @@ The following options are deprecated:
 | Options | Type | Description |
 | ------- | ---- | ----------- |
 | `ignoreIncomingPaths` | `IgnoreMatcher[]` | Http instrumentation will not trace all incoming requests that match paths |
-| `ignoreOutgoingUrls` | `IgnoreMatcher[]` | Http instrumentation will not trace all outgoing requests that match urls |
+
+## Semantic Conventions
+
+This package uses `@opentelemetry/semantic-conventions` version `1.22+`, which implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md)
+
+Attributes collected:
+
+| Attribute                                   | Short Description                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| `ip_tcp`                                    | Transport protocol used                                                        |
+| `ip_udp`                                    | Transport protocol used                                                        |
+| `http.client_ip`                            | The IP address of the original client behind all proxies, if known             |
+| `http.flavor`                               | Kind of HTTP protocol used                                                     |
+| `http.host`                                 | The value of the HTTP host header                                              |
+| `http.method`                               | HTTP request method                                                            |
+| `http.request_content_length`               | The size of the request payload body in bytes                                  |
+| `http.request_content_length_uncompressed`  | The size of the uncompressed request payload body after transport decoding     |
+| `http.response_content_length`              | The size of the response payload body in bytes                                 |
+| `http.response_content_length_uncompressed` | The size of the uncompressed response payload body after transport decoding    |
+| `http.route`                                | The matched route (path template).                                             |
+| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
+| `http.server_name`                          | The primary server name of the matched virtual host                            |
+| `http.status_code`                          | HTTP response status code                                                      |
+| `http.target`                               | The full request target as passed in a HTTP request line or equivalent         |
+| `http.url`                                  | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]` |
+| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
+| `net.host.ip`                               | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host        |
+| `net.host.name`                             | Local hostname or similar                                                      |
+| `net.host.port`                             | Like net.peer.port but for the host port                                       |
+| `net.peer.ip.`                              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)       |
+| `net.peer.name`                             | Remote hostname or similar                                                     |
+| `net.peer.port`                             | Remote port number                                                             |
+| `net.transport`                             | Transport protocol used                                                        |
 
 ## Useful links
 

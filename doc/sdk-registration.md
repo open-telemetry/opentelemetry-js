@@ -23,6 +23,7 @@ api.propagation.setGlobalPropagator(httpTraceContextPropagator);
 api.context.setGlobalContextManager(asyncHooksContextManager);
 ```
 
+[opentelemetry-js]: https://github.com/open-telemetry/opentelemetry-js
 [trace-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.TraceAPI.html
 [propagation-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.PropagationAPI.html
 [context-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.ContextAPI.html

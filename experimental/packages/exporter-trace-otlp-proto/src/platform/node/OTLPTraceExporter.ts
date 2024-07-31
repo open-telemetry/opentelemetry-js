@@ -20,14 +20,12 @@ import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
+  OTLPExporterNodeBase,
+  parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
 import {
-  OTLPProtoExporterNodeBase,
-  ServiceClientType,
-} from '@opentelemetry/otlp-proto-exporter-base';
-import {
-  createExportTraceServiceRequest,
-  IExportTraceServiceRequest,
+  IExportTraceServiceResponse,
+  ProtobufTraceSerializer,
 } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
 
@@ -41,39 +39,39 @@ const USER_AGENT = {
  * Collector Trace Exporter for Node with protobuf
  */
 export class OTLPTraceExporter
-  extends OTLPProtoExporterNodeBase<ReadableSpan, IExportTraceServiceRequest>
+  extends OTLPExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    super(config);
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
+    super(config, ProtobufTraceSerializer, {
       ...baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
       ),
-      ...config.headers,
-    };
-  }
-
-  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans);
+      ...parseHeaders(config?.headers),
+      ...USER_AGENT,
+      'Content-Type': 'application/x-protobuf',
+    });
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase) {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
-  }
+    if (typeof config.url === 'string') {
+      return config.url;
+    }
 
-  getServiceClientType() {
-    return ServiceClientType.SPANS;
+    const env = getEnv();
+    if (env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0) {
+      return appendRootPathToUrlIfNeeded(
+        env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      );
+    }
+
+    if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
+      return appendResourcePathToUrl(
+        env.OTEL_EXPORTER_OTLP_ENDPOINT,
+        DEFAULT_COLLECTOR_RESOURCE_PATH
+      );
+    }
+
+    return DEFAULT_COLLECTOR_URL;
   }
 }

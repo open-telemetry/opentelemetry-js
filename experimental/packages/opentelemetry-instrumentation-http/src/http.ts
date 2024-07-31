@@ -52,24 +52,23 @@ import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
-  isWrapped,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { errorMonitor } from 'events';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { SEMATTRS_HTTP_ROUTE } from '@opentelemetry/semantic-conventions';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
  */
-export class HttpInstrumentation extends InstrumentationBase<Http> {
+export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentationConfig> {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
   private _httpServerDurationHistogram!: Histogram;
   private _httpClientDurationHistogram!: Histogram;
 
-  constructor(config?: HttpInstrumentationConfig) {
+  constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
   }
@@ -93,106 +92,94 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     );
   }
 
-  private _getConfig(): HttpInstrumentationConfig {
-    return this._config;
-  }
-
-  override setConfig(config?: HttpInstrumentationConfig): void {
+  override setConfig(config: HttpInstrumentationConfig = {}): void {
     super.setConfig(config);
     this._headerCapture = this._createHeaderCapture();
   }
 
   init(): [
-    InstrumentationNodeModuleDefinition<Https>,
-    InstrumentationNodeModuleDefinition<Http>,
+    InstrumentationNodeModuleDefinition,
+    InstrumentationNodeModuleDefinition,
   ] {
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
   }
 
   private _getHttpInstrumentation() {
-    const version = process.versions.node;
-    return new InstrumentationNodeModuleDefinition<Http>(
+    return new InstrumentationNodeModuleDefinition(
       'http',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for http@${version}`);
-        if (isWrapped(moduleExports.request)) {
-          this._unwrap(moduleExports, 'request');
+      (moduleExports: Http): Http => {
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          const patchedRequest = this._wrap(
+            moduleExports,
+            'request',
+            this._getPatchOutgoingRequestFunction('http')
+          ) as unknown as Func<http.ClientRequest>;
+          this._wrap(
+            moduleExports,
+            'get',
+            this._getPatchOutgoingGetFunction(patchedRequest)
+          );
         }
-        this._wrap(
-          moduleExports,
-          'request',
-          this._getPatchOutgoingRequestFunction('http')
-        );
-        if (isWrapped(moduleExports.get)) {
-          this._unwrap(moduleExports, 'get');
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._wrap(
+            moduleExports.Server.prototype,
+            'emit',
+            this._getPatchIncomingRequestFunction('http')
+          );
         }
-        this._wrap(
-          moduleExports,
-          'get',
-          this._getPatchOutgoingGetFunction(moduleExports.request)
-        );
-        if (isWrapped(moduleExports.Server.prototype.emit)) {
-          this._unwrap(moduleExports.Server.prototype, 'emit');
-        }
-        this._wrap(
-          moduleExports.Server.prototype,
-          'emit',
-          this._getPatchIncomingRequestFunction('http')
-        );
         return moduleExports;
       },
-      moduleExports => {
+      (moduleExports: Http) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for http@${version}`);
 
-        this._unwrap(moduleExports, 'request');
-        this._unwrap(moduleExports, 'get');
-        this._unwrap(moduleExports.Server.prototype, 'emit');
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          this._unwrap(moduleExports, 'request');
+          this._unwrap(moduleExports, 'get');
+        }
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._unwrap(moduleExports.Server.prototype, 'emit');
+        }
       }
     );
   }
 
   private _getHttpsInstrumentation() {
-    const version = process.versions.node;
-    return new InstrumentationNodeModuleDefinition<Https>(
+    return new InstrumentationNodeModuleDefinition(
       'https',
       ['*'],
-      moduleExports => {
-        this._diag.debug(`Applying patch for https@${version}`);
-        if (isWrapped(moduleExports.request)) {
-          this._unwrap(moduleExports, 'request');
+      (moduleExports: Https): Https => {
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          const patchedRequest = this._wrap(
+            moduleExports,
+            'request',
+            this._getPatchHttpsOutgoingRequestFunction('https')
+          ) as unknown as Func<http.ClientRequest>;
+          this._wrap(
+            moduleExports,
+            'get',
+            this._getPatchHttpsOutgoingGetFunction(patchedRequest)
+          );
         }
-        this._wrap(
-          moduleExports,
-          'request',
-          this._getPatchHttpsOutgoingRequestFunction('https')
-        );
-        if (isWrapped(moduleExports.get)) {
-          this._unwrap(moduleExports, 'get');
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._wrap(
+            moduleExports.Server.prototype,
+            'emit',
+            this._getPatchIncomingRequestFunction('https')
+          );
         }
-        this._wrap(
-          moduleExports,
-          'get',
-          this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
-        );
-        if (isWrapped(moduleExports.Server.prototype.emit)) {
-          this._unwrap(moduleExports.Server.prototype, 'emit');
-        }
-        this._wrap(
-          moduleExports.Server.prototype,
-          'emit',
-          this._getPatchIncomingRequestFunction('https')
-        );
         return moduleExports;
       },
-      moduleExports => {
+      (moduleExports: Https) => {
         if (moduleExports === undefined) return;
-        this._diag.debug(`Removing patch for https@${version}`);
 
-        this._unwrap(moduleExports, 'request');
-        this._unwrap(moduleExports, 'get');
-        this._unwrap(moduleExports.Server.prototype, 'emit');
+        if (!this.getConfig().disableOutgoingRequestInstrumentation) {
+          this._unwrap(moduleExports, 'request');
+          this._unwrap(moduleExports, 'get');
+        }
+        if (!this.getConfig().disableIncomingRequestInstrumentation) {
+          this._unwrap(moduleExports.Server.prototype, 'emit');
+        }
       }
     );
   }
@@ -311,7 +298,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     startTime: HrTime,
     metricAttributes: MetricAttributes
   ): http.ClientRequest {
-    if (this._getConfig().requestHook) {
+    if (this.getConfig().requestHook) {
       this._callRequestHook(span, request);
     }
 
@@ -340,7 +327,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           utils.getOutgoingRequestMetricAttributesOnResponse(responseAttributes)
         );
 
-        if (this._getConfig().responseHook) {
+        if (this.getConfig().responseHook) {
           this._callResponseHook(span, response);
         }
 
@@ -375,10 +362,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
           span.setStatus(status);
 
-          if (this._getConfig().applyCustomAttributesOnSpan) {
+          if (this.getConfig().applyCustomAttributesOnSpan) {
             safeExecuteInTheMiddle(
               () =>
-                this._getConfig().applyCustomAttributesOnSpan!(
+                this.getConfig().applyCustomAttributesOnSpan!(
                   span,
                   request,
                   response
@@ -468,13 +455,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       if (
         utils.isIgnored(
           pathname,
-          instrumentation._getConfig().ignoreIncomingPaths,
+          instrumentation.getConfig().ignoreIncomingPaths,
           (e: unknown) =>
             instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
         ) ||
         safeExecuteInTheMiddle(
           () =>
-            instrumentation._getConfig().ignoreIncomingRequestHook?.(request),
+            instrumentation.getConfig().ignoreIncomingRequestHook?.(request),
           (e: unknown) => {
             if (e != null) {
               instrumentation._diag.error(
@@ -497,10 +484,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       const spanAttributes = utils.getIncomingRequestAttributes(request, {
         component: component,
-        serverName: instrumentation._getConfig().serverName,
+        serverName: instrumentation.getConfig().serverName,
         hookAttributes: instrumentation._callStartSpanHook(
           request,
-          instrumentation._getConfig().startIncomingSpanHook
+          instrumentation.getConfig().startIncomingSpanHook
         ),
       });
 
@@ -526,10 +513,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           context.bind(context.active(), request);
           context.bind(context.active(), response);
 
-          if (instrumentation._getConfig().requestHook) {
+          if (instrumentation.getConfig().requestHook) {
             instrumentation._callRequestHook(span, request);
           }
-          if (instrumentation._getConfig().responseHook) {
+          if (instrumentation.getConfig().responseHook) {
             instrumentation._callResponseHook(span, response);
           }
 
@@ -608,14 +595,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       if (
         utils.isIgnored(
           origin + pathname,
-          instrumentation._getConfig().ignoreOutgoingUrls,
+          instrumentation.getConfig().ignoreOutgoingUrls,
           (e: unknown) =>
             instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
         ) ||
         safeExecuteInTheMiddle(
           () =>
             instrumentation
-              ._getConfig()
+              .getConfig()
               .ignoreOutgoingRequestHook?.(optionsParsed),
           (e: unknown) => {
             if (e != null) {
@@ -639,7 +626,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         hostname,
         hookAttributes: instrumentation._callStartSpanHook(
           optionsParsed,
-          instrumentation._getConfig().startOutgoingSpanHook
+          instrumentation.getConfig().startOutgoingSpanHook
         ),
       });
 
@@ -729,15 +716,15 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
 
-    const route = attributes[SemanticAttributes.HTTP_ROUTE];
+    const route = attributes[SEMATTRS_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
     }
 
-    if (this._getConfig().applyCustomAttributesOnSpan) {
+    if (this.getConfig().applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(
         () =>
-          this._getConfig().applyCustomAttributesOnSpan!(
+          this.getConfig().applyCustomAttributesOnSpan!(
             span,
             request,
             response
@@ -771,8 +758,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
      */
     const requireParent =
       options.kind === SpanKind.CLIENT
-        ? this._getConfig().requireParentforOutgoingSpans
-        : this._getConfig().requireParentforIncomingSpans;
+        ? this.getConfig().requireParentforOutgoingSpans
+        : this.getConfig().requireParentforIncomingSpans;
 
     let span: Span;
     const currentSpan = trace.getSpan(ctx);
@@ -815,7 +802,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     response: http.IncomingMessage | http.ServerResponse
   ) {
     safeExecuteInTheMiddle(
-      () => this._getConfig().responseHook!(span, response),
+      () => this.getConfig().responseHook!(span, response),
       () => {},
       true
     );
@@ -826,7 +813,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request: http.ClientRequest | http.IncomingMessage
   ) {
     safeExecuteInTheMiddle(
-      () => this._getConfig().requestHook!(span, request),
+      () => this.getConfig().requestHook!(span, request),
       () => {},
       true
     );
@@ -846,7 +833,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   private _createHeaderCapture() {
-    const config = this._getConfig();
+    const config = this.getConfig();
 
     return {
       client: {

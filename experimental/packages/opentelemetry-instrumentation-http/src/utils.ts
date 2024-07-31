@@ -22,8 +22,30 @@ import {
   SpanKind,
 } from '@opentelemetry/api';
 import {
-  NetTransportValues,
-  SemanticAttributes,
+  NETTRANSPORTVALUES_IP_TCP,
+  NETTRANSPORTVALUES_IP_UDP,
+  SEMATTRS_HTTP_CLIENT_IP,
+  SEMATTRS_HTTP_FLAVOR,
+  SEMATTRS_HTTP_HOST,
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+  SEMATTRS_HTTP_ROUTE,
+  SEMATTRS_HTTP_SCHEME,
+  SEMATTRS_HTTP_SERVER_NAME,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_TARGET,
+  SEMATTRS_HTTP_URL,
+  SEMATTRS_HTTP_USER_AGENT,
+  SEMATTRS_NET_HOST_IP,
+  SEMATTRS_NET_HOST_NAME,
+  SEMATTRS_NET_HOST_PORT,
+  SEMATTRS_NET_PEER_IP,
+  SEMATTRS_NET_PEER_NAME,
+  SEMATTRS_NET_PEER_PORT,
+  SEMATTRS_NET_TRANSPORT,
 } from '@opentelemetry/semantic-conventions';
 import {
   IncomingHttpHeaders,
@@ -145,11 +167,8 @@ export const isIgnored = (
 export const setSpanWithError = (span: Span, error: Err): void => {
   const message = error.message;
 
-  span.setAttributes({
-    [AttributeNames.HTTP_ERROR_NAME]: error.name,
-    [AttributeNames.HTTP_ERROR_MESSAGE]: message,
-  });
-
+  span.setAttribute(AttributeNames.HTTP_ERROR_NAME, error.name);
+  span.setAttribute(AttributeNames.HTTP_ERROR_MESSAGE, message);
   span.setStatus({ code: SpanStatusCode.ERROR, message });
   span.recordException(error);
 };
@@ -167,10 +186,9 @@ export const setRequestContentLengthAttribute = (
   if (length === null) return;
 
   if (isCompressed(request.headers)) {
-    attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH] = length;
+    attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH] = length;
   } else {
-    attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] =
-      length;
+    attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = length;
   }
 };
 
@@ -187,10 +205,9 @@ export const setResponseContentLengthAttribute = (
   if (length === null) return;
 
   if (isCompressed(response.headers)) {
-    attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = length;
+    attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH] = length;
   } else {
-    attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] =
-      length;
+    attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = length;
   }
 };
 
@@ -343,20 +360,19 @@ export const getOutgoingRequestAttributes = (
   const headers = requestOptions.headers || {};
   const userAgent = headers['user-agent'];
   const attributes: SpanAttributes = {
-    [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
+    [SEMATTRS_HTTP_URL]: getAbsoluteUrl(
       requestOptions,
       headers,
       `${options.component}:`
     ),
-    [SemanticAttributes.HTTP_METHOD]: method,
-    [SemanticAttributes.HTTP_TARGET]: requestOptions.path || '/',
-    [SemanticAttributes.NET_PEER_NAME]: hostname,
-    [SemanticAttributes.HTTP_HOST]:
-      requestOptions.headers?.host ?? `${hostname}:${port}`,
+    [SEMATTRS_HTTP_METHOD]: method,
+    [SEMATTRS_HTTP_TARGET]: requestOptions.path || '/',
+    [SEMATTRS_NET_PEER_NAME]: hostname,
+    [SEMATTRS_HTTP_HOST]: headers.host ?? `${hostname}:${port}`,
   };
 
   if (userAgent !== undefined) {
-    attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
+    attributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
   return Object.assign(attributes, options.hookAttributes);
 };
@@ -369,11 +385,10 @@ export const getOutgoingRequestMetricAttributes = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_METHOD] =
-    spanAttributes[SemanticAttributes.HTTP_METHOD];
-  metricAttributes[SemanticAttributes.NET_PEER_NAME] =
-    spanAttributes[SemanticAttributes.NET_PEER_NAME];
-  //TODO: http.url attribute, it should susbtitute any parameters to avoid high cardinality.
+  metricAttributes[SEMATTRS_HTTP_METHOD] = spanAttributes[SEMATTRS_HTTP_METHOD];
+  metricAttributes[SEMATTRS_NET_PEER_NAME] =
+    spanAttributes[SEMATTRS_NET_PEER_NAME];
+  //TODO: http.url attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
 
@@ -381,17 +396,18 @@ export const getOutgoingRequestMetricAttributes = (
  * Returns attributes related to the kind of HTTP protocol used
  * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
  */
-export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
-  const attributes: SpanAttributes = {};
+export const setAttributesFromHttpKind = (
+  kind: string | undefined,
+  attributes: SpanAttributes
+): void => {
   if (kind) {
-    attributes[SemanticAttributes.HTTP_FLAVOR] = kind;
+    attributes[SEMATTRS_HTTP_FLAVOR] = kind;
     if (kind.toUpperCase() !== 'QUIC') {
-      attributes[SemanticAttributes.NET_TRANSPORT] = NetTransportValues.IP_TCP;
+      attributes[SEMATTRS_NET_TRANSPORT] = NETTRANSPORTVALUES_IP_TCP;
     } else {
-      attributes[SemanticAttributes.NET_TRANSPORT] = NetTransportValues.IP_UDP;
+      attributes[SEMATTRS_NET_TRANSPORT] = NETTRANSPORTVALUES_IP_UDP;
     }
   }
-  return attributes;
 };
 
 /**
@@ -406,20 +422,20 @@ export const getOutgoingRequestAttributesOnResponse = (
   const attributes: SpanAttributes = {};
   if (socket) {
     const { remoteAddress, remotePort } = socket;
-    attributes[SemanticAttributes.NET_PEER_IP] = remoteAddress;
-    attributes[SemanticAttributes.NET_PEER_PORT] = remotePort;
+    attributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
+    attributes[SEMATTRS_NET_PEER_PORT] = remotePort;
   }
   setResponseContentLengthAttribute(response, attributes);
 
   if (statusCode) {
-    attributes[SemanticAttributes.HTTP_STATUS_CODE] = statusCode;
+    attributes[SEMATTRS_HTTP_STATUS_CODE] = statusCode;
     attributes[AttributeNames.HTTP_STATUS_TEXT] = (
       statusMessage || ''
     ).toUpperCase();
   }
 
-  const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-  return Object.assign(attributes, httpKindAttributes);
+  setAttributesFromHttpKind(httpVersion, attributes);
+  return attributes;
 };
 
 /**
@@ -430,12 +446,11 @@ export const getOutgoingRequestMetricAttributesOnResponse = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.NET_PEER_PORT] =
-    spanAttributes[SemanticAttributes.NET_PEER_PORT];
-  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] =
-    spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
-  metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
-    spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  metricAttributes[SEMATTRS_NET_PEER_PORT] =
+    spanAttributes[SEMATTRS_NET_PEER_PORT];
+  metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
+    spanAttributes[SEMATTRS_HTTP_STATUS_CODE];
+  metricAttributes[SEMATTRS_HTTP_FLAVOR] = spanAttributes[SEMATTRS_HTTP_FLAVOR];
   return metricAttributes;
 };
 
@@ -465,36 +480,35 @@ export const getIncomingRequestAttributes = (
     'localhost';
   const serverName = options.serverName;
   const attributes: SpanAttributes = {
-    [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
+    [SEMATTRS_HTTP_URL]: getAbsoluteUrl(
       requestUrl,
       headers,
       `${options.component}:`
     ),
-    [SemanticAttributes.HTTP_HOST]: host,
-    [SemanticAttributes.NET_HOST_NAME]: hostname,
-    [SemanticAttributes.HTTP_METHOD]: method,
-    [SemanticAttributes.HTTP_SCHEME]: options.component,
+    [SEMATTRS_HTTP_HOST]: host,
+    [SEMATTRS_NET_HOST_NAME]: hostname,
+    [SEMATTRS_HTTP_METHOD]: method,
+    [SEMATTRS_HTTP_SCHEME]: options.component,
   };
 
   if (typeof ips === 'string') {
-    attributes[SemanticAttributes.HTTP_CLIENT_IP] = ips.split(',')[0];
+    attributes[SEMATTRS_HTTP_CLIENT_IP] = ips.split(',')[0];
   }
 
   if (typeof serverName === 'string') {
-    attributes[SemanticAttributes.HTTP_SERVER_NAME] = serverName;
+    attributes[SEMATTRS_HTTP_SERVER_NAME] = serverName;
   }
 
   if (requestUrl) {
-    attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.path || '/';
+    attributes[SEMATTRS_HTTP_TARGET] = requestUrl.path || '/';
   }
 
   if (userAgent !== undefined) {
-    attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
+    attributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
   setRequestContentLengthAttribute(request, attributes);
-
-  const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-  return Object.assign(attributes, httpKindAttributes, options.hookAttributes);
+  setAttributesFromHttpKind(httpVersion, attributes);
+  return Object.assign(attributes, options.hookAttributes);
 };
 
 /**
@@ -506,15 +520,12 @@ export const getIncomingRequestMetricAttributes = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_SCHEME] =
-    spanAttributes[SemanticAttributes.HTTP_SCHEME];
-  metricAttributes[SemanticAttributes.HTTP_METHOD] =
-    spanAttributes[SemanticAttributes.HTTP_METHOD];
-  metricAttributes[SemanticAttributes.NET_HOST_NAME] =
-    spanAttributes[SemanticAttributes.NET_HOST_NAME];
-  metricAttributes[SemanticAttributes.HTTP_FLAVOR] =
-    spanAttributes[SemanticAttributes.HTTP_FLAVOR];
-  //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
+  metricAttributes[SEMATTRS_HTTP_SCHEME] = spanAttributes[SEMATTRS_HTTP_SCHEME];
+  metricAttributes[SEMATTRS_HTTP_METHOD] = spanAttributes[SEMATTRS_HTTP_METHOD];
+  metricAttributes[SEMATTRS_NET_HOST_NAME] =
+    spanAttributes[SEMATTRS_NET_HOST_NAME];
+  metricAttributes[SEMATTRS_HTTP_FLAVOR] = spanAttributes[SEMATTRS_HTTP_FLAVOR];
+  //TODO: http.target attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
 
@@ -535,18 +546,18 @@ export const getIncomingRequestAttributesOnResponse = (
   const attributes: SpanAttributes = {};
   if (socket) {
     const { localAddress, localPort, remoteAddress, remotePort } = socket;
-    attributes[SemanticAttributes.NET_HOST_IP] = localAddress;
-    attributes[SemanticAttributes.NET_HOST_PORT] = localPort;
-    attributes[SemanticAttributes.NET_PEER_IP] = remoteAddress;
-    attributes[SemanticAttributes.NET_PEER_PORT] = remotePort;
+    attributes[SEMATTRS_NET_HOST_IP] = localAddress;
+    attributes[SEMATTRS_NET_HOST_PORT] = localPort;
+    attributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
+    attributes[SEMATTRS_NET_PEER_PORT] = remotePort;
   }
-  attributes[SemanticAttributes.HTTP_STATUS_CODE] = statusCode;
+  attributes[SEMATTRS_HTTP_STATUS_CODE] = statusCode;
   attributes[AttributeNames.HTTP_STATUS_TEXT] = (
     statusMessage || ''
   ).toUpperCase();
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
-    attributes[SemanticAttributes.HTTP_ROUTE] = rpcMetadata.route;
+    attributes[SEMATTRS_HTTP_ROUTE] = rpcMetadata.route;
   }
   return attributes;
 };
@@ -559,36 +570,35 @@ export const getIncomingRequestMetricAttributesOnResponse = (
   spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] =
-    spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
-  metricAttributes[SemanticAttributes.NET_HOST_PORT] =
-    spanAttributes[SemanticAttributes.NET_HOST_PORT];
-  if (spanAttributes[SemanticAttributes.HTTP_ROUTE] !== undefined) {
-    metricAttributes[SemanticAttributes.HTTP_ROUTE] =
-      spanAttributes[SemanticAttributes.HTTP_ROUTE];
+  metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
+    spanAttributes[SEMATTRS_HTTP_STATUS_CODE];
+  metricAttributes[SEMATTRS_NET_HOST_PORT] =
+    spanAttributes[SEMATTRS_NET_HOST_PORT];
+  if (spanAttributes[SEMATTRS_HTTP_ROUTE] !== undefined) {
+    metricAttributes[SEMATTRS_HTTP_ROUTE] = spanAttributes[SEMATTRS_HTTP_ROUTE];
   }
   return metricAttributes;
 };
 
 export function headerCapture(type: 'request' | 'response', headers: string[]) {
-  const normalizedHeaders = new Map(
-    headers.map(header => [
-      header.toLowerCase(),
-      header.toLowerCase().replace(/-/g, '_'),
-    ])
-  );
+  const normalizedHeaders = new Map<string, string>();
+  for (let i = 0, len = headers.length; i < len; i++) {
+    const capturedHeader = headers[i].toLowerCase();
+    normalizedHeaders.set(capturedHeader, capturedHeader.replace(/-/g, '_'));
+  }
 
   return (
     span: Span,
     getHeader: (key: string) => undefined | string | string[] | number
   ) => {
-    for (const [capturedHeader, normalizedHeader] of normalizedHeaders) {
+    for (const capturedHeader of normalizedHeaders.keys()) {
       const value = getHeader(capturedHeader);
 
       if (value === undefined) {
         continue;
       }
 
+      const normalizedHeader = normalizedHeaders.get(capturedHeader);
       const key = `http.${type}.header.${normalizedHeader}`;
 
       if (typeof value === 'string') {

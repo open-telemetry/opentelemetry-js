@@ -52,6 +52,10 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
    */
   private _exportInfo(logRecord: ReadableLogRecord) {
     return {
+      resource: {
+        attributes: logRecord.resource.attributes,
+      },
+      instrumentationScope: logRecord.instrumentationScope,
       timestamp: hrTimeToMicroseconds(logRecord.hrTime),
       traceId: logRecord.spanContext?.traceId,
       spanId: logRecord.spanContext?.spanId,

@@ -18,6 +18,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
 
 import * as assert from 'assert';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
@@ -40,9 +41,7 @@ import { VERSION } from '../src/version';
 
 const logsServiceProtoPath =
   'opentelemetry/proto/collector/logs/v1/logs_service.proto';
-const includeDirs = [
-  path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos'),
-];
+const includeDirs = [path.resolve(__dirname, '../../otlp-transformer/protos')];
 
 const httpAddr = 'https://localhost:1503';
 const udsAddr = 'unix:///tmp/otlp-logs.sock';
@@ -144,6 +143,24 @@ const testCollectorExporter = (params: TestParams) => {
       sinon.restore();
     });
 
+    if (useTLS && crypto.X509Certificate) {
+      it('test certs are valid', () => {
+        const certPaths = [
+          './test/certs/ca.crt',
+          './test/certs/client.crt',
+          './test/certs/server.crt',
+        ];
+        certPaths.forEach(certPath => {
+          const cert = new crypto.X509Certificate(fs.readFileSync(certPath));
+          const now = new Date();
+          assert.ok(
+            new Date(cert.validTo) > now,
+            `TLS cert "${certPath}" is still valid: cert.validTo="${cert.validTo}" (if this fails use 'npm run maint:regenerate-test-certs')`
+          );
+        });
+      });
+    }
+
     describe('instance', () => {
       it('should warn about headers when using grpc', () => {
         // Need to stub/spy on the underlying logger as the 'diag' instance is global
@@ -224,9 +241,9 @@ const testCollectorExporter = (params: TestParams) => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          assert.strictEqual(
+          assert.match(
             responseSpy.args[0][0].error.details,
-            'Deadline exceeded'
+            /Deadline exceeded.*/
           );
           done();
         }, 300);

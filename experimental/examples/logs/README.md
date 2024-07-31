@@ -7,8 +7,6 @@ npm install
 
 ## Run the Application
 
-LogRecord
-
 ```sh
 npm start
 ```

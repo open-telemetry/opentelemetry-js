@@ -13,7 +13,7 @@ const {
 } = require('@opentelemetry/sdk-metrics');
 const { Resource } = require('@opentelemetry/resources');
 const {
-  SemanticResourceAttributes,
+  SEMRESATTRS_SERVICE_NAME,
 } = require('@opentelemetry/semantic-conventions');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
@@ -36,7 +36,7 @@ const expHistogramView = new View({
 // Create an instance of the metric provider
 const meterProvider = new MeterProvider({
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'basic-metric-service',
+    [SEMRESATTRS_SERVICE_NAME]: 'basic-metric-service',
   }),
   views: [expHistogramView],
 });

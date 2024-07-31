@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone",
-  "version": "1.22.0",
+  "version": "1.25.1",
   "description": "OpenTelemetry Context Zone",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -17,7 +17,8 @@
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",
@@ -55,8 +56,8 @@
     "typescript": "4.4.4"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "1.22.0",
-    "zone.js": "^0.11.0 || ^0.13.0 || ^0.14.0"
+    "@opentelemetry/context-zone-peer-dep": "1.25.1",
+    "zone.js": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0"
   },
   "sideEffects": true,
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone"

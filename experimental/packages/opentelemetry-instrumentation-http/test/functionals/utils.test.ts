@@ -23,7 +23,14 @@ import {
   Attributes,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+  SEMATTRS_HTTP_ROUTE,
+  SEMATTRS_HTTP_TARGET,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
@@ -301,37 +308,34 @@ describe('Utility', () => {
             request,
             {} as ServerResponse
           );
-          assert.deepStrictEqual(
-            attributes[SemanticAttributes.HTTP_ROUTE],
-            '/user/:id'
-          );
+          assert.deepStrictEqual(attributes[SEMATTRS_HTTP_ROUTE], '/user/:id');
           context.disable();
           return done();
         }
       );
     });
 
-    it('should succesfully process without middleware stack', () => {
+    it('should successfully process without middleware stack', () => {
       const request = {
         socket: {},
       } as IncomingMessage;
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       } as ServerResponse & { socket: Socket });
-      assert.deepEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
+      assert.deepEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
   });
 
   describe('getIncomingRequestMetricAttributesOnResponse()', () => {
     it('should correctly add http_route if span has it', () => {
       const spanAttributes: Attributes = {
-        [SemanticAttributes.HTTP_ROUTE]: '/user/:id',
+        [SEMATTRS_HTTP_ROUTE]: '/user/:id',
       };
       const metricAttributes =
         utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
 
       assert.deepStrictEqual(
-        metricAttributes[SemanticAttributes.HTTP_ROUTE],
+        metricAttributes[SEMATTRS_HTTP_ROUTE],
         '/user/:id'
       );
     });
@@ -340,10 +344,7 @@ describe('Utility', () => {
       const spanAttributes: Attributes = {};
       const metricAttributes =
         utils.getIncomingRequestMetricAttributesOnResponse(spanAttributes);
-      assert.deepEqual(
-        metricAttributes[SemanticAttributes.HTTP_ROUTE],
-        undefined
-      );
+      assert.deepEqual(metricAttributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
   });
   // Verify the key in the given attributes is set to the given value,
@@ -354,10 +355,10 @@ describe('Utility', () => {
     value: number
   ) {
     const SemanticAttributess = [
-      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
-      SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-      SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH,
+      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+      SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
     ];
 
     for (const attr of SemanticAttributess) {
@@ -381,7 +382,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -397,7 +398,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -413,7 +414,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH,
+        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
         1200
       );
     });
@@ -432,7 +433,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -451,7 +452,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -470,7 +471,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
+        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
         1200
       );
     });
@@ -501,7 +502,7 @@ describe('Utility', () => {
       const attributes = utils.getIncomingRequestAttributes(request, {
         component: 'http',
       });
-      assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
+      assert.strictEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
 
     it('should set http.target as path in http span attributes', () => {
@@ -515,10 +516,7 @@ describe('Utility', () => {
       const attributes = utils.getIncomingRequestAttributes(request, {
         component: 'http',
       });
-      assert.strictEqual(
-        attributes[SemanticAttributes.HTTP_TARGET],
-        '/user/?q=val'
-      );
+      assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
     });
   });
 
