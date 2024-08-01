@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
- * TODO: Replace export * with named exports before next major version
+/* eslint-disable no-restricted-syntax --
+ * These re-exports are only of constants, only two-levels deep, and
+ * should not cause problems for tree-shakers.
  */
 export * from './trace';
 export * from './resource';
