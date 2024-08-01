@@ -22,6 +22,10 @@
 {% for attribute in ctx | attribute_sort %}
 {%- if attribute.name not in params.excluded_attributes %}
 {{d.docstring(attribute)}}
+{%- if attribute.type is not startingwith("template[") %}
 export const ATTR_{{ attribute.name | screaming_snake_case_const }} = '{{attribute.name}}';
+{%- else %}
+export const ATTR_{{ attribute.name | screaming_snake_case_const }} = (key: string) => `{{attribute.name}}.${key}`;
+{%- endif %}
 {%- endif %}
 {% endfor %}

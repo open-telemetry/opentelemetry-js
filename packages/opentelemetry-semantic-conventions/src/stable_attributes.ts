@@ -119,7 +119,7 @@ export const ATTR_EXCEPTION_TYPE = 'exception.type';
  * The `User-Agent` header is already captured in the `user_agent.original` attribute. Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
  * The attribute value **MUST** consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
  */
-export const ATTR_HTTP_REQUEST_HEADER = 'http.request.header';
+export const ATTR_HTTP_REQUEST_HEADER = (key: string) => `http.request.header.${key}`;
 
 /**
  * HTTP request method.
@@ -160,7 +160,7 @@ export const ATTR_HTTP_REQUEST_RESENDCOUNT = 'http.request.resend_count';
  * Users **MAY** explicitly configure instrumentations to capture them even though it is not recommended.
  * The attribute value **MUST** consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
  */
-export const ATTR_HTTP_RESPONSE_HEADER = 'http.response.header';
+export const ATTR_HTTP_RESPONSE_HEADER = (key: string) => `http.response.header.${key}`;
 
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
