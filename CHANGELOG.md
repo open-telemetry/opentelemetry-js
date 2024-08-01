@@ -12,14 +12,22 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.26.0
+
+### :rocket: (Enhancement)
+
 * feat: include instrumentation scope info in console span and log record exporters [#4848](https://github.com/open-telemetry/opentelemetry-js/pull/4848) @blumamir
 
 ### :bug: (Bug Fix)
 
 * fix(sdk-node): avoid spurious diag errors for unknown OTEL_NODE_RESOURCE_DETECTORS values [#4879](https://github.com/open-telemetry/opentelemetry-js/pull/4879) @trentm
 * deps(opentelemetry-instrumentation): Bump `shimmer` types to 1.2.0 [#4865](https://github.com/open-telemetry/opentelemetry-js/pull/4865) @lforst
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
