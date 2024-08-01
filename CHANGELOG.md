@@ -16,7 +16,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
-- deps(opentelemetry-instrumentation): Bump `shimmer` types to 1.2.0 [#4865](https://github.com/open-telemetry/opentelemetry-js/pull/4865) @lforst
+* fix(sdk-node): avoid spurious diag errors for unknown OTEL_NODE_RESOURCE_DETECTORS values [#4879](https://github.com/open-telemetry/opentelemetry-js/pull/4879) @trentm
+* deps(opentelemetry-instrumentation): Bump `shimmer` types to 1.2.0 [#4865](https://github.com/open-telemetry/opentelemetry-js/pull/4865) @lforst
 
 ### :books: (Refine Doc)
 

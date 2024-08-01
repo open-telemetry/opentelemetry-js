@@ -43,7 +43,7 @@ class MockedResponse extends Stream {
     super();
   }
 
-  send(data: string) {
+  send(data: Uint8Array) {
     this.emit('data', data);
     this.emit('end');
   }
@@ -65,6 +65,9 @@ describe('OTLPLogExporter', () => {
 
   afterEach(() => {
     fakeRequest = new Stream.PassThrough();
+    Object.defineProperty(fakeRequest, 'setTimeout', {
+      value: function (_timeout: number) {},
+    });
     sinon.restore();
   });
 
@@ -83,7 +86,9 @@ describe('OTLPLogExporter', () => {
     it('should include user-agent header by default', () => {
       const exporter = new OTLPLogExporter();
       assert.strictEqual(
-        exporter.headers['User-Agent'],
+        exporter['_transport']['_transport']['_parameters']['headers'][
+          'User-Agent'
+        ],
         `OTel-OTLP-Exporter-JavaScript/${VERSION}`
       );
     });
@@ -91,7 +96,10 @@ describe('OTLPLogExporter', () => {
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=bar';
       const exporter = new OTLPLogExporter();
-      assert.strictEqual(exporter.headers.foo, 'bar');
+      assert.strictEqual(
+        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
+        'bar'
+      );
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
     });
 
@@ -106,13 +114,19 @@ describe('OTLPLogExporter', () => {
 
     it('should override headers defined via env with headers defined in constructor', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const collectorExporter = new OTLPLogExporter({
+      const exporter = new OTLPLogExporter({
         headers: {
           foo: 'constructor',
         },
       });
-      assert.strictEqual(collectorExporter.headers.foo, 'constructor');
-      assert.strictEqual(collectorExporter.headers.bar, 'foo');
+      assert.strictEqual(
+        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
+        'constructor'
+      );
+      assert.strictEqual(
+        exporter['_transport']['_transport']['_parameters']['headers']['bar'],
+        'foo'
+      );
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
   });
@@ -152,10 +166,12 @@ describe('OTLPLogExporter', () => {
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
 
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+          done();
+        });
         return fakeRequest as any;
       });
       collectorExporter.export(logs, () => {});
@@ -165,10 +181,12 @@ describe('OTLPLogExporter', () => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
 
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+          done();
+        });
         return fakeRequest as any;
       });
 
@@ -180,10 +198,12 @@ describe('OTLPLogExporter', () => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
 
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
-        done();
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+          done();
+        });
         return fakeRequest as any;
       });
 
@@ -192,10 +212,13 @@ describe('OTLPLogExporter', () => {
 
     it('should successfully send the logs', done => {
       const fakeRequest = new Stream.PassThrough();
-      sinon.stub(http, 'request').returns(fakeRequest as any);
+      Object.defineProperty(fakeRequest, 'setTimeout', {
+        value: function (_timeout: number) {},
+      });
 
+      sinon.stub(http, 'request').returns(fakeRequest as any);
       let buff = Buffer.from('');
-      fakeRequest.on('end', () => {
+      fakeRequest.on('finish', () => {
         const responseBody = buff.toString();
         const json = JSON.parse(responseBody) as IExportLogsServiceRequest;
         const log1 = json.resourceLogs?.[0].scopeLogs?.[0].logRecords?.[0];
@@ -222,9 +245,11 @@ describe('OTLPLogExporter', () => {
       const spyLoggerError = sinon.stub(diag, 'error');
 
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        const mockRes = new MockedResponse(200);
-        cb(mockRes);
-        mockRes.send('success');
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(200);
+          cb(mockRes);
+          mockRes.send(Buffer.from('success'));
+        });
         return fakeRequest as any;
       });
 
@@ -237,9 +262,11 @@ describe('OTLPLogExporter', () => {
 
     it('should log the error message', done => {
       sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
-        const mockResError = new MockedResponse(400);
-        cb(mockResError);
-        mockResError.send('failed');
+        queueMicrotask(() => {
+          const mockRes = new MockedResponse(400);
+          cb(mockRes);
+          mockRes.send(Buffer.from('failure'));
+        });
 
         return fakeRequest as any;
       });

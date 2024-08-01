@@ -49,16 +49,15 @@ export class OTLPLogExporter
         ...config,
       },
       JsonLogsSerializer,
-      'application/json'
+      {
+        ...baggageUtils.parseKeyPairsIntoRecord(
+          getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
+        ),
+        ...parseHeaders(config?.headers),
+        ...USER_AGENT,
+        'Content-Type': 'application/json',
+      }
     );
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-      ),
-      ...parseHeaders(config?.headers),
-    };
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
