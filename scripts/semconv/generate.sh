@@ -36,10 +36,6 @@ docker run --rm --platform linux/amd64 \
   stable \
   /output/
 
-# Run lint checks
-# cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
-# npm run lint
-
-# Run the size checks for the generated files
+# Ensure semconv compiles
 cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
 npm run compile
