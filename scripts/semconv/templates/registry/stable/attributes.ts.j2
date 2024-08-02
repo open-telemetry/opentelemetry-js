@@ -1,4 +1,4 @@
-{{- template.set_file_name("stable_attributes.ts") -}}
+{{- template.set_file_name(ctx[0].file_name_prefix ~ "_attributes.ts") -}}
 {%- import 'docstring.ts.j2' as d -%}
 /*
  * Copyright The OpenTelemetry Authors
@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------------------------------------
 {% for attribute in ctx | attribute_sort %}
 {%- if attribute.name not in params.excluded_attributes %}
-{{d.docstring(attribute)}}
+{{d.docstring(attribute, "attribute")}}
 {%- if attribute.type is not template_type %}
 export const ATTR_{{ attribute.name | screaming_snake_case }} = '{{attribute.name}}';
 {%- else %}

@@ -2,29 +2,30 @@ params:
   excluded_attributes: ["messaging.client_id"]
 
 templates:
-  - pattern: stable_attributes.ts.j2
+  - pattern: attributes.ts.j2
+    # Remove file name prefix when per-pattern params are available https://github.com/open-telemetry/weaver/issues/288
     filter: >
       semconv_attributes({
         "exclude_stability": ["experimental"]
-      })
+      }) | map(. + { file_name_prefix: "stable" })
     application_mode: single
-  - pattern: stable_metrics.ts.j2
-    filter: >
-      semconv_metrics({
-        "exclude_stability": ["experimental"]
-      })
-    application_mode: single
-  - pattern: experimental_attributes.ts.j2
+  - pattern: attributes.ts.j2
     filter: >
       semconv_attributes({
         "exclude_stability": ["stable"]
-      })
+      }) | map(. + { file_name_prefix: "experimental" })
     application_mode: single
-  - pattern: experimental_metrics.ts.j2
+  - pattern: metrics.ts.j2
+    filter: >
+      semconv_metrics({
+        "exclude_stability": ["experimental"]
+      }) | map(. + { file_name_prefix: "stable" })
+    application_mode: single
+  - pattern: metrics.ts.j2
     filter: >
       semconv_metrics({
         "exclude_stability": ["stable"]
-      })
+      }) | map(. + { file_name_prefix: "experimental" })
     application_mode: single
 
 text_maps:
