@@ -7,25 +7,37 @@ templates:
     filter: >
       semconv_attributes({
         "exclude_stability": ["experimental"]
-      }) | map(. + { file_name_prefix: "stable" })
+      }) | {
+        stability: "stable",
+        attributes: .
+      }
     application_mode: single
   - pattern: attributes.ts.j2
     filter: >
       semconv_attributes({
         "exclude_stability": ["stable"]
-      }) | map(. + { file_name_prefix: "experimental" })
+      }) | {
+        stability: "experimental",
+        attributes: .
+      }
     application_mode: single
   - pattern: metrics.ts.j2
     filter: >
       semconv_metrics({
         "exclude_stability": ["experimental"]
-      }) | map(. + { file_name_prefix: "stable" })
+      }) | {
+        stability: "stable",
+        metrics: .
+      }
     application_mode: single
   - pattern: metrics.ts.j2
     filter: >
       semconv_metrics({
         "exclude_stability": ["stable"]
-      }) | map(. + { file_name_prefix: "experimental" })
+      }) | {
+        stability: "experimental",
+        metrics: .
+      }
     application_mode: single
 
 text_maps:

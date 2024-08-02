@@ -1,4 +1,4 @@
-{{- template.set_file_name(ctx[0].file_name_prefix ~ "_metrics.ts") -}}
+{{- template.set_file_name(ctx.stability ~ "_metrics.ts") -}}
 {%- import 'docstring.ts.j2' as d -%}
 /*
  * Copyright The OpenTelemetry Authors
@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------------------------------------
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
 //----------------------------------------------------------------------------------------------------------
-{% for metric in ctx | sort(attribute="metric_name") %}
+{% for metric in ctx.metrics | sort(attribute="metric_name") %}
 {{d.docstring(metric, "metric")}}
 export const METRIC_{{ metric.metric_name | screaming_snake_case }} = '{{metric.metric_name}}';
 {% endfor %}

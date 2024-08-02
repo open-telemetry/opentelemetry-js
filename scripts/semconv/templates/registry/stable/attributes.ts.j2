@@ -1,4 +1,4 @@
-{{- template.set_file_name(ctx[0].file_name_prefix ~ "_attributes.ts") -}}
+{{- template.set_file_name(ctx.stability ~ "_attributes.ts") -}}
 {%- import 'docstring.ts.j2' as d -%}
 /*
  * Copyright The OpenTelemetry Authors
@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------------------------------------
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
 //----------------------------------------------------------------------------------------------------------
-{% for attribute in ctx | attribute_sort %}
+{% for attribute in ctx.attributes | attribute_sort %}
 {%- if attribute.name not in params.excluded_attributes %}
 {{d.docstring(attribute, "attribute")}}
 {%- if attribute.type is not template_type %}
