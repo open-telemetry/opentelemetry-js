@@ -6,7 +6,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # freeze the spec version to make SpanAttributess generation reproducible
-SPEC_VERSION=v1.25.0
+SPEC_VERSION=v1.27.0
 GENERATOR_VERSION=0.8.0
 
 # When running on windows and your are getting references to ";C" (like Telemetry;C)

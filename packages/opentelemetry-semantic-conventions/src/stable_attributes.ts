@@ -19,6 +19,32 @@
 //----------------------------------------------------------------------------------------------------------
 
 /**
+ * Rate-limiting result, shows whether the lease was acquired or contains a rejection reason
+ */
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.result';
+
+/**
+  * Enum value 'acquired' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ACQUIRED = 'acquired';
+
+/**
+  * Enum value 'endpoint_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ENDPOINT_LIMITER = 'endpoint_limiter';
+
+/**
+  * Enum value 'global_limiter' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = 'global_limiter';
+
+/**
+  * Enum value 'request_canceled' for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
+  */
+export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = 'request_canceled';
+
+
+/**
  * The language of the telemetry SDK.
  */
 export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
@@ -102,6 +128,68 @@ export const ATTR_TELEMETRY_SDK_NAME = 'telemetry.sdk.name';
 export const ATTR_TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
 
 /**
+ * Full type name of the [`IExceptionHandler`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.diagnostics.iexceptionhandler) implementation that handled the exception.
+ */
+export const ATTR_ASPNETCORE_DIAGNOSTICS_HANDLER_TYPE = 'aspnetcore.diagnostics.handler.type';
+
+/**
+ * ASP.NET Core exception middleware handling result
+ */
+export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = 'aspnetcore.diagnostics.exception.result';
+
+/**
+  * Enum value 'aborted' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+  */
+export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_ABORTED = 'aborted';
+
+/**
+  * Enum value 'handled' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+  */
+export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_HANDLED = 'handled';
+
+/**
+  * Enum value 'skipped' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+  */
+export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_SKIPPED = 'skipped';
+
+/**
+  * Enum value 'unhandled' for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
+  */
+export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_UNHANDLED = 'unhandled';
+
+
+/**
+ * Rate limiting policy name.
+ */
+export const ATTR_ASPNETCORE_RATE_LIMITING_POLICY = 'aspnetcore.rate_limiting.policy';
+
+/**
+ * Flag indicating if request was handled by the application pipeline.
+ */
+export const ATTR_ASPNETCORE_REQUEST_IS_UNHANDLED = 'aspnetcore.request.is_unhandled';
+
+/**
+ * A value that indicates whether the matched route is a fallback route.
+ */
+export const ATTR_ASPNETCORE_ROUTING_IS_FALLBACK = 'aspnetcore.routing.is_fallback';
+
+/**
+ * Match result - success or failure
+ */
+export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status';
+
+/**
+  * Enum value 'failure' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
+  */
+export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_FAILURE = 'failure';
+
+/**
+  * Enum value 'success' for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
+  */
+export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = 'success';
+
+
+/**
  * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
  *
  * @note When observed from the server side, and when communicating through an intermediary, `client.address` **SHOULD** represent the client address behind any intermediaries,  for example proxies, if it's available.
@@ -118,7 +206,11 @@ export const ATTR_CLIENT_PORT = 'client.port';
 /**
  * Describes a class of error the operation ended with.
  *
- * @note The `error.type` **SHOULD** be predictable and **SHOULD** have low cardinality.
+ * @note The `error.type` **SHOULD** be predictable, and **SHOULD** have low cardinality.
+ * 
+ * When `error.type` is set to a type (e.g., an exception type), its
+ * canonical class name identifying the type within the artifact **SHOULD** be used.
+ * 
  * Instrumentations **SHOULD** document the list of errors they report.
  * 
  * The cardinality of `error.type` within one instrumentation library **SHOULD** be low.
@@ -155,7 +247,7 @@ export const ATTR_ERROR_TYPE_VALUE_OTHER = '_OTHER';
  * whether it will escape the scope of a span.
  * However, it is trivial to know that an exception
  * will escape, if one checks for an active exception just before ending the span,
- * as done in the [example for recording span exceptions](#recording-an-exception).
+ * as done in the [example for recording span exceptions](https://opentelemetry.io/docs/specs/semconv/exceptions/exceptions-spans/#recording-an-exception).
  * 
  * It follows that an exception may still escape the scope of the span
  * even if the `exception.escaped` attribute was not set or set to false,
@@ -294,6 +386,84 @@ export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 export const ATTR_HTTP_ROUTE = 'http.route';
 
 /**
+ * Name of the garbage collector action.
+ *
+ * @note Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
+ */
+export const ATTR_JVM_GC_ACTION = 'jvm.gc.action';
+
+/**
+ * Name of the garbage collector.
+ *
+ * @note Garbage collector name is generally obtained via [GarbageCollectionNotificationInfo#getGcName()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcName()).
+ */
+export const ATTR_JVM_GC_NAME = 'jvm.gc.name';
+
+/**
+ * Name of the memory pool.
+ *
+ * @note Pool names are generally obtained via [MemoryPoolMXBean#getName()](https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html#getName()).
+ */
+export const ATTR_JVM_MEMORY_POOL_NAME = 'jvm.memory.pool.name';
+
+/**
+ * The type of memory.
+ */
+export const ATTR_JVM_MEMORY_TYPE = 'jvm.memory.type';
+
+/**
+  * Enum value 'heap' for attribute {@link ATTR_JVM_MEMORY_TYPE}.
+  */
+export const ATTR_JVM_MEMORY_TYPE_VALUE_HEAP = 'heap';
+
+/**
+  * Enum value 'non_heap' for attribute {@link ATTR_JVM_MEMORY_TYPE}.
+  */
+export const ATTR_JVM_MEMORY_TYPE_VALUE_NON_HEAP = 'non_heap';
+
+
+/**
+ * Whether the thread is daemon or not.
+ */
+export const ATTR_JVM_THREAD_DAEMON = 'jvm.thread.daemon';
+
+/**
+ * State of the thread.
+ */
+export const ATTR_JVM_THREAD_STATE = 'jvm.thread.state';
+
+/**
+  * Enum value 'blocked' for attribute {@link ATTR_JVM_THREAD_STATE}.
+  */
+export const ATTR_JVM_THREAD_STATE_VALUE_BLOCKED = 'blocked';
+
+/**
+  * Enum value 'new' for attribute {@link ATTR_JVM_THREAD_STATE}.
+  */
+export const ATTR_JVM_THREAD_STATE_VALUE_NEW = 'new';
+
+/**
+  * Enum value 'runnable' for attribute {@link ATTR_JVM_THREAD_STATE}.
+  */
+export const ATTR_JVM_THREAD_STATE_VALUE_RUNNABLE = 'runnable';
+
+/**
+  * Enum value 'terminated' for attribute {@link ATTR_JVM_THREAD_STATE}.
+  */
+export const ATTR_JVM_THREAD_STATE_VALUE_TERMINATED = 'terminated';
+
+/**
+  * Enum value 'timed_waiting' for attribute {@link ATTR_JVM_THREAD_STATE}.
+  */
+export const ATTR_JVM_THREAD_STATE_VALUE_TIMED_WAITING = 'timed_waiting';
+
+/**
+  * Enum value 'waiting' for attribute {@link ATTR_JVM_THREAD_STATE}.
+  */
+export const ATTR_JVM_THREAD_STATE_VALUE_WAITING = 'waiting';
+
+
+/**
  * Local address of the network connection - IP address or Unix domain socket name.
  */
 export const ATTR_NETWORK_LOCAL_ADDRESS = 'network.local.address';
@@ -344,6 +514,11 @@ export const ATTR_NETWORK_TRANSPORT = 'network.transport';
 export const ATTR_NETWORK_TRANSPORT_VALUE_PIPE = 'pipe';
 
 /**
+  * Enum value 'quic' for attribute {@link ATTR_NETWORK_TRANSPORT}.
+  */
+export const ATTR_NETWORK_TRANSPORT_VALUE_QUIC = 'quic';
+
+/**
   * Enum value 'tcp' for attribute {@link ATTR_NETWORK_TRANSPORT}.
   */
 export const ATTR_NETWORK_TRANSPORT_VALUE_TCP = 'tcp';
@@ -378,6 +553,37 @@ export const ATTR_NETWORK_TYPE_VALUE_IPV6 = 'ipv6';
 
 
 /**
+ * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
+ */
+export const ATTR_OTEL_SCOPE_NAME = 'otel.scope.name';
+
+/**
+ * The version of the instrumentation scope - (`InstrumentationScope.Version` in OTLP).
+ */
+export const ATTR_OTEL_SCOPE_VERSION = 'otel.scope.version';
+
+/**
+ * Name of the code, either "OK" or "ERROR". **MUST** **NOT** be set if the status code is UNSET.
+ */
+export const ATTR_OTEL_STATUS_CODE = 'otel.status_code';
+
+/**
+  * Enum value 'ERROR' for attribute {@link ATTR_OTEL_STATUS_CODE}.
+  */
+export const ATTR_OTEL_STATUS_CODE_VALUE_ERROR = 'ERROR';
+
+/**
+  * Enum value 'OK' for attribute {@link ATTR_OTEL_STATUS_CODE}.
+  */
+export const ATTR_OTEL_STATUS_CODE_VALUE_OK = 'OK';
+
+
+/**
+ * Description of the Status if it has a value, otherwise not set.
+ */
+export const ATTR_OTEL_STATUS_DESCRIPTION = 'otel.status_description';
+
+/**
  * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
  *
  * @note When observed from the client side, and when communicating through an intermediary, `server.address` **SHOULD** represent the server address behind any intermediaries, for example proxies, if it's available.
@@ -394,7 +600,7 @@ export const ATTR_SERVER_PORT = 'server.port';
 /**
  * Logical name of the service.
  *
- * @note MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md#process), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value **MUST** be set to `unknown_service`.
+ * @note MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value **MUST** be set to `unknown_service`.
  */
 export const ATTR_SERVICE_NAME = 'service.name';
 
@@ -402,6 +608,48 @@ export const ATTR_SERVICE_NAME = 'service.name';
  * The version string of the service API or implementation. The format is not defined by these conventions.
  */
 export const ATTR_SERVICE_VERSION = 'service.version';
+
+/**
+ * SignalR HTTP connection closure status.
+ */
+export const ATTR_SIGNALR_CONNECTION_STATUS = 'signalr.connection.status';
+
+/**
+  * Enum value 'app_shutdown' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
+  */
+export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_APP_SHUTDOWN = 'app_shutdown';
+
+/**
+  * Enum value 'normal_closure' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
+  */
+export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_NORMAL_CLOSURE = 'normal_closure';
+
+/**
+  * Enum value 'timeout' for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
+  */
+export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_TIMEOUT = 'timeout';
+
+
+/**
+ * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md)
+ */
+export const ATTR_SIGNALR_TRANSPORT = 'signalr.transport';
+
+/**
+  * Enum value 'long_polling' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
+  */
+export const ATTR_SIGNALR_TRANSPORT_VALUE_LONG_POLLING = 'long_polling';
+
+/**
+  * Enum value 'server_sent_events' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
+  */
+export const ATTR_SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = 'server_sent_events';
+
+/**
+  * Enum value 'web_sockets' for attribute {@link ATTR_SIGNALR_TRANSPORT}.
+  */
+export const ATTR_SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = 'web_sockets';
+
 
 /**
  * The [URI fragment](https://www.rfc-editor.org/rfc/rfc3986#section-3.5) component

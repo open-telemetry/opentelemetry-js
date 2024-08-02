@@ -55,67 +55,157 @@ export const METRIC_CONTAINER_MEMORY_USAGE = 'container.memory.usage';
 export const METRIC_CONTAINER_NETWORK_IO = 'container.network.io';
 
 /**
+ * The number of connections that are currently in state described by the `state` attribute
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_DB_CLIENT_CONNECTION_COUNT = 'db.client.connection.count';
+
+/**
  * The time it took to create a new connection
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_CREATE_TIME = 'db.client.connections.create_time';
+export const METRIC_DB_CLIENT_CONNECTION_CREATE_TIME = 'db.client.connection.create_time';
 
 /**
  * The maximum number of idle open connections allowed
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MAX = 'db.client.connections.idle.max';
+export const METRIC_DB_CLIENT_CONNECTION_IDLE_MAX = 'db.client.connection.idle.max';
 
 /**
  * The minimum number of idle open connections allowed
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MIN = 'db.client.connections.idle.min';
+export const METRIC_DB_CLIENT_CONNECTION_IDLE_MIN = 'db.client.connection.idle.min';
 
 /**
  * The maximum number of open connections allowed
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_MAX = 'db.client.connections.max';
+export const METRIC_DB_CLIENT_CONNECTION_MAX = 'db.client.connection.max';
 
 /**
  * The number of pending requests for an open connection, cumulative for the entire pool
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_PENDING_REQUESTS = 'db.client.connections.pending_requests';
+export const METRIC_DB_CLIENT_CONNECTION_PENDING_REQUESTS = 'db.client.connection.pending_requests';
 
 /**
  * The number of connection timeouts that have occurred trying to obtain a connection from the pool
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_TIMEOUTS = 'db.client.connections.timeouts';
-
-/**
- * The number of connections that are currently in state described by the `state` attribute
- *
- * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
- */
-export const METRIC_DB_CLIENT_CONNECTIONS_USAGE = 'db.client.connections.usage';
+export const METRIC_DB_CLIENT_CONNECTION_TIMEOUTS = 'db.client.connection.timeouts';
 
 /**
  * The time between borrowing a connection and returning it to the pool
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_time';
+export const METRIC_DB_CLIENT_CONNECTION_USE_TIME = 'db.client.connection.use_time';
 
 /**
  * The time it took to obtain an open connection from the pool
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
+export const METRIC_DB_CLIENT_CONNECTION_WAIT_TIME = 'db.client.connection.wait_time';
+
+/**
+ * Deprecated, use `db.client.connection.create_time` instead. Note: the unit also changed from `ms` to `s`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.create_time`. Note: the unit also changed from `ms` to `s`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_CREATE_TIME = 'db.client.connections.create_time';
+
+/**
+ * Deprecated, use `db.client.connection.idle.max` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.idle.max`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MAX = 'db.client.connections.idle.max';
+
+/**
+ * Deprecated, use `db.client.connection.idle.min` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.idle.min`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MIN = 'db.client.connections.idle.min';
+
+/**
+ * Deprecated, use `db.client.connection.max` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.max`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_MAX = 'db.client.connections.max';
+
+/**
+ * Deprecated, use `db.client.connection.pending_requests` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.pending_requests`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_PENDING_REQUESTS = 'db.client.connections.pending_requests';
+
+/**
+ * Deprecated, use `db.client.connection.timeouts` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.timeouts`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_TIMEOUTS = 'db.client.connections.timeouts';
+
+/**
+ * Deprecated, use `db.client.connection.count` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.count`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_USAGE = 'db.client.connections.usage';
+
+/**
+ * Deprecated, use `db.client.connection.use_time` instead. Note: the unit also changed from `ms` to `s`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.use_time`. Note: the unit also changed from `ms` to `s`..
+ */
+export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_time';
+
+/**
+ * Deprecated, use `db.client.connection.wait_time` instead. Note: the unit also changed from `ms` to `s`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `db.client.connection.wait_time`. Note: the unit also changed from `ms` to `s`..
+ */
 export const METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wait_time';
+
+/**
+ * Duration of database client operations.
+ *
+ * @note Batch operations **SHOULD** be recorded as a single operation.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_DB_CLIENT_OPERATION_DURATION = 'db.client.operation.duration';
 
 /**
  * Measures the time taken to perform a DNS lookup.
@@ -186,6 +276,122 @@ export const METRIC_FAAS_NET_IO = 'faas.net_io';
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_FAAS_TIMEOUTS = 'faas.timeouts';
+
+/**
+ * GenAI operation duration
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GEN_AI_CLIENT_OPERATION_DURATION = 'gen_ai.client.operation.duration';
+
+/**
+ * Measures number of input and output tokens used
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GEN_AI_CLIENT_TOKEN_USAGE = 'gen_ai.client.token.usage';
+
+/**
+ * Generative AI server request duration such as time-to-last byte or last output token
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GEN_AI_SERVER_REQUEST_DURATION = 'gen_ai.server.request.duration';
+
+/**
+ * Time per output token generated after the first token for successful responses
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GEN_AI_SERVER_TIME_PER_OUTPUT_TOKEN = 'gen_ai.server.time_per_output_token';
+
+/**
+ * Time to generate first token for successful responses
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GEN_AI_SERVER_TIME_TO_FIRST_TOKEN = 'gen_ai.server.time_to_first_token';
+
+/**
+ * Heap size target percentage configured by the user, otherwise 100.
+ *
+ * @note The value range is [0.0,100.0]. Computed from `/gc/gogc:percent`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_CONFIG_GOGC = 'go.config.gogc';
+
+/**
+ * Count of live goroutines.
+ *
+ * @note Computed from `/sched/goroutines:goroutines`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_GOROUTINE_COUNT = 'go.goroutine.count';
+
+/**
+ * Memory allocated to the heap by the application.
+ *
+ * @note Computed from `/gc/heap/allocs:bytes`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_MEMORY_ALLOCATED = 'go.memory.allocated';
+
+/**
+ * Count of allocations to the heap by the application.
+ *
+ * @note Computed from `/gc/heap/allocs:objects`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_MEMORY_ALLOCATIONS = 'go.memory.allocations';
+
+/**
+ * Heap size target for the end of the GC cycle.
+ *
+ * @note Computed from `/gc/heap/goal:bytes`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_MEMORY_GC_GOAL = 'go.memory.gc.goal';
+
+/**
+ * Go runtime memory limit configured by the user, if a limit exists.
+ *
+ * @note Computed from `/gc/gomemlimit:bytes`. This metric is excluded if the limit obtained from the Go runtime is math.MaxInt64.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_MEMORY_LIMIT = 'go.memory.limit';
+
+/**
+ * Memory used by the Go runtime.
+ *
+ * @note Computed from `(/memory/classes/total:bytes - /memory/classes/heap/released:bytes)`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_MEMORY_USED = 'go.memory.used';
+
+/**
+ * The number of OS threads that can execute user-level Go code simultaneously.
+ *
+ * @note Computed from `/sched/gomaxprocs:threads`.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_PROCESSOR_LIMIT = 'go.processor.limit';
+
+/**
+ * The time goroutines have spent in the scheduler in a runnable state before actually running.
+ *
+ * @note Computed from `/sched/latencies:seconds`. Bucket boundaries are provided by the runtime, and are subject to change.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_GO_SCHEDULE_DURATION = 'go.schedule.duration';
 
 /**
  * Number of active HTTP requests.
@@ -266,11 +472,20 @@ export const METRIC_JVM_BUFFER_COUNT = 'jvm.buffer.count';
 export const METRIC_JVM_BUFFER_MEMORY_LIMIT = 'jvm.buffer.memory.limit';
 
 /**
+ * Deprecated, use `jvm.buffer.memory.used` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `jvm.buffer.memory.used`..
+ */
+export const METRIC_JVM_BUFFER_MEMORY_USAGE = 'jvm.buffer.memory.usage';
+
+/**
  * Measure of memory used by buffers.
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_JVM_BUFFER_MEMORY_USAGE = 'jvm.buffer.memory.usage';
+export const METRIC_JVM_BUFFER_MEMORY_USED = 'jvm.buffer.memory.used';
 
 /**
  * Measure of initial memory requested.
@@ -298,46 +513,158 @@ export const METRIC_JVM_SYSTEM_CPU_LOAD_1M = 'jvm.system.cpu.load_1m';
 export const METRIC_JVM_SYSTEM_CPU_UTILIZATION = 'jvm.system.cpu.utilization';
 
 /**
- * Measures the duration of process operation.
+ * Number of messages that were delivered to the application.
+ *
+ * @note Records the number of messages pulled from the broker or number of messages dispatched to the application in push-based scenarios.
+ * The metric **SHOULD** be reported once per message delivery. For example, if receiving and processing operations are both instrumented for a single message delivery, this counter is incremented when the message is received and not reported when it is processed.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_MESSAGING_CLIENT_CONSUMED_MESSAGES = 'messaging.client.consumed.messages';
+
+/**
+ * Duration of messaging operation initiated by a producer or consumer client.
+ *
+ * @note This metric **SHOULD** **NOT** be used to report processing duration - processing duration is reported in `messaging.process.duration` metric.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_MESSAGING_CLIENT_OPERATION_DURATION = 'messaging.client.operation.duration';
+
+/**
+ * Number of messages producer attempted to publish to the broker.
+ *
+ * @note This metric **MUST** **NOT** count messages that were created haven't yet been attempted to be published.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_MESSAGING_CLIENT_PUBLISHED_MESSAGES = 'messaging.client.published.messages';
+
+/**
+ * Duration of processing operation.
+ *
+ * @note This metric **MUST** be reported for operations with `messaging.operation.type` that matches `process`.
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_MESSAGING_PROCESS_DURATION = 'messaging.process.duration';
 
 /**
- * Measures the number of processed messages.
+ * Deprecated. Use `messaging.client.consumed.messages` instead.
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `messaging.client.consumed.messages`..
  */
 export const METRIC_MESSAGING_PROCESS_MESSAGES = 'messaging.process.messages';
 
 /**
- * Measures the duration of publish operation.
+ * Deprecated. Use `messaging.client.operation.duration` instead.
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `messaging.client.operation.duration`..
  */
 export const METRIC_MESSAGING_PUBLISH_DURATION = 'messaging.publish.duration';
 
 /**
- * Measures the number of published messages.
+ * Deprecated. Use `messaging.client.produced.messages` instead.
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `messaging.client.produced.messages`..
  */
 export const METRIC_MESSAGING_PUBLISH_MESSAGES = 'messaging.publish.messages';
 
 /**
- * Measures the duration of receive operation.
+ * Deprecated. Use `messaging.client.operation.duration` instead.
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `messaging.client.operation.duration`..
  */
 export const METRIC_MESSAGING_RECEIVE_DURATION = 'messaging.receive.duration';
 
 /**
- * Measures the number of received messages.
+ * Deprecated. Use `messaging.client.consumed.messages` instead.
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ *
+ * @deprecated  * Replaced by `messaging.client.consumed.messages`..
+ */
+export const METRIC_MESSAGING_RECEIVE_MESSAGES = 'messaging.receive.messages';
+
+/**
+ * Event loop maximum delay.
+ *
+ * @note Value can be retrieved from value `histogram.max` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_MESSAGING_RECEIVE_MESSAGES = 'messaging.receive.messages';
+export const METRIC_NODEJS_EVENTLOOP_DELAY_MAX = 'nodejs.eventloop.delay.max';
+
+/**
+ * Event loop mean delay.
+ *
+ * @note Value can be retrieved from value `histogram.mean` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_NODEJS_EVENTLOOP_DELAY_MEAN = 'nodejs.eventloop.delay.mean';
+
+/**
+ * Event loop minimum delay.
+ *
+ * @note Value can be retrieved from value `histogram.min` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_NODEJS_EVENTLOOP_DELAY_MIN = 'nodejs.eventloop.delay.min';
+
+/**
+ * Event loop 50 percentile delay.
+ *
+ * @note Value can be retrieved from value `histogram.percentile(50)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_NODEJS_EVENTLOOP_DELAY_P50 = 'nodejs.eventloop.delay.p50';
+
+/**
+ * Event loop 90 percentile delay.
+ *
+ * @note Value can be retrieved from value `histogram.percentile(90)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_NODEJS_EVENTLOOP_DELAY_P90 = 'nodejs.eventloop.delay.p90';
+
+/**
+ * Event loop 99 percentile delay.
+ *
+ * @note Value can be retrieved from value `histogram.percentile(99)` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_NODEJS_EVENTLOOP_DELAY_P99 = 'nodejs.eventloop.delay.p99';
+
+/**
+ * Event loop standard deviation delay.
+ *
+ * @note Value can be retrieved from value `histogram.stddev` of [`perf_hooks.monitorEventLoopDelay([options])`](https://nodejs.org/api/perf_hooks.html#perf_hooksmonitoreventloopdelayoptions)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_NODEJS_EVENTLOOP_DELAY_STDDEV = 'nodejs.eventloop.delay.stddev';
+
+/**
+ * Event loop utilization.
+ *
+ * @note The value range is [0.0,1.0] and can be retrieved from value [`performance.eventLoopUtilization([utilization1[, utilization2]])`](https://nodejs.org/api/perf_hooks.html#performanceeventlooputilizationutilization1-utilization2)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_NODEJS_EVENTLOOP_UTILIZATION = 'nodejs.eventloop.utilization';
 
 /**
  * Number of times the process has been context switched.
@@ -623,6 +950,17 @@ export const METRIC_SYSTEM_FILESYSTEM_UTILIZATION = 'system.filesystem.utilizati
 export const METRIC_SYSTEM_LINUX_MEMORY_AVAILABLE = 'system.linux.memory.available';
 
 /**
+ * Reports the memory used by the Linux kernel for managing caches of frequently used objects.
+ *
+ * @note The sum over the `reclaimable` and `unreclaimable` state values in `linux.memory.slab.usage` **SHOULD** be equal to the total slab memory available on the system.
+ * Note that the total slab memory is not constant and may vary over time.
+ * See also the [Slab allocator](https://blogs.oracle.com/linux/post/understanding-linux-kernel-memory-statistics) and `Slab` in [/proc/meminfo](https://man7.org/linux/man-pages/man5/proc.5.html).
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_SYSTEM_LINUX_MEMORY_SLAB_USAGE = 'system.linux.memory.slab.usage';
+
+/**
  * Total memory available in the system.
  *
  * @note Its value **SHOULD** equal the sum of `system.memory.state` over all states.
@@ -630,6 +968,16 @@ export const METRIC_SYSTEM_LINUX_MEMORY_AVAILABLE = 'system.linux.memory.availab
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_SYSTEM_MEMORY_LIMIT = 'system.memory.limit';
+
+/**
+ * Shared memory used (mostly by tmpfs).
+ *
+ * @note Equivalent of `shared` from [`free` command](https://man7.org/linux/man-pages/man1/free.1.html) or
+ * `Shmem` from [`/proc/meminfo`](https://man7.org/linux/man-pages/man5/proc.5.html)"
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_SYSTEM_MEMORY_SHARED = 'system.memory.shared';
 
 /**
  * Reports memory in use by state.
@@ -736,3 +1084,48 @@ export const METRIC_SYSTEM_PROCESS_COUNT = 'system.process.count';
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const METRIC_SYSTEM_PROCESS_CREATED = 'system.process.created';
+
+/**
+ * Garbage collection duration.
+ *
+ * @note The values can be retrieve from [`perf_hooks.PerformanceObserver(...).observe({ entryTypes: ['gc'] })`](https://nodejs.org/api/perf_hooks.html#performanceobserverobserveoptions)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_V8JS_GC_DURATION = 'v8js.gc.duration';
+
+/**
+ * Heap space available size.
+ *
+ * @note Value can be retrieved from value `space_available_size` of [`v8.getHeapSpaceStatistics()`](https://nodejs.org/api/v8.html#v8getheapspacestatistics)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_V8JS_HEAP_SPACE_AVAILABLE_SIZE = 'v8js.heap.space.available_size';
+
+/**
+ * Committed size of a heap space.
+ *
+ * @note Value can be retrieved from value `physical_space_size` of [`v8.getHeapSpaceStatistics()`](https://nodejs.org/api/v8.html#v8getheapspacestatistics)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_V8JS_HEAP_SPACE_PHYSICAL_SIZE = 'v8js.heap.space.physical_size';
+
+/**
+ * Total heap memory size pre-allocated.
+ *
+ * @note The value can be retrieved from value `space_size` of [`v8.getHeapSpaceStatistics()`](https://nodejs.org/api/v8.html#v8getheapspacestatistics)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_V8JS_MEMORY_HEAP_LIMIT = 'v8js.memory.heap.limit';
+
+/**
+ * Heap Memory size allocated.
+ *
+ * @note The value can be retrieved from value `space_used_size` of [`v8.getHeapSpaceStatistics()`](https://nodejs.org/api/v8.html#v8getheapspacestatistics)
+ *
+ * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const METRIC_V8JS_MEMORY_HEAP_USED = 'v8js.memory.heap.used';

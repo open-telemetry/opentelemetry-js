@@ -1,5 +1,5 @@
 params:
-  excluded_attributes: []
+  excluded_attributes: ["messaging.client_id"]
 
 templates:
   - pattern: stable_attributes.ts.j2
