@@ -21,5 +21,5 @@
 //----------------------------------------------------------------------------------------------------------
 {% for metric in ctx | sort(attribute="metric_name") %}
 {{d.docstring(metric)}}
-export const METRIC_{{ metric.metric_name | screaming_snake_case_const }} = '{{metric.metric_name}}';
+export const METRIC_{{ metric.metric_name | screaming_snake_case }} = '{{metric.metric_name}}';
 {% endfor %}

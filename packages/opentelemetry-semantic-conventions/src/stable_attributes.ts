@@ -24,6 +24,67 @@
 export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
 
 /**
+  * Enum value 'cpp' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_CPP = 'cpp';
+
+/**
+  * Enum value 'dotnet' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = 'dotnet';
+
+/**
+  * Enum value 'erlang' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = 'erlang';
+
+/**
+  * Enum value 'go' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_GO = 'go';
+
+/**
+  * Enum value 'java' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = 'java';
+
+/**
+  * Enum value 'nodejs' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = 'nodejs';
+
+/**
+  * Enum value 'php' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_PHP = 'php';
+
+/**
+  * Enum value 'python' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = 'python';
+
+/**
+  * Enum value 'ruby' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = 'ruby';
+
+/**
+  * Enum value 'rust' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_RUST = 'rust';
+
+/**
+  * Enum value 'swift' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = 'swift';
+
+/**
+  * Enum value 'webjs' for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
+  */
+export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = 'webjs';
+
+
+/**
  * The name of the telemetry SDK as defined above.
  *
  * @note The OpenTelemetry SDK **MUST** set the `telemetry.sdk.name` attribute to `opentelemetry`.
@@ -74,6 +135,12 @@ export const ATTR_CLIENT_PORT = 'client.port';
  * * Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
  */
 export const ATTR_ERROR_TYPE = 'error.type';
+
+/**
+  * Enum value '_OTHER' for attribute {@link ATTR_ERROR_TYPE}.
+  */
+export const ATTR_ERROR_TYPE_VALUE_OTHER = '_OTHER';
+
 
 /**
  * **SHOULD** be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
@@ -142,16 +209,67 @@ export const ATTR_HTTP_REQUEST_HEADER = (key: string) => `http.request.header.${
 export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method';
 
 /**
+  * Enum value '_OTHER' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_OTHER = '_OTHER';
+
+/**
+  * Enum value 'CONNECT' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_CONNECT = 'CONNECT';
+
+/**
+  * Enum value 'DELETE' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_DELETE = 'DELETE';
+
+/**
+  * Enum value 'GET' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_GET = 'GET';
+
+/**
+  * Enum value 'HEAD' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_HEAD = 'HEAD';
+
+/**
+  * Enum value 'OPTIONS' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_OPTIONS = 'OPTIONS';
+
+/**
+  * Enum value 'PATCH' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_PATCH = 'PATCH';
+
+/**
+  * Enum value 'POST' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_POST = 'POST';
+
+/**
+  * Enum value 'PUT' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_PUT = 'PUT';
+
+/**
+  * Enum value 'TRACE' for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
+  */
+export const ATTR_HTTP_REQUEST_METHOD_VALUE_TRACE = 'TRACE';
+
+
+/**
  * Original HTTP method sent by the client in the request line.
  */
-export const ATTR_HTTP_REQUEST_METHODORIGINAL = 'http.request.method_original';
+export const ATTR_HTTP_REQUEST_METHOD_ORIGINAL = 'http.request.method_original';
 
 /**
  * The ordinal number of request resending attempt (for any reason, including redirects).
  *
  * @note The resend count **SHOULD** be updated each time an HTTP request gets resent by the client, regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503 Server Unavailable, network issues, or any other).
  */
-export const ATTR_HTTP_REQUEST_RESENDCOUNT = 'http.request.resend_count';
+export const ATTR_HTTP_REQUEST_RESEND_COUNT = 'http.request.resend_count';
 
 /**
  * HTTP response headers, `<key>` being the normalized HTTP Header name (lowercase), the value being the header values.
@@ -165,7 +283,7 @@ export const ATTR_HTTP_RESPONSE_HEADER = (key: string) => `http.response.header.
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
  */
-export const ATTR_HTTP_RESPONSE_STATUSCODE = 'http.response.status_code';
+export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 
 /**
  * The matched route, that is, the path template in the format used by the respective server framework.
@@ -221,11 +339,43 @@ export const ATTR_NETWORK_PROTOCOL_VERSION = 'network.protocol.version';
 export const ATTR_NETWORK_TRANSPORT = 'network.transport';
 
 /**
+  * Enum value 'pipe' for attribute {@link ATTR_NETWORK_TRANSPORT}.
+  */
+export const ATTR_NETWORK_TRANSPORT_VALUE_PIPE = 'pipe';
+
+/**
+  * Enum value 'tcp' for attribute {@link ATTR_NETWORK_TRANSPORT}.
+  */
+export const ATTR_NETWORK_TRANSPORT_VALUE_TCP = 'tcp';
+
+/**
+  * Enum value 'udp' for attribute {@link ATTR_NETWORK_TRANSPORT}.
+  */
+export const ATTR_NETWORK_TRANSPORT_VALUE_UDP = 'udp';
+
+/**
+  * Enum value 'unix' for attribute {@link ATTR_NETWORK_TRANSPORT}.
+  */
+export const ATTR_NETWORK_TRANSPORT_VALUE_UNIX = 'unix';
+
+
+/**
  * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
  *
  * @note The value **SHOULD** be normalized to lowercase.
  */
 export const ATTR_NETWORK_TYPE = 'network.type';
+
+/**
+  * Enum value 'ipv4' for attribute {@link ATTR_NETWORK_TYPE}.
+  */
+export const ATTR_NETWORK_TYPE_VALUE_IPV4 = 'ipv4';
+
+/**
+  * Enum value 'ipv6' for attribute {@link ATTR_NETWORK_TYPE}.
+  */
+export const ATTR_NETWORK_TYPE_VALUE_IPV6 = 'ipv6';
+
 
 /**
  * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -289,4 +439,4 @@ export const ATTR_URL_SCHEME = 'url.scheme';
 /**
  * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
  */
-export const ATTR_USERAGENT_ORIGINAL = 'user_agent.original';
+export const ATTR_USER_AGENT_ORIGINAL = 'user_agent.original';

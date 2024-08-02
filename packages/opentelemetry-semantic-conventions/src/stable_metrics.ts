@@ -30,28 +30,28 @@ export const METRIC_ASPNETCORE_DIAGNOSTICS_EXCEPTIONS = 'aspnetcore.diagnostics.
  *
  * @note Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_ASPNETCORE_RATELIMITING_ACTIVEREQUESTLEASES = 'aspnetcore.rate_limiting.active_request_leases';
+export const METRIC_ASPNETCORE_RATE_LIMITING_ACTIVE_REQUEST_LEASES = 'aspnetcore.rate_limiting.active_request_leases';
 
 /**
  * Number of requests that are currently queued, waiting to acquire a rate limiting lease.
  *
  * @note Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_ASPNETCORE_RATELIMITING_QUEUEDREQUESTS = 'aspnetcore.rate_limiting.queued_requests';
+export const METRIC_ASPNETCORE_RATE_LIMITING_QUEUED_REQUESTS = 'aspnetcore.rate_limiting.queued_requests';
 
 /**
  * The time the request spent in a queue waiting to acquire a rate limiting lease.
  *
  * @note Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_ASPNETCORE_RATELIMITING_REQUEST_TIMEINQUEUE = 'aspnetcore.rate_limiting.request.time_in_queue';
+export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_TIME_IN_QUEUE = 'aspnetcore.rate_limiting.request.time_in_queue';
 
 /**
  * The duration of rate limiting lease held by requests on the server.
  *
  * @note Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_ASPNETCORE_RATELIMITING_REQUESTLEASE_DURATION = 'aspnetcore.rate_limiting.request_lease.duration';
+export const METRIC_ASPNETCORE_RATE_LIMITING_REQUEST_LEASE_DURATION = 'aspnetcore.rate_limiting.request_lease.duration';
 
 /**
  * Number of requests that tried to acquire a rate limiting lease.
@@ -63,14 +63,14 @@ export const METRIC_ASPNETCORE_RATELIMITING_REQUESTLEASE_DURATION = 'aspnetcore.
  * 
  * Meter name: `Microsoft.AspNetCore.RateLimiting`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_ASPNETCORE_RATELIMITING_REQUESTS = 'aspnetcore.rate_limiting.requests';
+export const METRIC_ASPNETCORE_RATE_LIMITING_REQUESTS = 'aspnetcore.rate_limiting.requests';
 
 /**
  * Number of requests that were attempted to be matched to an endpoint.
  *
  * @note Meter name: `Microsoft.AspNetCore.Routing`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_ASPNETCORE_ROUTING_MATCHATTEMPTS = 'aspnetcore.routing.match_attempts';
+export const METRIC_ASPNETCORE_ROUTING_MATCH_ATTEMPTS = 'aspnetcore.routing.match_attempts';
 
 /**
  * Duration of HTTP client requests.
@@ -107,7 +107,7 @@ export const METRIC_JVM_CPU_COUNT = 'jvm.cpu.count';
  *
  * @note The value range is [0.0,1.0]. This utilization is not defined as being for the specific interval since last measurement (unlike `system.cpu.utilization`). [Reference](https://docs.oracle.com/en/java/javase/17/docs/api/jdk.management/com/sun/management/OperatingSystemMXBean.html#getProcessCpuLoad()).
  */
-export const METRIC_JVM_CPU_RECENTUTILIZATION = 'jvm.cpu.recent_utilization';
+export const METRIC_JVM_CPU_RECENT_UTILIZATION = 'jvm.cpu.recent_utilization';
 
 /**
  * CPU time used by the process as reported by the JVM.
@@ -137,7 +137,7 @@ export const METRIC_JVM_MEMORY_USED = 'jvm.memory.used';
 /**
  * Measure of memory used, as measured after the most recent garbage collection event on this pool.
  */
-export const METRIC_JVM_MEMORY_USEDAFTERLASTGC = 'jvm.memory.used_after_last_gc';
+export const METRIC_JVM_MEMORY_USED_AFTER_LAST_GC = 'jvm.memory.used_after_last_gc';
 
 /**
  * Number of executing platform threads.
@@ -149,14 +149,14 @@ export const METRIC_JVM_THREAD_COUNT = 'jvm.thread.count';
  *
  * @note Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_KESTREL_ACTIVECONNECTIONS = 'kestrel.active_connections';
+export const METRIC_KESTREL_ACTIVE_CONNECTIONS = 'kestrel.active_connections';
 
 /**
  * Number of TLS handshakes that are currently in progress on the server.
  *
  * @note Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_KESTREL_ACTIVETLSHANDSHAKES = 'kestrel.active_tls_handshakes';
+export const METRIC_KESTREL_ACTIVE_TLS_HANDSHAKES = 'kestrel.active_tls_handshakes';
 
 /**
  * The duration of connections on the server.
@@ -170,14 +170,14 @@ export const METRIC_KESTREL_CONNECTION_DURATION = 'kestrel.connection.duration';
  *
  * @note Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_KESTREL_QUEUEDCONNECTIONS = 'kestrel.queued_connections';
+export const METRIC_KESTREL_QUEUED_CONNECTIONS = 'kestrel.queued_connections';
 
 /**
  * Number of HTTP requests on multiplexed connections (HTTP/2 and HTTP/3) that are currently queued and are waiting to start.
  *
  * @note Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_KESTREL_QUEUEDREQUESTS = 'kestrel.queued_requests';
+export const METRIC_KESTREL_QUEUED_REQUESTS = 'kestrel.queued_requests';
 
 /**
  * Number of connections rejected by the server.
@@ -185,14 +185,14 @@ export const METRIC_KESTREL_QUEUEDREQUESTS = 'kestrel.queued_requests';
  * @note Connections are rejected when the currently active count exceeds the value configured with `MaxConcurrentConnections`.
  * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_KESTREL_REJECTEDCONNECTIONS = 'kestrel.rejected_connections';
+export const METRIC_KESTREL_REJECTED_CONNECTIONS = 'kestrel.rejected_connections';
 
 /**
  * The duration of TLS handshakes on the server.
  *
  * @note Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_KESTREL_TLSHANDSHAKE_DURATION = 'kestrel.tls_handshake.duration';
+export const METRIC_KESTREL_TLS_HANDSHAKE_DURATION = 'kestrel.tls_handshake.duration';
 
 /**
  * Number of connections that are currently upgraded (WebSockets). .
@@ -201,14 +201,14 @@ export const METRIC_KESTREL_TLSHANDSHAKE_DURATION = 'kestrel.tls_handshake.durat
  * 
  * Meter name: `Microsoft.AspNetCore.Server.Kestrel`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_KESTREL_UPGRADEDCONNECTIONS = 'kestrel.upgraded_connections';
+export const METRIC_KESTREL_UPGRADED_CONNECTIONS = 'kestrel.upgraded_connections';
 
 /**
  * Number of connections that are currently active on the server.
  *
  * @note Meter name: `Microsoft.AspNetCore.Http.Connections`; Added in: ASP.NET Core 8.0
  */
-export const METRIC_SIGNALR_SERVER_ACTIVECONNECTIONS = 'signalr.server.active_connections';
+export const METRIC_SIGNALR_SERVER_ACTIVE_CONNECTIONS = 'signalr.server.active_connections';
 
 /**
  * The duration of connections on the server.

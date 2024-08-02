@@ -59,7 +59,7 @@ export const METRIC_CONTAINER_NETWORK_IO = 'container.network.io';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_CREATETIME = 'db.client.connections.create_time';
+export const METRIC_DB_CLIENT_CONNECTIONS_CREATE_TIME = 'db.client.connections.create_time';
 
 /**
  * The maximum number of idle open connections allowed
@@ -87,7 +87,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_MAX = 'db.client.connections.max';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_PENDINGREQUESTS = 'db.client.connections.pending_requests';
+export const METRIC_DB_CLIENT_CONNECTIONS_PENDING_REQUESTS = 'db.client.connections.pending_requests';
 
 /**
  * The number of connection timeouts that have occurred trying to obtain a connection from the pool
@@ -108,14 +108,14 @@ export const METRIC_DB_CLIENT_CONNECTIONS_USAGE = 'db.client.connections.usage';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_USETIME = 'db.client.connections.use_time';
+export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_time';
 
 /**
  * The time it took to obtain an open connection from the pool
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_DB_CLIENT_CONNECTIONS_WAITTIME = 'db.client.connections.wait_time';
+export const METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wait_time';
 
 /**
  * Measures the time taken to perform a DNS lookup.
@@ -136,7 +136,7 @@ export const METRIC_FAAS_COLDSTARTS = 'faas.coldstarts';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_FAAS_CPUUSAGE = 'faas.cpu_usage';
+export const METRIC_FAAS_CPU_USAGE = 'faas.cpu_usage';
 
 /**
  * Number of invocation errors
@@ -150,7 +150,7 @@ export const METRIC_FAAS_ERRORS = 'faas.errors';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_FAAS_INITDURATION = 'faas.init_duration';
+export const METRIC_FAAS_INIT_DURATION = 'faas.init_duration';
 
 /**
  * Number of successful invocations
@@ -164,21 +164,21 @@ export const METRIC_FAAS_INVOCATIONS = 'faas.invocations';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_FAAS_INVOKEDURATION = 'faas.invoke_duration';
+export const METRIC_FAAS_INVOKE_DURATION = 'faas.invoke_duration';
 
 /**
  * Distribution of max memory usage per invocation
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_FAAS_MEMUSAGE = 'faas.mem_usage';
+export const METRIC_FAAS_MEM_USAGE = 'faas.mem_usage';
 
 /**
  * Distribution of net I/O usage per invocation
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_FAAS_NETIO = 'faas.net_io';
+export const METRIC_FAAS_NET_IO = 'faas.net_io';
 
 /**
  * Number of invocation timeouts
@@ -192,7 +192,7 @@ export const METRIC_FAAS_TIMEOUTS = 'faas.timeouts';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_HTTP_CLIENT_ACTIVEREQUESTS = 'http.client.active_requests';
+export const METRIC_HTTP_CLIENT_ACTIVE_REQUESTS = 'http.client.active_requests';
 
 /**
  * The duration of the successfully established outbound HTTP connections.
@@ -206,7 +206,7 @@ export const METRIC_HTTP_CLIENT_CONNECTION_DURATION = 'http.client.connection.du
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_HTTP_CLIENT_OPENCONNECTIONS = 'http.client.open_connections';
+export const METRIC_HTTP_CLIENT_OPEN_CONNECTIONS = 'http.client.open_connections';
 
 /**
  * Size of HTTP client request bodies.
@@ -231,7 +231,7 @@ export const METRIC_HTTP_CLIENT_RESPONSE_BODY_SIZE = 'http.client.response.body.
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_HTTP_SERVER_ACTIVEREQUESTS = 'http.server.active_requests';
+export const METRIC_HTTP_SERVER_ACTIVE_REQUESTS = 'http.server.active_requests';
 
 /**
  * Size of HTTP server request bodies.
@@ -286,7 +286,7 @@ export const METRIC_JVM_MEMORY_INIT = 'jvm.memory.init';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_JVM_SYSTEM_CPU_LOAD1M = 'jvm.system.cpu.load_1m';
+export const METRIC_JVM_SYSTEM_CPU_LOAD_1M = 'jvm.system.cpu.load_1m';
 
 /**
  * Recent CPU utilization for the whole system as reported by the JVM.
@@ -344,7 +344,7 @@ export const METRIC_MESSAGING_RECEIVE_MESSAGES = 'messaging.receive.messages';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_PROCESS_CONTEXTSWITCHES = 'process.context_switches';
+export const METRIC_PROCESS_CONTEXT_SWITCHES = 'process.context_switches';
 
 /**
  * Total CPU seconds broken down by different states.
@@ -393,7 +393,7 @@ export const METRIC_PROCESS_NETWORK_IO = 'process.network.io';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_PROCESS_OPENFILEDESCRIPTOR_COUNT = 'process.open_file_descriptor.count';
+export const METRIC_PROCESS_OPEN_FILE_DESCRIPTOR_COUNT = 'process.open_file_descriptor.count';
 
 /**
  * Number of page faults the process has made.
@@ -439,7 +439,7 @@ export const METRIC_RPC_CLIENT_REQUEST_SIZE = 'rpc.client.request.size';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_RPC_CLIENT_REQUESTSPERRPC = 'rpc.client.requests_per_rpc';
+export const METRIC_RPC_CLIENT_REQUESTS_PER_RPC = 'rpc.client.requests_per_rpc';
 
 /**
  * Measures the size of RPC response messages (uncompressed).
@@ -459,7 +459,7 @@ export const METRIC_RPC_CLIENT_RESPONSE_SIZE = 'rpc.client.response.size';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_RPC_CLIENT_RESPONSESPERRPC = 'rpc.client.responses_per_rpc';
+export const METRIC_RPC_CLIENT_RESPONSES_PER_RPC = 'rpc.client.responses_per_rpc';
 
 /**
  * Measures the duration of inbound RPC.
@@ -491,7 +491,7 @@ export const METRIC_RPC_SERVER_REQUEST_SIZE = 'rpc.server.request.size';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_RPC_SERVER_REQUESTSPERRPC = 'rpc.server.requests_per_rpc';
+export const METRIC_RPC_SERVER_REQUESTS_PER_RPC = 'rpc.server.requests_per_rpc';
 
 /**
  * Measures the size of RPC response messages (uncompressed).
@@ -511,7 +511,7 @@ export const METRIC_RPC_SERVER_RESPONSE_SIZE = 'rpc.server.response.size';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_RPC_SERVER_RESPONSESPERRPC = 'rpc.server.responses_per_rpc';
+export const METRIC_RPC_SERVER_RESPONSES_PER_RPC = 'rpc.server.responses_per_rpc';
 
 /**
  * Reports the current frequency of the CPU in Hz
@@ -567,7 +567,7 @@ export const METRIC_SYSTEM_DISK_IO = 'system.disk.io';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_SYSTEM_DISK_IOTIME = 'system.disk.io_time';
+export const METRIC_SYSTEM_DISK_IO_TIME = 'system.disk.io_time';
 
 /**
 
@@ -586,7 +586,7 @@ export const METRIC_SYSTEM_DISK_MERGED = 'system.disk.merged';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_SYSTEM_DISK_OPERATIONTIME = 'system.disk.operation_time';
+export const METRIC_SYSTEM_DISK_OPERATION_TIME = 'system.disk.operation_time';
 
 /**
 
