@@ -7,7 +7,7 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # freeze the spec version to make SpanAttributess generation reproducible
 SPEC_VERSION=v1.25.0
-GENERATOR_VERSION=0.7.0
+GENERATOR_VERSION=0.8.0
 
 # When running on windows and your are getting references to ";C" (like Telemetry;C)
 # then this is an issue with the bash shell, so first run the following in your shell:

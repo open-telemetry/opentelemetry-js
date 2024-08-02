@@ -286,7 +286,7 @@ export const METRIC_JVM_MEMORY_INIT = 'jvm.memory.init';
  *
  * @experimental This metric is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const METRIC_JVM_SYSTEM_CPU_LOAD_1_M = 'jvm.system.cpu.load_1m';
+export const METRIC_JVM_SYSTEM_CPU_LOAD1M = 'jvm.system.cpu.load_1m';
 
 /**
  * Recent CPU utilization for the whole system as reported by the JVM.

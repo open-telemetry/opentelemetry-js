@@ -1012,7 +1012,7 @@ export const ATTR_HOST_ARCH = 'host.arch';
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_HOST_CPU_CACHE_L_2_SIZE = 'host.cpu.cache.l2.size';
+export const ATTR_HOST_CPU_CACHE_L2_SIZE = 'host.cpu.cache.l2.size';
 
 /**
  * Family or generation of the CPU.
@@ -1151,7 +1151,7 @@ export const ATTR_HTTP_RESPONSE_SIZE = 'http.response.size';
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_CLUSTER_NAME = 'k8s.cluster.name';
+export const ATTR_K8S_CLUSTER_NAME = 'k8s.cluster.name';
 
 /**
  * A pseudo-ID for the cluster, set to the UID of the `kube-system` namespace.
@@ -1181,154 +1181,154 @@ export const ATTR_K_8_S_CLUSTER_NAME = 'k8s.cluster.name';
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_CLUSTER_UID = 'k8s.cluster.uid';
+export const ATTR_K8S_CLUSTER_UID = 'k8s.cluster.uid';
 
 /**
  * The name of the Container from Pod specification, must be unique within a Pod. Container runtime usually uses different globally unique name (`container.name`).
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_CONTAINER_NAME = 'k8s.container.name';
+export const ATTR_K8S_CONTAINER_NAME = 'k8s.container.name';
 
 /**
  * Number of times the container was restarted. This attribute can be used to identify a particular container (running or stopped) within a container spec.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_CONTAINER_RESTARTCOUNT = 'k8s.container.restart_count';
+export const ATTR_K8S_CONTAINER_RESTARTCOUNT = 'k8s.container.restart_count';
 
 /**
  * The name of the CronJob.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_CRONJOB_NAME = 'k8s.cronjob.name';
+export const ATTR_K8S_CRONJOB_NAME = 'k8s.cronjob.name';
 
 /**
  * The UID of the CronJob.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_CRONJOB_UID = 'k8s.cronjob.uid';
+export const ATTR_K8S_CRONJOB_UID = 'k8s.cronjob.uid';
 
 /**
  * The name of the DaemonSet.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_DAEMONSET_NAME = 'k8s.daemonset.name';
+export const ATTR_K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
 
 /**
  * The UID of the DaemonSet.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_DAEMONSET_UID = 'k8s.daemonset.uid';
+export const ATTR_K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
 
 /**
  * The name of the Deployment.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_DEPLOYMENT_NAME = 'k8s.deployment.name';
+export const ATTR_K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';
 
 /**
  * The UID of the Deployment.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_DEPLOYMENT_UID = 'k8s.deployment.uid';
+export const ATTR_K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
 
 /**
  * The name of the Job.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_JOB_NAME = 'k8s.job.name';
+export const ATTR_K8S_JOB_NAME = 'k8s.job.name';
 
 /**
  * The UID of the Job.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_JOB_UID = 'k8s.job.uid';
+export const ATTR_K8S_JOB_UID = 'k8s.job.uid';
 
 /**
  * The name of the namespace that the pod is running in.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_NAMESPACE_NAME = 'k8s.namespace.name';
+export const ATTR_K8S_NAMESPACE_NAME = 'k8s.namespace.name';
 
 /**
  * The name of the Node.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_NODE_NAME = 'k8s.node.name';
+export const ATTR_K8S_NODE_NAME = 'k8s.node.name';
 
 /**
  * The UID of the Node.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_NODE_UID = 'k8s.node.uid';
+export const ATTR_K8S_NODE_UID = 'k8s.node.uid';
 
 /**
  * The annotation key-value pairs placed on the Pod, the `<key>` being the annotation name, the value being the annotation value.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_POD_ANNOTATION = 'k8s.pod.annotation';
+export const ATTR_K8S_POD_ANNOTATION = 'k8s.pod.annotation';
 
 /**
  * The label key-value pairs placed on the Pod, the `<key>` being the label name, the value being the label value.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_POD_LABEL = 'k8s.pod.label';
+export const ATTR_K8S_POD_LABEL = 'k8s.pod.label';
 
 /**
  * The name of the Pod.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_POD_NAME = 'k8s.pod.name';
+export const ATTR_K8S_POD_NAME = 'k8s.pod.name';
 
 /**
  * The UID of the Pod.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_POD_UID = 'k8s.pod.uid';
+export const ATTR_K8S_POD_UID = 'k8s.pod.uid';
 
 /**
  * The name of the ReplicaSet.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_REPLICASET_NAME = 'k8s.replicaset.name';
+export const ATTR_K8S_REPLICASET_NAME = 'k8s.replicaset.name';
 
 /**
  * The UID of the ReplicaSet.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_REPLICASET_UID = 'k8s.replicaset.uid';
+export const ATTR_K8S_REPLICASET_UID = 'k8s.replicaset.uid';
 
 /**
  * The name of the StatefulSet.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_STATEFULSET_NAME = 'k8s.statefulset.name';
+export const ATTR_K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
 
 /**
  * The UID of the StatefulSet.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_K_8_S_STATEFULSET_UID = 'k8s.statefulset.uid';
+export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 
 /**
  * The number of messages sent, received, or processed in the scope of the batching operation.
@@ -2009,21 +2009,21 @@ export const ATTR_TLS_CLIENT_CERTIFICATECHAIN = 'tls.client.certificate_chain';
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_CLIENT_HASH_MD_5 = 'tls.client.hash.md5';
+export const ATTR_TLS_CLIENT_HASH_MD5 = 'tls.client.hash.md5';
 
 /**
  * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_CLIENT_HASH_SHA_1 = 'tls.client.hash.sha1';
+export const ATTR_TLS_CLIENT_HASH_SHA1 = 'tls.client.hash.sha1';
 
 /**
  * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the client. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_CLIENT_HASH_SHA_256 = 'tls.client.hash.sha256';
+export const ATTR_TLS_CLIENT_HASH_SHA256 = 'tls.client.hash.sha256';
 
 /**
  * Distinguished name of [subject](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6) of the issuer of the x.509 certificate presented by the client.
@@ -2037,7 +2037,7 @@ export const ATTR_TLS_CLIENT_ISSUER = 'tls.client.issuer';
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_CLIENT_JA_3 = 'tls.client.ja3';
+export const ATTR_TLS_CLIENT_JA3 = 'tls.client.ja3';
 
 /**
  * Date/Time indicating when client certificate is no longer considered valid.
@@ -2135,21 +2135,21 @@ export const ATTR_TLS_SERVER_CERTIFICATECHAIN = 'tls.server.certificate_chain';
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_SERVER_HASH_MD_5 = 'tls.server.hash.md5';
+export const ATTR_TLS_SERVER_HASH_MD5 = 'tls.server.hash.md5';
 
 /**
  * Certificate fingerprint using the SHA1 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_SERVER_HASH_SHA_1 = 'tls.server.hash.sha1';
+export const ATTR_TLS_SERVER_HASH_SHA1 = 'tls.server.hash.sha1';
 
 /**
  * Certificate fingerprint using the SHA256 digest of DER-encoded version of certificate offered by the server. For consistency with other hash values, this value should be formatted as an uppercase hash.
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_SERVER_HASH_SHA_256 = 'tls.server.hash.sha256';
+export const ATTR_TLS_SERVER_HASH_SHA256 = 'tls.server.hash.sha256';
 
 /**
  * Distinguished name of [subject](https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.6) of the issuer of the x.509 certificate presented by the client.
@@ -2163,7 +2163,7 @@ export const ATTR_TLS_SERVER_ISSUER = 'tls.server.issuer';
  *
  * @experimental This attribute is experimental and is subject to change in minor releases of `@opentelemetry/semantic-conventions`.
  */
-export const ATTR_TLS_SERVER_JA_3_S = 'tls.server.ja3s';
+export const ATTR_TLS_SERVER_JA3S = 'tls.server.ja3s';
 
 /**
  * Date/Time indicating when server certificate is no longer considered valid.
