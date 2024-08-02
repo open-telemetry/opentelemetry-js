@@ -18,12 +18,6 @@
       "esnext": "./build/esnext/index-incubating.js",
       "types": "./build/src/index-incubating.d.ts",
       "default": "./build/src/index-incubating.js"
-    },
-    "./stable": {
-      "module": "./build/esm/stable.js",
-      "esnext": "./build/esnext/stable.js",
-      "types": "./build/src/stable.d.ts",
-      "default": "./build/src/stable.js"
     }
   },
   "typesVersions": {
@@ -33,9 +27,6 @@
       ],
       "incubating": [
         "./build/src/index-incubating.d.ts"
-      ],
-      "stable": [
-        "./build/src/stable.d.ts"
       ]
     }
   },
