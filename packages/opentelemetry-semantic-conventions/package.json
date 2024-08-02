@@ -31,8 +31,8 @@
       "*": [
         "./build/src/index.d.ts"
       ],
-      "experimental": [
-        "./build/src/index-experimental.d.ts"
+      "incubating": [
+        "./build/src/index-incubating.d.ts"
       ],
       "stable": [
         "./build/src/stable.d.ts"
