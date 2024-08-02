@@ -42,19 +42,19 @@ export const ATTR_ANDROID_OS_API_LEVEL = 'android.os.api_level';
 export const ATTR_ANDROID_STATE = 'android.state';
 
 /**
-  * Enum value 'background' for attribute {@link ATTR_ANDROID_STATE}.
+  * Enum value "background" for attribute {@link ATTR_ANDROID_STATE}.
   */
-export const ATTR_ANDROID_STATE_VALUE_BACKGROUND = 'background';
+export const ATTR_ANDROID_STATE_VALUE_BACKGROUND = "background";
 
 /**
-  * Enum value 'created' for attribute {@link ATTR_ANDROID_STATE}.
+  * Enum value "created" for attribute {@link ATTR_ANDROID_STATE}.
   */
-export const ATTR_ANDROID_STATE_VALUE_CREATED = 'created';
+export const ATTR_ANDROID_STATE_VALUE_CREATED = "created";
 
 /**
-  * Enum value 'foreground' for attribute {@link ATTR_ANDROID_STATE}.
+  * Enum value "foreground" for attribute {@link ATTR_ANDROID_STATE}.
   */
-export const ATTR_ANDROID_STATE_VALUE_FOREGROUND = 'foreground';
+export const ATTR_ANDROID_STATE_VALUE_FOREGROUND = "foreground";
 
 
 /**
@@ -296,14 +296,14 @@ export const ATTR_AWS_ECS_CONTAINER_ARN = 'aws.ecs.container.arn';
 export const ATTR_AWS_ECS_LAUNCHTYPE = 'aws.ecs.launchtype';
 
 /**
-  * Enum value 'ec2' for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
+  * Enum value "ec2" for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
   */
-export const ATTR_AWS_ECS_LAUNCHTYPE_VALUE_EC2 = 'ec2';
+export const ATTR_AWS_ECS_LAUNCHTYPE_VALUE_EC2 = "ec2";
 
 /**
-  * Enum value 'fargate' for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
+  * Enum value "fargate" for attribute {@link ATTR_AWS_ECS_LAUNCHTYPE}.
   */
-export const ATTR_AWS_ECS_LAUNCHTYPE_VALUE_FARGATE = 'fargate';
+export const ATTR_AWS_ECS_LAUNCHTYPE_VALUE_FARGATE = "fargate";
 
 
 /**
@@ -559,19 +559,19 @@ export const ATTR_CICD_PIPELINE_TASK_RUN_URL_FULL = 'cicd.pipeline.task.run.url.
 export const ATTR_CICD_PIPELINE_TASK_TYPE = 'cicd.pipeline.task.type';
 
 /**
-  * Enum value 'build' for attribute {@link ATTR_CICD_PIPELINE_TASK_TYPE}.
+  * Enum value "build" for attribute {@link ATTR_CICD_PIPELINE_TASK_TYPE}.
   */
-export const ATTR_CICD_PIPELINE_TASK_TYPE_VALUE_BUILD = 'build';
+export const ATTR_CICD_PIPELINE_TASK_TYPE_VALUE_BUILD = "build";
 
 /**
-  * Enum value 'deploy' for attribute {@link ATTR_CICD_PIPELINE_TASK_TYPE}.
+  * Enum value "deploy" for attribute {@link ATTR_CICD_PIPELINE_TASK_TYPE}.
   */
-export const ATTR_CICD_PIPELINE_TASK_TYPE_VALUE_DEPLOY = 'deploy';
+export const ATTR_CICD_PIPELINE_TASK_TYPE_VALUE_DEPLOY = "deploy";
 
 /**
-  * Enum value 'test' for attribute {@link ATTR_CICD_PIPELINE_TASK_TYPE}.
+  * Enum value "test" for attribute {@link ATTR_CICD_PIPELINE_TASK_TYPE}.
   */
-export const ATTR_CICD_PIPELINE_TASK_TYPE_VALUE_TEST = 'test';
+export const ATTR_CICD_PIPELINE_TASK_TYPE_VALUE_TEST = "test";
 
 
 /**
@@ -600,144 +600,144 @@ export const ATTR_CLOUD_AVAILABILITY_ZONE = 'cloud.availability_zone';
 export const ATTR_CLOUD_PLATFORM = 'cloud.platform';
 
 /**
-  * Enum value 'alibaba_cloud_ecs' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "alibaba_cloud_ecs" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs';
+export const ATTR_CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_ECS = "alibaba_cloud_ecs";
 
 /**
-  * Enum value 'alibaba_cloud_fc' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "alibaba_cloud_fc" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_FC = 'alibaba_cloud_fc';
+export const ATTR_CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_FC = "alibaba_cloud_fc";
 
 /**
-  * Enum value 'alibaba_cloud_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "alibaba_cloud_openshift" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_OPENSHIFT = 'alibaba_cloud_openshift';
+export const ATTR_CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_OPENSHIFT = "alibaba_cloud_openshift";
 
 /**
-  * Enum value 'aws_app_runner' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "aws_app_runner" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AWS_APP_RUNNER = 'aws_app_runner';
+export const ATTR_CLOUD_PLATFORM_VALUE_AWS_APP_RUNNER = "aws_app_runner";
 
 /**
-  * Enum value 'aws_ec2' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "aws_ec2" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AWS_EC2 = 'aws_ec2';
+export const ATTR_CLOUD_PLATFORM_VALUE_AWS_EC2 = "aws_ec2";
 
 /**
-  * Enum value 'aws_ecs' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "aws_ecs" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AWS_ECS = 'aws_ecs';
+export const ATTR_CLOUD_PLATFORM_VALUE_AWS_ECS = "aws_ecs";
 
 /**
-  * Enum value 'aws_eks' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "aws_eks" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AWS_EKS = 'aws_eks';
+export const ATTR_CLOUD_PLATFORM_VALUE_AWS_EKS = "aws_eks";
 
 /**
-  * Enum value 'aws_elastic_beanstalk' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "aws_elastic_beanstalk" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK = 'aws_elastic_beanstalk';
+export const ATTR_CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK = "aws_elastic_beanstalk";
 
 /**
-  * Enum value 'aws_lambda' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "aws_lambda" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AWS_LAMBDA = 'aws_lambda';
+export const ATTR_CLOUD_PLATFORM_VALUE_AWS_LAMBDA = "aws_lambda";
 
 /**
-  * Enum value 'aws_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "aws_openshift" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AWS_OPENSHIFT = 'aws_openshift';
+export const ATTR_CLOUD_PLATFORM_VALUE_AWS_OPENSHIFT = "aws_openshift";
 
 /**
-  * Enum value 'azure_aks' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "azure_aks" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_AKS = 'azure_aks';
+export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_AKS = "azure_aks";
 
 /**
-  * Enum value 'azure_app_service' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "azure_app_service" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_APP_SERVICE = 'azure_app_service';
+export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_APP_SERVICE = "azure_app_service";
 
 /**
-  * Enum value 'azure_container_apps' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "azure_container_apps" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_APPS = 'azure_container_apps';
+export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_APPS = "azure_container_apps";
 
 /**
-  * Enum value 'azure_container_instances' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "azure_container_instances" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_INSTANCES = 'azure_container_instances';
+export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_INSTANCES = "azure_container_instances";
 
 /**
-  * Enum value 'azure_functions' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "azure_functions" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_FUNCTIONS = 'azure_functions';
+export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_FUNCTIONS = "azure_functions";
 
 /**
-  * Enum value 'azure_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "azure_openshift" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_OPENSHIFT = 'azure_openshift';
+export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_OPENSHIFT = "azure_openshift";
 
 /**
-  * Enum value 'azure_vm' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "azure_vm" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_VM = 'azure_vm';
+export const ATTR_CLOUD_PLATFORM_VALUE_AZURE_VM = "azure_vm";
 
 /**
-  * Enum value 'gcp_app_engine' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "gcp_app_engine" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_GCP_APP_ENGINE = 'gcp_app_engine';
+export const ATTR_CLOUD_PLATFORM_VALUE_GCP_APP_ENGINE = "gcp_app_engine";
 
 /**
-  * Enum value 'gcp_bare_metal_solution' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "gcp_bare_metal_solution" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_GCP_BARE_METAL_SOLUTION = 'gcp_bare_metal_solution';
+export const ATTR_CLOUD_PLATFORM_VALUE_GCP_BARE_METAL_SOLUTION = "gcp_bare_metal_solution";
 
 /**
-  * Enum value 'gcp_cloud_functions' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "gcp_cloud_functions" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions';
+export const ATTR_CLOUD_PLATFORM_VALUE_GCP_CLOUD_FUNCTIONS = "gcp_cloud_functions";
 
 /**
-  * Enum value 'gcp_cloud_run' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "gcp_cloud_run" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_GCP_CLOUD_RUN = 'gcp_cloud_run';
+export const ATTR_CLOUD_PLATFORM_VALUE_GCP_CLOUD_RUN = "gcp_cloud_run";
 
 /**
-  * Enum value 'gcp_compute_engine' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "gcp_compute_engine" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_GCP_COMPUTE_ENGINE = 'gcp_compute_engine';
+export const ATTR_CLOUD_PLATFORM_VALUE_GCP_COMPUTE_ENGINE = "gcp_compute_engine";
 
 /**
-  * Enum value 'gcp_kubernetes_engine' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "gcp_kubernetes_engine" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_GCP_KUBERNETES_ENGINE = 'gcp_kubernetes_engine';
+export const ATTR_CLOUD_PLATFORM_VALUE_GCP_KUBERNETES_ENGINE = "gcp_kubernetes_engine";
 
 /**
-  * Enum value 'gcp_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "gcp_openshift" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_GCP_OPENSHIFT = 'gcp_openshift';
+export const ATTR_CLOUD_PLATFORM_VALUE_GCP_OPENSHIFT = "gcp_openshift";
 
 /**
-  * Enum value 'ibm_cloud_openshift' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "ibm_cloud_openshift" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
+export const ATTR_CLOUD_PLATFORM_VALUE_IBM_CLOUD_OPENSHIFT = "ibm_cloud_openshift";
 
 /**
-  * Enum value 'tencent_cloud_cvm' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "tencent_cloud_cvm" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_TENCENT_CLOUD_CVM = 'tencent_cloud_cvm';
+export const ATTR_CLOUD_PLATFORM_VALUE_TENCENT_CLOUD_CVM = "tencent_cloud_cvm";
 
 /**
-  * Enum value 'tencent_cloud_eks' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "tencent_cloud_eks" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_TENCENT_CLOUD_EKS = 'tencent_cloud_eks';
+export const ATTR_CLOUD_PLATFORM_VALUE_TENCENT_CLOUD_EKS = "tencent_cloud_eks";
 
 /**
-  * Enum value 'tencent_cloud_scf' for attribute {@link ATTR_CLOUD_PLATFORM}.
+  * Enum value "tencent_cloud_scf" for attribute {@link ATTR_CLOUD_PLATFORM}.
   */
-export const ATTR_CLOUD_PLATFORM_VALUE_TENCENT_CLOUD_SCF = 'tencent_cloud_scf';
+export const ATTR_CLOUD_PLATFORM_VALUE_TENCENT_CLOUD_SCF = "tencent_cloud_scf";
 
 
 /**
@@ -748,39 +748,39 @@ export const ATTR_CLOUD_PLATFORM_VALUE_TENCENT_CLOUD_SCF = 'tencent_cloud_scf';
 export const ATTR_CLOUD_PROVIDER = 'cloud.provider';
 
 /**
-  * Enum value 'alibaba_cloud' for attribute {@link ATTR_CLOUD_PROVIDER}.
+  * Enum value "alibaba_cloud" for attribute {@link ATTR_CLOUD_PROVIDER}.
   */
-export const ATTR_CLOUD_PROVIDER_VALUE_ALIBABA_CLOUD = 'alibaba_cloud';
+export const ATTR_CLOUD_PROVIDER_VALUE_ALIBABA_CLOUD = "alibaba_cloud";
 
 /**
-  * Enum value 'aws' for attribute {@link ATTR_CLOUD_PROVIDER}.
+  * Enum value "aws" for attribute {@link ATTR_CLOUD_PROVIDER}.
   */
-export const ATTR_CLOUD_PROVIDER_VALUE_AWS = 'aws';
+export const ATTR_CLOUD_PROVIDER_VALUE_AWS = "aws";
 
 /**
-  * Enum value 'azure' for attribute {@link ATTR_CLOUD_PROVIDER}.
+  * Enum value "azure" for attribute {@link ATTR_CLOUD_PROVIDER}.
   */
-export const ATTR_CLOUD_PROVIDER_VALUE_AZURE = 'azure';
+export const ATTR_CLOUD_PROVIDER_VALUE_AZURE = "azure";
 
 /**
-  * Enum value 'gcp' for attribute {@link ATTR_CLOUD_PROVIDER}.
+  * Enum value "gcp" for attribute {@link ATTR_CLOUD_PROVIDER}.
   */
-export const ATTR_CLOUD_PROVIDER_VALUE_GCP = 'gcp';
+export const ATTR_CLOUD_PROVIDER_VALUE_GCP = "gcp";
 
 /**
-  * Enum value 'heroku' for attribute {@link ATTR_CLOUD_PROVIDER}.
+  * Enum value "heroku" for attribute {@link ATTR_CLOUD_PROVIDER}.
   */
-export const ATTR_CLOUD_PROVIDER_VALUE_HEROKU = 'heroku';
+export const ATTR_CLOUD_PROVIDER_VALUE_HEROKU = "heroku";
 
 /**
-  * Enum value 'ibm_cloud' for attribute {@link ATTR_CLOUD_PROVIDER}.
+  * Enum value "ibm_cloud" for attribute {@link ATTR_CLOUD_PROVIDER}.
   */
-export const ATTR_CLOUD_PROVIDER_VALUE_IBM_CLOUD = 'ibm_cloud';
+export const ATTR_CLOUD_PROVIDER_VALUE_IBM_CLOUD = "ibm_cloud";
 
 /**
-  * Enum value 'tencent_cloud' for attribute {@link ATTR_CLOUD_PROVIDER}.
+  * Enum value "tencent_cloud" for attribute {@link ATTR_CLOUD_PROVIDER}.
   */
-export const ATTR_CLOUD_PROVIDER_VALUE_TENCENT_CLOUD = 'tencent_cloud';
+export const ATTR_CLOUD_PROVIDER_VALUE_TENCENT_CLOUD = "tencent_cloud";
 
 
 /**
@@ -927,19 +927,19 @@ export const ATTR_CONTAINER_COMMAND_LINE = 'container.command_line';
 export const ATTR_CONTAINER_CPU_STATE = 'container.cpu.state';
 
 /**
-  * Enum value 'kernel' for attribute {@link ATTR_CONTAINER_CPU_STATE}.
+  * Enum value "kernel" for attribute {@link ATTR_CONTAINER_CPU_STATE}.
   */
-export const ATTR_CONTAINER_CPU_STATE_VALUE_KERNEL = 'kernel';
+export const ATTR_CONTAINER_CPU_STATE_VALUE_KERNEL = "kernel";
 
 /**
-  * Enum value 'system' for attribute {@link ATTR_CONTAINER_CPU_STATE}.
+  * Enum value "system" for attribute {@link ATTR_CONTAINER_CPU_STATE}.
   */
-export const ATTR_CONTAINER_CPU_STATE_VALUE_SYSTEM = 'system';
+export const ATTR_CONTAINER_CPU_STATE_VALUE_SYSTEM = "system";
 
 /**
-  * Enum value 'user' for attribute {@link ATTR_CONTAINER_CPU_STATE}.
+  * Enum value "user" for attribute {@link ATTR_CONTAINER_CPU_STATE}.
   */
-export const ATTR_CONTAINER_CPU_STATE_VALUE_USER = 'user';
+export const ATTR_CONTAINER_CPU_STATE_VALUE_USER = "user";
 
 
 /**
@@ -1021,44 +1021,44 @@ export const ATTR_CONTAINER_RUNTIME = 'container.runtime';
 export const ATTR_CPU_MODE = 'cpu.mode';
 
 /**
-  * Enum value 'idle' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "idle" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_IDLE = 'idle';
+export const ATTR_CPU_MODE_VALUE_IDLE = "idle";
 
 /**
-  * Enum value 'interrupt' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "interrupt" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_INTERRUPT = 'interrupt';
+export const ATTR_CPU_MODE_VALUE_INTERRUPT = "interrupt";
 
 /**
-  * Enum value 'iowait' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "iowait" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_IOWAIT = 'iowait';
+export const ATTR_CPU_MODE_VALUE_IOWAIT = "iowait";
 
 /**
-  * Enum value 'kernel' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "kernel" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_KERNEL = 'kernel';
+export const ATTR_CPU_MODE_VALUE_KERNEL = "kernel";
 
 /**
-  * Enum value 'nice' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "nice" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_NICE = 'nice';
+export const ATTR_CPU_MODE_VALUE_NICE = "nice";
 
 /**
-  * Enum value 'steal' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "steal" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_STEAL = 'steal';
+export const ATTR_CPU_MODE_VALUE_STEAL = "steal";
 
 /**
-  * Enum value 'system' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "system" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_SYSTEM = 'system';
+export const ATTR_CPU_MODE_VALUE_SYSTEM = "system";
 
 /**
-  * Enum value 'user' for attribute {@link ATTR_CPU_MODE}.
+  * Enum value "user" for attribute {@link ATTR_CPU_MODE}.
   */
-export const ATTR_CPU_MODE_VALUE_USER = 'user';
+export const ATTR_CPU_MODE_VALUE_USER = "user";
 
 
 /**
@@ -1069,59 +1069,59 @@ export const ATTR_CPU_MODE_VALUE_USER = 'user';
 export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL = 'db.cassandra.consistency_level';
 
 /**
-  * Enum value 'all' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "all" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ALL = 'all';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ALL = "all";
 
 /**
-  * Enum value 'any' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "any" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ANY = 'any';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ANY = "any";
 
 /**
-  * Enum value 'each_quorum' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "each_quorum" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_EACH_QUORUM = 'each_quorum';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_EACH_QUORUM = "each_quorum";
 
 /**
-  * Enum value 'local_one' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "local_one" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_ONE = 'local_one';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_ONE = "local_one";
 
 /**
-  * Enum value 'local_quorum' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "local_quorum" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_QUORUM = 'local_quorum';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_QUORUM = "local_quorum";
 
 /**
-  * Enum value 'local_serial' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "local_serial" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_SERIAL = 'local_serial';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_SERIAL = "local_serial";
 
 /**
-  * Enum value 'one' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "one" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ONE = 'one';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ONE = "one";
 
 /**
-  * Enum value 'quorum' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "quorum" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_QUORUM = 'quorum';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_QUORUM = "quorum";
 
 /**
-  * Enum value 'serial' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "serial" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_SERIAL = 'serial';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_SERIAL = "serial";
 
 /**
-  * Enum value 'three' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "three" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_THREE = 'three';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_THREE = "three";
 
 /**
-  * Enum value 'two' for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
+  * Enum value "two" for attribute {@link ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL}.
   */
-export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_TWO = 'two';
+export const ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_TWO = "two";
 
 
 /**
@@ -1183,14 +1183,14 @@ export const ATTR_DB_CLIENT_CONNECTION_POOL_NAME = 'db.client.connection.pool.na
 export const ATTR_DB_CLIENT_CONNECTION_STATE = 'db.client.connection.state';
 
 /**
-  * Enum value 'idle' for attribute {@link ATTR_DB_CLIENT_CONNECTION_STATE}.
+  * Enum value "idle" for attribute {@link ATTR_DB_CLIENT_CONNECTION_STATE}.
   */
-export const ATTR_DB_CLIENT_CONNECTION_STATE_VALUE_IDLE = 'idle';
+export const ATTR_DB_CLIENT_CONNECTION_STATE_VALUE_IDLE = "idle";
 
 /**
-  * Enum value 'used' for attribute {@link ATTR_DB_CLIENT_CONNECTION_STATE}.
+  * Enum value "used" for attribute {@link ATTR_DB_CLIENT_CONNECTION_STATE}.
   */
-export const ATTR_DB_CLIENT_CONNECTION_STATE_VALUE_USED = 'used';
+export const ATTR_DB_CLIENT_CONNECTION_STATE_VALUE_USED = "used";
 
 
 /**
@@ -1212,14 +1212,14 @@ export const ATTR_DB_CLIENT_CONNECTIONS_POOL_NAME = 'db.client.connections.pool.
 export const ATTR_DB_CLIENT_CONNECTIONS_STATE = 'db.client.connections.state';
 
 /**
-  * Enum value 'idle' for attribute {@link ATTR_DB_CLIENT_CONNECTIONS_STATE}.
+  * Enum value "idle" for attribute {@link ATTR_DB_CLIENT_CONNECTIONS_STATE}.
   */
-export const ATTR_DB_CLIENT_CONNECTIONS_STATE_VALUE_IDLE = 'idle';
+export const ATTR_DB_CLIENT_CONNECTIONS_STATE_VALUE_IDLE = "idle";
 
 /**
-  * Enum value 'used' for attribute {@link ATTR_DB_CLIENT_CONNECTIONS_STATE}.
+  * Enum value "used" for attribute {@link ATTR_DB_CLIENT_CONNECTIONS_STATE}.
   */
-export const ATTR_DB_CLIENT_CONNECTIONS_STATE_VALUE_USED = 'used';
+export const ATTR_DB_CLIENT_CONNECTIONS_STATE_VALUE_USED = "used";
 
 
 /**
@@ -1257,14 +1257,14 @@ export const ATTR_DB_COSMOSDB_CLIENT_ID = 'db.cosmosdb.client_id';
 export const ATTR_DB_COSMOSDB_CONNECTION_MODE = 'db.cosmosdb.connection_mode';
 
 /**
-  * Enum value 'direct' for attribute {@link ATTR_DB_COSMOSDB_CONNECTION_MODE}.
+  * Enum value "direct" for attribute {@link ATTR_DB_COSMOSDB_CONNECTION_MODE}.
   */
-export const ATTR_DB_COSMOSDB_CONNECTION_MODE_VALUE_DIRECT = 'direct';
+export const ATTR_DB_COSMOSDB_CONNECTION_MODE_VALUE_DIRECT = "direct";
 
 /**
-  * Enum value 'gateway' for attribute {@link ATTR_DB_COSMOSDB_CONNECTION_MODE}.
+  * Enum value "gateway" for attribute {@link ATTR_DB_COSMOSDB_CONNECTION_MODE}.
   */
-export const ATTR_DB_COSMOSDB_CONNECTION_MODE_VALUE_GATEWAY = 'gateway';
+export const ATTR_DB_COSMOSDB_CONNECTION_MODE_VALUE_GATEWAY = "gateway";
 
 
 /**
@@ -1284,79 +1284,79 @@ export const ATTR_DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container';
 export const ATTR_DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type';
 
 /**
-  * Enum value 'Batch' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Batch" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_BATCH = 'Batch';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_BATCH = "Batch";
 
 /**
-  * Enum value 'Create' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Create" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_CREATE = 'Create';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_CREATE = "Create";
 
 /**
-  * Enum value 'Delete' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Delete" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_DELETE = 'Delete';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_DELETE = "Delete";
 
 /**
-  * Enum value 'Execute' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Execute" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE = 'Execute';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE = "Execute";
 
 /**
-  * Enum value 'ExecuteJavaScript' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "ExecuteJavaScript" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE_JAVASCRIPT = 'ExecuteJavaScript';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE_JAVASCRIPT = "ExecuteJavaScript";
 
 /**
-  * Enum value 'Head' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Head" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD = 'Head';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD = "Head";
 
 /**
-  * Enum value 'HeadFeed' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "HeadFeed" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD_FEED = 'HeadFeed';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD_FEED = "HeadFeed";
 
 /**
-  * Enum value 'Invalid' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Invalid" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_INVALID = 'Invalid';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_INVALID = "Invalid";
 
 /**
-  * Enum value 'Patch' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Patch" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_PATCH = 'Patch';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_PATCH = "Patch";
 
 /**
-  * Enum value 'Query' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Query" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY = 'Query';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY = "Query";
 
 /**
-  * Enum value 'QueryPlan' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "QueryPlan" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY_PLAN = 'QueryPlan';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY_PLAN = "QueryPlan";
 
 /**
-  * Enum value 'Read' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Read" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_READ = 'Read';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_READ = "Read";
 
 /**
-  * Enum value 'ReadFeed' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "ReadFeed" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_READ_FEED = 'ReadFeed';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_READ_FEED = "ReadFeed";
 
 /**
-  * Enum value 'Replace' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Replace" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_REPLACE = 'Replace';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_REPLACE = "Replace";
 
 /**
-  * Enum value 'Upsert' for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "Upsert" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_UPSERT = 'Upsert';
+export const ATTR_DB_COSMOSDB_OPERATION_TYPE_VALUE_UPSERT = "Upsert";
 
 
 /**
@@ -1555,274 +1555,274 @@ export const ATTR_DB_STATEMENT = 'db.statement';
 export const ATTR_DB_SYSTEM = 'db.system';
 
 /**
-  * Enum value 'adabas' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "adabas" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_ADABAS = 'adabas';
+export const ATTR_DB_SYSTEM_VALUE_ADABAS = "adabas";
 
 /**
-  * Enum value 'cache' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "cache" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_CACHE = 'cache';
+export const ATTR_DB_SYSTEM_VALUE_CACHE = "cache";
 
 /**
-  * Enum value 'cassandra' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "cassandra" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_CASSANDRA = 'cassandra';
+export const ATTR_DB_SYSTEM_VALUE_CASSANDRA = "cassandra";
 
 /**
-  * Enum value 'clickhouse' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "clickhouse" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_CLICKHOUSE = 'clickhouse';
+export const ATTR_DB_SYSTEM_VALUE_CLICKHOUSE = "clickhouse";
 
 /**
-  * Enum value 'cloudscape' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "cloudscape" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_CLOUDSCAPE = 'cloudscape';
+export const ATTR_DB_SYSTEM_VALUE_CLOUDSCAPE = "cloudscape";
 
 /**
-  * Enum value 'cockroachdb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "cockroachdb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_COCKROACHDB = 'cockroachdb';
+export const ATTR_DB_SYSTEM_VALUE_COCKROACHDB = "cockroachdb";
 
 /**
-  * Enum value 'coldfusion' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "coldfusion" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_COLDFUSION = 'coldfusion';
+export const ATTR_DB_SYSTEM_VALUE_COLDFUSION = "coldfusion";
 
 /**
-  * Enum value 'cosmosdb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "cosmosdb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_COSMOSDB = 'cosmosdb';
+export const ATTR_DB_SYSTEM_VALUE_COSMOSDB = "cosmosdb";
 
 /**
-  * Enum value 'couchbase' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "couchbase" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_COUCHBASE = 'couchbase';
+export const ATTR_DB_SYSTEM_VALUE_COUCHBASE = "couchbase";
 
 /**
-  * Enum value 'couchdb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "couchdb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_COUCHDB = 'couchdb';
+export const ATTR_DB_SYSTEM_VALUE_COUCHDB = "couchdb";
 
 /**
-  * Enum value 'db2' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "db2" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_DB2 = 'db2';
+export const ATTR_DB_SYSTEM_VALUE_DB2 = "db2";
 
 /**
-  * Enum value 'derby' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "derby" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_DERBY = 'derby';
+export const ATTR_DB_SYSTEM_VALUE_DERBY = "derby";
 
 /**
-  * Enum value 'dynamodb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "dynamodb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_DYNAMODB = 'dynamodb';
+export const ATTR_DB_SYSTEM_VALUE_DYNAMODB = "dynamodb";
 
 /**
-  * Enum value 'edb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "edb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_EDB = 'edb';
+export const ATTR_DB_SYSTEM_VALUE_EDB = "edb";
 
 /**
-  * Enum value 'elasticsearch' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "elasticsearch" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_ELASTICSEARCH = 'elasticsearch';
+export const ATTR_DB_SYSTEM_VALUE_ELASTICSEARCH = "elasticsearch";
 
 /**
-  * Enum value 'filemaker' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "filemaker" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_FILEMAKER = 'filemaker';
+export const ATTR_DB_SYSTEM_VALUE_FILEMAKER = "filemaker";
 
 /**
-  * Enum value 'firebird' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "firebird" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_FIREBIRD = 'firebird';
+export const ATTR_DB_SYSTEM_VALUE_FIREBIRD = "firebird";
 
 /**
-  * Enum value 'firstsql' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "firstsql" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_FIRSTSQL = 'firstsql';
+export const ATTR_DB_SYSTEM_VALUE_FIRSTSQL = "firstsql";
 
 /**
-  * Enum value 'geode' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "geode" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_GEODE = 'geode';
+export const ATTR_DB_SYSTEM_VALUE_GEODE = "geode";
 
 /**
-  * Enum value 'h2' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "h2" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_H2 = 'h2';
+export const ATTR_DB_SYSTEM_VALUE_H2 = "h2";
 
 /**
-  * Enum value 'hanadb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "hanadb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_HANADB = 'hanadb';
+export const ATTR_DB_SYSTEM_VALUE_HANADB = "hanadb";
 
 /**
-  * Enum value 'hbase' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "hbase" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_HBASE = 'hbase';
+export const ATTR_DB_SYSTEM_VALUE_HBASE = "hbase";
 
 /**
-  * Enum value 'hive' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "hive" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_HIVE = 'hive';
+export const ATTR_DB_SYSTEM_VALUE_HIVE = "hive";
 
 /**
-  * Enum value 'hsqldb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "hsqldb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_HSQLDB = 'hsqldb';
+export const ATTR_DB_SYSTEM_VALUE_HSQLDB = "hsqldb";
 
 /**
-  * Enum value 'influxdb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "influxdb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_INFLUXDB = 'influxdb';
+export const ATTR_DB_SYSTEM_VALUE_INFLUXDB = "influxdb";
 
 /**
-  * Enum value 'informix' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "informix" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_INFORMIX = 'informix';
+export const ATTR_DB_SYSTEM_VALUE_INFORMIX = "informix";
 
 /**
-  * Enum value 'ingres' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "ingres" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_INGRES = 'ingres';
+export const ATTR_DB_SYSTEM_VALUE_INGRES = "ingres";
 
 /**
-  * Enum value 'instantdb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "instantdb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_INSTANTDB = 'instantdb';
+export const ATTR_DB_SYSTEM_VALUE_INSTANTDB = "instantdb";
 
 /**
-  * Enum value 'interbase' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "interbase" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_INTERBASE = 'interbase';
+export const ATTR_DB_SYSTEM_VALUE_INTERBASE = "interbase";
 
 /**
-  * Enum value 'intersystems_cache' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "intersystems_cache" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_INTERSYSTEMS_CACHE = 'intersystems_cache';
+export const ATTR_DB_SYSTEM_VALUE_INTERSYSTEMS_CACHE = "intersystems_cache";
 
 /**
-  * Enum value 'mariadb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "mariadb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_MARIADB = 'mariadb';
+export const ATTR_DB_SYSTEM_VALUE_MARIADB = "mariadb";
 
 /**
-  * Enum value 'maxdb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "maxdb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_MAXDB = 'maxdb';
+export const ATTR_DB_SYSTEM_VALUE_MAXDB = "maxdb";
 
 /**
-  * Enum value 'memcached' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "memcached" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_MEMCACHED = 'memcached';
+export const ATTR_DB_SYSTEM_VALUE_MEMCACHED = "memcached";
 
 /**
-  * Enum value 'mongodb' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "mongodb" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_MONGODB = 'mongodb';
+export const ATTR_DB_SYSTEM_VALUE_MONGODB = "mongodb";
 
 /**
-  * Enum value 'mssql' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "mssql" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_MSSQL = 'mssql';
+export const ATTR_DB_SYSTEM_VALUE_MSSQL = "mssql";
 
 /**
-  * Enum value 'mssqlcompact' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "mssqlcompact" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_MSSQLCOMPACT = 'mssqlcompact';
+export const ATTR_DB_SYSTEM_VALUE_MSSQLCOMPACT = "mssqlcompact";
 
 /**
-  * Enum value 'mysql' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "mysql" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_MYSQL = 'mysql';
+export const ATTR_DB_SYSTEM_VALUE_MYSQL = "mysql";
 
 /**
-  * Enum value 'neo4j' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "neo4j" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_NEO4J = 'neo4j';
+export const ATTR_DB_SYSTEM_VALUE_NEO4J = "neo4j";
 
 /**
-  * Enum value 'netezza' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "netezza" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_NETEZZA = 'netezza';
+export const ATTR_DB_SYSTEM_VALUE_NETEZZA = "netezza";
 
 /**
-  * Enum value 'opensearch' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "opensearch" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_OPENSEARCH = 'opensearch';
+export const ATTR_DB_SYSTEM_VALUE_OPENSEARCH = "opensearch";
 
 /**
-  * Enum value 'oracle' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "oracle" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_ORACLE = 'oracle';
+export const ATTR_DB_SYSTEM_VALUE_ORACLE = "oracle";
 
 /**
-  * Enum value 'other_sql' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "other_sql" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_OTHER_SQL = 'other_sql';
+export const ATTR_DB_SYSTEM_VALUE_OTHER_SQL = "other_sql";
 
 /**
-  * Enum value 'pervasive' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "pervasive" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_PERVASIVE = 'pervasive';
+export const ATTR_DB_SYSTEM_VALUE_PERVASIVE = "pervasive";
 
 /**
-  * Enum value 'pointbase' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "pointbase" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_POINTBASE = 'pointbase';
+export const ATTR_DB_SYSTEM_VALUE_POINTBASE = "pointbase";
 
 /**
-  * Enum value 'postgresql' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "postgresql" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_POSTGRESQL = 'postgresql';
+export const ATTR_DB_SYSTEM_VALUE_POSTGRESQL = "postgresql";
 
 /**
-  * Enum value 'progress' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "progress" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_PROGRESS = 'progress';
+export const ATTR_DB_SYSTEM_VALUE_PROGRESS = "progress";
 
 /**
-  * Enum value 'redis' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "redis" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_REDIS = 'redis';
+export const ATTR_DB_SYSTEM_VALUE_REDIS = "redis";
 
 /**
-  * Enum value 'redshift' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "redshift" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_REDSHIFT = 'redshift';
+export const ATTR_DB_SYSTEM_VALUE_REDSHIFT = "redshift";
 
 /**
-  * Enum value 'spanner' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "spanner" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_SPANNER = 'spanner';
+export const ATTR_DB_SYSTEM_VALUE_SPANNER = "spanner";
 
 /**
-  * Enum value 'sqlite' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "sqlite" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_SQLITE = 'sqlite';
+export const ATTR_DB_SYSTEM_VALUE_SQLITE = "sqlite";
 
 /**
-  * Enum value 'sybase' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "sybase" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_SYBASE = 'sybase';
+export const ATTR_DB_SYSTEM_VALUE_SYBASE = "sybase";
 
 /**
-  * Enum value 'teradata' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "teradata" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_TERADATA = 'teradata';
+export const ATTR_DB_SYSTEM_VALUE_TERADATA = "teradata";
 
 /**
-  * Enum value 'trino' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "trino" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_TRINO = 'trino';
+export const ATTR_DB_SYSTEM_VALUE_TRINO = "trino";
 
 /**
-  * Enum value 'vertica' for attribute {@link ATTR_DB_SYSTEM}.
+  * Enum value "vertica" for attribute {@link ATTR_DB_SYSTEM}.
   */
-export const ATTR_DB_SYSTEM_VALUE_VERTICA = 'vertica';
+export const ATTR_DB_SYSTEM_VALUE_VERTICA = "vertica";
 
 
 /**
@@ -1880,14 +1880,14 @@ export const ATTR_DEPLOYMENT_NAME = 'deployment.name';
 export const ATTR_DEPLOYMENT_STATUS = 'deployment.status';
 
 /**
-  * Enum value 'failed' for attribute {@link ATTR_DEPLOYMENT_STATUS}.
+  * Enum value "failed" for attribute {@link ATTR_DEPLOYMENT_STATUS}.
   */
-export const ATTR_DEPLOYMENT_STATUS_VALUE_FAILED = 'failed';
+export const ATTR_DEPLOYMENT_STATUS_VALUE_FAILED = "failed";
 
 /**
-  * Enum value 'succeeded' for attribute {@link ATTR_DEPLOYMENT_STATUS}.
+  * Enum value "succeeded" for attribute {@link ATTR_DEPLOYMENT_STATUS}.
   */
-export const ATTR_DEPLOYMENT_STATUS_VALUE_SUCCEEDED = 'succeeded';
+export const ATTR_DEPLOYMENT_STATUS_VALUE_SUCCEEDED = "succeeded";
 
 
 /**
@@ -1950,14 +1950,14 @@ export const ATTR_DEVICE_MODEL_NAME = 'device.model.name';
 export const ATTR_DISK_IO_DIRECTION = 'disk.io.direction';
 
 /**
-  * Enum value 'read' for attribute {@link ATTR_DISK_IO_DIRECTION}.
+  * Enum value "read" for attribute {@link ATTR_DISK_IO_DIRECTION}.
   */
-export const ATTR_DISK_IO_DIRECTION_VALUE_READ = 'read';
+export const ATTR_DISK_IO_DIRECTION_VALUE_READ = "read";
 
 /**
-  * Enum value 'write' for attribute {@link ATTR_DISK_IO_DIRECTION}.
+  * Enum value "write" for attribute {@link ATTR_DISK_IO_DIRECTION}.
   */
-export const ATTR_DISK_IO_DIRECTION_VALUE_WRITE = 'write';
+export const ATTR_DISK_IO_DIRECTION_VALUE_WRITE = "write";
 
 
 /**
@@ -2041,19 +2041,19 @@ export const ATTR_FAAS_DOCUMENT_NAME = 'faas.document.name';
 export const ATTR_FAAS_DOCUMENT_OPERATION = 'faas.document.operation';
 
 /**
-  * Enum value 'delete' for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
+  * Enum value "delete" for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
   */
-export const ATTR_FAAS_DOCUMENT_OPERATION_VALUE_DELETE = 'delete';
+export const ATTR_FAAS_DOCUMENT_OPERATION_VALUE_DELETE = "delete";
 
 /**
-  * Enum value 'edit' for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
+  * Enum value "edit" for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
   */
-export const ATTR_FAAS_DOCUMENT_OPERATION_VALUE_EDIT = 'edit';
+export const ATTR_FAAS_DOCUMENT_OPERATION_VALUE_EDIT = "edit";
 
 /**
-  * Enum value 'insert' for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
+  * Enum value "insert" for attribute {@link ATTR_FAAS_DOCUMENT_OPERATION}.
   */
-export const ATTR_FAAS_DOCUMENT_OPERATION_VALUE_INSERT = 'insert';
+export const ATTR_FAAS_DOCUMENT_OPERATION_VALUE_INSERT = "insert";
 
 
 /**
@@ -2098,29 +2098,29 @@ export const ATTR_FAAS_INVOKED_NAME = 'faas.invoked_name';
 export const ATTR_FAAS_INVOKED_PROVIDER = 'faas.invoked_provider';
 
 /**
-  * Enum value 'alibaba_cloud' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
+  * Enum value "alibaba_cloud" for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
   */
-export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_ALIBABA_CLOUD = 'alibaba_cloud';
+export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_ALIBABA_CLOUD = "alibaba_cloud";
 
 /**
-  * Enum value 'aws' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
+  * Enum value "aws" for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
   */
-export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_AWS = 'aws';
+export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_AWS = "aws";
 
 /**
-  * Enum value 'azure' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
+  * Enum value "azure" for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
   */
-export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_AZURE = 'azure';
+export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_AZURE = "azure";
 
 /**
-  * Enum value 'gcp' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
+  * Enum value "gcp" for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
   */
-export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_GCP = 'gcp';
+export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_GCP = "gcp";
 
 /**
-  * Enum value 'tencent_cloud' for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
+  * Enum value "tencent_cloud" for attribute {@link ATTR_FAAS_INVOKED_PROVIDER}.
   */
-export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_TENCENT_CLOUD = 'tencent_cloud';
+export const ATTR_FAAS_INVOKED_PROVIDER_VALUE_TENCENT_CLOUD = "tencent_cloud";
 
 
 /**
@@ -2180,29 +2180,29 @@ export const ATTR_FAAS_TIME = 'faas.time';
 export const ATTR_FAAS_TRIGGER = 'faas.trigger';
 
 /**
-  * Enum value 'datasource' for attribute {@link ATTR_FAAS_TRIGGER}.
+  * Enum value "datasource" for attribute {@link ATTR_FAAS_TRIGGER}.
   */
-export const ATTR_FAAS_TRIGGER_VALUE_DATASOURCE = 'datasource';
+export const ATTR_FAAS_TRIGGER_VALUE_DATASOURCE = "datasource";
 
 /**
-  * Enum value 'http' for attribute {@link ATTR_FAAS_TRIGGER}.
+  * Enum value "http" for attribute {@link ATTR_FAAS_TRIGGER}.
   */
-export const ATTR_FAAS_TRIGGER_VALUE_HTTP = 'http';
+export const ATTR_FAAS_TRIGGER_VALUE_HTTP = "http";
 
 /**
-  * Enum value 'other' for attribute {@link ATTR_FAAS_TRIGGER}.
+  * Enum value "other" for attribute {@link ATTR_FAAS_TRIGGER}.
   */
-export const ATTR_FAAS_TRIGGER_VALUE_OTHER = 'other';
+export const ATTR_FAAS_TRIGGER_VALUE_OTHER = "other";
 
 /**
-  * Enum value 'pubsub' for attribute {@link ATTR_FAAS_TRIGGER}.
+  * Enum value "pubsub" for attribute {@link ATTR_FAAS_TRIGGER}.
   */
-export const ATTR_FAAS_TRIGGER_VALUE_PUBSUB = 'pubsub';
+export const ATTR_FAAS_TRIGGER_VALUE_PUBSUB = "pubsub";
 
 /**
-  * Enum value 'timer' for attribute {@link ATTR_FAAS_TRIGGER}.
+  * Enum value "timer" for attribute {@link ATTR_FAAS_TRIGGER}.
   */
-export const ATTR_FAAS_TRIGGER_VALUE_TIMER = 'timer';
+export const ATTR_FAAS_TRIGGER_VALUE_TIMER = "timer";
 
 
 /**
@@ -2345,14 +2345,14 @@ export const ATTR_GEN_AI_COMPLETION = 'gen_ai.completion';
 export const ATTR_GEN_AI_OPERATION_NAME = 'gen_ai.operation.name';
 
 /**
-  * Enum value 'chat' for attribute {@link ATTR_GEN_AI_OPERATION_NAME}.
+  * Enum value "chat" for attribute {@link ATTR_GEN_AI_OPERATION_NAME}.
   */
-export const ATTR_GEN_AI_OPERATION_NAME_VALUE_CHAT = 'chat';
+export const ATTR_GEN_AI_OPERATION_NAME_VALUE_CHAT = "chat";
 
 /**
-  * Enum value 'text_completion' for attribute {@link ATTR_GEN_AI_OPERATION_NAME}.
+  * Enum value "text_completion" for attribute {@link ATTR_GEN_AI_OPERATION_NAME}.
   */
-export const ATTR_GEN_AI_OPERATION_NAME_VALUE_TEXT_COMPLETION = 'text_completion';
+export const ATTR_GEN_AI_OPERATION_NAME_VALUE_TEXT_COMPLETION = "text_completion";
 
 
 /**
@@ -2459,24 +2459,24 @@ export const ATTR_GEN_AI_RESPONSE_MODEL = 'gen_ai.response.model';
 export const ATTR_GEN_AI_SYSTEM = 'gen_ai.system';
 
 /**
-  * Enum value 'anthropic' for attribute {@link ATTR_GEN_AI_SYSTEM}.
+  * Enum value "anthropic" for attribute {@link ATTR_GEN_AI_SYSTEM}.
   */
-export const ATTR_GEN_AI_SYSTEM_VALUE_ANTHROPIC = 'anthropic';
+export const ATTR_GEN_AI_SYSTEM_VALUE_ANTHROPIC = "anthropic";
 
 /**
-  * Enum value 'cohere' for attribute {@link ATTR_GEN_AI_SYSTEM}.
+  * Enum value "cohere" for attribute {@link ATTR_GEN_AI_SYSTEM}.
   */
-export const ATTR_GEN_AI_SYSTEM_VALUE_COHERE = 'cohere';
+export const ATTR_GEN_AI_SYSTEM_VALUE_COHERE = "cohere";
 
 /**
-  * Enum value 'openai' for attribute {@link ATTR_GEN_AI_SYSTEM}.
+  * Enum value "openai" for attribute {@link ATTR_GEN_AI_SYSTEM}.
   */
-export const ATTR_GEN_AI_SYSTEM_VALUE_OPENAI = 'openai';
+export const ATTR_GEN_AI_SYSTEM_VALUE_OPENAI = "openai";
 
 /**
-  * Enum value 'vertex_ai' for attribute {@link ATTR_GEN_AI_SYSTEM}.
+  * Enum value "vertex_ai" for attribute {@link ATTR_GEN_AI_SYSTEM}.
   */
-export const ATTR_GEN_AI_SYSTEM_VALUE_VERTEX_AI = 'vertex_ai';
+export const ATTR_GEN_AI_SYSTEM_VALUE_VERTEX_AI = "vertex_ai";
 
 
 /**
@@ -2487,14 +2487,14 @@ export const ATTR_GEN_AI_SYSTEM_VALUE_VERTEX_AI = 'vertex_ai';
 export const ATTR_GEN_AI_TOKEN_TYPE = 'gen_ai.token.type';
 
 /**
-  * Enum value 'input' for attribute {@link ATTR_GEN_AI_TOKEN_TYPE}.
+  * Enum value "input" for attribute {@link ATTR_GEN_AI_TOKEN_TYPE}.
   */
-export const ATTR_GEN_AI_TOKEN_TYPE_VALUE_INPUT = 'input';
+export const ATTR_GEN_AI_TOKEN_TYPE_VALUE_INPUT = "input";
 
 /**
-  * Enum value 'output' for attribute {@link ATTR_GEN_AI_TOKEN_TYPE}.
+  * Enum value "output" for attribute {@link ATTR_GEN_AI_TOKEN_TYPE}.
   */
-export const ATTR_GEN_AI_TOKEN_TYPE_VALUE_COMPLETION = 'output';
+export const ATTR_GEN_AI_TOKEN_TYPE_VALUE_COMPLETION = "output";
 
 
 /**
@@ -2537,14 +2537,14 @@ export const ATTR_GEN_AI_USAGE_PROMPT_TOKENS = 'gen_ai.usage.prompt_tokens';
 export const ATTR_GO_MEMORY_TYPE = 'go.memory.type';
 
 /**
-  * Enum value 'other' for attribute {@link ATTR_GO_MEMORY_TYPE}.
+  * Enum value "other" for attribute {@link ATTR_GO_MEMORY_TYPE}.
   */
-export const ATTR_GO_MEMORY_TYPE_VALUE_OTHER = 'other';
+export const ATTR_GO_MEMORY_TYPE_VALUE_OTHER = "other";
 
 /**
-  * Enum value 'stack' for attribute {@link ATTR_GO_MEMORY_TYPE}.
+  * Enum value "stack" for attribute {@link ATTR_GO_MEMORY_TYPE}.
   */
-export const ATTR_GO_MEMORY_TYPE_VALUE_STACK = 'stack';
+export const ATTR_GO_MEMORY_TYPE_VALUE_STACK = "stack";
 
 
 /**
@@ -2571,19 +2571,19 @@ export const ATTR_GRAPHQL_OPERATION_NAME = 'graphql.operation.name';
 export const ATTR_GRAPHQL_OPERATION_TYPE = 'graphql.operation.type';
 
 /**
-  * Enum value 'mutation' for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
+  * Enum value "mutation" for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
   */
-export const ATTR_GRAPHQL_OPERATION_TYPE_VALUE_MUTATION = 'mutation';
+export const ATTR_GRAPHQL_OPERATION_TYPE_VALUE_MUTATION = "mutation";
 
 /**
-  * Enum value 'query' for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
+  * Enum value "query" for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
   */
-export const ATTR_GRAPHQL_OPERATION_TYPE_VALUE_QUERY = 'query';
+export const ATTR_GRAPHQL_OPERATION_TYPE_VALUE_QUERY = "query";
 
 /**
-  * Enum value 'subscription' for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
+  * Enum value "subscription" for attribute {@link ATTR_GRAPHQL_OPERATION_TYPE}.
   */
-export const ATTR_GRAPHQL_OPERATION_TYPE_VALUE_SUBSCRIPTION = 'subscription';
+export const ATTR_GRAPHQL_OPERATION_TYPE_VALUE_SUBSCRIPTION = "subscription";
 
 
 /**
@@ -2615,44 +2615,44 @@ export const ATTR_HEROKU_RELEASE_CREATION_TIMESTAMP = 'heroku.release.creation_t
 export const ATTR_HOST_ARCH = 'host.arch';
 
 /**
-  * Enum value 'amd64' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "amd64" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_AMD64 = 'amd64';
+export const ATTR_HOST_ARCH_VALUE_AMD64 = "amd64";
 
 /**
-  * Enum value 'arm32' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "arm32" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_ARM32 = 'arm32';
+export const ATTR_HOST_ARCH_VALUE_ARM32 = "arm32";
 
 /**
-  * Enum value 'arm64' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "arm64" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_ARM64 = 'arm64';
+export const ATTR_HOST_ARCH_VALUE_ARM64 = "arm64";
 
 /**
-  * Enum value 'ia64' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "ia64" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_IA64 = 'ia64';
+export const ATTR_HOST_ARCH_VALUE_IA64 = "ia64";
 
 /**
-  * Enum value 'ppc32' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "ppc32" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_PPC32 = 'ppc32';
+export const ATTR_HOST_ARCH_VALUE_PPC32 = "ppc32";
 
 /**
-  * Enum value 'ppc64' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "ppc64" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_PPC64 = 'ppc64';
+export const ATTR_HOST_ARCH_VALUE_PPC64 = "ppc64";
 
 /**
-  * Enum value 's390x' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "s390x" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_S390X = 's390x';
+export const ATTR_HOST_ARCH_VALUE_S390X = "s390x";
 
 /**
-  * Enum value 'x86' for attribute {@link ATTR_HOST_ARCH}.
+  * Enum value "x86" for attribute {@link ATTR_HOST_ARCH}.
   */
-export const ATTR_HOST_ARCH_VALUE_X86 = 'x86';
+export const ATTR_HOST_ARCH_VALUE_X86 = "x86";
 
 
 /**
@@ -2776,14 +2776,14 @@ export const ATTR_HTTP_CLIENT_IP = 'http.client_ip';
 export const ATTR_HTTP_CONNECTION_STATE = 'http.connection.state';
 
 /**
-  * Enum value 'active' for attribute {@link ATTR_HTTP_CONNECTION_STATE}.
+  * Enum value "active" for attribute {@link ATTR_HTTP_CONNECTION_STATE}.
   */
-export const ATTR_HTTP_CONNECTION_STATE_VALUE_ACTIVE = 'active';
+export const ATTR_HTTP_CONNECTION_STATE_VALUE_ACTIVE = "active";
 
 /**
-  * Enum value 'idle' for attribute {@link ATTR_HTTP_CONNECTION_STATE}.
+  * Enum value "idle" for attribute {@link ATTR_HTTP_CONNECTION_STATE}.
   */
-export const ATTR_HTTP_CONNECTION_STATE_VALUE_IDLE = 'idle';
+export const ATTR_HTTP_CONNECTION_STATE_VALUE_IDLE = "idle";
 
 
 /**
@@ -2796,34 +2796,34 @@ export const ATTR_HTTP_CONNECTION_STATE_VALUE_IDLE = 'idle';
 export const ATTR_HTTP_FLAVOR = 'http.flavor';
 
 /**
-  * Enum value '1.0' for attribute {@link ATTR_HTTP_FLAVOR}.
+  * Enum value "1.0" for attribute {@link ATTR_HTTP_FLAVOR}.
   */
-export const ATTR_HTTP_FLAVOR_VALUE_HTTP_1_0 = '1.0';
+export const ATTR_HTTP_FLAVOR_VALUE_HTTP_1_0 = "1.0";
 
 /**
-  * Enum value '1.1' for attribute {@link ATTR_HTTP_FLAVOR}.
+  * Enum value "1.1" for attribute {@link ATTR_HTTP_FLAVOR}.
   */
-export const ATTR_HTTP_FLAVOR_VALUE_HTTP_1_1 = '1.1';
+export const ATTR_HTTP_FLAVOR_VALUE_HTTP_1_1 = "1.1";
 
 /**
-  * Enum value '2.0' for attribute {@link ATTR_HTTP_FLAVOR}.
+  * Enum value "2.0" for attribute {@link ATTR_HTTP_FLAVOR}.
   */
-export const ATTR_HTTP_FLAVOR_VALUE_HTTP_2_0 = '2.0';
+export const ATTR_HTTP_FLAVOR_VALUE_HTTP_2_0 = "2.0";
 
 /**
-  * Enum value '3.0' for attribute {@link ATTR_HTTP_FLAVOR}.
+  * Enum value "3.0" for attribute {@link ATTR_HTTP_FLAVOR}.
   */
-export const ATTR_HTTP_FLAVOR_VALUE_HTTP_3_0 = '3.0';
+export const ATTR_HTTP_FLAVOR_VALUE_HTTP_3_0 = "3.0";
 
 /**
-  * Enum value 'QUIC' for attribute {@link ATTR_HTTP_FLAVOR}.
+  * Enum value "QUIC" for attribute {@link ATTR_HTTP_FLAVOR}.
   */
-export const ATTR_HTTP_FLAVOR_VALUE_QUIC = 'QUIC';
+export const ATTR_HTTP_FLAVOR_VALUE_QUIC = "QUIC";
 
 /**
-  * Enum value 'SPDY' for attribute {@link ATTR_HTTP_FLAVOR}.
+  * Enum value "SPDY" for attribute {@link ATTR_HTTP_FLAVOR}.
   */
-export const ATTR_HTTP_FLAVOR_VALUE_SPDY = 'SPDY';
+export const ATTR_HTTP_FLAVOR_VALUE_SPDY = "SPDY";
 
 
 /**
@@ -2974,29 +2974,29 @@ export const ATTR_HTTP_USER_AGENT = 'http.user_agent';
 export const ATTR_IOS_STATE = 'ios.state';
 
 /**
-  * Enum value 'active' for attribute {@link ATTR_IOS_STATE}.
+  * Enum value "active" for attribute {@link ATTR_IOS_STATE}.
   */
-export const ATTR_IOS_STATE_VALUE_ACTIVE = 'active';
+export const ATTR_IOS_STATE_VALUE_ACTIVE = "active";
 
 /**
-  * Enum value 'background' for attribute {@link ATTR_IOS_STATE}.
+  * Enum value "background" for attribute {@link ATTR_IOS_STATE}.
   */
-export const ATTR_IOS_STATE_VALUE_BACKGROUND = 'background';
+export const ATTR_IOS_STATE_VALUE_BACKGROUND = "background";
 
 /**
-  * Enum value 'foreground' for attribute {@link ATTR_IOS_STATE}.
+  * Enum value "foreground" for attribute {@link ATTR_IOS_STATE}.
   */
-export const ATTR_IOS_STATE_VALUE_FOREGROUND = 'foreground';
+export const ATTR_IOS_STATE_VALUE_FOREGROUND = "foreground";
 
 /**
-  * Enum value 'inactive' for attribute {@link ATTR_IOS_STATE}.
+  * Enum value "inactive" for attribute {@link ATTR_IOS_STATE}.
   */
-export const ATTR_IOS_STATE_VALUE_INACTIVE = 'inactive';
+export const ATTR_IOS_STATE_VALUE_INACTIVE = "inactive";
 
 /**
-  * Enum value 'terminate' for attribute {@link ATTR_IOS_STATE}.
+  * Enum value "terminate" for attribute {@link ATTR_IOS_STATE}.
   */
-export const ATTR_IOS_STATE_VALUE_TERMINATE = 'terminate';
+export const ATTR_IOS_STATE_VALUE_TERMINATE = "terminate";
 
 
 /**
@@ -3216,14 +3216,14 @@ export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 export const ATTR_LINUX_MEMORY_SLAB_STATE = 'linux.memory.slab.state';
 
 /**
-  * Enum value 'reclaimable' for attribute {@link ATTR_LINUX_MEMORY_SLAB_STATE}.
+  * Enum value "reclaimable" for attribute {@link ATTR_LINUX_MEMORY_SLAB_STATE}.
   */
-export const ATTR_LINUX_MEMORY_SLAB_STATE_VALUE_RECLAIMABLE = 'reclaimable';
+export const ATTR_LINUX_MEMORY_SLAB_STATE_VALUE_RECLAIMABLE = "reclaimable";
 
 /**
-  * Enum value 'unreclaimable' for attribute {@link ATTR_LINUX_MEMORY_SLAB_STATE}.
+  * Enum value "unreclaimable" for attribute {@link ATTR_LINUX_MEMORY_SLAB_STATE}.
   */
-export const ATTR_LINUX_MEMORY_SLAB_STATE_VALUE_UNRECLAIMABLE = 'unreclaimable';
+export const ATTR_LINUX_MEMORY_SLAB_STATE_VALUE_UNRECLAIMABLE = "unreclaimable";
 
 
 /**
@@ -3262,14 +3262,14 @@ export const ATTR_LOG_FILE_PATH_RESOLVED = 'log.file.path_resolved';
 export const ATTR_LOG_IOSTREAM = 'log.iostream';
 
 /**
-  * Enum value 'stderr' for attribute {@link ATTR_LOG_IOSTREAM}.
+  * Enum value "stderr" for attribute {@link ATTR_LOG_IOSTREAM}.
   */
-export const ATTR_LOG_IOSTREAM_VALUE_STDERR = 'stderr';
+export const ATTR_LOG_IOSTREAM_VALUE_STDERR = "stderr";
 
 /**
-  * Enum value 'stdout' for attribute {@link ATTR_LOG_IOSTREAM}.
+  * Enum value "stdout" for attribute {@link ATTR_LOG_IOSTREAM}.
   */
-export const ATTR_LOG_IOSTREAM_VALUE_STDOUT = 'stdout';
+export const ATTR_LOG_IOSTREAM_VALUE_STDOUT = "stdout";
 
 
 /**
@@ -3319,14 +3319,14 @@ export const ATTR_MESSAGE_ID = 'message.id';
 export const ATTR_MESSAGE_TYPE = 'message.type';
 
 /**
-  * Enum value 'RECEIVED' for attribute {@link ATTR_MESSAGE_TYPE}.
+  * Enum value "RECEIVED" for attribute {@link ATTR_MESSAGE_TYPE}.
   */
-export const ATTR_MESSAGE_TYPE_VALUE_RECEIVED = 'RECEIVED';
+export const ATTR_MESSAGE_TYPE_VALUE_RECEIVED = "RECEIVED";
 
 /**
-  * Enum value 'SENT' for attribute {@link ATTR_MESSAGE_TYPE}.
+  * Enum value "SENT" for attribute {@link ATTR_MESSAGE_TYPE}.
   */
-export const ATTR_MESSAGE_TYPE_VALUE_SENT = 'SENT';
+export const ATTR_MESSAGE_TYPE_VALUE_SENT = "SENT";
 
 
 /**
@@ -3585,34 +3585,34 @@ export const ATTR_MESSAGING_OPERATION_NAME = 'messaging.operation.name';
 export const ATTR_MESSAGING_OPERATION_TYPE = 'messaging.operation.type';
 
 /**
-  * Enum value 'create' for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
+  * Enum value "create" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
   */
-export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_CREATE = 'create';
+export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_CREATE = "create";
 
 /**
-  * Enum value 'deliver' for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
+  * Enum value "deliver" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
   */
-export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_DELIVER = 'deliver';
+export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_DELIVER = "deliver";
 
 /**
-  * Enum value 'process' for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
+  * Enum value "process" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
   */
-export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_PROCESS = 'process';
+export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_PROCESS = "process";
 
 /**
-  * Enum value 'publish' for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
+  * Enum value "publish" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
   */
-export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_PUBLISH = 'publish';
+export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_PUBLISH = "publish";
 
 /**
-  * Enum value 'receive' for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
+  * Enum value "receive" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
   */
-export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_RECEIVE = 'receive';
+export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_RECEIVE = "receive";
 
 /**
-  * Enum value 'settle' for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
+  * Enum value "settle" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
   */
-export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_SETTLE = 'settle';
+export const ATTR_MESSAGING_OPERATION_TYPE_VALUE_SETTLE = "settle";
 
 
 /**
@@ -3646,14 +3646,14 @@ export const ATTR_MESSAGING_ROCKETMQ_CLIENT_GROUP = 'messaging.rocketmq.client_g
 export const ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL = 'messaging.rocketmq.consumption_model';
 
 /**
-  * Enum value 'broadcasting' for attribute {@link ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL}.
+  * Enum value "broadcasting" for attribute {@link ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL}.
   */
-export const ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_VALUE_BROADCASTING = 'broadcasting';
+export const ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_VALUE_BROADCASTING = "broadcasting";
 
 /**
-  * Enum value 'clustering' for attribute {@link ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL}.
+  * Enum value "clustering" for attribute {@link ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL}.
   */
-export const ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_VALUE_CLUSTERING = 'clustering';
+export const ATTR_MESSAGING_ROCKETMQ_CONSUMPTION_MODEL_VALUE_CLUSTERING = "clustering";
 
 
 /**
@@ -3699,24 +3699,24 @@ export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TAG = 'messaging.rocketmq.message.t
 export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE = 'messaging.rocketmq.message.type';
 
 /**
-  * Enum value 'delay' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
+  * Enum value "delay" for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
   */
-export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_DELAY = 'delay';
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_DELAY = "delay";
 
 /**
-  * Enum value 'fifo' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
+  * Enum value "fifo" for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
   */
-export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_FIFO = 'fifo';
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_FIFO = "fifo";
 
 /**
-  * Enum value 'normal' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
+  * Enum value "normal" for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
   */
-export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_NORMAL = 'normal';
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_NORMAL = "normal";
 
 /**
-  * Enum value 'transaction' for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
+  * Enum value "transaction" for attribute {@link ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE}.
   */
-export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_TRANSACTION = 'transaction';
+export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_TRANSACTION = "transaction";
 
 
 /**
@@ -3743,24 +3743,24 @@ export const ATTR_MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME = 'messagin
 export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS = 'messaging.servicebus.disposition_status';
 
 /**
-  * Enum value 'abandon' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
+  * Enum value "abandon" for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
   */
-export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_ABANDON = 'abandon';
+export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_ABANDON = "abandon";
 
 /**
-  * Enum value 'complete' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
+  * Enum value "complete" for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
   */
-export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_COMPLETE = 'complete';
+export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_COMPLETE = "complete";
 
 /**
-  * Enum value 'dead_letter' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
+  * Enum value "dead_letter" for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
   */
-export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_DEAD_LETTER = 'dead_letter';
+export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_DEAD_LETTER = "dead_letter";
 
 /**
-  * Enum value 'defer' for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
+  * Enum value "defer" for attribute {@link ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS}.
   */
-export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_DEFER = 'defer';
+export const ATTR_MESSAGING_SERVICEBUS_DISPOSITION_STATUS_VALUE_DEFER = "defer";
 
 
 /**
@@ -3787,59 +3787,59 @@ export const ATTR_MESSAGING_SERVICEBUS_MESSAGE_ENQUEUED_TIME = 'messaging.servic
 export const ATTR_MESSAGING_SYSTEM = 'messaging.system';
 
 /**
-  * Enum value 'activemq' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "activemq" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_ACTIVEMQ = 'activemq';
+export const ATTR_MESSAGING_SYSTEM_VALUE_ACTIVEMQ = "activemq";
 
 /**
-  * Enum value 'aws_sqs' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "aws_sqs" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_AWS_SQS = 'aws_sqs';
+export const ATTR_MESSAGING_SYSTEM_VALUE_AWS_SQS = "aws_sqs";
 
 /**
-  * Enum value 'eventgrid' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "eventgrid" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_EVENTGRID = 'eventgrid';
+export const ATTR_MESSAGING_SYSTEM_VALUE_EVENTGRID = "eventgrid";
 
 /**
-  * Enum value 'eventhubs' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "eventhubs" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_EVENTHUBS = 'eventhubs';
+export const ATTR_MESSAGING_SYSTEM_VALUE_EVENTHUBS = "eventhubs";
 
 /**
-  * Enum value 'gcp_pubsub' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "gcp_pubsub" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_GCP_PUBSUB = 'gcp_pubsub';
+export const ATTR_MESSAGING_SYSTEM_VALUE_GCP_PUBSUB = "gcp_pubsub";
 
 /**
-  * Enum value 'jms' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "jms" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_JMS = 'jms';
+export const ATTR_MESSAGING_SYSTEM_VALUE_JMS = "jms";
 
 /**
-  * Enum value 'kafka' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "kafka" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_KAFKA = 'kafka';
+export const ATTR_MESSAGING_SYSTEM_VALUE_KAFKA = "kafka";
 
 /**
-  * Enum value 'pulsar' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "pulsar" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_PULSAR = 'pulsar';
+export const ATTR_MESSAGING_SYSTEM_VALUE_PULSAR = "pulsar";
 
 /**
-  * Enum value 'rabbitmq' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "rabbitmq" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_RABBITMQ = 'rabbitmq';
+export const ATTR_MESSAGING_SYSTEM_VALUE_RABBITMQ = "rabbitmq";
 
 /**
-  * Enum value 'rocketmq' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "rocketmq" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_ROCKETMQ = 'rocketmq';
+export const ATTR_MESSAGING_SYSTEM_VALUE_ROCKETMQ = "rocketmq";
 
 /**
-  * Enum value 'servicebus' for attribute {@link ATTR_MESSAGING_SYSTEM}.
+  * Enum value "servicebus" for attribute {@link ATTR_MESSAGING_SYSTEM}.
   */
-export const ATTR_MESSAGING_SYSTEM_VALUE_SERVICEBUS = 'servicebus';
+export const ATTR_MESSAGING_SYSTEM_VALUE_SERVICEBUS = "servicebus";
 
 
 /**
@@ -3924,19 +3924,19 @@ export const ATTR_NET_PROTOCOL_VERSION = 'net.protocol.version';
 export const ATTR_NET_SOCK_FAMILY = 'net.sock.family';
 
 /**
-  * Enum value 'inet' for attribute {@link ATTR_NET_SOCK_FAMILY}.
+  * Enum value "inet" for attribute {@link ATTR_NET_SOCK_FAMILY}.
   */
-export const ATTR_NET_SOCK_FAMILY_VALUE_INET = 'inet';
+export const ATTR_NET_SOCK_FAMILY_VALUE_INET = "inet";
 
 /**
-  * Enum value 'inet6' for attribute {@link ATTR_NET_SOCK_FAMILY}.
+  * Enum value "inet6" for attribute {@link ATTR_NET_SOCK_FAMILY}.
   */
-export const ATTR_NET_SOCK_FAMILY_VALUE_INET6 = 'inet6';
+export const ATTR_NET_SOCK_FAMILY_VALUE_INET6 = "inet6";
 
 /**
-  * Enum value 'unix' for attribute {@link ATTR_NET_SOCK_FAMILY}.
+  * Enum value "unix" for attribute {@link ATTR_NET_SOCK_FAMILY}.
   */
-export const ATTR_NET_SOCK_FAMILY_VALUE_UNIX = 'unix';
+export const ATTR_NET_SOCK_FAMILY_VALUE_UNIX = "unix";
 
 
 /**
@@ -3994,29 +3994,29 @@ export const ATTR_NET_SOCK_PEER_PORT = 'net.sock.peer.port';
 export const ATTR_NET_TRANSPORT = 'net.transport';
 
 /**
-  * Enum value 'inproc' for attribute {@link ATTR_NET_TRANSPORT}.
+  * Enum value "inproc" for attribute {@link ATTR_NET_TRANSPORT}.
   */
-export const ATTR_NET_TRANSPORT_VALUE_INPROC = 'inproc';
+export const ATTR_NET_TRANSPORT_VALUE_INPROC = "inproc";
 
 /**
-  * Enum value 'ip_tcp' for attribute {@link ATTR_NET_TRANSPORT}.
+  * Enum value "ip_tcp" for attribute {@link ATTR_NET_TRANSPORT}.
   */
-export const ATTR_NET_TRANSPORT_VALUE_IP_TCP = 'ip_tcp';
+export const ATTR_NET_TRANSPORT_VALUE_IP_TCP = "ip_tcp";
 
 /**
-  * Enum value 'ip_udp' for attribute {@link ATTR_NET_TRANSPORT}.
+  * Enum value "ip_udp" for attribute {@link ATTR_NET_TRANSPORT}.
   */
-export const ATTR_NET_TRANSPORT_VALUE_IP_UDP = 'ip_udp';
+export const ATTR_NET_TRANSPORT_VALUE_IP_UDP = "ip_udp";
 
 /**
-  * Enum value 'other' for attribute {@link ATTR_NET_TRANSPORT}.
+  * Enum value "other" for attribute {@link ATTR_NET_TRANSPORT}.
   */
-export const ATTR_NET_TRANSPORT_VALUE_OTHER = 'other';
+export const ATTR_NET_TRANSPORT_VALUE_OTHER = "other";
 
 /**
-  * Enum value 'pipe' for attribute {@link ATTR_NET_TRANSPORT}.
+  * Enum value "pipe" for attribute {@link ATTR_NET_TRANSPORT}.
   */
-export const ATTR_NET_TRANSPORT_VALUE_PIPE = 'pipe';
+export const ATTR_NET_TRANSPORT_VALUE_PIPE = "pipe";
 
 
 /**
@@ -4055,109 +4055,109 @@ export const ATTR_NETWORK_CARRIER_NAME = 'network.carrier.name';
 export const ATTR_NETWORK_CONNECTION_SUBTYPE = 'network.connection.subtype';
 
 /**
-  * Enum value 'cdma' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "cdma" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA = 'cdma';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA = "cdma";
 
 /**
-  * Enum value 'cdma2000_1xrtt' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "cdma2000_1xrtt" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA2000_1XRTT = 'cdma2000_1xrtt';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA2000_1XRTT = "cdma2000_1xrtt";
 
 /**
-  * Enum value 'edge' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "edge" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EDGE = 'edge';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EDGE = "edge";
 
 /**
-  * Enum value 'ehrpd' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "ehrpd" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EHRPD = 'ehrpd';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EHRPD = "ehrpd";
 
 /**
-  * Enum value 'evdo_0' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "evdo_0" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_0 = 'evdo_0';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_0 = "evdo_0";
 
 /**
-  * Enum value 'evdo_a' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "evdo_a" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_A = 'evdo_a';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_A = "evdo_a";
 
 /**
-  * Enum value 'evdo_b' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "evdo_b" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_B = 'evdo_b';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_B = "evdo_b";
 
 /**
-  * Enum value 'gprs' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "gprs" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_GPRS = 'gprs';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_GPRS = "gprs";
 
 /**
-  * Enum value 'gsm' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "gsm" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_GSM = 'gsm';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_GSM = "gsm";
 
 /**
-  * Enum value 'hsdpa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "hsdpa" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSDPA = 'hsdpa';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSDPA = "hsdpa";
 
 /**
-  * Enum value 'hspa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "hspa" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSPA = 'hspa';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSPA = "hspa";
 
 /**
-  * Enum value 'hspap' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "hspap" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSPAP = 'hspap';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSPAP = "hspap";
 
 /**
-  * Enum value 'hsupa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "hsupa" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSUPA = 'hsupa';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_HSUPA = "hsupa";
 
 /**
-  * Enum value 'iden' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "iden" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_IDEN = 'iden';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_IDEN = "iden";
 
 /**
-  * Enum value 'iwlan' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "iwlan" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_IWLAN = 'iwlan';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_IWLAN = "iwlan";
 
 /**
-  * Enum value 'lte' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "lte" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_LTE = 'lte';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_LTE = "lte";
 
 /**
-  * Enum value 'lte_ca' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "lte_ca" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_LTE_CA = 'lte_ca';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_LTE_CA = "lte_ca";
 
 /**
-  * Enum value 'nr' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "nr" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_NR = 'nr';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_NR = "nr";
 
 /**
-  * Enum value 'nrnsa' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "nrnsa" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_NRNSA = 'nrnsa';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_NRNSA = "nrnsa";
 
 /**
-  * Enum value 'td_scdma' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "td_scdma" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_TD_SCDMA = 'td_scdma';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_TD_SCDMA = "td_scdma";
 
 /**
-  * Enum value 'umts' for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
+  * Enum value "umts" for attribute {@link ATTR_NETWORK_CONNECTION_SUBTYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_UMTS = 'umts';
+export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_UMTS = "umts";
 
 
 /**
@@ -4168,29 +4168,29 @@ export const ATTR_NETWORK_CONNECTION_SUBTYPE_VALUE_UMTS = 'umts';
 export const ATTR_NETWORK_CONNECTION_TYPE = 'network.connection.type';
 
 /**
-  * Enum value 'cell' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
+  * Enum value "cell" for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_CELL = 'cell';
+export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_CELL = "cell";
 
 /**
-  * Enum value 'unavailable' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
+  * Enum value "unavailable" for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_UNAVAILABLE = 'unavailable';
+export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_UNAVAILABLE = "unavailable";
 
 /**
-  * Enum value 'unknown' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
+  * Enum value "unknown" for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_UNKNOWN = 'unknown';
+export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_UNKNOWN = "unknown";
 
 /**
-  * Enum value 'wifi' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
+  * Enum value "wifi" for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_WIFI = 'wifi';
+export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_WIFI = "wifi";
 
 /**
-  * Enum value 'wired' for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
+  * Enum value "wired" for attribute {@link ATTR_NETWORK_CONNECTION_TYPE}.
   */
-export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_WIRED = 'wired';
+export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_WIRED = "wired";
 
 
 /**
@@ -4201,14 +4201,14 @@ export const ATTR_NETWORK_CONNECTION_TYPE_VALUE_WIRED = 'wired';
 export const ATTR_NETWORK_IO_DIRECTION = 'network.io.direction';
 
 /**
-  * Enum value 'receive' for attribute {@link ATTR_NETWORK_IO_DIRECTION}.
+  * Enum value "receive" for attribute {@link ATTR_NETWORK_IO_DIRECTION}.
   */
-export const ATTR_NETWORK_IO_DIRECTION_VALUE_RECEIVE = 'receive';
+export const ATTR_NETWORK_IO_DIRECTION_VALUE_RECEIVE = "receive";
 
 /**
-  * Enum value 'transmit' for attribute {@link ATTR_NETWORK_IO_DIRECTION}.
+  * Enum value "transmit" for attribute {@link ATTR_NETWORK_IO_DIRECTION}.
   */
-export const ATTR_NETWORK_IO_DIRECTION_VALUE_TRANSMIT = 'transmit';
+export const ATTR_NETWORK_IO_DIRECTION_VALUE_TRANSMIT = "transmit";
 
 
 /**
@@ -4231,14 +4231,14 @@ export const ATTR_OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 export const ATTR_OPENTRACING_REF_TYPE = 'opentracing.ref_type';
 
 /**
-  * Enum value 'child_of' for attribute {@link ATTR_OPENTRACING_REF_TYPE}.
+  * Enum value "child_of" for attribute {@link ATTR_OPENTRACING_REF_TYPE}.
   */
-export const ATTR_OPENTRACING_REF_TYPE_VALUE_CHILD_OF = 'child_of';
+export const ATTR_OPENTRACING_REF_TYPE_VALUE_CHILD_OF = "child_of";
 
 /**
-  * Enum value 'follows_from' for attribute {@link ATTR_OPENTRACING_REF_TYPE}.
+  * Enum value "follows_from" for attribute {@link ATTR_OPENTRACING_REF_TYPE}.
   */
-export const ATTR_OPENTRACING_REF_TYPE_VALUE_FOLLOWS_FROM = 'follows_from';
+export const ATTR_OPENTRACING_REF_TYPE_VALUE_FOLLOWS_FROM = "follows_from";
 
 
 /**
@@ -4270,59 +4270,59 @@ export const ATTR_OS_NAME = 'os.name';
 export const ATTR_OS_TYPE = 'os.type';
 
 /**
-  * Enum value 'aix' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "aix" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_AIX = 'aix';
+export const ATTR_OS_TYPE_VALUE_AIX = "aix";
 
 /**
-  * Enum value 'darwin' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "darwin" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_DARWIN = 'darwin';
+export const ATTR_OS_TYPE_VALUE_DARWIN = "darwin";
 
 /**
-  * Enum value 'dragonflybsd' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "dragonflybsd" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_DRAGONFLYBSD = 'dragonflybsd';
+export const ATTR_OS_TYPE_VALUE_DRAGONFLYBSD = "dragonflybsd";
 
 /**
-  * Enum value 'freebsd' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "freebsd" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_FREEBSD = 'freebsd';
+export const ATTR_OS_TYPE_VALUE_FREEBSD = "freebsd";
 
 /**
-  * Enum value 'hpux' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "hpux" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_HPUX = 'hpux';
+export const ATTR_OS_TYPE_VALUE_HPUX = "hpux";
 
 /**
-  * Enum value 'linux' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "linux" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_LINUX = 'linux';
+export const ATTR_OS_TYPE_VALUE_LINUX = "linux";
 
 /**
-  * Enum value 'netbsd' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "netbsd" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_NETBSD = 'netbsd';
+export const ATTR_OS_TYPE_VALUE_NETBSD = "netbsd";
 
 /**
-  * Enum value 'openbsd' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "openbsd" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_OPENBSD = 'openbsd';
+export const ATTR_OS_TYPE_VALUE_OPENBSD = "openbsd";
 
 /**
-  * Enum value 'solaris' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "solaris" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_SOLARIS = 'solaris';
+export const ATTR_OS_TYPE_VALUE_SOLARIS = "solaris";
 
 /**
-  * Enum value 'windows' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "windows" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_WINDOWS = 'windows';
+export const ATTR_OS_TYPE_VALUE_WINDOWS = "windows";
 
 /**
-  * Enum value 'z_os' for attribute {@link ATTR_OS_TYPE}.
+  * Enum value "z_os" for attribute {@link ATTR_OS_TYPE}.
   */
-export const ATTR_OS_TYPE_VALUE_Z_OS = 'z_os';
+export const ATTR_OS_TYPE_VALUE_Z_OS = "z_os";
 
 
 /**
@@ -4395,14 +4395,14 @@ export const ATTR_PROCESS_COMMAND_LINE = 'process.command_line';
 export const ATTR_PROCESS_CONTEXT_SWITCH_TYPE = 'process.context_switch_type';
 
 /**
-  * Enum value 'involuntary' for attribute {@link ATTR_PROCESS_CONTEXT_SWITCH_TYPE}.
+  * Enum value "involuntary" for attribute {@link ATTR_PROCESS_CONTEXT_SWITCH_TYPE}.
   */
-export const ATTR_PROCESS_CONTEXT_SWITCH_TYPE_VALUE_INVOLUNTARY = 'involuntary';
+export const ATTR_PROCESS_CONTEXT_SWITCH_TYPE_VALUE_INVOLUNTARY = "involuntary";
 
 /**
-  * Enum value 'voluntary' for attribute {@link ATTR_PROCESS_CONTEXT_SWITCH_TYPE}.
+  * Enum value "voluntary" for attribute {@link ATTR_PROCESS_CONTEXT_SWITCH_TYPE}.
   */
-export const ATTR_PROCESS_CONTEXT_SWITCH_TYPE_VALUE_VOLUNTARY = 'voluntary';
+export const ATTR_PROCESS_CONTEXT_SWITCH_TYPE_VALUE_VOLUNTARY = "voluntary";
 
 
 /**
@@ -4415,19 +4415,19 @@ export const ATTR_PROCESS_CONTEXT_SWITCH_TYPE_VALUE_VOLUNTARY = 'voluntary';
 export const ATTR_PROCESS_CPU_STATE = 'process.cpu.state';
 
 /**
-  * Enum value 'system' for attribute {@link ATTR_PROCESS_CPU_STATE}.
+  * Enum value "system" for attribute {@link ATTR_PROCESS_CPU_STATE}.
   */
-export const ATTR_PROCESS_CPU_STATE_VALUE_SYSTEM = 'system';
+export const ATTR_PROCESS_CPU_STATE_VALUE_SYSTEM = "system";
 
 /**
-  * Enum value 'user' for attribute {@link ATTR_PROCESS_CPU_STATE}.
+  * Enum value "user" for attribute {@link ATTR_PROCESS_CPU_STATE}.
   */
-export const ATTR_PROCESS_CPU_STATE_VALUE_USER = 'user';
+export const ATTR_PROCESS_CPU_STATE_VALUE_USER = "user";
 
 /**
-  * Enum value 'wait' for attribute {@link ATTR_PROCESS_CPU_STATE}.
+  * Enum value "wait" for attribute {@link ATTR_PROCESS_CPU_STATE}.
   */
-export const ATTR_PROCESS_CPU_STATE_VALUE_WAIT = 'wait';
+export const ATTR_PROCESS_CPU_STATE_VALUE_WAIT = "wait";
 
 
 /**
@@ -4494,14 +4494,14 @@ export const ATTR_PROCESS_OWNER = 'process.owner';
 export const ATTR_PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
 
 /**
-  * Enum value 'major' for attribute {@link ATTR_PROCESS_PAGING_FAULT_TYPE}.
+  * Enum value "major" for attribute {@link ATTR_PROCESS_PAGING_FAULT_TYPE}.
   */
-export const ATTR_PROCESS_PAGING_FAULT_TYPE_VALUE_MAJOR = 'major';
+export const ATTR_PROCESS_PAGING_FAULT_TYPE_VALUE_MAJOR = "major";
 
 /**
-  * Enum value 'minor' for attribute {@link ATTR_PROCESS_PAGING_FAULT_TYPE}.
+  * Enum value "minor" for attribute {@link ATTR_PROCESS_PAGING_FAULT_TYPE}.
   */
-export const ATTR_PROCESS_PAGING_FAULT_TYPE_VALUE_MINOR = 'minor';
+export const ATTR_PROCESS_PAGING_FAULT_TYPE_VALUE_MINOR = "minor";
 
 
 /**
@@ -4605,84 +4605,84 @@ export const ATTR_PROCESS_VPID = 'process.vpid';
 export const ATTR_RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
 
 /**
-  * Enum value 'aborted' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "aborted" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_ABORTED = 'aborted';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_ABORTED = "aborted";
 
 /**
-  * Enum value 'already_exists' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "already_exists" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_ALREADY_EXISTS = 'already_exists';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_ALREADY_EXISTS = "already_exists";
 
 /**
-  * Enum value 'cancelled' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "cancelled" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_CANCELLED = 'cancelled';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_CANCELLED = "cancelled";
 
 /**
-  * Enum value 'data_loss' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "data_loss" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_DATA_LOSS = 'data_loss';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_DATA_LOSS = "data_loss";
 
 /**
-  * Enum value 'deadline_exceeded' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "deadline_exceeded" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_DEADLINE_EXCEEDED = 'deadline_exceeded';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_DEADLINE_EXCEEDED = "deadline_exceeded";
 
 /**
-  * Enum value 'failed_precondition' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "failed_precondition" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_FAILED_PRECONDITION = 'failed_precondition';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_FAILED_PRECONDITION = "failed_precondition";
 
 /**
-  * Enum value 'internal' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "internal" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_INTERNAL = 'internal';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_INTERNAL = "internal";
 
 /**
-  * Enum value 'invalid_argument' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "invalid_argument" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_INVALID_ARGUMENT = 'invalid_argument';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_INVALID_ARGUMENT = "invalid_argument";
 
 /**
-  * Enum value 'not_found' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "not_found" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_NOT_FOUND = 'not_found';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_NOT_FOUND = "not_found";
 
 /**
-  * Enum value 'out_of_range' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "out_of_range" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_OUT_OF_RANGE = 'out_of_range';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_OUT_OF_RANGE = "out_of_range";
 
 /**
-  * Enum value 'permission_denied' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "permission_denied" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_PERMISSION_DENIED = 'permission_denied';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_PERMISSION_DENIED = "permission_denied";
 
 /**
-  * Enum value 'resource_exhausted' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "resource_exhausted" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_RESOURCE_EXHAUSTED = 'resource_exhausted';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_RESOURCE_EXHAUSTED = "resource_exhausted";
 
 /**
-  * Enum value 'unauthenticated' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "unauthenticated" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNAUTHENTICATED = 'unauthenticated';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNAUTHENTICATED = "unauthenticated";
 
 /**
-  * Enum value 'unavailable' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "unavailable" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNAVAILABLE = 'unavailable';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNAVAILABLE = "unavailable";
 
 /**
-  * Enum value 'unimplemented' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "unimplemented" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNIMPLEMENTED = 'unimplemented';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNIMPLEMENTED = "unimplemented";
 
 /**
-  * Enum value 'unknown' for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
+  * Enum value "unknown" for attribute {@link ATTR_RPC_CONNECT_RPC_ERROR_CODE}.
   */
-export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNKNOWN = 'unknown';
+export const ATTR_RPC_CONNECT_RPC_ERROR_CODE_VALUE_UNKNOWN = "unknown";
 
 
 /**
@@ -4866,14 +4866,14 @@ export const ATTR_RPC_MESSAGE_ID = 'rpc.message.id';
 export const ATTR_RPC_MESSAGE_TYPE = 'rpc.message.type';
 
 /**
-  * Enum value 'RECEIVED' for attribute {@link ATTR_RPC_MESSAGE_TYPE}.
+  * Enum value "RECEIVED" for attribute {@link ATTR_RPC_MESSAGE_TYPE}.
   */
-export const ATTR_RPC_MESSAGE_TYPE_VALUE_RECEIVED = 'RECEIVED';
+export const ATTR_RPC_MESSAGE_TYPE_VALUE_RECEIVED = "RECEIVED";
 
 /**
-  * Enum value 'SENT' for attribute {@link ATTR_RPC_MESSAGE_TYPE}.
+  * Enum value "SENT" for attribute {@link ATTR_RPC_MESSAGE_TYPE}.
   */
-export const ATTR_RPC_MESSAGE_TYPE_VALUE_SENT = 'SENT';
+export const ATTR_RPC_MESSAGE_TYPE_VALUE_SENT = "SENT";
 
 
 /**
@@ -4909,29 +4909,29 @@ export const ATTR_RPC_SERVICE = 'rpc.service';
 export const ATTR_RPC_SYSTEM = 'rpc.system';
 
 /**
-  * Enum value 'apache_dubbo' for attribute {@link ATTR_RPC_SYSTEM}.
+  * Enum value "apache_dubbo" for attribute {@link ATTR_RPC_SYSTEM}.
   */
-export const ATTR_RPC_SYSTEM_VALUE_APACHE_DUBBO = 'apache_dubbo';
+export const ATTR_RPC_SYSTEM_VALUE_APACHE_DUBBO = "apache_dubbo";
 
 /**
-  * Enum value 'connect_rpc' for attribute {@link ATTR_RPC_SYSTEM}.
+  * Enum value "connect_rpc" for attribute {@link ATTR_RPC_SYSTEM}.
   */
-export const ATTR_RPC_SYSTEM_VALUE_CONNECT_RPC = 'connect_rpc';
+export const ATTR_RPC_SYSTEM_VALUE_CONNECT_RPC = "connect_rpc";
 
 /**
-  * Enum value 'dotnet_wcf' for attribute {@link ATTR_RPC_SYSTEM}.
+  * Enum value "dotnet_wcf" for attribute {@link ATTR_RPC_SYSTEM}.
   */
-export const ATTR_RPC_SYSTEM_VALUE_DOTNET_WCF = 'dotnet_wcf';
+export const ATTR_RPC_SYSTEM_VALUE_DOTNET_WCF = "dotnet_wcf";
 
 /**
-  * Enum value 'grpc' for attribute {@link ATTR_RPC_SYSTEM}.
+  * Enum value "grpc" for attribute {@link ATTR_RPC_SYSTEM}.
   */
-export const ATTR_RPC_SYSTEM_VALUE_GRPC = 'grpc';
+export const ATTR_RPC_SYSTEM_VALUE_GRPC = "grpc";
 
 /**
-  * Enum value 'java_rmi' for attribute {@link ATTR_RPC_SYSTEM}.
+  * Enum value "java_rmi" for attribute {@link ATTR_RPC_SYSTEM}.
   */
-export const ATTR_RPC_SYSTEM_VALUE_JAVA_RMI = 'java_rmi';
+export const ATTR_RPC_SYSTEM_VALUE_JAVA_RMI = "java_rmi";
 
 
 /**
@@ -5017,14 +5017,14 @@ export const ATTR_SOURCE_PORT = 'source.port';
 export const ATTR_STATE = 'state';
 
 /**
-  * Enum value 'idle' for attribute {@link ATTR_STATE}.
+  * Enum value "idle" for attribute {@link ATTR_STATE}.
   */
-export const ATTR_STATE_VALUE_IDLE = 'idle';
+export const ATTR_STATE_VALUE_IDLE = "idle";
 
 /**
-  * Enum value 'used' for attribute {@link ATTR_STATE}.
+  * Enum value "used" for attribute {@link ATTR_STATE}.
   */
-export const ATTR_STATE_VALUE_USED = 'used';
+export const ATTR_STATE_VALUE_USED = "used";
 
 
 /**
@@ -5044,39 +5044,39 @@ export const ATTR_SYSTEM_CPU_LOGICAL_NUMBER = 'system.cpu.logical_number';
 export const ATTR_SYSTEM_CPU_STATE = 'system.cpu.state';
 
 /**
-  * Enum value 'idle' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
+  * Enum value "idle" for attribute {@link ATTR_SYSTEM_CPU_STATE}.
   */
-export const ATTR_SYSTEM_CPU_STATE_VALUE_IDLE = 'idle';
+export const ATTR_SYSTEM_CPU_STATE_VALUE_IDLE = "idle";
 
 /**
-  * Enum value 'interrupt' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
+  * Enum value "interrupt" for attribute {@link ATTR_SYSTEM_CPU_STATE}.
   */
-export const ATTR_SYSTEM_CPU_STATE_VALUE_INTERRUPT = 'interrupt';
+export const ATTR_SYSTEM_CPU_STATE_VALUE_INTERRUPT = "interrupt";
 
 /**
-  * Enum value 'iowait' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
+  * Enum value "iowait" for attribute {@link ATTR_SYSTEM_CPU_STATE}.
   */
-export const ATTR_SYSTEM_CPU_STATE_VALUE_IOWAIT = 'iowait';
+export const ATTR_SYSTEM_CPU_STATE_VALUE_IOWAIT = "iowait";
 
 /**
-  * Enum value 'nice' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
+  * Enum value "nice" for attribute {@link ATTR_SYSTEM_CPU_STATE}.
   */
-export const ATTR_SYSTEM_CPU_STATE_VALUE_NICE = 'nice';
+export const ATTR_SYSTEM_CPU_STATE_VALUE_NICE = "nice";
 
 /**
-  * Enum value 'steal' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
+  * Enum value "steal" for attribute {@link ATTR_SYSTEM_CPU_STATE}.
   */
-export const ATTR_SYSTEM_CPU_STATE_VALUE_STEAL = 'steal';
+export const ATTR_SYSTEM_CPU_STATE_VALUE_STEAL = "steal";
 
 /**
-  * Enum value 'system' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
+  * Enum value "system" for attribute {@link ATTR_SYSTEM_CPU_STATE}.
   */
-export const ATTR_SYSTEM_CPU_STATE_VALUE_SYSTEM = 'system';
+export const ATTR_SYSTEM_CPU_STATE_VALUE_SYSTEM = "system";
 
 /**
-  * Enum value 'user' for attribute {@link ATTR_SYSTEM_CPU_STATE}.
+  * Enum value "user" for attribute {@link ATTR_SYSTEM_CPU_STATE}.
   */
-export const ATTR_SYSTEM_CPU_STATE_VALUE_USER = 'user';
+export const ATTR_SYSTEM_CPU_STATE_VALUE_USER = "user";
 
 
 /**
@@ -5108,19 +5108,19 @@ export const ATTR_SYSTEM_FILESYSTEM_MOUNTPOINT = 'system.filesystem.mountpoint';
 export const ATTR_SYSTEM_FILESYSTEM_STATE = 'system.filesystem.state';
 
 /**
-  * Enum value 'free' for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
+  * Enum value "free" for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_STATE_VALUE_FREE = 'free';
+export const ATTR_SYSTEM_FILESYSTEM_STATE_VALUE_FREE = "free";
 
 /**
-  * Enum value 'reserved' for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
+  * Enum value "reserved" for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_STATE_VALUE_RESERVED = 'reserved';
+export const ATTR_SYSTEM_FILESYSTEM_STATE_VALUE_RESERVED = "reserved";
 
 /**
-  * Enum value 'used' for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
+  * Enum value "used" for attribute {@link ATTR_SYSTEM_FILESYSTEM_STATE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_STATE_VALUE_USED = 'used';
+export const ATTR_SYSTEM_FILESYSTEM_STATE_VALUE_USED = "used";
 
 
 /**
@@ -5131,34 +5131,34 @@ export const ATTR_SYSTEM_FILESYSTEM_STATE_VALUE_USED = 'used';
 export const ATTR_SYSTEM_FILESYSTEM_TYPE = 'system.filesystem.type';
 
 /**
-  * Enum value 'exfat' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
+  * Enum value "exfat" for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_EXFAT = 'exfat';
+export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_EXFAT = "exfat";
 
 /**
-  * Enum value 'ext4' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
+  * Enum value "ext4" for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_EXT4 = 'ext4';
+export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_EXT4 = "ext4";
 
 /**
-  * Enum value 'fat32' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
+  * Enum value "fat32" for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_FAT32 = 'fat32';
+export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_FAT32 = "fat32";
 
 /**
-  * Enum value 'hfsplus' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
+  * Enum value "hfsplus" for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_HFSPLUS = 'hfsplus';
+export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_HFSPLUS = "hfsplus";
 
 /**
-  * Enum value 'ntfs' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
+  * Enum value "ntfs" for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_NTFS = 'ntfs';
+export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_NTFS = "ntfs";
 
 /**
-  * Enum value 'refs' for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
+  * Enum value "refs" for attribute {@link ATTR_SYSTEM_FILESYSTEM_TYPE}.
   */
-export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_REFS = 'refs';
+export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_REFS = "refs";
 
 
 /**
@@ -5169,29 +5169,29 @@ export const ATTR_SYSTEM_FILESYSTEM_TYPE_VALUE_REFS = 'refs';
 export const ATTR_SYSTEM_MEMORY_STATE = 'system.memory.state';
 
 /**
-  * Enum value 'buffers' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
+  * Enum value "buffers" for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
   */
-export const ATTR_SYSTEM_MEMORY_STATE_VALUE_BUFFERS = 'buffers';
+export const ATTR_SYSTEM_MEMORY_STATE_VALUE_BUFFERS = "buffers";
 
 /**
-  * Enum value 'cached' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
+  * Enum value "cached" for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
   */
-export const ATTR_SYSTEM_MEMORY_STATE_VALUE_CACHED = 'cached';
+export const ATTR_SYSTEM_MEMORY_STATE_VALUE_CACHED = "cached";
 
 /**
-  * Enum value 'free' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
+  * Enum value "free" for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
   */
-export const ATTR_SYSTEM_MEMORY_STATE_VALUE_FREE = 'free';
+export const ATTR_SYSTEM_MEMORY_STATE_VALUE_FREE = "free";
 
 /**
-  * Enum value 'shared' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
+  * Enum value "shared" for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
   */
-export const ATTR_SYSTEM_MEMORY_STATE_VALUE_SHARED = 'shared';
+export const ATTR_SYSTEM_MEMORY_STATE_VALUE_SHARED = "shared";
 
 /**
-  * Enum value 'used' for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
+  * Enum value "used" for attribute {@link ATTR_SYSTEM_MEMORY_STATE}.
   */
-export const ATTR_SYSTEM_MEMORY_STATE_VALUE_USED = 'used';
+export const ATTR_SYSTEM_MEMORY_STATE_VALUE_USED = "used";
 
 
 /**
@@ -5202,64 +5202,64 @@ export const ATTR_SYSTEM_MEMORY_STATE_VALUE_USED = 'used';
 export const ATTR_SYSTEM_NETWORK_STATE = 'system.network.state';
 
 /**
-  * Enum value 'close' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "close" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_CLOSE = 'close';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_CLOSE = "close";
 
 /**
-  * Enum value 'close_wait' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "close_wait" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_CLOSE_WAIT = 'close_wait';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_CLOSE_WAIT = "close_wait";
 
 /**
-  * Enum value 'closing' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "closing" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_CLOSING = 'closing';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_CLOSING = "closing";
 
 /**
-  * Enum value 'delete' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "delete" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_DELETE = 'delete';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_DELETE = "delete";
 
 /**
-  * Enum value 'established' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "established" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_ESTABLISHED = 'established';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_ESTABLISHED = "established";
 
 /**
-  * Enum value 'fin_wait_1' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "fin_wait_1" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_FIN_WAIT_1 = 'fin_wait_1';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_FIN_WAIT_1 = "fin_wait_1";
 
 /**
-  * Enum value 'fin_wait_2' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "fin_wait_2" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_FIN_WAIT_2 = 'fin_wait_2';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_FIN_WAIT_2 = "fin_wait_2";
 
 /**
-  * Enum value 'last_ack' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "last_ack" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_LAST_ACK = 'last_ack';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_LAST_ACK = "last_ack";
 
 /**
-  * Enum value 'listen' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "listen" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_LISTEN = 'listen';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_LISTEN = "listen";
 
 /**
-  * Enum value 'syn_recv' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "syn_recv" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_SYN_RECV = 'syn_recv';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_SYN_RECV = "syn_recv";
 
 /**
-  * Enum value 'syn_sent' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "syn_sent" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_SYN_SENT = 'syn_sent';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_SYN_SENT = "syn_sent";
 
 /**
-  * Enum value 'time_wait' for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
+  * Enum value "time_wait" for attribute {@link ATTR_SYSTEM_NETWORK_STATE}.
   */
-export const ATTR_SYSTEM_NETWORK_STATE_VALUE_TIME_WAIT = 'time_wait';
+export const ATTR_SYSTEM_NETWORK_STATE_VALUE_TIME_WAIT = "time_wait";
 
 
 /**
@@ -5270,14 +5270,14 @@ export const ATTR_SYSTEM_NETWORK_STATE_VALUE_TIME_WAIT = 'time_wait';
 export const ATTR_SYSTEM_PAGING_DIRECTION = 'system.paging.direction';
 
 /**
-  * Enum value 'in' for attribute {@link ATTR_SYSTEM_PAGING_DIRECTION}.
+  * Enum value "in" for attribute {@link ATTR_SYSTEM_PAGING_DIRECTION}.
   */
-export const ATTR_SYSTEM_PAGING_DIRECTION_VALUE_IN = 'in';
+export const ATTR_SYSTEM_PAGING_DIRECTION_VALUE_IN = "in";
 
 /**
-  * Enum value 'out' for attribute {@link ATTR_SYSTEM_PAGING_DIRECTION}.
+  * Enum value "out" for attribute {@link ATTR_SYSTEM_PAGING_DIRECTION}.
   */
-export const ATTR_SYSTEM_PAGING_DIRECTION_VALUE_OUT = 'out';
+export const ATTR_SYSTEM_PAGING_DIRECTION_VALUE_OUT = "out";
 
 
 /**
@@ -5288,14 +5288,14 @@ export const ATTR_SYSTEM_PAGING_DIRECTION_VALUE_OUT = 'out';
 export const ATTR_SYSTEM_PAGING_STATE = 'system.paging.state';
 
 /**
-  * Enum value 'free' for attribute {@link ATTR_SYSTEM_PAGING_STATE}.
+  * Enum value "free" for attribute {@link ATTR_SYSTEM_PAGING_STATE}.
   */
-export const ATTR_SYSTEM_PAGING_STATE_VALUE_FREE = 'free';
+export const ATTR_SYSTEM_PAGING_STATE_VALUE_FREE = "free";
 
 /**
-  * Enum value 'used' for attribute {@link ATTR_SYSTEM_PAGING_STATE}.
+  * Enum value "used" for attribute {@link ATTR_SYSTEM_PAGING_STATE}.
   */
-export const ATTR_SYSTEM_PAGING_STATE_VALUE_USED = 'used';
+export const ATTR_SYSTEM_PAGING_STATE_VALUE_USED = "used";
 
 
 /**
@@ -5306,14 +5306,14 @@ export const ATTR_SYSTEM_PAGING_STATE_VALUE_USED = 'used';
 export const ATTR_SYSTEM_PAGING_TYPE = 'system.paging.type';
 
 /**
-  * Enum value 'major' for attribute {@link ATTR_SYSTEM_PAGING_TYPE}.
+  * Enum value "major" for attribute {@link ATTR_SYSTEM_PAGING_TYPE}.
   */
-export const ATTR_SYSTEM_PAGING_TYPE_VALUE_MAJOR = 'major';
+export const ATTR_SYSTEM_PAGING_TYPE_VALUE_MAJOR = "major";
 
 /**
-  * Enum value 'minor' for attribute {@link ATTR_SYSTEM_PAGING_TYPE}.
+  * Enum value "minor" for attribute {@link ATTR_SYSTEM_PAGING_TYPE}.
   */
-export const ATTR_SYSTEM_PAGING_TYPE_VALUE_MINOR = 'minor';
+export const ATTR_SYSTEM_PAGING_TYPE_VALUE_MINOR = "minor";
 
 
 /**
@@ -5324,24 +5324,24 @@ export const ATTR_SYSTEM_PAGING_TYPE_VALUE_MINOR = 'minor';
 export const ATTR_SYSTEM_PROCESS_STATUS = 'system.process.status';
 
 /**
-  * Enum value 'defunct' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
+  * Enum value "defunct" for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_DEFUNCT = 'defunct';
+export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_DEFUNCT = "defunct";
 
 /**
-  * Enum value 'running' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
+  * Enum value "running" for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_RUNNING = 'running';
+export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_RUNNING = "running";
 
 /**
-  * Enum value 'sleeping' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
+  * Enum value "sleeping" for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_SLEEPING = 'sleeping';
+export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_SLEEPING = "sleeping";
 
 /**
-  * Enum value 'stopped' for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
+  * Enum value "stopped" for attribute {@link ATTR_SYSTEM_PROCESS_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_STOPPED = 'stopped';
+export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_STOPPED = "stopped";
 
 
 /**
@@ -5354,24 +5354,24 @@ export const ATTR_SYSTEM_PROCESS_STATUS_VALUE_STOPPED = 'stopped';
 export const ATTR_SYSTEM_PROCESSES_STATUS = 'system.processes.status';
 
 /**
-  * Enum value 'defunct' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
+  * Enum value "defunct" for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_DEFUNCT = 'defunct';
+export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_DEFUNCT = "defunct";
 
 /**
-  * Enum value 'running' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
+  * Enum value "running" for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_RUNNING = 'running';
+export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_RUNNING = "running";
 
 /**
-  * Enum value 'sleeping' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
+  * Enum value "sleeping" for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_SLEEPING = 'sleeping';
+export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_SLEEPING = "sleeping";
 
 /**
-  * Enum value 'stopped' for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
+  * Enum value "stopped" for attribute {@link ATTR_SYSTEM_PROCESSES_STATUS}.
   */
-export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_STOPPED = 'stopped';
+export const ATTR_SYSTEM_PROCESSES_STATUS_VALUE_STOPPED = "stopped";
 
 
 /**
@@ -5406,14 +5406,14 @@ export const ATTR_TEST_CASE_NAME = 'test.case.name';
 export const ATTR_TEST_CASE_RESULT_STATUS = 'test.case.result.status';
 
 /**
-  * Enum value 'fail' for attribute {@link ATTR_TEST_CASE_RESULT_STATUS}.
+  * Enum value "fail" for attribute {@link ATTR_TEST_CASE_RESULT_STATUS}.
   */
-export const ATTR_TEST_CASE_RESULT_STATUS_VALUE_FAIL = 'fail';
+export const ATTR_TEST_CASE_RESULT_STATUS_VALUE_FAIL = "fail";
 
 /**
-  * Enum value 'pass' for attribute {@link ATTR_TEST_CASE_RESULT_STATUS}.
+  * Enum value "pass" for attribute {@link ATTR_TEST_CASE_RESULT_STATUS}.
   */
-export const ATTR_TEST_CASE_RESULT_STATUS_VALUE_PASS = 'pass';
+export const ATTR_TEST_CASE_RESULT_STATUS_VALUE_PASS = "pass";
 
 
 /**
@@ -5431,34 +5431,34 @@ export const ATTR_TEST_SUITE_NAME = 'test.suite.name';
 export const ATTR_TEST_SUITE_RUN_STATUS = 'test.suite.run.status';
 
 /**
-  * Enum value 'aborted' for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
+  * Enum value "aborted" for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
   */
-export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_ABORTED = 'aborted';
+export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_ABORTED = "aborted";
 
 /**
-  * Enum value 'failure' for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
+  * Enum value "failure" for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
   */
-export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_FAILURE = 'failure';
+export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_FAILURE = "failure";
 
 /**
-  * Enum value 'in_progress' for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
+  * Enum value "in_progress" for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
   */
-export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_IN_PROGRESS = 'in_progress';
+export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_IN_PROGRESS = "in_progress";
 
 /**
-  * Enum value 'skipped' for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
+  * Enum value "skipped" for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
   */
-export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_SKIPPED = 'skipped';
+export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_SKIPPED = "skipped";
 
 /**
-  * Enum value 'success' for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
+  * Enum value "success" for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
   */
-export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_SUCCESS = 'success';
+export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_SUCCESS = "success";
 
 /**
-  * Enum value 'timed_out' for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
+  * Enum value "timed_out" for attribute {@link ATTR_TEST_SUITE_RUN_STATUS}.
   */
-export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_TIMED_OUT = 'timed_out';
+export const ATTR_TEST_SUITE_RUN_STATUS_VALUE_TIMED_OUT = "timed_out";
 
 
 /**
@@ -5599,14 +5599,14 @@ export const ATTR_TLS_NEXT_PROTOCOL = 'tls.next_protocol';
 export const ATTR_TLS_PROTOCOL_NAME = 'tls.protocol.name';
 
 /**
-  * Enum value 'ssl' for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
+  * Enum value "ssl" for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
   */
-export const ATTR_TLS_PROTOCOL_NAME_VALUE_SSL = 'ssl';
+export const ATTR_TLS_PROTOCOL_NAME_VALUE_SSL = "ssl";
 
 /**
-  * Enum value 'tls' for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
+  * Enum value "tls" for attribute {@link ATTR_TLS_PROTOCOL_NAME}.
   */
-export const ATTR_TLS_PROTOCOL_NAME_VALUE_TLS = 'tls';
+export const ATTR_TLS_PROTOCOL_NAME_VALUE_TLS = "tls";
 
 
 /**
@@ -5832,24 +5832,24 @@ export const ATTR_USER_AGENT_VERSION = 'user_agent.version';
 export const ATTR_V8JS_GC_TYPE = 'v8js.gc.type';
 
 /**
-  * Enum value 'incremental' for attribute {@link ATTR_V8JS_GC_TYPE}.
+  * Enum value "incremental" for attribute {@link ATTR_V8JS_GC_TYPE}.
   */
-export const ATTR_V8JS_GC_TYPE_VALUE_INCREMENTAL = 'incremental';
+export const ATTR_V8JS_GC_TYPE_VALUE_INCREMENTAL = "incremental";
 
 /**
-  * Enum value 'major' for attribute {@link ATTR_V8JS_GC_TYPE}.
+  * Enum value "major" for attribute {@link ATTR_V8JS_GC_TYPE}.
   */
-export const ATTR_V8JS_GC_TYPE_VALUE_MAJOR = 'major';
+export const ATTR_V8JS_GC_TYPE_VALUE_MAJOR = "major";
 
 /**
-  * Enum value 'minor' for attribute {@link ATTR_V8JS_GC_TYPE}.
+  * Enum value "minor" for attribute {@link ATTR_V8JS_GC_TYPE}.
   */
-export const ATTR_V8JS_GC_TYPE_VALUE_MINOR = 'minor';
+export const ATTR_V8JS_GC_TYPE_VALUE_MINOR = "minor";
 
 /**
-  * Enum value 'weakcb' for attribute {@link ATTR_V8JS_GC_TYPE}.
+  * Enum value "weakcb" for attribute {@link ATTR_V8JS_GC_TYPE}.
   */
-export const ATTR_V8JS_GC_TYPE_VALUE_WEAKCB = 'weakcb';
+export const ATTR_V8JS_GC_TYPE_VALUE_WEAKCB = "weakcb";
 
 
 /**
@@ -5862,29 +5862,29 @@ export const ATTR_V8JS_GC_TYPE_VALUE_WEAKCB = 'weakcb';
 export const ATTR_V8JS_HEAP_SPACE_NAME = 'v8js.heap.space.name';
 
 /**
-  * Enum value 'code_space' for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
+  * Enum value "code_space" for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
   */
-export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_CODE_SPACE = 'code_space';
+export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_CODE_SPACE = "code_space";
 
 /**
-  * Enum value 'large_object_space' for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
+  * Enum value "large_object_space" for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
   */
-export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_LARGE_OBJECT_SPACE = 'large_object_space';
+export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_LARGE_OBJECT_SPACE = "large_object_space";
 
 /**
-  * Enum value 'map_space' for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
+  * Enum value "map_space" for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
   */
-export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_MAP_SPACE = 'map_space';
+export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_MAP_SPACE = "map_space";
 
 /**
-  * Enum value 'new_space' for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
+  * Enum value "new_space" for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
   */
-export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_NEW_SPACE = 'new_space';
+export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_NEW_SPACE = "new_space";
 
 /**
-  * Enum value 'old_space' for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
+  * Enum value "old_space" for attribute {@link ATTR_V8JS_HEAP_SPACE_NAME}.
   */
-export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_OLD_SPACE = 'old_space';
+export const ATTR_V8JS_HEAP_SPACE_NAME_VALUE_OLD_SPACE = "old_space";
 
 
 /**
@@ -5933,14 +5933,14 @@ export const ATTR_VCS_REPOSITORY_REF_REVISION = 'vcs.repository.ref.revision';
 export const ATTR_VCS_REPOSITORY_REF_TYPE = 'vcs.repository.ref.type';
 
 /**
-  * Enum value 'branch' for attribute {@link ATTR_VCS_REPOSITORY_REF_TYPE}.
+  * Enum value "branch" for attribute {@link ATTR_VCS_REPOSITORY_REF_TYPE}.
   */
-export const ATTR_VCS_REPOSITORY_REF_TYPE_VALUE_BRANCH = 'branch';
+export const ATTR_VCS_REPOSITORY_REF_TYPE_VALUE_BRANCH = "branch";
 
 /**
-  * Enum value 'tag' for attribute {@link ATTR_VCS_REPOSITORY_REF_TYPE}.
+  * Enum value "tag" for attribute {@link ATTR_VCS_REPOSITORY_REF_TYPE}.
   */
-export const ATTR_VCS_REPOSITORY_REF_TYPE_VALUE_TAG = 'tag';
+export const ATTR_VCS_REPOSITORY_REF_TYPE_VALUE_TAG = "tag";
 
 
 /**

@@ -1,6 +1,5 @@
 {{- template.set_file_name("experimental_attributes.ts") -}}
 {%- import 'docstring.ts.j2' as d -%}
-{%- import 'common.j2' as c -%}
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -23,7 +22,7 @@
 {% for attribute in ctx | attribute_sort %}
 {%- if attribute.name not in params.excluded_attributes %}
 {{d.docstring(attribute, "attribute")}}
-{%- if attribute.type is not startingwith("template[") %}
+{%- if attribute.type is not template_type %}
 export const ATTR_{{ attribute.name | screaming_snake_case }} = '{{attribute.name}}';
 {%- else %}
 export const ATTR_{{ attribute.name | screaming_snake_case }} = (key: string) => `{{attribute.name}}.${key}`;
@@ -31,9 +30,9 @@ export const ATTR_{{ attribute.name | screaming_snake_case }} = (key: string) =>
 {%- if attribute.type is mapping %}
 {% for espec in attribute.type.members | sort(attribute='value') %}
 /**
-  * Enum value {{ c.print(espec.value) }} for attribute {@link ATTR_{{ attribute.name | screaming_snake_case }}}.
+  * Enum value {{ espec.value | print_member_value }} for attribute {@link ATTR_{{ attribute.name | screaming_snake_case }}}.
   */
-export const ATTR_{{ attribute.name | screaming_snake_case }}_VALUE_{{ espec.id | screaming_snake_case }} = {{ c.print(espec.value) }};
+export const ATTR_{{ attribute.name | screaming_snake_case }}_VALUE_{{ espec.id | screaming_snake_case }} = {{ espec.value | print_member_value }};
 {% endfor %}
 {%- endif %}
 {%- endif %}
