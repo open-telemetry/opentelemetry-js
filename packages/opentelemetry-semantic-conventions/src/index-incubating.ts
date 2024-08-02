@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-// Experimental export also contains stable constants in order to maintain
+// Incubating export also contains stable constants in order to maintain
 // backward compatibility between minor version releases
 export * from './stable_attributes';
 export * from './stable_metrics';
