@@ -13,6 +13,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :rocket: (Enhancement)
 
 * feat: include instrumentation scope info in console span and log record exporters [#4848](https://github.com/open-telemetry/opentelemetry-js/pull/4848) @blumamir
+* feat(semconv): update semantic conventions to 1.27 [#4690](https://github.com/open-telemetry/opentelemetry-js/pull/4690) @dyladan
 
 ### :bug: (Bug Fix)
 
@@ -50,7 +51,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * refactor(sdk-trace-base): Use tree-shakeable string constants for semconv [#4749](https://github.com/open-telemetry/opentelemetry-js/pull/4749) @JohannesHuster
 * refactor(resources): update deprecated semconv to use exported strings [#4755](https://github.com/open-telemetry/opentelemetry-js/pull/#4755) @JamieDanielson
 * refactor(exporters): update deprecated semconv to use exported strings [#4756](https://github.com/open-telemetry/opentelemetry-js/pull/#4756) @JamieDanielson
-* feat(semconv): update semantic conventions to 1.25 and include metric names [#4690](https://github.com/open-telemetry/opentelemetry-js/pull/4690) @dyladan
 
 ### :books: (Refine Doc)
 
