@@ -43,7 +43,6 @@ export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = "global
   */
 export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = "request_canceled";
 
-
 /**
  * The language of the telemetry SDK.
  */
@@ -109,7 +108,6 @@ export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift";
   */
 export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs";
 
-
 /**
  * The name of the telemetry SDK as defined above.
  *
@@ -157,7 +155,6 @@ export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_SKIPPED = "skipp
   */
 export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_UNHANDLED = "unhandled";
 
-
 /**
  * Rate limiting policy name.
  */
@@ -187,7 +184,6 @@ export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_FAILURE = "failure";
   * Enum value "success" for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
   */
 export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = "success";
-
 
 /**
  * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -232,7 +228,6 @@ export const ATTR_ERROR_TYPE = 'error.type';
   * Enum value "_OTHER" for attribute {@link ATTR_ERROR_TYPE}.
   */
 export const ATTR_ERROR_TYPE_VALUE_OTHER = "_OTHER";
-
 
 /**
  * **SHOULD** be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
@@ -350,7 +345,6 @@ export const ATTR_HTTP_REQUEST_METHOD_VALUE_PUT = "PUT";
   */
 export const ATTR_HTTP_REQUEST_METHOD_VALUE_TRACE = "TRACE";
 
-
 /**
  * Original HTTP method sent by the client in the request line.
  */
@@ -421,7 +415,6 @@ export const ATTR_JVM_MEMORY_TYPE_VALUE_HEAP = "heap";
   */
 export const ATTR_JVM_MEMORY_TYPE_VALUE_NON_HEAP = "non_heap";
 
-
 /**
  * Whether the thread is daemon or not.
  */
@@ -461,7 +454,6 @@ export const ATTR_JVM_THREAD_STATE_VALUE_TIMED_WAITING = "timed_waiting";
   * Enum value "waiting" for attribute {@link ATTR_JVM_THREAD_STATE}.
   */
 export const ATTR_JVM_THREAD_STATE_VALUE_WAITING = "waiting";
-
 
 /**
  * Local address of the network connection - IP address or Unix domain socket name.
@@ -533,7 +525,6 @@ export const ATTR_NETWORK_TRANSPORT_VALUE_UDP = "udp";
   */
 export const ATTR_NETWORK_TRANSPORT_VALUE_UNIX = "unix";
 
-
 /**
  * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
  *
@@ -550,7 +541,6 @@ export const ATTR_NETWORK_TYPE_VALUE_IPV4 = "ipv4";
   * Enum value "ipv6" for attribute {@link ATTR_NETWORK_TYPE}.
   */
 export const ATTR_NETWORK_TYPE_VALUE_IPV6 = "ipv6";
-
 
 /**
  * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
@@ -576,7 +566,6 @@ export const ATTR_OTEL_STATUS_CODE_VALUE_ERROR = "ERROR";
   * Enum value "OK" for attribute {@link ATTR_OTEL_STATUS_CODE}.
   */
 export const ATTR_OTEL_STATUS_CODE_VALUE_OK = "OK";
-
 
 /**
  * Description of the Status if it has a value, otherwise not set.
@@ -629,7 +618,6 @@ export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_NORMAL_CLOSURE = "normal_closu
   */
 export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_TIMEOUT = "timeout";
 
-
 /**
  * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md)
  */
@@ -649,7 +637,6 @@ export const ATTR_SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = "server_sent_even
   * Enum value "web_sockets" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
   */
 export const ATTR_SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets";
-
 
 /**
  * The [URI fragment](https://www.rfc-editor.org/rfc/rfc3986#section-3.5) component
@@ -688,3 +675,4 @@ export const ATTR_URL_SCHEME = 'url.scheme';
  * Value of the [HTTP User-Agent](https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent) header sent by the client.
  */
 export const ATTR_USER_AGENT_ORIGINAL = 'user_agent.original';
+

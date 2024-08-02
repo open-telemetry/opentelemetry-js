@@ -216,3 +216,4 @@ export const METRIC_SIGNALR_SERVER_ACTIVE_CONNECTIONS = 'signalr.server.active_c
  * @note Meter name: `Microsoft.AspNetCore.Http.Connections`; Added in: ASP.NET Core 8.0
  */
 export const METRIC_SIGNALR_SERVER_CONNECTION_DURATION = 'signalr.server.connection.duration';
+

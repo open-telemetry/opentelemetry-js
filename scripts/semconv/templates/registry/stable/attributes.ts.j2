@@ -1,5 +1,5 @@
-{{- template.set_file_name(ctx.stability ~ "_attributes.ts") -}}
-{%- import 'docstring.ts.j2' as d -%}
+{{- template.set_file_name(ctx.stability ~ "_attributes.ts") }}
+{%- import 'docstring.ts.j2' as d %}
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -19,21 +19,25 @@
 //----------------------------------------------------------------------------------------------------------
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
 //----------------------------------------------------------------------------------------------------------
+
 {% for attribute in ctx.attributes | attribute_sort %}
-{%- if attribute.name not in params.excluded_attributes %}
+{% if attribute.name not in params.excluded_attributes %}
 {{d.docstring(attribute, "attribute")}}
-{%- if attribute.type is not template_type %}
+{% if attribute.type is not template_type %}
 export const ATTR_{{ attribute.name | screaming_snake_case }} = '{{attribute.name}}';
-{%- else %}
+
+{% else %}
 export const ATTR_{{ attribute.name | screaming_snake_case }} = (key: string) => `{{attribute.name}}.${key}`;
-{%- endif %}
-{%- if attribute.type is mapping %}
+
+{% endif %}
+{% if attribute.type is mapping %}
 {% for espec in attribute.type.members | sort(attribute='value') %}
 /**
   * Enum value {{ espec.value | print_member_value }} for attribute {@link ATTR_{{ attribute.name | screaming_snake_case }}}.
   */
 export const ATTR_{{ attribute.name | screaming_snake_case }}_VALUE_{{ espec.id | screaming_snake_case }} = {{ espec.value | print_member_value }};
+
 {% endfor %}
-{%- endif %}
-{%- endif %}
+{% endif %}
+{% endif %}
 {% endfor %}

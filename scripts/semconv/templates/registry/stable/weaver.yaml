@@ -40,6 +40,11 @@ templates:
       }
     application_mode: single
 
+# Whitespace control settings to simplify the definition of templates
+whitespace_control:
+  trim_blocks: true
+  lstrip_blocks: true
+
 text_maps:
   js_types:
     int: number
