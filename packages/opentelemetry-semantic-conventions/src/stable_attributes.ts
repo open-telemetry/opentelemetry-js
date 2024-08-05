@@ -15,7 +15,7 @@
  */
 
 //----------------------------------------------------------------------------------------------------------
-// DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
+// DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/registry/stable/attributes.ts.j2
 //----------------------------------------------------------------------------------------------------------
 
 /**
@@ -26,22 +26,22 @@ export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT = 'aspnetcore.rate_limiting.re
 /**
   * Enum value "acquired" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
   */
-export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ACQUIRED = "acquired";
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ACQUIRED = "acquired";
 
 /**
   * Enum value "endpoint_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
   */
-export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ENDPOINT_LIMITER = "endpoint_limiter";
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_ENDPOINT_LIMITER = "endpoint_limiter";
 
 /**
   * Enum value "global_limiter" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
   */
-export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = "global_limiter";
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_GLOBAL_LIMITER = "global_limiter";
 
 /**
   * Enum value "request_canceled" for attribute {@link ATTR_ASPNETCORE_RATE_LIMITING_RESULT}.
   */
-export const ATTR_ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = "request_canceled";
+export const ASPNETCORE_RATE_LIMITING_RESULT_VALUE_REQUEST_CANCELED = "request_canceled";
 
 /**
  * The language of the telemetry SDK.
@@ -51,62 +51,62 @@ export const ATTR_TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
 /**
   * Enum value "cpp" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_CPP = "cpp";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_CPP = "cpp";
 
 /**
   * Enum value "dotnet" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = "dotnet";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = "dotnet";
 
 /**
   * Enum value "erlang" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = "erlang";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = "erlang";
 
 /**
   * Enum value "go" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_GO = "go";
 
 /**
   * Enum value "java" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = "java";
 
 /**
   * Enum value "nodejs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = "nodejs";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = "nodejs";
 
 /**
   * Enum value "php" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_PHP = "php";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_PHP = "php";
 
 /**
   * Enum value "python" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = "python";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = "python";
 
 /**
   * Enum value "ruby" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = "ruby";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = "ruby";
 
 /**
   * Enum value "rust" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_RUST = "rust";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_RUST = "rust";
 
 /**
   * Enum value "swift" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = "swift";
 
 /**
   * Enum value "webjs" for attribute {@link ATTR_TELEMETRY_SDK_LANGUAGE}.
   */
-export const ATTR_TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs";
+export const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs";
 
 /**
  * The name of the telemetry SDK as defined above.
@@ -138,22 +138,22 @@ export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT = 'aspnetcore.diagnost
 /**
   * Enum value "aborted" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
   */
-export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_ABORTED = "aborted";
+export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_ABORTED = "aborted";
 
 /**
   * Enum value "handled" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
   */
-export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_HANDLED = "handled";
+export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_HANDLED = "handled";
 
 /**
   * Enum value "skipped" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
   */
-export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_SKIPPED = "skipped";
+export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_SKIPPED = "skipped";
 
 /**
   * Enum value "unhandled" for attribute {@link ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT}.
   */
-export const ATTR_ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_UNHANDLED = "unhandled";
+export const ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT_VALUE_UNHANDLED = "unhandled";
 
 /**
  * Rate limiting policy name.
@@ -178,12 +178,12 @@ export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_st
 /**
   * Enum value "failure" for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
   */
-export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_FAILURE = "failure";
+export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_FAILURE = "failure";
 
 /**
   * Enum value "success" for attribute {@link ATTR_ASPNETCORE_ROUTING_MATCH_STATUS}.
   */
-export const ATTR_ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = "success";
+export const ASPNETCORE_ROUTING_MATCH_STATUS_VALUE_SUCCESS = "success";
 
 /**
  * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -227,7 +227,7 @@ export const ATTR_ERROR_TYPE = 'error.type';
 /**
   * Enum value "_OTHER" for attribute {@link ATTR_ERROR_TYPE}.
   */
-export const ATTR_ERROR_TYPE_VALUE_OTHER = "_OTHER";
+export const ERROR_TYPE_VALUE_OTHER = "_OTHER";
 
 /**
  * **SHOULD** be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
@@ -298,52 +298,52 @@ export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method';
 /**
   * Enum value "_OTHER" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_OTHER = "_OTHER";
+export const HTTP_REQUEST_METHOD_VALUE_OTHER = "_OTHER";
 
 /**
   * Enum value "CONNECT" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_CONNECT = "CONNECT";
+export const HTTP_REQUEST_METHOD_VALUE_CONNECT = "CONNECT";
 
 /**
   * Enum value "DELETE" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_DELETE = "DELETE";
+export const HTTP_REQUEST_METHOD_VALUE_DELETE = "DELETE";
 
 /**
   * Enum value "GET" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_GET = "GET";
+export const HTTP_REQUEST_METHOD_VALUE_GET = "GET";
 
 /**
   * Enum value "HEAD" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_HEAD = "HEAD";
+export const HTTP_REQUEST_METHOD_VALUE_HEAD = "HEAD";
 
 /**
   * Enum value "OPTIONS" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_OPTIONS = "OPTIONS";
+export const HTTP_REQUEST_METHOD_VALUE_OPTIONS = "OPTIONS";
 
 /**
   * Enum value "PATCH" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_PATCH = "PATCH";
+export const HTTP_REQUEST_METHOD_VALUE_PATCH = "PATCH";
 
 /**
   * Enum value "POST" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_POST = "POST";
+export const HTTP_REQUEST_METHOD_VALUE_POST = "POST";
 
 /**
   * Enum value "PUT" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_PUT = "PUT";
+export const HTTP_REQUEST_METHOD_VALUE_PUT = "PUT";
 
 /**
   * Enum value "TRACE" for attribute {@link ATTR_HTTP_REQUEST_METHOD}.
   */
-export const ATTR_HTTP_REQUEST_METHOD_VALUE_TRACE = "TRACE";
+export const HTTP_REQUEST_METHOD_VALUE_TRACE = "TRACE";
 
 /**
  * Original HTTP method sent by the client in the request line.
@@ -408,12 +408,12 @@ export const ATTR_JVM_MEMORY_TYPE = 'jvm.memory.type';
 /**
   * Enum value "heap" for attribute {@link ATTR_JVM_MEMORY_TYPE}.
   */
-export const ATTR_JVM_MEMORY_TYPE_VALUE_HEAP = "heap";
+export const JVM_MEMORY_TYPE_VALUE_HEAP = "heap";
 
 /**
   * Enum value "non_heap" for attribute {@link ATTR_JVM_MEMORY_TYPE}.
   */
-export const ATTR_JVM_MEMORY_TYPE_VALUE_NON_HEAP = "non_heap";
+export const JVM_MEMORY_TYPE_VALUE_NON_HEAP = "non_heap";
 
 /**
  * Whether the thread is daemon or not.
@@ -428,32 +428,32 @@ export const ATTR_JVM_THREAD_STATE = 'jvm.thread.state';
 /**
   * Enum value "blocked" for attribute {@link ATTR_JVM_THREAD_STATE}.
   */
-export const ATTR_JVM_THREAD_STATE_VALUE_BLOCKED = "blocked";
+export const JVM_THREAD_STATE_VALUE_BLOCKED = "blocked";
 
 /**
   * Enum value "new" for attribute {@link ATTR_JVM_THREAD_STATE}.
   */
-export const ATTR_JVM_THREAD_STATE_VALUE_NEW = "new";
+export const JVM_THREAD_STATE_VALUE_NEW = "new";
 
 /**
   * Enum value "runnable" for attribute {@link ATTR_JVM_THREAD_STATE}.
   */
-export const ATTR_JVM_THREAD_STATE_VALUE_RUNNABLE = "runnable";
+export const JVM_THREAD_STATE_VALUE_RUNNABLE = "runnable";
 
 /**
   * Enum value "terminated" for attribute {@link ATTR_JVM_THREAD_STATE}.
   */
-export const ATTR_JVM_THREAD_STATE_VALUE_TERMINATED = "terminated";
+export const JVM_THREAD_STATE_VALUE_TERMINATED = "terminated";
 
 /**
   * Enum value "timed_waiting" for attribute {@link ATTR_JVM_THREAD_STATE}.
   */
-export const ATTR_JVM_THREAD_STATE_VALUE_TIMED_WAITING = "timed_waiting";
+export const JVM_THREAD_STATE_VALUE_TIMED_WAITING = "timed_waiting";
 
 /**
   * Enum value "waiting" for attribute {@link ATTR_JVM_THREAD_STATE}.
   */
-export const ATTR_JVM_THREAD_STATE_VALUE_WAITING = "waiting";
+export const JVM_THREAD_STATE_VALUE_WAITING = "waiting";
 
 /**
  * Local address of the network connection - IP address or Unix domain socket name.
@@ -503,27 +503,27 @@ export const ATTR_NETWORK_TRANSPORT = 'network.transport';
 /**
   * Enum value "pipe" for attribute {@link ATTR_NETWORK_TRANSPORT}.
   */
-export const ATTR_NETWORK_TRANSPORT_VALUE_PIPE = "pipe";
+export const NETWORK_TRANSPORT_VALUE_PIPE = "pipe";
 
 /**
   * Enum value "quic" for attribute {@link ATTR_NETWORK_TRANSPORT}.
   */
-export const ATTR_NETWORK_TRANSPORT_VALUE_QUIC = "quic";
+export const NETWORK_TRANSPORT_VALUE_QUIC = "quic";
 
 /**
   * Enum value "tcp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
   */
-export const ATTR_NETWORK_TRANSPORT_VALUE_TCP = "tcp";
+export const NETWORK_TRANSPORT_VALUE_TCP = "tcp";
 
 /**
   * Enum value "udp" for attribute {@link ATTR_NETWORK_TRANSPORT}.
   */
-export const ATTR_NETWORK_TRANSPORT_VALUE_UDP = "udp";
+export const NETWORK_TRANSPORT_VALUE_UDP = "udp";
 
 /**
   * Enum value "unix" for attribute {@link ATTR_NETWORK_TRANSPORT}.
   */
-export const ATTR_NETWORK_TRANSPORT_VALUE_UNIX = "unix";
+export const NETWORK_TRANSPORT_VALUE_UNIX = "unix";
 
 /**
  * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
@@ -535,12 +535,12 @@ export const ATTR_NETWORK_TYPE = 'network.type';
 /**
   * Enum value "ipv4" for attribute {@link ATTR_NETWORK_TYPE}.
   */
-export const ATTR_NETWORK_TYPE_VALUE_IPV4 = "ipv4";
+export const NETWORK_TYPE_VALUE_IPV4 = "ipv4";
 
 /**
   * Enum value "ipv6" for attribute {@link ATTR_NETWORK_TYPE}.
   */
-export const ATTR_NETWORK_TYPE_VALUE_IPV6 = "ipv6";
+export const NETWORK_TYPE_VALUE_IPV6 = "ipv6";
 
 /**
  * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
@@ -560,12 +560,12 @@ export const ATTR_OTEL_STATUS_CODE = 'otel.status_code';
 /**
   * Enum value "ERROR" for attribute {@link ATTR_OTEL_STATUS_CODE}.
   */
-export const ATTR_OTEL_STATUS_CODE_VALUE_ERROR = "ERROR";
+export const OTEL_STATUS_CODE_VALUE_ERROR = "ERROR";
 
 /**
   * Enum value "OK" for attribute {@link ATTR_OTEL_STATUS_CODE}.
   */
-export const ATTR_OTEL_STATUS_CODE_VALUE_OK = "OK";
+export const OTEL_STATUS_CODE_VALUE_OK = "OK";
 
 /**
  * Description of the Status if it has a value, otherwise not set.
@@ -606,17 +606,17 @@ export const ATTR_SIGNALR_CONNECTION_STATUS = 'signalr.connection.status';
 /**
   * Enum value "app_shutdown" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
   */
-export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_APP_SHUTDOWN = "app_shutdown";
+export const SIGNALR_CONNECTION_STATUS_VALUE_APP_SHUTDOWN = "app_shutdown";
 
 /**
   * Enum value "normal_closure" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
   */
-export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_NORMAL_CLOSURE = "normal_closure";
+export const SIGNALR_CONNECTION_STATUS_VALUE_NORMAL_CLOSURE = "normal_closure";
 
 /**
   * Enum value "timeout" for attribute {@link ATTR_SIGNALR_CONNECTION_STATUS}.
   */
-export const ATTR_SIGNALR_CONNECTION_STATUS_VALUE_TIMEOUT = "timeout";
+export const SIGNALR_CONNECTION_STATUS_VALUE_TIMEOUT = "timeout";
 
 /**
  * [SignalR transport type](https://github.com/dotnet/aspnetcore/blob/main/src/SignalR/docs/specs/TransportProtocols.md)
@@ -626,17 +626,17 @@ export const ATTR_SIGNALR_TRANSPORT = 'signalr.transport';
 /**
   * Enum value "long_polling" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
   */
-export const ATTR_SIGNALR_TRANSPORT_VALUE_LONG_POLLING = "long_polling";
+export const SIGNALR_TRANSPORT_VALUE_LONG_POLLING = "long_polling";
 
 /**
   * Enum value "server_sent_events" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
   */
-export const ATTR_SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = "server_sent_events";
+export const SIGNALR_TRANSPORT_VALUE_SERVER_SENT_EVENTS = "server_sent_events";
 
 /**
   * Enum value "web_sockets" for attribute {@link ATTR_SIGNALR_TRANSPORT}.
   */
-export const ATTR_SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets";
+export const SIGNALR_TRANSPORT_VALUE_WEB_SOCKETS = "web_sockets";
 
 /**
  * The [URI fragment](https://www.rfc-editor.org/rfc/rfc3986#section-3.5) component

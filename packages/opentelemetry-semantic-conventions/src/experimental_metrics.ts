@@ -15,7 +15,7 @@
  */
 
 //----------------------------------------------------------------------------------------------------------
-// DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
+// DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/register/stable/metrics.ts.j2
 //----------------------------------------------------------------------------------------------------------
 
 /**
