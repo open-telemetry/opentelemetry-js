@@ -2068,329 +2068,329 @@ const TMP_DBSYSTEMVALUES_COCKROACHDB = 'cockroachdb';
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_OTHER_SQL.
+ * @deprecated Use DB_SYSTEM_VALUE_OTHER_SQL.
  */
 export const DBSYSTEMVALUES_OTHER_SQL = TMP_DBSYSTEMVALUES_OTHER_SQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_MSSQL.
+ * @deprecated Use DB_SYSTEM_VALUE_MSSQL.
  */
 export const DBSYSTEMVALUES_MSSQL = TMP_DBSYSTEMVALUES_MSSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_MYSQL.
+ * @deprecated Use DB_SYSTEM_VALUE_MYSQL.
  */
 export const DBSYSTEMVALUES_MYSQL = TMP_DBSYSTEMVALUES_MYSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_ORACLE.
+ * @deprecated Use DB_SYSTEM_VALUE_ORACLE.
  */
 export const DBSYSTEMVALUES_ORACLE = TMP_DBSYSTEMVALUES_ORACLE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_DB2.
+ * @deprecated Use DB_SYSTEM_VALUE_DB2.
  */
 export const DBSYSTEMVALUES_DB2 = TMP_DBSYSTEMVALUES_DB2;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_POSTGRESQL.
+ * @deprecated Use DB_SYSTEM_VALUE_POSTGRESQL.
  */
 export const DBSYSTEMVALUES_POSTGRESQL = TMP_DBSYSTEMVALUES_POSTGRESQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_REDSHIFT.
+ * @deprecated Use DB_SYSTEM_VALUE_REDSHIFT.
  */
 export const DBSYSTEMVALUES_REDSHIFT = TMP_DBSYSTEMVALUES_REDSHIFT;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_HIVE.
+ * @deprecated Use DB_SYSTEM_VALUE_HIVE.
  */
 export const DBSYSTEMVALUES_HIVE = TMP_DBSYSTEMVALUES_HIVE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_CLOUDSCAPE.
+ * @deprecated Use DB_SYSTEM_VALUE_CLOUDSCAPE.
  */
 export const DBSYSTEMVALUES_CLOUDSCAPE = TMP_DBSYSTEMVALUES_CLOUDSCAPE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_HSQLDB.
+ * @deprecated Use DB_SYSTEM_VALUE_HSQLDB.
  */
 export const DBSYSTEMVALUES_HSQLDB = TMP_DBSYSTEMVALUES_HSQLDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_PROGRESS.
+ * @deprecated Use DB_SYSTEM_VALUE_PROGRESS.
  */
 export const DBSYSTEMVALUES_PROGRESS = TMP_DBSYSTEMVALUES_PROGRESS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_MAXDB.
+ * @deprecated Use DB_SYSTEM_VALUE_MAXDB.
  */
 export const DBSYSTEMVALUES_MAXDB = TMP_DBSYSTEMVALUES_MAXDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_HANADB.
+ * @deprecated Use DB_SYSTEM_VALUE_HANADB.
  */
 export const DBSYSTEMVALUES_HANADB = TMP_DBSYSTEMVALUES_HANADB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_INGRES.
+ * @deprecated Use DB_SYSTEM_VALUE_INGRES.
  */
 export const DBSYSTEMVALUES_INGRES = TMP_DBSYSTEMVALUES_INGRES;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_FIRSTSQL.
+ * @deprecated Use DB_SYSTEM_VALUE_FIRSTSQL.
  */
 export const DBSYSTEMVALUES_FIRSTSQL = TMP_DBSYSTEMVALUES_FIRSTSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_EDB.
+ * @deprecated Use DB_SYSTEM_VALUE_EDB.
  */
 export const DBSYSTEMVALUES_EDB = TMP_DBSYSTEMVALUES_EDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_CACHE.
+ * @deprecated Use DB_SYSTEM_VALUE_CACHE.
  */
 export const DBSYSTEMVALUES_CACHE = TMP_DBSYSTEMVALUES_CACHE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_ADABAS.
+ * @deprecated Use DB_SYSTEM_VALUE_ADABAS.
  */
 export const DBSYSTEMVALUES_ADABAS = TMP_DBSYSTEMVALUES_ADABAS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_FIREBIRD.
+ * @deprecated Use DB_SYSTEM_VALUE_FIREBIRD.
  */
 export const DBSYSTEMVALUES_FIREBIRD = TMP_DBSYSTEMVALUES_FIREBIRD;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_DERBY.
+ * @deprecated Use DB_SYSTEM_VALUE_DERBY.
  */
 export const DBSYSTEMVALUES_DERBY = TMP_DBSYSTEMVALUES_DERBY;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_FILEMAKER.
+ * @deprecated Use DB_SYSTEM_VALUE_FILEMAKER.
  */
 export const DBSYSTEMVALUES_FILEMAKER = TMP_DBSYSTEMVALUES_FILEMAKER;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_INFORMIX.
+ * @deprecated Use DB_SYSTEM_VALUE_INFORMIX.
  */
 export const DBSYSTEMVALUES_INFORMIX = TMP_DBSYSTEMVALUES_INFORMIX;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_INSTANTDB.
+ * @deprecated Use DB_SYSTEM_VALUE_INSTANTDB.
  */
 export const DBSYSTEMVALUES_INSTANTDB = TMP_DBSYSTEMVALUES_INSTANTDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_INTERBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_INTERBASE.
  */
 export const DBSYSTEMVALUES_INTERBASE = TMP_DBSYSTEMVALUES_INTERBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_MARIADB.
+ * @deprecated Use DB_SYSTEM_VALUE_MARIADB.
  */
 export const DBSYSTEMVALUES_MARIADB = TMP_DBSYSTEMVALUES_MARIADB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_NETEZZA.
+ * @deprecated Use DB_SYSTEM_VALUE_NETEZZA.
  */
 export const DBSYSTEMVALUES_NETEZZA = TMP_DBSYSTEMVALUES_NETEZZA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_PERVASIVE.
+ * @deprecated Use DB_SYSTEM_VALUE_PERVASIVE.
  */
 export const DBSYSTEMVALUES_PERVASIVE = TMP_DBSYSTEMVALUES_PERVASIVE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_POINTBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_POINTBASE.
  */
 export const DBSYSTEMVALUES_POINTBASE = TMP_DBSYSTEMVALUES_POINTBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_SQLITE.
+ * @deprecated Use DB_SYSTEM_VALUE_SQLITE.
  */
 export const DBSYSTEMVALUES_SQLITE = TMP_DBSYSTEMVALUES_SQLITE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_SYBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_SYBASE.
  */
 export const DBSYSTEMVALUES_SYBASE = TMP_DBSYSTEMVALUES_SYBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_TERADATA.
+ * @deprecated Use DB_SYSTEM_VALUE_TERADATA.
  */
 export const DBSYSTEMVALUES_TERADATA = TMP_DBSYSTEMVALUES_TERADATA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_VERTICA.
+ * @deprecated Use DB_SYSTEM_VALUE_VERTICA.
  */
 export const DBSYSTEMVALUES_VERTICA = TMP_DBSYSTEMVALUES_VERTICA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_H2.
+ * @deprecated Use DB_SYSTEM_VALUE_H2.
  */
 export const DBSYSTEMVALUES_H2 = TMP_DBSYSTEMVALUES_H2;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_COLDFUSION.
+ * @deprecated Use DB_SYSTEM_VALUE_COLDFUSION.
  */
 export const DBSYSTEMVALUES_COLDFUSION = TMP_DBSYSTEMVALUES_COLDFUSION;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_CASSANDRA.
+ * @deprecated Use DB_SYSTEM_VALUE_CASSANDRA.
  */
 export const DBSYSTEMVALUES_CASSANDRA = TMP_DBSYSTEMVALUES_CASSANDRA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_HBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_HBASE.
  */
 export const DBSYSTEMVALUES_HBASE = TMP_DBSYSTEMVALUES_HBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_MONGODB.
+ * @deprecated Use DB_SYSTEM_VALUE_MONGODB.
  */
 export const DBSYSTEMVALUES_MONGODB = TMP_DBSYSTEMVALUES_MONGODB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_REDIS.
+ * @deprecated Use DB_SYSTEM_VALUE_REDIS.
  */
 export const DBSYSTEMVALUES_REDIS = TMP_DBSYSTEMVALUES_REDIS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_COUCHBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_COUCHBASE.
  */
 export const DBSYSTEMVALUES_COUCHBASE = TMP_DBSYSTEMVALUES_COUCHBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_COUCHDB.
+ * @deprecated Use DB_SYSTEM_VALUE_COUCHDB.
  */
 export const DBSYSTEMVALUES_COUCHDB = TMP_DBSYSTEMVALUES_COUCHDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_COSMOSDB.
+ * @deprecated Use DB_SYSTEM_VALUE_COSMOSDB.
  */
 export const DBSYSTEMVALUES_COSMOSDB = TMP_DBSYSTEMVALUES_COSMOSDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_DYNAMODB.
+ * @deprecated Use DB_SYSTEM_VALUE_DYNAMODB.
  */
 export const DBSYSTEMVALUES_DYNAMODB = TMP_DBSYSTEMVALUES_DYNAMODB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_NEO4J.
+ * @deprecated Use DB_SYSTEM_VALUE_NEO4J.
  */
 export const DBSYSTEMVALUES_NEO4J = TMP_DBSYSTEMVALUES_NEO4J;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_GEODE.
+ * @deprecated Use DB_SYSTEM_VALUE_GEODE.
  */
 export const DBSYSTEMVALUES_GEODE = TMP_DBSYSTEMVALUES_GEODE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_ELASTICSEARCH.
+ * @deprecated Use DB_SYSTEM_VALUE_ELASTICSEARCH.
  */
 export const DBSYSTEMVALUES_ELASTICSEARCH = TMP_DBSYSTEMVALUES_ELASTICSEARCH;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_MEMCACHED.
+ * @deprecated Use DB_SYSTEM_VALUE_MEMCACHED.
  */
 export const DBSYSTEMVALUES_MEMCACHED = TMP_DBSYSTEMVALUES_MEMCACHED;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUES_COCKROACHDB.
+ * @deprecated Use DB_SYSTEM_VALUE_COCKROACHDB.
  */
 export const DBSYSTEMVALUES_COCKROACHDB = TMP_DBSYSTEMVALUES_COCKROACHDB;
 
@@ -2621,7 +2621,7 @@ const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL = 'local_serial';
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_ALL.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ALL.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ALL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ALL;
@@ -2629,7 +2629,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_ALL =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_EACH_QUORUM.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_EACH_QUORUM.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM;
@@ -2637,7 +2637,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_QUORUM.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_QUORUM.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM;
@@ -2645,7 +2645,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_LOCAL_QUORUM.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_QUORUM.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM;
@@ -2653,7 +2653,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_ONE.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ONE.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ONE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ONE;
@@ -2661,7 +2661,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_ONE =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_TWO.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_TWO.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_TWO =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_TWO;
@@ -2669,7 +2669,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_TWO =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_THREE.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_THREE.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_THREE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_THREE;
@@ -2677,7 +2677,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_THREE =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_LOCAL_ONE.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_ONE.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE;
@@ -2685,7 +2685,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_ANY.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ANY.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ANY =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ANY;
@@ -2693,7 +2693,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_ANY =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_SERIAL.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_SERIAL.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL;
@@ -2701,7 +2701,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUES_LOCAL_SERIAL.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_SERIAL.
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL;
@@ -2783,35 +2783,35 @@ const TMP_FAASTRIGGERVALUES_OTHER = 'other';
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUES_DATASOURCE.
+ * @deprecated Use FAAS_TRIGGER_VALUE_DATASOURCE.
  */
 export const FAASTRIGGERVALUES_DATASOURCE = TMP_FAASTRIGGERVALUES_DATASOURCE;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUES_HTTP.
+ * @deprecated Use FAAS_TRIGGER_VALUE_HTTP.
  */
 export const FAASTRIGGERVALUES_HTTP = TMP_FAASTRIGGERVALUES_HTTP;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUES_PUBSUB.
+ * @deprecated Use FAAS_TRIGGER_VALUE_PUBSUB.
  */
 export const FAASTRIGGERVALUES_PUBSUB = TMP_FAASTRIGGERVALUES_PUBSUB;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUES_TIMER.
+ * @deprecated Use FAAS_TRIGGER_VALUE_TIMER.
  */
 export const FAASTRIGGERVALUES_TIMER = TMP_FAASTRIGGERVALUES_TIMER;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUES_OTHER.
+ * @deprecated Use FAAS_TRIGGER_VALUE_OTHER.
  */
 export const FAASTRIGGERVALUES_OTHER = TMP_FAASTRIGGERVALUES_OTHER;
 
@@ -2866,7 +2866,7 @@ const TMP_FAASDOCUMENTOPERATIONVALUES_DELETE = 'delete';
 /**
  * Describes the type of the operation that was performed on the data.
  *
- * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUES_INSERT.
+ * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_INSERT.
  */
 export const FAASDOCUMENTOPERATIONVALUES_INSERT =
   TMP_FAASDOCUMENTOPERATIONVALUES_INSERT;
@@ -2874,7 +2874,7 @@ export const FAASDOCUMENTOPERATIONVALUES_INSERT =
 /**
  * Describes the type of the operation that was performed on the data.
  *
- * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUES_EDIT.
+ * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_EDIT.
  */
 export const FAASDOCUMENTOPERATIONVALUES_EDIT =
   TMP_FAASDOCUMENTOPERATIONVALUES_EDIT;
@@ -2882,7 +2882,7 @@ export const FAASDOCUMENTOPERATIONVALUES_EDIT =
 /**
  * Describes the type of the operation that was performed on the data.
  *
- * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUES_DELETE.
+ * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_DELETE.
  */
 export const FAASDOCUMENTOPERATIONVALUES_DELETE =
   TMP_FAASDOCUMENTOPERATIONVALUES_DELETE;
@@ -2935,7 +2935,7 @@ const TMP_FAASINVOKEDPROVIDERVALUES_GCP = 'gcp';
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUES_ALIBABA_CLOUD.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_ALIBABA_CLOUD.
  */
 export const FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD =
   TMP_FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD;
@@ -2945,7 +2945,7 @@ export const FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD =
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUES_AWS.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_AWS.
  */
 export const FAASINVOKEDPROVIDERVALUES_AWS = TMP_FAASINVOKEDPROVIDERVALUES_AWS;
 
@@ -2954,7 +2954,7 @@ export const FAASINVOKEDPROVIDERVALUES_AWS = TMP_FAASINVOKEDPROVIDERVALUES_AWS;
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUES_AZURE.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_AZURE.
  */
 export const FAASINVOKEDPROVIDERVALUES_AZURE =
   TMP_FAASINVOKEDPROVIDERVALUES_AZURE;
@@ -2964,7 +2964,7 @@ export const FAASINVOKEDPROVIDERVALUES_AZURE =
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUES_GCP.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_GCP.
  */
 export const FAASINVOKEDPROVIDERVALUES_GCP = TMP_FAASINVOKEDPROVIDERVALUES_GCP;
 
@@ -3021,49 +3021,49 @@ const TMP_NETTRANSPORTVALUES_OTHER = 'other';
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUES_IP_TCP.
+ * @deprecated Use NET_TRANSPORT_VALUE_IP_TCP.
  */
 export const NETTRANSPORTVALUES_IP_TCP = TMP_NETTRANSPORTVALUES_IP_TCP;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUES_IP_UDP.
+ * @deprecated Use NET_TRANSPORT_VALUE_IP_UDP.
  */
 export const NETTRANSPORTVALUES_IP_UDP = TMP_NETTRANSPORTVALUES_IP_UDP;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUES_IP.
+ * @deprecated Use NET_TRANSPORT_VALUE_IP.
  */
 export const NETTRANSPORTVALUES_IP = TMP_NETTRANSPORTVALUES_IP;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUES_UNIX.
+ * @deprecated Use NET_TRANSPORT_VALUE_UNIX.
  */
 export const NETTRANSPORTVALUES_UNIX = TMP_NETTRANSPORTVALUES_UNIX;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUES_PIPE.
+ * @deprecated Use NET_TRANSPORT_VALUE_PIPE.
  */
 export const NETTRANSPORTVALUES_PIPE = TMP_NETTRANSPORTVALUES_PIPE;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUES_INPROC.
+ * @deprecated Use NET_TRANSPORT_VALUE_INPROC.
  */
 export const NETTRANSPORTVALUES_INPROC = TMP_NETTRANSPORTVALUES_INPROC;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUES_OTHER.
+ * @deprecated Use NET_TRANSPORT_VALUE_OTHER.
  */
 export const NETTRANSPORTVALUES_OTHER = TMP_NETTRANSPORTVALUES_OTHER;
 
@@ -3128,7 +3128,7 @@ const TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN = 'unknown';
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUES_WIFI.
+ * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_WIFI.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIFI =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIFI;
@@ -3136,7 +3136,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_WIFI =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUES_WIRED.
+ * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_WIRED.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIRED =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIRED;
@@ -3144,7 +3144,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_WIRED =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUES_CELL.
+ * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_CELL.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_CELL =
   TMP_NETHOSTCONNECTIONTYPEVALUES_CELL;
@@ -3152,7 +3152,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_CELL =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUES_UNAVAILABLE.
+ * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_UNAVAILABLE.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE;
@@ -3160,7 +3160,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUES_UNKNOWN.
+ * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_UNKNOWN.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNKNOWN =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN;
@@ -3234,7 +3234,7 @@ const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA = 'lte_ca';
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_GPRS.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_GPRS.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GPRS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GPRS;
@@ -3242,7 +3242,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_GPRS =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_EDGE.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EDGE.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EDGE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EDGE;
@@ -3250,7 +3250,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EDGE =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_UMTS.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_UMTS.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_UMTS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_UMTS;
@@ -3258,7 +3258,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_UMTS =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_CDMA.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_CDMA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA;
@@ -3266,7 +3266,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_EVDO_0.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EVDO_0.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0;
@@ -3274,7 +3274,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_EVDO_A.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EVDO_A.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A;
@@ -3282,7 +3282,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_CDMA2000_1XRTT.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_CDMA2000_1XRTT.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT;
@@ -3290,7 +3290,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_HSDPA.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSDPA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA;
@@ -3298,7 +3298,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_HSUPA.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSUPA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA;
@@ -3306,7 +3306,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_HSPA.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSPA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPA;
@@ -3314,7 +3314,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_IDEN.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_IDEN.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IDEN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IDEN;
@@ -3322,7 +3322,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_IDEN =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_EVDO_B.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EVDO_B.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B;
@@ -3330,7 +3330,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_LTE.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_LTE.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE;
@@ -3338,7 +3338,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_EHRPD.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EHRPD.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD;
@@ -3346,7 +3346,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_HSPAP.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSPAP.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP;
@@ -3354,7 +3354,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_GSM.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_GSM.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GSM =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GSM;
@@ -3362,7 +3362,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_GSM =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_TD_SCDMA.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_TD_SCDMA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA;
@@ -3370,7 +3370,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_IWLAN.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_IWLAN.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN;
@@ -3378,7 +3378,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_NR.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_NR.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NR =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NR;
@@ -3386,7 +3386,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_NR =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_NRNSA.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_NRNSA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA;
@@ -3394,7 +3394,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUES_LTE_CA.
+ * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_LTE_CA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA;
@@ -3520,7 +3520,7 @@ const TMP_HTTPFLAVORVALUES_QUIC = 'QUIC';
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUES_HTTP_1_0.
+ * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_1_0.
  */
 export const HTTPFLAVORVALUES_HTTP_1_0 = TMP_HTTPFLAVORVALUES_HTTP_1_0;
 
@@ -3529,7 +3529,7 @@ export const HTTPFLAVORVALUES_HTTP_1_0 = TMP_HTTPFLAVORVALUES_HTTP_1_0;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUES_HTTP_1_1.
+ * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_1_1.
  */
 export const HTTPFLAVORVALUES_HTTP_1_1 = TMP_HTTPFLAVORVALUES_HTTP_1_1;
 
@@ -3538,7 +3538,7 @@ export const HTTPFLAVORVALUES_HTTP_1_1 = TMP_HTTPFLAVORVALUES_HTTP_1_1;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUES_HTTP_2_0.
+ * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_2_0.
  */
 export const HTTPFLAVORVALUES_HTTP_2_0 = TMP_HTTPFLAVORVALUES_HTTP_2_0;
 
@@ -3547,7 +3547,7 @@ export const HTTPFLAVORVALUES_HTTP_2_0 = TMP_HTTPFLAVORVALUES_HTTP_2_0;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUES_SPDY.
+ * @deprecated Use HTTP_FLAVOR_VALUE_SPDY.
  */
 export const HTTPFLAVORVALUES_SPDY = TMP_HTTPFLAVORVALUES_SPDY;
 
@@ -3556,7 +3556,7 @@ export const HTTPFLAVORVALUES_SPDY = TMP_HTTPFLAVORVALUES_SPDY;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUES_QUIC.
+ * @deprecated Use HTTP_FLAVOR_VALUE_QUIC.
  */
 export const HTTPFLAVORVALUES_QUIC = TMP_HTTPFLAVORVALUES_QUIC;
 
@@ -3611,7 +3611,7 @@ const TMP_MESSAGINGDESTINATIONKINDVALUES_TOPIC = 'topic';
 /**
  * The kind of message destination.
  *
- * @deprecated Use MESSAGING_DESTINATION_KIND_VALUES_QUEUE.
+ * @deprecated Use MESSAGING_DESTINATION_KIND_VALUE_QUEUE.
  */
 export const MESSAGINGDESTINATIONKINDVALUES_QUEUE =
   TMP_MESSAGINGDESTINATIONKINDVALUES_QUEUE;
@@ -3619,7 +3619,7 @@ export const MESSAGINGDESTINATIONKINDVALUES_QUEUE =
 /**
  * The kind of message destination.
  *
- * @deprecated Use MESSAGING_DESTINATION_KIND_VALUES_TOPIC.
+ * @deprecated Use MESSAGING_DESTINATION_KIND_VALUE_TOPIC.
  */
 export const MESSAGINGDESTINATIONKINDVALUES_TOPIC =
   TMP_MESSAGINGDESTINATIONKINDVALUES_TOPIC;
@@ -3662,7 +3662,7 @@ const TMP_MESSAGINGOPERATIONVALUES_PROCESS = 'process';
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  *
- * @deprecated Use MESSAGING_OPERATION_VALUES_RECEIVE.
+ * @deprecated Use MESSAGING_OPERATION_VALUE_RECEIVE.
  */
 export const MESSAGINGOPERATIONVALUES_RECEIVE =
   TMP_MESSAGINGOPERATIONVALUES_RECEIVE;
@@ -3670,7 +3670,7 @@ export const MESSAGINGOPERATIONVALUES_RECEIVE =
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  *
- * @deprecated Use MESSAGING_OPERATION_VALUES_PROCESS.
+ * @deprecated Use MESSAGING_OPERATION_VALUE_PROCESS.
  */
 export const MESSAGINGOPERATIONVALUES_PROCESS =
   TMP_MESSAGINGOPERATIONVALUES_PROCESS;
@@ -3728,14 +3728,14 @@ const TMP_RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED = 16;
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_OK.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_OK.
  */
 export const RPCGRPCSTATUSCODEVALUES_OK = TMP_RPCGRPCSTATUSCODEVALUES_OK;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_CANCELLED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_CANCELLED.
  */
 export const RPCGRPCSTATUSCODEVALUES_CANCELLED =
   TMP_RPCGRPCSTATUSCODEVALUES_CANCELLED;
@@ -3743,7 +3743,7 @@ export const RPCGRPCSTATUSCODEVALUES_CANCELLED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_UNKNOWN.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNKNOWN.
  */
 export const RPCGRPCSTATUSCODEVALUES_UNKNOWN =
   TMP_RPCGRPCSTATUSCODEVALUES_UNKNOWN;
@@ -3751,7 +3751,7 @@ export const RPCGRPCSTATUSCODEVALUES_UNKNOWN =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_INVALID_ARGUMENT.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_INVALID_ARGUMENT.
  */
 export const RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT =
   TMP_RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT;
@@ -3759,7 +3759,7 @@ export const RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_DEADLINE_EXCEEDED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_DEADLINE_EXCEEDED.
  */
 export const RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED =
   TMP_RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED;
@@ -3767,7 +3767,7 @@ export const RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_NOT_FOUND.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_NOT_FOUND.
  */
 export const RPCGRPCSTATUSCODEVALUES_NOT_FOUND =
   TMP_RPCGRPCSTATUSCODEVALUES_NOT_FOUND;
@@ -3775,7 +3775,7 @@ export const RPCGRPCSTATUSCODEVALUES_NOT_FOUND =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_ALREADY_EXISTS.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_ALREADY_EXISTS.
  */
 export const RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS =
   TMP_RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS;
@@ -3783,7 +3783,7 @@ export const RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_PERMISSION_DENIED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_PERMISSION_DENIED.
  */
 export const RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED =
   TMP_RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED;
@@ -3791,7 +3791,7 @@ export const RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_RESOURCE_EXHAUSTED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_RESOURCE_EXHAUSTED.
  */
 export const RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED =
   TMP_RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED;
@@ -3799,7 +3799,7 @@ export const RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_FAILED_PRECONDITION.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_FAILED_PRECONDITION.
  */
 export const RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION =
   TMP_RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION;
@@ -3807,7 +3807,7 @@ export const RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_ABORTED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_ABORTED.
  */
 export const RPCGRPCSTATUSCODEVALUES_ABORTED =
   TMP_RPCGRPCSTATUSCODEVALUES_ABORTED;
@@ -3815,7 +3815,7 @@ export const RPCGRPCSTATUSCODEVALUES_ABORTED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_OUT_OF_RANGE.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_OUT_OF_RANGE.
  */
 export const RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE =
   TMP_RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE;
@@ -3823,7 +3823,7 @@ export const RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_UNIMPLEMENTED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNIMPLEMENTED.
  */
 export const RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED =
   TMP_RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED;
@@ -3831,7 +3831,7 @@ export const RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_INTERNAL.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_INTERNAL.
  */
 export const RPCGRPCSTATUSCODEVALUES_INTERNAL =
   TMP_RPCGRPCSTATUSCODEVALUES_INTERNAL;
@@ -3839,7 +3839,7 @@ export const RPCGRPCSTATUSCODEVALUES_INTERNAL =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_UNAVAILABLE.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNAVAILABLE.
  */
 export const RPCGRPCSTATUSCODEVALUES_UNAVAILABLE =
   TMP_RPCGRPCSTATUSCODEVALUES_UNAVAILABLE;
@@ -3847,7 +3847,7 @@ export const RPCGRPCSTATUSCODEVALUES_UNAVAILABLE =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_DATA_LOSS.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_DATA_LOSS.
  */
 export const RPCGRPCSTATUSCODEVALUES_DATA_LOSS =
   TMP_RPCGRPCSTATUSCODEVALUES_DATA_LOSS;
@@ -3855,7 +3855,7 @@ export const RPCGRPCSTATUSCODEVALUES_DATA_LOSS =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUES_UNAUTHENTICATED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNAUTHENTICATED.
  */
 export const RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED =
   TMP_RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED;
@@ -3957,14 +3957,14 @@ const TMP_MESSAGETYPEVALUES_RECEIVED = 'RECEIVED';
 /**
  * Whether this is a received or sent message.
  *
- * @deprecated Use MESSAGE_TYPE_VALUES_SENT.
+ * @deprecated Use MESSAGE_TYPE_VALUE_SENT.
  */
 export const MESSAGETYPEVALUES_SENT = TMP_MESSAGETYPEVALUES_SENT;
 
 /**
  * Whether this is a received or sent message.
  *
- * @deprecated Use MESSAGE_TYPE_VALUES_RECEIVED.
+ * @deprecated Use MESSAGE_TYPE_VALUE_RECEIVED.
  */
 export const MESSAGETYPEVALUES_RECEIVED = TMP_MESSAGETYPEVALUES_RECEIVED;
 

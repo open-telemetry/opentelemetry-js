@@ -1301,7 +1301,7 @@ const TMP_CLOUDPROVIDERVALUES_GCP = 'gcp';
 /**
  * Name of the cloud provider.
  *
- * @deprecated Use CLOUD_PROVIDER_VALUES_ALIBABA_CLOUD.
+ * @deprecated Use CLOUD_PROVIDER_VALUE_ALIBABA_CLOUD.
  */
 export const CLOUDPROVIDERVALUES_ALIBABA_CLOUD =
   TMP_CLOUDPROVIDERVALUES_ALIBABA_CLOUD;
@@ -1309,21 +1309,21 @@ export const CLOUDPROVIDERVALUES_ALIBABA_CLOUD =
 /**
  * Name of the cloud provider.
  *
- * @deprecated Use CLOUD_PROVIDER_VALUES_AWS.
+ * @deprecated Use CLOUD_PROVIDER_VALUE_AWS.
  */
 export const CLOUDPROVIDERVALUES_AWS = TMP_CLOUDPROVIDERVALUES_AWS;
 
 /**
  * Name of the cloud provider.
  *
- * @deprecated Use CLOUD_PROVIDER_VALUES_AZURE.
+ * @deprecated Use CLOUD_PROVIDER_VALUE_AZURE.
  */
 export const CLOUDPROVIDERVALUES_AZURE = TMP_CLOUDPROVIDERVALUES_AZURE;
 
 /**
  * Name of the cloud provider.
  *
- * @deprecated Use CLOUD_PROVIDER_VALUES_GCP.
+ * @deprecated Use CLOUD_PROVIDER_VALUE_GCP.
  */
 export const CLOUDPROVIDERVALUES_GCP = TMP_CLOUDPROVIDERVALUES_GCP;
 
@@ -1393,7 +1393,7 @@ const TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE = 'gcp_app_engine';
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_ALIBABA_CLOUD_ECS.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_ECS.
  */
 export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS =
   TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS;
@@ -1403,7 +1403,7 @@ export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_ECS =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_ALIBABA_CLOUD_FC.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_ALIBABA_CLOUD_FC.
  */
 export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC =
   TMP_CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC;
@@ -1413,7 +1413,7 @@ export const CLOUDPLATFORMVALUES_ALIBABA_CLOUD_FC =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AWS_EC2.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AWS_EC2.
  */
 export const CLOUDPLATFORMVALUES_AWS_EC2 = TMP_CLOUDPLATFORMVALUES_AWS_EC2;
 
@@ -1422,7 +1422,7 @@ export const CLOUDPLATFORMVALUES_AWS_EC2 = TMP_CLOUDPLATFORMVALUES_AWS_EC2;
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AWS_ECS.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AWS_ECS.
  */
 export const CLOUDPLATFORMVALUES_AWS_ECS = TMP_CLOUDPLATFORMVALUES_AWS_ECS;
 
@@ -1431,7 +1431,7 @@ export const CLOUDPLATFORMVALUES_AWS_ECS = TMP_CLOUDPLATFORMVALUES_AWS_ECS;
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AWS_EKS.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AWS_EKS.
  */
 export const CLOUDPLATFORMVALUES_AWS_EKS = TMP_CLOUDPLATFORMVALUES_AWS_EKS;
 
@@ -1440,7 +1440,7 @@ export const CLOUDPLATFORMVALUES_AWS_EKS = TMP_CLOUDPLATFORMVALUES_AWS_EKS;
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AWS_LAMBDA.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AWS_LAMBDA.
  */
 export const CLOUDPLATFORMVALUES_AWS_LAMBDA =
   TMP_CLOUDPLATFORMVALUES_AWS_LAMBDA;
@@ -1450,7 +1450,7 @@ export const CLOUDPLATFORMVALUES_AWS_LAMBDA =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AWS_ELASTIC_BEANSTALK.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK.
  */
 export const CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK =
   TMP_CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK;
@@ -1460,7 +1460,7 @@ export const CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AZURE_VM.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AZURE_VM.
  */
 export const CLOUDPLATFORMVALUES_AZURE_VM = TMP_CLOUDPLATFORMVALUES_AZURE_VM;
 
@@ -1469,7 +1469,7 @@ export const CLOUDPLATFORMVALUES_AZURE_VM = TMP_CLOUDPLATFORMVALUES_AZURE_VM;
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AZURE_CONTAINER_INSTANCES.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AZURE_CONTAINER_INSTANCES.
  */
 export const CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES =
   TMP_CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES;
@@ -1479,7 +1479,7 @@ export const CLOUDPLATFORMVALUES_AZURE_CONTAINER_INSTANCES =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AZURE_AKS.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AZURE_AKS.
  */
 export const CLOUDPLATFORMVALUES_AZURE_AKS = TMP_CLOUDPLATFORMVALUES_AZURE_AKS;
 
@@ -1488,7 +1488,7 @@ export const CLOUDPLATFORMVALUES_AZURE_AKS = TMP_CLOUDPLATFORMVALUES_AZURE_AKS;
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AZURE_FUNCTIONS.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AZURE_FUNCTIONS.
  */
 export const CLOUDPLATFORMVALUES_AZURE_FUNCTIONS =
   TMP_CLOUDPLATFORMVALUES_AZURE_FUNCTIONS;
@@ -1498,7 +1498,7 @@ export const CLOUDPLATFORMVALUES_AZURE_FUNCTIONS =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_AZURE_APP_SERVICE.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_AZURE_APP_SERVICE.
  */
 export const CLOUDPLATFORMVALUES_AZURE_APP_SERVICE =
   TMP_CLOUDPLATFORMVALUES_AZURE_APP_SERVICE;
@@ -1508,7 +1508,7 @@ export const CLOUDPLATFORMVALUES_AZURE_APP_SERVICE =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_GCP_COMPUTE_ENGINE.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_GCP_COMPUTE_ENGINE.
  */
 export const CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE =
   TMP_CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE;
@@ -1518,7 +1518,7 @@ export const CLOUDPLATFORMVALUES_GCP_COMPUTE_ENGINE =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_GCP_CLOUD_RUN.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_GCP_CLOUD_RUN.
  */
 export const CLOUDPLATFORMVALUES_GCP_CLOUD_RUN =
   TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_RUN;
@@ -1528,7 +1528,7 @@ export const CLOUDPLATFORMVALUES_GCP_CLOUD_RUN =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_GCP_KUBERNETES_ENGINE.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_GCP_KUBERNETES_ENGINE.
  */
 export const CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE =
   TMP_CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE;
@@ -1538,7 +1538,7 @@ export const CLOUDPLATFORMVALUES_GCP_KUBERNETES_ENGINE =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_GCP_CLOUD_FUNCTIONS.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_GCP_CLOUD_FUNCTIONS.
  */
 export const CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS =
   TMP_CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS;
@@ -1548,7 +1548,7 @@ export const CLOUDPLATFORMVALUES_GCP_CLOUD_FUNCTIONS =
  *
  * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
  *
- * @deprecated Use CLOUD_PLATFORM_VALUES_GCP_APP_ENGINE.
+ * @deprecated Use CLOUD_PLATFORM_VALUE_GCP_APP_ENGINE.
  */
 export const CLOUDPLATFORMVALUES_GCP_APP_ENGINE =
   TMP_CLOUDPLATFORMVALUES_GCP_APP_ENGINE;
@@ -1653,14 +1653,14 @@ const TMP_AWSECSLAUNCHTYPEVALUES_FARGATE = 'fargate';
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
  *
- * @deprecated Use AWS_ECS_LAUNCHTYPE_VALUES_EC2.
+ * @deprecated Use AWS_ECS_LAUNCHTYPE_VALUE_EC2.
  */
 export const AWSECSLAUNCHTYPEVALUES_EC2 = TMP_AWSECSLAUNCHTYPEVALUES_EC2;
 
 /**
  * The [launch type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS task.
  *
- * @deprecated Use AWS_ECS_LAUNCHTYPE_VALUES_FARGATE.
+ * @deprecated Use AWS_ECS_LAUNCHTYPE_VALUE_FARGATE.
  */
 export const AWSECSLAUNCHTYPEVALUES_FARGATE =
   TMP_AWSECSLAUNCHTYPEVALUES_FARGATE;
@@ -1708,49 +1708,49 @@ const TMP_HOSTARCHVALUES_X86 = 'x86';
 /**
  * The CPU architecture the host system is running on.
  *
- * @deprecated Use HOST_ARCH_VALUES_AMD64.
+ * @deprecated Use HOST_ARCH_VALUE_AMD64.
  */
 export const HOSTARCHVALUES_AMD64 = TMP_HOSTARCHVALUES_AMD64;
 
 /**
  * The CPU architecture the host system is running on.
  *
- * @deprecated Use HOST_ARCH_VALUES_ARM32.
+ * @deprecated Use HOST_ARCH_VALUE_ARM32.
  */
 export const HOSTARCHVALUES_ARM32 = TMP_HOSTARCHVALUES_ARM32;
 
 /**
  * The CPU architecture the host system is running on.
  *
- * @deprecated Use HOST_ARCH_VALUES_ARM64.
+ * @deprecated Use HOST_ARCH_VALUE_ARM64.
  */
 export const HOSTARCHVALUES_ARM64 = TMP_HOSTARCHVALUES_ARM64;
 
 /**
  * The CPU architecture the host system is running on.
  *
- * @deprecated Use HOST_ARCH_VALUES_IA64.
+ * @deprecated Use HOST_ARCH_VALUE_IA64.
  */
 export const HOSTARCHVALUES_IA64 = TMP_HOSTARCHVALUES_IA64;
 
 /**
  * The CPU architecture the host system is running on.
  *
- * @deprecated Use HOST_ARCH_VALUES_PPC32.
+ * @deprecated Use HOST_ARCH_VALUE_PPC32.
  */
 export const HOSTARCHVALUES_PPC32 = TMP_HOSTARCHVALUES_PPC32;
 
 /**
  * The CPU architecture the host system is running on.
  *
- * @deprecated Use HOST_ARCH_VALUES_PPC64.
+ * @deprecated Use HOST_ARCH_VALUE_PPC64.
  */
 export const HOSTARCHVALUES_PPC64 = TMP_HOSTARCHVALUES_PPC64;
 
 /**
  * The CPU architecture the host system is running on.
  *
- * @deprecated Use HOST_ARCH_VALUES_X86.
+ * @deprecated Use HOST_ARCH_VALUE_X86.
  */
 export const HOSTARCHVALUES_X86 = TMP_HOSTARCHVALUES_X86;
 
@@ -1821,77 +1821,77 @@ const TMP_OSTYPEVALUES_Z_OS = 'z_os';
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_WINDOWS.
+ * @deprecated Use OS_TYPE_VALUE_WINDOWS.
  */
 export const OSTYPEVALUES_WINDOWS = TMP_OSTYPEVALUES_WINDOWS;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_LINUX.
+ * @deprecated Use OS_TYPE_VALUE_LINUX.
  */
 export const OSTYPEVALUES_LINUX = TMP_OSTYPEVALUES_LINUX;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_DARWIN.
+ * @deprecated Use OS_TYPE_VALUE_DARWIN.
  */
 export const OSTYPEVALUES_DARWIN = TMP_OSTYPEVALUES_DARWIN;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_FREEBSD.
+ * @deprecated Use OS_TYPE_VALUE_FREEBSD.
  */
 export const OSTYPEVALUES_FREEBSD = TMP_OSTYPEVALUES_FREEBSD;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_NETBSD.
+ * @deprecated Use OS_TYPE_VALUE_NETBSD.
  */
 export const OSTYPEVALUES_NETBSD = TMP_OSTYPEVALUES_NETBSD;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_OPENBSD.
+ * @deprecated Use OS_TYPE_VALUE_OPENBSD.
  */
 export const OSTYPEVALUES_OPENBSD = TMP_OSTYPEVALUES_OPENBSD;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_DRAGONFLYBSD.
+ * @deprecated Use OS_TYPE_VALUE_DRAGONFLYBSD.
  */
 export const OSTYPEVALUES_DRAGONFLYBSD = TMP_OSTYPEVALUES_DRAGONFLYBSD;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_HPUX.
+ * @deprecated Use OS_TYPE_VALUE_HPUX.
  */
 export const OSTYPEVALUES_HPUX = TMP_OSTYPEVALUES_HPUX;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_AIX.
+ * @deprecated Use OS_TYPE_VALUE_AIX.
  */
 export const OSTYPEVALUES_AIX = TMP_OSTYPEVALUES_AIX;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_SOLARIS.
+ * @deprecated Use OS_TYPE_VALUE_SOLARIS.
  */
 export const OSTYPEVALUES_SOLARIS = TMP_OSTYPEVALUES_SOLARIS;
 
 /**
  * The operating system type.
  *
- * @deprecated Use OS_TYPE_VALUES_Z_OS.
+ * @deprecated Use OS_TYPE_VALUE_Z_OS.
  */
 export const OSTYPEVALUES_Z_OS = TMP_OSTYPEVALUES_Z_OS;
 
@@ -1977,7 +1977,7 @@ const TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS = 'webjs';
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_CPP.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_CPP.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_CPP =
   TMP_TELEMETRYSDKLANGUAGEVALUES_CPP;
@@ -1985,7 +1985,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_CPP =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_DOTNET.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_DOTNET =
   TMP_TELEMETRYSDKLANGUAGEVALUES_DOTNET;
@@ -1993,7 +1993,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_DOTNET =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_ERLANG.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_ERLANG =
   TMP_TELEMETRYSDKLANGUAGEVALUES_ERLANG;
@@ -2001,14 +2001,14 @@ export const TELEMETRYSDKLANGUAGEVALUES_ERLANG =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_GO.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_GO.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_GO = TMP_TELEMETRYSDKLANGUAGEVALUES_GO;
 
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_JAVA.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_JAVA.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_JAVA =
   TMP_TELEMETRYSDKLANGUAGEVALUES_JAVA;
@@ -2016,7 +2016,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_JAVA =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_NODEJS.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_NODEJS =
   TMP_TELEMETRYSDKLANGUAGEVALUES_NODEJS;
@@ -2024,7 +2024,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_NODEJS =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_PHP.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_PHP.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_PHP =
   TMP_TELEMETRYSDKLANGUAGEVALUES_PHP;
@@ -2032,7 +2032,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_PHP =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_PYTHON.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_PYTHON =
   TMP_TELEMETRYSDKLANGUAGEVALUES_PYTHON;
@@ -2040,7 +2040,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_PYTHON =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_RUBY.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_RUBY.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_RUBY =
   TMP_TELEMETRYSDKLANGUAGEVALUES_RUBY;
@@ -2048,7 +2048,7 @@ export const TELEMETRYSDKLANGUAGEVALUES_RUBY =
 /**
  * The language of the telemetry SDK.
  *
- * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUES_WEBJS.
+ * @deprecated Use TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS.
  */
 export const TELEMETRYSDKLANGUAGEVALUES_WEBJS =
   TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS;
