@@ -104,12 +104,13 @@ export abstract class OTLPExporterNodeBase<
       .then(response => {
         if (response.status === 'success') {
           onSuccess();
-          return;
-        }
-        if (response.status === 'failure' && response.error) {
+        } else if (response.status === 'failure' && response.error) {
           onError(response.error);
+        } else if (response.status === 'retryable') {
+          onError(new OTLPExporterError('Export failed with retryable status'));
+        } else {
+          onError(new OTLPExporterError('Export failed with unknown error'));
         }
-        onError(new OTLPExporterError('Export failed with unknown error'));
       }, onError);
 
     this._sendingPromises.push(promise);
