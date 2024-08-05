@@ -2,7 +2,13 @@
 
 {% macro docstring(obj, type="value") -%}/**
 {{ strong_reqs(obj.brief | comment_with_prefix(" * ")) }}
-{% if obj.note %}
+{% if obj.examples is sequence %}{% for example in obj.examples %}
+ *
+ * @example {{ example }}
+{% endfor %}{%elif obj.examples%}
+ *
+ * @example {{ obj.examples | print_member_value }}
+{% endif %}{% if obj.note %}
  *
 {{ ("@note " ~ strong_reqs(obj.note)) | comment_with_prefix(" * ") }}
 {% endif %}{% if (obj.stability) != "stable" %}
