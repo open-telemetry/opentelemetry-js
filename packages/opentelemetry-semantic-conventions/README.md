@@ -29,7 +29,7 @@ import {
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_NAME,
   ATTR_NETWORK_PROTOCOL_VERSION,
-  ATTR_NETWORK_TRANSPORT_VALUE_TCP,
+  NETWORK_TRANSPORT_VALUE_TCP,
 } from '@opentelemetry/semantic-conventions';
 
 const span = tracer.startSpan(spanName, spanOptions)
@@ -38,7 +38,7 @@ const span = tracer.startSpan(spanName, spanOptions)
     [ATTR_NETWORK_PEER_PORT]: 8080,
     [ATTR_NETWORK_PROTOCOL_NAME]: 'http',
     [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
-    [ATTR_NETWORK_TRANSPORT]: ATTR_NETWORK_TRANSPORT_VALUE_TCP,
+    [ATTR_NETWORK_TRANSPORT]: NETWORK_TRANSPORT_VALUE_TCP,
   });
 ```
 
