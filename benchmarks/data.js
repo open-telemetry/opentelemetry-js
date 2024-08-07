@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1722609118305,
+  "lastUpdate": 1723034891241,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -13534,6 +13534,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 651469,
             "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "01cea7caeb130142cc017f77ea74834a35d0e8d6",
+          "message": "Use weaver to generate latest semconv 1.27 (#4690)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>\nCo-authored-by: Marc Pichler <marcpi@edu.aau.at>",
+          "timestamp": "2024-08-07T12:45:34Z",
+          "tree_id": "51748ac59fdd17def69880aec7329a1b632af01d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/01cea7caeb130142cc017f77ea74834a35d0e8d6"
+        },
+        "date": 1723034890334,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 922167,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11510,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 675540,
+            "range": "±0.62%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 668214,
+            "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "100 samples"
           }
