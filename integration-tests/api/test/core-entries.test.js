@@ -25,24 +25,14 @@ const assert = require('assert');
 // change for CJS users.
 // So we have to use plain JavaScript to verity the `package.json#exports` here.
 
-describe('@opentelemetry/api entries', () => {
-  it('should import root entry', async () => {
-    const mod = await import('@opentelemetry/api');
-    assert.ok(mod.trace != null);
+describe('@opentelemetry/core entries', () => {
+  it('should import baggage utils under named const', async () => {
+    const mod = await import('@opentelemetry/core');
+    assert.ok(mod.baggageUtils.getKeyPairs != null);
   });
 
-  it('should require root entry', () => {
-    const mod = require('@opentelemetry/api');
-    assert.ok(mod.trace != null);
-  });
-
-  it('should import experimental entry', async () => {
-    const mod = await import('@opentelemetry/api/experimental');
-    assert.ok(mod.wrapTracer != null);
-  });
-
-  it('should require experimental entry', () => {
-    const mod = require('@opentelemetry/api/experimental');
-    assert.ok(mod.wrapTracer != null);
+  it('should require baggage utils under named const', () => {
+    const mod = require('@opentelemetry/core');
+    assert.ok(mod.baggageUtils.getKeyPairs != null);
   });
 });
