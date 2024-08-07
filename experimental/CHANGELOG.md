@@ -31,6 +31,24 @@ All notable changes to experimental packages in this project will be documented 
 ### :house: (Internal)
 
 * refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+* refactor: remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880)
+  * Packages updated:
+    * api-events
+    * api-logs
+    * exporter-logs-otlp-grpc
+    * exporter-trace-otlp-grpc
+    * exporter-trace-otlp-http
+    * opentelemetry-browser-detector
+    * opentelemetry-exporter-metrics-otlp-grpc
+    * opentelemetry-exporter-metrics-otlp-http
+    * opentelemetry-exporter-metrics-otlp-proto
+    * opentelemetry-exporter-prometheus
+    * opentelemetry-instrumentation-fetch
+    * opentelemetry-instrumentation-http
+    * opentelemetry-instrumentation-xml-http-request
+    * opentelemetry-instrumentation
+    * opentelemetry-sdk-node
+    * otlp-exporter-base
 
 ## 0.52.1
 
