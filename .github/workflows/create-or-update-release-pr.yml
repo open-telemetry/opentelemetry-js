@@ -15,6 +15,7 @@ on:
         options:
           - experimental
           - sdk
+          - semconv
           - all
 
 jobs:
