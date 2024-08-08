@@ -27,7 +27,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :house: (Internal)
 
 * refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
-* refactor: remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880)
+* refactor: remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
   * Packages updated:
     * opentelemetry-context-zone
     * opentelemetry-core
