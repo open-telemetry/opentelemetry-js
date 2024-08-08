@@ -11,14 +11,51 @@ Semantic Convention constants for use with the OpenTelemetry SDK/APIs. [This doc
 npm install --save @opentelemetry/semantic-conventions
 ```
 
+## Import Structure
+
+This package has 2 separate exports.
+The main export (`@opentelemetry/semantic-conventions`) includes only stable semantic conventions.
+It is subject to the restrictions of semantic versioning 2.0.
+The `/incubating` export (`@opentelemetry/semantic-conventions/incubating`) contains all stable and unstable semantic conventions.
+It is _NOT_ subject to the restrictions of semantic versioning and _MAY_ contain breaking changes in minor releases.
+
 ## Usage
 
-```ts
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+### Stable SemConv
 
-const span = tracer.startSpan().startSpan(spanName, spanOptions)
+```ts
+import { 
+  ATTR_NETWORK_PEER_ADDRESS,
+  ATTR_NETWORK_PEER_PORT,
+  ATTR_NETWORK_PROTOCOL_NAME,
+  ATTR_NETWORK_PROTOCOL_VERSION,
+  NETWORK_TRANSPORT_VALUE_TCP,
+} from '@opentelemetry/semantic-conventions';
+
+const span = tracer.startSpan(spanName, spanOptions)
   .setAttributes({
-    [SemanticAttributes.NET_PEER_NAME]: 'localhost',
+    [ATTR_NETWORK_PEER_ADDRESS]: 'localhost',
+    [ATTR_NETWORK_PEER_PORT]: 8080,
+    [ATTR_NETWORK_PROTOCOL_NAME]: 'http',
+    [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+    [ATTR_NETWORK_TRANSPORT]: NETWORK_TRANSPORT_VALUE_TCP,
+  });
+```
+
+### Unstable SemConv
+
+```ts
+import { 
+  ATTR_PROCESS_COMMAND,
+  ATTR_PROCESS_COMMAND_ARGS,
+  ATTR_PROCESS_COMMAND_LINE,
+} from '@opentelemetry/semantic-conventions/incubating';
+
+const span = tracer.startSpan(spanName, spanOptions)
+  .setAttributes({
+    [ATTR_PROCESS_COMMAND]: 'cat',
+    [ATTR_PROCESS_COMMAND_ARGS]: ['file1', 'file2'],
+    [ATTR_CONTAINER_COMMAND_LINE]: 'cat file1 file2',
   });
 ```
 

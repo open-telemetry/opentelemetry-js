@@ -87,10 +87,10 @@ export abstract class InstrumentationBase<
       return wrap(moduleExports, name, wrapper);
     } else {
       const wrapped = wrap(Object.assign({}, moduleExports), name, wrapper);
-
-      return Object.defineProperty(moduleExports, name, {
+      Object.defineProperty(moduleExports, name, {
         value: wrapped,
       });
+      return wrapped;
     }
   };
 

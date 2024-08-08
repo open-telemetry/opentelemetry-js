@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 import {
   OTLPExporterConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
   OTLPExporterBrowserBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
@@ -40,28 +37,11 @@ export class OTLPLogExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(config, ProtobufLogsSerializer, 'application/x-protobuf');
-    const env = getEnv();
-    this._headers = Object.assign(
-      this._headers,
-      baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_LOGS_HEADERS)
-    );
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {
     if (typeof config.url === 'string') {
       return config.url;
-    }
-
-    const env = getEnv();
-    if (env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT.length > 0) {
-      return appendRootPathToUrlIfNeeded(env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT);
-    }
-
-    if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
-      return appendResourcePathToUrl(
-        env.OTEL_EXPORTER_OTLP_ENDPOINT,
-        DEFAULT_COLLECTOR_RESOURCE_PATH
-      );
     }
 
     return DEFAULT_COLLECTOR_URL;

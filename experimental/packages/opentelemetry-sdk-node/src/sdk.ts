@@ -121,19 +121,18 @@ export class NodeSDK {
     this._configuration = configuration;
 
     this._resource = configuration.resource ?? new Resource({});
-    let defaultDetectors: (Detector | DetectorSync)[] = [];
-    if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
-      defaultDetectors = getResourceDetectorsFromEnv();
+    this._autoDetectResources = configuration.autoDetectResources ?? true;
+    if (!this._autoDetectResources) {
+      this._resourceDetectors = [];
+    } else if (configuration.resourceDetectors != null) {
+      this._resourceDetectors = configuration.resourceDetectors;
+    } else if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
+      this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
-      defaultDetectors = [envDetector, processDetector, hostDetector];
+      this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
 
-    this._resourceDetectors =
-      configuration.resourceDetectors ?? defaultDetectors;
-
     this._serviceName = configuration.serviceName;
-
-    this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     // If a tracer provider can be created from manual configuration, create it
     if (

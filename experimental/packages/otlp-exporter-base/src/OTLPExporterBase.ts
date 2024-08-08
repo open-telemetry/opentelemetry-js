@@ -35,6 +35,9 @@ export abstract class OTLPExporterBase<
   ExportItem,
 > {
   public readonly url: string;
+  /**
+   * @deprecated scheduled for removal. This is only used in tests.
+   */
   public readonly hostname: string | undefined;
   public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
