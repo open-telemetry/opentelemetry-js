@@ -16,7 +16,12 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { Aggregation, InstrumentType, PushMetricExporter } from '../../src';
+import {
+  AggregationOption,
+  AggregationType,
+  InstrumentType,
+  PushMetricExporter,
+} from '../../src';
 import { ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -107,8 +112,8 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 }
 
 class TestDropMetricExporter extends TestMetricExporter {
-  selectAggregation(_instrumentType: InstrumentType): Aggregation {
-    return Aggregation.Drop();
+  selectAggregation(_instrumentType: InstrumentType): AggregationOption {
+    return { type: AggregationType.DROP };
   }
 }
 

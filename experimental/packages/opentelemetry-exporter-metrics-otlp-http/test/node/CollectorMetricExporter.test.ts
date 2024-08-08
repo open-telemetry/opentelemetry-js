@@ -43,9 +43,9 @@ import {
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 import {
-  Aggregation,
+  AggregationOption,
   AggregationTemporality,
-  ExplicitBucketHistogramAggregation,
+  AggregationType,
   InstrumentType,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
@@ -225,9 +225,13 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
   describe('aggregation', () => {
     it('aggregationSelector calls the selector supplied to the constructor', () => {
-      const aggregation = new ExplicitBucketHistogramAggregation([
-        0, 100, 100000,
-      ]);
+      const aggregation: AggregationOption = {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 100, 100000],
+        },
+      };
+
       const exporter = new OTLPMetricExporter({
         aggregationPreference: _instrumentType => aggregation,
       });
@@ -239,11 +243,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
     it('aggregationSelector returns the default aggregation preference when nothing is supplied', () => {
       const exporter = new OTLPMetricExporter({
-        aggregationPreference: _instrumentType => Aggregation.Default(),
+        aggregationPreference: _instrumentType => {
+          return { type: AggregationType.DEFAULT };
+        },
       });
-      assert.equal(
+      assert.deepStrictEqual(
         exporter.selectAggregation(InstrumentType.COUNTER),
-        Aggregation.Default()
+        {
+          type: AggregationType.DEFAULT,
+        }
       );
     });
   });
