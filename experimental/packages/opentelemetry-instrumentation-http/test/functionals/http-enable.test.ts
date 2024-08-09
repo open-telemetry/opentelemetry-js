@@ -23,6 +23,7 @@ import {
   trace,
   SpanAttributes,
   DiagConsoleLogger,
+  MetricAttributes,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -94,6 +95,10 @@ function doNock(
 
 export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
+};
+
+export const customMetricAttributeFunction = (span: ISpan, spanKind: SpanKind, attr: MetricAttributes): void => {
+  attr['custom metric attribute function'] = 'test';
 };
 
 export const requestHookFunction = (
@@ -176,6 +181,9 @@ describe('HttpInstrumentation', () => {
           },
           applyCustomAttributesOnSpan: () => {
             throw new Error(applyCustomAttributesOnSpanErrorMessage);
+          },
+          applyCustomAttributesOnMetric: () => {
+            throw new Error('bad applyCustomAttributesOnMetric function');
           },
         };
         instrumentation.setConfig(config);
@@ -308,6 +316,7 @@ describe('HttpInstrumentation', () => {
             return false;
           },
           applyCustomAttributesOnSpan: customAttributeFunction,
+          applyCustomAttributesOnMetric: customMetricAttributeFunction,
           requestHook: requestHookFunction,
           responseHook: responseHookFunction,
           startIncomingSpanHook: startIncomingSpanHookFunction,

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Span, SpanAttributes } from '@opentelemetry/api';
+import { MetricAttributes, Span, SpanAttributes, SpanKind } from '@opentelemetry/api';
 import type * as http from 'http';
 import type * as https from 'https';
 import {
@@ -80,6 +80,10 @@ export interface StartOutgoingSpanCustomAttributeFunction {
   (request: RequestOptions): SpanAttributes;
 }
 
+export interface HttpCustomMetricAttributeFunction {
+  (span: Span, spanKind: SpanKind, metricAttributes: MetricAttributes): void;
+}
+
 /**
  * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
@@ -104,6 +108,8 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   disableOutgoingRequestInstrumentation?: boolean;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
+  /** Function for adding custom attributes before metric is recorded */
+  applyCustomAttributesOnMetric?: HttpCustomMetricAttributeFunction;
   /** Function for adding custom attributes before request is handled */
   requestHook?: HttpRequestCustomAttributeFunction;
   /** Function for adding custom attributes before response is handled */
