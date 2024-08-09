@@ -38,7 +38,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * opentelemetry-sdk-trace-base
     * opentelemetry-sdk-trace-node
     * opentelemetry-sdk-trace-web
-    * opentelemetry-semantic-conventions
     * propagator-aws-xray
     * sdk-metrics
 
