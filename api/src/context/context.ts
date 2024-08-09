@@ -16,7 +16,11 @@
 
 import { Context } from './types';
 
-/** Get a key to uniquely identify a context value */
+/**
+ * Get a key to uniquely identify a context value
+ *
+ * @since 1.0.0
+ */
 export function createContextKey(description: string) {
   // The specification states that for the same input, multiple calls should
   // return different keys. Due to the nature of the JS dependency management
@@ -81,5 +85,9 @@ class BaseContext implements Context {
   public deleteValue!: (key: symbol) => Context;
 }
 
-/** The root context is used as the default parent context when there is no active context */
+/**
+ * The root context is used as the default parent context when there is no active context
+ *
+ * @since 1.0.0
+ */
 export const ROOT_CONTEXT: Context = new BaseContext();

@@ -25,6 +25,8 @@ const NOOP_TRACER = new NoopTracer();
 
 /**
  * Proxy tracer provided by the proxy tracer provider
+ *
+ * @since 1.0.0
  */
 export class ProxyTracer implements Tracer {
   // When a real implementation is provided, this will be it
@@ -75,6 +77,9 @@ export class ProxyTracer implements Tracer {
   }
 }
 
+/**
+ * @since 1.0.3
+ */
 export interface TracerDelegator {
   getDelegateTracer(
     name: string,

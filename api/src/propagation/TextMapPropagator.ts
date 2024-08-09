@@ -26,6 +26,8 @@ import { Context } from '../context/types';
  * (extractor) side is usually an object such as http headers. Propagation is
  * usually implemented via library-specific request interceptors, where the
  * client-side injects values and the server-side extracts them.
+ *
+ * @since 1.0.0
  */
 export interface TextMapPropagator<Carrier = any> {
   /**
@@ -73,7 +75,9 @@ export interface TextMapPropagator<Carrier = any> {
 
 /**
  * A setter is specified by the caller to define a specific method
- * to set key/value pairs on the carrier within a propagator.
+ * to set key/value pairs on the carrier within a propagator
+ *
+ * @since 1.0.0
  */
 export interface TextMapSetter<Carrier = any> {
   /**
@@ -92,6 +96,8 @@ export interface TextMapSetter<Carrier = any> {
 /**
  * A getter is specified by the caller to define a specific method
  * to get the value of a key from a carrier.
+ *
+ * @since 1.0.0
  */
 export interface TextMapGetter<Carrier = any> {
   /**
@@ -110,6 +116,9 @@ export interface TextMapGetter<Carrier = any> {
   get(carrier: Carrier, key: string): undefined | string | string[];
 }
 
+/**
+ * @since 1.0.0
+ */
 export const defaultTextMapGetter: TextMapGetter = {
   get(carrier, key) {
     if (carrier == null) {
@@ -126,6 +135,9 @@ export const defaultTextMapGetter: TextMapGetter = {
   },
 };
 
+/**
+ * @since 1.0.0
+ */
 export const defaultTextMapSetter: TextMapSetter = {
   set(carrier, key, value) {
     if (carrier == null) {

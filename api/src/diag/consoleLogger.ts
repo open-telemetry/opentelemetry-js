@@ -29,6 +29,8 @@ const consoleMap: { n: keyof DiagLogger; c: ConsoleMapKeys }[] = [
  * A simple Immutable Console based diagnostic logger which will output any messages to the Console.
  * If you want to limit the amount of logging to a specific level or lower use the
  * {@link createLogLevelDiagLogger}
+ *
+ * @since 1.0.0
  */
 export class DiagConsoleLogger implements DiagLogger {
   constructor() {

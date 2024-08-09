@@ -31,6 +31,8 @@ import { SpanContext } from './span_context';
  *    However, it is desirable to associate incoming SpanContext to new trace
  *    initiated on service provider side so two traces (from Client and from
  *    Service Provider) can be correlated.
+ *
+ * @since 1.0.0
  */
 export interface Link {
   /** The {@link SpanContext} of a linked span. */
