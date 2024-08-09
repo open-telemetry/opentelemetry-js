@@ -27,6 +27,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 ### :house: (Internal)
 
 * refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+* deps(sdk-metrics): remove unused lodash.merge dependency [#4905](https://github.com/open-telemetry/opentelemetry-js/pull/4905) @pichlermarc
 
 ## 1.25.1
 
