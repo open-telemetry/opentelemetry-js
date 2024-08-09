@@ -80,7 +80,11 @@ export class BasicTracerProvider implements TracerProvider {
       reconfigureLimits(config)
     );
     this.resource = mergedConfig.resource ?? Resource.empty();
-    this.resource = Resource.default().merge(this.resource);
+
+    if (mergedConfig.mergeResourceWithDefaults) {
+      this.resource = Resource.default().merge(this.resource);
+    }
+
     this._config = Object.assign({}, mergedConfig, {
       resource: this.resource,
     });
