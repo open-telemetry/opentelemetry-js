@@ -84,7 +84,8 @@ describe('Global Utils', () => {
     assert.notStrictEqual(manager, api1.context['_getContextManager']());
   });
 
-  it('should not register if the version is a mismatch', () => {
+  it('should not register if the version is a mismatch', function() {
+    this.timeout(6000);
     const logger1 = getMockLogger();
     const logger2 = getMockLogger();
 

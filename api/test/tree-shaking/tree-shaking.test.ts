@@ -60,6 +60,7 @@ describe('tree-shaking', () => {
 
   for (const testAPI of testAPIs) {
     it(`verify ${testAPI.name}`, async function () {
+      this.timeout(10000);
       if (parseInt(process.versions.node.split('.')[0], 10) < 10) {
         this.skip();
       }

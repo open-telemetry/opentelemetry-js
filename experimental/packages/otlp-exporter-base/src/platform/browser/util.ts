@@ -85,7 +85,7 @@ export function sendWithXhr(
     retries = DEFAULT_EXPORT_MAX_ATTEMPTS,
     minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF
   ) => {
-    xhr = new XMLHttpRequest();
+    xhr = createOtelJsXMLHttpRequest();
     xhr.open('POST', url);
 
     const defaultHeaders = {
@@ -160,4 +160,20 @@ export function sendWithXhr(
   };
 
   sendWithRetry();
+}
+
+declare global {
+  function createOtelJsXMLHttpRequest(): XMLHttpRequest;
+}
+
+/**
+ * function to create XMLHttpRequest but use the globalThis implementation
+ * if available
+ */
+function createOtelJsXMLHttpRequest(): XMLHttpRequest {
+  if (typeof globalThis.createOtelJsXMLHttpRequest === 'function') {
+    return globalThis.createOtelJsXMLHttpRequest();
+  }
+
+  return new XMLHttpRequest();
 }
