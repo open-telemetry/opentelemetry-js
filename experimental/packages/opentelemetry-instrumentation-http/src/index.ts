@@ -14,6 +14,49 @@
  * limitations under the License.
  */
 
-export * from './http';
-export * from './types';
-export * from './utils';
+export { HttpInstrumentation } from './http';
+export {
+  Err,
+  Func,
+  GetFunction,
+  Http,
+  HttpCallback,
+  HttpCallbackOptional,
+  HttpCustomAttributeFunction,
+  HttpInstrumentationConfig,
+  HttpRequestArgs,
+  HttpRequestCustomAttributeFunction,
+  HttpResponseCustomAttributeFunction,
+  Https,
+  IgnoreIncomingRequestFunction,
+  IgnoreMatcher,
+  IgnoreOutgoingRequestFunction,
+  ParsedRequestOptions,
+  RequestFunction,
+  RequestSignature,
+  StartIncomingSpanCustomAttributeFunction,
+  StartOutgoingSpanCustomAttributeFunction,
+} from './types';
+export {
+  extractHostnameAndPort,
+  getAbsoluteUrl,
+  getIncomingRequestAttributes,
+  getIncomingRequestAttributesOnResponse,
+  getIncomingRequestMetricAttributes,
+  getIncomingRequestMetricAttributesOnResponse,
+  getOutgoingRequestAttributes,
+  getOutgoingRequestAttributesOnResponse,
+  getOutgoingRequestMetricAttributes,
+  getOutgoingRequestMetricAttributesOnResponse,
+  getRequestInfo,
+  headerCapture,
+  isCompressed,
+  isIgnored,
+  isValidOptionsType,
+  parseResponseStatus,
+  satisfiesPattern,
+  setAttributesFromHttpKind,
+  setRequestContentLengthAttribute,
+  setResponseContentLengthAttribute,
+  setSpanWithError,
+} from './utils';
