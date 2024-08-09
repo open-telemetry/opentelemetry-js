@@ -10,8 +10,9 @@ We aim to eventually automate this process as much as possible.
 3. For `Release Type`, select if you want to create a release PR for a new `minor` or `patch` version.
 4. For `Release Scope`, select if you want to release
    - `experimental` (all packages under `./experimental/packages`)
-   - `sdk` (all packages under `./packages/` and `./experimental/packages`)
-   - `all` (all packages under `./api/`, `./packages/` and `./experimental/packages`)
+   - `sdk` (all packages under `./packages/` except for `semantic-conventions`, and `./experimental/packages`)
+   - `semconv` (all packages under `./packages/opentelemetry-semantic-conventions`)
+   - `all` (all packages under `./api/`, `./packages/` and `./experimental/packages` except for `semantic-conventions`)
 
 > [!TIP]
 > If there was a commit to `main`, after PR creation simply run the workflow again before merging it.
@@ -53,6 +54,7 @@ We aim to eventually automate this process as much as possible.
 2. Run
    - `npm run _github:draft_release:experimental`, if you published an `all`, `sdk` or `experimental` release
    - `npm run _github:draft_release:stable`, if you published an `all` or `sdk` release
+   - `npm run _github:draft_release:semconv`, if you published a `semconv` release
    - `npm run _github:draft_release:api` if you published an `all` release
 3. Verify that the contents of the created draft releases (title, changelog, selected commit)
 4. Publish the releases

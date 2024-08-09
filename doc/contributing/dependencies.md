@@ -17,7 +17,7 @@ This section refers to `"dependencies"` and `"devDependencies"` entries in `pack
 
 All packages from the `@opentelemetry/` namespace MUST have the same pinned version, as these dependencies are automatically updated on each release by lerna.
 
-**Example:** all packages under `packages/` should consistently maintain the same version, as should those under `experimental/packages/`.
+**Example:** all packages under `packages/` except for `@opentelemetry/semantic-conventions` should consistently maintain the same version, as should those under `experimental/packages/`.
 
 An exception is granted for dependencies on `@opentelemetry/api`, which, if used by the package SHOULD NOT be included as a `dependency`. `@opentelemetry/api` SHOULD be included as a `peerDependency` instead. The version range of the `peerDependency` SHOULD reflect the minimum supported, and SHOULD NOT allow versions greater than the latest released minor version.
 

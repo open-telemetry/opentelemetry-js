@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
+For semantic convention package changes, see the [semconv CHANGELOG](packages/opentelemetry-semantic-conventions/CHANGELOG.md).
 
 ## Unreleased
 
@@ -16,6 +17,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat(semconv): update semantic conventions to 1.27 (from 1.7.0) [#4690](https://github.com/open-telemetry/opentelemetry-js/pull/4690) @dyladan
   * Exported names have changed to `ATTR_{name}` for attributes (e.g. `ATTR_HTTP_REQUEST_METHOD`), `{name}_VALUE_{value}` for enumeration values (e.g. `HTTP_REQUEST_METHOD_VALUE_POST`), and `METRIC_{name}` for metrics. Exported names from previous versions are deprecated.
   * Import `@opentelemetry/semantic-conventions` for *stable* semantic conventions. Import `@opentelemetry/semantic-conventions/incubating` for all semantic conventions, stable and unstable.
+  * Note: Semantic conventions are now versioned separately from other stable artifacts, to correspond to the version of semantic conventions they provide.
 
 ### :bug: (Bug Fix)
 
