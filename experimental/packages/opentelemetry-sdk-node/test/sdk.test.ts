@@ -66,7 +66,7 @@ import {
   serviceInstanceIdDetectorSync,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { logs } from '@opentelemetry/api-logs';
+import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
 import {
   SimpleLogRecordProcessor,
   InMemoryLogRecordExporter,
@@ -85,6 +85,7 @@ describe('Node SDK', () => {
   let ctxManager: any;
   let propagator: any;
   let delegate: any;
+  let logsDelegate: any;
 
   beforeEach(() => {
     diag.disable();
@@ -92,10 +93,14 @@ describe('Node SDK', () => {
     trace.disable();
     propagation.disable();
     metrics.disable();
+    logs.disable();
 
     ctxManager = context['_getContextManager']();
     propagator = propagation['_getGlobalPropagator']();
     delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
+    logsDelegate = (
+      logs.getLoggerProvider() as ProxyLoggerProvider
+    ).getDelegate();
   });
 
   afterEach(() => {
@@ -129,7 +134,11 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
-      assert.ok(!(logs.getLoggerProvider() instanceof LoggerProvider));
+      assert.strictEqual(
+        (logs.getLoggerProvider() as ProxyLoggerProvider).getDelegate(),
+        logsDelegate,
+        'logger provider should not have changed'
+      );
       delete env.OTEL_TRACES_EXPORTER;
       await sdk.shutdown();
     });
@@ -322,7 +331,10 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
 
-      assert.ok(logs.getLoggerProvider() instanceof LoggerProvider);
+      assert.ok(
+        (logs.getLoggerProvider() as ProxyLoggerProvider) instanceof
+          LoggerProvider
+      );
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
     });
