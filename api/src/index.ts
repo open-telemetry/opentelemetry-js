@@ -37,6 +37,8 @@ export {
 export type { DiagAPI } from './api/diag';
 
 // Metrics APIs
+export { ProxyMeter, MeterDelegator } from './metrics/ProxyMeter';
+export { ProxyMeterProvider } from './metrics/ProxyMeterProvider';
 export { createNoopMeter } from './metrics/NoopMeter';
 export { MeterOptions, Meter } from './metrics/Meter';
 export { MeterProvider } from './metrics/MeterProvider';
