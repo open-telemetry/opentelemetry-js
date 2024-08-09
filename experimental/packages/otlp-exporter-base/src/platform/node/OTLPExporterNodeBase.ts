@@ -23,7 +23,7 @@ import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExporterTransport } from '../../exporter-transport';
 import { createHttpExporterTransport } from './http-exporter-transport';
 import { OTLPExporterError } from '../../types';
-import { createRetryingTransport } from '../../retryable-transport';
+import { createRetryingTransport } from '../../retrying-transport';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -76,7 +76,6 @@ export abstract class OTLPExporterNodeBase<
           signalSpecificHeaders
         ),
         url: this.url,
-        timeoutMillis: this.timeoutMillis,
       }),
     });
   }
@@ -100,16 +99,19 @@ export abstract class OTLPExporterNodeBase<
       return;
     }
 
-    const promise = this._transport.send(data).then(response => {
-      if (response.status === 'success') {
-        onSuccess();
-        return;
-      }
-      if (response.status === 'failure' && response.error) {
-        onError(response.error);
-      }
-      onError(new OTLPExporterError('Export failed with unknown error'));
-    }, onError);
+    const promise = this._transport
+      .send(data, this.timeoutMillis)
+      .then(response => {
+        if (response.status === 'success') {
+          onSuccess();
+        } else if (response.status === 'failure' && response.error) {
+          onError(response.error);
+        } else if (response.status === 'retryable') {
+          onError(new OTLPExporterError('Export failed with retryable status'));
+        } else {
+          onError(new OTLPExporterError('Export failed with unknown error'));
+        }
+      }, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {
