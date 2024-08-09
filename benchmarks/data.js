@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1723191972706,
+  "lastUpdate": 1723208295453,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -13640,6 +13640,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "robb@thekidds.org",
+            "name": "Robb Kidd",
+            "username": "robbkidd"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "cf8edbed43c3e54eadcafe6fc6f39a1d03c89aa7",
+          "message": "refactor: remove \"export *\" in favor of explicit named exports (#4880)\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>\nCo-authored-by: Trent Mick <trentm@gmail.com>\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-08-09T10:42:38Z",
+          "tree_id": "a185a32e3454289a2f189084f36efadd381b8c3d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/cf8edbed43c3e54eadcafe6fc6f39a1d03c89aa7"
+        },
+        "date": 1723208294557,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 977152,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11685,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 662101,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 663334,
+            "range": "±0.90%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
