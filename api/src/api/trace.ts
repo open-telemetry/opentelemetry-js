@@ -40,6 +40,8 @@ const API_NAME = 'trace';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Tracing API
+ *
+ * @since 1.0.0
  */
 export class TraceAPI {
   private static _instance?: TraceAPI;
