@@ -16,6 +16,8 @@ All notable changes to experimental packages in this project will be documented 
   * allowing overrides of the `User-Agent` header was not specification compliant.
 * feat(exporter-*-otlp*)!: remove environment-variable specific code from browser exporters
   * (user-facing) removes the ability to configure browser exporters by using `process.env` polyfills
+* feat(exporter-*-otlp-*)!: use transport interface in browser exporters [#4895](https://github.com/open-telemetry/opentelemetry-js/pull/4895) @pichlermarc
+  * (user-facing) protected `headers` property was intended for internal use has been removed from all exporters
 
 ### :rocket: (Enhancement)
 
