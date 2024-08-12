@@ -40,6 +40,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
     * opentelemetry-sdk-trace-web
     * propagator-aws-xray
     * sdk-metrics
+* deps(sdk-metrics): remove unused lodash.merge dependency [#4905](https://github.com/open-telemetry/opentelemetry-js/pull/4905) @pichlermarc
 
 ## 1.25.1
 
