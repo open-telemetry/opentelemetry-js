@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @since 1.0.0
+ */
 export enum TraceFlags {
   /** Represents no flag set. */
   NONE = 0x0,

@@ -29,6 +29,8 @@ import { Link } from './link';
  * may have children.
  *
  * Spans are created by the {@link Tracer.startSpan} method.
+ *
+ * @since 1.0.0
  */
 export interface Span {
   /**
