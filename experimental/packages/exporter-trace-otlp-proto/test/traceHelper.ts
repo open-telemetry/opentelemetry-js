@@ -268,7 +268,7 @@ export class MockedResponse extends Stream {
     super();
   }
 
-  send(data: string) {
+  send(data: Uint8Array) {
     this.emit('data', data);
     this.emit('end');
   }
