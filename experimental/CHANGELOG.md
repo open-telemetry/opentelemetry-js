@@ -25,12 +25,23 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
+* fix(api-logs): align AnyValue to spec [#4893](https://github.com/open-telemetry/opentelemetry-js/pull/4893) @blumamir
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
 
 * refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+* refactor: remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
+  * Packages updated:
+    * api-events
+    * api-logs
+    * opentelemetry-browser-detector
+    * opentelemetry-exporter-prometheus
+    * opentelemetry-instrumentation-fetch
+    * opentelemetry-instrumentation-http
+    * opentelemetry-instrumentation-xml-http-request
+    * opentelemetry-instrumentation
 
 ## 0.52.1
 

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * @since 1.0.0
+ */
 export interface Context {
   /**
    * Get a value from the context.
@@ -40,6 +43,9 @@ export interface Context {
   deleteValue(key: symbol): Context;
 }
 
+/**
+ * @since 1.0.0
+ */
 export interface ContextManager {
   /**
    * Get the current active context
