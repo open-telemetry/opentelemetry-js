@@ -70,7 +70,7 @@
     "request": "2.88.2",
     "request-promise-native": "1.0.9",
     "sinon": "15.1.2",
-    "superagent": "9.0.2",
+    "superagent": "10.0.1",
     "typescript": "4.4.4"
   },
   "peerDependencies": {
