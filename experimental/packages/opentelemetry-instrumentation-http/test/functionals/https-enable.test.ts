@@ -184,6 +184,7 @@ describe('HttpsInstrumentation', () => {
         );
       });
     });
+
     describe('with good instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
@@ -702,6 +703,61 @@ describe('HttpsInstrumentation', () => {
           });
         });
         req.end();
+      });
+    });
+
+    describe('partially disable instrumentation', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('allows to disable outgoing request instrumentation', () => {
+        instrumentation.setConfig({
+          disableOutgoingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = https.createServer(
+          {
+            key: fs.readFileSync('test/fixtures/server-key.pem'),
+            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+          },
+          (request, response) => {
+            response.end('Test Server Response');
+          }
+        );
+
+        server.listen(serverPort);
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), true);
+        assert.strictEqual(isWrapped(http.get), false);
+        assert.strictEqual(isWrapped(http.request), false);
+      });
+
+      it('allows to disable incoming request instrumentation', () => {
+        instrumentation.setConfig({
+          disableIncomingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = https.createServer(
+          {
+            key: fs.readFileSync('test/fixtures/server-key.pem'),
+            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+          },
+          (request, response) => {
+            response.end('Test Server Response');
+          }
+        );
+
+        server.listen(serverPort);
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), false);
+        assert.strictEqual(isWrapped(http.get), true);
+        assert.strictEqual(isWrapped(http.request), true);
       });
     });
   });

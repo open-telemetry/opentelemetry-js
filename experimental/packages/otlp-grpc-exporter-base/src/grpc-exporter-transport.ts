@@ -22,8 +22,10 @@ import type {
   ChannelCredentials,
   Client,
 } from '@grpc/grpc-js';
-import { ExportResponse } from './export-response';
-import { IExporterTransport } from './exporter-transport';
+import {
+  ExportResponse,
+  IExporterTransport,
+} from '@opentelemetry/otlp-exporter-base';
 
 // values taken from '@grpc/grpc-js` so that we don't need to require/import it.
 const GRPC_COMPRESSION_NONE = 0;
@@ -86,7 +88,6 @@ export interface GrpcExporterTransportParameters {
    */
   metadata: () => Metadata;
   compression: 'gzip' | 'none';
-  timeoutMillis: number;
 }
 
 export class GrpcExporterTransport implements IExporterTransport {
@@ -99,7 +100,7 @@ export class GrpcExporterTransport implements IExporterTransport {
     this._client?.close();
   }
 
-  send(data: Uint8Array): Promise<ExportResponse> {
+  send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     // We need to make a for gRPC
     const buffer = Buffer.from(data);
 
@@ -143,9 +144,7 @@ export class GrpcExporterTransport implements IExporterTransport {
     }
 
     return new Promise<ExportResponse>(resolve => {
-      // this will always be defined
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const deadline = Date.now() + this._parameters.timeoutMillis;
+      const deadline = Date.now() + timeoutMillis;
 
       // this should never happen
       if (this._metadata == null) {
