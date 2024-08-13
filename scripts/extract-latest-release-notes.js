@@ -20,12 +20,12 @@ function extractLatestChangelog(changelogPath) {
   const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?((?=^## )|$(?![\r\n]))/ms;
 
   return changelog.match(firstReleaseNoteEntryExp)[0];
-}
+};
 
 fs.mkdirSync('./.tmp/', {
   recursive: true
 });
 
-const notesFile = './.tmp/release-notes.md'
+const notesFile = './.tmp/release-notes.md';
 const changelogFilePaths = process.argv.slice(2);
 fs.writeFileSync(notesFile, changelogFilePaths.map(filePath => extractLatestChangelog(filePath)).join('\n'));
