@@ -54,7 +54,7 @@
     "_lerna:remove_api": "node -e 'var fs=require(\"fs\");var p=require(\"./package.json\");p.workspaces=p.workspaces.filter(p=>p!==\"api\");fs.writeFileSync(\"package.json\",JSON.stringify(p,null,2))'",
     "_lerna:remove_experimental": "node -e 'var fs=require(\"fs\");var p=require(\"./package.json\");p.workspaces=p.workspaces.filter(p=>p!==\"experimental/*\");fs.writeFileSync(\"package.json\",JSON.stringify(p,null,2))'",
     "_lerna:remove_semconv": "node -e 'var fs=require(\"fs\");var p=require(\"./package.json\");p.workspaces=p.workspaces.filter(p=>p!==\"packages/opentelemetry-semantic-conventions/*\");fs.writeFileSync(\"package.json\",JSON.stringify(p,null,2))'",
-    "_lerna:remove_stable_except_semconv": "node -e 'var fs=require(\"fs\");var p=require(\"./package.json\");p.workspaces=p.workspaces.filter(p=>!(p.startsWith(\"packages/\") && p!==\"packages/opentelemetry-semantic-conventions/*\");fs.writeFileSync(\"package.json\",JSON.stringify(p,null,2))'",
+    "_lerna:remove_stable_except_semconv": "node -e 'var fs=require(\"fs\");var p=require(\"./package.json\");p.workspaces=p.workspaces.filter(p=>!(p.startsWith(\"packages/\") && p!==\"packages/opentelemetry-semantic-conventions/*\"));fs.writeFileSync(\"package.json\",JSON.stringify(p,null,2))'",
     "_lerna:remove_stable": "node -e 'var fs=require(\"fs\");var p=require(\"./package.json\");p.workspaces=p.workspaces.filter(p=>p!==\"packages/*\");fs.writeFileSync(\"package.json\",JSON.stringify(p,null,2))'",
     "_lerna:version_patch": "npx lerna version patch --exact --no-git-tag-version --no-push --yes",
     "_lerna:version_minor": "npx lerna version minor --exact --no-git-tag-version --no-push --yes",
