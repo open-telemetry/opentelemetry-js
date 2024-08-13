@@ -28,7 +28,7 @@ cd ${SCRIPT_DIR}
 docker run --rm --platform linux/amd64 \
   -v ${SCRIPT_DIR}/semantic-conventions/model:/source \
   -v ${SCRIPT_DIR}/templates:/weaver/templates \
-  -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/:/output \
+  -v ${ROOT_DIR}/packages/semantic-conventions/src/:/output \
   otel/weaver:$GENERATOR_VERSION \
   registry generate \
   --registry=/source \
@@ -37,5 +37,5 @@ docker run --rm --platform linux/amd64 \
   /output/
 
 # Ensure semconv compiles
-cd "${ROOT_DIR}/packages/opentelemetry-semantic-conventions"
+cd "${ROOT_DIR}/packages/semantic-conventions"
 npm run compile
