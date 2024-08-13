@@ -5,10 +5,7 @@
     "rootDir": "."
   },
   "files": [],
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ],
+  "include": ["src/**/*.ts", "test/**/*.ts"],
   "references": [
     {
       "path": "../../api"
@@ -29,7 +26,7 @@
       "path": "../opentelemetry-sdk-trace-base"
     },
     {
-      "path": "../opentelemetry-semantic-conventions"
+      "path": "../semantic-conventions"
     }
   ]
 }

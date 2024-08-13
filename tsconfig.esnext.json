@@ -84,7 +84,7 @@
       "path": "packages/opentelemetry-sdk-trace-web/tsconfig.esnext.json"
     },
     {
-      "path": "packages/opentelemetry-semantic-conventions/tsconfig.esnext.json"
+      "path": "packages/semantic-conventions/tsconfig.esnext.json"
     },
     {
       "path": "packages/propagator-aws-xray/tsconfig.esnext.json"

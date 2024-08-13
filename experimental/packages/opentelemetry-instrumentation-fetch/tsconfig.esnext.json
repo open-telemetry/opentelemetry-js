@@ -5,9 +5,7 @@
     "rootDir": "src",
     "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "references": [
     {
       "path": "../../../api"
@@ -28,7 +26,7 @@
       "path": "../../../packages/opentelemetry-sdk-trace-web"
     },
     {
-      "path": "../../../packages/opentelemetry-semantic-conventions"
+      "path": "../../../packages/semantic-conventions"
     },
     {
       "path": "../opentelemetry-instrumentation"
