@@ -16,10 +16,10 @@ const fs = require('fs');
 function extractLatestChangelog(changelogPath) {
   const changelog = fs.readFileSync(changelogPath).toString();
   // Matches everything from the first entry at h2 ('##') followed by a space and a non-prerelease semver version
-  // until the next entry at h2.
-  const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?(?=^## )/ms;
-  // append the changelog with a dummy entry to ensure new packages match the regex
-  return (changelog + '\n## ').match(firstReleaseNoteEntryExp)[0];
+  // until the next entry at h2 or the end of the file (useful for first entry).
+  const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?((?=^## )|$(?![\r\n]))/ms;
+
+  return changelog.match(firstReleaseNoteEntryExp)[0];
 }
 
 fs.mkdirSync('./.tmp/', {
