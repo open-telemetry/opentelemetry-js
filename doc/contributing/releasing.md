@@ -11,7 +11,7 @@ We aim to eventually automate this process as much as possible.
 4. For `Release Scope`, select if you want to release
    - `experimental` (all packages under `./experimental/packages`)
    - `sdk` (all packages under `./packages/` except for `semantic-conventions`, and `./experimental/packages`)
-   - `semconv` (all packages under `./packages/opentelemetry-semantic-conventions`)
+   - `semconv` (all packages under `./packages/semantic-conventions`)
    - `all` (all packages under `./api/`, `./packages/` and `./experimental/packages` except for `semantic-conventions`)
 
 > [!TIP]
