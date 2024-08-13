@@ -39,11 +39,6 @@ export class TraceIdRatioBasedSampler implements Sampler {
     return `TraceIdRatioBased{${this._ratio}}`;
   }
 
-  // Required for testing
-  getRatio(): number {
-    return this._ratio;
-  }
-
   private _normalize(ratio: number): number {
     if (typeof ratio !== 'number' || isNaN(ratio)) return 0;
     return ratio >= 1 ? 1 : ratio <= 0 ? 0 : ratio;

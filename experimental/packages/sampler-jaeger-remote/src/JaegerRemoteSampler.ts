@@ -134,9 +134,4 @@ export class JaegerRemoteSampler implements Sampler {
     );
     return response.data;
   }
-
-  // Required for testing
-  getCurrentSampler(): Sampler {
-    return this._sampler;
-  }
 }

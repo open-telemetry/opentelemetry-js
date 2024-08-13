@@ -186,7 +186,7 @@ describe('JaegerRemoteSampler', () => {
       });
       await clock.tickAsync(poolingInterval);
       assert.equal(
-        await jaegerRemoteSampler.getCurrentSampler(),
+        jaegerRemoteSampler['_sampler'],
         alwaysOffSampler
       );
     });
@@ -229,18 +229,18 @@ describe('JaegerRemoteSampler', () => {
           initialSampler: alwaysOnSampler,
         });
         await clock.tickAsync(poolingInterval);
-        const jaegerCurrentSampler = jaegerRemoteSampler.getCurrentSampler();
+        const jaegerCurrentSampler = jaegerRemoteSampler['_sampler'];
         assert.equal(jaegerCurrentSampler instanceof ParentBasedSampler, true);
         const parentBasedRootSampler = (
           jaegerCurrentSampler as ParentBasedSampler
-        ).getRootSampler();
+        )['_root'];
         assert.equal(
           parentBasedRootSampler instanceof TraceIdRatioBasedSampler,
           true
         );
         const internalTraceIdRatioBasedSamplerRatio = (
           parentBasedRootSampler as TraceIdRatioBasedSampler
-        ).getRatio();
+        )['_ratio'];
         assert.equal(internalTraceIdRatioBasedSamplerRatio, samplingRate);
       });
 
@@ -272,18 +272,18 @@ describe('JaegerRemoteSampler', () => {
           initialSampler: alwaysOnSampler,
         });
         await clock.tickAsync(poolingInterval);
-        const jaegerCurrentSampler = jaegerRemoteSampler.getCurrentSampler();
+        const jaegerCurrentSampler = jaegerRemoteSampler['_sampler'];
         assert.equal(jaegerCurrentSampler instanceof ParentBasedSampler, true);
         const parentBasedRootSampler = (
           jaegerCurrentSampler as ParentBasedSampler
-        ).getRootSampler();
+        )['_root'];
         assert.equal(
           parentBasedRootSampler instanceof TraceIdRatioBasedSampler,
           true
         );
         const internalTraceIdRatioBasedSamplerRatio = (
           parentBasedRootSampler as TraceIdRatioBasedSampler
-        ).getRatio();
+        )['_ratio'];
         assert.equal(internalTraceIdRatioBasedSamplerRatio, samplingRate);
       });
     });
@@ -336,11 +336,11 @@ describe('JaegerRemoteSampler', () => {
           initialSampler: alwaysOnSampler,
         });
         await clock.tickAsync(poolingInterval);
-        const jaegerCurrentSampler = jaegerRemoteSampler.getCurrentSampler();
+        const jaegerCurrentSampler = jaegerRemoteSampler['_sampler'];
         assert.equal(jaegerCurrentSampler instanceof ParentBasedSampler, true);
         const parentBasedRootSampler = (
           jaegerCurrentSampler as ParentBasedSampler
-        ).getRootSampler();
+        )['_root'];
         assert.equal(
           parentBasedRootSampler instanceof PerOperationSampler,
           true
@@ -353,19 +353,19 @@ describe('JaegerRemoteSampler', () => {
 
         const defautRatio = (
           defaultSampler as TraceIdRatioBasedSampler
-        ).getRatio();
+        )['_ratio'];
         assert.equal(defaultSamplingProbability, defautRatio);
 
         const op1Sampler = perOperationSampler.getSamplerForOperation(op1);
         assert.equal(op1Sampler instanceof TraceIdRatioBasedSampler, true);
 
-        const op1Ratio = (op1Sampler as TraceIdRatioBasedSampler).getRatio();
+        const op1Ratio = (op1Sampler as TraceIdRatioBasedSampler)['_ratio'];
         assert.equal(op1SamplingRate, op1Ratio);
 
         const op2Sampler = perOperationSampler.getSamplerForOperation(op2);
         assert.equal(op2Sampler instanceof TraceIdRatioBasedSampler, true);
 
-        const op2Ratio = (op2Sampler as TraceIdRatioBasedSampler).getRatio();
+        const op2Ratio = (op2Sampler as TraceIdRatioBasedSampler)['_ratio'];
         assert.equal(op2SamplingRate, op2Ratio);
       });
     });

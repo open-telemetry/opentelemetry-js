@@ -3,7 +3,7 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**Note: This is an experimental package under active development. As part of the OpenTelemetry project, this package is subject to possible breaking changes.**
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
 
 The Sample Jaeger Remote Sampler package is designed for OpenTelemetry to dynamically fetch and update sampling strategies from a Jaeger agent or collector. This enables applications to adjust their tracing strategies based on the current configuration provided by Jaeger, optimizing for both performance and observability.
 
