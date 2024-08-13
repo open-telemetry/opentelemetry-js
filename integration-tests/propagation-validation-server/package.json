@@ -15,7 +15,7 @@
     "@opentelemetry/context-async-hooks": "1.25.1",
     "@opentelemetry/core": "1.25.1",
     "@opentelemetry/sdk-trace-base": "1.25.1",
-    "axios": "1.6.0",
+    "axios": "1.7.4",
     "body-parser": "1.19.0",
     "express": "4.19.2"
   },

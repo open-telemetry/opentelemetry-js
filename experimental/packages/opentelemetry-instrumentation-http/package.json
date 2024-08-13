@@ -60,7 +60,7 @@
     "@types/semver": "7.5.8",
     "@types/sinon": "17.0.3",
     "@types/superagent": "8.1.8",
-    "axios": "1.6.0",
+    "axios": "1.7.4",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
