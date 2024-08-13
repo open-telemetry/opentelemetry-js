@@ -367,18 +367,19 @@ export class NodeSDK {
             break;
           case undefined:
           case '':
-            diag.info(`OTLP logs protocol is not set. Using http/protobuf.`);
             exporters.push(new OTLPProtoLogExporter());
             break;
           default:
-            diag.warn(`Unsupported OTLP logs protocol. Using http/protobuf.`);
+            diag.warn(
+              `Unsupported OTLP logs protocol: "${protocol}". Using http/protobuf.`
+            );
             exporters.push(new OTLPProtoLogExporter());
         }
       } else if (exporter === 'console') {
         exporters.push(new ConsoleLogRecordExporter());
       } else {
         diag.warn(
-          `Unsupported log exporter: ${exporter}. Supported exporters are: otlp, console.`
+          `Unsupported OTEL_LOGS_EXPORTER value: "${exporter}". Supported values are: otlp, console, none.`
         );
       }
     });

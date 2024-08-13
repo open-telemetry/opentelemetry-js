@@ -951,6 +951,9 @@ describe('Node SDK', () => {
 
     afterEach(() => {
       stubLogger.reset();
+      delete env.OTEL_LOGS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
+      delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
     });
 
     it('should not register the provider if OTEL_LOGS_EXPORTER contains none', async () => {
@@ -964,6 +967,18 @@ describe('Node SDK', () => {
       );
 
       Sinon.assert.notCalled(logsAPIStub);
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/protobuf by default', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+      const loggerProvider = logs.getLoggerProvider();
+      const sharedState = (loggerProvider as any)['_sharedState'];
+      assert(
+        sharedState.registeredLogRecordProcessors[0]._exporter instanceof
+          OTLPProtoLogExporter
+      );
       await sdk.shutdown();
     });
 
@@ -993,7 +1008,6 @@ describe('Node SDK', () => {
         sharedState.registeredLogRecordProcessors[1] instanceof
           BatchLogRecordProcessor
       );
-      delete env.OTEL_LOGS_EXPORTER;
       await sdk.shutdown();
     });
 
@@ -1011,8 +1025,6 @@ describe('Node SDK', () => {
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPGrpcLogExporter
       );
-      delete env.OTEL_LOGS_EXPORTER;
-      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
       await sdk.shutdown();
     });
 
@@ -1030,8 +1042,6 @@ describe('Node SDK', () => {
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPHttpLogExporter
       );
-      delete env.OTEL_LOGS_EXPORTER;
-      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
       await sdk.shutdown();
     });
 
@@ -1049,9 +1059,6 @@ describe('Node SDK', () => {
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPGrpcLogExporter
       );
-
-      delete env.OTEL_LOGS_EXPORTER;
-      delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
       await sdk.shutdown();
     });
 
@@ -1069,9 +1076,6 @@ describe('Node SDK', () => {
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPProtoLogExporter
       );
-
-      delete env.OTEL_LOGS_EXPORTER;
-      delete env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL;
       await sdk.shutdown();
     });
   });
