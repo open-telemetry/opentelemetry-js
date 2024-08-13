@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1723559324113,
+  "lastUpdate": 1723561370569,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -14054,6 +14054,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 639262,
             "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "15e6534451045993bd4197a26d8d8bd64916fde4",
+          "message": "chore(deps): update dependency semver to v7.6.3 (#4916)",
+          "timestamp": "2024-08-13T14:58:30Z",
+          "tree_id": "320c0eb26dafbb692fe8b196b4fb6438913c28b0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/15e6534451045993bd4197a26d8d8bd64916fde4"
+        },
+        "date": 1723561369623,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 978531,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11862,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 691954,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 666867,
+            "range": "±0.18%",
             "unit": "ops/sec",
             "extra": "100 samples"
           }
