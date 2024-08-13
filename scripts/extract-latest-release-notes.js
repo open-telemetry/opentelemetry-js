@@ -6,6 +6,7 @@
  * - node scripts/extract-latest-release-notes.js [PATH TO CHANGELOG]...
  * Examples:
  * - node scripts/extract-latest-release-notes.js ./packages/CHANGELOG.md
+ * - node scripts/extract-latest-release-notes.js ./packages/opentelemetry-semantic-conventions/CHANGELOG.md
  * - node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md
  * - node scripts/extract-latest-release-notes.js ./api/CHANGELOG.md ./packages/CHANGELOG.md ./experimental/CHANGELOG.md
  */
@@ -17,8 +18,8 @@ function extractLatestChangelog(changelogPath) {
   // Matches everything from the first entry at h2 ('##') followed by a space and a non-prerelease semver version
   // until the next entry at h2.
   const firstReleaseNoteEntryExp = /^## \d+\.\d+\.\d\n.*?(?=^## )/ms;
-
-  return changelog.match(firstReleaseNoteEntryExp)[0];
+  // append the changelog with a dummy entry to ensure new packages match the regex
+  return (changelog + '\n## ').match(firstReleaseNoteEntryExp)[0];
 }
 
 fs.mkdirSync('./.tmp/', {
