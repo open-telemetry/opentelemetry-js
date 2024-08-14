@@ -35,8 +35,8 @@ export class ProxyLogger implements Logger {
    *
    * @param logRecord
    */
-  emit(_logRecord: LogRecord): void {
-    this._getLogger().emit(_logRecord);
+  emit(logRecord: LogRecord): void {
+    this._getLogger().emit(logRecord);
   }
 
   /**

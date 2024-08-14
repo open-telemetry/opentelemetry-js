@@ -24,13 +24,13 @@ export class ProxyLoggerProvider implements LoggerProvider {
   private _delegate?: LoggerProvider;
 
   getLogger(
-    _name: string,
-    _version?: string | undefined,
-    _options?: LoggerOptions | undefined
+    name: string,
+    version?: string | undefined,
+    options?: LoggerOptions | undefined
   ): Logger {
     return (
-      this.getDelegateLogger(_name, _version, _options) ??
-      new ProxyLogger(this, _name, _version, _options)
+      this.getDelegateLogger(name, version, options) ??
+      new ProxyLogger(this, name, version, options)
     );
   }
 
