@@ -46,8 +46,7 @@ export class PerOperationSampler implements Sampler {
     );
   }
 
-  // Required for testing
-  getSamplerForOperation(spanName: string): Sampler {
+  private getSamplerForOperation(spanName: string): Sampler {
     let resultantSampler = this._perOperationSampler.get(spanName);
     if (resultantSampler == null) {
       resultantSampler = this._defaultSampler;

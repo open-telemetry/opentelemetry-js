@@ -348,7 +348,7 @@ describe('JaegerRemoteSampler', () => {
         const perOperationSampler =
           parentBasedRootSampler as PerOperationSampler;
 
-        const defaultSampler = perOperationSampler.getSamplerForOperation('');
+        const defaultSampler = perOperationSampler['getSamplerForOperation']('');
         assert.equal(defaultSampler instanceof TraceIdRatioBasedSampler, true);
 
         const defautRatio = (
@@ -356,13 +356,13 @@ describe('JaegerRemoteSampler', () => {
         )['_ratio'];
         assert.equal(defaultSamplingProbability, defautRatio);
 
-        const op1Sampler = perOperationSampler.getSamplerForOperation(op1);
+        const op1Sampler = perOperationSampler['getSamplerForOperation'](op1);
         assert.equal(op1Sampler instanceof TraceIdRatioBasedSampler, true);
 
         const op1Ratio = (op1Sampler as TraceIdRatioBasedSampler)['_ratio'];
         assert.equal(op1SamplingRate, op1Ratio);
 
-        const op2Sampler = perOperationSampler.getSamplerForOperation(op2);
+        const op2Sampler = perOperationSampler['getSamplerForOperation'](op2);
         assert.equal(op2Sampler instanceof TraceIdRatioBasedSampler, true);
 
         const op2Ratio = (op2Sampler as TraceIdRatioBasedSampler)['_ratio'];
