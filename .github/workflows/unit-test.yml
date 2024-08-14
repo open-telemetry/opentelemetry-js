@@ -54,6 +54,8 @@ jobs:
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '14' }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   node-windows-tests:
     runs-on: windows-latest
     env:
@@ -108,6 +110,8 @@ jobs:
         run: npm run test:browser
       - name: Report Coverage
         run: npm run codecov:browser
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   webworker-tests:
     runs-on: ubuntu-latest
     env:
@@ -132,6 +136,8 @@ jobs:
         run: npm run test:webworker
       - name: Report Coverage
         run: npm run codecov:webworker
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   api-eol-node-test:
     strategy:
       fail-fast: false
