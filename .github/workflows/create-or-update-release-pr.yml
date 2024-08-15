@@ -16,7 +16,7 @@ on:
           - experimental # all packages in experimental/packages
           - sdk # all SDK packages, experimental and stable, excluding semantic conventions
           - semconv # only semantic convention package
-          - all # all release packages, including API
+          - all # all release packages, including API, excluding semconv
 
 jobs:
   create-or-update-release-pr:
