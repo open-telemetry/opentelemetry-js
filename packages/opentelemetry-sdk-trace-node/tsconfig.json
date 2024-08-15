@@ -4,10 +4,16 @@
     "outDir": "build",
     "rootDir": "."
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
   "references": [
     {
       "path": "../../api"
+    },
+    {
+      "path": "../../semantic-conventions"
     },
     {
       "path": "../opentelemetry-context-async-hooks"
@@ -26,9 +32,6 @@
     },
     {
       "path": "../opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../semantic-conventions"
     }
   ]
 }
