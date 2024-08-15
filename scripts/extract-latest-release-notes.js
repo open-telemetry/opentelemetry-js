@@ -6,7 +6,7 @@
  * - node scripts/extract-latest-release-notes.js [PATH TO CHANGELOG]...
  * Examples:
  * - node scripts/extract-latest-release-notes.js ./packages/CHANGELOG.md
- * - node scripts/extract-latest-release-notes.js ./packages/semantic-conventions/CHANGELOG.md
+ * - node scripts/extract-latest-release-notes.js ./semantic-conventions/CHANGELOG.md
  * - node scripts/extract-latest-release-notes.js ./experimental/CHANGELOG.md
  * - node scripts/extract-latest-release-notes.js ./api/CHANGELOG.md ./packages/CHANGELOG.md ./experimental/CHANGELOG.md
  */

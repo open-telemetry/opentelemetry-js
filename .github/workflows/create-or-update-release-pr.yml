@@ -13,10 +13,10 @@ on:
         type: choice
         description: Release Scope
         options:
-          - experimental
-          - sdk
-          - semconv
-          - all
+          - experimental # all packages in experimental/packages
+          - sdk # all SDK packages, experimental and stable, excluding semantic conventions
+          - semconv # only semantic convention package
+          - all # all release packages, including API
 
 jobs:
   create-or-update-release-pr:

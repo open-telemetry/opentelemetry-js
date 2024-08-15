@@ -16,7 +16,7 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
-      "path": "../../../packages/semantic-conventions"
+      "path": "../../../semantic-conventions"
     },
     {
       "path": "../../../packages/sdk-metrics"
