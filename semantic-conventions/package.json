@@ -35,13 +35,13 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "version": "node ../../scripts/version-update.js",
+    "version": "node ../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "peer-api-check": "node ../scripts/peer-api-check.js",
     "size-check": "npm run compile && mocha 'test/**/*.test.ts'",
-    "align-api-deps": "node ../../scripts/align-api-deps.js"
+    "align-api-deps": "node ../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",
