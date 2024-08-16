@@ -32,7 +32,7 @@ class HttpExporterTransport implements IExporterTransport {
 
   constructor(private _parameters: HttpRequestParameters) {}
 
-  async send(data: Uint8Array): Promise<ExportResponse> {
+  async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     if (this._send == null) {
       // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
       const {
@@ -50,9 +50,15 @@ class HttpExporterTransport implements IExporterTransport {
     return new Promise<ExportResponse>(resolve => {
       // this will always be defined
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this._send?.(this._parameters, this._agent!, data, result => {
-        resolve(result);
-      });
+      this._send?.(
+        this._parameters,
+        this._agent!,
+        data,
+        result => {
+          resolve(result);
+        },
+        timeoutMillis
+      );
     });
   }
   shutdown() {

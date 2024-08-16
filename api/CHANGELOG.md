@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+* refactor(api): remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
+
 ## 1.9.0
 
 ### :rocket: (Enhancement)

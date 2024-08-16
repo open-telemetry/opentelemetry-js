@@ -14,5 +14,9 @@
  * limitations under the License.
  */
 
-export * from '@opentelemetry/context-zone-peer-dep';
+export {
+  Func,
+  TargetWithEvents,
+  ZoneContextManager,
+} from '@opentelemetry/context-zone-peer-dep';
 import 'zone.js';
