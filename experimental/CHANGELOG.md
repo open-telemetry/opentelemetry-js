@@ -5,8 +5,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
-* feat(sdk-node): Automatically configure logs exporter [#4740](https://github.com/open-telemetry/opentelemetry-js/pull/4740)
-
 ### :boom: Breaking Change
 
 * fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
@@ -18,6 +16,7 @@ All notable changes to experimental packages in this project will be documented 
   * allowing overrides of the `User-Agent` header was not specification compliant.
 * feat(exporter-*-otlp*)!: remove environment-variable specific code from browser exporters
   * (user-facing) removes the ability to configure browser exporters by using `process.env` polyfills
+* feat(sdk-node)!: Automatically configure logs exporter [#4740](https://github.com/open-telemetry/opentelemetry-js/pull/4740)
 
 ### :rocket: (Enhancement)
 
