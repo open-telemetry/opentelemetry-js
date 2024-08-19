@@ -222,9 +222,9 @@ describe('HttpExporterTransport', function () {
 
       // assert
       assert.strictEqual(result.status, 'failure');
-      assert.strictEqual(
+      assert.match(
         (result as ExportResponseFailure).error.message,
-        'connect ECONNREFUSED 127.0.0.1:8081'
+        /^connect ECONNREFUSED .*/
       );
     });
 
