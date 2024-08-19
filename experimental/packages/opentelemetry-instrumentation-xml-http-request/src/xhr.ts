@@ -492,10 +492,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         if (currentSpan && spanUrl) {
           if (plugin.getConfig().measureRequestSize && args?.[0]) {
             const body = args[0];
-            currentSpan.setAttribute(
-              ATTR_HTTP_REQUEST_BODY_SIZE,
-              getXHRBodyLength(body)
-            );
+            const bodyLength = getXHRBodyLength(body);
+            if (bodyLength !== undefined) {
+              currentSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
+            }
           }
 
           api.context.with(
