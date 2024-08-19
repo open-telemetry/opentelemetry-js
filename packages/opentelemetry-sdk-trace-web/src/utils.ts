@@ -139,7 +139,7 @@ function _getBodyNonDestructively(body: ReadableStream) {
   if (!body.tee) {
     return {
       body,
-      length: Promise.resolve(null),
+      length: Promise.resolve(undefined),
     };
   }
 
@@ -230,7 +230,7 @@ export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
  */
 export function getXHRBodyLength(
   body: Document | XMLHttpRequestBodyInit
-): number {
+): number | undefined {
   if (typeof Document !== 'undefined' && body instanceof Document) {
     return new XMLSerializer().serializeToString(document).length;
   }
@@ -259,7 +259,7 @@ export function getXHRBodyLength(
   }
 
   DIAG_LOGGER.warn('unknown body type');
-  return 0;
+  return undefined;
 }
 
 const TEXT_ENCODER = new TextEncoder();

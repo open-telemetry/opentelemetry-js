@@ -620,7 +620,9 @@ describe('utils', () => {
         'text/html'
       );
 
-      assert.ok(getXHRBodyLength(doc) > 0, 'body length is 0');
+      const length = getXHRBodyLength(doc);
+      assert.ok(length !== undefined, 'body length is undefined');
+      assert.ok(length, 'body length is 0');
     });
     it('should compute body length for Blob payload', () => {
       const blob = new Blob(['hello world'], {
@@ -719,7 +721,7 @@ describe('utils', () => {
       );
 
       // we got the correct length
-      assert.strictEqual(length, null);
+      assert.strictEqual(length, undefined);
 
       // AND the body is still readable
       assert.strictEqual(requestParams.body.locked, false);
