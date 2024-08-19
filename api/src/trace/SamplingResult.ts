@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanAttributes } from './attributes';
+import { Attributes } from '../common/Attributes';
 import { TraceState } from './trace_state';
 
 /**
@@ -55,7 +55,7 @@ export interface SamplingResult {
    * Caller may call {@link Sampler}.shouldSample any number of times and
    * can safely cache the returned value.
    */
-  attributes?: Readonly<SpanAttributes>;
+  attributes?: Readonly<Attributes>;
   /**
    * A {@link TraceState} that will be associated with the {@link Span} through
    * the new {@link SpanContext}. Samplers SHOULD return the TraceState from

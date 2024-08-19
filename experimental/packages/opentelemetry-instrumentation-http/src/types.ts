@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Span, SpanAttributes } from '@opentelemetry/api';
+import { Span, Attributes } from '@opentelemetry/api';
 import type * as http from 'http';
 import type * as https from 'https';
 import {
@@ -73,11 +73,11 @@ export interface HttpResponseCustomAttributeFunction {
 }
 
 export interface StartIncomingSpanCustomAttributeFunction {
-  (request: IncomingMessage): SpanAttributes;
+  (request: IncomingMessage): Attributes;
 }
 
 export interface StartOutgoingSpanCustomAttributeFunction {
-  (request: RequestOptions): SpanAttributes;
+  (request: RequestOptions): Attributes;
 }
 
 /**

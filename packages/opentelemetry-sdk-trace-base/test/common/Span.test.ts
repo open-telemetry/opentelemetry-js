@@ -23,8 +23,8 @@ import {
   SpanKind,
   TraceFlags,
   HrTime,
-  SpanAttributes,
-  SpanAttributeValue,
+  Attributes,
+  AttributeValue,
 } from '@opentelemetry/api';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
@@ -266,7 +266,7 @@ describe('Span', () => {
           span.setAttribute(k, v);
         }
         for (const [k, v] of Object.entries(invalidAttributes)) {
-          span.setAttribute(k, v as unknown as SpanAttributeValue);
+          span.setAttribute(k, v as unknown as AttributeValue);
         }
 
         assert.deepStrictEqual(span.attributes, validAttributes);
@@ -735,7 +735,7 @@ describe('Span', () => {
       );
 
       span.setAttributes(validAttributes);
-      span.setAttributes(invalidAttributes as unknown as SpanAttributes);
+      span.setAttributes(invalidAttributes as unknown as Attributes);
 
       assert.deepStrictEqual(span.attributes, validAttributes);
     });
@@ -766,7 +766,7 @@ describe('Span', () => {
       span.addEvent('rev', {
         ...validAttributes,
         ...invalidAttributes,
-      } as unknown as SpanAttributes);
+      } as unknown as Attributes);
       span.end();
 
       assert.strictEqual(span.events.length, 1);

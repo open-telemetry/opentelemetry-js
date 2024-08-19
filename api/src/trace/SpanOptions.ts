@@ -15,7 +15,7 @@
  */
 
 import { TimeInput } from '../common/Time';
-import { SpanAttributes } from './attributes';
+import { Attributes } from '../common/Attributes';
 import { Link } from './link';
 import { SpanKind } from './span_kind';
 
@@ -30,7 +30,7 @@ export interface SpanOptions {
   kind?: SpanKind;
 
   /** A span's attributes */
-  attributes?: SpanAttributes;
+  attributes?: Attributes;
 
   /** {@link Link}s span to other spans */
   links?: Link[];

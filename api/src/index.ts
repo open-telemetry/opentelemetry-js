@@ -74,7 +74,6 @@ export {
 export type { PropagationAPI } from './api/propagation';
 
 // Trace APIs
-export { SpanAttributes, SpanAttributeValue } from './trace/attributes';
 export { Link } from './trace/link';
 export { ProxyTracer, TracerDelegator } from './trace/ProxyTracer';
 export { ProxyTracerProvider } from './trace/ProxyTracerProvider';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanAttributes } from './attributes';
+import { Attributes } from '../common/Attributes';
 import { SpanContext } from './span_context';
 
 /**
@@ -35,8 +35,8 @@ import { SpanContext } from './span_context';
 export interface Link {
   /** The {@link SpanContext} of a linked span. */
   context: SpanContext;
-  /** A set of {@link SpanAttributes} on the link. */
-  attributes?: SpanAttributes;
+  /** A set of {@link Attributes} on the link. */
+  attributes?: Attributes;
   /** Count of attributes of the link that were dropped due to collection limits */
   droppedAttributesCount?: number;
 }

@@ -16,7 +16,7 @@
 
 import { Exception } from '../common/Exception';
 import { TimeInput } from '../common/Time';
-import { SpanAttributes } from './attributes';
+import { Attributes } from '../common/Attributes';
 import { INVALID_SPAN_CONTEXT } from './invalid-span-constants';
 import { Span } from './span';
 import { SpanContext } from './span_context';
@@ -44,12 +44,12 @@ export class NonRecordingSpan implements Span {
   }
 
   // By default does nothing
-  setAttributes(_attributes: SpanAttributes): this {
+  setAttributes(_attributes: Attributes): this {
     return this;
   }
 
   // By default does nothing
-  addEvent(_name: string, _attributes?: SpanAttributes): this {
+  addEvent(_name: string, _attributes?: Attributes): this {
     return this;
   }
 
