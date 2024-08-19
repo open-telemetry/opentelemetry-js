@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD004 -->
 # CHANGELOG
 
-All notable changes to semantic conventions package in this project will be documented in this file.
+All notable changes to the semantic-conventions package will be documented in this file.
 
 ## Unreleased
 
