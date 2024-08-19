@@ -11,8 +11,8 @@ We aim to eventually automate this process as much as possible.
 4. For `Release Scope`, select if you want to release
    - `experimental` (all packages under `./experimental/packages`)
    - `sdk` (all packages under `./packages/` and `./experimental/packages`)
-   - `semconv` (all packages under `./packages/semantic-conventions` (currently only one))
-   - `all` (all packages under `./api/`, `./packages/` and `./experimental/packages` except for `semantic-conventions`)
+   - `all` (all packages under `./api/`, `./packages/` and `./experimental/packages`; excludes `./semantic-conventions/`)
+   - `semconv` (the single semconv package at `./semantic-conventions/`)
 
 > [!TIP]
 > If there was a commit to `main`, after PR creation simply run the workflow again before merging it.
