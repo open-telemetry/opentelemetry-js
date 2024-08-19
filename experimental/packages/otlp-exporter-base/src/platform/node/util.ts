@@ -13,35 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as url from 'url';
-import * as http from 'http';
-import * as https from 'https';
-import { OTLPExporterNodeConfigBase } from '.';
-import { diag } from '@opentelemetry/api';
+
 import { CompressionAlgorithm } from './types';
 import { getEnv } from '@opentelemetry/core';
-
-export function createHttpAgent(
-  config: OTLPExporterNodeConfigBase
-): http.Agent | https.Agent | undefined {
-  if (config.httpAgentOptions && config.keepAlive === false) {
-    diag.warn('httpAgentOptions is used only when keepAlive is true');
-    return undefined;
-  }
-
-  if (config.keepAlive === false || !config.url) return undefined;
-
-  try {
-    const parsedUrl = new url.URL(config.url as string);
-    const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
-    return new Agent({ keepAlive: true, ...config.httpAgentOptions });
-  } catch (err) {
-    diag.error(
-      `collector exporter failed to create http agent. err: ${err.message}`
-    );
-    return undefined;
-  }
-}
 
 export function configureCompression(
   compression: CompressionAlgorithm | undefined
