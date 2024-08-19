@@ -53,8 +53,6 @@ export {
   UpDownCounter,
   BatchObservableCallback,
   MetricAdvice,
-  MetricAttributes,
-  MetricAttributeValue,
   ObservableCallback,
 } from './metrics/Metric';
 export {

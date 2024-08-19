@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue } from '../common/Attributes';
+import { Attributes } from '../common/Attributes';
 import { Context } from '../context/types';
 import { BatchObservableResult, ObservableResult } from './ObservableResult';
 
@@ -80,9 +80,7 @@ export enum ValueType {
  *   <li> count the number of 5xx errors. </li>
  * <ol>
  */
-export interface Counter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
-> {
+export interface Counter<AttributesTypes extends Attributes = Attributes> {
   /**
    * Increment value of counter by the input. Inputs must not be negative.
    */
@@ -90,7 +88,7 @@ export interface Counter<
 }
 
 export interface UpDownCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > {
   /**
    * Increment value of counter by the input. Inputs may be negative.
@@ -98,18 +96,14 @@ export interface UpDownCounter<
   add(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
 
-export interface Gauge<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
-> {
+export interface Gauge<AttributesTypes extends Attributes = Attributes> {
   /**
    * Records a measurement.
    */
   record(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
 
-export interface Histogram<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
-> {
+export interface Histogram<AttributesTypes extends Attributes = Attributes> {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
@@ -117,20 +111,10 @@ export interface Histogram<
 }
 
 /**
- * @deprecated please use {@link Attributes}
- */
-export type MetricAttributes = Attributes;
-
-/**
- * @deprecated please use {@link AttributeValue}
- */
-export type MetricAttributeValue = AttributeValue;
-
-/**
  * The observable callback for Observable instruments.
  */
 export type ObservableCallback<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = (
   observableResult: ObservableResult<AttributesTypes>
 ) => void | Promise<void>;
@@ -139,14 +123,12 @@ export type ObservableCallback<
  * The observable callback for a batch of Observable instruments.
  */
 export type BatchObservableCallback<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = (
   observableResult: BatchObservableResult<AttributesTypes>
 ) => void | Promise<void>;
 
-export interface Observable<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
-> {
+export interface Observable<AttributesTypes extends Attributes = Attributes> {
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    *
@@ -160,12 +142,10 @@ export interface Observable<
   removeCallback(callback: ObservableCallback<AttributesTypes>): void;
 }
 
-export type ObservableCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
-> = Observable<AttributesTypes>;
+export type ObservableCounter<AttributesTypes extends Attributes = Attributes> =
+  Observable<AttributesTypes>;
 export type ObservableUpDownCounter<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
+  AttributesTypes extends Attributes = Attributes,
 > = Observable<AttributesTypes>;
-export type ObservableGauge<
-  AttributesTypes extends MetricAttributes = MetricAttributes,
-> = Observable<AttributesTypes>;
+export type ObservableGauge<AttributesTypes extends Attributes = Attributes> =
+  Observable<AttributesTypes>;

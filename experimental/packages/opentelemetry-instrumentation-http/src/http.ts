@@ -26,7 +26,7 @@ import {
   SpanStatusCode,
   trace,
   Histogram,
-  MetricAttributes,
+  Attributes,
   ValueType,
 } from '@opentelemetry/api';
 import {
@@ -296,7 +296,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     request: http.ClientRequest,
     span: Span,
     startTime: HrTime,
-    metricAttributes: MetricAttributes
+    metricAttributes: Attributes
   ): http.ClientRequest {
     if (this.getConfig().requestHook) {
       this._callRequestHook(span, request);
@@ -631,7 +631,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       });
 
       const startTime = hrTime();
-      const metricAttributes: MetricAttributes =
+      const metricAttributes: Attributes =
         utils.getOutgoingRequestMetricAttributes(attributes);
 
       const spanOptions: SpanOptions = {
@@ -696,7 +696,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     request: http.IncomingMessage,
     response: http.ServerResponse,
     span: Span,
-    metricAttributes: MetricAttributes,
+    metricAttributes: Attributes,
     startTime: HrTime
   ) {
     const attributes = utils.getIncomingRequestAttributesOnResponse(
@@ -739,7 +739,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   private _onServerResponseError(
     span: Span,
-    metricAttributes: MetricAttributes,
+    metricAttributes: Attributes,
     startTime: HrTime,
     error: Err
   ) {
@@ -779,7 +779,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     span: Span,
     spanKind: SpanKind,
     startTime: HrTime,
-    metricAttributes: MetricAttributes
+    metricAttributes: Attributes
   ) {
     if (!this._spanNotEnded.has(span)) {
       return;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, MetricAttributes } from '@opentelemetry/api';
+import { HrTime, Attributes } from '@opentelemetry/api';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { MetricData, MetricDescriptor } from '../export/MetricData';
 import { Maybe } from '../utils';
@@ -88,7 +88,7 @@ export interface Accumulation {
   record(value: number): void;
 }
 
-export type AccumulationRecord<T> = [MetricAttributes, T];
+export type AccumulationRecord<T> = [Attributes, T];
 
 /**
  * Base interface for aggregators. Aggregators are responsible for holding

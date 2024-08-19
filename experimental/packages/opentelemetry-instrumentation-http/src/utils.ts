@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import {
-  MetricAttributes,
   Attributes,
   SpanStatusCode,
   Span,
@@ -383,11 +382,10 @@ export const getOutgoingRequestAttributes = (
  */
 export const getOutgoingRequestMetricAttributes = (
   attributes: Attributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
+): Attributes => {
+  const metricAttributes: Attributes = {};
   metricAttributes[SEMATTRS_HTTP_METHOD] = attributes[SEMATTRS_HTTP_METHOD];
-  metricAttributes[SEMATTRS_NET_PEER_NAME] =
-    attributes[SEMATTRS_NET_PEER_NAME];
+  metricAttributes[SEMATTRS_NET_PEER_NAME] = attributes[SEMATTRS_NET_PEER_NAME];
   //TODO: http.url attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
@@ -444,10 +442,9 @@ export const getOutgoingRequestAttributesOnResponse = (
  */
 export const getOutgoingRequestMetricAttributesOnResponse = (
   attributes: Attributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
-  metricAttributes[SEMATTRS_NET_PEER_PORT] =
-    attributes[SEMATTRS_NET_PEER_PORT];
+): Attributes => {
+  const metricAttributes: Attributes = {};
+  metricAttributes[SEMATTRS_NET_PEER_PORT] = attributes[SEMATTRS_NET_PEER_PORT];
   metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
     attributes[SEMATTRS_HTTP_STATUS_CODE];
   metricAttributes[SEMATTRS_HTTP_FLAVOR] = attributes[SEMATTRS_HTTP_FLAVOR];
@@ -518,12 +515,11 @@ export const getIncomingRequestAttributes = (
  */
 export const getIncomingRequestMetricAttributes = (
   attributes: Attributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
+): Attributes => {
+  const metricAttributes: Attributes = {};
   metricAttributes[SEMATTRS_HTTP_SCHEME] = attributes[SEMATTRS_HTTP_SCHEME];
   metricAttributes[SEMATTRS_HTTP_METHOD] = attributes[SEMATTRS_HTTP_METHOD];
-  metricAttributes[SEMATTRS_NET_HOST_NAME] =
-    attributes[SEMATTRS_NET_HOST_NAME];
+  metricAttributes[SEMATTRS_NET_HOST_NAME] = attributes[SEMATTRS_NET_HOST_NAME];
   metricAttributes[SEMATTRS_HTTP_FLAVOR] = attributes[SEMATTRS_HTTP_FLAVOR];
   //TODO: http.target attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
@@ -568,12 +564,11 @@ export const getIncomingRequestAttributesOnResponse = (
  */
 export const getIncomingRequestMetricAttributesOnResponse = (
   attributes: Attributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
+): Attributes => {
+  const metricAttributes: Attributes = {};
   metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
     attributes[SEMATTRS_HTTP_STATUS_CODE];
-  metricAttributes[SEMATTRS_NET_HOST_PORT] =
-    attributes[SEMATTRS_NET_HOST_PORT];
+  metricAttributes[SEMATTRS_NET_HOST_PORT] = attributes[SEMATTRS_NET_HOST_PORT];
   if (attributes[SEMATTRS_HTTP_ROUTE] !== undefined) {
     metricAttributes[SEMATTRS_HTTP_ROUTE] = attributes[SEMATTRS_HTTP_ROUTE];
   }

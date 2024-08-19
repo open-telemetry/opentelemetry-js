@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import { Attributes } from '../common/Attributes';
 import { Meter } from './Meter';
 import {
   BatchObservableCallback,
   Counter,
   Gauge,
   Histogram,
-  MetricAttributes,
   MetricOptions,
   Observable,
   ObservableCallback,
@@ -112,22 +112,22 @@ export class NoopMeter implements Meter {
 export class NoopMetric {}
 
 export class NoopCounterMetric extends NoopMetric implements Counter {
-  add(_value: number, _attributes: MetricAttributes): void {}
+  add(_value: number, _attributes: Attributes): void {}
 }
 
 export class NoopUpDownCounterMetric
   extends NoopMetric
   implements UpDownCounter
 {
-  add(_value: number, _attributes: MetricAttributes): void {}
+  add(_value: number, _attributes: Attributes): void {}
 }
 
 export class NoopGaugeMetric extends NoopMetric implements Gauge {
-  record(_value: number, _attributes: MetricAttributes): void {}
+  record(_value: number, _attributes: Attributes): void {}
 }
 
 export class NoopHistogramMetric extends NoopMetric implements Histogram {
-  record(_value: number, _attributes: MetricAttributes): void {}
+  record(_value: number, _attributes: Attributes): void {}
 }
 
 export class NoopObservableMetric {
