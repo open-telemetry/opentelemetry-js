@@ -219,7 +219,7 @@ export function getFetchBodyLength(...args: Parameters<typeof fetch>) {
     return info
       .clone()
       .text()
-      .then(t => t.length);
+      .then(t => getByteLength(t));
   }
 }
 
@@ -247,19 +247,24 @@ export function getXHRBodyLength(
   if (body instanceof FormData) {
     // typescript doesn't like it when we pass FormData into URLSearchParams
     // even though this is actually totally valid
-    return new URLSearchParams(body as any).toString().length;
+    return getByteLength(new URLSearchParams(body as any).toString());
   }
 
   if (body instanceof URLSearchParams) {
-    return body.toString().length;
+    return getByteLength(body.toString());
   }
 
   if (typeof body === 'string') {
-    return body.length;
+    return getByteLength(body);
   }
 
   DIAG_LOGGER.warn('unknown body type');
   return 0;
+}
+
+const TEXT_ENCODER = new TextEncoder();
+function getByteLength(s: string): number {
+  return TEXT_ENCODER.encode(s).byteLength;
 }
 
 /**

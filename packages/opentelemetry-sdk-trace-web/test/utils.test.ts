@@ -661,6 +661,9 @@ describe('utils', () => {
       });
       assert.strictEqual(getXHRBodyLength(jsonString), 36);
       assert.strictEqual(getXHRBodyLength('hello world'), 11);
+      assert.strictEqual(getXHRBodyLength('π'), 2); // one character, 2 bytes
+      assert.strictEqual(getXHRBodyLength('🔥🔪😭'), 12); // each emoji is 4 bytes
+      assert.strictEqual(getXHRBodyLength('مرحبا بالعالم'), 25); // hello world in Arabic is 25 bytes
       assert.strictEqual(getXHRBodyLength(''), 0);
     });
   });
