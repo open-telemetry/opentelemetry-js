@@ -332,7 +332,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
               createdSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, length);
             })
             .catch(error => {
-              plugin._diag.error('getFetchBodyLength', error);
+              plugin._diag.warn('getFetchBodyLength', error);
             });
         }
 
