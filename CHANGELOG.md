@@ -10,6 +10,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :boom: Breaking Change
 
+* refactor!: replace `SpanAttributes`, `MetricsAttributes` and `ResourceAttributes` with `Attributes` [#4928](https://github.com/open-telemetry/opentelemetry-js/pull/4928)
 * fix(otlp-exporter-base)!: decrease default concurrency limit to 30 [#4211](https://github.com/open-telemetry/opentelemetry-js/pull/4211) @pichlermarc
   * fixes a memory leak on prolonged collector unavailability
   * this change is marked as breaking as it changes defaults
