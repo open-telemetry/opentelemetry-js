@@ -29,11 +29,17 @@ const sampleRequestData = new Uint8Array([1, 2, 3]);
 
 describe('HttpExporterTransport', function () {
   describe('send', function () {
-    let server: http.Server;
+    let server: http.Server | undefined;
 
     afterEach(function (done) {
       sinon.restore();
-      server.close(done);
+      if (server != null) {
+        server.close(done);
+        server = undefined;
+      } else {
+        server = undefined;
+        done();
+      }
     });
 
     it('returns success on success status', async function () {
@@ -203,15 +209,9 @@ describe('HttpExporterTransport', function () {
 
     it('returns failure when server does not exist', async function () {
       // arrange
-      server = http.createServer((_, res) => {
-        res.statusCode = 200;
-        res.end();
-      });
-      server.listen(8080);
-
       const transport = createHttpExporterTransport({
         // use wrong port
-        url: 'http://localhost:8081',
+        url: 'http://example.test',
         headers: {},
         compression: 'none',
         agentOptions: {},
@@ -222,9 +222,9 @@ describe('HttpExporterTransport', function () {
 
       // assert
       assert.strictEqual(result.status, 'failure');
-      assert.match(
+      assert.strictEqual(
         (result as ExportResponseFailure).error.message,
-        /^connect ECONNREFUSED .*/
+        'getaddrinfo ENOTFOUND example.test'
       );
     });
 
