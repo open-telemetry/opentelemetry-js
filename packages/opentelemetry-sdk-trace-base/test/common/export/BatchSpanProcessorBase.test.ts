@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
+import { Attributes, diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
   ExportResult,
   ExportResultCode,
@@ -37,7 +37,7 @@ import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -442,7 +442,7 @@ describe('BatchSpanProcessorBase', () => {
         const tracer = new BasicTracerProvider({
           resource: new Resource(
             {},
-            new Promise<ResourceAttributes>(resolve => {
+            new Promise<Attributes>(resolve => {
               setTimeout(() => resolve({ async: 'fromasync' }), 1);
             })
           ),

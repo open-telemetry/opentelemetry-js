@@ -19,8 +19,8 @@ import {
   SEMRESATTRS_PROCESS_RUNTIME_NAME,
   SEMRESATTRS_PROCESS_RUNTIME_VERSION,
 } from '@opentelemetry/semantic-conventions';
-import { DetectorSync, ResourceAttributes } from '../types';
-import { diag } from '@opentelemetry/api';
+import { DetectorSync } from '../types';
+import { Attributes, diag } from '@opentelemetry/api';
 import { ResourceDetectionConfig } from '../config';
 import { IResource } from '../IResource';
 import { Resource } from '../Resource';
@@ -39,7 +39,7 @@ class BrowserDetectorSync implements DetectorSync {
     if (!isBrowser) {
       return Resource.empty();
     }
-    const browserResource: ResourceAttributes = {
+    const browserResource: Attributes = {
       [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'browser',
       [SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
       [SEMRESATTRS_PROCESS_RUNTIME_VERSION]: navigator.userAgent,
@@ -54,7 +54,7 @@ class BrowserDetectorSync implements DetectorSync {
    * @returns The sanitized resource attributes.
    */
   private _getResourceAttributes(
-    browserResource: ResourceAttributes,
+    browserResource: Attributes,
     _config?: ResourceDetectionConfig
   ) {
     if (browserResource[SEMRESATTRS_PROCESS_RUNTIME_VERSION] === '') {

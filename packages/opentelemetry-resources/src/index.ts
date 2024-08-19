@@ -17,7 +17,7 @@
 export { Resource } from './Resource';
 export { IResource } from './IResource';
 export { defaultServiceName } from './platform';
-export { DetectorSync, ResourceAttributes, Detector } from './types';
+export { DetectorSync, Detector } from './types';
 export { ResourceDetectionConfig } from './config';
 export {
   browserDetector,
