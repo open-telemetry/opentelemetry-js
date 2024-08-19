@@ -25,12 +25,12 @@ import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
 import {
   SEMATTRS_HTTP_HOST,
   SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
 } from '@opentelemetry/semantic-conventions';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '@opentelemetry/semantic-conventions/incubating';
 import {
   addSpanNetworkEvents,
   getXHRBodyLength,
@@ -493,7 +493,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
           if (plugin.getConfig().measureRequestSize && args?.[0]) {
             const body = args[0];
             currentSpan.setAttribute(
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+              ATTR_HTTP_REQUEST_BODY_SIZE,
               getXHRBodyLength(body)
             );
           }

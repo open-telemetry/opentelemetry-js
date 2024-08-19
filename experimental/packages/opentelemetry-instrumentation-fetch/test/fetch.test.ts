@@ -44,13 +44,13 @@ import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   SEMATTRS_HTTP_HOST,
   SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
 } from '@opentelemetry/semantic-conventions';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '@opentelemetry/semantic-conventions/incubating';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -451,12 +451,12 @@ describe('fetch', () => {
         `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
       );
       const requestContentLength = attributes[
-        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+        ATTR_HTTP_REQUEST_BODY_SIZE
       ] as number;
       assert.strictEqual(
         requestContentLength,
         undefined,
-        `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+        `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
       );
       const responseContentLength = attributes[
         SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -681,10 +681,7 @@ describe('fetch', () => {
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
         const attributes = span.attributes;
 
-        assert.strictEqual(
-          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
-          undefined
-        );
+        assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], undefined);
       });
     });
 
@@ -718,10 +715,7 @@ describe('fetch', () => {
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
         const attributes = span.attributes;
 
-        assert.strictEqual(
-          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
-          17
-        );
+        assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 17);
       });
     });
 
@@ -755,10 +749,7 @@ describe('fetch', () => {
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
         const attributes = span.attributes;
 
-        assert.strictEqual(
-          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
-          17
-        );
+        assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 17);
       });
     });
 
@@ -794,10 +785,7 @@ describe('fetch', () => {
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
         const attributes = span.attributes;
 
-        assert.strictEqual(
-          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
-          17
-        );
+        assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 17);
       });
     });
 
@@ -835,10 +823,7 @@ describe('fetch', () => {
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
         const attributes = span.attributes;
 
-        assert.strictEqual(
-          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH],
-          11
-        );
+        assert.strictEqual(attributes[ATTR_HTTP_REQUEST_BODY_SIZE], 11);
       });
     });
   });

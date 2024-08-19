@@ -29,12 +29,12 @@ import {
   SEMATTRS_HTTP_HOST,
   SEMATTRS_HTTP_METHOD,
   SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
 } from '@opentelemetry/semantic-conventions';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '@opentelemetry/semantic-conventions/incubating';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
@@ -410,12 +410,12 @@ describe('xhr', () => {
             `attributes ${SEMATTRS_HTTP_URL} is wrong`
           );
           const requestContentLength = attributes[
-            SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+            ATTR_HTTP_REQUEST_BODY_SIZE
           ] as number;
           assert.strictEqual(
             requestContentLength,
             undefined,
-            `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+            `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
           );
           const responseContentLength = attributes[
             SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -1024,12 +1024,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_URL} is wrong`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -1138,12 +1138,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -1223,12 +1223,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -1308,12 +1308,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -1593,12 +1593,12 @@ describe('xhr', () => {
             `attributes ${SEMATTRS_HTTP_URL} is wrong`
           );
           const requestContentLength = attributes[
-            SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+            ATTR_HTTP_REQUEST_BODY_SIZE
           ] as number;
           assert.strictEqual(
             requestContentLength,
             19,
-            `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} !== 19`
+            `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} !== 19`
           );
           const responseContentLength = attributes[
             SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2205,12 +2205,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_URL} is wrong`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2319,12 +2319,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2404,12 +2404,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
@@ -2489,12 +2489,12 @@ describe('xhr', () => {
               `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
             );
             const requestContentLength = attributes[
-              SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH
+              ATTR_HTTP_REQUEST_BODY_SIZE
             ] as number;
             assert.strictEqual(
               requestContentLength,
               undefined,
-              `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH} is defined`
+              `attributes ${ATTR_HTTP_REQUEST_BODY_SIZE} is defined`
             );
             const responseContentLength = attributes[
               SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
