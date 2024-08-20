@@ -29,7 +29,7 @@ import * as assert from 'assert';
 import { InstrumentationScope, VERSION } from '@opentelemetry/core';
 import {
   AggregationType,
-  MeterProvider,
+  createMeterProvider,
   MetricReader,
   ViewOptions,
 } from '@opentelemetry/sdk-metrics';
@@ -78,7 +78,7 @@ const defaultResource = Resource.default().merge(
 );
 
 let reader = new TestMetricReader();
-let meterProvider = new MeterProvider({
+let meterProvider = createMeterProvider({
   resource: defaultResource,
   readers: [reader],
 });
@@ -90,7 +90,7 @@ export async function collect() {
 
 export function setUp(views?: ViewOptions[]) {
   reader = new TestMetricReader();
-  meterProvider = new MeterProvider({
+  meterProvider = createMeterProvider({
     resource: defaultResource,
     views,
     readers: [reader],

@@ -15,16 +15,22 @@
  */
 import * as metrics from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
-import { ConsoleMetricExporter } from '../../src/export/ConsoleMetricExporter';
-import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
+import { createConsoleMetricExporter } from '../../src/export/ConsoleMetricExporter';
+import { createPeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { ResourceMetrics } from '../../src/export/MetricData';
-import { MeterProvider } from '../../src/MeterProvider';
+import { createMeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { assertAggregationTemporalitySelector } from './utils';
 import { DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR } from '../../src/export/AggregationSelector';
-import { AggregationTemporality, InstrumentType } from '../../src';
+import {
+  AggregationTemporality,
+  InstrumentType,
+  MetricReader,
+  PushMetricExporter,
+} from '../../src';
+import { MeterProvider } from '@opentelemetry/api';
 
 async function waitForNumberOfExports(
   exporter: sinon.SinonSpy<
@@ -48,22 +54,22 @@ async function waitForNumberOfExports(
 describe('ConsoleMetricExporter', () => {
   describe('export', () => {
     let previousConsoleDir: any;
-    let exporter: ConsoleMetricExporter;
+    let exporter: PushMetricExporter;
     let meterProvider: MeterProvider;
-    let metricReader: PeriodicExportingMetricReader;
+    let metricReader: MetricReader;
     let meter: metrics.Meter;
 
     beforeEach(() => {
       previousConsoleDir = console.dir;
       console.dir = () => {};
 
-      exporter = new ConsoleMetricExporter();
-      metricReader = new PeriodicExportingMetricReader({
+      exporter = createConsoleMetricExporter();
+      metricReader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 100,
         exportTimeoutMillis: 100,
       });
-      meterProvider = new MeterProvider({
+      meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [metricReader],
       });
@@ -129,7 +135,7 @@ describe('ConsoleMetricExporter', () => {
 
   describe('constructor', () => {
     it('with no arguments should select cumulative temporality', () => {
-      const exporter = new ConsoleMetricExporter();
+      const exporter = createConsoleMetricExporter();
       assertAggregationTemporalitySelector(
         exporter,
         DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
@@ -137,7 +143,7 @@ describe('ConsoleMetricExporter', () => {
     });
 
     it('with empty options should select cumulative temporality', () => {
-      const exporter = new ConsoleMetricExporter({});
+      const exporter = createConsoleMetricExporter({});
       assertAggregationTemporalitySelector(
         exporter,
         DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
@@ -145,7 +151,7 @@ describe('ConsoleMetricExporter', () => {
     });
 
     it('with cumulative preference should select cumulative temporality', () => {
-      const exporter = new ConsoleMetricExporter({
+      const exporter = createConsoleMetricExporter({
         temporalitySelector: _ => AggregationTemporality.CUMULATIVE,
       });
       assertAggregationTemporalitySelector(
@@ -169,7 +175,7 @@ describe('ConsoleMetricExporter', () => {
             return AggregationTemporality.CUMULATIVE;
         }
       };
-      const exporter = new ConsoleMetricExporter({
+      const exporter = createConsoleMetricExporter({
         temporalitySelector: selector,
       });
       assertAggregationTemporalitySelector(exporter, selector);

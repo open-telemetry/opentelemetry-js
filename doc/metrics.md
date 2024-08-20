@@ -543,7 +543,7 @@ const collectorOptions = {
 const exporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({});
 
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
+meterProvider.addMetricReader(createPeriodicExportingMetricReader({
   exporter: metricExporter,
   exportIntervalMillis: 1000,
 }));

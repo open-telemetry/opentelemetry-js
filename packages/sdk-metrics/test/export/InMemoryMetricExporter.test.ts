@@ -18,14 +18,16 @@ import { Resource } from '@opentelemetry/resources';
 import * as metrics from '@opentelemetry/api';
 import assert = require('assert');
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { InMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter';
+import { createInMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter';
 import { ResourceMetrics } from '../../src/export/MetricData';
-import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
-import { MeterProvider } from '../../src/MeterProvider';
+import { createPeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
+import { createMeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
+import { MetricReader } from '../../src';
+import { MeterProvider } from '@opentelemetry/api';
 
 async function waitForNumberOfExports(
-  exporter: InMemoryMetricExporter,
+  exporter: ReturnType<typeof createInMemoryMetricExporter>,
   numberOfExports: number
 ): Promise<ResourceMetrics[]> {
   if (numberOfExports <= 0) {
@@ -43,19 +45,21 @@ async function waitForNumberOfExports(
 }
 
 describe('InMemoryMetricExporter', () => {
-  let exporter: InMemoryMetricExporter;
+  let exporter: ReturnType<typeof createInMemoryMetricExporter>;
   let meterProvider: MeterProvider;
-  let metricReader: PeriodicExportingMetricReader;
+  let metricReader: MetricReader;
   let meter: metrics.Meter;
 
   beforeEach(() => {
-    exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
-    metricReader = new PeriodicExportingMetricReader({
+    exporter = createInMemoryMetricExporter({
+      aggregationTemporality: AggregationTemporality.CUMULATIVE,
+    });
+    metricReader = createPeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
       exportTimeoutMillis: 100,
     });
-    meterProvider = new MeterProvider({
+    meterProvider = createMeterProvider({
       resource: defaultResource,
       readers: [metricReader],
     });

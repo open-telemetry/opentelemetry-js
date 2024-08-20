@@ -18,10 +18,10 @@ import * as assert from 'assert';
 import { MetricAttributes, UpDownCounter } from '@opentelemetry/api';
 import {
   AggregationTemporality,
+  createMeterProvider,
   DataPoint,
   DataPointType,
   Histogram,
-  MeterProvider,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
 import * as sinon from 'sinon';
@@ -82,7 +82,7 @@ describe('PrometheusSerializer', () => {
     describe('Singular', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           views: [
             {
               aggregation: { type: AggregationType.SUM },
@@ -132,7 +132,7 @@ describe('PrometheusSerializer', () => {
     describe('Histogram', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           views: [
             {
               aggregation: {
@@ -202,7 +202,7 @@ describe('PrometheusSerializer', () => {
     describe('monotonic Sum', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           views: [
             {
               aggregation: { type: AggregationType.SUM },
@@ -257,7 +257,7 @@ describe('PrometheusSerializer', () => {
     describe('non-monotonic Sum', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           views: [
             {
               aggregation: { type: AggregationType.SUM },
@@ -311,7 +311,7 @@ describe('PrometheusSerializer', () => {
     describe('Gauge', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           views: [
             {
               aggregation: {
@@ -367,7 +367,7 @@ describe('PrometheusSerializer', () => {
     describe('with ExplicitBucketHistogramAggregation', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           views: [
             {
               aggregation: {
@@ -425,7 +425,7 @@ describe('PrometheusSerializer', () => {
       it('serialize cumulative metric record on instrument that allows negative values', async () => {
         const serializer = new PrometheusSerializer();
         const reader = new TestMetricReader();
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           views: [
             {
               aggregation: {
@@ -481,7 +481,7 @@ describe('PrometheusSerializer', () => {
       options: Partial<{ unit: string; exportAll: boolean }> = {}
     ) {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         views: [
           {
             aggregation: { type: AggregationType.SUM },
@@ -573,7 +573,7 @@ describe('PrometheusSerializer', () => {
       fn: (counter: UpDownCounter) => void
     ) {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         views: [
           {
             aggregation: { type: AggregationType.SUM },

@@ -23,7 +23,7 @@ import {
   DataPointType,
   Histogram,
   InstrumentType,
-  MeterProvider,
+  createMeterProvider,
   MetricDescriptor,
   MetricReader,
 } from '../src';
@@ -408,7 +408,7 @@ describe('Instruments', () => {
     });
 
     it('should allow metric advice with empty explicit boundaries', function () {
-      const meter = new MeterProvider({
+      const meter = createMeterProvider({
         readers: [new TestMetricReader()],
       }).getMeter('meter');
 
@@ -804,7 +804,7 @@ describe('Instruments', () => {
 function setup() {
   const deltaReader = new TestDeltaMetricReader();
   const cumulativeReader = new TestMetricReader();
-  const meterProvider = new MeterProvider({
+  const meterProvider = createMeterProvider({
     resource: defaultResource,
     readers: [deltaReader, cumulativeReader],
   });

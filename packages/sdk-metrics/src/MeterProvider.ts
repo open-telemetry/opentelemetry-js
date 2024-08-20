@@ -41,7 +41,7 @@ export interface MeterProviderOptions {
 /**
  * This class implements the {@link MeterProvider} interface.
  */
-export class MeterProvider implements IMeterProvider {
+class MeterProvider implements IMeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
 
@@ -121,4 +121,13 @@ export class MeterProvider implements IMeterProvider {
       })
     );
   }
+}
+
+export function createMeterProvider(
+  options?: MeterProviderOptions
+): IMeterProvider & {
+  shutdown(options?: ShutdownOptions): Promise<void>;
+  forceFlush(options?: ForceFlushOptions): Promise<void>;
+} {
+  return new MeterProvider(options);
 }

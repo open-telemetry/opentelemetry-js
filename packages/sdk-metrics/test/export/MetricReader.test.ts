@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider } from '../../src/MeterProvider';
+import { createMeterProvider } from '../../src/MeterProvider';
 import { assertRejects } from '../test-utils';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
@@ -75,14 +75,14 @@ describe('MetricReader', () => {
       const reader = new TestMetricReader();
       assert.throws(
         () =>
-          new MeterProvider({
+          createMeterProvider({
             readers: [reader, reader],
           }),
         /MetricReader can not be bound to a MeterProvider again/
       );
       assert.throws(
         () =>
-          new MeterProvider({
+          createMeterProvider({
             readers: [reader],
           }),
         /MetricReader can not be bound to a MeterProvider again/
@@ -151,7 +151,7 @@ describe('MetricReader', () => {
       const reader = new TestMetricReader({
         metricProducers: [additionalProducer],
       });
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader],
       });
@@ -192,7 +192,7 @@ describe('MetricReader', () => {
           new TestMetricProducer({ errors: ['err2'] }),
         ],
       });
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         readers: [reader],
       });
 

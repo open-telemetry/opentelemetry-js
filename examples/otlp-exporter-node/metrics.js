@@ -42,7 +42,7 @@ const meterProvider = new MeterProvider({
 });
 
 meterProvider.addMetricReader(
-  new PeriodicExportingMetricReader({
+  createPeriodicExportingMetricReader({
     exporter: metricExporter,
     // exporter: new ConsoleMetricExporter(),
     exportIntervalMillis: 1000,

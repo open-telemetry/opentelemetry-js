@@ -28,7 +28,7 @@ import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
 import {
   AggregationType,
-  MeterProvider,
+  createMeterProvider,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
 import {
@@ -55,7 +55,7 @@ const testResource = new Resource({
 });
 
 let reader = new TestMetricReader();
-let meterProvider = new MeterProvider({
+let meterProvider = createMeterProvider({
   resource: testResource,
   readers: [reader],
 });
@@ -68,7 +68,7 @@ export async function collect() {
 
 export function setUp() {
   reader = new TestMetricReader();
-  meterProvider = new MeterProvider({
+  meterProvider = createMeterProvider({
     resource: testResource,
     views: [
       {
