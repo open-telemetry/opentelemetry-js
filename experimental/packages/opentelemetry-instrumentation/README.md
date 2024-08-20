@@ -232,6 +232,8 @@ If your application is written in JavaScript as ESM, or it must compile to ESM f
 The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
 This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
 
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-vs-cjs.md).
+
 ## Limitations
 
 Instrumentations for external modules (e.g. express, mongodb,...) hooks the `require` call or `import` statement. Therefore following conditions need to be met that this mechanism can work:
