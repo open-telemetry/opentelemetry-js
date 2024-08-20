@@ -34,10 +34,10 @@
       "path": "../../../packages/opentelemetry-sdk-trace-node"
     },
     {
-      "path": "../../../packages/opentelemetry-semantic-conventions"
+      "path": "../../../packages/sdk-metrics"
     },
     {
-      "path": "../../../packages/sdk-metrics"
+      "path": "../../../semantic-conventions"
     },
     {
       "path": "../api-logs"
