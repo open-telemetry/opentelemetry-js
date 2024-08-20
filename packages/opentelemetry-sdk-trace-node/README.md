@@ -9,7 +9,7 @@ For manual instrumentation see the
 [@opentelemetry/sdk-trace-base](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base) package.
 
 **Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
-For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](../../../doc/esm-vs-cjs.md).
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-vs-cjs.md).
 
 ## How auto instrumentation works
 
