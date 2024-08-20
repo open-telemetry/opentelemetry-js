@@ -38,7 +38,11 @@ import {
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
-import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
+import {
+  createMeterProvider,
+  MetricReader,
+  ViewOptions,
+} from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
   SpanProcessor,
@@ -61,9 +65,9 @@ export type MeterProviderConfig = {
    */
   reader?: MetricReader;
   /**
-   * List of {@link View}s that should be passed to the MeterProvider
+   * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
-  views?: View[];
+  views?: ViewOptions[];
 };
 
 export type LoggerProviderConfig = {
@@ -91,7 +95,7 @@ export class NodeSDK {
 
   private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
   private _loggerProvider?: LoggerProvider;
-  private _meterProvider?: MeterProvider;
+  private _meterProvider?: ReturnType<typeof createMeterProvider>;
   private _serviceName?: string;
   private _configuration?: Partial<NodeSDKConfiguration>;
 
@@ -271,7 +275,7 @@ export class NodeSDK {
       if (this._meterProviderConfig.reader) {
         readers.push(this._meterProviderConfig.reader);
       }
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
         readers: readers,

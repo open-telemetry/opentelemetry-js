@@ -15,9 +15,9 @@
  */
 import {
   AggregationTemporality,
+  createInMemoryMetricExporter,
+  createMeterProvider,
   DataPointType,
-  InMemoryMetricExporter,
-  MeterProvider,
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -47,11 +47,11 @@ const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
 const tracerProvider = new NodeTracerProvider();
-const metricsMemoryExporter = new InMemoryMetricExporter(
-  AggregationTemporality.DELTA
-);
+const metricsMemoryExporter = createInMemoryMetricExporter({
+  aggregationTemporality: AggregationTemporality.DELTA,
+});
 const metricReader = new TestMetricReader(metricsMemoryExporter);
-const meterProvider = new MeterProvider({ readers: [metricReader] });
+const meterProvider = createMeterProvider({ readers: [metricReader] });
 
 instrumentation.setTracerProvider(tracerProvider);
 instrumentation.setMeterProvider(meterProvider);

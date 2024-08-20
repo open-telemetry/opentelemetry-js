@@ -19,12 +19,9 @@ import {
   createAllowListAttributesProcessor,
   createNoopAttributesProcessor,
 } from '../../src/view/AttributesProcessor';
+import { InstrumentType, AggregationType } from '../../src';
+import { DEFAULT_AGGREGATION } from '../../src/view/Aggregation';
 import { View } from '../../src/view/View';
-import {
-  InstrumentType,
-  Aggregation,
-  ExplicitBucketHistogramAggregation,
-} from '../../src';
 
 describe('View', () => {
   describe('constructor', () => {
@@ -33,7 +30,7 @@ describe('View', () => {
         const view = new View({ instrumentName: '*' });
         assert.strictEqual(view.name, undefined);
         assert.strictEqual(view.description, undefined);
-        assert.strictEqual(view.aggregation, Aggregation.Default());
+        assert.strictEqual(view.aggregation, DEFAULT_AGGREGATION);
         assert.strictEqual(
           view.attributesProcessor,
           createNoopAttributesProcessor()
@@ -43,7 +40,7 @@ describe('View', () => {
         const view = new View({ meterName: '*' });
         assert.strictEqual(view.name, undefined);
         assert.strictEqual(view.description, undefined);
-        assert.strictEqual(view.aggregation, Aggregation.Default());
+        assert.strictEqual(view.aggregation, DEFAULT_AGGREGATION);
         assert.strictEqual(
           view.attributesProcessor,
           createNoopAttributesProcessor()
@@ -69,7 +66,10 @@ describe('View', () => {
       assert.throws(
         () =>
           new View({
-            aggregation: new ExplicitBucketHistogramAggregation([1, 100]),
+            aggregation: {
+              type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+              options: { boundaries: [1, 100] },
+            },
           })
       );
     });

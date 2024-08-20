@@ -15,15 +15,15 @@
  */
 
 import { InstrumentType } from '../InstrumentDescriptor';
-import { Aggregation } from '../view/Aggregation';
 import { AggregationTemporality } from './AggregationTemporality';
+import { AggregationOption, AggregationType } from '../view/AggregationOption';
 
 /**
  * Aggregation selector based on metric instrument types.
  */
 export type AggregationSelector = (
   instrumentType: InstrumentType
-) => Aggregation;
+) => AggregationOption;
 
 /**
  * Aggregation temporality selector based on metric instrument types.
@@ -33,6 +33,11 @@ export type AggregationTemporalitySelector = (
 ) => AggregationTemporality;
 
 export const DEFAULT_AGGREGATION_SELECTOR: AggregationSelector =
-  _instrumentType => Aggregation.Default();
+  _instrumentType => {
+    return {
+      type: AggregationType.DEFAULT,
+    };
+  };
+
 export const DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR: AggregationTemporalitySelector =
   _instrumentType => AggregationTemporality.CUMULATIVE;

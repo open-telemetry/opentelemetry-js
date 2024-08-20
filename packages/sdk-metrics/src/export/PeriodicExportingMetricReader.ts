@@ -54,7 +54,7 @@ export type PeriodicExportingMetricReaderOptions = {
  * {@link MetricReader} which collects metrics based on a user-configurable time interval, and passes the metrics to
  * the configured {@link PushMetricExporter}
  */
-export class PeriodicExportingMetricReader extends MetricReader {
+class PeriodicExportingMetricReader extends MetricReader {
   private _interval?: ReturnType<typeof setInterval>;
   private _exporter: PushMetricExporter;
   private readonly _exportInterval: number;
@@ -169,4 +169,14 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
     await this._exporter.shutdown();
   }
+}
+
+/**
+ * Creates a {@link MetricReader} which collects metrics based on a user-configurable time interval, and passes the
+ * metrics to the configured {@link PushMetricExporter}
+ */
+export function createPeriodicExportingMetricReader(
+  options: PeriodicExportingMetricReaderOptions
+): MetricReader {
+  return new PeriodicExportingMetricReader(options);
 }

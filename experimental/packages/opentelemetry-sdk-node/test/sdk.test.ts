@@ -23,6 +23,7 @@ import {
   DiagLogLevel,
   metrics,
   DiagConsoleLogger,
+  MeterProvider,
 } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
@@ -31,12 +32,10 @@ import {
 import { CompositePropagator } from '@opentelemetry/core';
 import {
   AggregationTemporality,
-  ConsoleMetricExporter,
-  InMemoryMetricExporter,
+  createConsoleMetricExporter,
   InstrumentType,
-  MeterProvider,
-  PeriodicExportingMetricReader,
-  View,
+  createPeriodicExportingMetricReader,
+  createInMemoryMetricExporter,
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -80,6 +79,10 @@ import {
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
   : AsyncHooksContextManager;
+
+function isSdkMeterProvider(obj: any) {
+  return typeof obj.shutdown === 'function';
+}
 
 describe('Node SDK', () => {
   let ctxManager: any;
@@ -128,7 +131,7 @@ describe('Node SDK', () => {
         delegate,
         'tracer provider should not have changed'
       );
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.ok(!isSdkMeterProvider(metrics.getMeterProvider()));
       assert.ok(!(logs.getLoggerProvider() instanceof LoggerProvider));
       delete env.OTEL_TRACES_EXPORTER;
       await sdk.shutdown();
@@ -176,7 +179,7 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.ok(!isSdkMeterProvider(metrics.getMeterProvider()));
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
@@ -199,7 +202,7 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.ok(!isSdkMeterProvider(metrics.getMeterProvider()));
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
@@ -229,7 +232,7 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.ok(!isSdkMeterProvider(metrics.getMeterProvider()));
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
@@ -257,8 +260,8 @@ describe('Node SDK', () => {
       // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
       // which sets up an exporter and affects the context manager
       env.OTEL_TRACES_EXPORTER = 'none';
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
+      const exporter = createConsoleMetricExporter();
+      const metricReader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 100,
         exportTimeoutMillis: 100,
@@ -287,7 +290,7 @@ describe('Node SDK', () => {
         'tracer provider should not have changed'
       );
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      assert.ok(isSdkMeterProvider(metrics.getMeterProvider()));
 
       await sdk.shutdown();
       delete env.OTEL_TRACES_EXPORTER;
@@ -345,7 +348,7 @@ describe('Node SDK', () => {
   });
 
   async function waitForNumberOfMetrics(
-    exporter: InMemoryMetricExporter,
+    exporter: ReturnType<typeof createInMemoryMetricExporter>,
     numberOfMetrics: number
   ): Promise<void> {
     if (numberOfMetrics <= 0) {
@@ -364,10 +367,10 @@ describe('Node SDK', () => {
     // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
     // which sets up an exporter and affects the context manager
     env.OTEL_TRACES_EXPORTER = 'none';
-    const exporter = new InMemoryMetricExporter(
-      AggregationTemporality.CUMULATIVE
-    );
-    const metricReader = new PeriodicExportingMetricReader({
+    const exporter = createInMemoryMetricExporter({
+      aggregationTemporality: AggregationTemporality.CUMULATIVE,
+    });
+    const metricReader = createPeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
       exportTimeoutMillis: 100,
@@ -376,11 +379,11 @@ describe('Node SDK', () => {
     const sdk = new NodeSDK({
       metricReader: metricReader,
       views: [
-        new View({
+        {
           name: 'test-view',
           instrumentName: 'test_counter',
           instrumentType: InstrumentType.COUNTER,
-        }),
+        },
       ],
       autoDetectResources: false,
     });
@@ -819,8 +822,8 @@ describe('Node SDK', () => {
     });
 
     it('should not register a meter provider if a reader is provided', async () => {
-      const exporter = new ConsoleMetricExporter();
-      const metricReader = new PeriodicExportingMetricReader({
+      const exporter = createConsoleMetricExporter();
+      const metricReader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 100,
         exportTimeoutMillis: 100,
@@ -832,7 +835,7 @@ describe('Node SDK', () => {
       });
       sdk.start();
 
-      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.ok(!isSdkMeterProvider(metrics.getMeterProvider()));
 
       await sdk.shutdown();
     });

@@ -24,6 +24,11 @@ import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { Aggregation } from './Aggregation';
 import { InstrumentType } from '../InstrumentDescriptor';
+import {
+  AggregationOption,
+  AggregationType,
+  toAggregation,
+} from './AggregationOption';
 
 export type ViewOptions = {
   /**
@@ -57,14 +62,14 @@ export type ViewOptions = {
   attributesProcessors?: IAttributesProcessor[];
   /**
    * Alters the metric stream:
-   * Alters the {@link Aggregation} of the metric stream.
+   * Alters the Aggregation of the metric stream.
    *
    * @example <caption>changes the aggregation of the selected instrument(s) to ExplicitBucketHistogramAggregation</caption>
-   * aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100])
+   * aggregation: { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM, options: { boundaries: [1, 10, 100] } }
    * @example <caption>changes the aggregation of the selected instrument(s) to LastValueAggregation</caption>
-   * aggregation: new LastValueAggregation()
+   * aggregation: { type: AggregationType.LAST_VALUE, options: { boundaries: [1, 10, 100] } }
    */
-  aggregation?: Aggregation;
+  aggregation?: AggregationOption;
   /**
    * Instrument selection criteria:
    * The original type of the Instrument(s).
@@ -132,6 +137,26 @@ function isSelectorNotProvided(options: ViewOptions): boolean {
   );
 }
 
+function validateViewOptions(viewOptions: ViewOptions) {
+  // If no criteria is provided, the SDK SHOULD treat it as an error.
+  // It is recommended that the SDK implementations fail fast.
+  if (isSelectorNotProvided(viewOptions)) {
+    throw new Error('Cannot create view with no selector arguments supplied');
+  }
+
+  // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
+  // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
+  if (
+    viewOptions.name != null &&
+    (viewOptions?.instrumentName == null ||
+      PatternPredicate.hasWildcard(viewOptions.instrumentName))
+  ) {
+    throw new Error(
+      'Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.'
+    );
+  }
+}
+
 /**
  * Can be passed to a {@link MeterProvider} to select instruments and alter their metric stream.
  */
@@ -196,23 +221,7 @@ export class View {
    * })
    */
   constructor(viewOptions: ViewOptions) {
-    // If no criteria is provided, the SDK SHOULD treat it as an error.
-    // It is recommended that the SDK implementations fail fast.
-    if (isSelectorNotProvided(viewOptions)) {
-      throw new Error('Cannot create view with no selector arguments supplied');
-    }
-
-    // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
-    // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
-    if (
-      viewOptions.name != null &&
-      (viewOptions?.instrumentName == null ||
-        PatternPredicate.hasWildcard(viewOptions.instrumentName))
-    ) {
-      throw new Error(
-        'Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.'
-      );
-    }
+    validateViewOptions(viewOptions);
 
     // Create multi-processor if attributesProcessors are defined.
     if (viewOptions.attributesProcessors != null) {
@@ -225,7 +234,9 @@ export class View {
 
     this.name = viewOptions.name;
     this.description = viewOptions.description;
-    this.aggregation = viewOptions.aggregation ?? Aggregation.Default();
+    this.aggregation = toAggregation(
+      viewOptions.aggregation ?? { type: AggregationType.DEFAULT }
+    );
     this.instrumentSelector = new InstrumentSelector({
       name: viewOptions.instrumentName,
       type: viewOptions.instrumentType,

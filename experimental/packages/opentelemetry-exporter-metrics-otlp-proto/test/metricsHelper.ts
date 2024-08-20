@@ -25,10 +25,9 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import {
-  ExplicitBucketHistogramAggregation,
-  MeterProvider,
+  AggregationType,
+  createMeterProvider,
   MetricReader,
-  View,
 } from '@opentelemetry/sdk-metrics';
 import {
   encodeAsString,
@@ -55,7 +54,7 @@ const testResource = new Resource({
 });
 
 let reader = new TestMetricReader();
-let meterProvider = new MeterProvider({
+let meterProvider = createMeterProvider({
   resource: testResource,
   readers: [reader],
 });
@@ -68,13 +67,16 @@ export async function collect() {
 
 export function setUp() {
   reader = new TestMetricReader();
-  meterProvider = new MeterProvider({
+  meterProvider = createMeterProvider({
     resource: testResource,
     views: [
-      new View({
-        aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+      {
+        aggregation: {
+          type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+          options: { boundaries: [0, 100] },
+        },
         instrumentName: 'int-histogram',
-      }),
+      },
     ],
     readers: [reader],
   });

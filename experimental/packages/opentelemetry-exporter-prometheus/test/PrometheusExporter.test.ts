@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import { Counter, Meter, ObservableResult } from '@opentelemetry/api';
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import {
+  Counter,
+  Meter,
+  MeterProvider,
+  ObservableResult,
+} from '@opentelemetry/api';
+import { createMeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
@@ -200,12 +205,12 @@ describe('PrometheusExporter', () => {
 
   describe('export', () => {
     let exporter: PrometheusExporter;
-    let meterProvider: MeterProvider;
+    let meterProvider: ReturnType<typeof createMeterProvider>;
     let meter: Meter;
 
     beforeEach(async () => {
       exporter = new PrometheusExporter();
-      meterProvider = new MeterProvider({
+      meterProvider = createMeterProvider({
         readers: [exporter],
       });
       meter = meterProvider.getMeter('test-prometheus', '1');
@@ -471,7 +476,7 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter;
 
     function setup(reader: PrometheusExporter) {
-      meterProvider = new MeterProvider({
+      meterProvider = createMeterProvider({
         readers: [exporter],
       });
 
