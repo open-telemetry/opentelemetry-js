@@ -225,8 +225,8 @@ to avoid leaking information from one provider to the other because there are a 
 ## Instrumentation for ECMAScript Modules (ESM) in Node.js (experimental)
 
 Node.js uses a different module loader for ECMAScript Modules (ESM) vs. CommonJS (CJS).
-A `require()` statement will cause Node.js to use the CommonJS module loader.
-An `import()` statement will cause Node.js to use the ECMAScript module loader.
+A `require()` call will cause Node.js to use the CommonJS module loader.
+An `import ...` statement or `import()` call will cause Node.js to use the ECMAScript module loader.
 
 If your application is written in JavaScript as ESM, or it must compile to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
 The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
