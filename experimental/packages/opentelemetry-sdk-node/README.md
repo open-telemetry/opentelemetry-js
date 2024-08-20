@@ -9,6 +9,9 @@ This package provides the full OpenTelemetry SDK for Node.js including tracing a
 
 ## Quick Start
 
+**Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](../../../doc/esm-vs-cjs.md).
+
 To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate instrumentation for the node modules used by your application.
 
 ### Installation

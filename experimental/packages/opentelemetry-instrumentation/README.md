@@ -7,6 +7,9 @@
 
 ## Installation
 
+**Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](../../../doc/esm-vs-cjs.md).
+
 ```bash
 npm install --save @opentelemetry/instrumentation
 ```
@@ -225,52 +228,9 @@ Node.js uses a different module loader for ECMAScript Modules (ESM) vs. CommonJS
 A `require()` statement will cause Node.js to use the CommonJS module loader.
 An `import()` statement will cause Node.js to use the ECMAScript module loader.
 
-### TypeScript
-
-Many TypeScript projects today are written using ESM syntax, regardless of how they are compiled.
-In the `tsconfig.json`, there is an option to compile to ESM or CJS.
-If the compiled code is ESM, those import statements will remain the same (e.g. `import { foo } from 'bar';`).
-If the compiled code is CJS, those import statements will become `require()` statements (e.g. `const { foo } = require('bar');`)
-
-For more explanation about CJS and ESM, see the [Node.js docs](https://nodejs.org/dist/latest-v18.x/docs/api/modules.html#enabling).
-
-### Initializing the SDK
-
-Instrumentation setup and configuration must be run before your application code.
-If the SDK is initialized in a separate file (recommended), ensure it is imported first in application startup, or use the `--require` or `--import` flag during startup to preload the module.
-
-For CJS, the `NODE_OPTIONS` for the startup command should include `--require ./instrumentation.js`.
-For ESM, replace `--require` with `--import`.
-
-### Instrumentation Hook
-
 If your application is written in JavaScript as ESM, or it must compile to ESM from TypeScript, then a loader hook is required to properly patch instrumentation.
 The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
 This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
-
-For SDK initialization and instrumentation hooking, the entire startup command should include the following `NODE_OPTIONS`:
-
-| Node.js Version   | NODE_OPTIONS                                                                                    |
-| ----------------- | ----------------------------------------------------------------------------------------------- |
-| >=16.0.0          | `--require ./instrumentation.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
-| 18.0.0            | ?                                                                                               |
-| >=18.1.0 <18.19.0 | `--require ./instrumentation.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
-| >=18.19.0         | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-| 20.x              | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-| 22.x              | `--import ./instrumentation.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-
-A note on `--experimental-loader` per [Node.js docs](https://nodejs.org/api/cli.html#--experimental-loadermodule):
-
-> This flag is discouraged and may be removed in a future version of Node.js. Please use `--import` with `register()` instead.
-
-Experimental loader is intended to be deprecated, and will be replaced with something like `--import=@opentelemetry/instrumentation/hook.mjs`
-
-<!--
-TODO
-import * as module from 'module'
-
-module.register('import-in-the-middle/hook.mjs', import.meta.url)
- -->
 
 ## Limitations
 

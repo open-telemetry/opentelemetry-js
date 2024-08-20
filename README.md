@@ -41,6 +41,9 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Quick Start
 
+**Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](../../../doc/esm-vs-cjs.md).
+
 The following describes how to set up tracing for a basic web application.
 For more detailed documentation, see the website at <https://opentelemetry.io/docs/instrumentation/js/>.
 
