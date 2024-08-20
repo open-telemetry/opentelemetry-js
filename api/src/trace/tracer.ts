@@ -20,6 +20,8 @@ import { SpanOptions } from './SpanOptions';
 
 /**
  * Tracer provides an interface for creating {@link Span}s.
+ *
+ * @since 1.0.0
  */
 export interface Tracer {
   /**

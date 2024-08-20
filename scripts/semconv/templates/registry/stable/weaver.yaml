@@ -1,0 +1,54 @@
+params:
+  excluded_attributes: ["messaging.client_id"]
+
+templates:
+  - pattern: attributes.ts.j2
+    # Remove file name prefix when per-pattern params are available https://github.com/open-telemetry/weaver/issues/288
+    filter: >
+      semconv_attributes({
+        "exclude_stability": ["experimental"]
+      }) | {
+        stability: "stable",
+        attributes: .
+      }
+    application_mode: single
+  - pattern: attributes.ts.j2
+    filter: >
+      semconv_attributes({
+        "exclude_stability": ["stable"]
+      }) | {
+        stability: "experimental",
+        attributes: .
+      }
+    application_mode: single
+  - pattern: metrics.ts.j2
+    filter: >
+      semconv_metrics({
+        "exclude_stability": ["experimental"]
+      }) | {
+        stability: "stable",
+        metrics: .
+      }
+    application_mode: single
+  - pattern: metrics.ts.j2
+    filter: >
+      semconv_metrics({
+        "exclude_stability": ["stable"]
+      }) | {
+        stability: "experimental",
+        metrics: .
+      }
+    application_mode: single
+
+# Whitespace control settings to simplify the definition of templates
+whitespace_control:
+  trim_blocks: true
+  lstrip_blocks: true
+
+text_maps:
+  js_types:
+    int: number
+    double: number
+    boolean: boolean
+    string: string
+    string[]: string[]
