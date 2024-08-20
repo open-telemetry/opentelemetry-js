@@ -111,7 +111,7 @@ export class MyInstrumentation extends InstrumentationBase {
 
 // Later, but before the module to instrument is required
 
-const myInstrumentationn = new MyInstrumentation();
+const myInstrumentation = new MyInstrumentation();
 myInstrumentation.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
 myInstrumentation.setMeterProvider(meterProvider); // this is optional
 myInstrumentation.enable();
