@@ -8,7 +8,7 @@
 ## Installation
 
 **Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
-For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-vs-cjs.md).
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
 
 ```bash
 npm install --save @opentelemetry/instrumentation
@@ -232,7 +232,7 @@ If your application is written in JavaScript as ESM, or it must compile to ESM f
 The custom hook for ESM instrumentation is `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
 This flag must be passed to the `node` binary, which is often done as a startup command and/or in the `NODE_OPTIONS` environment variable.
 
-For more details on ECMAScript Modules vs CommonJS, refer to [esm-vs-cjs](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-vs-cjs.md).
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
 
 ## Limitations
 
