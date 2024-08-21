@@ -40,7 +40,8 @@ function alignSemconvDeps({dryRun}){
       } else if (!depRange && !devDepRange) {
         return false;
       } else {
-        if ((depRange || devDepRange) === semconvVer) {
+        const currDepRange = depRange || devDepRange;
+        if (currDepRange === semconvVer) {
           return false;
         }
         return true;
