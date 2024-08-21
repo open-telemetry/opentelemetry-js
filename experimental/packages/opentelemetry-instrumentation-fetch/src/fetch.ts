@@ -64,6 +64,10 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   clearTimingResources?: boolean;
   // urls which should include trace headers when origin doesn't match
   propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
+  /**
+   * URLs that partially match any regex or exactly match strings in allowUrls
+   * will be traced.
+   */
   allowUrls?: Array<string | RegExp>;
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
@@ -204,12 +208,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   ): api.Span | undefined {
     if (!core.isUrlAllowed(url, this.getConfig().allowUrls)) {
       this._diag.debug('ignoring span as url does not match an allowed url');
-      console.log(`ignoring ${url} as url does not match an allowed url`);
       return;
     }
     if (core.isUrlIgnored(url, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
-      console.log(`ignoring ${url} as url does matches an ignored url`);
       return;
     }
     const method = (options.method || 'GET').toUpperCase();

@@ -20,6 +20,11 @@ export function urlMatches(url: string, urlToMatch: string | RegExp): boolean {
     return !!url.match(urlToMatch);
   }
 }
+/**
+ * Check if {@param url} should be allowed when comparing against {@param allowedUrls}
+ * @param url
+ * @param allowedUrls
+ */
 export function isUrlAllowed(
   url: string,
   allowedUrls?: Array<string | RegExp>
