@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724236375595,
+  "lastUpdate": 1724238304551,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -14524,6 +14524,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.69%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f2a6bcc20462e39282c7318ea0fca8e40e6e5e8b",
+          "message": "feat(otlp-exporter-base)!: use transport interface in web exporters (#4895)",
+          "timestamp": "2024-08-21T10:35:49Z",
+          "tree_id": "abdd59006f929159b85a93a8f25b952c5eb42dac",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f2a6bcc20462e39282c7318ea0fca8e40e6e5e8b"
+        },
+        "date": 1724238303722,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 990738,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12081,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 693246,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 667764,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
