@@ -6,8 +6,7 @@ To verify whether your application is ESM or CJS, refer to [Node.js docs for Det
 An `.mjs` extension or `type:module` in the built app's `package.json` indicates the app is ESM.
 
 **Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CJS.**
-ESM support is ongoing and bundler support is limited.
-For ESM, a few adjustments are needed for configuration and startup commands.
+ESM support is ongoing; a few adjustments are needed for configuration and startup commands.
 
 For more explanation about CJS and ESM, see the [Node.js docs](https://nodejs.org/api/modules.html#enabling).
 
