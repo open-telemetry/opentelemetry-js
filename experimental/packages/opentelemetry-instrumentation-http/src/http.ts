@@ -55,10 +55,31 @@ import {
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { RPCMetadata, RPCType, setRPCMetadata, getEnv } from '@opentelemetry/core';
+import {
+  RPCMetadata,
+  RPCType,
+  setRPCMetadata,
+  getEnv,
+} from '@opentelemetry/core';
 import { errorMonitor } from 'events';
 import { SEMATTRS_HTTP_ROUTE } from '@opentelemetry/semantic-conventions';
-import { extractHostnameAndPort, getIncomingRequestAttributes, getIncomingRequestAttributesOnResponse, getIncomingRequestMetricAttributes, getIncomingRequestMetricAttributesOnResponse, getOutgoingRequestAttributes, getOutgoingRequestAttributesOnResponse, getOutgoingRequestMetricAttributes, getOutgoingRequestMetricAttributesOnResponse, getRequestInfo, headerCapture, isIgnored, isValidOptionsType, parseResponseStatus, setSpanWithError } from './utils';
+import {
+  extractHostnameAndPort,
+  getIncomingRequestAttributes,
+  getIncomingRequestAttributesOnResponse,
+  getIncomingRequestMetricAttributes,
+  getIncomingRequestMetricAttributesOnResponse,
+  getOutgoingRequestAttributes,
+  getOutgoingRequestAttributesOnResponse,
+  getOutgoingRequestMetricAttributes,
+  getOutgoingRequestMetricAttributesOnResponse,
+  getRequestInfo,
+  headerCapture,
+  isIgnored,
+  isValidOptionsType,
+  parseResponseStatus,
+  setSpanWithError,
+} from './utils';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
@@ -333,8 +354,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         if (request.listenerCount('response') <= 1) {
           response.resume();
         }
-        const responseAttributes =
-          getOutgoingRequestAttributesOnResponse(response, this._semconvStability);
+        const responseAttributes = getOutgoingRequestAttributesOnResponse(
+          response,
+          this._semconvStability
+        );
         span.setAttributes(responseAttributes);
         metricAttributes = Object.assign(
           metricAttributes,
@@ -368,10 +391,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           } else {
             // behaves same for new and old semconv
             status = {
-              code: parseResponseStatus(
-                SpanKind.CLIENT,
-                response.statusCode
-              ),
+              code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
             };
           }
 
@@ -572,7 +592,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
-                setSpanWithError(span, error, instrumentation._semconvStability);
+                setSpanWithError(
+                  span,
+                  error,
+                  instrumentation._semconvStability
+                );
                 instrumentation._closeHttpSpan(
                   span,
                   SpanKind.SERVER,
@@ -651,15 +675,19 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const { hostname, port } = extractHostnameAndPort(optionsParsed);
 
-      const attributes = getOutgoingRequestAttributes(optionsParsed, {
-        component,
-        port,
-        hostname,
-        hookAttributes: instrumentation._callStartSpanHook(
-          optionsParsed,
-          instrumentation.getConfig().startOutgoingSpanHook
-        ),
-      }, instrumentation._semconvStability);
+      const attributes = getOutgoingRequestAttributes(
+        optionsParsed,
+        {
+          component,
+          port,
+          hostname,
+          hookAttributes: instrumentation._callStartSpanHook(
+            optionsParsed,
+            instrumentation.getConfig().startOutgoingSpanHook
+          ),
+        },
+        instrumentation._semconvStability
+      );
 
       const startTime = hrTime();
       const metricAttributes: MetricAttributes =

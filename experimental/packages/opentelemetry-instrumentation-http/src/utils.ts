@@ -68,7 +68,12 @@ import {
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
-import { Err, IgnoreMatcher, ParsedRequestOptions, SemconvStability } from './types';
+import {
+  Err,
+  IgnoreMatcher,
+  ParsedRequestOptions,
+  SemconvStability,
+} from './types';
 
 /**
  * Get an absolute url
@@ -175,19 +180,25 @@ export const isIgnored = (
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
  */
-export const setSpanWithError = (span: Span, error: Err, semconvStability: SemconvStability): void => {
+export const setSpanWithError = (
+  span: Span,
+  error: Err,
+  semconvStability: SemconvStability
+): void => {
   const message = error.message;
 
   if ((semconvStability & SemconvStability.OLD) === SemconvStability.OLD) {
     span.setAttribute(AttributeNames.HTTP_ERROR_NAME, error.name);
     span.setAttribute(AttributeNames.HTTP_ERROR_MESSAGE, message);
   }
-  
 
-  if ((semconvStability & SemconvStability.STABLE) === SemconvStability.STABLE) {
+  if (
+    (semconvStability & SemconvStability.STABLE) ===
+    SemconvStability.STABLE
+  ) {
     span.setAttribute(ATTR_ERROR_TYPE, error.name);
   }
-  
+
   span.setStatus({ code: SpanStatusCode.ERROR, message });
   span.recordException(error);
 };
@@ -371,7 +382,7 @@ export const getOutgoingRequestAttributes = (
     port: string | number;
     hookAttributes?: SpanAttributes;
   },
-  semconvStability: SemconvStability,
+  semconvStability: SemconvStability
 ): SpanAttributes => {
   const hostname = options.hostname;
   const port = options.port;
@@ -466,7 +477,7 @@ export const setAttributesFromHttpKind = (
  */
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
-  semconvStability: SemconvStability,
+  semconvStability: SemconvStability
 ): SpanAttributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const oldAttributes: SpanAttributes = {};
@@ -476,7 +487,10 @@ export const getOutgoingRequestAttributesOnResponse = (
     stableAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
   }
 
-  if (socket && (semconvStability & SemconvStability.OLD) === SemconvStability.OLD) {
+  if (
+    socket &&
+    (semconvStability & SemconvStability.OLD) === SemconvStability.OLD
+  ) {
     const { remoteAddress, remotePort } = socket;
     oldAttributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
     oldAttributes[SEMATTRS_NET_PEER_PORT] = remotePort;
@@ -504,7 +518,7 @@ export const getOutgoingRequestAttributesOnResponse = (
  * @param {SpanAttributes} spanAttributes the span attributes
  */
 export const getOutgoingRequestMetricAttributesOnResponse = (
-  spanAttributes: SpanAttributes,
+  spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
   metricAttributes[SEMATTRS_NET_PEER_PORT] =

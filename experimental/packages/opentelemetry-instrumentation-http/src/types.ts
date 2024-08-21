@@ -136,7 +136,7 @@ export interface Err extends Error {
 /**
  * Tracks whether this instrumentation emits old experimental,
  * new stable, or both semantic conventions.
- * 
+ *
  * Enum values chosen such that the enum may be used as a bitmask.
  */
 export const enum SemconvStability {
