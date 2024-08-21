@@ -576,10 +576,14 @@ describe('export - real http request destroyed before response received', () => 
 
     setTimeout(() => {
       collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
+        try {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
+        } catch (e) {
+          done(e);
+        }
         done();
       });
     }, 0);

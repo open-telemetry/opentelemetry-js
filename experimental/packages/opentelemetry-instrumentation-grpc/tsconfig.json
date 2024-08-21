@@ -25,7 +25,7 @@
       "path": "../../../packages/opentelemetry-sdk-trace-node"
     },
     {
-      "path": "../../../packages/opentelemetry-semantic-conventions"
+      "path": "../../../semantic-conventions"
     },
     {
       "path": "../opentelemetry-instrumentation"

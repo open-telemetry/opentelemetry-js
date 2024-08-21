@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-export * from './types/EventLogger';
-export * from './types/EventLoggerProvider';
-export * from './types/Event';
-export * from './types/EventLoggerOptions';
+export { EventLogger } from './types/EventLogger';
+export { EventLoggerProvider } from './types/EventLoggerProvider';
+export { Event } from './types/Event';
+export { EventLoggerOptions } from './types/EventLoggerOptions';
 
 import { EventsAPI } from './api/events';
 export const events = EventsAPI.getInstance();

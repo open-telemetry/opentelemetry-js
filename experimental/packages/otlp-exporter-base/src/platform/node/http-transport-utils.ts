@@ -25,22 +25,20 @@ import {
 } from '../../is-export-retryable';
 import { OTLPExporterError } from '../../types';
 
-export const DEFAULT_EXPORT_INITIAL_BACKOFF = 1000;
-export const DEFAULT_EXPORT_MAX_BACKOFF = 5000;
-export const DEFAULT_EXPORT_BACKOFF_MULTIPLIER = 1.5;
-
 /**
  * Sends data using http
  * @param params
  * @param agent
  * @param data
  * @param onDone
+ * @param timeoutMillis
  */
 export function sendWithHttp(
   params: HttpRequestParameters,
   agent: http.Agent | https.Agent,
   data: Uint8Array,
-  onDone: (response: ExportResponse) => void
+  onDone: (response: ExportResponse) => void,
+  timeoutMillis: number
 ): void {
   const parsedUrl = new URL(params.url);
   const nodeVersion = Number(process.versions.node.split('.')[0]);
@@ -63,9 +61,6 @@ export function sendWithHttp(
     res.on('data', chunk => responseData.push(chunk));
 
     res.on('end', () => {
-      if (req.destroyed) {
-        return;
-      }
       if (res.statusCode && res.statusCode < 299) {
         onDone({
           status: 'success',
@@ -86,7 +81,7 @@ export function sendWithHttp(
     });
   });
 
-  req.setTimeout(params.timeoutMillis, () => {
+  req.setTimeout(timeoutMillis, () => {
     req.destroy();
     onDone({
       status: 'failure',
