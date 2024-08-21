@@ -38,18 +38,31 @@ This flag must be passed to the `node` binary, which is often done as a startup 
 Though the OpenTelemetry loader currently relies on `import-in-the-middle`, direct usage of `import-in-the-middle/hook.mjs` may cease to work in the future.
 The only currently supported loader hook is `@opentelemetry/instrumentation/hook.mjs`.
 
-Experimental loader is intended to be deprecated, and will be replaced with something like `--import=@opentelemetry/instrumentation/hook.mjs`
+**Note:** Eventually the recommendation for how to setup OpenTelemetry for usage with ESM will change to no longer require `--experimental-loader=@opentelemetry/instrumentation/hook.mjs`.
+Instead the bootstrap code (in `./telemetry.js`) will use Node.js's newer `module.register(...)`.
+Refer to this [issue](https://github.com/open-telemetry/opentelemetry-js/issues/4933) for details.
 
-Regarding `--experimental-loader` per [Node.js docs](https://nodejs.org/api/cli.html#--experimental-loadermodule):
+Because of ongoing issues with loaders running TypeScript code as ESM in development environments, results may vary.
 
-> This flag is discouraged and may be removed in a future version of Node.js. Please use `--import` with `register()` instead.
+To use `ts-node` to run the uncompiled TypeScript code, the module must be CJS.
+To use `tsx` to run the uncompiled TypeScript code as ESM, the `--import` flag must be used.
 
-<!--
-TODO
-import * as module from 'module'
+## Using the Zero Code Option with `auto-instrumentations-node`
 
-module.register('@opentelemetry/instrumentation/hook.mjs', import.meta.url)
--->
+The `auto-instrumentations-node` package contains a `register` function that must be invoked using `--require` or `--import`.
+For ESM, the package also requires the usage of the loader hook.
+
+Startup command for CJS:
+
+```sh
+node --require @opentelemetry/auto-instrumentations-node/register app.js
+```
+
+Startup command for ESM:
+
+```sh
+node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import @opentelemetry/auto-instrumentations-node/register app.js
+```
 
 ## Examples
 
@@ -102,11 +115,8 @@ node --require ./telemetry.js app.js
 Startup command for compiled ESM:
 
 ```sh
-node --require ./telemetry.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs app.js
+node --experimental-loader=@opentelemetry/instrumentation/hook.mjs --import ./telemetry.js app.js
 ```
-
-To use `ts-node` to run the uncompiled TypeScript code, the module must be CJS.
-To use `tsx` to run the uncompiled TypeScript code as ESM, the `--import` flag must be used.
 
 ### ESM Options for Different Versions of Node.js
 
@@ -114,18 +124,8 @@ The entire startup command should include the following `NODE_OPTIONS`:
 
 | Node.js Version   | NODE_OPTIONS                                                                              |
 | ----------------- | ----------------------------------------------------------------------------------------- |
-| >=16.0.0          | `--require ./telemetry.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
+| 16.x              | `--require ./telemetry.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
 | >=18.1.0 <18.19.0 | `--require ./telemetry.cjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs` |
-| >=18.19.0         | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
+| ^18.19.0          | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 | 20.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
 | 22.x              | `--import ./telemetry.mjs --experimental-loader=@opentelemetry/instrumentation/hook.mjs`  |
-
-## Using the Zero Code Option with `auto-instrumentations-node`
-
-The `auto-instrumentations-node` package contains a `register` function that must be invoked using `--require`.
-
-Startup command:
-
-```sh
-node --require @opentelemetry/auto-instrumentations-node/register app.js
-```
