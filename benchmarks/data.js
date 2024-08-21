@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724238304551,
+  "lastUpdate": 1724262369891,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -14574,6 +14574,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 667764,
             "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7aff06d7936dc5cd4836c5a558486a47c52427e8",
+          "message": "chore(release): script to align workspace on new semconv package version (#4937)",
+          "timestamp": "2024-08-21T17:44:06Z",
+          "tree_id": "6773b96eb8638dbdf333642dbc38684f57fa2f63",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7aff06d7936dc5cd4836c5a558486a47c52427e8"
+        },
+        "date": 1724262369009,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 960107,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11608,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 672401,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662046,
+            "range": "±0.30%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
