@@ -20,6 +20,21 @@ export function urlMatches(url: string, urlToMatch: string | RegExp): boolean {
     return !!url.match(urlToMatch);
   }
 }
+export function isUrlAllowed(
+  url: string,
+  allowedUrls?: Array<string | RegExp>
+): boolean {
+  if (!allowedUrls) {
+    return true;
+  }
+
+  for (const allowedUrl of allowedUrls) {
+    if (urlMatches(url, allowedUrl)) {
+      return true;
+    }
+  }
+  return false;
+}
 /**
  * Check if {@param url} should be ignored when comparing against {@param ignoredUrls}
  * @param url
