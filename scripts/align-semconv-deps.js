@@ -33,15 +33,14 @@ function alignSemconvDeps({dryRun}){
   const targetWsDirs = wsDirs
     .filter(wsDir => {
       const pj = JSON.parse(fs.readFileSync(path.join(wsDir, 'package.json')));
-      let depRange = pj.dependencies && pj.dependencies['@opentelemetry/semantic-conventions'];
+      const depRange = pj.dependencies && pj.dependencies['@opentelemetry/semantic-conventions'];
       const devDepRange = pj.devDependencies && pj.devDependencies['@opentelemetry/semantic-conventions'];
       if (depRange && devDepRange) {
         throw new Error(`why does "${wsDir}/package.json" have a dep *and* devDep on the semconv package?`);
       } else if (!depRange && !devDepRange) {
         return false;
       } else {
-        depRange = depRange || devDepRange;
-        if (depRange === semconvVer) {
+        if ((depRange || devDepRange) === semconvVer) {
           return false;
         }
         return true;
@@ -79,11 +78,11 @@ function alignSemconvDeps({dryRun}){
         }
       }
     }
-  })
+  });
 }
 
 function main() {
-  alignSemconvDeps({dryRun: false})
+  alignSemconvDeps({dryRun: false});
 }
 
 main();
