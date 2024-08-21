@@ -626,6 +626,37 @@ describe('xhr', () => {
           }
         );
 
+        describe('when url is allowed', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = url;
+            prepareData(done, url, {
+              propagateTraceHeaderCorsUrls,
+              allowUrls: [propagateTraceHeaderCorsUrls],
+            });
+          });
+
+          it('should create a span', () => {
+            assert.ok(exportSpy.called, 'span should be exported');
+          });
+        });
+
+        describe('when another url is allowed', () => {
+          const otherUrl = 'http://localhost:8099/get';
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = url;
+            prepareData(done, url, {
+              propagateTraceHeaderCorsUrls,
+              allowUrls: [otherUrl],
+            });
+          });
+
+          it('should NOT create a span', () => {
+            assert.ok(exportSpy.notCalled, "span shouldn't be exported");
+          });
+        });
+
         describe('when url is ignored', () => {
           beforeEach(done => {
             clearData();
