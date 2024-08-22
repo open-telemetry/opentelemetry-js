@@ -49,7 +49,7 @@ To use `tsx` to run the uncompiled TypeScript code as ESM, the `--import` flag m
 
 ## Using the Zero Code Option with `auto-instrumentations-node`
 
-The `auto-instrumentations-node` package contains a `register` function that must be invoked using `--require` or `--import`.
+The `auto-instrumentations-node` package contains a `register` entry-point that can be used with `--require` or `--import` to setup and start the SDK easily, without application code changes.
 For ESM, the package also requires the usage of the loader hook.
 
 Startup command for CJS:
