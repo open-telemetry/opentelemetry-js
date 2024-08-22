@@ -24,6 +24,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(otlp-transformer): Do not limit @opentelemetry/api upper range peerDependency [#4816](https://github.com/open-telemetry/opentelemetry-js/pull/4816) @mydea
 * feat(instrumentation-http): Allow to opt-out of instrumenting incoming/outgoing requests [#4643](https://github.com/open-telemetry/opentelemetry-js/pull/4643) @mydea
+* feat(instrumentation): Add allowUrls config option to web instrumentation [#4938](https://github.com/open-telemetry/opentelemetry-js/pull/4938) @jairo-mendoza
 
 ### :bug: (Bug Fix)
 
