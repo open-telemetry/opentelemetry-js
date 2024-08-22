@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724318208338,
+  "lastUpdate": 1724318305748,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -14732,6 +14732,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "4105753+danielpatrickdotdev@users.noreply.github.com",
+            "name": "Daniel",
+            "username": "danielpatrickdotdev"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5c1ae0aa5b686aae3e7511f1eb9cfcc4d7ab2326",
+          "message": "docs(sdk-metrics): Update Histogram docs to reflect upper bound inclusivity (#4829)\n\nCo-authored-by: Hector Hernandez <39923391+hectorhdzg@users.noreply.github.com>",
+          "timestamp": "2024-08-22T09:14:14Z",
+          "tree_id": "54bf351fa5911a809cf53c37a8770c47c30b0a11",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5c1ae0aa5b686aae3e7511f1eb9cfcc4d7ab2326"
+        },
+        "date": 1724318304830,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 976720,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12500,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 690373,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648595,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
