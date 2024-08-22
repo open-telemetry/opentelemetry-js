@@ -13,4 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './SemanticAttributes';
+
+/* eslint-disable no-restricted-syntax --
+ * These re-exports are only of constants, only one-level deep at this point,
+ * and should not cause problems for tree-shakers.
+ */
+export * from './SemanticResourceAttributes';

@@ -14,6 +14,11 @@ All notable changes to experimental packages in this project will be documented 
   * (user-facing) `hostname` was intended for use in tests and is not used by any exporters, it will be removed in a future release
 * fix(exporter-*-otlp-*)!: ensure `User-Agent` header cannot be overwritten by the user [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
   * allowing overrides of the `User-Agent` header was not specification compliant.
+* feat(exporter-*-otlp*)!: remove environment-variable specific code from browser exporters
+  * (user-facing) removes the ability to configure browser exporters by using `process.env` polyfills
+* feat(sdk-node)!: Automatically configure logs exporter [#4740](https://github.com/open-telemetry/opentelemetry-js/pull/4740)
+* feat(exporter-*-otlp-*)!: use transport interface in browser exporters [#4895](https://github.com/open-telemetry/opentelemetry-js/pull/4895) @pichlermarc
+  * (user-facing) protected `headers` property was intended for internal use has been removed from all exporters
 
 ### :rocket: (Enhancement)
 
@@ -23,12 +28,24 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
+* fix(api-logs): align AnyValue to spec [#4893](https://github.com/open-telemetry/opentelemetry-js/pull/4893) @blumamir
+* fix(instrumentation): remove diag.debug() message for instrumentations that do not patch modules [#4925](https://github.com/open-telemetry/opentelemetry-js/pull/4925) @trentm
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
 
 * refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+* refactor: remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
+  * Packages updated:
+    * api-events
+    * api-logs
+    * opentelemetry-browser-detector
+    * opentelemetry-exporter-prometheus
+    * opentelemetry-instrumentation-fetch
+    * opentelemetry-instrumentation-http
+    * opentelemetry-instrumentation-xml-http-request
+    * opentelemetry-instrumentation
 
 ## 0.52.1
 
