@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { Console } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
@@ -27,7 +29,6 @@ interface ConsoleMetricExporterOptions {
   temporalitySelector?: AggregationTemporalitySelector;
 }
 
-/* eslint-disable no-console */
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = false;
   protected _temporalitySelector: AggregationTemporalitySelector;
@@ -71,7 +72,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   ): void {
     for (const scopeMetrics of metrics.scopeMetrics) {
       for (const metric of scopeMetrics.metrics) {
-        console.dir(
+        Console.dir(
           {
             descriptor: metric.descriptor,
             dataPointType: metric.dataPointType,

@@ -16,6 +16,7 @@
 
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
+import { Console } from '@opentelemetry/api';
 import {
   ExportResult,
   ExportResultCode,
@@ -27,7 +28,6 @@ import {
  * console. This class can be used for diagnostic purposes.
  */
 
-/* eslint-disable no-console */
 export class ConsoleSpanExporter implements SpanExporter {
   /**
    * Export spans.
@@ -91,7 +91,7 @@ export class ConsoleSpanExporter implements SpanExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const span of spans) {
-      console.dir(this._exportInfo(span), { depth: 3 });
+      Console.dir(this._exportInfo(span), { depth: 3 });
     }
     if (done) {
       return done({ code: ExportResultCode.SUCCESS });
