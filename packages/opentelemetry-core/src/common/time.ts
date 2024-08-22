@@ -141,6 +141,14 @@ export function hrTimeToMicroseconds(time: api.HrTime): number {
 }
 
 /**
+ * Convert hrTime to seconds.
+ * @param time
+ */
+export function hrTimeToSeconds(time: api.HrTime): number {
+  return time[0] + time[1] / SECOND_TO_NANOSECONDS;
+}
+
+/**
  * check if time is HrTime
  * @param value
  */
