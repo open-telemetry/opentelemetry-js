@@ -13,6 +13,9 @@
       "path": "../../api"
     },
     {
+      "path": "../../semantic-conventions"
+    },
+    {
       "path": "../opentelemetry-context-zone"
     },
     {
@@ -26,9 +29,6 @@
     },
     {
       "path": "../opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }

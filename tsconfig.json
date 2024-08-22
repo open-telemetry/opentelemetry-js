@@ -43,10 +43,10 @@
       "packages/opentelemetry-sdk-trace-base",
       "packages/opentelemetry-sdk-trace-node",
       "packages/opentelemetry-sdk-trace-web",
-      "packages/opentelemetry-semantic-conventions",
       "packages/opentelemetry-shim-opentracing",
       "packages/propagator-aws-xray",
-      "packages/sdk-metrics"
+      "packages/sdk-metrics",
+      "semantic-conventions"
     ],
     "out": "docs",
     "exclude": [
@@ -177,9 +177,6 @@
       "path": "packages/opentelemetry-sdk-trace-web"
     },
     {
-      "path": "packages/opentelemetry-semantic-conventions"
-    },
-    {
       "path": "packages/opentelemetry-shim-opentracing"
     },
     {
@@ -190,6 +187,9 @@
     },
     {
       "path": "packages/template"
+    },
+    {
+      "path": "semantic-conventions"
     }
   ]
 }
