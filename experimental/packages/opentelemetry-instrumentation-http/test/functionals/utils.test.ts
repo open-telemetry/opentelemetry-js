@@ -36,7 +36,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { IgnoreMatcher, ParsedRequestOptions } from '../../src/types';
+import { IgnoreMatcher, ParsedRequestOptions, SemconvStability } from '../../src/types';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
@@ -262,7 +262,7 @@ describe('Utility', () => {
         SpanKind.INTERNAL
       );
       /* tslint:disable-next-line:no-any */
-      utils.setSpanWithError(span, new Error(errorMessage));
+      utils.setSpanWithError(span, new Error(errorMessage), SemconvStability.OLD);
       const attributes = span.attributes;
       assert.strictEqual(
         attributes[AttributeNames.HTTP_ERROR_MESSAGE],
