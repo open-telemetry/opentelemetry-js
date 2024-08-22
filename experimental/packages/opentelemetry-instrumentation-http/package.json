@@ -79,7 +79,7 @@
   "dependencies": {
     "@opentelemetry/core": "1.25.1",
     "@opentelemetry/instrumentation": "0.52.1",
-    "@opentelemetry/semantic-conventions": "1.25.1",
+    "@opentelemetry/semantic-conventions": "1.26.0",
     "semver": "^7.5.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http",
