@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724318107989,
+  "lastUpdate": 1724318208338,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -14678,6 +14678,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 654058,
             "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "legendecas@gmail.com",
+            "name": "Chengzhong Wu",
+            "username": "legendecas"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0b8d310cf5fc62fa341337f4212cba035b7b851b",
+          "message": "fix(sdk-metrics): use inclusive upper bounds in histogram (#4935)\n\nCo-authored-by: Daniel Patrick <github@danielpatrick.dev>",
+          "timestamp": "2024-08-22T09:12:59Z",
+          "tree_id": "54bf351fa5911a809cf53c37a8770c47c30b0a11",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0b8d310cf5fc62fa341337f4212cba035b7b851b"
+        },
+        "date": 1724318207493,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 958910,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11610,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 692484,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 656968,
+            "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
