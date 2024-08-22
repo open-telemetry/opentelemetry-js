@@ -17,7 +17,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import {
-  binarySearchLB,
+  binarySearchUB,
   callWithTimeout,
   hashAttributes,
   TimeoutError,
@@ -66,26 +66,35 @@ describe('utils', () => {
     });
   });
 
-  describe('binarySearchLB', () => {
+  describe('binarySearchUB', () => {
     const tests = [
       /** [ arr, value, expected lb idx ] */
-      [[0, 10, 100, 1000], -1, -1],
+      [[0, 10, 100, 1000], -1, 0],
       [[0, 10, 100, 1000], 0, 0],
-      [[0, 10, 100, 1000], 1, 0],
+      [[0, 10, 100, 1000], 1, 1],
       [[0, 10, 100, 1000], 10, 1],
+      [[0, 10, 100, 1000], 100, 2],
+      [[0, 10, 100, 1000], 101, 3],
       [[0, 10, 100, 1000], 1000, 3],
-      [[0, 10, 100, 1000], 1001, 3],
+      [[0, 10, 100, 1000], 1001, 4],
 
-      [[0, 10, 100, 1000, 10_000], -1, -1],
+      [[0, 10, 100, 1000, 10_000], -1, 0],
       [[0, 10, 100, 1000, 10_000], 0, 0],
       [[0, 10, 100, 1000, 10_000], 10, 1],
-      [[0, 10, 100, 1000, 10_000], 1001, 3],
-      [[0, 10, 100, 1000, 10_000], 10_001, 4],
+      [[0, 10, 100, 1000, 10_000], 100, 2],
+      [[0, 10, 100, 1000, 10_000], 101, 3],
+      [[0, 10, 100, 1000, 10_000], 1001, 4],
+      [[0, 10, 100, 1000, 10_000], 10_001, 5],
+
+      [[], 1, 0],
+      [[1], 0, 0],
+      [[1], 1, 0],
+      [[1], 2, 1],
     ] as [number[], number, number][];
 
     for (const [idx, test] of tests.entries()) {
-      it(`test idx(${idx}): find lb of ${test[1]} in [${test[0]}]`, () => {
-        assert.strictEqual(binarySearchLB(test[0], test[1]), test[2]);
+      it(`test idx(${idx}): find ub of ${test[1]} in [${test[0]}]`, () => {
+        assert.strictEqual(binarySearchUB(test[0], test[1]), test[2]);
       });
     }
   });

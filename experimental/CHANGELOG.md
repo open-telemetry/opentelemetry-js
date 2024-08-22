@@ -16,6 +16,9 @@ All notable changes to experimental packages in this project will be documented 
   * allowing overrides of the `User-Agent` header was not specification compliant.
 * feat(exporter-*-otlp*)!: remove environment-variable specific code from browser exporters
   * (user-facing) removes the ability to configure browser exporters by using `process.env` polyfills
+* feat(sdk-node)!: Automatically configure logs exporter [#4740](https://github.com/open-telemetry/opentelemetry-js/pull/4740)
+* feat(exporter-*-otlp-*)!: use transport interface in browser exporters [#4895](https://github.com/open-telemetry/opentelemetry-js/pull/4895) @pichlermarc
+  * (user-facing) protected `headers` property was intended for internal use has been removed from all exporters
 
 ### :rocket: (Enhancement)
 
@@ -26,8 +29,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation): ensure .setConfig() results in config.enabled defaulting to true [#4941](https://github.com/open-telemetry/opentelemetry-js/pull/4941) @trentm
 * fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
 * fix(api-logs): align AnyValue to spec [#4893](https://github.com/open-telemetry/opentelemetry-js/pull/4893) @blumamir
+* fix(instrumentation): remove diag.debug() message for instrumentations that do not patch modules [#4925](https://github.com/open-telemetry/opentelemetry-js/pull/4925) @trentm
 
 ### :books: (Refine Doc)
 

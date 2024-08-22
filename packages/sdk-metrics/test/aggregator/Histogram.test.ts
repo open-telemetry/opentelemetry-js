@@ -189,7 +189,7 @@ describe('HistogramAggregator', () => {
             value: {
               buckets: {
                 boundaries: [1, 10, 100],
-                counts: [1, 1, 0, 0],
+                counts: [2, 0, 0, 0],
               },
               count: 2,
               sum: 1,
@@ -231,7 +231,7 @@ describe('HistogramAggregator', () => {
             value: {
               buckets: {
                 boundaries: [1, 10, 100],
-                counts: [1, 1, 0, 0],
+                counts: [2, 0, 0, 0],
               },
               count: 2,
               sum: 1,
