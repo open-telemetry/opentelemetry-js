@@ -27,6 +27,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation): ensure .setConfig() results in config.enabled defaulting to true [#4941](https://github.com/open-telemetry/opentelemetry-js/pull/4941) @trentm
 * fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
 * fix(api-logs): align AnyValue to spec [#4893](https://github.com/open-telemetry/opentelemetry-js/pull/4893) @blumamir
 * fix(instrumentation): remove diag.debug() message for instrumentations that do not patch modules [#4925](https://github.com/open-telemetry/opentelemetry-js/pull/4925) @trentm
