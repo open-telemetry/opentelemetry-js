@@ -407,7 +407,7 @@ export const getOutgoingRequestAttributes = (
     // Required attributes
     [ATTR_HTTP_REQUEST_METHOD]: method,
     [ATTR_SERVER_ADDRESS]: hostname,
-    [ATTR_SERVER_PORT]: port,
+    [ATTR_SERVER_PORT]: Number(port),
     [ATTR_URL_FULL]: urlFull,
     // protocol name always http
 
@@ -487,10 +487,7 @@ export const getOutgoingRequestAttributesOnResponse = (
     stableAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] = statusCode;
   }
 
-  if (
-    socket &&
-    (semconvStability & SemconvStability.OLD) === SemconvStability.OLD
-  ) {
+  if (socket) {
     const { remoteAddress, remotePort } = socket;
     oldAttributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
     oldAttributes[SEMATTRS_NET_PEER_PORT] = remotePort;
@@ -510,7 +507,15 @@ export const getOutgoingRequestAttributesOnResponse = (
   }
 
   setAttributesFromHttpKind(httpVersion, oldAttributes);
-  return oldAttributes;
+
+  switch (semconvStability) {
+    case SemconvStability.STABLE:
+      return stableAttributes;
+    case SemconvStability.OLD:
+      return oldAttributes;
+  }
+
+  return Object.assign(oldAttributes, stableAttributes);
 };
 
 /**
