@@ -28,6 +28,7 @@
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-transformer",
       "experimental/packages/propagator-aws-xray-lambda",
+      "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-events",
       "experimental/packages/sdk-logs",
       "experimental/packages/shim-opencensus",
@@ -130,6 +131,9 @@
     },
     {
       "path": "experimental/packages/propagator-aws-xray-lambda"
+    },
+    {
+      "path": "experimental/packages/sampler-jaeger-remote"
     },
     {
       "path": "experimental/packages/sdk-events"
