@@ -143,7 +143,10 @@ describe('JaegerRemoteSampler', () => {
         .stub(JaegerRemoteSampler.prototype, 'getSamplerConfig' as any)
         .resolves(sampleSamplingStrategyResponse);
       convertSamplingResponseToSamplerStub = sinon
-        .stub(JaegerRemoteSampler.prototype, 'convertSamplingResponseToSampler' as any)
+        .stub(
+          JaegerRemoteSampler.prototype,
+          'convertSamplingResponseToSampler' as any
+        )
         .resolves(alwaysOffSampler);
     });
 
@@ -185,10 +188,7 @@ describe('JaegerRemoteSampler', () => {
         initialSampler: alwaysOnSampler,
       });
       await clock.tickAsync(poolingInterval);
-      assert.equal(
-        jaegerRemoteSampler['_sampler'],
-        alwaysOffSampler
-      );
+      assert.equal(jaegerRemoteSampler['_sampler'], alwaysOffSampler);
     });
   });
 
@@ -348,12 +348,13 @@ describe('JaegerRemoteSampler', () => {
         const perOperationSampler =
           parentBasedRootSampler as PerOperationSampler;
 
-        const defaultSampler = perOperationSampler['getSamplerForOperation']('');
+        const defaultSampler =
+          perOperationSampler['getSamplerForOperation']('');
         assert.equal(defaultSampler instanceof TraceIdRatioBasedSampler, true);
 
-        const defautRatio = (
-          defaultSampler as TraceIdRatioBasedSampler
-        )['_ratio'];
+        const defautRatio = (defaultSampler as TraceIdRatioBasedSampler)[
+          '_ratio'
+        ];
         assert.equal(defaultSamplingProbability, defautRatio);
 
         const op1Sampler = perOperationSampler['getSamplerForOperation'](op1);

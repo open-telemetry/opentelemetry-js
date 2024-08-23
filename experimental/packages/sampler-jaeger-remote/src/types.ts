@@ -28,16 +28,16 @@ export enum StrategyType {
 }
 
 /**
-* Interface for probabilistic sampling options.
-*/
+ * Interface for probabilistic sampling options.
+ */
 export interface ProbabilisticSamplingOptions {
   /** The sampling rate, typically a number between 0 and 1 */
   samplingRate: number;
 }
 
 /**
-* Interface representing a per-operation sampling strategy.
-*/
+ * Interface representing a per-operation sampling strategy.
+ */
 export interface PerOperationStrategy {
   /** The name or identifier of the operation */
   operation: string;
@@ -46,8 +46,8 @@ export interface PerOperationStrategy {
 }
 
 /**
-* Interface representing the response of a sampling strategy.
-*/
+ * Interface representing the response of a sampling strategy.
+ */
 export interface SamplingStrategyResponse {
   /** The type of sampling strategy being used */
   strategyType: StrategyType;
@@ -55,13 +55,13 @@ export interface SamplingStrategyResponse {
   probabilisticSampling: ProbabilisticSamplingOptions;
   /** Optional operation-specific sampling configuration */
   operationSampling?: {
-      /** The default sampling probability for operations */
-      defaultSamplingProbability: number;
-      /** The default lower bound of traces per second */
-      defaultLowerBoundTracesPerSecond: number;
-      /** Array of per-operation sampling strategies */
-      perOperationStrategies: PerOperationStrategy[];
-      /** The default upper bound of traces per second */
-      defaultUpperBoundTracesPerSecond: number;
+    /** The default sampling probability for operations */
+    defaultSamplingProbability: number;
+    /** The default lower bound of traces per second */
+    defaultLowerBoundTracesPerSecond: number;
+    /** Array of per-operation sampling strategies */
+    perOperationStrategies: PerOperationStrategy[];
+    /** The default upper bound of traces per second */
+    defaultUpperBoundTracesPerSecond: number;
   };
 }
