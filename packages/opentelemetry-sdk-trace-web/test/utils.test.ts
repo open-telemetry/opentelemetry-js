@@ -701,64 +701,64 @@ describe('utils', () => {
         key2: 'hello world',
       });
       const requestParams = { body: textToReadableStream(jsonString) };
-      const length = await getFetchBodyLength(
+      const lengthPromise = getFetchBodyLength(
         'https://example.com',
         requestParams
       );
 
-      // we got the correct length
-      assert.strictEqual(length, 36);
+      // if we try to await lengthPromise here, we get a timeout
 
-      // AND the body is still readable
+      let lengthResolved = false;
+      lengthPromise.finally(() => (lengthResolved = true));
+
+      // length doesn't get read yet
+      assert.strictEqual(lengthResolved, false);
+
+      // the body is still readable
       assert.strictEqual(requestParams.body.locked, false);
 
       // AND the body is still correct
       const { value } = await requestParams.body.getReader().read();
       const decoder = new TextDecoder();
       assert.strictEqual(decoder.decode(value), jsonString);
+
+      // AND now length got read, and we got the correct length
+      const length = await lengthPromise;
+      assert.strictEqual(lengthResolved, true);
+      assert.strictEqual(length, 36);
     });
 
     it('should (non-destructively) read the unicode body stream of the second param when the first param is string', async () => {
       const bodyString = 'π🔥🔪😭';
       const requestParams = { body: textToReadableStream(bodyString) };
-      const length = await getFetchBodyLength(
+      const lengthPromise = getFetchBodyLength(
         'https://example.com',
         requestParams
       );
 
-      // we got the correct length
-      assert.strictEqual(length, 14);
+      // if we try to await lengthPromise here, we get a timeout
 
-      // AND the body is still readable
+      let lengthResolved = false;
+      lengthPromise.finally(() => (lengthResolved = true));
+
+      // length doesn't get read yet
+      assert.strictEqual(lengthResolved, false);
+
+      // the body is still readable
       assert.strictEqual(requestParams.body.locked, false);
 
       // AND the body is still correct
       const { value } = await requestParams.body.getReader().read();
       const decoder = new TextDecoder();
       assert.strictEqual(decoder.decode(value), bodyString);
-    });
 
-    it('should (non-destructively) read the byte body stream of the second param when the first param is string', async () => {
-      const bodyString = 'π🔥🔪😭';
-      const requestParams = { body: textToReadableStream(bodyString) };
-      const length = await getFetchBodyLength(
-        'https://example.com',
-        requestParams
-      );
-
-      // we got the correct length
+      // AND now length got read, and we got the correct length
+      const length = await lengthPromise;
+      assert.strictEqual(lengthResolved, true);
       assert.strictEqual(length, 14);
-
-      // AND the body is still readable
-      assert.strictEqual(requestParams.body.locked, false);
-
-      // AND the body is still correct
-      const { value } = await requestParams.body.getReader().read();
-      const decoder = new TextDecoder();
-      assert.strictEqual(decoder.decode(value), bodyString);
     });
 
-    it('should handle readablestream objects without a tee method', async () => {
+    it('should handle readablestream objects without a pipeThrough method', async () => {
       const jsonString = JSON.stringify({
         key1: 'true',
         key2: 'hello world',
@@ -766,7 +766,7 @@ describe('utils', () => {
       const stream = textToReadableStream(jsonString);
 
       // @ts-expect-error intentionally remove the .tee() method to mimic older environments where this method isn't available
-      stream.tee = undefined;
+      stream.pipeThrough = undefined;
 
       const requestParams = { body: stream };
       const length = await getFetchBodyLength(

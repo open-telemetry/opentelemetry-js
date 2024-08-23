@@ -131,44 +131,39 @@ export function addSpanNetworkEvents(
 
 function _getBodyNonDestructively(body: ReadableStream) {
   // can't read a ReadableStream without destroying it
-  // on most platforms, we CAN tee the body stream, which lets us split it,
-  // but that still locks the original stream, so we end up needing to return one of the forks.
-  //
-  // some (older) platforms don't expose the tee method and in that scenario, we're out of luck;
+  // but we CAN pipe it through and return a new ReadableStream
+
+  // some (older) platforms don't expose the pipeThrough method and in that scenario, we're out of luck;
   //   there's no way to read the stream without consuming it.
-  if (!body.tee) {
+  if (!body.pipeThrough) {
     return {
       body,
       length: Promise.resolve(undefined),
     };
   }
 
-  const [bodyToReturn, bodyToConsume] = body.tee();
+  let length = 0;
+  let resolveLength: (l: number) => void;
+  const lengthPromise = new Promise<number>(resolve => {
+    resolveLength = resolve;
+  });
 
-  const lengthPromise = async () => {
-    let length = 0;
-    const reader = bodyToConsume.getReader();
+  const transform = new TransformStream({
+    start() {},
+    async transform(chunk, controller) {
+      const bytearray = (await chunk) as Uint8Array;
+      length += bytearray.byteLength;
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const contents = await reader.read();
-      if (contents.value) {
-        // this isn't *explicitly* documented but according to MDN and Chrome Developer blog, contents.value is a Uint8Array
-        // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_1_-_simple_example
-        // https://developer.chrome.com/docs/capabilities/web-apis/fetch-streaming-requests
-        const value = contents.value as Uint8Array;
-        length += value.byteLength;
-      }
-      if (contents.done) {
-        break;
-      }
-    }
-    return length;
-  };
+      controller.enqueue(chunk);
+    },
+    flush() {
+      resolveLength(length);
+    },
+  });
 
   return {
-    body: bodyToReturn,
-    length: lengthPromise(),
+    body: body.pipeThrough(transform),
+    length: lengthPromise,
   };
 }
 
