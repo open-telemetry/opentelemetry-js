@@ -81,12 +81,13 @@ Attributes collected:
 
 | Attribute                                   | Short Description                                                              |
 | ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `http.status_code`                          | HTTP response status code                                                       |
+| `http.status_code`                          | HTTP response status code                                                      |
 | `http.host`                                 | The value of the HTTP host header                                              |
 | `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
 | `http.scheme`                               | The URI scheme identifying the used protocol                                   |
 | `http.url`                                  | Full HTTP request URL                                                          |
 | `http.method`                               | HTTP request method                                                            |
+| `http.request.body.size`                    | Uncompressed size of the request body, if any body exists                      |
 
 ## Useful links
 
