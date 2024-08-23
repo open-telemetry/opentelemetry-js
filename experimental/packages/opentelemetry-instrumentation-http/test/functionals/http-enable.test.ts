@@ -1079,8 +1079,8 @@ describe('HttpInstrumentation', () => {
         instrumentation.disable();
       });
 
-      it('should generate valid spans (client side and server side)', async () => {
-        await httpRequest.get(
+      it('should generate semconv 1.27 spans', async () => {
+        const response = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${pathname}`
         );
         const spans = memoryExporter.getFinishedSpans();
@@ -1094,7 +1094,7 @@ describe('HttpInstrumentation', () => {
           [ATTR_SERVER_PORT]: serverPort,
           [ATTR_URL_FULL]: `${protocol}://${hostname}:${serverPort}${pathname}`,
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_PEER_ADDRESS]: '::1',
+          [ATTR_NETWORK_PEER_ADDRESS]: response.address,
           [ATTR_NETWORK_PEER_PORT]: serverPort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
         });
