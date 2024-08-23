@@ -88,10 +88,11 @@ function createResource(
   ) as PerformanceResourceTiming;
 }
 
-function textToReadableStream(msg: string): ReadableStream {
+const ENCODER = new TextEncoder();
+function textToReadableStream(msg: string) {
   return new ReadableStream({
     start: controller => {
-      controller.enqueue(msg);
+      controller.enqueue(ENCODER.encode(msg));
       controller.close();
     },
     cancel: controller => {
@@ -682,6 +683,18 @@ describe('utils', () => {
       assert.strictEqual(length, 36);
     });
 
+    it('should handle undefined body', async () => {
+      const length = await getFetchBodyLength('https://example.com', {});
+      assert.strictEqual(length, undefined);
+    });
+
+    it('should handle unicode body', async () => {
+      const length = await getFetchBodyLength('https://example.com', {
+        body: 'π🔥🔪😭',
+      });
+      assert.strictEqual(length, 14); // pi is 2 bytes, each emoji is 4
+    });
+
     it('should (non-destructively) read the body stream of the second param when the first param is string', async () => {
       const jsonString = JSON.stringify({
         key1: 'true',
@@ -701,7 +714,48 @@ describe('utils', () => {
 
       // AND the body is still correct
       const { value } = await requestParams.body.getReader().read();
-      assert.strictEqual(value, jsonString);
+      const decoder = new TextDecoder();
+      assert.strictEqual(decoder.decode(value), jsonString);
+    });
+
+    it('should (non-destructively) read the unicode body stream of the second param when the first param is string', async () => {
+      const bodyString = 'π🔥🔪😭';
+      const requestParams = { body: textToReadableStream(bodyString) };
+      const length = await getFetchBodyLength(
+        'https://example.com',
+        requestParams
+      );
+
+      // we got the correct length
+      assert.strictEqual(length, 14);
+
+      // AND the body is still readable
+      assert.strictEqual(requestParams.body.locked, false);
+
+      // AND the body is still correct
+      const { value } = await requestParams.body.getReader().read();
+      const decoder = new TextDecoder();
+      assert.strictEqual(decoder.decode(value), bodyString);
+    });
+
+    it('should (non-destructively) read the byte body stream of the second param when the first param is string', async () => {
+      const bodyString = 'π🔥🔪😭';
+      const requestParams = { body: textToReadableStream(bodyString) };
+      const length = await getFetchBodyLength(
+        'https://example.com',
+        requestParams
+      );
+
+      // we got the correct length
+      assert.strictEqual(length, 14);
+
+      // AND the body is still readable
+      assert.strictEqual(requestParams.body.locked, false);
+
+      // AND the body is still correct
+      const { value } = await requestParams.body.getReader().read();
+      const decoder = new TextDecoder();
+      assert.strictEqual(decoder.decode(value), bodyString);
     });
 
     it('should handle readablestream objects without a tee method', async () => {
@@ -728,7 +782,8 @@ describe('utils', () => {
 
       // AND the body is still correct
       const { value } = await requestParams.body.getReader().read();
-      assert.strictEqual(value, jsonString);
+      const decoder = new TextDecoder();
+      assert.strictEqual(decoder.decode(value), jsonString);
     });
 
     it('should read the body of the first param when recieving a request', async () => {

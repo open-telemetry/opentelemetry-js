@@ -153,7 +153,11 @@ function _getBodyNonDestructively(body: ReadableStream) {
     while (true) {
       const contents = await reader.read();
       if (contents.value) {
-        length += contents.value.length;
+        // this isn't *explicitly* documented but according to MDN and Chrome Developer blog, contents.value is a Uint8Array
+        // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_1_-_simple_example
+        // https://developer.chrome.com/docs/capabilities/web-apis/fetch-streaming-requests
+        const value = contents.value as Uint8Array;
+        length += value.byteLength;
       }
       if (contents.done) {
         break;
