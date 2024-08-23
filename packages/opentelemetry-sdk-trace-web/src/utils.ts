@@ -244,9 +244,7 @@ export function getXHRBodyLength(
   }
 
   if (body instanceof FormData) {
-    // typescript doesn't like it when we pass FormData into URLSearchParams
-    // even though this is actually totally valid
-    return getByteLength(new URLSearchParams(body as any).toString());
+    return getFormDataSize(body);
   }
 
   if (body instanceof URLSearchParams) {
@@ -264,6 +262,19 @@ export function getXHRBodyLength(
 const TEXT_ENCODER = new TextEncoder();
 function getByteLength(s: string): number {
   return TEXT_ENCODER.encode(s).byteLength;
+}
+
+function getFormDataSize(formData: FormData): number {
+  let size = 0;
+  for (const [key, value] of formData.entries()) {
+    size += key.length;
+    if (value instanceof Blob) {
+      size += value.size;
+    } else {
+      size += value.length;
+    }
+  }
+  return size;
 }
 
 /**

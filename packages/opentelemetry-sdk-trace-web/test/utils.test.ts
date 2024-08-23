@@ -645,8 +645,21 @@ describe('utils', () => {
       formData.append('key1', 'true');
       formData.append('key2', 'hello world');
 
-      assert.strictEqual(getXHRBodyLength(formData), 26);
+      assert.strictEqual(getXHRBodyLength(formData), 23);
       assert.strictEqual(getXHRBodyLength(new FormData()), 0);
+    });
+    it('should compute body length for FormData payload with a file', () => {
+      const formData = new FormData();
+      const f = new File(
+        ['hello world hello world hello world'],
+        'test_file.txt'
+      );
+      formData.append('file', f);
+
+      // length should be:
+      // 4 for the key of the file in the form data
+      // 35 for the file contents
+      assert.strictEqual(getXHRBodyLength(formData), 39);
     });
     it('should compute body length for URLSearchParams payload', () => {
       const search = new URLSearchParams({
