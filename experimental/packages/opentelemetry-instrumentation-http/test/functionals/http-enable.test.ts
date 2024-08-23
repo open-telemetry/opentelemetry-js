@@ -1123,7 +1123,7 @@ describe('HttpInstrumentation', () => {
       });
 
       it('should create client spans with semconv 1.27 and old 1.7', async () => {
-        await httpRequest.get(
+        const response = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${pathname}`
         );
         const spans = memoryExporter.getFinishedSpans();
@@ -1138,7 +1138,7 @@ describe('HttpInstrumentation', () => {
           [ATTR_SERVER_PORT]: serverPort,
           [ATTR_URL_FULL]: `http://${hostname}:${serverPort}${pathname}`,
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_PEER_ADDRESS]: '::1',
+          [ATTR_NETWORK_PEER_ADDRESS]: response.address,
           [ATTR_NETWORK_PEER_PORT]: serverPort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
 
@@ -1150,7 +1150,7 @@ describe('HttpInstrumentation', () => {
           [SEMATTRS_HTTP_STATUS_CODE]: 200,
           [SEMATTRS_HTTP_TARGET]: '/test',
           [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
-          [SEMATTRS_NET_PEER_IP]: '::1',
+          [SEMATTRS_NET_PEER_IP]: response.address,
           [SEMATTRS_NET_PEER_NAME]: hostname,
           [SEMATTRS_NET_PEER_PORT]: serverPort,
           [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
