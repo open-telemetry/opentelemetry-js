@@ -1,5 +1,5 @@
 /**
- * This script updates changelogs after lerna has updated versions in the respective areas (packages/*, experimental/packages/*, api/)
+ * This script updates changelogs after lerna has updated versions in the respective areas (packages/*, experimental/packages/*, api/, semantic-conventions/)
  * - removes all empty subsections (bugs, enhancements, etc.) in the changelog.
  * - replaces the "Unreleased"-header with the version from the first non-private package in the directory (versions are expected to be uniform across a changelog)
  * - adds a new "Unreleased"-header with empty subsections at the top

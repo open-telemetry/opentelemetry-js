@@ -32,7 +32,9 @@ export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
   textMapPropagator: TextMapPropagator;
+  /** @deprecated use logRecordProcessors instead*/
   logRecordProcessor: LogRecordProcessor;
+  logRecordProcessors?: LogRecordProcessor[];
   metricReader: MetricReader;
   views: View[];
   instrumentations: (Instrumentation | Instrumentation[])[];
