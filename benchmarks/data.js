@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724341357260,
+  "lastUpdate": 1724405945987,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -14888,6 +14888,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.51%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "legalimpurity.github@gmail.com",
+            "name": "Rajat Khanna",
+            "username": "legalimpurity"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c398601cc182ccc4af1144445e0ea9b797ff4426",
+          "message": "feat(jaeger-remote-sampler): Implement jaeger remote sampler (#4589)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2024-08-23T09:36:51Z",
+          "tree_id": "c4b80bbaabb7514b71ed675b2ba5abf0461f9c5c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c398601cc182ccc4af1144445e0ea9b797ff4426"
+        },
+        "date": 1724405945053,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 937342,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11870,
+            "range": "±0.73%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 698053,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 667327,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
