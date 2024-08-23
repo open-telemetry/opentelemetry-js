@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Console } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { internal, ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
 import { ResourceMetrics } from './MetricData';
@@ -72,7 +71,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   ): void {
     for (const scopeMetrics of metrics.scopeMetrics) {
       for (const metric of scopeMetrics.metrics) {
-        Console.dir(
+        internal.Console.dir(
           {
             descriptor: metric.descriptor,
             dataPointType: metric.dataPointType,
