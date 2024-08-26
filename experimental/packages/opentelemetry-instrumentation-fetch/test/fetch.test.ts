@@ -75,10 +75,11 @@ const getData = (url: string, method?: string) => {
   });
 };
 
+const ENCODER = new TextEncoder();
 const textToReadableStream = (msg: string): ReadableStream => {
   return new ReadableStream({
     start: controller => {
-      controller.enqueue(msg);
+      controller.enqueue(ENCODER.encode(msg));
       controller.close();
     },
     cancel: controller => {
