@@ -136,6 +136,7 @@ function _getBodyNonDestructively(body: ReadableStream) {
   // some (older) platforms don't expose the pipeThrough method and in that scenario, we're out of luck;
   //   there's no way to read the stream without consuming it.
   if (!body.pipeThrough) {
+    DIAG_LOGGER.warn('Platform has ReadableStream but not pipeThrough!');
     return {
       body,
       length: Promise.resolve(undefined),
