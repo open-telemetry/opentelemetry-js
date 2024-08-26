@@ -221,10 +221,11 @@ describe('fetch', () => {
         if (typeof input === 'string') {
           const body = init.body;
           if (body instanceof ReadableStream) {
+            const decoder = new TextDecoder();
             requestBody = '';
             const read = async () => {
               for await (const c of body) {
-                requestBody += c;
+                requestBody += decoder.decode(c);
               }
             };
             read();
