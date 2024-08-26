@@ -117,6 +117,7 @@ describe('Node SDK', () => {
       // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
       // which sets up an exporter and affects the context manager
       env.OTEL_TRACES_EXPORTER = 'none';
+      env.OTEL_LOGS_EXPORTER = 'none';
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
