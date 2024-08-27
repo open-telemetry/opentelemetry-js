@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724672296094,
+  "lastUpdate": 1724745868658,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -14992,6 +14992,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.69%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jamieedanielson@gmail.com",
+            "name": "Jamie Danielson",
+            "username": "JamieDanielson"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "966ac176af249d86de6cb10feac2306062846768",
+          "message": "docs: Describe support for ESM (#4876)\n\nCo-authored-by: Trent Mick <trentm@gmail.com>",
+          "timestamp": "2024-08-27T08:01:52Z",
+          "tree_id": "abb5a85cfdc66f0c75dd5166d7ad6da173fc9784",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/966ac176af249d86de6cb10feac2306062846768"
+        },
+        "date": 1724745867766,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 961709,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11467,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 703519,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 674756,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
