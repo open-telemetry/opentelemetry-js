@@ -15,7 +15,7 @@
  */
 
 import { ExportResult, hrTimeToMicroseconds } from '@opentelemetry/core';
-import { ExportResultCode } from '@opentelemetry/core';
+import { internal, ExportResultCode } from '@opentelemetry/core';
 
 import type { ReadableLogRecord } from './ReadableLogRecord';
 import type { LogRecordExporter } from './LogRecordExporter';
@@ -25,7 +25,6 @@ import type { LogRecordExporter } from './LogRecordExporter';
  * console. This class can be used for diagnostic purposes.
  */
 
-/* eslint-disable no-console */
 export class ConsoleLogRecordExporter implements LogRecordExporter {
   /**
    * Export logs.
@@ -77,7 +76,7 @@ export class ConsoleLogRecordExporter implements LogRecordExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const logRecord of logRecords) {
-      console.dir(this._exportInfo(logRecord), { depth: 3 });
+      internal.Console.dir(this._exportInfo(logRecord), { depth: 3 });
     }
     done?.({ code: ExportResultCode.SUCCESS });
   }

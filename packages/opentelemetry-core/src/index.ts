@@ -116,7 +116,14 @@ export { isUrlIgnored, urlMatches } from './utils/url';
 export { isWrapped } from './utils/wrap';
 export { BindOnceFuture } from './utils/callback';
 export { VERSION } from './version';
+export {
+  ConsoleConfig,
+  ConsoleLogFunction,
+  ConsoleFunctionNames,
+} from './internal/console';
 import { _export } from './internal/exporter';
+import { Console } from './internal/console';
 export const internal = {
   _export,
+  Console,
 };
