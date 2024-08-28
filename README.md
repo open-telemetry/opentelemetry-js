@@ -41,6 +41,9 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Quick Start
 
+**Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
+
 The following describes how to set up tracing for a basic web application.
 For more detailed documentation, see the website at <https://opentelemetry.io/docs/instrumentation/js/>.
 
@@ -110,7 +113,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 ## Supported Runtimes
 
 | Platform Version    | Supported                                     |
-|---------------------|-----------------------------------------------|
+| ------------------- | --------------------------------------------- |
 | Node.JS `v22`       | :heavy_check_mark:                            |
 | Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
@@ -143,13 +146,13 @@ There may also be API packages for experimental signals in the experimental dire
 All stable packages are released with the same version, and all experimental packages are released with the same version.
 The below table describes which versions of each set of packages are expected to work together.
 
-| Stable Packages                                                 | Experimental Packages |
-|-----------------------------------------------------------------|-----------------------|
-| 1.21.x                                                          | 0.48.x                |
-| 1.20.x                                                          | 0.47.x                |
-| 1.19.x                                                          | 0.46.x                |
-| 1.18.x                                                          | 0.45.x                |
-| 1.17.x                                                          | 0.44.x                |
+| Stable Packages | Experimental Packages |
+| --------------- | --------------------- |
+| 1.21.x          | 0.48.x                |
+| 1.20.x          | 0.47.x                |
+| 1.19.x          | 0.46.x                |
+| 1.18.x          | 0.45.x                |
+| 1.17.x          | 0.44.x                |
 
 <details>
 <summary>Older version compatibility matrix</summary>
