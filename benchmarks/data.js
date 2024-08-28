@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724800096388,
+  "lastUpdate": 1724829221582,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -15094,6 +15094,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 652781,
             "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "bd25230eae8b77f8d6cd24fcdd39d1eb334d2eae",
+          "message": "docs: document console exporter output stability (#4956)\n\nCo-authored-by: Jackson Weber <47067795+JacksonWeber@users.noreply.github.com>",
+          "timestamp": "2024-08-28T07:11:10Z",
+          "tree_id": "c93999fce378689efa83805c98e472befe104ee2",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bd25230eae8b77f8d6cd24fcdd39d1eb334d2eae"
+        },
+        "date": 1724829220670,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 994985,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12151,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 680769,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662595,
+            "range": "±0.32%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
