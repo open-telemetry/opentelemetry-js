@@ -7,6 +7,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.53.0
+
+### :boom: Breaking Change
+
 * fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
 * feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
   * (user-facing) `headers` was intended for internal use has been removed from all exporters
@@ -32,8 +44,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
 * fix(api-logs): align AnyValue to spec [#4893](https://github.com/open-telemetry/opentelemetry-js/pull/4893) @blumamir
 * fix(instrumentation): remove diag.debug() message for instrumentations that do not patch modules [#4925](https://github.com/open-telemetry/opentelemetry-js/pull/4925) @trentm
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 

@@ -13,6 +13,16 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.26.0
+
+### :rocket: (Enhancement)
+
 * feat: include instrumentation scope info in console span and log record exporters [#4848](https://github.com/open-telemetry/opentelemetry-js/pull/4848) @blumamir
 * feat(semconv): update semantic conventions to 1.27 (from 1.7.0) [#4690](https://github.com/open-telemetry/opentelemetry-js/pull/4690) @dyladan
   * Exported names have changed to `ATTR_{name}` for attributes (e.g. `ATTR_HTTP_REQUEST_METHOD`), `{name}_VALUE_{value}` for enumeration values (e.g. `HTTP_REQUEST_METHOD_VALUE_POST`), and `METRIC_{name}` for metrics. Exported names from previous versions are deprecated.
@@ -25,8 +35,6 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * deps(opentelemetry-instrumentation): Bump `shimmer` types to 1.2.0 [#4865](https://github.com/open-telemetry/opentelemetry-js/pull/4865) @lforst
 * fix(instrumentation): Fix optional property types [#4833](https://github.com/open-telemetry/opentelemetry-js/pull/4833) @alecmev
 * fix(sdk-metrics): fix(sdk-metrics): use inclusive upper bounds in histogram [#4829](https://github.com/open-telemetry/opentelemetry-js/pull/4829)
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 

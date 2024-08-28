@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-events",
-  "version": "0.52.1",
+  "version": "0.53.0",
   "publishConfig": {
     "access": "public"
   },
@@ -97,8 +97,8 @@
     "webpack-merge": "5.10.0"
   },
   "dependencies": {
-    "@opentelemetry/api-events": "0.52.1",
-    "@opentelemetry/api-logs": "0.52.1",
-    "@opentelemetry/sdk-logs": "0.52.1"
+    "@opentelemetry/api-events": "0.53.0",
+    "@opentelemetry/api-logs": "0.53.0",
+    "@opentelemetry/sdk-logs": "0.53.0"
   }
 }
