@@ -98,7 +98,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "5.0.1",
     "gh-pages": "6.0.0",
-    "glob": "^10.4.5",
+    "glob": "^11.0.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.2.1",
