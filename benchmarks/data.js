@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724835892188,
+  "lastUpdate": 1724849334056,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -15252,6 +15252,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.25%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "41c0d88710500e01881c39a003439e715dde29df",
+          "message": "chore(deps): update dependency chromedriver to v128 (#4954)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-08-28T12:46:08Z",
+          "tree_id": "6bbfe8629b364b6abb78749cd2615403b968e2b6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/41c0d88710500e01881c39a003439e715dde29df"
+        },
+        "date": 1724849330612,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 963380,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12139,
+            "range": "±0.17%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 673089,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 665463,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
           }
         ]
       }
