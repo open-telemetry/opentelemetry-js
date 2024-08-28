@@ -362,7 +362,7 @@ describe('fetch', () => {
 
     it('span should have correct name', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-      assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+      assert.strictEqual(span.name, 'GET', 'span has wrong name');
     });
 
     it('span should have correct kind', () => {
@@ -932,7 +932,7 @@ describe('fetch', () => {
       );
       assert.strictEqual(
         exportSpy.args[0][0][0].name,
-        'HTTP GET',
+        'GET',
         'wrong span captured'
       );
 

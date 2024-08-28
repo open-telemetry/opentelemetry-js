@@ -206,7 +206,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       return;
     }
     const method = (options.method || 'GET').toUpperCase();
-    const spanName = `HTTP ${method}`;
+    const spanName = `${method}`;
     return this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {

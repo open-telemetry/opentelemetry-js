@@ -6,6 +6,7 @@ All notable changes to experimental packages in this project will be documented 
 ## Unreleased
 
 ### :boom: Breaking Change
+* fix(instrumentation-fetch)! Remove HTTP prefix in span name.
 
 ### :rocket: (Enhancement)
 
