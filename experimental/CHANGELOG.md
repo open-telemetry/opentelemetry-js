@@ -6,7 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 ## Unreleased
 
 ### :boom: Breaking Change
-* fix(instrumentation-fetch)! Remove HTTP prefix in span name.
+
+* fix(instrumentation-fetch)! Remove HTTP prefix in span name. [#4962](https://github.com/open-telemetry/opentelemetry-js/pull/4962) @wolfgangcodes
 
 ### :rocket: (Enhancement)
 
