@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "@opentelemetry/instrumentation": "0.53.0",
-    "@opentelemetry/semantic-conventions": "1.26.0"
+    "@opentelemetry/semantic-conventions": "1.27.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
   "sideEffects": false
