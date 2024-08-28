@@ -59,7 +59,7 @@
     "@types/request-promise-native": "1.0.21",
     "@types/semver": "7.5.8",
     "@types/sinon": "17.0.3",
-    "@types/superagent": "8.1.8",
+    "@types/superagent": "8.1.9",
     "axios": "1.6.0",
     "codecov": "3.8.3",
     "cross-var": "1.1.0",
