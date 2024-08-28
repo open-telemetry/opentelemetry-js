@@ -48,7 +48,7 @@
     "nightwatch": "3.0.1",
     "selenium-server": "3.141.59",
     "terser-webpack-plugin": "4.2.3",
-    "webpack": "5.89.0",
+    "webpack": "5.94.0",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "4.5.0",
     "webpack-merge": "5.10.0"
