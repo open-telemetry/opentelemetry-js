@@ -37,7 +37,7 @@
     "@opentelemetry/resources": "1.26.0",
     "@opentelemetry/sdk-trace-base": "1.26.0",
     "@opentelemetry/sdk-trace-node": "1.26.0",
-    "@opentelemetry/semantic-conventions": "1.26.0"
+    "@opentelemetry/semantic-conventions": "1.27.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http",
   "devDependencies": {

@@ -15,6 +15,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: (Internal)
 
+## 1.27.0
+
 ## 1.26.0
 
 Note: This package will now be versioned according to the version of semantic conventions being provided.
