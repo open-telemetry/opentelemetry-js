@@ -27,7 +27,6 @@
       "experimental/packages/otlp-exporter-base",
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-transformer",
-      "experimental/packages/propagator-aws-xray-lambda",
       "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-events",
       "experimental/packages/sdk-logs",
@@ -45,7 +44,6 @@
       "packages/opentelemetry-sdk-trace-node",
       "packages/opentelemetry-sdk-trace-web",
       "packages/opentelemetry-shim-opentracing",
-      "packages/propagator-aws-xray",
       "packages/sdk-metrics",
       "semantic-conventions"
     ],
@@ -130,9 +128,6 @@
       "path": "experimental/packages/otlp-transformer"
     },
     {
-      "path": "experimental/packages/propagator-aws-xray-lambda"
-    },
-    {
       "path": "experimental/packages/sampler-jaeger-remote"
     },
     {
@@ -182,9 +177,6 @@
     },
     {
       "path": "packages/opentelemetry-shim-opentracing"
-    },
-    {
-      "path": "packages/propagator-aws-xray"
     },
     {
       "path": "packages/sdk-metrics"
