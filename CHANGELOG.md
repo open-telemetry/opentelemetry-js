@@ -15,6 +15,10 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :bug: (Bug Fix)
 
+- fix(propagator-aws-xray-*): move propagators back to contrib repository [#4966](https://github.com/open-telemetry/opentelemetry-js/pull/4966) @pichlermarc
+  - `@opentelemetry/propagator-aws-xray` is now located in https://github.com/open-telemetry/opentelemetry-js-contrib
+  - `@opentelemetry/propagator-aws-xray-lambda` is now located in https://github.com/open-telemetry/opentelemetry-js-contrib
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
