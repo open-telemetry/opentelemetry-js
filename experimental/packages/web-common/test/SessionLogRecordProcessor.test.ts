@@ -73,13 +73,7 @@ describe('SessionLogRecordProcessor', () => {
         return null;
       },
     });
-
-    await processor
-      .forceFlush()
-      .then(() => assert.ok(true))
-      .catch(() =>
-        assert.fail('forceFlush threw an error when it should not have')
-      );
+    await processor.forceFlush();
   });
 
   it('shutdown is a no-op and does not throw error', async () => {
@@ -88,12 +82,6 @@ describe('SessionLogRecordProcessor', () => {
         return null;
       },
     });
-
-    await processor
-      .shutdown()
-      .then(() => assert.ok(true))
-      .catch(() =>
-        assert.fail('shutdown threw an error when it should not have')
-      );
+    await processor.shutdown();
   });
 });
