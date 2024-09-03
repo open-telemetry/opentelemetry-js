@@ -16,4 +16,4 @@
 
 export { SessionSpanProcessor } from './SessionSpanProcessor';
 export { SessionLogRecordProcessor } from './SessionLogRecordProcessor';
-export { SessionProvider as SessionIdProvider } from './types/SessionProvider';
+export { SessionProvider } from './types/SessionProvider';

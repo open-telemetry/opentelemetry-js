@@ -23,7 +23,7 @@ import {
 import { SessionProvider } from './types/SessionProvider';
 
 /**
- * BaggageSpanProcessor is a {@link SpanProcessor} that reads entries stored in {@link Baggage}
+ * SessionSpanProcessor is a {@link SpanProcessor} that adds the session.id attribute
  */
 export class SessionSpanProcessor implements SpanProcessor {
   private _sessionIdProvider: SessionProvider;
@@ -35,9 +35,7 @@ export class SessionSpanProcessor implements SpanProcessor {
   /**
    * Forces to export all finished spans
    */
-  forceFlush(): Promise<void> {
-    // no-op
-    return Promise.resolve();
+  async forceFlush(): Promise<void> {
   }
 
   /**
@@ -65,8 +63,6 @@ export class SessionSpanProcessor implements SpanProcessor {
    * Shuts down the processor. Called when SDK is shut down. This is an
    * opportunity for processor to do any cleanup required.
    */
-  shutdown(): Promise<void> {
-    // no-op
-    return Promise.resolve();
+  async shutdown(): Promise<void> {
   }
 }

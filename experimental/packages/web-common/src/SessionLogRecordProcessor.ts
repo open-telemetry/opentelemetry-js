@@ -19,7 +19,7 @@ import { LogRecord, LogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { SessionProvider } from './types/SessionProvider';
 
 /**
- * BaggageSpanProcessor is a {@link SpanProcessor} that reads entries stored in {@link Baggage}
+ * SessionLogRecordProcessor is a {@link SpanProcessor} adds the session.id attribute
  */
 export class SessionLogRecordProcessor implements LogRecordProcessor {
   private _sessionIdProvider: SessionProvider;
@@ -38,17 +38,13 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
   /**
    * Forces to export all finished spans
    */
-  forceFlush(): Promise<void> {
-    // no-op
-    return Promise.resolve();
+  async forceFlush(): Promise<void> {
   }
 
   /**
    * Shuts down the processor. Called when SDK is shut down. This is an
    * opportunity for processor to do any cleanup required.
    */
-  shutdown(): Promise<void> {
-    // no-op
-    return Promise.resolve();
+  async shutdown(): Promise<void> {
   }
 }
