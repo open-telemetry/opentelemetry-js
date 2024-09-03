@@ -38,13 +38,11 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
   /**
    * Forces to export all finished spans
    */
-  async forceFlush(): Promise<void> {
-  }
+  async forceFlush(): Promise<void> {}
 
   /**
    * Shuts down the processor. Called when SDK is shut down. This is an
    * opportunity for processor to do any cleanup required.
    */
-  async shutdown(): Promise<void> {
-  }
+  async shutdown(): Promise<void> {}
 }

@@ -35,8 +35,7 @@ export class SessionSpanProcessor implements SpanProcessor {
   /**
    * Forces to export all finished spans
    */
-  async forceFlush(): Promise<void> {
-  }
+  async forceFlush(): Promise<void> {}
 
   /**
    * Called when a {@link Span} is started, if the `span.isRecording()`
@@ -63,6 +62,5 @@ export class SessionSpanProcessor implements SpanProcessor {
    * Shuts down the processor. Called when SDK is shut down. This is an
    * opportunity for processor to do any cleanup required.
    */
-  async shutdown(): Promise<void> {
-  }
+  async shutdown(): Promise<void> {}
 }
