@@ -13,6 +13,10 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation): Add allowUrls config option to web instrumentation [#4938](https://github.com/open-telemetry/opentelemetry-js/pull/4938) @jairo-mendoza
+  * `XMLHttpRequestInstrumentation` and `FetchInstrumentation` now accept an `allowUrls` config option.
+  * `isUrlAllowed` function added to core. Both web instrumentation classes will depend on this function when using the new config option.
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
