@@ -20,6 +20,7 @@ import {
   Span,
   ReadableSpan,
 } from '@opentelemetry/sdk-trace-base';
+import { ATTR_SESSION_ID } from '@opentelemetry/semantic-conventions/incubating';
 import { SessionProvider } from './types/SessionProvider';
 
 /**
@@ -45,7 +46,7 @@ export class SessionSpanProcessor implements SpanProcessor {
   onStart(span: Span, _parentContext: Context): void {
     const sessionId = this._sessionIdProvider.getSessionId();
     if (sessionId) {
-      span.setAttribute('session.id', sessionId);
+      span.setAttribute(ATTR_SESSION_ID, sessionId);
     }
   }
 
