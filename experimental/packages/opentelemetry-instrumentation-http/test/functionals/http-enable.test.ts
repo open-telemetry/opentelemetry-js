@@ -173,7 +173,7 @@ describe('HttpInstrumentation', () => {
         memoryExporter.reset();
       });
 
-      before(() => {
+      before(async () => {
         const config: HttpInstrumentationConfig = {
           ignoreIncomingPaths: [
             (url: string) => {
@@ -201,7 +201,7 @@ describe('HttpInstrumentation', () => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
       });
 
       after(() => {
@@ -254,7 +254,7 @@ describe('HttpInstrumentation', () => {
         instrumentation.disable();
       });
 
-      it('allows to disable outgoing request instrumentation', () => {
+      it('allows to disable outgoing request instrumentation', async () => {
         server.close();
         instrumentation.disable();
 
@@ -266,14 +266,14 @@ describe('HttpInstrumentation', () => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
 
         assert.strictEqual(isWrapped(http.Server.prototype.emit), true);
         assert.strictEqual(isWrapped(http.get), false);
         assert.strictEqual(isWrapped(http.request), false);
       });
 
-      it('allows to disable incoming request instrumentation', () => {
+      it('allows to disable incoming request instrumentation', async () => {
         server.close();
         instrumentation.disable();
 
@@ -285,7 +285,7 @@ describe('HttpInstrumentation', () => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
 
         assert.strictEqual(isWrapped(http.Server.prototype.emit), false);
         assert.strictEqual(isWrapped(http.get), true);
@@ -298,7 +298,7 @@ describe('HttpInstrumentation', () => {
         memoryExporter.reset();
       });
 
-      before(() => {
+      before(async () => {
         instrumentation.setConfig({
           ignoreIncomingPaths: [
             '/ignored/string',
@@ -364,7 +364,7 @@ describe('HttpInstrumentation', () => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
       });
 
       after(() => {
@@ -1035,7 +1035,7 @@ describe('HttpInstrumentation', () => {
         memoryExporter.reset();
       });
 
-      before(() => {
+      before(async () => {
         instrumentation.setConfig({});
         instrumentation['_semconvStability'] = SemconvStability.STABLE;
         instrumentation.enable();
@@ -1071,7 +1071,7 @@ describe('HttpInstrumentation', () => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
       });
 
       after(() => {
@@ -1107,14 +1107,14 @@ describe('HttpInstrumentation', () => {
         instrumentation.setConfig({});
       });
 
-      before(() => {
+      before(async () => {
         instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
         instrumentation.enable();
         server = http.createServer((_, response) => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
       });
 
       after(() => {
@@ -1315,7 +1315,7 @@ describe('HttpInstrumentation', () => {
       memoryExporter.reset();
     });
 
-    before(() => {
+    before(async () => {
       instrumentation.setConfig({
         headersToSpanAttributes: {
           client: {
@@ -1335,7 +1335,7 @@ describe('HttpInstrumentation', () => {
         response.end('Test Server Response');
       });
 
-      server.listen(serverPort);
+      await new Promise<void>(resolve => server.listen(serverPort, resolve));
     });
 
     after(() => {
