@@ -23,6 +23,7 @@ import {
   Attributes,
 } from '@opentelemetry/api';
 import {
+  ATTR_CLIENT_ADDRESS,
   ATTR_ERROR_TYPE,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_REQUEST_METHOD_ORIGINAL,
@@ -33,6 +34,9 @@ import {
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
   ATTR_URL_FULL,
+  ATTR_URL_PATH,
+  ATTR_URL_SCHEME,
+  ATTR_USER_AGENT_ORIGINAL,
   NETTRANSPORTVALUES_IP_TCP,
   NETTRANSPORTVALUES_IP_UDP,
   SEMATTRS_HTTP_CLIENT_IP,
@@ -74,6 +78,7 @@ import {
   ParsedRequestOptions,
   SemconvStability,
 } from './types';
+import forwardedParse = require('forwarded-parse');
 
 /**
  * Get an absolute url
@@ -536,17 +541,132 @@ export const getOutgoingRequestMetricAttributesOnResponse = (
   return metricAttributes;
 };
 
+function parseHostHeader(
+  hostHeader: string,
+  proto?: string
+): { host: string; port?: string } {
+  const [host, port] = hostHeader.split(':');
+  if (host && port) {
+    return { host, port };
+  }
+
+  if (proto === 'http') {
+    return { host, port: '80' };
+  }
+
+  if (proto === 'https') {
+    return { host, port: '443' };
+  }
+
+  return { host };
+}
+
+/**
+ * Get server.address and port according to http semconv 1.27
+ * https://github.com/open-telemetry/semantic-conventions/blob/bf0a2c1134f206f034408b201dbec37960ed60ec/docs/http/http-spans.md#setting-serveraddress-and-serverport-attributes
+ */
+function getServerAddress(
+  request: IncomingMessage,
+  component: 'http' | 'https'
+): { host: string; port?: string } | null {
+  const forwardedHeader = request.headers['forwarded'];
+  if (forwardedHeader) {
+    for (const entry of forwardedParse(forwardedHeader)) {
+      if (entry.host) {
+        return parseHostHeader(entry.host, entry.proto);
+      }
+    }
+  }
+
+  const xForwardedHost = request.headers['x-forwarded-host'];
+  if (typeof xForwardedHost === 'string') {
+    if (typeof request.headers['x-forwarded-proto'] === 'string') {
+      return parseHostHeader(
+        xForwardedHost,
+        request.headers['x-forwarded-proto']
+      );
+    }
+
+    if (Array.isArray(request.headers['x-forwarded-proto'])) {
+      return parseHostHeader(
+        xForwardedHost,
+        request.headers['x-forwarded-proto'][0]
+      );
+    }
+
+    return parseHostHeader(xForwardedHost);
+  } else if (
+    Array.isArray(xForwardedHost) &&
+    typeof xForwardedHost[0] === 'string' &&
+    xForwardedHost[0].length > 0
+  ) {
+    if (typeof request.headers['x-forwarded-proto'] === 'string') {
+      return parseHostHeader(
+        xForwardedHost[0],
+        request.headers['x-forwarded-proto']
+      );
+    }
+
+    if (Array.isArray(request.headers['x-forwarded-proto'])) {
+      return parseHostHeader(
+        xForwardedHost[0],
+        request.headers['x-forwarded-proto'][0]
+      );
+    }
+
+    return parseHostHeader(xForwardedHost[0]);
+  }
+
+  const host = request.headers['host'];
+  if (typeof host === 'string' && host.length > 0) {
+    return parseHostHeader(host, component);
+  }
+
+  return null;
+}
+
+/**
+ * Get server.address and port according to http semconv 1.27
+ * https://github.com/open-telemetry/semantic-conventions/blob/bf0a2c1134f206f034408b201dbec37960ed60ec/docs/http/http-spans.md#setting-serveraddress-and-serverport-attributes
+ */
+function getRemoteClientAddress(request: IncomingMessage): string | null {
+  const forwardedHeader = request.headers['forwarded'];
+  if (forwardedHeader) {
+    for (const entry of forwardedParse(forwardedHeader)) {
+      if (entry.for) {
+        return entry.for;
+      }
+    }
+  }
+
+  const xForwardedFor = request.headers['x-forwarded-for'];
+  if (typeof xForwardedFor === 'string') {
+    return xForwardedFor;
+  } else if (Array.isArray(xForwardedFor)) {
+    return xForwardedFor[0];
+  }
+
+  const remote = request.socket.remoteAddress;
+  if (remote) {
+    return remote;
+  }
+
+  return null;
+}
+
 /**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
  * @param {{ component: string, serverName?: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
+ * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
   options: {
-    component: string;
+    component: 'http' | 'https';
     serverName?: string;
     hookAttributes?: SpanAttributes;
+    semconvStability: SemconvStability;
   }
 ): SpanAttributes => {
   const headers = request.headers;
@@ -560,8 +680,24 @@ export const getIncomingRequestAttributes = (
     requestUrl?.hostname ||
     host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
     'localhost';
+
+  const serverAddress = getServerAddress(request, options.component);
   const serverName = options.serverName;
-  const attributes: SpanAttributes = {
+
+  const newAttributes: Attributes = {
+    [ATTR_HTTP_REQUEST_METHOD]: request.method,
+    [ATTR_URL_PATH]: requestUrl?.pathname ?? undefined,
+    [ATTR_URL_SCHEME]: options.component,
+    [ATTR_SERVER_ADDRESS]: serverAddress?.host,
+    [ATTR_SERVER_PORT]: serverAddress?.port,
+    [ATTR_CLIENT_ADDRESS]: getRemoteClientAddress(request) ?? undefined,
+    [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
+    [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
+    [ATTR_NETWORK_PROTOCOL_VERSION]: request.httpVersion,
+    [ATTR_USER_AGENT_ORIGINAL]: userAgent,
+  };
+
+  const oldAttributes: Attributes = {
     [SEMATTRS_HTTP_URL]: getAbsoluteUrl(
       requestUrl,
       headers,
@@ -574,23 +710,31 @@ export const getIncomingRequestAttributes = (
   };
 
   if (typeof ips === 'string') {
-    attributes[SEMATTRS_HTTP_CLIENT_IP] = ips.split(',')[0];
+    oldAttributes[SEMATTRS_HTTP_CLIENT_IP] = ips.split(',')[0];
   }
 
   if (typeof serverName === 'string') {
-    attributes[SEMATTRS_HTTP_SERVER_NAME] = serverName;
+    oldAttributes[SEMATTRS_HTTP_SERVER_NAME] = serverName;
   }
 
   if (requestUrl) {
-    attributes[SEMATTRS_HTTP_TARGET] = requestUrl.path || '/';
+    oldAttributes[SEMATTRS_HTTP_TARGET] = requestUrl.path || '/';
   }
 
   if (userAgent !== undefined) {
-    attributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
+    oldAttributes[SEMATTRS_HTTP_USER_AGENT] = userAgent;
   }
-  setRequestContentLengthAttribute(request, attributes);
-  setAttributesFromHttpKind(httpVersion, attributes);
-  return Object.assign(attributes, options.hookAttributes);
+  setRequestContentLengthAttribute(request, oldAttributes);
+  setAttributesFromHttpKind(httpVersion, oldAttributes);
+
+  switch (options.semconvStability) {
+    case SemconvStability.STABLE:
+      return Object.assign(newAttributes, options.hookAttributes);
+    case SemconvStability.OLD:
+      return Object.assign(oldAttributes, options.hookAttributes);
+  }
+
+  return Object.assign(oldAttributes, newAttributes, options.hookAttributes);
 };
 
 /**
@@ -617,31 +761,44 @@ export const getIncomingRequestMetricAttributes = (
  */
 export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage,
-  response: ServerResponse
+  response: ServerResponse,
+  semconvStability: SemconvStability,
 ): SpanAttributes => {
   // take socket from the request,
   // since it may be detached from the response object in keep-alive mode
   const { socket } = request;
   const { statusCode, statusMessage } = response;
-
+  
+  const newAttributes = {
+    [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
+  }
+  
   const rpcMetadata = getRPCMetadata(context.active());
-  const attributes: SpanAttributes = {};
+  const oldAttributes: SpanAttributes = {};
   if (socket) {
     const { localAddress, localPort, remoteAddress, remotePort } = socket;
-    attributes[SEMATTRS_NET_HOST_IP] = localAddress;
-    attributes[SEMATTRS_NET_HOST_PORT] = localPort;
-    attributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
-    attributes[SEMATTRS_NET_PEER_PORT] = remotePort;
+    oldAttributes[SEMATTRS_NET_HOST_IP] = localAddress;
+    oldAttributes[SEMATTRS_NET_HOST_PORT] = localPort;
+    oldAttributes[SEMATTRS_NET_PEER_IP] = remoteAddress;
+    oldAttributes[SEMATTRS_NET_PEER_PORT] = remotePort;
   }
-  attributes[SEMATTRS_HTTP_STATUS_CODE] = statusCode;
-  attributes[AttributeNames.HTTP_STATUS_TEXT] = (
+  oldAttributes[SEMATTRS_HTTP_STATUS_CODE] = statusCode;
+  oldAttributes[AttributeNames.HTTP_STATUS_TEXT] = (
     statusMessage || ''
   ).toUpperCase();
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
-    attributes[SEMATTRS_HTTP_ROUTE] = rpcMetadata.route;
+    oldAttributes[SEMATTRS_HTTP_ROUTE] = rpcMetadata.route;
   }
-  return attributes;
+
+  switch (semconvStability) {
+    case SemconvStability.STABLE:
+      return newAttributes
+    case SemconvStability.OLD:
+      return oldAttributes
+  }
+
+  return Object.assign(oldAttributes, newAttributes);
 };
 
 /**
