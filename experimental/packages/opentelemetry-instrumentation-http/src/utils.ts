@@ -409,12 +409,10 @@ export const getOutgoingRequestAttributes = (
     [ATTR_SERVER_ADDRESS]: hostname,
     [ATTR_SERVER_PORT]: Number(port),
     [ATTR_URL_FULL]: urlFull,
-    // protocol name always http
-
-    // Recommended
+    // leaving out protocol version, it is not yet negotiated
+    // leaving out protocol name, it is only required when protocol version is set
     // retries and redirects not supported
-    // http protocol version not yet known
-
+    
     // Opt-in attributes left off for now
   };
 
