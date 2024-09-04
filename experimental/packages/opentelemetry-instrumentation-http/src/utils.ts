@@ -227,7 +227,7 @@ export const setRequestContentLengthAttribute = (
  * Adds attributes for response content-length and content-encoding HTTP headers
  * @param { IncomingMessage } Response object whose headers will be analyzed
  * @param { SpanAttributes } SpanAttributes object to be modified
- * 
+ *
  * @deprecated this is for an older version of semconv. It is retained for compatibility using OTEL_SEMCONV_STABILITY_OPT_IN
  */
 export const setResponseContentLengthAttribute = (
@@ -416,7 +416,7 @@ export const getOutgoingRequestAttributes = (
     // leaving out protocol version, it is not yet negotiated
     // leaving out protocol name, it is only required when protocol version is set
     // retries and redirects not supported
-    
+
     // Opt-in attributes left off for now
   };
 
