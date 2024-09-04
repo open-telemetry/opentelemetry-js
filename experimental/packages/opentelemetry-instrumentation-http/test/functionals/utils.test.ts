@@ -265,7 +265,6 @@ describe('Utility', () => {
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
         SpanKind.INTERNAL
       );
-      /* tslint:disable-next-line:no-any */
       utils.setSpanWithError(
         span,
         new Error(errorMessage),

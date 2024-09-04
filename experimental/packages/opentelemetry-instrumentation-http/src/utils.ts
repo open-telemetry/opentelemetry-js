@@ -179,6 +179,7 @@ export const isIgnored = (
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
+ * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const setSpanWithError = (
   span: Span,
@@ -226,6 +227,8 @@ export const setRequestContentLengthAttribute = (
  * Adds attributes for response content-length and content-encoding HTTP headers
  * @param { IncomingMessage } Response object whose headers will be analyzed
  * @param { SpanAttributes } SpanAttributes object to be modified
+ * 
+ * @deprecated this is for an older version of semconv. It is retained for compatibility using OTEL_SEMCONV_STABILITY_OPT_IN
  */
 export const setResponseContentLengthAttribute = (
   response: IncomingMessage,
@@ -373,6 +376,7 @@ export const extractHostnameAndPort = (
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
  * @param {{ component: string, hostname: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
+ * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
@@ -471,7 +475,7 @@ export const setAttributesFromHttpKind = (
 /**
  * Returns outgoing request attributes scoped to the response data
  * @param {IncomingMessage} response the response object
- * @param {{ hostname: string }} options used to pass data needed to create attributes
+ * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
