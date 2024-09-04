@@ -762,7 +762,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     const attributes = getIncomingRequestAttributesOnResponse(
       request,
       response,
-      this._semconvStability,
+      this._semconvStability
     );
     metricAttributes = Object.assign(
       metricAttributes,

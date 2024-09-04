@@ -762,17 +762,17 @@ export const getIncomingRequestMetricAttributes = (
 export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage,
   response: ServerResponse,
-  semconvStability: SemconvStability,
+  semconvStability: SemconvStability
 ): SpanAttributes => {
   // take socket from the request,
   // since it may be detached from the response object in keep-alive mode
   const { socket } = request;
   const { statusCode, statusMessage } = response;
-  
+
   const newAttributes = {
     [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
-  }
-  
+  };
+
   const rpcMetadata = getRPCMetadata(context.active());
   const oldAttributes: SpanAttributes = {};
   if (socket) {
@@ -793,9 +793,9 @@ export const getIncomingRequestAttributesOnResponse = (
 
   switch (semconvStability) {
     case SemconvStability.STABLE:
-      return newAttributes
+      return newAttributes;
     case SemconvStability.OLD:
-      return oldAttributes
+      return oldAttributes;
   }
 
   return Object.assign(oldAttributes, newAttributes);
