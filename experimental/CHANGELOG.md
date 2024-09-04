@@ -11,6 +11,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(sampler-jaeger-remote): fixes an issue where package could emit unhandled promise rejections @Just-Sieb
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

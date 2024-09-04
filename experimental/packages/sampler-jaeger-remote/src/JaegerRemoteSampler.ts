@@ -58,6 +58,8 @@ export class JaegerRemoteSampler implements Sampler {
       this._syncingConfig = true;
       try {
         await this.getAndUpdateSampler();
+      } catch (err) {
+        diag.warn('Could not update sampler', err);
       } finally {
         this._syncingConfig = false;
       }
