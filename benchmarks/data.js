@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1725877621542,
+  "lastUpdate": 1725919535334,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -15616,6 +15616,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.52%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "39923391+hectorhdzg@users.noreply.github.com",
+            "name": "Hector Hernandez",
+            "username": "hectorhdzg"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f7dc8ff5fa3efde2fd2d1a571ab47cce8f6f7381",
+          "message": "feat(api-logs): Add delegating no-op logger provider (#4861)",
+          "timestamp": "2024-09-09T21:57:11Z",
+          "tree_id": "8adf5567efefcfdc31f249f54e6f0d35b47f3bf6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f7dc8ff5fa3efde2fd2d1a571ab47cce8f6f7381"
+        },
+        "date": 1725919534488,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 954130,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11956,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 617125,
+            "range": "±0.56%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648062,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
