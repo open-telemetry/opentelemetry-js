@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1725974543980,
+  "lastUpdate": 1725976395140,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -15720,6 +15720,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.35%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f8ab5592ddea5cba0a3b33bf8d74f27872c0367f",
+          "message": "Update HTTP client span semconv to 1.27 (#4940)\n\nCo-authored-by: Marc Pichler <marcpi@edu.aau.at>\nCo-authored-by: Mend Renovate <bot@renovateapp.com>\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-09-10T13:44:26Z",
+          "tree_id": "e8b8dbe282985cdb5fe189511006caf9da83f2bc",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f8ab5592ddea5cba0a3b33bf8d74f27872c0367f"
+        },
+        "date": 1725976394310,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 976763,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11867,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 674469,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 663746,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "91 samples"
           }
         ]
       }
