@@ -19,8 +19,8 @@ import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SessionSpanProcessor } from '../src/SessionSpanProcessor';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 
-describe('SessionSpanProcessor', () => {
-  it('adds session.id attribute', () => {
+describe('SessionSpanProcessor', function () {
+  it('adds session.id attribute', function () {
     const expectedAttributes = {
       'session.id': '12345678',
     };
@@ -40,7 +40,7 @@ describe('SessionSpanProcessor', () => {
     assert.deepEqual((span as Span).attributes, expectedAttributes);
   });
 
-  it('does not add session.id attribute when there is no session', () => {
+  it('does not add session.id attribute when there is no session', function () {
     const tracer = new BasicTracerProvider().getTracer('session-testing');
     const span = tracer.startSpan('test-span');
 
@@ -56,7 +56,7 @@ describe('SessionSpanProcessor', () => {
     assert.deepEqual((span as Span).attributes, {});
   });
 
-  it('does not add session.id attribute when there is no provider', () => {
+  it('does not add session.id attribute when there is no provider', function () {
     const tracer = new BasicTracerProvider().getTracer('session-testing');
     const span = tracer.startSpan('test-span');
 
@@ -66,7 +66,7 @@ describe('SessionSpanProcessor', () => {
     assert.deepEqual((span as Span).attributes, {});
   });
 
-  it('forceFlush is a no-op and does not throw error', async () => {
+  it('forceFlush is a no-op and does not throw error', async function () {
     const processor = new SessionSpanProcessor({
       getSessionId: () => {
         return null;
@@ -75,7 +75,7 @@ describe('SessionSpanProcessor', () => {
     await processor.forceFlush();
   });
 
-  it('onEnd is a no-op and does not throw error', async () => {
+  it('onEnd is a no-op and does not throw error', async function () {
     const tracer = new BasicTracerProvider().getTracer('session-testing');
     const span = tracer.startSpan('test-span');
 
@@ -90,7 +90,7 @@ describe('SessionSpanProcessor', () => {
     }, 'onEnd threw an error when it should not have');
   });
 
-  it('shutdown is a no-op and does not throw error', async () => {
+  it('shutdown is a no-op and does not throw error', async function () {
     const processor = new SessionSpanProcessor({
       getSessionId: () => {
         return null;

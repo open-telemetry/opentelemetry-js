@@ -22,8 +22,8 @@ import {
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
 
-describe('SessionLogRecordProcessor', () => {
-  it('adds session.id attribute', () => {
+describe('SessionLogRecordProcessor', function () {
+  it('adds session.id attribute', function () {
     const expectedAttributes = {
       'session.id': '12345678',
     };
@@ -47,7 +47,7 @@ describe('SessionLogRecordProcessor', () => {
     assert.deepEqual(logRecord.attributes, expectedAttributes);
   });
 
-  it('does not add session.id attribute when there is no session', () => {
+  it('does not add session.id attribute when there is no session', function () {
     const sessionProvider = {
       getSessionId: () => {
         return null;
@@ -67,7 +67,7 @@ describe('SessionLogRecordProcessor', () => {
     assert.deepEqual(logRecord.attributes, {});
   });
 
-  it('does not add session.id attribute when there is no provider', () => {
+  it('does not add session.id attribute when there is no provider', function () {
     const exporter = new InMemoryLogRecordExporter();
     const processor = new SessionLogRecordProcessor(null as any);
     const provider = new LoggerProvider();
@@ -81,7 +81,7 @@ describe('SessionLogRecordProcessor', () => {
     assert.deepEqual(logRecord.attributes, {});
   });
 
-  it('forceFlush is a no-op and does not throw error', async () => {
+  it('forceFlush is a no-op and does not throw error', async function () {
     const processor = new SessionLogRecordProcessor({
       getSessionId: () => {
         return null;
@@ -90,7 +90,7 @@ describe('SessionLogRecordProcessor', () => {
     await processor.forceFlush();
   });
 
-  it('shutdown is a no-op and does not throw error', async () => {
+  it('shutdown is a no-op and does not throw error', async function () {
     const processor = new SessionLogRecordProcessor({
       getSessionId: () => {
         return null;
