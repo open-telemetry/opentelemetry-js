@@ -67,6 +67,20 @@ describe('SessionLogRecordProcessor', () => {
     assert.deepEqual(logRecord.attributes, {});
   });
 
+  it('does not add session.id attribute when there is no provider', () => {
+    const exporter = new InMemoryLogRecordExporter();
+    const processor = new SessionLogRecordProcessor(null as any);
+    const provider = new LoggerProvider();
+    provider.addLogRecordProcessor(processor);
+    provider.addLogRecordProcessor(new SimpleLogRecordProcessor(exporter));
+
+    const logger = provider.getLogger('session-testing');
+    logger.emit({ body: 'test-body' });
+
+    const logRecord = exporter.getFinishedLogRecords()[0];
+    assert.deepEqual(logRecord.attributes, {});
+  });
+
   it('forceFlush is a no-op and does not throw error', async () => {
     const processor = new SessionLogRecordProcessor({
       getSessionId: () => {

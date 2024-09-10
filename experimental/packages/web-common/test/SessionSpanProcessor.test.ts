@@ -56,6 +56,16 @@ describe('SessionSpanProcessor', () => {
     assert.deepEqual((span as Span).attributes, {});
   });
 
+  it('does not add session.id attribute when there is no provider', () => {
+    const tracer = new BasicTracerProvider().getTracer('session-testing');
+    const span = tracer.startSpan('test-span');
+
+    const processor = new SessionSpanProcessor(null as any);
+    processor.onStart(span as Span, ROOT_CONTEXT);
+
+    assert.deepEqual((span as Span).attributes, {});
+  });
+
   it('forceFlush is a no-op and does not throw error', async () => {
     const processor = new SessionSpanProcessor({
       getSessionId: () => {

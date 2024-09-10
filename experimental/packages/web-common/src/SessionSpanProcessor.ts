@@ -44,7 +44,7 @@ export class SessionSpanProcessor implements SpanProcessor {
    * @param span the Span that just started.
    */
   onStart(span: Span, _parentContext: Context): void {
-    const sessionId = this._sessionIdProvider.getSessionId();
+    const sessionId = this._sessionIdProvider?.getSessionId();
     if (sessionId) {
       span.setAttribute(ATTR_SESSION_ID, sessionId);
     }

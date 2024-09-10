@@ -30,7 +30,7 @@ export class SessionLogRecordProcessor implements LogRecordProcessor {
   }
 
   onEmit(logRecord: LogRecord, _context?: Context | undefined): void {
-    const sessionId = this._sessionIdProvider.getSessionId();
+    const sessionId = this._sessionIdProvider?.getSessionId();
     if (sessionId) {
       logRecord.setAttribute(ATTR_SESSION_ID, sessionId);
     }
