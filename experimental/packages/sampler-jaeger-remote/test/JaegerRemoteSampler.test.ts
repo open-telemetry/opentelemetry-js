@@ -80,12 +80,27 @@ describe('JaegerRemoteSampler', () => {
       );
       new JaegerRemoteSampler({
         endpoint,
+        poolingInterval,
+        serviceName,
+        initialSampler: alwaysOnSampler,
+      });
+      await clock.tickAsync(poolingInterval * 2);
+      sinon.assert.callCount(getAndUpdateSamplerStub, 1);
+    });
+
+    it('Doesnt throw unhandled promise rejection when failing to get remote config', async () => {
+      getAndUpdateSamplerStub.rejects();
+      const unhandledRejectionListener = sinon.fake();
+      process.once('unhandledRejection', unhandledRejectionListener);
+      new JaegerRemoteSampler({
+        endpoint,
         serviceName,
         poolingInterval,
         initialSampler: alwaysOnSampler,
       });
       await clock.tickAsync(poolingInterval * 2);
-      sinon.assert.callCount(getAndUpdateSamplerStub, 1);
+      sinon.assert.callCount(getAndUpdateSamplerStub, 2);
+      sinon.assert.callCount(unhandledRejectionListener, 0);
     });
   });
 

@@ -9,9 +9,14 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(api-logs): Add delegating no-op logger provider [#4861](https://github.com/open-telemetry/opentelemetry-js/pull/4861) @hectorhdzg
+* feat(instrumentation-http): Add support for client span semantic conventions 1.27 [#4940](https://github.com/open-telemetry/opentelemetry-js/pull/4940) @dyladan
 * feat(instrumentation): Add allowUrls config option to web instrumentation [#4938](https://github.com/open-telemetry/opentelemetry-js/pull/4938) @jairo-mendoza
 
 ### :bug: (Bug Fix)
+
+* fix(sampler-jaeger-remote): fixes an issue where package could emit unhandled promise rejections @Just-Sieb
+* fix(otlp-grpc-exporter-base): default compression to `'none'` if env vars `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` and `OTEL_EXPORTER_OTLP_COMPRESSION` are falsy @sjvans
 
 ### :books: (Refine Doc)
 
