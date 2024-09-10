@@ -14,6 +14,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(sampler-jaeger-remote): fixes an issue where package could emit unhandled promise rejections @Just-Sieb
+* fix(otlp-grpc-exporter-base): default compression to `'none'` if env vars `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` and `OTEL_EXPORTER_OTLP_COMPRESSION` are falsy @sjvans
 
 ### :books: (Refine Doc)
 
