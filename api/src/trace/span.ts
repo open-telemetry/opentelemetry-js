@@ -16,7 +16,7 @@
 
 import { Exception } from '../common/Exception';
 import { TimeInput } from '../common/Time';
-import { Attributes, AttributeValue } from '../common/Attributes';
+import { SpanAttributes, SpanAttributeValue } from './attributes';
 import { SpanContext } from './span_context';
 import { SpanStatus } from './status';
 import { Link } from './link';
@@ -29,6 +29,8 @@ import { Link } from './link';
  * may have children.
  *
  * Spans are created by the {@link Tracer.startSpan} method.
+ *
+ * @since 1.0.0
  */
 export interface Span {
   /**
@@ -51,7 +53,7 @@ export interface Span {
    * @param value the value for this attribute. Setting a value null or
    *              undefined is invalid and will result in undefined behavior.
    */
-  setAttribute(key: string, value: AttributeValue): this;
+  setAttribute(key: string, value: SpanAttributeValue): this;
 
   /**
    * Sets attributes to the span.
@@ -60,7 +62,7 @@ export interface Span {
    *                   null or undefined attribute values
    *                   are invalid and will result in undefined behavior.
    */
-  setAttributes(attributes: Attributes): this;
+  setAttributes(attributes: SpanAttributes): this;
 
   /**
    * Adds an event to the Span.
@@ -73,7 +75,7 @@ export interface Span {
    */
   addEvent(
     name: string,
-    attributesOrStartTime?: Attributes | TimeInput,
+    attributesOrStartTime?: SpanAttributes | TimeInput,
     startTime?: TimeInput
   ): this;
 

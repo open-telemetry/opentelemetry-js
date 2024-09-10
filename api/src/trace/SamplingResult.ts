@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-import { Attributes } from '../common/Attributes';
+import { SpanAttributes } from './attributes';
 import { TraceState } from './trace_state';
 
 /**
  * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
  * A sampling decision that determines how a {@link Span} will be recorded
  * and collected.
+ *
+ * @since 1.0.0
  */
 export enum SamplingDecision {
   /**
@@ -44,6 +46,8 @@ export enum SamplingDecision {
  * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
  * A sampling result contains a decision for a {@link Span} and additional
  * attributes the sampler would like to added to the Span.
+ *
+ * @since 1.0.0
  */
 export interface SamplingResult {
   /**
@@ -55,7 +59,7 @@ export interface SamplingResult {
    * Caller may call {@link Sampler}.shouldSample any number of times and
    * can safely cache the returned value.
    */
-  attributes?: Readonly<Attributes>;
+  attributes?: Readonly<SpanAttributes>;
   /**
    * A {@link TraceState} that will be associated with the {@link Span} through
    * the new {@link SpanContext}. Samplers SHOULD return the TraceState from

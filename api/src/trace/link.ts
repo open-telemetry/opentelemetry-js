@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '../common/Attributes';
+import { SpanAttributes } from './attributes';
 import { SpanContext } from './span_context';
 
 /**
@@ -31,12 +31,14 @@ import { SpanContext } from './span_context';
  *    However, it is desirable to associate incoming SpanContext to new trace
  *    initiated on service provider side so two traces (from Client and from
  *    Service Provider) can be correlated.
+ *
+ * @since 1.0.0
  */
 export interface Link {
   /** The {@link SpanContext} of a linked span. */
   context: SpanContext;
-  /** A set of {@link Attributes} on the link. */
-  attributes?: Attributes;
+  /** A set of {@link SpanAttributes} on the link. */
+  attributes?: SpanAttributes;
   /** Count of attributes of the link that were dropped due to collection limits */
   droppedAttributesCount?: number;
 }
