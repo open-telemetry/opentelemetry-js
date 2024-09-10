@@ -14,7 +14,7 @@
       "path": "../../api"
     },
     {
-      "path": "../opentelemetry-semantic-conventions"
+      "path": "../../semantic-conventions"
     }
   ]
 }

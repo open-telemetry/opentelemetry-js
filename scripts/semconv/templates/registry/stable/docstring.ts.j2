@@ -1,0 +1,21 @@
+{% macro strong_reqs(string) -%}{{ string | replace(" MUST ", " **MUST** ") | replace(" MUST NOT ", " **MUST NOT** ") | replace(" SHOULD ", " **SHOULD** ") | replace(" SHOULD NOT ", " **SHOULD NOT** ") |  replace(" MAY ", " **MAY** ") | replace(" NOT ", " **NOT** ") }}{% endmacro -%}
+
+{% macro docstring(obj, type="value") -%}/**
+{{ strong_reqs(obj.brief | comment_with_prefix(" * ")) }}
+{% if obj.examples is sequence %}{% for example in obj.examples %}
+ *
+ * @example {{ example }}
+{% endfor %}{%elif obj.examples%}
+ *
+ * @example {{ obj.examples | print_member_value }}
+{% endif %}{% if obj.note %}
+ *
+{{ ("@note " ~ strong_reqs(obj.note)) | comment_with_prefix(" * ") }}
+{% endif %}{% if (obj.stability) != "stable" %}
+ *
+ * @experimental This {{type}} is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+{% endif %}{% if obj.deprecated %}
+ *
+ * @deprecated {{ strong_reqs(obj.deprecated) | comment_with_prefix(" * ") }}
+{% endif %}
+ */{% endmacro -%}

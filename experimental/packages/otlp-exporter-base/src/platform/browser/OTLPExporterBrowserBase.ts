@@ -15,13 +15,15 @@
  */
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterConfigBase } from '../../types';
-import * as otlpTypes from '../../types';
+import { OTLPExporterConfigBase, OTLPExporterError } from '../../types';
 import { parseHeaders } from '../../util';
-import { sendWithBeacon, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
+import { IExporterTransport } from '../../exporter-transport';
+import { createXhrTransport } from './xhr-transport';
+import { createSendBeaconTransport } from './send-beacon-transport';
+import { createRetryingTransport } from '../../retrying-transport';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -30,10 +32,8 @@ export abstract class OTLPExporterBrowserBase<
   ExportItem,
   ServiceResponse,
 > extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem> {
-  protected _headers: Record<string, string>;
-  private _useXHR: boolean = false;
-  private _contentType: string;
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
+  private _transport: IExporterTransport;
 
   /**
    * @param config
@@ -47,19 +47,28 @@ export abstract class OTLPExporterBrowserBase<
   ) {
     super(config);
     this._serializer = serializer;
-    this._contentType = contentType;
-    this._useXHR =
+    const useXhr =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (this._useXHR) {
-      this._headers = Object.assign(
-        {},
-        parseHeaders(config.headers),
-        baggageUtils.parseKeyPairsIntoRecord(
-          getEnv().OTEL_EXPORTER_OTLP_HEADERS
-        )
-      );
+    if (useXhr) {
+      this._transport = createRetryingTransport({
+        transport: createXhrTransport({
+          headers: Object.assign(
+            {},
+            parseHeaders(config.headers),
+            baggageUtils.parseKeyPairsIntoRecord(
+              getEnv().OTEL_EXPORTER_OTLP_HEADERS
+            ),
+            { 'Content-Type': contentType }
+          ),
+          url: this.url,
+        }),
+      });
     } else {
-      this._headers = {};
+      // sendBeacon has no way to signal retry, so we do not wrap it in a RetryingTransport
+      this._transport = createSendBeaconTransport({
+        url: this.url,
+        blobType: contentType,
+      });
     }
   }
 
@@ -68,39 +77,35 @@ export abstract class OTLPExporterBrowserBase<
   onShutdown(): void {}
 
   send(
-    items: ExportItem[],
+    objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: otlpTypes.OTLPExporterError) => void
+    onError: (error: OTLPExporterError) => void
   ): void {
     if (this._shutdownOnce.isCalled) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
-    const body = this._serializer.serializeRequest(items) ?? new Uint8Array();
 
-    const promise = new Promise<void>((resolve, reject) => {
-      if (this._useXHR) {
-        sendWithXhr(
-          body,
-          this.url,
-          {
-            ...this._headers,
-            'Content-Type': this._contentType,
-          },
-          this.timeoutMillis,
-          resolve,
-          reject
-        );
-      } else {
-        sendWithBeacon(
-          body,
-          this.url,
-          { type: this._contentType },
-          resolve,
-          reject
-        );
-      }
-    }).then(onSuccess, onError);
+    const data = this._serializer.serializeRequest(objects);
+
+    if (data == null) {
+      onError(new Error('Could not serialize message'));
+      return;
+    }
+
+    const promise = this._transport
+      .send(data, this.timeoutMillis)
+      .then(response => {
+        if (response.status === 'success') {
+          onSuccess();
+        } else if (response.status === 'failure' && response.error) {
+          onError(response.error);
+        } else if (response.status === 'retryable') {
+          onError(new OTLPExporterError('Export failed with retryable status'));
+        } else {
+          onError(new OTLPExporterError('Export failed with unknown error'));
+        }
+      }, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {

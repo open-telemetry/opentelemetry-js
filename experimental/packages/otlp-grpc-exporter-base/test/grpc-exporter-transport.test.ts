@@ -57,13 +57,14 @@ const simpleClientConfig: GrpcExporterTransportParameters = {
     metadata.set('foo', 'bar');
     return metadata;
   },
-  timeoutMillis: 100,
   grpcPath: '/test/Export',
   grpcName: 'name',
   credentials: createInsecureCredentials,
   compression: 'none',
   address: 'localhost:1234',
 };
+
+const timeoutMillis = 100;
 
 interface ExportedData {
   request: Buffer;
@@ -185,7 +186,7 @@ describe('GrpcExporterTransport', function () {
     it('calls _client.close() if client is defined', async function () {
       const transport = new GrpcExporterTransport(simpleClientConfig);
       // send something so that client is defined
-      await transport.send(Buffer.from([1, 2, 3]));
+      await transport.send(Buffer.from([1, 2, 3]), timeoutMillis);
       assert.ok(transport['_client'], '_client is not defined after send()');
       const closeSpy = sinon.spy(transport['_client'], 'close');
 
@@ -223,7 +224,8 @@ describe('GrpcExporterTransport', function () {
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
-        Buffer.from([1, 2, 3])
+        Buffer.from([1, 2, 3]),
+        timeoutMillis
       )) as ExportResponseSuccess;
 
       assert.strictEqual(result.status, 'success');
@@ -250,7 +252,8 @@ describe('GrpcExporterTransport', function () {
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
-        Buffer.from([])
+        Buffer.from([]),
+        timeoutMillis
       )) as ExportResponseSuccess;
 
       assert.strictEqual(result.status, 'success');
@@ -267,7 +270,8 @@ describe('GrpcExporterTransport', function () {
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
-        Buffer.from([])
+        Buffer.from([]),
+        timeoutMillis
       )) as ExportResponseFailure;
 
       assert.strictEqual(result.status, 'failure');
@@ -281,7 +285,8 @@ describe('GrpcExporterTransport', function () {
       const transport = new GrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
-        Buffer.from([])
+        Buffer.from([]),
+        timeoutMillis
       )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.ok(types.isNativeError(result.error));
@@ -297,7 +302,8 @@ describe('GrpcExporterTransport', function () {
       const transport = new GrpcExporterTransport(config);
 
       const result = (await transport.send(
-        Buffer.from([])
+        Buffer.from([]),
+        timeoutMillis
       )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.strictEqual(result.error, expectedError);
@@ -313,7 +319,8 @@ describe('GrpcExporterTransport', function () {
       const transport = new GrpcExporterTransport(config);
 
       const result = (await transport.send(
-        Buffer.from([])
+        Buffer.from([]),
+        timeoutMillis
       )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.deepEqual(result.error, expectedError);
@@ -329,7 +336,8 @@ describe('GrpcExporterTransport', function () {
       const transport = new GrpcExporterTransport(config);
 
       const result = (await transport.send(
-        Buffer.from([])
+        Buffer.from([]),
+        timeoutMillis
       )) as ExportResponseFailure;
       assert.strictEqual(result.status, 'failure');
       assert.strictEqual(result.error, expectedError);

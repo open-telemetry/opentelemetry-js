@@ -191,9 +191,9 @@ describe('OTLPMetricExporter - web', () => {
 
         collectorExporter.export(metrics, () => {});
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const response: any = debugStub.args[2][0];
-          assert.strictEqual(response, 'sendBeacon - can send');
+          assert.strictEqual(response, 'SendBeacon success');
           assert.strictEqual(errorStub.args.length, 0);
 
           done();
@@ -204,9 +204,17 @@ describe('OTLPMetricExporter - web', () => {
         stubBeacon.returns(false);
 
         collectorExporter.export(metrics, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('cannot send'));
-          done();
+          try {
+            assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+            assert.ok(
+              result.error,
+              'Expected Error, but no Error was present on the result'
+            );
+            assert.match(result.error?.message, /SendBeacon failed/);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -232,7 +240,7 @@ describe('OTLPMetricExporter - web', () => {
       it('should successfully send the metrics using XMLHttpRequest', done => {
         collectorExporter.export(metrics, () => {});
 
-        setTimeout(() => {
+        queueMicrotask(async () => {
           const request = server.requests[0];
           assert.strictEqual(request.method, 'POST');
           assert.strictEqual(request.url, 'http://foo.bar.com');
@@ -240,7 +248,7 @@ describe('OTLPMetricExporter - web', () => {
           const body = request.requestBody;
           const decoder = new TextDecoder();
           const json = JSON.parse(
-            decoder.decode(body)
+            decoder.decode(await body.arrayBuffer())
           ) as IExportMetricsServiceRequest;
           // The order of the metrics is not guaranteed.
           const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
@@ -310,12 +318,12 @@ describe('OTLPMetricExporter - web', () => {
       it('should log the successful message', done => {
         collectorExporter.export(metrics, () => {});
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(200);
 
           const response: any = debugStub.args[2][0];
-          assert.strictEqual(response, 'xhr success');
+          assert.strictEqual(response, 'XHR success');
           assert.strictEqual(errorStub.args.length, 0);
 
           assert.strictEqual(stubBeacon.callCount, 0);
@@ -325,13 +333,19 @@ describe('OTLPMetricExporter - web', () => {
 
       it('should log the error message', done => {
         collectorExporter.export(metrics, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('Failed to export'));
-          assert.strictEqual(stubBeacon.callCount, 0);
+          try {
+            assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+            assert.deepStrictEqual(
+              result.error?.message,
+              'XHR request failed with non-retryable status'
+            );
+          } catch (e) {
+            done(e);
+          }
           done();
         });
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(400);
         });
@@ -339,7 +353,7 @@ describe('OTLPMetricExporter - web', () => {
       it('should send custom headers', done => {
         collectorExporter.export(metrics, () => {});
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(200);
 
@@ -411,114 +425,5 @@ describe('OTLPMetricExporter - web', () => {
         });
       });
     });
-  });
-});
-
-describe('when configuring via environment', () => {
-  const envSource = window as any;
-  it('should use url defined in env that ends with root path and append version and signal path', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/metrics`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use url defined in env without checking if path is already present', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use url defined in env and append version and signal', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics/';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-  });
-  it('should add root path when signal url defined in env contains no path and no root path', () => {
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}/`
-    );
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains root path but no path', () => {
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains path', () => {
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains path and ends in /', () => {
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
-      'http://foo.bar/v1/metrics/';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter._otlpExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-  });
-  it('should use headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-    const collectorExporter = new OTLPMetricExporter({
-      headers: {},
-      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
-    });
-    assert.strictEqual(
-      collectorExporter['_otlpExporter']['_headers'].foo,
-      'bar'
-    );
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-  it('should override global headers config with signal headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-    const collectorExporter = new OTLPMetricExporter({
-      headers: {},
-      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
-    });
-    assert.strictEqual(
-      collectorExporter['_otlpExporter']['_headers'].foo,
-      'boo'
-    );
-    assert.strictEqual(
-      collectorExporter['_otlpExporter']['_headers'].bar,
-      'foo'
-    );
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });

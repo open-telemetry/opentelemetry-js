@@ -13,4 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './SemanticResourceAttributes';
+
+// Incubating export also contains stable constants in order to maintain
+// backward compatibility between minor version releases
+export * from './stable_attributes';
+export * from './stable_metrics';
+export * from './experimental_attributes';
+export * from './experimental_metrics';

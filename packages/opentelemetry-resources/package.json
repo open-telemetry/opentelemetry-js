@@ -82,7 +82,7 @@
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
-    "mocha": "10.2.0",
+    "mocha": "10.7.3",
     "nock": "13.3.8",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
