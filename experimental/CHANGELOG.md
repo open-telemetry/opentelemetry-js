@@ -10,6 +10,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(api-logs): Add delegating no-op logger provider [#4861](https://github.com/open-telemetry/opentelemetry-js/pull/4861) @hectorhdzg
+* feat(instrumentation-http): Add support for client span semantic conventions 1.27 [#4940](https://github.com/open-telemetry/opentelemetry-js/pull/4940) @dyladan
 
 ### :bug: (Bug Fix)
 
