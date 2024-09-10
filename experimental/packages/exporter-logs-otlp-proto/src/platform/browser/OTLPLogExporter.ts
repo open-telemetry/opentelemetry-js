@@ -25,9 +25,6 @@ import {
 
 import { ReadableLogRecord, LogRecordExporter } from '@opentelemetry/sdk-logs';
 
-const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/logs';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
-
 /**
  * Collector Trace Exporter for Web
  */
@@ -36,14 +33,11 @@ export class OTLPLogExporter
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config, ProtobufLogsSerializer, 'application/x-protobuf');
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return DEFAULT_COLLECTOR_URL;
+    super(
+      config,
+      ProtobufLogsSerializer,
+      { 'Content-Type': 'application/x-protobuf' },
+      'v1/logs'
+    );
   }
 }
