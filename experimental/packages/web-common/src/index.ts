@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-export { SessionSpanProcessor } from './SessionSpanProcessor';
-export { SessionLogRecordProcessor } from './SessionLogRecordProcessor';
 export { SessionProvider } from './types/SessionProvider';
+export {
+  createSessionSpanProcessor,
+  createSessionLogRecordProcessor,
+} from './utils';
