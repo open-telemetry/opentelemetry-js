@@ -1167,7 +1167,6 @@ describe('HttpInstrumentation', () => {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 2);
         const outgoingSpan = spans[1];
-        console.log(response.data);
 
         // should have only required and recommended attributes for semconv 1.27
         assert.deepStrictEqual(outgoingSpan.attributes, {
