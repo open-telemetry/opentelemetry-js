@@ -86,6 +86,7 @@ instrumentation.disable();
 
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
+import { getRemoteClientAddress } from '../../src/utils';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -1074,7 +1075,10 @@ describe('HttpInstrumentation', () => {
             assert.strictEqual(rpcData.route, undefined);
             rpcData.route = 'TheRoute';
           }
-          response.end('Test Server Response');
+          response.setHeader('Content-Type', 'application/json');
+          response.end(
+            JSON.stringify({ address: getRemoteClientAddress(request) })
+          );
         });
 
         await new Promise<void>(resolve => server.listen(serverPort, resolve));
@@ -1114,14 +1118,16 @@ describe('HttpInstrumentation', () => {
         const [incomingSpan, _] = spans;
         assert.strictEqual(spans.length, 2);
 
+        const body = JSON.parse(response.data);
+
         // should have only required and recommended attributes for semconv 1.27
         assert.deepStrictEqual(incomingSpan.attributes, {
-          [ATTR_CLIENT_ADDRESS]: response.address,
+          [ATTR_CLIENT_ADDRESS]: body.address,
           [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
           [ATTR_SERVER_ADDRESS]: hostname,
           [ATTR_SERVER_PORT]: serverPort,
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_PEER_ADDRESS]: response.address,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
           [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
           [ATTR_URL_PATH]: pathname,
@@ -1139,8 +1145,11 @@ describe('HttpInstrumentation', () => {
       before(async () => {
         instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
         instrumentation.enable();
-        server = http.createServer((_, response) => {
-          response.end('Test Server Response');
+        server = http.createServer((request, response) => {
+          response.setHeader('Content-Type', 'application/json');
+          response.end(
+            JSON.stringify({ address: getRemoteClientAddress(request) })
+          );
         });
 
         await new Promise<void>(resolve => server.listen(serverPort, resolve));
@@ -1158,6 +1167,7 @@ describe('HttpInstrumentation', () => {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 2);
         const outgoingSpan = spans[1];
+        console.log(response.data);
 
         // should have only required and recommended attributes for semconv 1.27
         assert.deepStrictEqual(outgoingSpan.attributes, {
@@ -1175,7 +1185,8 @@ describe('HttpInstrumentation', () => {
           [SEMATTRS_HTTP_FLAVOR]: '1.1',
           [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
           [SEMATTRS_HTTP_METHOD]: 'GET',
-          [SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED]: 20,
+          [SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED]:
+            response.data.length,
           [SEMATTRS_HTTP_STATUS_CODE]: 200,
           [SEMATTRS_HTTP_TARGET]: '/test',
           [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
@@ -1196,16 +1207,17 @@ describe('HttpInstrumentation', () => {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 2);
         const incomingSpan = spans[0];
+        const body = JSON.parse(response.data);
 
         // should have only required and recommended attributes for semconv 1.27
         assert.deepStrictEqual(incomingSpan.attributes, {
           // 1.27 attributes
-          [ATTR_CLIENT_ADDRESS]: response.clientRemoteAddress,
+          [ATTR_CLIENT_ADDRESS]: body.address,
           [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
           [ATTR_SERVER_ADDRESS]: hostname,
           [ATTR_SERVER_PORT]: serverPort,
           [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
-          [ATTR_NETWORK_PEER_ADDRESS]: response.address,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
           [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
           [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
           [ATTR_URL_PATH]: pathname,
@@ -1220,10 +1232,10 @@ describe('HttpInstrumentation', () => {
           [SEMATTRS_HTTP_TARGET]: '/test',
           [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
           [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
-          [SEMATTRS_NET_HOST_IP]: response.address,
+          [SEMATTRS_NET_HOST_IP]: body.address,
           [SEMATTRS_NET_HOST_NAME]: hostname,
           [SEMATTRS_NET_HOST_PORT]: serverPort,
-          [SEMATTRS_NET_PEER_IP]: response.clientRemoteAddress,
+          [SEMATTRS_NET_PEER_IP]: body.address,
           [SEMATTRS_NET_PEER_PORT]: response.clientRemotePort,
 
           // unspecified old names

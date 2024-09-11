@@ -629,7 +629,9 @@ function getServerAddress(
  * Get server.address and port according to http semconv 1.27
  * https://github.com/open-telemetry/semantic-conventions/blob/bf0a2c1134f206f034408b201dbec37960ed60ec/docs/http/http-spans.md#setting-serveraddress-and-serverport-attributes
  */
-function getRemoteClientAddress(request: IncomingMessage): string | null {
+export function getRemoteClientAddress(
+  request: IncomingMessage
+): string | null {
   const forwardedHeader = request.headers['forwarded'];
   if (forwardedHeader) {
     for (const entry of forwardedParse(forwardedHeader)) {
