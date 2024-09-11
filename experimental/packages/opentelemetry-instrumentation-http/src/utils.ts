@@ -689,7 +689,9 @@ export const getIncomingRequestAttributes = (
     [ATTR_URL_PATH]: requestUrl?.pathname ?? undefined,
     [ATTR_URL_SCHEME]: options.component,
     [ATTR_SERVER_ADDRESS]: serverAddress?.host,
-    [ATTR_SERVER_PORT]: serverAddress?.port ? Number(serverAddress.port) : undefined,
+    [ATTR_SERVER_PORT]: serverAddress?.port
+      ? Number(serverAddress.port)
+      : undefined,
     [ATTR_CLIENT_ADDRESS]: getRemoteClientAddress(request) ?? undefined,
     [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
     [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
