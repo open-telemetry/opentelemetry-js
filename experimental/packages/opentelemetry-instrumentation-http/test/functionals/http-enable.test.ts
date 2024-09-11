@@ -1116,7 +1116,7 @@ describe('HttpInstrumentation', () => {
 
         // should have only required and recommended attributes for semconv 1.27
         assert.deepStrictEqual(incomingSpan.attributes, {
-          [ATTR_CLIENT_ADDRESS]: response.clientRemoteAddress,
+          [ATTR_CLIENT_ADDRESS]: response.address,
           [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
           [ATTR_SERVER_ADDRESS]: hostname,
           [ATTR_SERVER_PORT]: serverPort,
