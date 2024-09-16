@@ -47,17 +47,39 @@ import {
   HttpInstrumentationConfig,
   HttpRequestArgs,
   Https,
+  SemconvStability,
 } from './types';
-import * as utils from './utils';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
+import {
+  RPCMetadata,
+  RPCType,
+  setRPCMetadata,
+  getEnv,
+} from '@opentelemetry/core';
 import { errorMonitor } from 'events';
 import { SEMATTRS_HTTP_ROUTE } from '@opentelemetry/semantic-conventions';
+import {
+  extractHostnameAndPort,
+  getIncomingRequestAttributes,
+  getIncomingRequestAttributesOnResponse,
+  getIncomingRequestMetricAttributes,
+  getIncomingRequestMetricAttributesOnResponse,
+  getOutgoingRequestAttributes,
+  getOutgoingRequestAttributesOnResponse,
+  getOutgoingRequestMetricAttributes,
+  getOutgoingRequestMetricAttributesOnResponse,
+  getRequestInfo,
+  headerCapture,
+  isIgnored,
+  isValidOptionsType,
+  parseResponseStatus,
+  setSpanWithError,
+} from './utils';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
@@ -69,9 +91,21 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   private _httpServerDurationHistogram!: Histogram;
   private _httpClientDurationHistogram!: Histogram;
 
+  private _semconvStability = SemconvStability.OLD;
+
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
+
+    for (const entry in getEnv().OTEL_SEMCONV_STABILITY_OPT_IN) {
+      if (entry.toLowerCase() === 'http/dup') {
+        // http/dup takes highest precedence. If it is found, there is no need to read the rest of the list
+        this._semconvStability = SemconvStability.DUPLICATE;
+        break;
+      } else if (entry.toLowerCase() === 'http') {
+        this._semconvStability = SemconvStability.STABLE;
+      }
+    }
   }
 
   protected override _updateMetricInstruments() {
@@ -320,12 +354,14 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         if (request.listenerCount('response') <= 1) {
           response.resume();
         }
-        const responseAttributes =
-          utils.getOutgoingRequestAttributesOnResponse(response);
+        const responseAttributes = getOutgoingRequestAttributesOnResponse(
+          response,
+          this._semconvStability
+        );
         span.setAttributes(responseAttributes);
         metricAttributes = Object.assign(
           metricAttributes,
-          utils.getOutgoingRequestMetricAttributesOnResponse(responseAttributes)
+          getOutgoingRequestMetricAttributesOnResponse(responseAttributes)
         );
 
         if (this.getConfig().responseHook) {
@@ -353,11 +389,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           if (response.aborted && !response.complete) {
             status = { code: SpanStatusCode.ERROR };
           } else {
+            // behaves same for new and old semconv
             status = {
-              code: utils.parseResponseStatus(
-                SpanKind.CLIENT,
-                response.statusCode
-              ),
+              code: parseResponseStatus(SpanKind.CLIENT, response.statusCode),
             };
           }
 
@@ -395,7 +429,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             return;
           }
           responseFinished = true;
-          utils.setSpanWithError(span, error);
+          setSpanWithError(span, error, this._semconvStability);
           span.setStatus({
             code: SpanStatusCode.ERROR,
             message: error.message,
@@ -423,7 +457,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return;
       }
       responseFinished = true;
-      utils.setSpanWithError(span, error);
+      setSpanWithError(span, error, this._semconvStability);
       this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
 
@@ -458,7 +492,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       );
 
       if (
-        utils.isIgnored(
+        isIgnored(
           pathname,
           instrumentation.getConfig().ignoreIncomingPaths,
           (e: unknown) =>
@@ -487,7 +521,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const headers = request.headers;
 
-      const spanAttributes = utils.getIncomingRequestAttributes(request, {
+      const spanAttributes = getIncomingRequestAttributes(request, {
         component: component,
         serverName: instrumentation.getConfig().serverName,
         hookAttributes: instrumentation._callStartSpanHook(
@@ -503,7 +537,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const startTime = hrTime();
       const metricAttributes =
-        utils.getIncomingRequestMetricAttributes(spanAttributes);
+        getIncomingRequestMetricAttributes(spanAttributes);
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(method, spanOptions, ctx);
@@ -558,7 +592,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
             () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
-                utils.setSpanWithError(span, error);
+                setSpanWithError(
+                  span,
+                  error,
+                  instrumentation._semconvStability
+                );
                 instrumentation._closeHttpSpan(
                   span,
                   SpanKind.SERVER,
@@ -584,7 +622,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       options: url.URL | http.RequestOptions | string,
       ...args: unknown[]
     ): http.ClientRequest {
-      if (!utils.isValidOptionsType(options)) {
+      if (!isValidOptionsType(options)) {
         return original.apply(this, [options, ...args]);
       }
       const extraOptions =
@@ -592,7 +630,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as http.RequestOptions)
           : undefined;
-      const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
+      const { origin, pathname, method, optionsParsed } = getRequestInfo(
         options,
         extraOptions
       );
@@ -610,7 +648,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
 
       if (
-        utils.isIgnored(
+        isIgnored(
           origin + pathname,
           instrumentation.getConfig().ignoreOutgoingUrls,
           (e: unknown) =>
@@ -635,21 +673,25 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         return original.apply(this, [optionsParsed, ...args]);
       }
 
-      const { hostname, port } = utils.extractHostnameAndPort(optionsParsed);
+      const { hostname, port } = extractHostnameAndPort(optionsParsed);
 
-      const attributes = utils.getOutgoingRequestAttributes(optionsParsed, {
-        component,
-        port,
-        hostname,
-        hookAttributes: instrumentation._callStartSpanHook(
-          optionsParsed,
-          instrumentation.getConfig().startOutgoingSpanHook
-        ),
-      });
+      const attributes = getOutgoingRequestAttributes(
+        optionsParsed,
+        {
+          component,
+          port,
+          hostname,
+          hookAttributes: instrumentation._callStartSpanHook(
+            optionsParsed,
+            instrumentation.getConfig().startOutgoingSpanHook
+          ),
+        },
+        instrumentation._semconvStability
+      );
 
       const startTime = hrTime();
       const metricAttributes: MetricAttributes =
-        utils.getOutgoingRequestMetricAttributes(attributes);
+        getOutgoingRequestMetricAttributes(attributes);
 
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
@@ -683,7 +725,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           () => original.apply(this, [optionsParsed, ...args]),
           error => {
             if (error) {
-              utils.setSpanWithError(span, error);
+              setSpanWithError(span, error, instrumentation._semconvStability);
               instrumentation._closeHttpSpan(
                 span,
                 SpanKind.CLIENT,
@@ -716,13 +758,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     metricAttributes: MetricAttributes,
     startTime: HrTime
   ) {
-    const attributes = utils.getIncomingRequestAttributesOnResponse(
+    const attributes = getIncomingRequestAttributesOnResponse(
       request,
       response
     );
     metricAttributes = Object.assign(
       metricAttributes,
-      utils.getIncomingRequestMetricAttributesOnResponse(attributes)
+      getIncomingRequestMetricAttributesOnResponse(attributes)
     );
 
     this._headerCapture.server.captureResponseHeaders(span, header =>
@@ -730,7 +772,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     );
 
     span.setAttributes(attributes).setStatus({
-      code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode),
+      code: parseResponseStatus(SpanKind.SERVER, response.statusCode),
     });
 
     const route = attributes[SEMATTRS_HTTP_ROUTE];
@@ -760,7 +802,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     startTime: HrTime,
     error: Err
   ) {
-    utils.setSpanWithError(span, error);
+    setSpanWithError(span, error, this._semconvStability);
     this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }
 
@@ -854,21 +896,21 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
     return {
       client: {
-        captureRequestHeaders: utils.headerCapture(
+        captureRequestHeaders: headerCapture(
           'request',
           config.headersToSpanAttributes?.client?.requestHeaders ?? []
         ),
-        captureResponseHeaders: utils.headerCapture(
+        captureResponseHeaders: headerCapture(
           'response',
           config.headersToSpanAttributes?.client?.responseHeaders ?? []
         ),
       },
       server: {
-        captureRequestHeaders: utils.headerCapture(
+        captureRequestHeaders: headerCapture(
           'request',
           config.headersToSpanAttributes?.server?.requestHeaders ?? []
         ),
-        captureResponseHeaders: utils.headerCapture(
+        captureResponseHeaders: headerCapture(
           'response',
           config.headersToSpanAttributes?.server?.responseHeaders ?? []
         ),

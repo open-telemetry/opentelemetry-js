@@ -16,7 +16,7 @@ jobs:
           - "16"
           - "18"
           - "20"
-          - "22.6" # temp until 22.8 is released (bug in 22.7)
+          - "22"
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
