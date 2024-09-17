@@ -688,20 +688,29 @@ export const getIncomingRequestAttributes = (
   const serverAddress = getServerAddress(request, options.component);
   const serverName = options.serverName;
 
+  const remoteClientAddress = getRemoteClientAddress(request);
+
   const newAttributes: Attributes = {
     [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
-    [ATTR_URL_PATH]: requestUrl?.pathname ?? undefined,
     [ATTR_URL_SCHEME]: options.component,
     [ATTR_SERVER_ADDRESS]: serverAddress?.host,
-    [ATTR_SERVER_PORT]: serverAddress?.port
-      ? Number(serverAddress.port)
-      : undefined,
-    [ATTR_CLIENT_ADDRESS]: getRemoteClientAddress(request) ?? undefined,
     [ATTR_NETWORK_PEER_ADDRESS]: request.socket.remoteAddress,
     [ATTR_NETWORK_PEER_PORT]: request.socket.remotePort,
     [ATTR_NETWORK_PROTOCOL_VERSION]: request.httpVersion,
     [ATTR_USER_AGENT_ORIGINAL]: userAgent,
   };
+
+  if (requestUrl?.pathname != null) {
+    newAttributes[ATTR_URL_PATH] = requestUrl.pathname;
+  }
+
+  if (remoteClientAddress != null) {
+    newAttributes[ATTR_CLIENT_ADDRESS] = remoteClientAddress;
+  }
+
+  if (serverAddress?.port != null) {
+    newAttributes[ATTR_SERVER_PORT] = Number(serverAddress.port);
+  }
 
   // conditionally required if request method required case normalization
   if (method != normalizedMethod) {
