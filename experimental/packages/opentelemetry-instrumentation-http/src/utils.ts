@@ -545,20 +545,55 @@ function parseHostHeader(
   hostHeader: string,
   proto?: string
 ): { host: string; port?: string } {
-  const [host, port] = hostHeader.split(':');
-  if (host && port) {
-    return { host, port };
+  const parts = hostHeader.split(':');
+
+  // no semicolon implies ipv4 dotted syntax or host name without port
+  // x.x.x.x
+  // example.com
+  if (parts.length === 1) {
+    if (proto === 'http') {
+      return { host: parts[0], port: '80' };
+    }
+  
+    if (proto === 'https') {
+      return { host: parts[0], port: '443' }
+    }
+
+    return { host: parts[0] }
   }
 
-  if (proto === 'http') {
-    return { host, port: '80' };
+  // single semicolon implies ipv4 dotted syntax or host name with port
+  // x.x.x.x:yyyy
+  // example.com:yyyy
+  if (parts.length === 2) {
+    return {
+      host: parts[0],
+      port: parts[1],
+    }
   }
 
-  if (proto === 'https') {
-    return { host, port: '443' };
+  // more than 2 parts implies ipv6 syntax with multiple colons
+  // [x:x:x:x:x:x:x:x]
+  // [x:x:x:x:x:x:x:x]:yyyy
+  if (parts[0].startsWith("[")) {
+    if (parts[parts.length - 1].endsWith("]")) {
+      if (proto === 'http') {
+        return { host: hostHeader, port: '80' };
+      }
+    
+      if (proto === 'https') {
+        return { host: hostHeader, port: '443' }
+      }
+    } else if (parts[parts.length - 2].endsWith("]")) {
+      return {
+        host: parts.slice(0, -1).join(":"),
+        port: parts[parts.length - 1]
+      }
+    }
   }
 
-  return { host };
+  // if nothing above matches just return the host header
+  return { host: hostHeader }
 }
 
 /**
