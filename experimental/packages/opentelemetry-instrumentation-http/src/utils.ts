@@ -554,12 +554,12 @@ function parseHostHeader(
     if (proto === 'http') {
       return { host: parts[0], port: '80' };
     }
-  
+
     if (proto === 'https') {
-      return { host: parts[0], port: '443' }
+      return { host: parts[0], port: '443' };
     }
 
-    return { host: parts[0] }
+    return { host: parts[0] };
   }
 
   // single semicolon implies ipv4 dotted syntax or host name with port
@@ -569,31 +569,31 @@ function parseHostHeader(
     return {
       host: parts[0],
       port: parts[1],
-    }
+    };
   }
 
   // more than 2 parts implies ipv6 syntax with multiple colons
   // [x:x:x:x:x:x:x:x]
   // [x:x:x:x:x:x:x:x]:yyyy
-  if (parts[0].startsWith("[")) {
-    if (parts[parts.length - 1].endsWith("]")) {
+  if (parts[0].startsWith('[')) {
+    if (parts[parts.length - 1].endsWith(']')) {
       if (proto === 'http') {
         return { host: hostHeader, port: '80' };
       }
-    
+
       if (proto === 'https') {
-        return { host: hostHeader, port: '443' }
+        return { host: hostHeader, port: '443' };
       }
-    } else if (parts[parts.length - 2].endsWith("]")) {
+    } else if (parts[parts.length - 2].endsWith(']')) {
       return {
-        host: parts.slice(0, -1).join(":"),
-        port: parts[parts.length - 1]
-      }
+        host: parts.slice(0, -1).join(':'),
+        port: parts[parts.length - 1],
+      };
     }
   }
 
   // if nothing above matches just return the host header
-  return { host: hostHeader }
+  return { host: hostHeader };
 }
 
 /**
@@ -908,22 +908,22 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
 
 const KNOWN_METHODS = new Set([
   // methods from https://www.rfc-editor.org/rfc/rfc9110.html#name-methods
-  "GET",
-  "HEAD",
-  "POST",
-  "PUT",
-  "DELETE",
-  "CONNECT",
-  "OPTIONS",
-  "TRACE",
+  'GET',
+  'HEAD',
+  'POST',
+  'PUT',
+  'DELETE',
+  'CONNECT',
+  'OPTIONS',
+  'TRACE',
 
   // PATCH from https://www.rfc-editor.org/rfc/rfc5789.html
-  "PATCH",
-])
+  'PATCH',
+]);
 
 function normalizeMethod(method?: string | null) {
   if (method == null) {
-    return "GET";
+    return 'GET';
   }
 
   const upper = method.toUpperCase();
@@ -931,5 +931,5 @@ function normalizeMethod(method?: string | null) {
     return upper;
   }
 
-  return "_OTHER";
+  return '_OTHER';
 }
