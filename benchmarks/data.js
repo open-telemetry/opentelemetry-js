@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1726047320962,
+  "lastUpdate": 1726592081383,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -15822,6 +15822,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 652735,
             "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "martin@martinkuba.com",
+            "name": "Martin Kuba",
+            "username": "martinkuba"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e9eb92476e4953f1a8e39012e39a04585222eb1e",
+          "message": "feat(web): add processors for adding session ID (#4972)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-09-16T22:25:41Z",
+          "tree_id": "352356b8735fed224f6504260c4dde86858f5714",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e9eb92476e4953f1a8e39012e39a04585222eb1e"
+        },
+        "date": 1726592080554,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 971619,
+            "range": "±0.37%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11742,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 665494,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 667567,
+            "range": "±0.36%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
