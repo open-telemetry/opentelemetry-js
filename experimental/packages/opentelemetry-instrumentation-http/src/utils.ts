@@ -748,7 +748,7 @@ export const getIncomingRequestAttributes = (
   }
 
   // conditionally required if request method required case normalization
-  if (method != normalizedMethod) {
+  if (method !== normalizedMethod) {
     newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
