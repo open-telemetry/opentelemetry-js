@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1726592081383,
+  "lastUpdate": 1726592602505,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -15874,6 +15874,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 667567,
             "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "david.luna@elastic.co",
+            "name": "David Luna",
+            "username": "david-luna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "af0ecacf7255cb3a3ff7be7952baa469ddf915cc",
+          "message": "chore(deps): bump @opentelemetry/api dependency to 1.3.0 (#4992)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-09-17T08:13:13Z",
+          "tree_id": "0ce85abcc9d3b6005ae977a3adc97cede7f5ea56",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/af0ecacf7255cb3a3ff7be7952baa469ddf915cc"
+        },
+        "date": 1726592601671,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 975709,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11805,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 690646,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 646323,
+            "range": "±0.30%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
