@@ -395,8 +395,8 @@ export const getOutgoingRequestAttributes = (
 ): SpanAttributes => {
   const hostname = options.hostname;
   const port = options.port;
-  const requestMethod = requestOptions.method;
-  const method = requestMethod ? requestMethod.toUpperCase() : 'GET';
+  const method = requestOptions.method ?? 'GET';
+  const normalizedMethod = normalizeMethod(method);
   const headers = requestOptions.headers || {};
   const userAgent = headers['user-agent'];
   const urlFull = getAbsoluteUrl(
@@ -414,7 +414,7 @@ export const getOutgoingRequestAttributes = (
 
   const newAttributes: Attributes = {
     // Required attributes
-    [ATTR_HTTP_REQUEST_METHOD]: method,
+    [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
     [ATTR_SERVER_ADDRESS]: hostname,
     [ATTR_SERVER_PORT]: Number(port),
     [ATTR_URL_FULL]: urlFull,
@@ -426,8 +426,8 @@ export const getOutgoingRequestAttributes = (
   };
 
   // conditionally required if request method required case normalization
-  if (requestMethod && method !== requestMethod) {
-    newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = requestMethod;
+  if (method !== normalizedMethod) {
+    newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
   }
 
   if (userAgent !== undefined) {
@@ -674,7 +674,6 @@ export const getIncomingRequestAttributes = (
   const headers = request.headers;
   const userAgent = headers['user-agent'];
   const ips = headers['x-forwarded-for'];
-  const method = request.method || 'GET';
   const httpVersion = request.httpVersion;
   const requestUrl = request.url ? url.parse(request.url) : null;
   const host = requestUrl?.host || headers.host;
@@ -683,11 +682,14 @@ export const getIncomingRequestAttributes = (
     host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
     'localhost';
 
+  const method = request.method;
+  const normalizedMethod = normalizeMethod(method);
+
   const serverAddress = getServerAddress(request, options.component);
   const serverName = options.serverName;
 
   const newAttributes: Attributes = {
-    [ATTR_HTTP_REQUEST_METHOD]: request.method,
+    [ATTR_HTTP_REQUEST_METHOD]: normalizedMethod,
     [ATTR_URL_PATH]: requestUrl?.pathname ?? undefined,
     [ATTR_URL_SCHEME]: options.component,
     [ATTR_SERVER_ADDRESS]: serverAddress?.host,
@@ -700,6 +702,11 @@ export const getIncomingRequestAttributes = (
     [ATTR_NETWORK_PROTOCOL_VERSION]: request.httpVersion,
     [ATTR_USER_AGENT_ORIGINAL]: userAgent,
   };
+
+  // conditionally required if request method required case normalization
+  if (method != normalizedMethod) {
+    newAttributes[ATTR_HTTP_REQUEST_METHOD_ORIGINAL] = method;
+  }
 
   const oldAttributes: Attributes = {
     [SEMATTRS_HTTP_URL]: getAbsoluteUrl(
@@ -853,4 +860,32 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
       }
     }
   };
+}
+
+const KNOWN_METHODS = new Set([
+  // methods from https://www.rfc-editor.org/rfc/rfc9110.html#name-methods
+  "GET",
+  "HEAD",
+  "POST",
+  "PUT",
+  "DELETE",
+  "CONNECT",
+  "OPTIONS",
+  "TRACE",
+
+  // PATCH from https://www.rfc-editor.org/rfc/rfc5789.html
+  "PATCH",
+])
+
+function normalizeMethod(method?: string | null) {
+  if (method == null) {
+    return "GET";
+  }
+
+  const upper = method.toUpperCase();
+  if (KNOWN_METHODS.has(upper)) {
+    return upper;
+  }
+
+  return "_OTHER";
 }
