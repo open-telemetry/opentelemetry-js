@@ -57,6 +57,9 @@
       "path": "experimental/packages/sdk-logs/tsconfig.esnext.json"
     },
     {
+      "path": "experimental/packages/web-common/tsconfig.esnext.json"
+    },
+    {
       "path": "packages/opentelemetry-context-zone/tsconfig.esnext.json"
     },
     {

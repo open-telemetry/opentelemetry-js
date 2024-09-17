@@ -1,23 +1,17 @@
 {
-  "name": "@opentelemetry/exporter-logs-otlp-http",
+  "name": "@opentelemetry/web-common",
   "version": "0.53.0",
   "publishConfig": {
     "access": "public"
   },
-  "description": "OpenTelemetry Collector Logs Exporter allows user to send collected logs to the OpenTelemetry Collector",
+  "description": "Common utilities for web instrumentation",
   "author": "OpenTelemetry Authors",
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-http",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/web-common",
   "license": "Apache-2.0",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
@@ -29,32 +23,31 @@
     "node": ">=14"
   },
   "scripts": {
-    "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "prepublishOnly": "npm run compile",
+    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "prewatch": "npm run precompile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "test": "nyc mocha 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
+    "test": "nyc mocha test/**/*.test.ts",
     "test:browser": "karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
-    "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "align-api-deps": "node ../../../scripts/align-api-deps.js"
   },
   "keywords": [
     "opentelemetry",
-    "nodejs",
-    "browser",
+    "web",
     "tracing",
     "profiling",
-    "logs",
-    "stats"
+    "stats",
+    "monitoring"
   ],
   "files": [
     "build/esm/**/*.js",
@@ -71,14 +64,22 @@
     "README.md"
   ],
   "sideEffects": false,
+  "peerDependencies": {
+    "@opentelemetry/api": ">=1.4.0 <1.10.0"
+  },
+  "dependencies": {
+    "@opentelemetry/sdk-logs": "^0.53.0",
+    "@opentelemetry/sdk-trace-base": "^1.26.0",
+    "@opentelemetry/semantic-conventions": "1.27.0"
+  },
   "devDependencies": {
     "@babel/core": "7.25.2",
-    "@babel/preset-env": "7.25.4",
     "@opentelemetry/api": "1.9.0",
-    "@opentelemetry/resources": "1.26.0",
+    "@opentelemetry/api-events": "0.53.0",
+    "@opentelemetry/api-logs": "0.53.0",
     "@types/mocha": "10.0.7",
     "@types/node": "18.6.5",
-    "@types/sinon": "17.0.3",
+    "@types/sinon": "10.0.20",
     "@types/webpack-env": "1.16.3",
     "babel-loader": "8.4.1",
     "babel-plugin-istanbul": "7.0.0",
@@ -99,15 +100,5 @@
     "webpack": "5.94.0",
     "webpack-cli": "5.1.4",
     "webpack-merge": "5.10.0"
-  },
-  "peerDependencies": {
-    "@opentelemetry/api": "^1.3.0"
-  },
-  "dependencies": {
-    "@opentelemetry/api-logs": "0.53.0",
-    "@opentelemetry/core": "1.26.0",
-    "@opentelemetry/otlp-exporter-base": "0.53.0",
-    "@opentelemetry/otlp-transformer": "0.53.0",
-    "@opentelemetry/sdk-logs": "0.53.0"
   }
 }
