@@ -57,6 +57,9 @@
       "path": "experimental/packages/sdk-logs/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/web-common/tsconfig.esm.json"
+    },
+    {
       "path": "packages/opentelemetry-context-zone/tsconfig.esm.json"
     },
     {

@@ -13,6 +13,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat: add processors for adding session.id attribute to spans and logs [#4972](https://github.com/open-telemetry/opentelemetry-js/pull/4972)
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
