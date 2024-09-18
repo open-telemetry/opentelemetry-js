@@ -15,6 +15,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): avoid keeping non-string `status.message` on `Span#setStatus()`
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
