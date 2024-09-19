@@ -22,9 +22,9 @@ import {
 } from '@opentelemetry/sdk-trace-base';
 import { assertPropagation, assertSpan } from './utils/assertionUtils';
 import {
-  ATTR_RPC_METHOD,
-  ATTR_RPC_SERVICE,
-} from '@opentelemetry/semantic-conventions/incubating';
+  SEMATTRS_RPC_METHOD,
+  SEMATTRS_RPC_SERVICE,
+} from '@opentelemetry/semantic-conventions';
 import { AttributeValues } from '../src/enums/AttributeValues';
 
 export type SpanAssertionFunction = (
@@ -74,8 +74,8 @@ function validateSpans(
     SpanKind.CLIENT,
     validations
   );
-  assert.strictEqual(clientSpan.attributes[ATTR_RPC_METHOD], rpcMethod);
-  assert.strictEqual(clientSpan.attributes[ATTR_RPC_SERVICE], rpcService);
+  assert.strictEqual(clientSpan.attributes[SEMATTRS_RPC_METHOD], rpcMethod);
+  assert.strictEqual(clientSpan.attributes[SEMATTRS_RPC_SERVICE], rpcService);
 }
 
 export function assertNoSpansExported(
