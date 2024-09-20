@@ -23,6 +23,11 @@ import {
 import { createEmptyMetadata } from '../grpc-exporter-transport';
 import { getOtlpGrpcConfigurationFromEnv } from './otlp-grpc-env-configuration';
 
+/**
+ * @deprecated
+ * @param config
+ * @param signalIdentifier
+ */
 export function convertLegacyOtlpGrpcOptions(
   config: OTLPGRPCExporterConfigNode,
   signalIdentifier: string
