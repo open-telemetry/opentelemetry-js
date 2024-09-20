@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1726661098138,
+  "lastUpdate": 1726831961141,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -16084,6 +16084,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "david.luna@elastic.co",
+            "name": "David Luna",
+            "username": "david-luna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0571e429b6c8232823642e0a64b9e07f6a743251",
+          "message": "refactor(browser-detector): replace `ResourceAtrributes` with `Attributes` (#5004)",
+          "timestamp": "2024-09-20T11:14:34Z",
+          "tree_id": "20acecb9664c5d1fc04dba589b8626a11df8fe93",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0571e429b6c8232823642e0a64b9e07f6a743251"
+        },
+        "date": 1726831960222,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 981781,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11800,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 698698,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 644620,
+            "range": "±0.44%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
