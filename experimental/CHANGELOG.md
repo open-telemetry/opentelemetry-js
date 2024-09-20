@@ -25,6 +25,8 @@ All notable changes to experimental packages in this project will be documented 
 
 * refactor(browser-detector): replace `ResourceAttributes` with `Attributes` [#5004](https://github.com/open-telemetry/opentelemetry-js/pull/5004)
 
+* refactor(sdk-logs): replace `ResourceAttributes` with `Attributes` [#5005](https://github.com/open-telemetry/opentelemetry-js/pull/5005) @david-luna
+
 ## 0.53.0
 
 ### :boom: Breaking Change
