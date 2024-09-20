@@ -23,6 +23,8 @@ All notable changes to experimental packages in this project will be documented 
 
 * refactor(exporter-prometheus): replace `MetricAttributes` and `MetricAttributeValues` with `Attributes` and `AttributeValues` [#4993](https://github.com/open-telemetry/opentelemetry-js/pull/4993)
 
+* refactor(browser-detector): replace `ResourceAttributes` with `Attributes` [#5004](https://github.com/open-telemetry/opentelemetry-js/pull/5004)
+
 ## 0.53.0
 
 ### :boom: Breaking Change
