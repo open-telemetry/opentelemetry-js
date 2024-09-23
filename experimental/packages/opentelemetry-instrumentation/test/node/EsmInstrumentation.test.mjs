@@ -26,14 +26,21 @@ class TestInstrumentationWrapFn extends InstrumentationBase {
     super('test-esm-instrumentation', '0.0.1', config);
   }
   init() {
-    console.log('test-esm-instrumentation initialized!');
     return new InstrumentationNodeModuleDefinition(
       'test-esm-module',
       ['*'],
       moduleExports => {
-        this._wrap(moduleExports, 'testFunction', () => {
-          return () => 'patched';
+        const wrapRetval = this._wrap(moduleExports, 'testFunction', () => {
+          return function wrappedTestFunction() {
+            return 'patched';
+          };
         });
+        assert.strictEqual(typeof wrapRetval, 'function');
+        assert.strictEqual(
+          wrapRetval.name,
+          'wrappedTestFunction',
+          '_wrap(..., "testFunction", ...) return value is the wrapped function'
+        );
         return moduleExports;
       },
       moduleExports => {
@@ -49,7 +56,6 @@ class TestInstrumentationMasswrapFn extends InstrumentationBase {
     super('test-esm-instrumentation', '0.0.1', config);
   }
   init() {
-    console.log('test-esm-instrumentation initialized!');
     return new InstrumentationNodeModuleDefinition(
       'test-esm-module',
       ['*'],
@@ -79,7 +85,6 @@ class TestInstrumentationSimple extends InstrumentationBase {
     super('test-esm-instrumentation', '0.0.1', config);
   }
   init() {
-    console.log('test-esm-instrumentation initialized!');
     return new InstrumentationNodeModuleDefinition(
       'test-esm-module',
       ['*'],

@@ -150,12 +150,16 @@ describe('OTLPTraceExporter - web', () => {
 
         collectorTraceExporter.export(spans, () => {});
 
-        setTimeout(() => {
-          const response: any = spyLoggerDebug.args[2][0];
-          assert.strictEqual(response, 'sendBeacon - can send');
-          assert.strictEqual(spyLoggerError.args.length, 0);
+        queueMicrotask(() => {
+          try {
+            const response: any = spyLoggerDebug.args[2][0];
+            assert.strictEqual(response, 'SendBeacon success');
+            assert.strictEqual(spyLoggerError.args.length, 0);
 
-          done();
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
 
@@ -163,9 +167,17 @@ describe('OTLPTraceExporter - web', () => {
         stubBeacon.returns(false);
 
         collectorTraceExporter.export(spans, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('cannot send'));
-          done();
+          try {
+            assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+            assert.ok(
+              result.error,
+              'Expected Error, but no Error was present on the result'
+            );
+            assert.match(result.error?.message, /SendBeacon failed/);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -179,8 +191,8 @@ describe('OTLPTraceExporter - web', () => {
         clock = sinon.useFakeTimers();
 
         (window.navigator as any).sendBeacon = false;
-        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
         server = sinon.fakeServer.create();
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
       afterEach(() => {
         server.restore();
@@ -189,15 +201,15 @@ describe('OTLPTraceExporter - web', () => {
       it('should successfully send the spans using XMLHttpRequest', done => {
         collectorTraceExporter.export(spans, () => {});
 
-        queueMicrotask(() => {
+        queueMicrotask(async () => {
           const request = server.requests[0];
           assert.strictEqual(request.method, 'POST');
           assert.strictEqual(request.url, 'http://foo.bar.com');
 
-          const body = request.requestBody;
+          const body = request.requestBody as Blob;
           const decoder = new TextDecoder();
           const json = JSON.parse(
-            decoder.decode(body)
+            decoder.decode(await body.arrayBuffer())
           ) as IExportTraceServiceRequest;
           const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
@@ -235,28 +247,36 @@ describe('OTLPTraceExporter - web', () => {
         queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(200);
-          const response: any = spyLoggerDebug.args[2][0];
-          assert.strictEqual(response, 'xhr success');
-          assert.strictEqual(spyLoggerError.args.length, 0);
-          assert.strictEqual(stubBeacon.callCount, 0);
-
-          clock.restore();
-          done();
+          try {
+            const response: any = spyLoggerDebug.args[2][0];
+            assert.strictEqual(response, 'XHR success');
+            assert.strictEqual(spyLoggerError.args.length, 0);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            clock.restore();
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
 
       it('should log the error message', done => {
         collectorTraceExporter.export(spans, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('Failed to export'));
+          try {
+            assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+            assert.deepStrictEqual(
+              result.error?.message,
+              'XHR request failed with non-retryable status'
+            );
+          } catch (e) {
+            done(e);
+          }
           done();
         });
 
         queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(400);
-          clock.restore();
-          done();
         });
       });
 
@@ -421,17 +441,20 @@ describe('OTLPTraceExporter - web', () => {
       it('should log the timeout request error message', done => {
         const responseSpy = sinon.spy();
         collectorTraceExporter.export(spans, responseSpy);
-        clock.tick(10000);
+        clock.tick(20000);
         clock.restore();
 
         setTimeout(() => {
-          const result = responseSpy.args[0][0] as core.ExportResult;
-          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as OTLPExporterError;
-          assert.ok(error !== undefined);
-          assert.strictEqual(error.message, 'Request Timeout');
-
-          done();
+          try {
+            const result = responseSpy.args[0][0] as core.ExportResult;
+            assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+            const error = result.error as OTLPExporterError;
+            assert.ok(error !== undefined);
+            assert.strictEqual(error.message, 'XHR request timed out');
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -455,15 +478,19 @@ describe('OTLPTraceExporter - web', () => {
 
       setTimeout(() => {
         // Expect 4 failures
-        assert.strictEqual(failures.length, 4);
-        failures.forEach(([result]) => {
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
-          assert.strictEqual(
-            result.error!.message,
-            'Concurrent export limit reached'
-          );
-        });
-        done();
+        try {
+          assert.strictEqual(failures.length, 4);
+          failures.forEach(([result]) => {
+            assert.strictEqual(result.code, ExportResultCode.FAILED);
+            assert.strictEqual(
+              result.error!.message,
+              'Concurrent export limit reached'
+            );
+          });
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     });
   });
@@ -487,102 +514,6 @@ describe('OTLPTraceExporter - browser (getDefaultUrl)', () => {
       assert.strictEqual(collectorExporter['url'], url);
       done();
     });
-  });
-});
-
-describe('when configuring via environment', () => {
-  const envSource = window as any;
-  it('should use url defined in env that ends with root path and append version and signal path', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/traces`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use url defined in env without checking if path is already present', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/traces';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use url defined in env and append version and signal', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should add root path when signal url defined in env contains no path and no root path', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}/`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains root path but no path', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains path', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should not add root path when signal url defined in env contains path and ends in /', () => {
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces/';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-    );
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-  });
-  it('should use headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-    const collectorExporter = new OTLPTraceExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'bar');
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-  it('should override global headers config with signal headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
-    const collectorExporter = new OTLPTraceExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'boo');
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.bar, 'foo');
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });
 
@@ -610,26 +541,33 @@ describe('export with retry - real http request destroyed', () => {
       (window.navigator as any).sendBeacon = false;
       collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
     });
-    it('should log the timeout request error message when retrying with exponential backoff with jitter', done => {
+    it('should log the retryable request error message when retrying with exponential backoff with jitter', done => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      let retry = 0;
+      let calls = 0;
       server.respondWith(
         'http://localhost:4318/v1/traces',
         function (xhr: any) {
-          retry++;
+          calls++;
           xhr.respond(503);
         }
       );
 
       collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 1);
-        done();
+        try {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(
+            error.message,
+            'Export failed with retryable status'
+          );
+          assert.strictEqual(calls, 6);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     }).timeout(3000);
 
@@ -637,22 +575,29 @@ describe('export with retry - real http request destroyed', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      let retry = 0;
+      let calls = 0;
       server.respondWith(
         'http://localhost:4318/v1/traces',
         function (xhr: any) {
-          retry++;
-          xhr.respond(503, { 'Retry-After': 3 });
+          calls++;
+          xhr.respond(503, { 'Retry-After': 0.1 });
         }
       );
 
       collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 1);
-        done();
+        try {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(
+            error.message,
+            'Export failed with retryable status'
+          );
+          assert.strictEqual(calls, 6);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     }).timeout(3000);
     it('should log the timeout request error message when retry-after header is a date', done => {
@@ -665,18 +610,25 @@ describe('export with retry - real http request destroyed', () => {
         function (xhr: any) {
           retry++;
           const d = new Date();
-          d.setSeconds(d.getSeconds() + 1);
+          d.setSeconds(d.getSeconds() + 0.1);
           xhr.respond(503, { 'Retry-After': d });
         }
       );
 
       collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 2);
-        done();
+        try {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(
+            error.message,
+            'Export failed with retryable status'
+          );
+          assert.strictEqual(retry, 6);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     }).timeout(3000);
     it('should log the timeout request error message when retry-after header is a date with long delay', done => {
@@ -695,12 +647,19 @@ describe('export with retry - real http request destroyed', () => {
       );
 
       collectorTraceExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 1);
-        done();
+        try {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(
+            error.message,
+            'Export failed with retryable status'
+          );
+          assert.strictEqual(retry, 1);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
     }).timeout(3000);
   });

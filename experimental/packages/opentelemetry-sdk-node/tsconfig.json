@@ -34,13 +34,22 @@
       "path": "../../../packages/opentelemetry-sdk-trace-node"
     },
     {
-      "path": "../../../packages/opentelemetry-semantic-conventions"
-    },
-    {
       "path": "../../../packages/sdk-metrics"
     },
     {
+      "path": "../../../semantic-conventions"
+    },
+    {
       "path": "../api-logs"
+    },
+    {
+      "path": "../exporter-logs-otlp-grpc"
+    },
+    {
+      "path": "../exporter-logs-otlp-http"
+    },
+    {
+      "path": "../exporter-logs-otlp-proto"
     },
     {
       "path": "../exporter-trace-otlp-grpc"

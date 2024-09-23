@@ -16,10 +16,7 @@
 
 export {
   OTLPExporterNodeBase,
-  sendWithHttp,
-  createHttpAgent,
-  configureCompression,
   OTLPExporterNodeConfigBase,
   CompressionAlgorithm,
 } from './node';
-export { OTLPExporterBrowserBase, sendWithXhr } from './browser';
+export { OTLPExporterBrowserBase } from './browser';

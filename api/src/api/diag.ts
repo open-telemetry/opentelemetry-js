@@ -34,6 +34,8 @@ const API_NAME = 'diag';
 /**
  * Singleton object which represents the entry point to the OpenTelemetry internal
  * diagnostic API
+ *
+ * @since 1.0.0
  */
 export class DiagAPI implements DiagLogger, DiagLoggerApi {
   private static _instance?: DiagAPI;

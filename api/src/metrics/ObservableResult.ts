@@ -18,6 +18,8 @@ import { MetricAttributes, Observable } from './Metric';
 
 /**
  * Interface that is being used in callback function for Observable Metric.
+ *
+ * @since 1.3.0
  */
 export interface ObservableResult<
   AttributesTypes extends MetricAttributes = MetricAttributes,

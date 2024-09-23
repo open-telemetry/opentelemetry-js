@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 For API changes, see the [API CHANGELOG](api/CHANGELOG.md).
 For experimental package changes, see the [experimental CHANGELOG](experimental/CHANGELOG.md).
+For semantic convention package changes, see the [semconv CHANGELOG](packages/semantic-conventions/CHANGELOG.md).
 
 ## Unreleased
 
@@ -12,13 +13,53 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat: add processors for adding session.id attribute to spans and logs [#4972](https://github.com/open-telemetry/opentelemetry-js/pull/4972)
+
 ### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): avoid keeping non-string `status.message` on `Span#setStatus()` [#4999](https://github.com/open-telemetry/opentelemetry-js/pull/4999) @pichlermarc
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
 
+* deps: set `@opentelemetry/api` dependency min version to 1.3.0 in `examples`, `experimental/packages`, `integration-tests` and `selenium-tests`
+  [#4992](https://github.com/open-telemetry/opentelemetry-js/pull/4992)
+
+## 1.26.0
+
+### :rocket: (Enhancement)
+
+* feat: include instrumentation scope info in console span and log record exporters [#4848](https://github.com/open-telemetry/opentelemetry-js/pull/4848) @blumamir
+* feat(semconv): update semantic conventions to 1.27 (from 1.7.0) [#4690](https://github.com/open-telemetry/opentelemetry-js/pull/4690) @dyladan
+  * Exported names have changed to `ATTR_{name}` for attributes (e.g. `ATTR_HTTP_REQUEST_METHOD`), `{name}_VALUE_{value}` for enumeration values (e.g. `HTTP_REQUEST_METHOD_VALUE_POST`), and `METRIC_{name}` for metrics. Exported names from previous versions are deprecated.
+  * Import `@opentelemetry/semantic-conventions` for *stable* semantic conventions. Import `@opentelemetry/semantic-conventions/incubating` for all semantic conventions, stable and unstable.
+  * Note: Semantic conventions are now versioned separately from other stable artifacts, to correspond to the version of semantic conventions they provide. Changes will be in a separate changelog.
+
+### :bug: (Bug Fix)
+
+* fix(sdk-node): avoid spurious diag errors for unknown OTEL_NODE_RESOURCE_DETECTORS values [#4879](https://github.com/open-telemetry/opentelemetry-js/pull/4879) @trentm
+* deps(opentelemetry-instrumentation): Bump `shimmer` types to 1.2.0 [#4865](https://github.com/open-telemetry/opentelemetry-js/pull/4865) @lforst
+* fix(instrumentation): Fix optional property types [#4833](https://github.com/open-telemetry/opentelemetry-js/pull/4833) @alecmev
+* fix(sdk-metrics): fix(sdk-metrics): use inclusive upper bounds in histogram [#4829](https://github.com/open-telemetry/opentelemetry-js/pull/4829)
+
+### :house: (Internal)
+
 * refactor: Simplify the code for the `getEnv` function [#4799](https://github.com/open-telemetry/opentelemetry-js/pull/4799) @danstarns
+* refactor: remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd
+  * Packages updated:
+    * opentelemetry-context-zone
+    * opentelemetry-core
+    * opentelemetry-exporter-jaeger
+    * opentelemetry-exporter-zipkin
+    * opentelemetry-propagator-b3
+    * opentelemetry-propagator-jaeger
+    * opentelemetry-sdk-trace-base
+    * opentelemetry-sdk-trace-node
+    * opentelemetry-sdk-trace-web
+    * propagator-aws-xray
+    * sdk-metrics
+* deps(sdk-metrics): remove unused lodash.merge dependency [#4905](https://github.com/open-telemetry/opentelemetry-js/pull/4905) @pichlermarc
 
 ## 1.25.1
 

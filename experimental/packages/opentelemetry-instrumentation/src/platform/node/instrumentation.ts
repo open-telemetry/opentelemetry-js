@@ -66,14 +66,6 @@ export abstract class InstrumentationBase<
 
     this._modules = (modules as InstrumentationModuleDefinition[]) || [];
 
-    if (this._modules.length === 0) {
-      diag.debug(
-        'No modules instrumentation has been defined for ' +
-          `'${this.instrumentationName}@${this.instrumentationVersion}'` +
-          ', nothing will be patched'
-      );
-    }
-
     if (this._config.enabled) {
       this.enable();
     }
@@ -87,10 +79,10 @@ export abstract class InstrumentationBase<
       return wrap(moduleExports, name, wrapper);
     } else {
       const wrapped = wrap(Object.assign({}, moduleExports), name, wrapper);
-
-      return Object.defineProperty(moduleExports, name, {
+      Object.defineProperty(moduleExports, name, {
         value: wrapped,
       });
+      return wrapped;
     }
   };
 
