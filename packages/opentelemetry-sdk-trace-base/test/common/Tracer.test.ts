@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  SpanAttributes,
+  Attributes,
   Context,
   context,
   createContextKey,
@@ -65,7 +65,7 @@ describe('Tracer', () => {
       _traceId: string,
       _spanName: string,
       _spanKind: SpanKind,
-      attributes: SpanAttributes,
+      attributes: Attributes,
       links: Link[]
     ) {
       // The attributes object should be valid.
@@ -82,7 +82,7 @@ describe('Tracer', () => {
           testAttribute: 'foobar',
           // invalid attributes should be sanitized.
           ...invalidAttributes,
-        } as unknown as SpanAttributes,
+        } as unknown as Attributes,
         traceState: this.traceState,
       };
     }
@@ -442,7 +442,7 @@ describe('Tracer', () => {
     const attributes = {
       ...validAttributes,
       ...invalidAttributes,
-    } as unknown as SpanAttributes;
+    } as unknown as Attributes;
     const links = [
       {
         context: {
