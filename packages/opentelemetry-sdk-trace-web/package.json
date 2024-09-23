@@ -13,8 +13,6 @@
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-
-
     "version": "node ../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "karma start --single-run",
