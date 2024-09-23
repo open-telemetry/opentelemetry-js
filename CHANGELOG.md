@@ -18,6 +18,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 ### :bug: (Bug Fix)
 
 * fix(sdk-trace-base): avoid keeping non-string `status.message` on `Span#setStatus()` [#4999](https://github.com/open-telemetry/opentelemetry-js/pull/4999) @pichlermarc
+* fix(sdk-metrics): Add missing catch and handle error in promise of `PeriodicExportingMetricReader` [#5006](https://github.com/open-telemetry/opentelemetry-js/pull/5006) @jj22ee
 
 ### :books: (Refine Doc)
 
