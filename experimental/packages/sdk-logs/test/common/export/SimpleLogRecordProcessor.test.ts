@@ -21,7 +21,8 @@ import {
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { Attributes } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import { Resource as Resource190 } from '@opentelemetry/resources_1.9.0';
 
 import {
@@ -121,7 +122,7 @@ describe('SimpleLogRecordProcessor', () => {
       const exporter = new InMemoryLogRecordExporter();
       const asyncResource = new Resource(
         {},
-        new Promise<ResourceAttributes>(resolve => {
+        new Promise<Attributes>(resolve => {
           setTimeout(() => resolve({ async: 'fromasync' }), 1);
         })
       );
@@ -143,7 +144,7 @@ describe('SimpleLogRecordProcessor', () => {
       const testExporterWithDelay = new TestExporterWithDelay();
       const asyncResource = new Resource(
         {},
-        new Promise<ResourceAttributes>(resolve => {
+        new Promise<Attributes>(resolve => {
           setTimeout(() => resolve({ async: 'fromasync' }), 1);
         })
       );

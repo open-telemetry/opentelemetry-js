@@ -22,6 +22,7 @@ type GetResult = Promise<{
   resHeaders: http.IncomingHttpHeaders;
   reqHeaders: http.OutgoingHttpHeaders;
   method: string | undefined;
+  address?: string;
 }>;
 
 function get(input: string | URL, options?: http.RequestOptions): GetResult;
@@ -46,6 +47,7 @@ function get(input: any, options?: any): GetResult {
           reqHeaders: req.getHeaders ? req.getHeaders() : (req as any)._headers,
           resHeaders: res.headers,
           method: res.req.method,
+          address: req.socket?.remoteAddress,
         });
       });
       resp.on('error', err => {
