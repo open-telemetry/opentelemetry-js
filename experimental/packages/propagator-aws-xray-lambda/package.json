@@ -53,7 +53,6 @@
     "@types/sinon": "17.0.3",
     "babel-loader": "8.4.1",
     "babel-plugin-istanbul": "7.0.0",
-    "codecov": "3.8.3",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "mocha": "10.7.3",

@@ -29,9 +29,6 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../",
-    "codecov:webworker": "nyc report --reporter=json && codecov -f coverage/*.json -p ../",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../",
     "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "docs": "typedoc",
@@ -86,7 +83,6 @@
     "@types/webpack": "5.28.5",
     "@types/webpack-env": "1.16.3",
     "babel-plugin-istanbul": "7.0.0",
-    "codecov": "3.8.3",
     "cross-var": "1.1.0",
     "dpdm": "3.13.1",
     "karma": "6.4.4",
