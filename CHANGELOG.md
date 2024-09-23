@@ -17,6 +17,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): avoid keeping non-string `status.message` on `Span#setStatus()` [#4999](https://github.com/open-telemetry/opentelemetry-js/pull/4999) @pichlermarc
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
