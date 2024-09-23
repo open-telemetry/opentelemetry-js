@@ -15,14 +15,7 @@
  */
 
 import { ResourceDetectionConfig } from './config';
-import { Attributes } from '@opentelemetry/api';
 import { IResource } from './IResource';
-
-/**
- * Interface for Resource attributes.
- */
-// TODO: replace ResourceAttributes with Attributes
-export type ResourceAttributes = Attributes;
 
 /**
  * @deprecated please use {@link DetectorSync}

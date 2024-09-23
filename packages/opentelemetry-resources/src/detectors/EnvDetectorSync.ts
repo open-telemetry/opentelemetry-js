@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../Resource';
-import { DetectorSync, ResourceAttributes } from '../types';
+import { DetectorSync } from '../types';
 import { ResourceDetectionConfig } from '../config';
 import { IResource } from '../IResource';
 
@@ -54,7 +54,7 @@ class EnvDetectorSync implements DetectorSync {
    * @param config The resource detection config
    */
   detect(_config?: ResourceDetectionConfig): IResource {
-    const attributes: ResourceAttributes = {};
+    const attributes: Attributes = {};
     const env = getEnv();
 
     const rawAttributes = env.OTEL_RESOURCE_ATTRIBUTES;
@@ -92,10 +92,10 @@ class EnvDetectorSync implements DetectorSync {
    */
   private _parseResourceAttributes(
     rawEnvAttributes?: string
-  ): ResourceAttributes {
+  ): Attributes {
     if (!rawEnvAttributes) return {};
 
-    const attributes: ResourceAttributes = {};
+    const attributes: Attributes = {};
     const rawAttributes: string[] = rawEnvAttributes.split(
       this._COMMA_SEPARATOR,
       -1
