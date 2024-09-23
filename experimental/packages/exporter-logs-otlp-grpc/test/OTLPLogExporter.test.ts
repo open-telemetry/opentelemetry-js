@@ -109,12 +109,17 @@ const testCollectorExporter = (params: TestParams) => {
           server.bindAsync(
             serverAddr.protocol === 'https:' ? serverAddr.host : address,
             credentials,
-            () => {
-              server.start();
-              done();
+            err => {
+              if (err) {
+                done(err);
+              } else {
+                server.start();
+                done();
+              }
             }
           );
-        });
+        })
+        .catch(done);
     });
 
     after(() => {

@@ -9,6 +9,9 @@ This package provides the full OpenTelemetry SDK for Node.js including tracing a
 
 ## Quick Start
 
+**Note: Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
+
 To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate instrumentation for the node modules used by your application.
 
 ### Installation
@@ -191,19 +194,19 @@ This is an alternative to programmatically configuring an exporter or span proce
 
 ### Exporters
 
-| Environment variable | Description |
-|----------------------|-------------|
+| Environment variable | Description                                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `jaeger`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
-| OTEL_LOGS_EXPORTER | List of exporters to be used for logging, separated by commas. Options include `otlp`, `console` and `none`. Default is `otlp`. `none` means no autoconfigured exporter. |
+| OTEL_LOGS_EXPORTER   | List of exporters to be used for logging, separated by commas. Options include `otlp`, `console` and `none`. Default is `otlp`. `none` means no autoconfigured exporter.           |
 
 ### OTLP Exporter
 
-| Environment variable | Description |
-|----------------------|-------------|
-| OTEL_EXPORTER_OTLP_PROTOCOL | The transport protocol to use on OTLP trace, metric, and log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
-| OTEL_EXPORTER_OTLP_TRACES_PROTOCOL | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
-| OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
-| OTEL_EXPORTER_OTLP_LOGS_PROTOCOL | The transport protocol to use on OTLP log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
+| Environment variable                | Description                                                                                                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| OTEL_EXPORTER_OTLP_PROTOCOL         | The transport protocol to use on OTLP trace, metric, and log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
+| OTEL_EXPORTER_OTLP_TRACES_PROTOCOL  | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                  |
+| OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                 |
+| OTEL_EXPORTER_OTLP_LOGS_PROTOCOL    | The transport protocol to use on OTLP log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`.                    |
 
 Additionally, you can specify other applicable environment variables that apply to each exporter such as the following:
 
