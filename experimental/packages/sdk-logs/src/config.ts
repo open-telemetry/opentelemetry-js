@@ -31,6 +31,7 @@ export function loadDefaultConfig() {
       attributeCountLimit: getEnv().OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT,
     },
     includeTraceContext: true,
+    mergeResourceWithDefaults: true,
   };
 }
 
