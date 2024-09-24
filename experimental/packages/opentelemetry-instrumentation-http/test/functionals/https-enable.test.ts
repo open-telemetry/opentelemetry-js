@@ -21,6 +21,7 @@ import {
   Span as ISpan,
   SpanKind,
   trace,
+  MetricAttributes,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/api';
@@ -88,6 +89,10 @@ export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
+export const customMetricAttributeFunction = (span: ISpan, spanKind: SpanKind, attr: MetricAttributes): void => {
+  attr['custom metric attribute function'] = 'test';
+};
+
 describe('HttpsInstrumentation', () => {
   let contextManager: ContextManager;
 
@@ -129,6 +134,9 @@ describe('HttpsInstrumentation', () => {
           },
           applyCustomAttributesOnSpan: () => {
             throw new Error(applyCustomAttributesOnSpanErrorMessage);
+          },
+          applyCustomAttributesOnMetric: () => {
+            throw new Error('bad applyCustomAttributesOnMetric function');
           },
         });
         instrumentation.enable();
@@ -217,6 +225,7 @@ describe('HttpsInstrumentation', () => {
             return false;
           },
           applyCustomAttributesOnSpan: customAttributeFunction,
+          applyCustomAttributesOnMetric: customMetricAttributeFunction,
           serverName,
         });
         instrumentation.enable();
