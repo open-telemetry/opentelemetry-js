@@ -13,15 +13,22 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat: add processors for adding session.id attribute to spans and logs [#4972](https://github.com/open-telemetry/opentelemetry-js/pull/4972)
 * feat(instrumentation): Add allowUrls config option to web instrumentation [#4938](https://github.com/open-telemetry/opentelemetry-js/pull/4938) @jairo-mendoza
   * `XMLHttpRequestInstrumentation` and `FetchInstrumentation` now accept an `allowUrls` config option.
   * `isUrlAllowed` function added to core. Both web instrumentation classes will depend on this function when using the new config option.
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): avoid keeping non-string `status.message` on `Span#setStatus()` [#4999](https://github.com/open-telemetry/opentelemetry-js/pull/4999) @pichlermarc
+* fix(sdk-metrics): Add missing catch and handle error in promise of `PeriodicExportingMetricReader` [#5006](https://github.com/open-telemetry/opentelemetry-js/pull/5006) @jj22ee
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* deps: set `@opentelemetry/api` dependency min version to 1.3.0 in `examples`, `experimental/packages`, `integration-tests` and `selenium-tests`
+  [#4992](https://github.com/open-telemetry/opentelemetry-js/pull/4992)
 
 ## 1.26.0
 

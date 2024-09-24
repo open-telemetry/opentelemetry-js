@@ -853,6 +853,32 @@ describe('Span', () => {
       message: 'This is an error',
     });
     span.end();
+
+    assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+    assert.strictEqual(span.status.message, 'This is an error');
+  });
+
+  it('should drop non-string status message', function () {
+    const warnStub = sinon.spy(diag, 'warn');
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: new Error('this is not a string') as any,
+    });
+    span.end();
+
+    assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+    assert.strictEqual(span.status.message, undefined);
+    sinon.assert.calledOnceWithExactly(
+      warnStub,
+      "Dropping invalid status.message of type 'object', expected 'string'"
+    );
   });
 
   it('should return ReadableSpan', () => {

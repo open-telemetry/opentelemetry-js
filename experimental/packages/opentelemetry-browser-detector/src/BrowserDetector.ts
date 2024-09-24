@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
 import {
   Detector,
   IResource,
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import { ResourceAttributes } from '@opentelemetry/resources';
 import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
 
 /**
@@ -33,7 +32,7 @@ class BrowserDetector implements Detector {
     if (!isBrowser) {
       return Resource.empty();
     }
-    const browserResource: ResourceAttributes = getBrowserAttributes();
+    const browserResource: Attributes = getBrowserAttributes();
     return this._getResourceAttributes(browserResource, config);
   }
   /**
@@ -44,7 +43,7 @@ class BrowserDetector implements Detector {
    * @returns The sanitized resource attributes.
    */
   private _getResourceAttributes(
-    browserResource: ResourceAttributes,
+    browserResource: Attributes,
     _config?: ResourceDetectionConfig
   ) {
     if (
@@ -62,8 +61,8 @@ class BrowserDetector implements Detector {
 }
 
 // Add Browser related attributes to resources
-function getBrowserAttributes(): ResourceAttributes {
-  const browserAttribs: ResourceAttributes = {};
+function getBrowserAttributes(): Attributes {
+  const browserAttribs: Attributes = {};
   const userAgentData: UserAgentData | undefined = (navigator as any)
     .userAgentData;
   if (userAgentData) {

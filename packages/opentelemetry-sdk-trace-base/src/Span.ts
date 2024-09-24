@@ -226,7 +226,19 @@ export class Span implements APISpan, ReadableSpan {
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = status;
+    this.status = { ...status };
+
+    // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
+    // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
+    // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
+    // undefined to avoid an incorrect type causing issues downstream.
+    if (this.status.message != null && typeof status.message !== 'string') {
+      diag.warn(
+        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+      );
+      delete this.status.message;
+    }
+
     return this;
   }
 

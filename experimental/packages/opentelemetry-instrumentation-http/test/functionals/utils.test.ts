@@ -313,7 +313,8 @@ describe('Utility', () => {
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
             request,
-            {} as ServerResponse
+            {} as ServerResponse,
+            SemconvStability.OLD
           );
           assert.deepStrictEqual(attributes[SEMATTRS_HTTP_ROUTE], '/user/:id');
           context.disable();
@@ -326,9 +327,13 @@ describe('Utility', () => {
       const request = {
         socket: {},
       } as IncomingMessage;
-      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
-        socket: {},
-      } as ServerResponse & { socket: Socket });
+      const attributes = utils.getIncomingRequestAttributesOnResponse(
+        request,
+        {
+          socket: {},
+        } as ServerResponse & { socket: Socket },
+        SemconvStability.OLD
+      );
       assert.deepEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
   });
@@ -501,6 +506,7 @@ describe('Utility', () => {
       const request = {
         url: 'http://hostname/user/:id',
         method: 'GET',
+        socket: {},
       } as IncomingMessage;
       request.headers = {
         'user-agent': 'chrome',
@@ -508,6 +514,7 @@ describe('Utility', () => {
       };
       const attributes = utils.getIncomingRequestAttributes(request, {
         component: 'http',
+        semconvStability: SemconvStability.OLD,
       });
       assert.strictEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
@@ -516,12 +523,14 @@ describe('Utility', () => {
       const request = {
         url: 'http://hostname/user/?q=val',
         method: 'GET',
+        socket: {},
       } as IncomingMessage;
       request.headers = {
         'user-agent': 'chrome',
       };
       const attributes = utils.getIncomingRequestAttributes(request, {
         component: 'http',
+        semconvStability: SemconvStability.OLD,
       });
       assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
     });
