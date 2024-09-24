@@ -160,7 +160,8 @@ export function configureCompression(
 
   const envCompression =
     getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
-    getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+    getEnv().OTEL_EXPORTER_OTLP_COMPRESSION ||
+    'none';
 
   if (envCompression === 'gzip') {
     return CompressionAlgorithm.GZIP;

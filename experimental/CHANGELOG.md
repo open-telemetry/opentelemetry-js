@@ -7,6 +7,29 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+* feat(api-logs): Add delegating no-op logger provider [#4861](https://github.com/open-telemetry/opentelemetry-js/pull/4861) @hectorhdzg
+* feat(instrumentation-http): Add support for client span semantic conventions 1.27 [#4940](https://github.com/open-telemetry/opentelemetry-js/pull/4940) @dyladan
+
+### :bug: (Bug Fix)
+
+* fix(sampler-jaeger-remote): fixes an issue where package could emit unhandled promise rejections @Just-Sieb
+* fix(otlp-grpc-exporter-base): default compression to `'none'` if env vars `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` and `OTEL_EXPORTER_OTLP_COMPRESSION` are falsy @sjvans
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+* refactor(exporter-prometheus): replace `MetricAttributes` and `MetricAttributeValues` with `Attributes` and `AttributeValues` [#4993](https://github.com/open-telemetry/opentelemetry-js/pull/4993)
+
+* refactor(browser-detector): replace `ResourceAttributes` with `Attributes` [#5004](https://github.com/open-telemetry/opentelemetry-js/pull/5004)
+* refactor(sdk-logs): replace `ResourceAttributes` with `Attributes` [#5005](https://github.com/open-telemetry/opentelemetry-js/pull/5005) @david-luna
+
+## 0.53.0
+
+### :boom: Breaking Change
+
 * fix(instrumentation)!:remove unused description property from interface [#4847](https://github.com/open-telemetry/opentelemetry-js/pull/4847) @blumamir
 * feat(exporter-*-otlp-*)!: use transport interface in node.js exporters [#4743](https://github.com/open-telemetry/opentelemetry-js/pull/4743) @pichlermarc
   * (user-facing) `headers` was intended for internal use has been removed from all exporters
@@ -24,14 +47,14 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(otlp-transformer): Do not limit @opentelemetry/api upper range peerDependency [#4816](https://github.com/open-telemetry/opentelemetry-js/pull/4816) @mydea
 * feat(instrumentation-http): Allow to opt-out of instrumenting incoming/outgoing requests [#4643](https://github.com/open-telemetry/opentelemetry-js/pull/4643) @mydea
+* feat(sampler-jaeger-remote): added support of jaeger-remote-sampler according to this [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#jaegerremotesampler) [#4534](https://github.com/open-telemetry/opentelemetry-js/pull/4589) @legalimpurity
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation): ensure .setConfig() results in config.enabled defaulting to true [#4941](https://github.com/open-telemetry/opentelemetry-js/pull/4941) @trentm
 * fix(instrumentation-http): Ensure instrumentation of `http.get` and `https.get` work when used in ESM code [#4857](https://github.com/open-telemetry/opentelemetry-js/issues/4857) @trentm
 * fix(api-logs): align AnyValue to spec [#4893](https://github.com/open-telemetry/opentelemetry-js/pull/4893) @blumamir
 * fix(instrumentation): remove diag.debug() message for instrumentations that do not patch modules [#4925](https://github.com/open-telemetry/opentelemetry-js/pull/4925) @trentm
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
