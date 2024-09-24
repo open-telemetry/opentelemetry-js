@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727109368568,
+  "lastUpdate": 1727168745919,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -16344,6 +16344,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.64%",
             "unit": "ops/sec",
             "extra": "90 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "107072447+jj22ee@users.noreply.github.com",
+            "name": "Jonathan Lee",
+            "username": "jj22ee"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "5627d8451ee8240e0c206d57f0c7ad639f2742a3",
+          "message": "fix(sdk-metrics): Add missing catch and handle error in promise of `PeriodicExportingMetricReader` (#5006)",
+          "timestamp": "2024-09-24T08:26:39Z",
+          "tree_id": "d01eef092bc533601923bbb9d5172c4ab13f65bc",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5627d8451ee8240e0c206d57f0c7ad639f2742a3"
+        },
+        "date": 1727168745036,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 974698,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11697,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 685896,
+            "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 654200,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
