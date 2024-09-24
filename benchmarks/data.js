@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727168745919,
+  "lastUpdate": 1727168820083,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -16396,6 +16396,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.41%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "1ce52050bd525266cb8239a691600052d6119173",
+          "message": "fix(deps): update dependency express to v4.20.0 [security] (#4989)",
+          "timestamp": "2024-09-24T08:27:26Z",
+          "tree_id": "fe99018975c7e3f69a50143c1ca8f40834724e0f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1ce52050bd525266cb8239a691600052d6119173"
+        },
+        "date": 1727168819211,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 920578,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11514,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 678009,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662262,
+            "range": "±0.76%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
