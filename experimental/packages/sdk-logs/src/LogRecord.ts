@@ -26,7 +26,7 @@ import type { IResource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import {AnyValue, LogAttributes, LogBody} from '@opentelemetry/api-logs';
+import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecord implements ReadableLogRecord {
