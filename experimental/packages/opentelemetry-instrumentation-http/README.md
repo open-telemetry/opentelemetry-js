@@ -76,7 +76,7 @@ The following options are deprecated:
 
 ## Semantic Conventions
 
-### Client Spans
+### Client and Server Spans
 
 Prior to version `0.54`, this instrumentation created spans targeting an experimental semantic convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
 
@@ -91,7 +91,7 @@ If neither `http` or `http/dup` is included in `OTEL_SEMCONV_STABILITY_OPT_IN`, 
 Enabled when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` OR `http/dup`.
 This is the recommended configuration, and will soon become the default behavior.
 
-Follow all requirements and recommendations of HTTP Client Span Semantic Conventions [Version 1.27.0](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md), including all required and recommended attributes.
+Follow all requirements and recommendations of HTTP Client and Server Span Semantic Conventions [Version 1.27.0](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md), including all required and recommended attributes.
 
 #### Legacy Behavior (default)
 

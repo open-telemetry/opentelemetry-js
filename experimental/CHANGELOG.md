@@ -10,7 +10,10 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(api-logs): Add delegating no-op logger provider [#4861](https://github.com/open-telemetry/opentelemetry-js/pull/4861) @hectorhdzg
-* feat(instrumentation-http): Add support for client span semantic conventions 1.27 [#4940](https://github.com/open-telemetry/opentelemetry-js/pull/4940) @dyladan
+* feat(instrumentation-http): Add support for [Semantic Conventions 1.27+](https://github.com/open-telemetry/semantic-conventions/releases/tag/v1.27.0) [#4940](https://github.com/open-telemetry/opentelemetry-js/pull/4940) [#4978](https://github.com/open-telemetry/opentelemetry-js/pull/4978) @dyladan
+  * Applies to both client and server spans
+  * Generate spans compliant with Semantic Conventions 1.27+ when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` or `http/dup`
+  * Generate spans backwards compatible with previous attributes when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT contain `http`
 
 ### :bug: (Bug Fix)
 
@@ -46,6 +49,9 @@ All notable changes to experimental packages in this project will be documented 
 ### :house: (Internal)
 
 * refactor(exporter-prometheus): replace `MetricAttributes` and `MetricAttributeValues` with `Attributes` and `AttributeValues` [#4993](https://github.com/open-telemetry/opentelemetry-js/pull/4993)
+
+* refactor(browser-detector): replace `ResourceAttributes` with `Attributes` [#5004](https://github.com/open-telemetry/opentelemetry-js/pull/5004)
+* refactor(sdk-logs): replace `ResourceAttributes` with `Attributes` [#5005](https://github.com/open-telemetry/opentelemetry-js/pull/5005) @david-luna
 
 ## 0.53.0
 

@@ -528,6 +528,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           request,
           instrumentation.getConfig().startIncomingSpanHook
         ),
+        semconvStability: instrumentation._semconvStability,
       });
 
       const spanOptions: SpanOptions = {
@@ -760,7 +761,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   ) {
     const attributes = getIncomingRequestAttributesOnResponse(
       request,
-      response
+      response,
+      this._semconvStability
     );
     metricAttributes = Object.assign(
       metricAttributes,
