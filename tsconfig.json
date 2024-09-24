@@ -28,9 +28,11 @@
       "experimental/packages/otlp-grpc-exporter-base",
       "experimental/packages/otlp-transformer",
       "experimental/packages/propagator-aws-xray-lambda",
+      "experimental/packages/sampler-jaeger-remote",
       "experimental/packages/sdk-events",
       "experimental/packages/sdk-logs",
       "experimental/packages/shim-opencensus",
+      "experimental/packages/web-common",
       "packages/opentelemetry-context-async-hooks",
       "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
@@ -132,6 +134,9 @@
       "path": "experimental/packages/propagator-aws-xray-lambda"
     },
     {
+      "path": "experimental/packages/sampler-jaeger-remote"
+    },
+    {
       "path": "experimental/packages/sdk-events"
     },
     {
@@ -139,6 +144,9 @@
     },
     {
       "path": "experimental/packages/shim-opencensus"
+    },
+    {
+      "path": "experimental/packages/web-common"
     },
     {
       "path": "packages/opentelemetry-context-async-hooks"

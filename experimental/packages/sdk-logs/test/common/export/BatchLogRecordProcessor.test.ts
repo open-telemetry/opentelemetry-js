@@ -32,7 +32,8 @@ import {
 import { BatchLogRecordProcessorBase } from '../../../src/export/BatchLogRecordProcessorBase';
 import { reconfigureLimits } from '../../../src/config';
 import { LoggerProviderSharedState } from '../../../src/internal/LoggerProviderSharedState';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { Attributes } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 
 class BatchLogRecordProcessor extends BatchLogRecordProcessorBase<BufferConfig> {
   onInit() {}
@@ -316,7 +317,7 @@ describe('BatchLogRecordProcessorBase', () => {
       const processor = new BatchLogRecordProcessor(exporter);
       const asyncResource = new Resource(
         {},
-        new Promise<ResourceAttributes>(resolve => {
+        new Promise<Attributes>(resolve => {
           setTimeout(() => resolve({ async: 'fromasync' }), 1);
         })
       );

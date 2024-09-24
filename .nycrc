@@ -3,6 +3,7 @@
   "extension": [
     ".ts"
   ],
+  "reporter": ["text", "json"],
   "exclude": [
     "**/*.d.ts",
     "build/**/*.*",
