@@ -62,7 +62,6 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
     * propagator-aws-xray
     * sdk-metrics
 * deps(sdk-metrics): remove unused lodash.merge dependency [#4905](https://github.com/open-telemetry/opentelemetry-js/pull/4905) @pichlermarc
-* refactor(sdk-trace-base): replace `SpanAttributes` with `Attributes` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009) @david-luna
 
 ## 1.25.1
 
