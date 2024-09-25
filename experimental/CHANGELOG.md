@@ -19,6 +19,9 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix(sampler-jaeger-remote): fixes an issue where package could emit unhandled promise rejections @Just-Sieb
 * fix(otlp-grpc-exporter-base): default compression to `'none'` if env vars `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` and `OTEL_EXPORTER_OTLP_COMPRESSION` are falsy @sjvans
+* fix(sdk-events): remove devDependencies to old `@opentelemetry/api-logs@0.52.0`, `@opentelemetry/api-events@0.52.0` packages [#5013](https://github.com/open-telemetry/opentelemetry-js/pull/5013) @pichlermarc
+* fix(sdk-logs): remove devDependencies to old `@opentelemetry/api-logs@0.52.0` [#5013](https://github.com/open-telemetry/opentelemetry-js/pull/5013) @pichlermarc
+* fix(sdk-logs): align LogRecord#setAttribute type with types from `@opentelemetry/api-logs@0.53.0` [#5013](https://github.com/open-telemetry/opentelemetry-js/pull/5013) @pichlermarc
 * feat(exporter-*-otlp-*)!: rewrite exporter config logic for testability [#4971](https://github.com/open-telemetry/opentelemetry-js/pull/4971) @pichlermarc
   * (user-facing) `getDefaultUrl` was intended for internal use has been removed from all exporters
   * (user-facing) `getUrlFromConfig` was intended for internal use and has been removed from all exporters
