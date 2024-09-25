@@ -90,9 +90,7 @@ class EnvDetectorSync implements DetectorSync {
    * of key/value pairs.
    * @returns The sanitized resource attributes.
    */
-  private _parseResourceAttributes(
-    rawEnvAttributes?: string
-  ): Attributes {
+  private _parseResourceAttributes(rawEnvAttributes?: string): Attributes {
     if (!rawEnvAttributes) return {};
 
     const attributes: Attributes = {};

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes,diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
 import {
   SEMRESATTRS_SERVICE_NAME,
   SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
