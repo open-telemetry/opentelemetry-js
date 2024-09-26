@@ -29,9 +29,7 @@ export type ForceFlushOptions = CommonReaderOptions;
  * This is intentionally not using the API's type as it's only available from @opentelemetry/api 1.9.0 and up.
  * In SDK 2.0 we'll be able to bump the minimum API version and remove this workaround.
  */
-export interface Gauge<
-  AttributesTypes extends Attributes = Attributes,
-> {
+export interface Gauge<AttributesTypes extends Attributes = Attributes> {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
