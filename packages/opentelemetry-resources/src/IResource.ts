@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ResourceAttributes } from './types';
+import { Attributes } from '@opentelemetry/api';
 
 /**
  * An interface that represents a resource. A Resource describes the entity for which signals (metrics or trace) are
@@ -33,7 +33,7 @@ export interface IResource {
   /**
    * @returns the Resource's attributes.
    */
-  readonly attributes: ResourceAttributes;
+  readonly attributes: Attributes;
 
   /**
    * Returns a promise that will never be rejected. Resolves when all async attributes have finished being added to
