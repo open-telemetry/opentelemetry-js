@@ -12,6 +12,7 @@
 * feat(sdk-metrics)!: replace attributeKeys with custom processors option [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532) @pichlermarc
 * refactor(sdk-trace-base)!: replace `SpanAttributes` with `Attributes` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009) @david-luna
 * refactor(resources)!: replace `ResourceAttributes` with `Attributes` [#5016](https://github.com/open-telemetry/opentelemetry-js/pull/5016) @david-luna
+* refactor(sdk-metrics)!: replace `MetricsAttributes` with `Attributes` [#5020](https://github.com/open-telemetry/opentelemetry-js/pull/5020) @david-luna
 
 ### :rocket: (Enhancement)
 
