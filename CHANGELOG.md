@@ -27,6 +27,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 * deps: set `@opentelemetry/api` dependency min version to 1.3.0 in `examples`, `experimental/packages`, `integration-tests` and `selenium-tests`
   [#4992](https://github.com/open-telemetry/opentelemetry-js/pull/4992)
+* refactor(sdk-metrics): replace `MetricsAttributes` with `Attributes` [#5021](https://github.com/open-telemetry/opentelemetry-js/pull/5021) @david-luna
 
 ## 1.26.0
 
