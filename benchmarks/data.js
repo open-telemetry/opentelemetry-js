@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727294415828,
+  "lastUpdate": 1727359740810,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -16602,6 +16602,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 652004,
             "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "rv2673@users.noreply.github.com",
+            "name": "Richard Versteeg",
+            "username": "rv2673"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a5dade5462bcc550b67e15ed6da7d867166dc998",
+          "message": "fix(opentelemetry-core): confusing log extract of composite propagator (#5017)",
+          "timestamp": "2024-09-26T14:00:40Z",
+          "tree_id": "7d9260aa7093b1a6b7fa52fea01ff4dc1dab31a6",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a5dade5462bcc550b67e15ed6da7d867166dc998"
+        },
+        "date": 1727359739943,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 982262,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11944,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 661265,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662195,
+            "range": "±0.23%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
