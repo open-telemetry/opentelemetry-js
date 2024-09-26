@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
+import { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -54,7 +54,7 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
 
   record(
     value: number,
-    attributes: MetricAttributes,
+    attributes: Attributes,
     context: Context,
     recordTime: HrTime
   ) {
