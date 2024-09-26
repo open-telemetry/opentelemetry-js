@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
@@ -25,9 +25,9 @@ export function isNotNullish<T>(item: Maybe<T>): item is T {
 
 /**
  * Converting the unordered attributes into unique identifier string.
- * @param attributes user provided unordered MetricAttributes.
+ * @param attributes user provided unordered Attributes.
  */
-export function hashAttributes(attributes: MetricAttributes): string {
+export function hashAttributes(attributes: Attributes): string {
   let keys = Object.keys(attributes);
   if (keys.length === 0) return '';
 
