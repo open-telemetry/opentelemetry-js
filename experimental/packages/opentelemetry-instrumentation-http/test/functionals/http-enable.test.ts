@@ -21,7 +21,7 @@ import {
   Span as ISpan,
   SpanKind,
   trace,
-  SpanAttributes,
+  Attributes,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -144,13 +144,13 @@ export const responseHookFunction = (
 
 export const startIncomingSpanHookFunction = (
   request: IncomingMessage
-): SpanAttributes => {
+): Attributes => {
   return { guid: request.headers?.guid };
 };
 
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
-): SpanAttributes => {
+): Attributes => {
   return { guid: request.headers?.guid };
 };
 
