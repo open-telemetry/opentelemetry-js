@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727362503907,
+  "lastUpdate": 1727423443959,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -16708,6 +16708,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.47%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "david.luna@elastic.co",
+            "name": "David Luna",
+            "username": "david-luna"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "466140bdf8c29dd36f666ee24db9fadbe9ff8041",
+          "message": "refactor(sdk-metrics): replace `MetricsAttributes` with `Attributes` (#5021)",
+          "timestamp": "2024-09-27T07:42:21Z",
+          "tree_id": "49f716bccf2ab0dd93ff6d2cc38519ae277dee7c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/466140bdf8c29dd36f666ee24db9fadbe9ff8041"
+        },
+        "date": 1727423443143,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 928716,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11870,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 666950,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 672750,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
