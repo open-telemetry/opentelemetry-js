@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import { _global, GLOBAL_LOGS_API_KEY } from '../../src/internal/global-utils';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
+import { ProxyLoggerProvider } from '../../src';
 
 const api1 = require('../../src') as typeof import('../../src');
 
@@ -66,11 +67,10 @@ describe('Global Utils', () => {
     assert.strictEqual(original, api1.logs.getLoggerProvider());
   });
 
-  it('should return the module NoOp implementation if the version is a mismatch', () => {
-    const original = api1.logs.getLoggerProvider();
-    api1.logs.setGlobalLoggerProvider(new NoopLoggerProvider());
+  it('should return the module no op implementation if the version is a mismatch', () => {
+    api1.logs.setGlobalLoggerProvider(new ProxyLoggerProvider());
     const afterSet = _global[GLOBAL_LOGS_API_KEY]!(-1);
 
-    assert.strictEqual(original, afterSet);
+    assert.ok(afterSet instanceof NoopLoggerProvider);
   });
 });
