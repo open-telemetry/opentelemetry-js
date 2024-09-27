@@ -67,16 +67,29 @@ function appendResourcePathToUrl(
   try {
     // just try to parse, if it fails we catch and warn.
     new URL(url);
-    if (!url.endsWith('/')) {
-      url = url + '/';
-    }
-    return url + path;
   } catch {
     diag.warn(
       `Configuration: Could not parse environment-provided export URL: '${url}', falling back to undefined`
     );
     return undefined;
   }
+
+  if (!url.endsWith('/')) {
+    url = url + '/';
+  }
+  url += path;
+
+  try {
+    // just try to parse, if it fails we catch and warn.
+    new URL(url);
+  } catch {
+    diag.warn(
+      `Configuration: Provided URL appended with '${path}' is not a valid URL, using 'undefined' instead of '${url}'`
+    );
+    return undefined;
+  }
+
+  return url;
 }
 
 function getNonSpecificUrlFromEnv(
