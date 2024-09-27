@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 import {
-  MetricAttributes,
-  SpanAttributes,
+  Attributes,
   SpanStatusCode,
   Span,
   context,
   SpanKind,
-  Attributes,
 } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
@@ -212,11 +210,11 @@ export const setSpanWithError = (
 /**
  * Adds attributes for request content-length and content-encoding HTTP headers
  * @param { IncomingMessage } Request object whose headers will be analyzed
- * @param { SpanAttributes } SpanAttributes object to be modified
+ * @param { Attributes } Attributes object to be modified
  */
 export const setRequestContentLengthAttribute = (
   request: IncomingMessage,
-  attributes: SpanAttributes
+  attributes: Attributes
 ): void => {
   const length = getContentLength(request.headers);
   if (length === null) return;
@@ -231,13 +229,13 @@ export const setRequestContentLengthAttribute = (
 /**
  * Adds attributes for response content-length and content-encoding HTTP headers
  * @param { IncomingMessage } Response object whose headers will be analyzed
- * @param { SpanAttributes } SpanAttributes object to be modified
+ * @param { Attributes } Attributes object to be modified
  *
  * @deprecated this is for an older version of semconv. It is retained for compatibility using OTEL_SEMCONV_STABILITY_OPT_IN
  */
 export const setResponseContentLengthAttribute = (
   response: IncomingMessage,
-  attributes: SpanAttributes
+  attributes: Attributes
 ): void => {
   const length = getContentLength(response.headers);
   if (length === null) return;
@@ -380,7 +378,7 @@ export const extractHostnameAndPort = (
 /**
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
- * @param {{ component: string, hostname: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
+ * @param {{ component: string, hostname: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
  * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getOutgoingRequestAttributes = (
@@ -389,10 +387,10 @@ export const getOutgoingRequestAttributes = (
     component: string;
     hostname: string;
     port: string | number;
-    hookAttributes?: SpanAttributes;
+    hookAttributes?: Attributes;
   },
   semconvStability: SemconvStability
-): SpanAttributes => {
+): Attributes => {
   const hostname = options.hostname;
   const port = options.port;
   const method = requestOptions.method ?? 'GET';
@@ -404,7 +402,7 @@ export const getOutgoingRequestAttributes = (
     headers,
     `${options.component}:`
   );
-  const oldAttributes: SpanAttributes = {
+  const oldAttributes: Attributes = {
     [SEMATTRS_HTTP_URL]: urlFull,
     [SEMATTRS_HTTP_METHOD]: method,
     [SEMATTRS_HTTP_TARGET]: requestOptions.path || '/',
@@ -446,12 +444,12 @@ export const getOutgoingRequestAttributes = (
 
 /**
  * Returns outgoing request Metric attributes scoped to the request data
- * @param {SpanAttributes} spanAttributes the span attributes
+ * @param {Attributes} spanAttributes the span attributes
  */
 export const getOutgoingRequestMetricAttributes = (
-  spanAttributes: SpanAttributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
+  spanAttributes: Attributes
+): Attributes => {
+  const metricAttributes: Attributes = {};
   metricAttributes[SEMATTRS_HTTP_METHOD] = spanAttributes[SEMATTRS_HTTP_METHOD];
   metricAttributes[SEMATTRS_NET_PEER_NAME] =
     spanAttributes[SEMATTRS_NET_PEER_NAME];
@@ -465,7 +463,7 @@ export const getOutgoingRequestMetricAttributes = (
  */
 export const setAttributesFromHttpKind = (
   kind: string | undefined,
-  attributes: SpanAttributes
+  attributes: Attributes
 ): void => {
   if (kind) {
     attributes[SEMATTRS_HTTP_FLAVOR] = kind;
@@ -485,9 +483,9 @@ export const setAttributesFromHttpKind = (
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
   semconvStability: SemconvStability
-): SpanAttributes => {
+): Attributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
-  const oldAttributes: SpanAttributes = {};
+  const oldAttributes: Attributes = {};
   const stableAttributes: Attributes = {};
 
   if (statusCode != null) {
@@ -527,12 +525,12 @@ export const getOutgoingRequestAttributesOnResponse = (
 
 /**
  * Returns outgoing request Metric attributes scoped to the response data
- * @param {SpanAttributes} spanAttributes the span attributes
+ * @param {Attributes} spanAttributes the span attributes
  */
 export const getOutgoingRequestMetricAttributesOnResponse = (
-  spanAttributes: SpanAttributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
+  spanAttributes: Attributes
+): Attributes => {
+  const metricAttributes: Attributes = {};
   metricAttributes[SEMATTRS_NET_PEER_PORT] =
     spanAttributes[SEMATTRS_NET_PEER_PORT];
   metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
@@ -694,7 +692,7 @@ export function getRemoteClientAddress(
 /**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
- * @param {{ component: string, serverName?: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
+ * @param {{ component: string, serverName?: string, hookAttributes?: Attributes }} options used to pass data needed to create attributes
  * @param {SemconvStability} semconvStability determines which semconv version to use
  */
 export const getIncomingRequestAttributes = (
@@ -702,10 +700,10 @@ export const getIncomingRequestAttributes = (
   options: {
     component: 'http' | 'https';
     serverName?: string;
-    hookAttributes?: SpanAttributes;
+    hookAttributes?: Attributes;
     semconvStability: SemconvStability;
   }
-): SpanAttributes => {
+): Attributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
   const ips = headers['x-forwarded-for'];
@@ -794,13 +792,13 @@ export const getIncomingRequestAttributes = (
 
 /**
  * Returns incoming request Metric attributes scoped to the request data
- * @param {SpanAttributes} spanAttributes the span attributes
+ * @param {Attributes} spanAttributes the span attributes
  * @param {{ component: string }} options used to pass data needed to create attributes
  */
 export const getIncomingRequestMetricAttributes = (
-  spanAttributes: SpanAttributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
+  spanAttributes: Attributes
+): Attributes => {
+  const metricAttributes: Attributes = {};
   metricAttributes[SEMATTRS_HTTP_SCHEME] = spanAttributes[SEMATTRS_HTTP_SCHEME];
   metricAttributes[SEMATTRS_HTTP_METHOD] = spanAttributes[SEMATTRS_HTTP_METHOD];
   metricAttributes[SEMATTRS_NET_HOST_NAME] =
@@ -818,7 +816,7 @@ export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage,
   response: ServerResponse,
   semconvStability: SemconvStability
-): SpanAttributes => {
+): Attributes => {
   // take socket from the request,
   // since it may be detached from the response object in keep-alive mode
   const { socket } = request;
@@ -829,7 +827,7 @@ export const getIncomingRequestAttributesOnResponse = (
   };
 
   const rpcMetadata = getRPCMetadata(context.active());
-  const oldAttributes: SpanAttributes = {};
+  const oldAttributes: Attributes = {};
   if (socket) {
     const { localAddress, localPort, remoteAddress, remotePort } = socket;
     oldAttributes[SEMATTRS_NET_HOST_IP] = localAddress;
@@ -858,12 +856,12 @@ export const getIncomingRequestAttributesOnResponse = (
 
 /**
  * Returns incoming request Metric attributes scoped to the request data
- * @param {SpanAttributes} spanAttributes the span attributes
+ * @param {Attributes} spanAttributes the span attributes
  */
 export const getIncomingRequestMetricAttributesOnResponse = (
-  spanAttributes: SpanAttributes
-): MetricAttributes => {
-  const metricAttributes: MetricAttributes = {};
+  spanAttributes: Attributes
+): Attributes => {
+  const metricAttributes: Attributes = {};
   metricAttributes[SEMATTRS_HTTP_STATUS_CODE] =
     spanAttributes[SEMATTRS_HTTP_STATUS_CODE];
   metricAttributes[SEMATTRS_NET_HOST_PORT] =

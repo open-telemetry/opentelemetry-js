@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 import {
-  SpanAttributes,
+  Attributes,
   SpanStatusCode,
   ROOT_CONTEXT,
   SpanKind,
   TraceFlags,
   context,
-  Attributes,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import {
@@ -362,7 +361,7 @@ describe('Utility', () => {
   // Verify the key in the given attributes is set to the given value,
   // and that no other HTTP Content Length attributes are set.
   function verifyValueInAttributes(
-    attributes: SpanAttributes,
+    attributes: Attributes,
     key: string | undefined,
     value: number
   ) {
@@ -384,7 +383,7 @@ describe('Utility', () => {
 
   describe('setRequestContentLengthAttributes()', () => {
     it('should set request content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
 
       request.headers = {
@@ -400,7 +399,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -416,7 +415,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -434,7 +433,7 @@ describe('Utility', () => {
 
   describe('setResponseContentLengthAttributes()', () => {
     it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -451,7 +450,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -470,7 +469,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -489,7 +488,7 @@ describe('Utility', () => {
     });
 
     it('should set no attributes with no content-length header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const message = {} as IncomingMessage;
 
       message.headers = {
