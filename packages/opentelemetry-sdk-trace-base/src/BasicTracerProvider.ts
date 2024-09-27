@@ -70,7 +70,7 @@ export class BasicTracerProvider implements TracerProvider {
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
 
-  activeSpanProcessor: SpanProcessor;
+  private activeSpanProcessor: SpanProcessor;
   readonly resource: IResource;
 
   constructor(config: TracerConfig = {}) {
