@@ -26,9 +26,8 @@ import {
   SpanStatusCode,
   trace,
   Histogram,
-  MetricAttributes,
-  ValueType,
   Attributes,
+  ValueType,
 } from '@opentelemetry/api';
 import {
   hrTime,
@@ -422,7 +421,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     request: http.ClientRequest,
     span: Span,
     startTime: HrTime,
-    oldMetricAttributes: MetricAttributes,
+    oldMetricAttributes: Attributes,
     stableMetricAttributes: Attributes
   ): http.ClientRequest {
     if (this.getConfig().requestHook) {
@@ -818,7 +817,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       );
 
       const startTime = hrTime();
-      const oldMetricAttributes: MetricAttributes =
+      const oldMetricAttributes: Attributes =
         getOutgoingRequestMetricAttributes(attributes);
 
       // request method, server address, and server port are both required span attributes
@@ -904,8 +903,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     request: http.IncomingMessage,
     response: http.ServerResponse,
     span: Span,
-    oldMetriceAttributes: MetricAttributes,
-    stableMetriceAttributes: MetricAttributes,
+    oldMetriceAttributes: Attributes,
+    stableMetriceAttributes: Attributes,
     startTime: HrTime
   ) {
     const attributes = getIncomingRequestAttributesOnResponse(
@@ -955,8 +954,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
   private _onServerResponseError(
     span: Span,
-    oldMetricAttributes: MetricAttributes,
-    stableMetricAttributes: MetricAttributes,
+    oldMetricAttributes: Attributes,
+    stableMetricAttributes: Attributes,
     startTime: HrTime,
     error: Err
   ) {
@@ -1003,8 +1002,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     span: Span,
     spanKind: SpanKind,
     startTime: HrTime,
-    oldMetricAttributes: MetricAttributes,
-    stableMetricAttributes: MetricAttributes
+    oldMetricAttributes: Attributes,
+    stableMetricAttributes: Attributes
   ) {
     if (!this._spanNotEnded.has(span)) {
       return;
