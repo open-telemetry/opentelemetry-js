@@ -25,7 +25,6 @@ import {
   OTLPExporterConfigBase,
   ExportServiceError,
 } from './types';
-import { configureExporterTimeout } from './util';
 
 /**
  * Collector Exporter abstract base class
@@ -34,12 +33,6 @@ export abstract class OTLPExporterBase<
   T extends OTLPExporterConfigBase,
   ExportItem,
 > {
-  public readonly url: string;
-  /**
-   * @deprecated scheduled for removal. This is only used in tests.
-   */
-  public readonly hostname: string | undefined;
-  public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
   protected _shutdownOnce: BindOnceFuture<void>;
@@ -48,11 +41,6 @@ export abstract class OTLPExporterBase<
    * @param config
    */
   constructor(config: T = {} as T) {
-    this.url = this.getDefaultUrl(config);
-    if (typeof config.hostname === 'string') {
-      this.hostname = config.hostname;
-    }
-
     this.shutdown = this.shutdown.bind(this);
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
@@ -60,11 +48,6 @@ export abstract class OTLPExporterBase<
       typeof config.concurrencyLimit === 'number'
         ? config.concurrencyLimit
         : 30;
-
-    this.timeoutMillis = configureExporterTimeout(config.timeoutMillis);
-
-    // platform dependent
-    this.onInit(config);
   }
 
   /**
@@ -138,11 +121,9 @@ export abstract class OTLPExporterBase<
   }
 
   abstract onShutdown(): void;
-  abstract onInit(config: T): void;
   abstract send(
     items: ExportItem[],
     onSuccess: () => void,
     onError: (error: OTLPExporterError) => void
   ): void;
-  abstract getDefaultUrl(config: T): string;
 }

@@ -23,8 +23,6 @@ import type { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer
 import { OTLPExporterBrowserBase } from '@opentelemetry/otlp-exporter-base';
 import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
 
-import { getDefaultUrl } from '../config';
-
 /**
  * Collector Logs Exporter for Web
  */
@@ -38,11 +36,10 @@ export class OTLPLogExporter
         ...config,
       },
       JsonLogsSerializer,
-      'application/json'
+      {
+        'Content-Type': 'application/json',
+      },
+      'v1/logs'
     );
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    return getDefaultUrl(config);
   }
 }

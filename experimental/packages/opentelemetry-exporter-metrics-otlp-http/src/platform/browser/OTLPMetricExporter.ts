@@ -27,22 +27,18 @@ import {
 } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<
   ResourceMetrics,
   IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPMetricExporterOptions & OTLPExporterConfigBase) {
-    super(config, JsonMetricsSerializer, 'application/json');
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return DEFAULT_COLLECTOR_URL;
+    super(
+      config,
+      JsonMetricsSerializer,
+      { 'Content-Type': 'application/json' },
+      DEFAULT_COLLECTOR_RESOURCE_PATH
+    );
   }
 }
 
