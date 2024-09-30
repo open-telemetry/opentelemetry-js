@@ -903,8 +903,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     request: http.IncomingMessage,
     response: http.ServerResponse,
     span: Span,
-    oldMetriceAttributes: Attributes,
-    stableMetriceAttributes: Attributes,
+    oldMetricAttributes: Attributes,
+    stableMetricAttributes: Attributes,
     startTime: HrTime
   ) {
     const attributes = getIncomingRequestAttributesOnResponse(
@@ -912,8 +912,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       response,
       this._semconvStability
     );
-    oldMetriceAttributes = Object.assign(
-      oldMetriceAttributes,
+    oldMetricAttributes = Object.assign(
+      oldMetricAttributes,
       getIncomingRequestMetricAttributesOnResponse(attributes)
     );
 
@@ -947,8 +947,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       span,
       SpanKind.SERVER,
       startTime,
-      oldMetriceAttributes,
-      stableMetriceAttributes
+      oldMetricAttributes,
+      stableMetricAttributes
     );
   }
 
