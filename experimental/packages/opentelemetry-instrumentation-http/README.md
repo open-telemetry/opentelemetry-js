@@ -63,6 +63,7 @@ Http instrumentation has few options available to choose from. You can set the f
 | `ignoreOutgoingRequestHook` | `IgnoreOutgoingRequestFunction` | Http instrumentation will not trace all outgoing requests that matched with custom function |
 | `disableOutgoingRequestInstrumentation` | `boolean` | Set to true to avoid instrumenting outgoing requests at all. This can be helpful when another instrumentation handles outgoing requests. |
 | `disableIncomingRequestInstrumentation` | `boolean` | Set to true to avoid instrumenting incoming requests at all. This can be helpful when another instrumentation handles incoming requests. |
+| `disableMetrics` | `boolean` | Set to true in order to disable instrumentation-http from emitting any metrics such as duration of inbound/outbound HTTP requests. |
 | [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L101) | `string` | The primary server name of the matched virtual host. |
 | [`requireParentforOutgoingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L103) | Boolean | Require that is a parent span to create new span for outgoing requests. |
 | [`requireParentforIncomingSpans`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-http/src/types.ts#L105) | Boolean | Require that is a parent span to create new span for incoming requests. |

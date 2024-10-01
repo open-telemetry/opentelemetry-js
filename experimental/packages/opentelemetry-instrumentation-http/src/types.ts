@@ -102,6 +102,8 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   disableIncomingRequestInstrumentation?: boolean;
   /** If set to true, outgoing requests will not be instrumented at all. */
   disableOutgoingRequestInstrumentation?: boolean;
+  /** If set to true, no metrics will be emitted */
+  disableMetrics?: boolean;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
   /** Function for adding custom attributes before request is handled */

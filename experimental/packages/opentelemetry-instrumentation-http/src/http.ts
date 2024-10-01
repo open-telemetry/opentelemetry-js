@@ -88,6 +88,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private _headerCapture;
+  private _disableMetrics: boolean;
   private _httpServerDurationHistogram!: Histogram;
   private _httpClientDurationHistogram!: Histogram;
 
@@ -96,6 +97,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   constructor(config: HttpInstrumentationConfig = {}) {
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
+    this._disableMetrics = this.getConfig().disableMetrics || false;
 
     for (const entry in getEnv().OTEL_SEMCONV_STABILITY_OPT_IN) {
       if (entry.toLowerCase() === 'http/dup') {
@@ -851,9 +853,9 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
     // Record metrics
     const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
-    if (spanKind === SpanKind.SERVER) {
+    if (spanKind === SpanKind.SERVER && !this._disableMetrics) {
       this._httpServerDurationHistogram.record(duration, metricAttributes);
-    } else if (spanKind === SpanKind.CLIENT) {
+    } else if (spanKind === SpanKind.CLIENT && !this._disableMetrics) {
       this._httpClientDurationHistogram.record(duration, metricAttributes);
     }
   }

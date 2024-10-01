@@ -14,6 +14,7 @@ All notable changes to experimental packages in this project will be documented 
   * Applies to both client and server spans
   * Generate spans compliant with Semantic Conventions 1.27+ when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` or `http/dup`
   * Generate spans backwards compatible with previous attributes when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT contain `http`
+* feat(add-option-to-disable-instrumentation-http-metrics): Add option to disable instrumentation-http metrics such as incoming or outgoing HTTP request duration [#4409](https://github.com/open-telemetry/opentelemetry-js/pull/5029) @AkselAllas
 
 ### :bug: (Bug Fix)
 
