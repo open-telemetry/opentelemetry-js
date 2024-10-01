@@ -58,14 +58,14 @@ const spanContext: api.SpanContext = {
 describe('transform', () => {
   describe('toZipkinSpan', () => {
     it('should convert an OpenTelemetry span to a Zipkin span', () => {
-      const span = new Span(
-        tracer,
-        api.ROOT_CONTEXT,
+      const span = tracer.startSpan(
         'my-span',
-        spanContext,
-        api.SpanKind.SERVER,
-        parentId
-      );
+        { kind: api.SpanKind.SERVER },
+        api.ROOT_CONTEXT,
+      ) as unknown as Span;
+      (span as any)['_spanContext'] = spanContext;
+      (span as any)['parentSpanId'] = parentId;
+
       span.setAttributes({
         key1: 'value1',
         key2: 'value2',
@@ -112,13 +112,11 @@ describe('transform', () => {
       });
     });
     it("should skip parentSpanId if doesn't exist", () => {
-      const span = new Span(
-        tracer,
-        api.ROOT_CONTEXT,
+      const span = tracer.startSpan(
         'my-span',
-        spanContext,
-        api.SpanKind.SERVER
-      );
+        { kind: api.SpanKind.SERVER },
+        api.ROOT_CONTEXT,
+      ) as unknown as Span;
       span.end();
 
       const zipkinSpan = toZipkinSpan(
@@ -163,13 +161,11 @@ describe('transform', () => {
       it(`should map OpenTelemetry SpanKind ${
         api.SpanKind[item.ot]
       } to Zipkin ${item.zipkin}`, () => {
-        const span = new Span(
-          tracer,
-          api.ROOT_CONTEXT,
+        const span = tracer.startSpan(
           'my-span',
-          spanContext,
-          item.ot
-        );
+          { kind: item.ot },
+          api.ROOT_CONTEXT,
+        ) as unknown as Span;
         span.end();
 
         const zipkinSpan = toZipkinSpan(
@@ -208,14 +204,12 @@ describe('transform', () => {
 
   describe('_toZipkinTags', () => {
     it('should convert OpenTelemetry attributes to Zipkin tags', () => {
-      const span = new Span(
-        tracer,
-        api.ROOT_CONTEXT,
+      const span = tracer.startSpan(
         'my-span',
-        spanContext,
-        api.SpanKind.SERVER,
-        parentId
-      );
+        { kind: api.SpanKind.SERVER },
+        api.ROOT_CONTEXT,
+      ) as unknown as Span;
+
       span.setAttributes({
         key1: 'value1',
         key2: 'value2',
@@ -239,21 +233,18 @@ describe('transform', () => {
       });
     });
     it('should map OpenTelemetry constructor attributes to a Zipkin tag', () => {
-      const span = new Span(
-        tracer,
-        api.ROOT_CONTEXT,
+      const span = tracer.startSpan(
         'my-span',
-        spanContext,
-        api.SpanKind.SERVER,
-        parentId,
-        [],
-        undefined,
-        undefined,
         {
-          key1: 'value1',
-          key2: 'value2',
-        }
-      );
+          kind: api.SpanKind.SERVER,
+          attributes: {
+            key1: 'value1',
+            key2: 'value2',
+          }
+        },
+        api.ROOT_CONTEXT,
+      ) as unknown as Span;
+
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
         defaultStatusCodeTagName,
@@ -273,14 +264,13 @@ describe('transform', () => {
       });
     });
     it('should map OpenTelemetry SpanStatus.code to a Zipkin tag', () => {
-      const span = new Span(
-        tracer,
-        api.ROOT_CONTEXT,
+      const span = tracer.startSpan(
         'my-span',
-        spanContext,
-        api.SpanKind.SERVER,
-        parentId
-      );
+        {
+          kind: api.SpanKind.SERVER,
+        },
+        api.ROOT_CONTEXT,
+      ) as unknown as Span;
       const status: api.SpanStatus = {
         code: api.SpanStatusCode.ERROR,
       };
@@ -309,14 +299,13 @@ describe('transform', () => {
       });
     });
     it('should map OpenTelemetry SpanStatus.message to a Zipkin tag', () => {
-      const span = new Span(
-        tracer,
-        api.ROOT_CONTEXT,
+      const span = tracer.startSpan(
         'my-span',
-        spanContext,
-        api.SpanKind.SERVER,
-        parentId
-      );
+        {
+          kind: api.SpanKind.SERVER,
+        },
+        api.ROOT_CONTEXT,
+      ) as unknown as Span;
       const status: api.SpanStatus = {
         code: api.SpanStatusCode.ERROR,
         message: 'my-message',
@@ -350,14 +339,13 @@ describe('transform', () => {
 
   describe('_toZipkinAnnotations', () => {
     it('should convert OpenTelemetry events to Zipkin annotations', () => {
-      const span = new Span(
-        tracer,
-        api.ROOT_CONTEXT,
+      const span = tracer.startSpan(
         'my-span',
-        spanContext,
-        api.SpanKind.SERVER,
-        parentId
-      );
+        {
+          kind: api.SpanKind.SERVER,
+        },
+        api.ROOT_CONTEXT,
+      ) as unknown as Span;
       span.addEvent('my-event1');
       span.addEvent('my-event2', { key1: 'value1' });
 
