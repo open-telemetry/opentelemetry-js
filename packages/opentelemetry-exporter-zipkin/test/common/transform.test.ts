@@ -61,7 +61,7 @@ describe('transform', () => {
       const span = tracer.startSpan(
         'my-span',
         { kind: api.SpanKind.SERVER },
-        api.ROOT_CONTEXT,
+        api.ROOT_CONTEXT
       ) as unknown as Span;
       (span as any)['_spanContext'] = spanContext;
       (span as any)['parentSpanId'] = parentId;
@@ -115,7 +115,7 @@ describe('transform', () => {
       const span = tracer.startSpan(
         'my-span',
         { kind: api.SpanKind.SERVER },
-        api.ROOT_CONTEXT,
+        api.ROOT_CONTEXT
       ) as unknown as Span;
       span.end();
 
@@ -164,7 +164,7 @@ describe('transform', () => {
         const span = tracer.startSpan(
           'my-span',
           { kind: item.ot },
-          api.ROOT_CONTEXT,
+          api.ROOT_CONTEXT
         ) as unknown as Span;
         span.end();
 
@@ -207,7 +207,7 @@ describe('transform', () => {
       const span = tracer.startSpan(
         'my-span',
         { kind: api.SpanKind.SERVER },
-        api.ROOT_CONTEXT,
+        api.ROOT_CONTEXT
       ) as unknown as Span;
 
       span.setAttributes({
@@ -240,9 +240,9 @@ describe('transform', () => {
           attributes: {
             key1: 'value1',
             key2: 'value2',
-          }
+          },
         },
-        api.ROOT_CONTEXT,
+        api.ROOT_CONTEXT
       ) as unknown as Span;
 
       const tags: zipkinTypes.Tags = _toZipkinTags(
@@ -269,7 +269,7 @@ describe('transform', () => {
         {
           kind: api.SpanKind.SERVER,
         },
-        api.ROOT_CONTEXT,
+        api.ROOT_CONTEXT
       ) as unknown as Span;
       const status: api.SpanStatus = {
         code: api.SpanStatusCode.ERROR,
@@ -304,7 +304,7 @@ describe('transform', () => {
         {
           kind: api.SpanKind.SERVER,
         },
-        api.ROOT_CONTEXT,
+        api.ROOT_CONTEXT
       ) as unknown as Span;
       const status: api.SpanStatus = {
         code: api.SpanStatusCode.ERROR,
@@ -344,7 +344,7 @@ describe('transform', () => {
         {
           kind: api.SpanKind.SERVER,
         },
-        api.ROOT_CONTEXT,
+        api.ROOT_CONTEXT
       ) as unknown as Span;
       span.addEvent('my-event1');
       span.addEvent('my-event2', { key1: 'value1' });
