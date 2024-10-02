@@ -21,6 +21,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace): make activeSpanProcessor private [#4965](https://github.com/open-telemetry/opentelemetry-js/pull/4965) @legalimpurity
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

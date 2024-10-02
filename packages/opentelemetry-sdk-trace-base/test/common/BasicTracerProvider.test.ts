@@ -88,12 +88,12 @@ describe('BasicTracerProvider', () => {
 
       it('should use noop span processor by default', () => {
         const tracer = new BasicTracerProvider();
-        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+        assert.ok(tracer['activeSpanProcessor'] instanceof NoopSpanProcessor);
       });
       it('should use noop span processor by default and no diag error', () => {
         const errorStub = sinon.spy(diag, 'error');
         const tracer = new BasicTracerProvider();
-        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+        assert.ok(tracer['activeSpanProcessor'] instanceof NoopSpanProcessor);
 
         sinon.assert.notCalled(errorStub);
       });
@@ -105,7 +105,7 @@ describe('BasicTracerProvider', () => {
         envSource.OTEL_TRACES_EXPORTER = 'someExporter';
 
         const tracer = new BasicTracerProvider();
-        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+        assert.ok(tracer['activeSpanProcessor'] instanceof NoopSpanProcessor);
 
         sinon.assert.calledWith(
           errorStub,

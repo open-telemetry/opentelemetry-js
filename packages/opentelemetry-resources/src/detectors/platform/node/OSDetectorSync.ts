@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+import { Attributes } from '@opentelemetry/api';
 import {
   SEMRESATTRS_OS_TYPE,
   SEMRESATTRS_OS_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../../Resource';
-import { DetectorSync, ResourceAttributes } from '../../../types';
+import { DetectorSync } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';
 import { platform, release } from 'os';
 import { normalizeType } from './utils';
@@ -30,7 +31,7 @@ import { normalizeType } from './utils';
  */
 class OSDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): Resource {
-    const attributes: ResourceAttributes = {
+    const attributes: Attributes = {
       [SEMRESATTRS_OS_TYPE]: normalizeType(platform()),
       [SEMRESATTRS_OS_VERSION]: release(),
     };

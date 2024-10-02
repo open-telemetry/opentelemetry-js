@@ -36,7 +36,8 @@ import {
 } from '../../../src';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { Attributes } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 
 describe('SimpleSpanProcessor', () => {
@@ -164,7 +165,7 @@ describe('SimpleSpanProcessor', () => {
       const providerWithAsyncResource = new BasicTracerProvider({
         resource: new Resource(
           {},
-          new Promise<ResourceAttributes>(resolve => {
+          new Promise<Attributes>(resolve => {
             setTimeout(() => resolve({ async: 'fromasync' }), 1);
           })
         ),
@@ -205,7 +206,7 @@ describe('SimpleSpanProcessor', () => {
       const providerWithAsyncResource = new BasicTracerProvider({
         resource: new Resource(
           {},
-          new Promise<ResourceAttributes>(resolve => {
+          new Promise<Attributes>(resolve => {
             setTimeout(() => resolve({ async: 'fromasync' }), 1);
           })
         ),
