@@ -92,6 +92,7 @@ This is the recommended configuration, and will soon become the default behavior
 Follow all requirements and recommendations of HTTP Client and Server Semantic Conventions Version 1.27.0 for [spans](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-spans.md) and [metrics](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md), including all required and recommended attributes.
 
 Metrics Exported:
+
 - [`http.server.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpserverrequestduration)
 - [`http.client.request.duration`](https://github.com/open-telemetry/semantic-conventions/blob/v1.27.0/docs/http/http-metrics.md#metric-httpclientrequestduration)
 
