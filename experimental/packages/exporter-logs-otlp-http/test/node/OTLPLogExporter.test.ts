@@ -18,7 +18,6 @@ import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
-import * as Config from '../../src/platform/config';
 
 import { OTLPLogExporter } from '../../src/platform/node';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
@@ -103,15 +102,6 @@ describe('OTLPLogExporter', () => {
       delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
     });
 
-    it('should use timeout defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = '';
-      envSource.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT = 30000;
-      const exporter = new OTLPLogExporter();
-      assert.strictEqual(exporter.timeoutMillis, 30000);
-      delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
-      delete envSource.OTEL_EXPORTER_OTLP_LOGS_TIMEOUT;
-    });
-
     it('should override headers defined via env with headers defined in constructor', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       const exporter = new OTLPLogExporter({
@@ -131,23 +121,12 @@ describe('OTLPLogExporter', () => {
     });
   });
 
-  describe('getDefaultUrl', () => {
-    it('should call getDefaultUrl', () => {
-      const getDefaultUrl = sinon.stub(Config, 'getDefaultUrl');
-      const exporter = new OTLPLogExporter();
-      exporter.getDefaultUrl({});
-      // this callCount is 2, because new OTLPLogExporter also call it
-      assert.strictEqual(getDefaultUrl.callCount, 2);
-    });
-  });
-
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
         },
-        hostname: 'foo',
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },

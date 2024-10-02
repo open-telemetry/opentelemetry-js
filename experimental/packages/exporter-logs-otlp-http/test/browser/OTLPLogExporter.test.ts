@@ -16,7 +16,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import * as Config from '../../src/platform/config';
 import { OTLPLogExporter } from '../../src/platform/browser';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
@@ -35,16 +34,6 @@ describe('OTLPLogExporter', () => {
     it('should create an instance', () => {
       const exporter = new OTLPLogExporter();
       assert.ok(exporter instanceof OTLPLogExporter);
-    });
-  });
-
-  describe('getDefaultUrl', () => {
-    it('should call getDefaultUrl', () => {
-      const getDefaultUrl = sinon.stub(Config, 'getDefaultUrl');
-      const exporter = new OTLPLogExporter();
-      exporter.getDefaultUrl({});
-      // this callCount is 2, because new OTLPLogExporter also call it
-      assert.strictEqual(getDefaultUrl.callCount, 2);
     });
   });
 

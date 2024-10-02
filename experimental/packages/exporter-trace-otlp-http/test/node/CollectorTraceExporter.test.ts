@@ -35,7 +35,6 @@ import {
 } from '../traceHelper';
 import { MockedResponse } from './nodeHelpers';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
-import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -80,144 +79,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
   });
 
-  describe('when configuring via environment', () => {
-    const envSource = process.env;
-    it('should use url defined in env that ends with root path and append version and signal path', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/traces`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should use url defined in env without checking if path is already present', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/traces';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should use url defined in env and append version and signal', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should override global exporter url with signal url defined in env', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces/';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-    });
-    it('should override url defined in env with url defined in constructor', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
-      const constructorDefinedEndpoint = 'http://constructor/v1/traces';
-      const collectorExporter = new OTLPTraceExporter({
-        url: constructorDefinedEndpoint,
-      });
-      assert.strictEqual(collectorExporter.url, constructorDefinedEndpoint);
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-    });
-    it('should add root path when signal url defined in env contains no path and no root path', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}/`
-      );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains root path but no path', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains path', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains path and ends in /', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT =
-        'http://foo.bar/v1/traces/';
-      const collectorExporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
-    });
-    it('should use headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-      const exporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'bar'
-      );
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should include user agent in header', () => {
-      const exporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers'][
-          'User-Agent'
-        ],
-        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-      );
-    });
-    it('should override global headers config with signal headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
-      const exporter = new OTLPTraceExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'boo'
-      );
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['bar'],
-        'foo'
-      );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should override headers defined via env with headers defined in constructor', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const exporter = new OTLPTraceExporter({
-        headers: {
-          foo: 'constructor',
-        },
-      });
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'constructor'
-      );
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['bar'],
-        'foo'
-      );
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-  });
-
   describe('export', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
@@ -225,7 +86,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
         headers: {
           foo: 'bar',
         },
-        hostname: 'foo',
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
@@ -439,7 +299,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
         headers: {
           foo: 'bar',
         },
-        hostname: 'foo',
         url: 'http://foo.bar.com',
         keepAlive: true,
         compression: CompressionAlgorithm.GZIP,
@@ -481,27 +340,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
   });
 
-  describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
-    it('should default to localhost', done => {
-      const collectorExporter = new OTLPTraceExporter();
-      setTimeout(() => {
-        assert.strictEqual(
-          collectorExporter['url'],
-          'http://localhost:4318/v1/traces'
-        );
-        done();
-      });
-    });
-
-    it('should keep the URL if included', done => {
-      const url = 'http://foo.bar.com';
-      const collectorExporter = new OTLPTraceExporter({ url });
-      setTimeout(() => {
-        assert.strictEqual(collectorExporter['url'], url);
-        done();
-      });
-    });
-  });
   describe('export - with timeout', () => {
     beforeEach(() => {
       fakeRequest = new Stream.PassThrough();
@@ -516,7 +354,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
         headers: {
           foo: 'bar',
         },
-        hostname: 'foo',
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
