@@ -65,6 +65,7 @@ import { errorMonitor } from 'events';
 import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PROTOCOL_VERSION,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
@@ -928,6 +929,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     const route = attributes[SEMATTRS_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
+      stableMetricAttributes[ATTR_HTTP_ROUTE] = route;
     }
 
     if (this.getConfig().applyCustomAttributesOnSpan) {

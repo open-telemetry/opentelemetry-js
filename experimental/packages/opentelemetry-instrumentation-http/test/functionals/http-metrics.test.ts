@@ -22,6 +22,7 @@ import {
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   ATTR_HTTP_REQUEST_METHOD,
+  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PROTOCOL_VERSION,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
@@ -39,6 +40,7 @@ import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
 import { TestMetricReader } from '../utils/TestMetricReader';
+import { context, ContextManager } from '@opentelemetry/api';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
@@ -46,6 +48,8 @@ instrumentation.disable();
 
 import * as http from 'http';
 import { SemconvStability } from '../../src/types';
+import { getRPCMetadata, RPCType } from '@opentelemetry/core';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 let server: http.Server;
 const serverPort = 22346;
@@ -63,14 +67,24 @@ instrumentation.setTracerProvider(tracerProvider);
 instrumentation.setMeterProvider(meterProvider);
 
 describe('metrics', () => {
+  let contextManager: ContextManager;
+
   beforeEach(() => {
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
     instrumentation['_updateMetricInstruments']();
     metricsMemoryExporter.reset();
   });
 
   before(() => {
+    instrumentation.setConfig({});
     instrumentation.enable();
     server = http.createServer((request, response) => {
+      const rpcData = getRPCMetadata(context.active());
+      assert.ok(rpcData != null);
+      assert.strictEqual(rpcData.type, RPCType.HTTP);
+      assert.strictEqual(rpcData.route, undefined);
+      rpcData.route = 'TheRoute';
       response.end('Test Server Response');
     });
     server.listen(serverPort);
@@ -340,6 +354,7 @@ describe('metrics', () => {
         [ATTR_HTTP_REQUEST_METHOD]: 'GET',
         [ATTR_URL_SCHEME]: 'http',
         [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        [ATTR_HTTP_ROUTE]: 'TheRoute',
       });
 
       assert.strictEqual(metrics[3].dataPointType, DataPointType.HISTOGRAM);
