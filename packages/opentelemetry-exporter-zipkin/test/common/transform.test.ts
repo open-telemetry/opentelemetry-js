@@ -16,17 +16,16 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  hrTime,
   hrTimeDuration,
   hrTimeToMicroseconds,
+  millisToHrTime,
   VERSION,
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
+import { IResource } from '@opentelemetry/resources';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-} from '@opentelemetry/semantic-conventions';
+import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import {
   defaultStatusCodeTagName,
   defaultStatusErrorTagName,
@@ -35,43 +34,69 @@ import {
   _toZipkinTags,
 } from '../../src/transform';
 import * as zipkinTypes from '../../src/types';
-const tracer = new BasicTracerProvider({
-  resource: Resource.default().merge(
-    new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
-      cost: '112.12',
-      service: 'ui',
-      version: '1',
-    })
-  ),
-}).getTracer('default');
 
-const language = tracer.resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE];
-
+const resource = {
+  attributes: {
+    [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
+    cost: '112.12',
+    service: 'ui',
+    version: '1',
+    'telemetry.sdk.language': 'nodejs',
+    'telemetry.sdk.name': 'opentelemetry',
+    'telemetry.sdk.version': VERSION,
+  },
+} as unknown as IResource;
 const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
   traceFlags: api.TraceFlags.SAMPLED,
 };
+const currentTime = Date.now();
+const durationMs = 10;
+const startTime = hrTime(currentTime - durationMs);
+const endTime = hrTime(currentTime);
+const duration = millisToHrTime(durationMs);
+
+function getSpan(options: Partial<ReadableSpan>): ReadableSpan {
+  const span = {
+    name: options.name || 'my-span',
+    kind: typeof options.kind === 'number' ? options.kind : api.SpanKind.SERVER,
+    startTime: options.startTime || startTime,
+    endTime: options.endTime || endTime,
+    duration: options.duration || duration,
+    spanContext: () => spanContext,
+    parentSpanId: options.parentSpanId || parentId,
+    attributes: options.attributes || {},
+    events: options.events || [],
+    status: options.status || { code: api.SpanStatusCode.UNSET },
+    resource,
+  } as ReadableSpan;
+
+  // Expicit `undefined` properties fro options will be removed from the
+  // result span.
+  Object.keys(options).forEach(k => {
+    if (options[k as keyof ReadableSpan] === undefined) {
+      delete span[k as keyof ReadableSpan];
+    }
+  });
+
+  return span;
+}
 
 describe('transform', () => {
   describe('toZipkinSpan', () => {
     it('should convert an OpenTelemetry span to a Zipkin span', () => {
-      const span = tracer.startSpan(
-        'my-span',
-        { kind: api.SpanKind.SERVER },
-        api.ROOT_CONTEXT
-      ) as unknown as Span;
-      (span as any)['_spanContext'] = spanContext;
-      (span as any)['parentSpanId'] = parentId;
-
-      span.setAttributes({
-        key1: 'value1',
-        key2: 'value2',
+      const span = getSpan({
+        attributes: { key1: 'value1', key2: 'value2' },
+        events: [
+          {
+            name: 'my-event',
+            time: hrTime(Date.now() + 5),
+            attributes: { key3: 'value 3' },
+          },
+        ],
       });
-      span.addEvent('my-event', { key3: 'value3' });
-      span.end();
 
       const zipkinSpan = toZipkinSpan(
         span,
@@ -103,7 +128,7 @@ describe('transform', () => {
           cost: '112.12',
           service: 'ui',
           version: '1',
-          'telemetry.sdk.language': language,
+          'telemetry.sdk.language': 'nodejs',
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
         },
@@ -112,12 +137,9 @@ describe('transform', () => {
       });
     });
     it("should skip parentSpanId if doesn't exist", () => {
-      const span = tracer.startSpan(
-        'my-span',
-        { kind: api.SpanKind.SERVER },
-        api.ROOT_CONTEXT
-      ) as unknown as Span;
-      span.end();
+      const span = getSpan({
+        parentSpanId: undefined,
+      });
 
       const zipkinSpan = toZipkinSpan(
         span,
@@ -142,7 +164,7 @@ describe('transform', () => {
           cost: '112.12',
           service: 'ui',
           version: '1',
-          'telemetry.sdk.language': language,
+          'telemetry.sdk.language': 'nodejs',
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
         },
@@ -161,13 +183,10 @@ describe('transform', () => {
       it(`should map OpenTelemetry SpanKind ${
         api.SpanKind[item.ot]
       } to Zipkin ${item.zipkin}`, () => {
-        const span = tracer.startSpan(
-          'my-span',
-          { kind: item.ot },
-          api.ROOT_CONTEXT
-        ) as unknown as Span;
-        span.end();
-
+        const span = getSpan({
+          kind: item.ot,
+          parentSpanId: undefined,
+        });
         const zipkinSpan = toZipkinSpan(
           span,
           'my-service',
@@ -191,7 +210,7 @@ describe('transform', () => {
             cost: '112.12',
             service: 'ui',
             version: '1',
-            'telemetry.sdk.language': language,
+            'telemetry.sdk.language': 'nodejs',
             'telemetry.sdk.name': 'opentelemetry',
             'telemetry.sdk.version': VERSION,
           },
@@ -204,15 +223,12 @@ describe('transform', () => {
 
   describe('_toZipkinTags', () => {
     it('should convert OpenTelemetry attributes to Zipkin tags', () => {
-      const span = tracer.startSpan(
-        'my-span',
-        { kind: api.SpanKind.SERVER },
-        api.ROOT_CONTEXT
-      ) as unknown as Span;
-
-      span.setAttributes({
-        key1: 'value1',
-        key2: 'value2',
+      const span = getSpan({
+        parentSpanId: undefined,
+        attributes: {
+          key1: 'value1',
+          key2: 'value2',
+        },
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
@@ -224,7 +240,7 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
-        'telemetry.sdk.language': language,
+        'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
         cost: '112.12',
@@ -233,17 +249,13 @@ describe('transform', () => {
       });
     });
     it('should map OpenTelemetry constructor attributes to a Zipkin tag', () => {
-      const span = tracer.startSpan(
-        'my-span',
-        {
-          kind: api.SpanKind.SERVER,
-          attributes: {
-            key1: 'value1',
-            key2: 'value2',
-          },
+      const span = getSpan({
+        parentSpanId: undefined,
+        attributes: {
+          key1: 'value1',
+          key2: 'value2',
         },
-        api.ROOT_CONTEXT
-      ) as unknown as Span;
+      });
 
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
@@ -255,7 +267,7 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
-        'telemetry.sdk.language': language,
+        'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
         cost: '112.12',
@@ -264,20 +276,13 @@ describe('transform', () => {
       });
     });
     it('should map OpenTelemetry SpanStatus.code to a Zipkin tag', () => {
-      const span = tracer.startSpan(
-        'my-span',
-        {
-          kind: api.SpanKind.SERVER,
+      const span = getSpan({
+        parentSpanId: undefined,
+        attributes: {
+          key1: 'value1',
+          key2: 'value2',
         },
-        api.ROOT_CONTEXT
-      ) as unknown as Span;
-      const status: api.SpanStatus = {
-        code: api.SpanStatusCode.ERROR,
-      };
-      span.setStatus(status);
-      span.setAttributes({
-        key1: 'value1',
-        key2: 'value2',
+        status: { code: api.SpanStatusCode.ERROR },
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
@@ -290,7 +295,7 @@ describe('transform', () => {
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
         [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
-        'telemetry.sdk.language': language,
+        'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
         cost: '112.12',
@@ -299,21 +304,13 @@ describe('transform', () => {
       });
     });
     it('should map OpenTelemetry SpanStatus.message to a Zipkin tag', () => {
-      const span = tracer.startSpan(
-        'my-span',
-        {
-          kind: api.SpanKind.SERVER,
+      const span = getSpan({
+        parentSpanId: undefined,
+        attributes: {
+          key1: 'value1',
+          key2: 'value2',
         },
-        api.ROOT_CONTEXT
-      ) as unknown as Span;
-      const status: api.SpanStatus = {
-        code: api.SpanStatusCode.ERROR,
-        message: 'my-message',
-      };
-      span.setStatus(status);
-      span.setAttributes({
-        key1: 'value1',
-        key2: 'value2',
+        status: { code: api.SpanStatusCode.ERROR, message: 'my-message' },
       });
       const tags: zipkinTypes.Tags = _toZipkinTags(
         span,
@@ -325,9 +322,9 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
-        [defaultStatusErrorTagName]: status.message,
+        [defaultStatusErrorTagName]: 'my-message',
         [SEMRESATTRS_SERVICE_NAME]: 'zipkin-test',
-        'telemetry.sdk.language': language,
+        'telemetry.sdk.language': 'nodejs',
         'telemetry.sdk.name': 'opentelemetry',
         'telemetry.sdk.version': VERSION,
         cost: '112.12',
@@ -339,15 +336,17 @@ describe('transform', () => {
 
   describe('_toZipkinAnnotations', () => {
     it('should convert OpenTelemetry events to Zipkin annotations', () => {
-      const span = tracer.startSpan(
-        'my-span',
-        {
-          kind: api.SpanKind.SERVER,
-        },
-        api.ROOT_CONTEXT
-      ) as unknown as Span;
-      span.addEvent('my-event1');
-      span.addEvent('my-event2', { key1: 'value1' });
+      const span = getSpan({
+        parentSpanId: undefined,
+        events: [
+          { name: 'my-event1', time: hrTime(Date.now()) },
+          {
+            name: 'my-event2',
+            time: hrTime(Date.now()),
+            attributes: { key1: 'value1' },
+          },
+        ],
+      });
 
       const annotations = _toZipkinAnnotations(span.events);
       assert.deepStrictEqual(annotations, [
