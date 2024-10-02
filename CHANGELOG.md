@@ -23,6 +23,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :books: (Refine Doc)
 
+* docs: [Browser] Define the support browser runtimes [Issue #4168](https://github.com/open-telemetry/opentelemetry-js/issues/4168) PR:[#5032](https://github.com/open-telemetry/opentelemetry-js/pull/5032) @MSNev
+
 ### :house: (Internal)
 
 * deps: set `@opentelemetry/api` dependency min version to 1.3.0 in `examples`, `experimental/packages`, `integration-tests` and `selenium-tests`
