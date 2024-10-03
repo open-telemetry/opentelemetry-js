@@ -73,7 +73,7 @@ function getSpan(options: Partial<ReadableSpan>): ReadableSpan {
     resource,
   } as ReadableSpan;
 
-  // Expicit `undefined` properties fro options will be removed from the
+  // Expicit `undefined` properties in options will be removed from the
   // result span.
   Object.keys(options).forEach(k => {
     if (options[k as keyof ReadableSpan] === undefined) {
