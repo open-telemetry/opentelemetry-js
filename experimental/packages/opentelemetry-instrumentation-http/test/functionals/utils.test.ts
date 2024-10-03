@@ -20,7 +20,6 @@ import {
   context,
   Span,
 } from '@opentelemetry/api';
-// import { Span } from '@opentelemetry/sdk-trace-base';
 import {
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
