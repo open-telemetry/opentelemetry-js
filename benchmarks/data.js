@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1727695711173,
+  "lastUpdate": 1727968175222,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -16916,6 +16916,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "79311274+RichardChukwu@users.noreply.github.com",
+            "name": "Richard Chukwu",
+            "username": "RichardChukwu"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e0e2b4ad815ef31b249ab4b19c78c268d3facf9e",
+          "message": "fix(sdk-node): use warn instead of error on unknown OTEL_NODE_RESOURCE_DETECTORS values (#5034)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-10-03T14:53:13Z",
+          "tree_id": "ec504c10e618b16c63a6efc0a0297e9826bbb260",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e0e2b4ad815ef31b249ab4b19c78c268d3facf9e"
+        },
+        "date": 1727968174389,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 960353,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11590,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 646253,
+            "range": "±0.58%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 618929,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
