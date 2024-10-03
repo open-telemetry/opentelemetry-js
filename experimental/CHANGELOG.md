@@ -46,6 +46,7 @@ All notable changes to experimental packages in this project will be documented 
     * `appendResourcePathToUrlIfNeeded`
     * `configureExporterTimeout`
     * `invalidTimeout`
+* Changed `diag.error` to `diag.warn` for unknown `OTEL_NODE_RESOURCE_DETECTORS` values in [#4882](https://github.com/open-telemetry/opentelemetry-js/issues/4882).
 
 ### :books: (Refine Doc)
 
