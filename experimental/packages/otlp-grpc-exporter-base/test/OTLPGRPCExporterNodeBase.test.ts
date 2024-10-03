@@ -17,25 +17,19 @@
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { OTLPGRPCExporterNodeBase } from '../src/OTLPGRPCExporterNodeBase';
-import { OTLPGRPCExporterConfigNode } from '../src/types';
 import { mockedReadableSpan } from './traceHelper';
-import { ExportResponse, ExportResponseSuccess } from '../src/export-response';
-import { IExporterTransport } from '../src/exporter-transport';
+import {
+  ExportResponse,
+  ExportResponseSuccess,
+  IExporterTransport,
+} from '@opentelemetry/otlp-exporter-base';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import sinon = require('sinon');
 
 class MockCollectorExporter extends OTLPGRPCExporterNodeBase<
   ReadableSpan,
   any
-> {
-  getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {
-    return '';
-  }
-
-  getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
-    return '';
-  }
-}
+> {}
 
 const successfulResponse: ExportResponseSuccess = {
   status: 'success',
@@ -52,9 +46,6 @@ describe('OTLPGRPCExporterNodeBase', () => {
       shutdown: sinon.stub(),
     };
     const mockTransport = <IExporterTransport>transportStubs;
-    const signalSpecificMetadata: Record<string, string> = {
-      key: 'signal-specific-metadata',
-    };
 
     const serializerStubs = {
       serializeRequest: sinon.stub().resolves(Buffer.from([1, 2, 3])),
@@ -67,10 +58,10 @@ describe('OTLPGRPCExporterNodeBase', () => {
 
     exporter = new MockCollectorExporter(
       { concurrencyLimit },
-      signalSpecificMetadata,
+      serializer,
       'grpcName',
       'grpcPath',
-      serializer
+      'SIGNAL'
     );
 
     exporter['_transport'] = mockTransport;

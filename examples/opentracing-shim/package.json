@@ -8,7 +8,8 @@
     "zipkin:client": "cross-env EXPORTER=zipkin node ./client.js",
     "zipkin:server": "cross-env EXPORTER=zipkin node ./server.js",
     "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js",
-    "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js"
+    "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js",
+    "align-api-deps": "node ../../scripts/align-api-deps.js"
   },
   "repository": {
     "type": "git",
@@ -29,13 +30,13 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/api": "^1.3.0",
     "@opentelemetry/exporter-jaeger": "0.25.0",
     "@opentelemetry/exporter-zipkin": "0.25.0",
     "@opentelemetry/instrumentation": "0.25.0",
     "@opentelemetry/sdk-trace-node": "0.25.0",
     "@opentelemetry/resources": "0.25.0",
-    "@opentelemetry/semantic-conventions": "0.25.0",
+    "@opentelemetry/semantic-conventions": "^1.22.0",
     "@opentelemetry/shim-opentracing": "0.25.0",
     "@opentelemetry/sdk-trace-base": "0.25.0",
     "opentracing": "^0.14.4"

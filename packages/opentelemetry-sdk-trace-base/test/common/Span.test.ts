@@ -34,7 +34,11 @@ import {
   hrTimeToNanoseconds,
   otperformance as performance,
 } from '@opentelemetry/core';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_EXCEPTION_MESSAGE,
+  SEMATTRS_EXCEPTION_STACKTRACE,
+  SEMATTRS_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
@@ -849,6 +853,32 @@ describe('Span', () => {
       message: 'This is an error',
     });
     span.end();
+
+    assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+    assert.strictEqual(span.status.message, 'This is an error');
+  });
+
+  it('should drop non-string status message', function () {
+    const warnStub = sinon.spy(diag, 'warn');
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: new Error('this is not a string') as any,
+    });
+    span.end();
+
+    assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+    assert.strictEqual(span.status.message, undefined);
+    sinon.assert.calledOnceWithExactly(
+      warnStub,
+      "Dropping invalid status.message of type 'object', expected 'string'"
+    );
   });
 
   it('should return ReadableSpan', () => {
@@ -1250,11 +1280,10 @@ describe('Span', () => {
 
           assert.ok(event.attributes);
 
-          const type = event.attributes[SemanticAttributes.EXCEPTION_TYPE];
-          const message =
-            event.attributes[SemanticAttributes.EXCEPTION_MESSAGE];
+          const type = event.attributes[SEMATTRS_EXCEPTION_TYPE];
+          const message = event.attributes[SEMATTRS_EXCEPTION_MESSAGE];
           const stacktrace = String(
-            event.attributes[SemanticAttributes.EXCEPTION_STACKTRACE]
+            event.attributes[SEMATTRS_EXCEPTION_STACKTRACE]
           );
           assert.strictEqual(type, 'Error');
           assert.strictEqual(message, 'boom');
@@ -1294,7 +1323,7 @@ describe('Span', () => {
         span.recordException({ code: 12 });
         const event = span.events[0];
         assert.deepStrictEqual(event.attributes, {
-          [SemanticAttributes.EXCEPTION_TYPE]: '12',
+          [SEMATTRS_EXCEPTION_TYPE]: '12',
         });
       });
     });

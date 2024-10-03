@@ -21,10 +21,7 @@ import type {
 import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import type { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterBrowserBase } from '@opentelemetry/otlp-exporter-base';
-import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
-
-import { getDefaultUrl } from '../config';
 
 /**
  * Collector Logs Exporter for Web
@@ -34,24 +31,15 @@ export class OTLPLogExporter
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    // load  OTEL_EXPORTER_OTLP_LOGS_TIMEOUT env var
     super(
       {
-        timeoutMillis: getEnv().OTEL_EXPORTER_OTLP_LOGS_TIMEOUT,
         ...config,
       },
       JsonLogsSerializer,
-      'application/json'
+      {
+        'Content-Type': 'application/json',
+      },
+      'v1/logs'
     );
-    this._headers = {
-      ...this._headers,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-      ),
-    };
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    return getDefaultUrl(config);
   }
 }

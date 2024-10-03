@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Span, SpanAttributes } from '@opentelemetry/api';
+import { Span, Attributes } from '@opentelemetry/api';
 import type * as http from 'http';
 import type * as https from 'https';
 import {
@@ -73,11 +73,11 @@ export interface HttpResponseCustomAttributeFunction {
 }
 
 export interface StartIncomingSpanCustomAttributeFunction {
-  (request: IncomingMessage): SpanAttributes;
+  (request: IncomingMessage): Attributes;
 }
 
 export interface StartOutgoingSpanCustomAttributeFunction {
-  (request: RequestOptions): SpanAttributes;
+  (request: RequestOptions): Attributes;
 }
 
 /**
@@ -98,6 +98,10 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   ignoreOutgoingUrls?: IgnoreMatcher[];
   /** Not trace all outgoing requests that matched with custom function */
   ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
+  /** If set to true, incoming requests will not be instrumented at all. */
+  disableIncomingRequestInstrumentation?: boolean;
+  /** If set to true, outgoing requests will not be instrumented at all. */
+  disableOutgoingRequestInstrumentation?: boolean;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
   /** Function for adding custom attributes before request is handled */
@@ -127,4 +131,19 @@ export interface Err extends Error {
   path?: string;
   syscall?: string;
   stack?: string;
+}
+
+/**
+ * Tracks whether this instrumentation emits old experimental,
+ * new stable, or both semantic conventions.
+ *
+ * Enum values chosen such that the enum may be used as a bitmask.
+ */
+export const enum SemconvStability {
+  /** Emit only stable semantic conventions */
+  STABLE = 0x1,
+  /** Emit only old semantic convetions */
+  OLD = 0x2,
+  /** Emit both stable and old semantic convetions */
+  DUPLICATE = 0x1 | 0x2,
 }

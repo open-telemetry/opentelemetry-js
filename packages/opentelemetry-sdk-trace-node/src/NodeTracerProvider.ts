@@ -26,7 +26,6 @@ import {
 import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
-import { AWSXRayPropagator } from '@opentelemetry/propagator-aws-xray';
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -51,7 +50,6 @@ export class NodeTracerProvider extends BasicTracerProvider {
       () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
     ],
     ['jaeger', () => new JaegerPropagator()],
-    ['xray', () => new AWSXRayPropagator()],
   ]);
 
   constructor(config: NodeTracerConfig = {}) {

@@ -25,7 +25,6 @@ import {
   ObservableUpDownCounter,
   BatchObservableCallback,
   Observable,
-  Attributes,
 } from '@opentelemetry/api';
 import {
   createInstrumentDescriptor,
@@ -51,12 +50,8 @@ export class Meter implements IMeter {
 
   /**
    * Create a {@link Gauge} instrument.
-   * @experimental
    */
-  createGauge<AttributesTypes extends Attributes = Attributes>(
-    name: string,
-    options?: MetricOptions
-  ): Gauge<AttributesTypes> {
+  createGauge(name: string, options?: MetricOptions): Gauge {
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.GAUGE,

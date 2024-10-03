@@ -21,7 +21,7 @@ import {
   Span as ISpan,
   SpanKind,
   trace,
-  SpanAttributes,
+  Attributes,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -30,12 +30,34 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import {
+  ATTR_CLIENT_ADDRESS,
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_NETWORK_PEER_ADDRESS,
+  ATTR_NETWORK_PEER_PORT,
+  ATTR_NETWORK_PROTOCOL_VERSION,
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
+  ATTR_URL_FULL,
+  ATTR_URL_PATH,
+  ATTR_URL_SCHEME,
+  HTTP_REQUEST_METHOD_VALUE_GET,
   NETTRANSPORTVALUES_IP_TCP,
   SEMATTRS_HTTP_CLIENT_IP,
   SEMATTRS_HTTP_FLAVOR,
+  SEMATTRS_HTTP_HOST,
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
   SEMATTRS_HTTP_ROUTE,
+  SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_TARGET,
+  SEMATTRS_HTTP_URL,
+  SEMATTRS_NET_HOST_IP,
+  SEMATTRS_NET_HOST_NAME,
   SEMATTRS_NET_HOST_PORT,
+  SEMATTRS_NET_PEER_IP,
+  SEMATTRS_NET_PEER_NAME,
   SEMATTRS_NET_PEER_PORT,
   SEMATTRS_NET_TRANSPORT,
 } from '@opentelemetry/semantic-conventions';
@@ -43,7 +65,7 @@ import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
-import { HttpInstrumentationConfig } from '../../src/types';
+import { HttpInstrumentationConfig, SemconvStability } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
@@ -63,6 +85,8 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
+import { AttributeNames } from '../../src/enums/AttributeNames';
+import { getRemoteClientAddress } from '../../src/utils';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -120,13 +144,13 @@ export const responseHookFunction = (
 
 export const startIncomingSpanHookFunction = (
   request: IncomingMessage
-): SpanAttributes => {
+): Attributes => {
   return { guid: request.headers?.guid };
 };
 
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
-): SpanAttributes => {
+): Attributes => {
   return { guid: request.headers?.guid };
 };
 
@@ -156,7 +180,7 @@ describe('HttpInstrumentation', () => {
         memoryExporter.reset();
       });
 
-      before(() => {
+      before(async () => {
         const config: HttpInstrumentationConfig = {
           ignoreIncomingPaths: [
             (url: string) => {
@@ -184,7 +208,7 @@ describe('HttpInstrumentation', () => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
       });
 
       after(() => {
@@ -227,12 +251,61 @@ describe('HttpInstrumentation', () => {
       });
     });
 
+    describe('partially disable instrumentation', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('allows to disable outgoing request instrumentation', async () => {
+        server.close();
+        instrumentation.disable();
+
+        instrumentation.setConfig({
+          disableOutgoingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = http.createServer((_request, response) => {
+          response.end('Test Server Response');
+        });
+
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), true);
+        assert.strictEqual(isWrapped(http.get), false);
+        assert.strictEqual(isWrapped(http.request), false);
+      });
+
+      it('allows to disable incoming request instrumentation', async () => {
+        server.close();
+        instrumentation.disable();
+
+        instrumentation.setConfig({
+          disableIncomingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = http.createServer((_request, response) => {
+          response.end('Test Server Response');
+        });
+
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), false);
+        assert.strictEqual(isWrapped(http.get), true);
+        assert.strictEqual(isWrapped(http.request), true);
+      });
+    });
+
     describe('with good instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
       });
 
-      before(() => {
+      before(async () => {
         instrumentation.setConfig({
           ignoreIncomingPaths: [
             '/ignored/string',
@@ -298,7 +371,7 @@ describe('HttpInstrumentation', () => {
           response.end('Test Server Response');
         });
 
-        server.listen(serverPort);
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
       });
 
       after(() => {
@@ -964,6 +1037,212 @@ describe('HttpInstrumentation', () => {
       });
     });
 
+    describe('with semconv stability set to http', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      before(async () => {
+        instrumentation.setConfig({});
+        instrumentation['_semconvStability'] = SemconvStability.STABLE;
+        instrumentation.enable();
+        server = http.createServer((request, response) => {
+          if (request.url?.includes('/premature-close')) {
+            response.destroy();
+            return;
+          }
+          if (request.url?.includes('/hang')) {
+            // write response headers.
+            response.write('');
+            // hang the request.
+            return;
+          }
+          if (request.url?.includes('/destroy-request')) {
+            // force flush http response header to trigger client response callback
+            response.write('');
+            setTimeout(() => {
+              request.socket.destroy();
+            }, 100);
+            return;
+          }
+          if (request.url?.includes('/ignored')) {
+            provider.getTracer('test').startSpan('some-span').end();
+          }
+          if (request.url?.includes('/setroute')) {
+            const rpcData = getRPCMetadata(context.active());
+            assert.ok(rpcData != null);
+            assert.strictEqual(rpcData.type, RPCType.HTTP);
+            assert.strictEqual(rpcData.route, undefined);
+            rpcData.route = 'TheRoute';
+          }
+          response.setHeader('Content-Type', 'application/json');
+          response.end(
+            JSON.stringify({ address: getRemoteClientAddress(request) })
+          );
+        });
+
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+      });
+
+      after(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('should generate semconv 1.27 client spans', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [_, outgoingSpan] = spans;
+        assert.strictEqual(spans.length, 2);
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(outgoingSpan.attributes, {
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_URL_FULL]: `${protocol}://${hostname}:${serverPort}${pathname}`,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: response.address,
+          [ATTR_NETWORK_PEER_PORT]: serverPort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        });
+      });
+
+      it('should generate semconv 1.27 server spans', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, _] = spans;
+        assert.strictEqual(spans.length, 2);
+
+        const body = JSON.parse(response.data);
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(incomingSpan.attributes, {
+          [ATTR_CLIENT_ADDRESS]: body.address,
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
+          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+          [ATTR_URL_PATH]: pathname,
+          [ATTR_URL_SCHEME]: protocol,
+        });
+      });
+    });
+
+    describe('with semconv stability set to http/dup', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+        instrumentation.setConfig({});
+      });
+
+      before(async () => {
+        instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
+        instrumentation.enable();
+        server = http.createServer((request, response) => {
+          response.setHeader('Content-Type', 'application/json');
+          response.end(
+            JSON.stringify({ address: getRemoteClientAddress(request) })
+          );
+        });
+
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+      });
+
+      after(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('should create client spans with semconv 1.27 and old 1.7', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const outgoingSpan = spans[1];
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(outgoingSpan.attributes, {
+          // 1.27 attributes
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_URL_FULL]: `http://${hostname}:${serverPort}${pathname}`,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: response.address,
+          [ATTR_NETWORK_PEER_PORT]: serverPort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+
+          // 1.7 attributes
+          [SEMATTRS_HTTP_FLAVOR]: '1.1',
+          [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
+          [SEMATTRS_HTTP_METHOD]: 'GET',
+          [SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED]:
+            response.data.length,
+          [SEMATTRS_HTTP_STATUS_CODE]: 200,
+          [SEMATTRS_HTTP_TARGET]: '/test',
+          [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
+          [SEMATTRS_NET_PEER_IP]: response.address,
+          [SEMATTRS_NET_PEER_NAME]: hostname,
+          [SEMATTRS_NET_PEER_PORT]: serverPort,
+          [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
+
+          // unspecified old names
+          [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
+        });
+      });
+
+      it('should create server spans with semconv 1.27 and old 1.7', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const incomingSpan = spans[0];
+        const body = JSON.parse(response.data);
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(incomingSpan.attributes, {
+          // 1.27 attributes
+          [ATTR_CLIENT_ADDRESS]: body.address,
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
+          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+          [ATTR_URL_PATH]: pathname,
+          [ATTR_URL_SCHEME]: protocol,
+
+          // 1.7 attributes
+          [SEMATTRS_HTTP_FLAVOR]: '1.1',
+          [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
+          [SEMATTRS_HTTP_METHOD]: 'GET',
+          [SEMATTRS_HTTP_SCHEME]: protocol,
+          [SEMATTRS_HTTP_STATUS_CODE]: 200,
+          [SEMATTRS_HTTP_TARGET]: '/test',
+          [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
+          [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
+          [SEMATTRS_NET_HOST_IP]: body.address,
+          [SEMATTRS_NET_HOST_NAME]: hostname,
+          [SEMATTRS_NET_HOST_PORT]: serverPort,
+          [SEMATTRS_NET_PEER_IP]: body.address,
+          [SEMATTRS_NET_PEER_PORT]: response.clientRemotePort,
+
+          // unspecified old names
+          [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
+        });
+      });
+    });
+
     describe('with require parent span', () => {
       beforeEach(done => {
         memoryExporter.reset();
@@ -1118,7 +1397,7 @@ describe('HttpInstrumentation', () => {
       memoryExporter.reset();
     });
 
-    before(() => {
+    before(async () => {
       instrumentation.setConfig({
         headersToSpanAttributes: {
           client: {
@@ -1138,7 +1417,7 @@ describe('HttpInstrumentation', () => {
         response.end('Test Server Response');
       });
 
-      server.listen(serverPort);
+      await new Promise<void>(resolve => server.listen(serverPort, resolve));
     });
 
     after(() => {

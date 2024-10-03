@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 import {
-  SpanAttributes,
+  Attributes,
   SpanStatusCode,
   ROOT_CONTEXT,
   SpanKind,
   TraceFlags,
   context,
-  Attributes,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import {
@@ -36,7 +35,11 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { IgnoreMatcher, ParsedRequestOptions } from '../../src/types';
+import {
+  IgnoreMatcher,
+  ParsedRequestOptions,
+  SemconvStability,
+} from '../../src/types';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
@@ -261,8 +264,11 @@ describe('Utility', () => {
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
         SpanKind.INTERNAL
       );
-      /* tslint:disable-next-line:no-any */
-      utils.setSpanWithError(span, new Error(errorMessage));
+      utils.setSpanWithError(
+        span,
+        new Error(errorMessage),
+        SemconvStability.OLD
+      );
       const attributes = span.attributes;
       assert.strictEqual(
         attributes[AttributeNames.HTTP_ERROR_MESSAGE],
@@ -306,7 +312,8 @@ describe('Utility', () => {
         () => {
           const attributes = utils.getIncomingRequestAttributesOnResponse(
             request,
-            {} as ServerResponse
+            {} as ServerResponse,
+            SemconvStability.OLD
           );
           assert.deepStrictEqual(attributes[SEMATTRS_HTTP_ROUTE], '/user/:id');
           context.disable();
@@ -319,9 +326,13 @@ describe('Utility', () => {
       const request = {
         socket: {},
       } as IncomingMessage;
-      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
-        socket: {},
-      } as ServerResponse & { socket: Socket });
+      const attributes = utils.getIncomingRequestAttributesOnResponse(
+        request,
+        {
+          socket: {},
+        } as ServerResponse & { socket: Socket },
+        SemconvStability.OLD
+      );
       assert.deepEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
   });
@@ -350,7 +361,7 @@ describe('Utility', () => {
   // Verify the key in the given attributes is set to the given value,
   // and that no other HTTP Content Length attributes are set.
   function verifyValueInAttributes(
-    attributes: SpanAttributes,
+    attributes: Attributes,
     key: string | undefined,
     value: number
   ) {
@@ -372,7 +383,7 @@ describe('Utility', () => {
 
   describe('setRequestContentLengthAttributes()', () => {
     it('should set request content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
 
       request.headers = {
@@ -388,7 +399,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -404,7 +415,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -422,7 +433,7 @@ describe('Utility', () => {
 
   describe('setResponseContentLengthAttributes()', () => {
     it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -439,7 +450,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -458,7 +469,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -477,7 +488,7 @@ describe('Utility', () => {
     });
 
     it('should set no attributes with no content-length header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const message = {} as IncomingMessage;
 
       message.headers = {
@@ -494,6 +505,7 @@ describe('Utility', () => {
       const request = {
         url: 'http://hostname/user/:id',
         method: 'GET',
+        socket: {},
       } as IncomingMessage;
       request.headers = {
         'user-agent': 'chrome',
@@ -501,6 +513,7 @@ describe('Utility', () => {
       };
       const attributes = utils.getIncomingRequestAttributes(request, {
         component: 'http',
+        semconvStability: SemconvStability.OLD,
       });
       assert.strictEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
@@ -509,12 +522,14 @@ describe('Utility', () => {
       const request = {
         url: 'http://hostname/user/?q=val',
         method: 'GET',
+        socket: {},
       } as IncomingMessage;
       request.headers = {
         'user-agent': 'chrome',
       };
       const attributes = utils.getIncomingRequestAttributes(request, {
         component: 'http',
+        semconvStability: SemconvStability.OLD,
       });
       assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
     });

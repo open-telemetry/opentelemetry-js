@@ -17,6 +17,7 @@
 import * as protoLoader from '@grpc/proto-loader';
 import { diag, DiagLogger } from '@opentelemetry/api';
 import * as assert from 'assert';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
@@ -40,7 +41,6 @@ import {
   IExportMetricsServiceRequest,
   IResourceMetrics,
 } from '@opentelemetry/otlp-transformer';
-import { VERSION } from '../src/version';
 import { AggregationTemporalityPreference } from '@opentelemetry/exporter-metrics-otlp-http';
 
 const metricsServiceProtoPath =
@@ -168,6 +168,24 @@ const testOTLPMetricExporter = (params: TestParams) => {
       sinon.restore();
     });
 
+    if (useTLS && crypto.X509Certificate) {
+      it('test certs are valid', () => {
+        const certPaths = [
+          './test/certs/ca.crt',
+          './test/certs/client.crt',
+          './test/certs/server.crt',
+        ];
+        certPaths.forEach(certPath => {
+          const cert = new crypto.X509Certificate(fs.readFileSync(certPath));
+          const now = new Date();
+          assert.ok(
+            new Date(cert.validTo) > now,
+            `TLS cert "${certPath}" is still valid: cert.validTo="${cert.validTo}" (if this fails use 'npm run maint:regenerate-test-certs')`
+          );
+        });
+      });
+    }
+
     describe('instance', () => {
       let warnStub: sinon.SinonStub;
 
@@ -282,112 +300,6 @@ const testOTLPMetricExporter = (params: TestParams) => {
     });
   });
 };
-
-describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
-  it('should default to localhost', done => {
-    const collectorExporter = new OTLPMetricExporter();
-    setTimeout(() => {
-      assert.strictEqual(collectorExporter._otlpExporter.url, 'localhost:4317');
-      done();
-    });
-  });
-  it('should keep the URL if included', done => {
-    const url = 'http://foo.bar.com';
-    const collectorExporter = new OTLPMetricExporter({
-      url,
-      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
-    });
-    setTimeout(() => {
-      assert.strictEqual(collectorExporter._otlpExporter.url, 'foo.bar.com');
-      done();
-    });
-  });
-});
-
-describe('when configuring via environment', () => {
-  afterEach(function () {
-    // Ensure we don't pollute other tests if assertions fail
-    delete envSource.OTEL_EXPORTER_OTLP_ENDPOINT;
-    delete envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
-    delete envSource.OTEL_EXPORTER_OTLP_HEADERS;
-    delete envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS;
-    sinon.restore();
-  });
-
-  const envSource = process.env;
-  it('should use url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(collectorExporter._otlpExporter.url, 'foo.bar');
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(collectorExporter._otlpExporter.url, 'foo.metrics');
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-  });
-  it('should use override url defined in env with url defined in constructor', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-    const constructorDefinedEndpoint = 'http://constructor/v1/metrics';
-    const collectorExporter = new OTLPMetricExporter({
-      url: constructorDefinedEndpoint,
-    });
-    assert.strictEqual(collectorExporter._otlpExporter.url, 'constructor');
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-    const collectorExporter = new OTLPMetricExporter();
-    const actualMetadata =
-      collectorExporter._otlpExporter['_transport']['_parameters'].metadata();
-    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-  it('should include user agent in header', () => {
-    const collectorExporter = new OTLPMetricExporter();
-    const actualMetadata =
-      collectorExporter._otlpExporter['_transport']['_parameters'].metadata();
-    assert.deepStrictEqual(actualMetadata.get('User-Agent'), [
-      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-    ]);
-  });
-  it('should not override hard-coded headers config with headers defined via env', () => {
-    const metadata = new grpc.Metadata();
-    metadata.set('foo', 'bar');
-    metadata.set('goo', 'lol');
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-    const collectorExporter = new OTLPMetricExporter({
-      metadata,
-      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
-    });
-    const actualMetadata =
-      collectorExporter._otlpExporter['_transport']['_parameters'].metadata();
-    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
-    assert.deepStrictEqual(actualMetadata.get('bar'), ['foo']);
-    assert.deepStrictEqual(actualMetadata.get('goo'), ['lol']);
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-
-  it('should override headers defined via env with headers defined in constructor', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-    const collectorExporter = new OTLPMetricExporter({
-      headers: {
-        foo: 'constructor',
-      },
-    });
-
-    const actualMetadata =
-      collectorExporter._otlpExporter['_transport']['_parameters'].metadata();
-    assert.deepStrictEqual(actualMetadata.get('foo'), ['constructor']);
-    assert.deepStrictEqual(actualMetadata.get('bar'), ['foo']);
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-});
 
 testOTLPMetricExporter({ useTLS: true });
 testOTLPMetricExporter({ useTLS: false });

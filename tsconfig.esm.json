@@ -51,7 +51,13 @@
       "path": "experimental/packages/propagator-aws-xray-lambda/tsconfig.esm.json"
     },
     {
+      "path": "experimental/packages/sdk-events/tsconfig.esm.json"
+    },
+    {
       "path": "experimental/packages/sdk-logs/tsconfig.esm.json"
+    },
+    {
+      "path": "experimental/packages/web-common/tsconfig.esm.json"
     },
     {
       "path": "packages/opentelemetry-context-zone/tsconfig.esm.json"
@@ -81,13 +87,13 @@
       "path": "packages/opentelemetry-sdk-trace-web/tsconfig.esm.json"
     },
     {
-      "path": "packages/opentelemetry-semantic-conventions/tsconfig.esm.json"
-    },
-    {
       "path": "packages/propagator-aws-xray/tsconfig.esm.json"
     },
     {
       "path": "packages/sdk-metrics/tsconfig.esm.json"
+    },
+    {
+      "path": "semantic-conventions/tsconfig.esm.json"
     }
   ]
 }

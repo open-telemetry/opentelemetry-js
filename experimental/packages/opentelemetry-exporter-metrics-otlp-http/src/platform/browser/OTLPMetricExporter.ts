@@ -15,14 +15,11 @@
  */
 
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
-import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
 import {
   OTLPExporterBrowserBase,
   OTLPExporterConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/otlp-exporter-base';
 import {
   IExportMetricsServiceResponse,
@@ -30,35 +27,18 @@ import {
 } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<
   ResourceMetrics,
   IExportMetricsServiceResponse
 > {
   constructor(config?: OTLPMetricExporterOptions & OTLPExporterConfigBase) {
-    super(config, JsonMetricsSerializer, 'application/json');
-    this._headers = Object.assign(
-      this._headers,
-      baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
-      )
+    super(
+      config,
+      JsonMetricsSerializer,
+      { 'Content-Type': 'application/json' },
+      DEFAULT_COLLECTOR_RESOURCE_PATH
     );
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(
-          getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-        )
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
   }
 }
 

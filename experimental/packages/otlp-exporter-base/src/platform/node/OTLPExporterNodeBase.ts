@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-import type * as http from 'http';
-import type * as https from 'https';
-
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
-import * as otlpTypes from '../../types';
-import { parseHeaders } from '../../util';
-import { createHttpAgent, sendWithHttp, configureCompression } from './util';
+import { OTLPExporterNodeConfigBase } from './types';
 import { diag } from '@opentelemetry/api';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
+import { IExporterTransport } from '../../exporter-transport';
+import { createHttpExporterTransport } from './http-exporter-transport';
+import { OTLPExporterError } from '../../types';
+import { createRetryingTransport } from '../../retrying-transport';
+import { convertLegacyAgentOptions } from './convert-legacy-agent-options';
+import {
+  getHttpConfigurationDefaults,
+  mergeOtlpHttpConfigurationWithDefaults,
+} from '../../configuration/otlp-http-configuration';
+import { getHttpConfigurationFromEnvironment } from '../../configuration/otlp-http-env-configuration';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -33,55 +36,79 @@ export abstract class OTLPExporterNodeBase<
   ExportItem,
   ServiceResponse,
 > extends OTLPExporterBase<OTLPExporterNodeConfigBase, ExportItem> {
-  DEFAULT_HEADERS: Record<string, string> = {};
-  headers: Record<string, string>;
-  agent: http.Agent | https.Agent | undefined;
-  compression: CompressionAlgorithm;
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
-  private _contentType: string;
+  private _transport: IExporterTransport;
+  private _timeoutMillis: number;
 
   constructor(
     config: OTLPExporterNodeConfigBase = {},
     serializer: ISerializer<ExportItem[], ServiceResponse>,
-    contentType: string
+    requiredHeaders: Record<string, string>,
+    signalIdentifier: string,
+    signalResourcePath: string
   ) {
     super(config);
-    this._contentType = contentType;
+    const actualConfig = mergeOtlpHttpConfigurationWithDefaults(
+      {
+        url: config.url,
+        headers: config.headers,
+        concurrencyLimit: config.concurrencyLimit,
+        timeoutMillis: config.timeoutMillis,
+        compression: config.compression,
+      },
+      getHttpConfigurationFromEnvironment(signalIdentifier, signalResourcePath),
+      getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
+    );
+
+    this._timeoutMillis = actualConfig.timeoutMillis;
+    this._concurrencyLimit = actualConfig.concurrencyLimit;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    this.headers = Object.assign(
-      this.DEFAULT_HEADERS,
-      parseHeaders(config.headers),
-      baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
-    );
-    this.agent = createHttpAgent(config);
-    this.compression = configureCompression(config.compression);
     this._serializer = serializer;
-  }
 
-  onInit(_config: OTLPExporterNodeConfigBase): void {}
+    this._transport = createRetryingTransport({
+      transport: createHttpExporterTransport({
+        agentOptions: convertLegacyAgentOptions(config),
+        compression: actualConfig.compression,
+        headers: actualConfig.headers,
+        url: actualConfig.url,
+      }),
+    });
+  }
 
   send(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: otlpTypes.OTLPExporterError) => void
+    onError: (error: OTLPExporterError) => void
   ): void {
     if (this._shutdownOnce.isCalled) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
 
-    const promise = new Promise<void>((resolve, reject) => {
-      sendWithHttp(
-        this,
-        this._serializer.serializeRequest(objects) ?? new Uint8Array(),
-        this._contentType,
-        resolve,
-        reject
-      );
-    }).then(onSuccess, onError);
+    const data = this._serializer.serializeRequest(objects);
+
+    if (data == null) {
+      onError(new Error('Could not serialize message'));
+      return;
+    }
+
+    const promise = this._transport
+      .send(data, this._timeoutMillis)
+      .then(response => {
+        if (response.status === 'success') {
+          onSuccess();
+        } else if (response.status === 'failure' && response.error) {
+          onError(response.error);
+        } else if (response.status === 'retryable') {
+          onError(new OTLPExporterError('Export failed with retryable status'));
+        } else {
+          onError(new OTLPExporterError('Export failed with unknown error'));
+        }
+      }, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {

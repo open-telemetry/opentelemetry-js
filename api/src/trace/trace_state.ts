@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * @since 1.0.0
+ */
 export interface TraceState {
   /**
    * Create a new TraceState which inherits from this TraceState and has the

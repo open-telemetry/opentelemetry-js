@@ -43,7 +43,11 @@ import {
   sanitizeAttributes,
 } from '@opentelemetry/core';
 import { IResource } from '@opentelemetry/resources';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  SEMATTRS_EXCEPTION_MESSAGE,
+  SEMATTRS_EXCEPTION_STACKTRACE,
+  SEMATTRS_EXCEPTION_TYPE,
+} from '@opentelemetry/semantic-conventions';
 import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
 import { SpanProcessor } from './SpanProcessor';
@@ -222,7 +226,19 @@ export class Span implements APISpan, ReadableSpan {
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = status;
+    this.status = { ...status };
+
+    // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
+    // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
+    // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
+    // undefined to avoid an incorrect type causing issues downstream.
+    if (this.status.message != null && typeof status.message !== 'string') {
+      diag.warn(
+        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+      );
+      delete this.status.message;
+    }
+
     return this;
   }
 
@@ -299,26 +315,25 @@ export class Span implements APISpan, ReadableSpan {
   recordException(exception: Exception, time?: TimeInput): void {
     const attributes: SpanAttributes = {};
     if (typeof exception === 'string') {
-      attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
+      attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[SemanticAttributes.EXCEPTION_TYPE] =
-          exception.code.toString();
+        attributes[SEMATTRS_EXCEPTION_TYPE] = exception.code.toString();
       } else if (exception.name) {
-        attributes[SemanticAttributes.EXCEPTION_TYPE] = exception.name;
+        attributes[SEMATTRS_EXCEPTION_TYPE] = exception.name;
       }
       if (exception.message) {
-        attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception.message;
+        attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception.message;
       }
       if (exception.stack) {
-        attributes[SemanticAttributes.EXCEPTION_STACKTRACE] = exception.stack;
+        attributes[SEMATTRS_EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
 
     // these are minimum requirements from spec
     if (
-      attributes[SemanticAttributes.EXCEPTION_TYPE] ||
-      attributes[SemanticAttributes.EXCEPTION_MESSAGE]
+      attributes[SEMATTRS_EXCEPTION_TYPE] ||
+      attributes[SEMATTRS_EXCEPTION_MESSAGE]
     ) {
       this.addEvent(ExceptionEventName, attributes, time);
     } else {

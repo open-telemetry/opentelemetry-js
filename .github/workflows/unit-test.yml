@@ -45,15 +45,11 @@ jobs:
         run: npm run compile
 
       - name: Unit tests
-        run: |
-          # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
-          if [ "${{ matrix.node_version }}" = "18" ] || [ "${{ matrix.node_version }}" == "20" ] || [ "${{ matrix.node_version }}" == "22" ]; then
-            export NODE_OPTIONS=--openssl-legacy-provider
-          fi
-          npm run test
+        run: npm run test
       - name: Report Coverage
-        run: npm run codecov
-        if: ${{ matrix.node_version == '14' }}
+        uses: codecov/codecov-action@v4
+        with:
+          verbose: true
   node-windows-tests:
     runs-on: windows-latest
     env:
@@ -80,8 +76,6 @@ jobs:
           npm run compile
 
       - name: Unit tests
-        env:
-         NODE_OPTIONS: --openssl-legacy-provider
         run: npm run test
   browser-tests:
     runs-on: ubuntu-latest
@@ -107,7 +101,9 @@ jobs:
       - name: Unit tests
         run: npm run test:browser
       - name: Report Coverage
-        run: npm run codecov:browser
+        uses: codecov/codecov-action@v4
+        with:
+          verbose: true
   webworker-tests:
     runs-on: ubuntu-latest
     env:
@@ -131,7 +127,9 @@ jobs:
       - name: Unit tests
         run: npm run test:webworker
       - name: Report Coverage
-        run: npm run codecov:webworker
+        uses: codecov/codecov-action@v4
+        with:
+          verbose: true
   api-eol-node-test:
     strategy:
       fail-fast: false
@@ -156,7 +154,7 @@ jobs:
         working-directory: ./api
         run: |
           npm install --ignore-scripts
-          npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
+          npm install @types/mocha@^7 mocha@^7 ts-loader@^8
           node ../scripts/version-update.js
           npx tsc --build tsconfig.json tsconfig.esm.json
 

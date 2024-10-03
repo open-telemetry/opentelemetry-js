@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/api';
 import { logs } from '@opentelemetry/api-logs';
 import {
-  InstrumentationOption,
+  Instrumentation,
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import {
@@ -37,7 +37,17 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import { LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
+import {
+  LogRecordProcessor,
+  LoggerProvider,
+  BatchLogRecordProcessor,
+  ConsoleLogRecordExporter,
+  LogRecordExporter,
+  SimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
+import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
+import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
@@ -51,10 +61,7 @@ import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import {
-  getResourceDetectorsFromEnv,
-  parseInstrumentationOptions,
-} from './utils';
+import { getResourceDetectorsFromEnv, filterBlanksAndNulls } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -73,7 +80,7 @@ export type LoggerProviderConfig = {
   /**
    * Reference to the LoggerRecordProcessor instance by the NodeSDK
    */
-  logRecordProcessor: LogRecordProcessor;
+  logRecordProcessors: LogRecordProcessor[];
 };
 
 export class NodeSDK {
@@ -85,7 +92,7 @@ export class NodeSDK {
   };
   private _loggerProviderConfig?: LoggerProviderConfig;
   private _meterProviderConfig?: MeterProviderConfig;
-  private _instrumentations: InstrumentationOption[];
+  private _instrumentations: Instrumentation[];
 
   private _resource: IResource;
   private _resourceDetectors: Array<Detector | DetectorSync>;
@@ -124,19 +131,18 @@ export class NodeSDK {
     this._configuration = configuration;
 
     this._resource = configuration.resource ?? new Resource({});
-    let defaultDetectors: (Detector | DetectorSync)[] = [];
-    if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
-      defaultDetectors = getResourceDetectorsFromEnv();
+    this._autoDetectResources = configuration.autoDetectResources ?? true;
+    if (!this._autoDetectResources) {
+      this._resourceDetectors = [];
+    } else if (configuration.resourceDetectors != null) {
+      this._resourceDetectors = configuration.resourceDetectors;
+    } else if (process.env.OTEL_NODE_RESOURCE_DETECTORS != null) {
+      this._resourceDetectors = getResourceDetectorsFromEnv();
     } else {
-      defaultDetectors = [envDetector, processDetector, hostDetector];
+      this._resourceDetectors = [envDetector, processDetector, hostDetector];
     }
 
-    this._resourceDetectors =
-      configuration.resourceDetectors ?? defaultDetectors;
-
     this._serviceName = configuration.serviceName;
-
-    this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     // If a tracer provider can be created from manual configuration, create it
     if (
@@ -177,10 +183,19 @@ export class NodeSDK {
       };
     }
 
-    if (configuration.logRecordProcessor) {
+    if (configuration.logRecordProcessors) {
       this._loggerProviderConfig = {
-        logRecordProcessor: configuration.logRecordProcessor,
+        logRecordProcessors: configuration.logRecordProcessors,
       };
+    } else if (configuration.logRecordProcessor) {
+      this._loggerProviderConfig = {
+        logRecordProcessors: [configuration.logRecordProcessor],
+      };
+      diag.warn(
+        "The 'logRecordProcessor' option is deprecated. Please use 'logRecordProcessors' instead."
+      );
+    } else {
+      this.configureLoggerProviderFromEnv();
     }
 
     if (configuration.metricReader || configuration.views) {
@@ -196,11 +211,7 @@ export class NodeSDK {
       this._meterProviderConfig = meterProviderConfig;
     }
 
-    let instrumentations: InstrumentationOption[] = [];
-    if (configuration.instrumentations) {
-      instrumentations = configuration.instrumentations;
-    }
-    this._instrumentations = instrumentations;
+    this._instrumentations = configuration.instrumentations?.flat() ?? [];
   }
 
   /**
@@ -254,7 +265,10 @@ export class NodeSDK {
     }
 
     tracerProvider.register({
-      contextManager: this._tracerProviderConfig?.contextManager,
+      contextManager:
+        this._tracerProviderConfig?.contextManager ??
+        // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
+        this._configuration?.contextManager,
       propagator: this._tracerProviderConfig?.textMapPropagator,
     });
 
@@ -262,9 +276,11 @@ export class NodeSDK {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
       });
-      loggerProvider.addLogRecordProcessor(
-        this._loggerProviderConfig.logRecordProcessor
-      );
+
+      for (const logRecordProcessor of this._loggerProviderConfig
+        .logRecordProcessors) {
+        loggerProvider.addLogRecordProcessor(logRecordProcessor);
+      }
 
       this._loggerProvider = loggerProvider;
 
@@ -289,9 +305,7 @@ export class NodeSDK {
       // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609
       // If the MeterProvider is not yet registered when instrumentations are registered, all metrics are dropped.
       // This code is obsolete once https://github.com/open-telemetry/opentelemetry-js/issues/3622 is implemented.
-      for (const instrumentation of parseInstrumentationOptions(
-        this._instrumentations
-      )) {
+      for (const instrumentation of this._instrumentations) {
         instrumentation.setMeterProvider(metrics.getMeterProvider());
       }
     }
@@ -314,5 +328,72 @@ export class NodeSDK {
         // return void instead of the array from Promise.all
         .then(() => {})
     );
+  }
+
+  private configureLoggerProviderFromEnv(): void {
+    const logExportersList = process.env.OTEL_LOGS_EXPORTER ?? '';
+    const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
+
+    if (enabledExporters.length === 0) {
+      diag.info('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
+      enabledExporters.push('otlp');
+    }
+
+    if (enabledExporters.includes('none')) {
+      diag.info(
+        `OTEL_LOGS_EXPORTER contains "none". Logger provider will not be initialized.`
+      );
+      return;
+    }
+
+    const exporters: LogRecordExporter[] = [];
+
+    enabledExporters.forEach(exporter => {
+      if (exporter === 'otlp') {
+        const protocol = (
+          process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??
+          process.env.OTEL_EXPORTER_OTLP_PROTOCOL
+        )?.trim();
+
+        switch (protocol) {
+          case 'grpc':
+            exporters.push(new OTLPGrpcLogExporter());
+            break;
+          case 'http/json':
+            exporters.push(new OTLPHttpLogExporter());
+            break;
+          case 'http/protobuf':
+            exporters.push(new OTLPProtoLogExporter());
+            break;
+          case undefined:
+          case '':
+            exporters.push(new OTLPProtoLogExporter());
+            break;
+          default:
+            diag.warn(
+              `Unsupported OTLP logs protocol: "${protocol}". Using http/protobuf.`
+            );
+            exporters.push(new OTLPProtoLogExporter());
+        }
+      } else if (exporter === 'console') {
+        exporters.push(new ConsoleLogRecordExporter());
+      } else {
+        diag.warn(
+          `Unsupported OTEL_LOGS_EXPORTER value: "${exporter}". Supported values are: otlp, console, none.`
+        );
+      }
+    });
+
+    if (exporters.length > 0) {
+      this._loggerProviderConfig = {
+        logRecordProcessors: exporters.map(exporter => {
+          if (exporter instanceof ConsoleLogRecordExporter) {
+            return new SimpleLogRecordProcessor(exporter);
+          } else {
+            return new BatchLogRecordProcessor(exporter);
+          }
+        }),
+      };
+    }
   }
 }

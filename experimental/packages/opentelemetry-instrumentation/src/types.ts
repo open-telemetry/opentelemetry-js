@@ -27,13 +27,6 @@ export interface Instrumentation<
   /** Instrumentation Version  */
   instrumentationVersion: string;
 
-  /**
-   * Instrumentation Description - please describe all useful information
-   * as Instrumentation might patch different version of different modules,
-   * or support different browsers etc.
-   */
-  instrumentationDescription?: string;
-
   /** Method to disable the instrumentation  */
   disable(): void;
 
@@ -54,14 +47,6 @@ export interface Instrumentation<
 
   /** Method to get instrumentation config  */
   getConfig(): ConfigType;
-
-  /**
-   * Contains all supported versions.
-   * All versions must be compatible with [semver](https://semver.org/spec/v2.0.0.html) format.
-   * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
-   * If omitted, all versions of the module will be patched.
-   */
-  supportedVersions?: string[];
 }
 
 /**
@@ -96,13 +81,23 @@ export interface InstrumentationModuleFile {
 
   moduleExports?: unknown;
 
-  /** Supported version this file */
+  /** Supported versions for the file.
+   *
+   * A module version is supported if one of the supportedVersions in the array satisfies the module version.
+   * The syntax of the version is checked with the `satisfies` function of "The semantic versioner for npm", see
+   * [`semver` package](https://www.npmjs.com/package/semver)
+   * If the version is not supported, we won't apply instrumentation patch.
+   * If omitted, all versions of the module will be patched.
+   *
+   * It is recommended to always specify a range that is bound to a major version, to avoid breaking changes.
+   * New major versions should be reviewed and tested before being added to the supportedVersions array.
+   *
+   * Example: ['>=1.2.3 <3']
+   */
   supportedVersions: string[];
 
   /** Method to patch the instrumentation  */
   patch(moduleExports: unknown, moduleVersion?: string): unknown;
-
-  /** Method to patch the instrumentation  */
 
   /** Method to unpatch the instrumentation  */
   unpatch(moduleExports?: unknown, moduleVersion?: string): void;
@@ -118,7 +113,19 @@ export interface InstrumentationModuleDefinition {
   /** Instrumented module version */
   moduleVersion?: string;
 
-  /** Supported version of module  */
+  /** Supported version of module.
+   *
+   * A module version is supported if one of the supportedVersions in the array satisfies the module version.
+   * The syntax of the version is checked with the `satisfies` function of "The semantic versioner for npm", see
+   * [`semver` package](https://www.npmjs.com/package/semver)
+   * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
+   * If omitted, all versions of the module will be patched.
+   *
+   * It is recommended to always specify a range that is bound to a major version, to avoid breaking changes.
+   * New major versions should be reviewed and tested before being added to the supportedVersions array.
+   *
+   * Example: ['>=1.2.3 <3']
+   */
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
@@ -129,11 +136,15 @@ export interface InstrumentationModuleDefinition {
 
   /** Method to patch the instrumentation  */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  patch?: (moduleExports: any, moduleVersion?: string) => any;
+  patch?:
+    | ((moduleExports: any, moduleVersion?: string | undefined) => any)
+    | undefined;
 
   /** Method to unpatch the instrumentation  */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  unpatch?: (moduleExports: any, moduleVersion?: string) => void;
+  unpatch?:
+    | ((moduleExports: any, moduleVersion?: string | undefined) => void)
+    | undefined;
 }
 
 /**

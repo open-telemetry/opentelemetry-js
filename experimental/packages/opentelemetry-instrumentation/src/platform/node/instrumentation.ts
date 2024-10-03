@@ -25,15 +25,16 @@ import {
   Hooked,
 } from './RequireInTheMiddleSingleton';
 import type { HookFn } from 'import-in-the-middle';
-import * as ImportInTheMiddle from 'import-in-the-middle';
+import { Hook as HookImport } from 'import-in-the-middle';
 import {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
 } from '../../types';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
-import { Hook } from 'require-in-the-middle';
+import { Hook as HookRequire } from 'require-in-the-middle';
 import { readFileSync } from 'fs';
+import { isWrapped } from '../../utils';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -45,7 +46,7 @@ export abstract class InstrumentationBase<
   implements types.Instrumentation<ConfigType>
 {
   private _modules: InstrumentationModuleDefinition[];
-  private _hooks: (Hooked | Hook)[] = [];
+  private _hooks: (Hooked | HookRequire)[] = [];
   private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton =
     RequireInTheMiddleSingleton.getInstance();
   private _enabled = false;
@@ -53,7 +54,7 @@ export abstract class InstrumentationBase<
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: ConfigType = {} as ConfigType // The cast here may be wrong as ConfigType may contain required fields
+    config: ConfigType
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
@@ -65,28 +66,23 @@ export abstract class InstrumentationBase<
 
     this._modules = (modules as InstrumentationModuleDefinition[]) || [];
 
-    if (this._modules.length === 0) {
-      diag.debug(
-        'No modules instrumentation has been defined for ' +
-          `'${this.instrumentationName}@${this.instrumentationVersion}'` +
-          ', nothing will be patched'
-      );
-    }
-
     if (this._config.enabled) {
       this.enable();
     }
   }
 
   protected override _wrap: typeof wrap = (moduleExports, name, wrapper) => {
+    if (isWrapped(moduleExports[name])) {
+      this._unwrap(moduleExports, name);
+    }
     if (!utilTypes.isProxy(moduleExports)) {
       return wrap(moduleExports, name, wrapper);
     } else {
       const wrapped = wrap(Object.assign({}, moduleExports), name, wrapper);
-
-      return Object.defineProperty(moduleExports, name, {
+      Object.defineProperty(moduleExports, name, {
         value: wrapped,
       });
+      return wrapped;
     }
   };
 
@@ -301,16 +297,15 @@ export abstract class InstrumentationBase<
       // For an absolute paths, we must create a separate instance of the
       // require-in-the-middle `Hook`.
       const hook = path.isAbsolute(module.name)
-        ? new Hook([module.name], { internals: true }, onRequire)
+        ? new HookRequire([module.name], { internals: true }, onRequire)
         : this._requireInTheMiddleSingleton.register(module.name, onRequire);
 
       this._hooks.push(hook);
-      const esmHook =
-        new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default)(
-          [module.name],
-          { internals: false },
-          <HookFn>hookFn
-        );
+      const esmHook = new HookImport(
+        [module.name],
+        { internals: false },
+        <HookFn>hookFn
+      );
       this._hooks.push(esmHook);
     }
   }

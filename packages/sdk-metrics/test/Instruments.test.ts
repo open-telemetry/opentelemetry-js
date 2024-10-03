@@ -19,25 +19,25 @@ import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import {
-  InstrumentType,
-  MeterProvider,
-  MetricReader,
   DataPoint,
   DataPointType,
   Histogram,
+  InstrumentType,
+  MeterProvider,
   MetricDescriptor,
+  MetricReader,
 } from '../src';
 import {
   TestDeltaMetricReader,
   TestMetricReader,
 } from './export/TestMetricReader';
 import {
-  assertMetricData,
   assertDataPoint,
-  commonValues,
+  assertMetricData,
   commonAttributes,
-  defaultResource,
+  commonValues,
   defaultInstrumentationScope,
+  defaultResource,
 } from './util';
 import { ObservableResult, ValueType } from '@opentelemetry/api';
 
@@ -325,7 +325,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 10,
@@ -341,7 +341,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 100,
@@ -395,7 +395,7 @@ describe('Instruments', () => {
             value: {
               buckets: {
                 boundaries: [1, 9, 100],
-                counts: [1, 0, 0, 1],
+                counts: [1, 0, 1, 0],
               },
               count: 2,
               sum: 100,
@@ -484,7 +484,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 0, 1, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 4,
               sum: 220,
@@ -534,7 +534,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 10.1,
@@ -550,7 +550,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 100.1,
@@ -759,6 +759,41 @@ describe('Instruments', () => {
           {
             attributes: { foo: 'bar' },
             value: 1,
+          },
+        ],
+      });
+    });
+  });
+
+  describe('Gauge', () => {
+    it('should record common values and attributes without exceptions', async () => {
+      const { meter } = setup();
+      const gauge = meter.createGauge('test');
+
+      for (const values of commonValues) {
+        for (const attributes of commonAttributes) {
+          gauge.record(values, attributes);
+        }
+      }
+    });
+
+    it('should record values', async () => {
+      const { meter, cumulativeReader } = setup();
+      const gauge = meter.createGauge('test');
+
+      gauge.record(1, { foo: 'bar' });
+      gauge.record(-1);
+
+      await validateExport(cumulativeReader, {
+        dataPointType: DataPointType.GAUGE,
+        dataPoints: [
+          {
+            attributes: { foo: 'bar' },
+            value: 1,
+          },
+          {
+            attributes: {},
+            value: -1,
           },
         ],
       });

@@ -88,9 +88,10 @@ describe('tree-shaking', () => {
       const fs = new Union();
       fs.use(mfs as any).use(realFs);
 
-      //direct webpack to use unionfs for file input
-      compiler.inputFileSystem = fs;
-      //direct webpack to output to memoryfs rather than to disk
+      // direct webpack to use unionfs for file input
+      // needs workaround from https://github.com/webpack/webpack/issues/18242#issuecomment-2018116985 since webpack 5.91.0
+      compiler.inputFileSystem = fs as any as typeof compiler.inputFileSystem;
+      // direct webpack to output to memoryfs rather than to disk
       compiler.outputFileSystem = {
         ...mfs,
         join: path.join,

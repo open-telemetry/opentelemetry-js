@@ -15,22 +15,12 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
-import {
-  OTLPExporterNodeBase,
-  parseHeaders,
-} from '@opentelemetry/otlp-exporter-base';
-import {
-  OTLPExporterNodeConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
-} from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceResponse } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
 import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer';
 
-const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 const USER_AGENT = {
   'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
@@ -43,27 +33,15 @@ export class OTLPTraceExporter
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    super(config, JsonTraceSerializer, 'application/json');
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
-      ),
-      ...parseHeaders(config?.headers),
-    };
-  }
-
-  getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
-    return typeof config.url === 'string'
-      ? config.url
-      : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrl(
-          getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
-          DEFAULT_COLLECTOR_RESOURCE_PATH
-        )
-      : DEFAULT_COLLECTOR_URL;
+    super(
+      config,
+      JsonTraceSerializer,
+      {
+        ...USER_AGENT,
+        'Content-Type': 'application/json',
+      },
+      'TRACES',
+      'v1/traces'
+    );
   }
 }
