@@ -29,6 +29,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   [#4992](https://github.com/open-telemetry/opentelemetry-js/pull/4992)
 * refactor(sdk-metrics): replace `MetricsAttributes` with `Attributes` [#5021](https://github.com/open-telemetry/opentelemetry-js/pull/5021) @david-luna
 * refactor(instrumentation-http): replace `SpanAttributes` and `MetricsAttributes` with `Attributes` [#5023](https://github.com/open-telemetry/opentelemetry-js/pull/5023) @david-luna
+* chore(exporter-zipkin): remove usages of Span constructor [#5030](https://github.com/open-telemetry/opentelemetry-js/pull/5030) @david-luna
 * test(instrumentation-http): remove usages of `new Span` in tests [#5035](https://github.com/open-telemetry/opentelemetry-js/pull/5035) @david-luna
 
 ## 1.26.0
