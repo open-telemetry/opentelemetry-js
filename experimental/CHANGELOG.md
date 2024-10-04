@@ -46,6 +46,7 @@ All notable changes to experimental packages in this project will be documented 
     * `appendResourcePathToUrlIfNeeded`
     * `configureExporterTimeout`
     * `invalidTimeout`
+* fix(sdk-node): use warn instead of error on unknown OTEL_NODE_RESOURCE_DETECTORS values [#5034](https://github.com/open-telemetry/opentelemetry-js/pull/5034)
 
 ### :books: (Refine Doc)
 
