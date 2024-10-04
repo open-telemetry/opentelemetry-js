@@ -65,6 +65,11 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   // urls which should include trace headers when origin doesn't match
   propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
   /**
+   * URLs that partially match any regex or exactly match strings in allowUrls
+   * will be traced.
+   */
+  allowUrls?: Array<string | RegExp>;
+  /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
    * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
    * also not be traced.
@@ -201,6 +206,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     url: string,
     options: Partial<Request | RequestInit> = {}
   ): api.Span | undefined {
+    if (!core.isUrlAllowed(url, this.getConfig().allowUrls)) {
+      this._diag.debug('ignoring span as url does not match an allowed url');
+      return;
+    }
     if (core.isUrlIgnored(url, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
