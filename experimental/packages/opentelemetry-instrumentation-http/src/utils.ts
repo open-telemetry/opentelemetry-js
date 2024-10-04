@@ -342,14 +342,7 @@ export const getRequestInfo = (
  * Makes sure options is of type string or object
  * @param options for the request
  */
-// export const isValidOptionsType = (options: unknown): boolean => {
-//   if (!options) {
-//     return false;
-//   }
 
-//   const type = typeof options;
-//   return type === 'string' || (type === 'object' && !Array.isArray(options));
-// };
 export const isValidOptionsType = (options: unknown): boolean => {
   if (!options) {
     return false;
