@@ -70,7 +70,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "lerna": "6.6.2",
+    "lerna": "^8.1.8",
     "mocha": "10.7.3",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
@@ -85,5 +85,11 @@
     "zone.js": "^0.10.2 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0"
   },
   "sideEffects": false,
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep",
+  "dependencies": {
+    "geckodriver": "3.2.0",
+    "markdownlint-cli2": "0.14.0",
+    "nightwatch": "3.8.0",
+    "request-promise-native": "0.0.0"
+  }
 }

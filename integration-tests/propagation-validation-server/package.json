@@ -17,7 +17,13 @@
     "@opentelemetry/sdk-trace-base": "1.26.0",
     "axios": "1.7.4",
     "body-parser": "1.20.3",
-    "express": "4.20.0"
+    "express": "^4.21.0",
+    "geckodriver": "3.2.0",
+    "lerna": "8.1.8",
+    "markdownlint-cli2": "0.14.0",
+    "nightwatch": "3.8.0",
+    "request-promise-native": "0.0.0",
+    "webpack-dev-server": "4.15.2"
   },
   "devDependencies": {
     "typescript": "4.4.4"

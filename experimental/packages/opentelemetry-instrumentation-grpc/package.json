@@ -62,7 +62,7 @@
     "@types/semver": "7.5.8",
     "@types/sinon": "17.0.3",
     "cross-var": "1.1.0",
-    "lerna": "6.6.2",
+    "lerna": "^8.1.8",
     "mocha": "10.7.3",
     "nyc": "15.1.0",
     "semver": "7.6.3",
@@ -74,7 +74,11 @@
   },
   "dependencies": {
     "@opentelemetry/instrumentation": "0.53.0",
-    "@opentelemetry/semantic-conventions": "1.27.0"
+    "@opentelemetry/semantic-conventions": "1.27.0",
+    "geckodriver": "3.2.0",
+    "markdownlint-cli2": "0.14.0",
+    "nightwatch": "3.8.0",
+    "request-promise-native": "0.0.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
   "sideEffects": false

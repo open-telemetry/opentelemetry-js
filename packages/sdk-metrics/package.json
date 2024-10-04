@@ -68,7 +68,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
-    "lerna": "6.6.2",
+    "lerna": "^8.1.8",
     "mocha": "10.7.3",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
@@ -83,7 +83,11 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.26.0",
-    "@opentelemetry/resources": "1.26.0"
+    "@opentelemetry/resources": "1.26.0",
+    "geckodriver": "3.2.0",
+    "markdownlint-cli2": "0.14.0",
+    "nightwatch": "3.8.0",
+    "request-promise-native": "0.0.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics",
   "sideEffects": false

@@ -1,3 +1,8 @@
+# Scope Manager Omission
+
+The OpenTelemetry shim for OpenTracing was initially intended to include a scope manager feature. However, this feature has not yet been implemented. This documentation aims to clarify this omission for users who may expect this functionality.
+
+If you're relying on scope management for your tracing implementation, we encourage you to explore alternative solutions or consider contributing to the project to help implement this feature in the future.
 # OpenTracing shim
 
 [![NPM Published Version][npm-img]][npm-url]
