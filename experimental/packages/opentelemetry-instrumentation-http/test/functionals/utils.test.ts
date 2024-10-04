@@ -16,12 +16,10 @@
 import {
   Attributes,
   SpanStatusCode,
-  ROOT_CONTEXT,
   SpanKind,
-  TraceFlags,
   context,
+  Span,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import {
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
@@ -257,26 +255,28 @@ describe('Utility', () => {
   describe('setSpanWithError()', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
-      const span = new Span(
-        new BasicTracerProvider().getTracer('default'),
-        ROOT_CONTEXT,
-        'test',
-        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-        SpanKind.INTERNAL
-      );
-      utils.setSpanWithError(
-        span,
-        new Error(errorMessage),
-        SemconvStability.OLD
-      );
-      const attributes = span.attributes;
-      assert.strictEqual(
-        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
-        errorMessage
-      );
-      assert.strictEqual(span.events.length, 1);
-      assert.strictEqual(span.events[0].name, 'exception');
-      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+      const error = new Error(errorMessage);
+      const span = {
+        setAttribute: () => undefined,
+        setStatus: () => undefined,
+        recordException: () => undefined,
+      } as unknown as Span;
+      const mock = sinon.mock(span);
+
+      mock
+        .expects('setAttribute')
+        .calledWithExactly(AttributeNames.HTTP_ERROR_NAME, 'error');
+      mock
+        .expects('setAttribute')
+        .calledWithExactly(AttributeNames.HTTP_ERROR_MESSAGE, errorMessage);
+      mock.expects('setStatus').calledWithExactly({
+        code: SpanStatusCode.ERROR,
+        message: errorMessage,
+      });
+      mock.expects('recordException').calledWithExactly(error);
+
+      utils.setSpanWithError(span, error, SemconvStability.OLD);
+      mock.verify();
     });
   });
 
@@ -537,40 +537,51 @@ describe('Utility', () => {
 
   describe('headers to span attributes capture', () => {
     let span: Span;
+    let mock: sinon.SinonMock;
 
     beforeEach(() => {
-      span = new Span(
-        new BasicTracerProvider().getTracer('default'),
-        ROOT_CONTEXT,
-        'test',
-        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-        SpanKind.INTERNAL
-      );
+      span = {
+        setAttribute: () => undefined,
+      } as unknown as Span;
+      mock = sinon.mock(span);
     });
 
     it('should set attributes for request and response keys', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.origin', ['localhost']);
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.response.header.cookie', ['token=123']);
+
       utils.headerCapture('request', ['Origin'])(span, () => 'localhost');
       utils.headerCapture('response', ['Cookie'])(span, () => 'token=123');
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-      ]);
-      assert.deepStrictEqual(span.attributes['http.response.header.cookie'], [
-        'token=123',
-      ]);
+      mock.verify();
     });
 
     it('should set attributes for multiple values', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.origin', [
+          'localhost',
+          'www.example.com',
+        ]);
+
       utils.headerCapture('request', ['Origin'])(span, () => [
         'localhost',
         'www.example.com',
       ]);
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-        'www.example.com',
-      ]);
+      mock.verify();
     });
 
     it('sets attributes for multiple headers', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.origin', ['localhost']);
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.foo', [42]);
+
       utils.headerCapture('request', ['Origin', 'Foo'])(span, header => {
         if (header === 'origin') {
           return 'localhost';
@@ -582,22 +593,24 @@ describe('Utility', () => {
 
         return undefined;
       });
-
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-      ]);
-      assert.deepStrictEqual(span.attributes['http.request.header.foo'], [42]);
+      mock.verify();
     });
 
     it('should normalize header names', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.x_forwarded_for', ['foo']);
+
       utils.headerCapture('request', ['X-Forwarded-For'])(span, () => 'foo');
-      assert.deepStrictEqual(
-        span.attributes['http.request.header.x_forwarded_for'],
-        ['foo']
-      );
+      mock.verify();
     });
 
     it('ignores non-existent headers', () => {
+      mock
+        .expects('setAttribute')
+        .once()
+        .calledWithExactly('http.request.header.origin', ['localhost']);
+
       utils.headerCapture('request', ['Origin', 'Accept'])(span, header => {
         if (header === 'origin') {
           return 'localhost';
@@ -605,14 +618,7 @@ describe('Utility', () => {
 
         return undefined;
       });
-
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-      ]);
-      assert.deepStrictEqual(
-        span.attributes['http.request.header.accept'],
-        undefined
-      );
+      mock.verify();
     });
   });
 
