@@ -1,20 +1,19 @@
 # OpenTelemetry HTTP and HTTPS Instrumentation for Node.js
 
 [![NPM Published Version][npm-img]][npm-url]
-[![Apache License][license-image]][license-image]
+[![Apache License][license-image]][license-url]
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
 This module provides automatic instrumentation for [`http`](https://nodejs.org/api/http.html) and [`https`](https://nodejs.org/api/https.html).
 
-For automatic instrumentation see the
-[@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node) package.
+For automatic instrumentation, see the [@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node) package.
 
 ## Installation
 
 ```bash
 npm install --save @opentelemetry/instrumentation-http
-```
+
 
 ## Supported Versions
 
@@ -43,6 +42,7 @@ provider.register();
 registerInstrumentations({
   instrumentations: [new HttpInstrumentation()],
 });
+
 
 ```
 
@@ -119,9 +119,8 @@ Create HTTP client spans which implement Semantic Convention [Version 1.7.0](htt
 When `OTEL_SEMCONV_STABILITY_OPT_IN` is not set or includes `http/dup`, this module implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md).
 
 Attributes collected:
-
 | Attribute                                   | Short Description                                                              |
-| ------------------------------------------- | ------------------------------------------------------------------------------ |
+|---------------------------------------------|--------------------------------------------------------------------------------|
 | `ip_tcp`                                    | Transport protocol used                                                        |
 | `ip_udp`                                    | Transport protocol used                                                        |
 | `http.client_ip`                            | The IP address of the original client behind all proxies, if known             |
@@ -140,12 +139,12 @@ Attributes collected:
 | `http.url`                                  | Full HTTP request URL in the form `scheme://host[:port]/path?query[#fragment]` |
 | `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
 | `net.host.ip`                               | Like net.peer.ip but for the host IP. Useful in case of a multi-IP host        |
-| `net.host.name`                             | Local hostname or similar                                                      |
-| `net.host.port`                             | Like net.peer.port but for the host port                                       |
-| `net.peer.ip.`                              | Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)       |
-| `net.peer.name`                             | Remote hostname or similar                                                     |
-| `net.peer.port`                             | Remote port number                                                             |
-| `net.transport`                             | Transport protocol used                                                        |
+| `net.host.name`                             | Local hostname of the server.                                                  |
+| `net.peer.ip`                               | The IP address of the remote client                                            |
+| `net.peer.name`                             | The DNS name or IP address of the remote client                                |
+| `net.peer.port`                             | The port of the remote peer                                                   |
+| `peer.service`                              | The name of the remote service                                                |
+| `service.name`                              | Name of the service that generated the span                                     |
 
 ## Useful links
 
