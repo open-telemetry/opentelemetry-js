@@ -15,6 +15,7 @@
  */
 
 import { NOOP_LOGGER } from './NoopLogger';
+import { EventRecord } from './types/EventRecord';
 import { Logger } from './types/Logger';
 import { LoggerOptions } from './types/LoggerOptions';
 import { LogRecord } from './types/LogRecord';
@@ -37,6 +38,10 @@ export class ProxyLogger implements Logger {
    */
   emit(logRecord: LogRecord): void {
     this._getLogger().emit(logRecord);
+  }
+
+  emitEvent(name: string, eventRecord?: EventRecord): void {
+    this._getLogger().emitEvent(name, eventRecord);
   }
 
   /**

@@ -20,6 +20,7 @@ import { context } from '@opentelemetry/api';
 
 import { LogRecord } from './LogRecord';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
+import { SeverityNumber } from '@opentelemetry/api-logs';
 
 export class Logger implements logsAPI.Logger {
   constructor(
@@ -52,5 +53,24 @@ export class Logger implements logsAPI.Logger {
      * If logRecord is needed after OnEmit returns (i.e. for asynchronous processing) only reads are permitted.
      */
     logRecordInstance._makeReadonly();
+  }
+
+  public emitEvent(name: string, eventRecord?: logsAPI.EventRecord): void {
+    const curEvtRecord = eventRecord || {};
+    const attributes = curEvtRecord.attributes || {};
+    attributes['event.name'] = name;
+
+    const logRecord: logsAPI.LogRecord = {
+      attributes: attributes,
+      context: curEvtRecord.context || context.active(),
+      severityNumber: curEvtRecord.severityNumber || SeverityNumber.INFO,
+      timestamp: curEvtRecord.timestamp || Date.now(),
+    };
+
+    if (curEvtRecord.data) {
+      logRecord.body = curEvtRecord.data;
+    }
+
+    this.emit(logRecord);
   }
 }
