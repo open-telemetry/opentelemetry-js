@@ -22,7 +22,7 @@ import {
 } from '@opentelemetry/core';
 import { IResource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
-import { Span } from './Span';
+import { SpanImpl } from './Span';
 import { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
 import { SpanProcessor } from './SpanProcessor';
@@ -138,7 +138,7 @@ export class Tracer implements api.Tracer {
       Object.assign(attributes, samplingResult.attributes)
     );
 
-    const span = new Span(
+    const span = new SpanImpl(
       this,
       context,
       name,

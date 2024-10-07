@@ -42,6 +42,7 @@ import {
   AlwaysOnSampler,
   AlwaysOffSampler,
 } from '../../src';
+import { SpanImpl } from '../../src/Span';
 
 class DummyPropagator implements TextMapPropagator {
   inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
@@ -582,7 +583,7 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span);
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
     });
 
     it('should propagate resources', () => {
@@ -597,7 +598,7 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       const context = span.spanContext();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
@@ -638,7 +639,7 @@ describe('BasicTracerProvider', () => {
           traceState: state,
         })
       );
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       const context = span.spanContext();
       assert.strictEqual(context.traceId, 'd4cda95b652f4a1592b449d5929fda1b');
       assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
@@ -691,7 +692,7 @@ describe('BasicTracerProvider', () => {
           'invalid-parent' as unknown as SpanContext
         )
       );
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       assert.deepStrictEqual((span as Span).parentSpanId, undefined);
     });
 
@@ -706,7 +707,7 @@ describe('BasicTracerProvider', () => {
           traceFlags: TraceFlags.SAMPLED,
         })
       );
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       const context = span.spanContext();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
@@ -733,7 +734,7 @@ describe('BasicTracerProvider', () => {
         sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
