@@ -340,6 +340,7 @@ export const getRequestInfo = (
 
 /**
  * Makes sure options is of type string or object
+ * If a string, make sure the URL has no authentication credentials (username/password)
  * @param options for the request
  */
 
