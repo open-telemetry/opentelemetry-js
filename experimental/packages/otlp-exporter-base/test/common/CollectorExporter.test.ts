@@ -27,7 +27,6 @@ class OTLPTraceExporter extends OTLPExporterBase<
   CollectorExporterConfig,
   ComplexTestObject
 > {
-  onInit() {}
   onShutdown() {}
   send(
     items: any[],
@@ -55,12 +54,8 @@ describe('OTLPTraceExporter - common', () => {
   });
 
   describe('constructor', () => {
-    let onInitSpy: any;
-
     beforeEach(() => {
-      onInitSpy = sinon.stub(OTLPTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
-        hostname: 'foo',
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
@@ -68,20 +63,6 @@ describe('OTLPTraceExporter - common', () => {
 
     it('should create an instance', () => {
       assert.ok(typeof collectorExporter !== 'undefined');
-    });
-
-    it('should call onInit', () => {
-      assert.strictEqual(onInitSpy.callCount, 1);
-    });
-
-    describe('when config contains certain params', () => {
-      it('should set hostname', () => {
-        assert.strictEqual(collectorExporter.hostname, 'foo');
-      });
-
-      it('should set url', () => {
-        assert.strictEqual(collectorExporter.url, 'http://foo.bar.com');
-      });
     });
   });
 
@@ -190,7 +171,6 @@ describe('OTLPTraceExporter - common', () => {
     beforeEach(() => {
       onShutdownSpy = sinon.stub(OTLPTraceExporter.prototype, 'onShutdown');
       collectorExporterConfig = {
-        hostname: 'foo',
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPTraceExporter(collectorExporterConfig);

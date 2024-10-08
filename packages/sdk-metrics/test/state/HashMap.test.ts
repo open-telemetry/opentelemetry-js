@@ -15,14 +15,14 @@
  */
 
 import * as assert from 'assert';
-import { MetricAttributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import { HashMap } from '../../src/state/HashMap';
 import { hashAttributes } from '../../src/utils';
 
 describe('HashMap', () => {
   describe('set & get', () => {
     it('should get and set with attributes', () => {
-      const map = new HashMap<MetricAttributes, number, string>(hashAttributes);
+      const map = new HashMap<Attributes, number, string>(hashAttributes);
       const hash = hashAttributes({ foo: 'bar' });
 
       map.set({ foo: 'bar' }, 1);
@@ -41,7 +41,7 @@ describe('HashMap', () => {
 
   describe('has', () => {
     it('should return if the key exists in the value map', () => {
-      const map = new HashMap<MetricAttributes, number, string>(hashAttributes);
+      const map = new HashMap<Attributes, number, string>(hashAttributes);
       const hash = hashAttributes({ foo: 'bar' });
 
       // with pinned hash code
@@ -58,7 +58,7 @@ describe('HashMap', () => {
 
   describe('entries', () => {
     it('iterating with entries', () => {
-      const map = new HashMap<MetricAttributes, number, string>(hashAttributes);
+      const map = new HashMap<Attributes, number, string>(hashAttributes);
       map.set({ foo: '1' }, 1);
       map.set({ foo: '2' }, 2);
       map.set({ foo: '3' }, 3);

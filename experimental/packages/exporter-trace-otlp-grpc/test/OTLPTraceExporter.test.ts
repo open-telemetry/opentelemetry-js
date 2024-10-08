@@ -28,7 +28,6 @@ import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../src';
-import { VERSION } from '../src/version';
 
 import {
   ensureExportedSpanIsCorrect,
@@ -299,103 +298,8 @@ const testCollectorExporter = (params: TestParams) => {
         }, 500);
       });
     });
-    describe('Trace Exporter with compression', () => {
-      const envSource = process.env;
-      it('should return gzip compression algorithm on exporter', () => {
-        const credentials = useTLS
-          ? grpc.credentials.createSsl(
-              fs.readFileSync('./test/certs/ca.crt'),
-              fs.readFileSync('./test/certs/client.key'),
-              fs.readFileSync('./test/certs/client.crt')
-            )
-          : grpc.credentials.createInsecure();
-
-        envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
-        collectorExporter = new OTLPTraceExporter({
-          url: address,
-          credentials,
-          metadata: metadata,
-        });
-        assert.strictEqual(
-          collectorExporter.compression,
-          CompressionAlgorithm.GZIP
-        );
-        delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
-      });
-    });
   });
 };
-
-describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
-  it('should default to localhost', done => {
-    const collectorExporter = new OTLPTraceExporter({});
-    setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], 'localhost:4317');
-      done();
-    });
-  });
-  it('should keep the URL if included', done => {
-    const url = 'http://foo.bar.com';
-    const collectorExporter = new OTLPTraceExporter({ url });
-    setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], 'foo.bar.com');
-      done();
-    });
-  });
-});
-
-describe('when configuring via environment', () => {
-  const envSource = process.env;
-
-  afterEach(function () {
-    // Ensure we don't pollute other tests if assertions fail
-    delete envSource.OTEL_EXPORTER_OTLP_ENDPOINT;
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
-    delete envSource.OTEL_EXPORTER_OTLP_HEADERS;
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS;
-    sinon.restore();
-  });
-
-  it('should use url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(collectorExporter.url, 'foo.bar');
-  });
-  it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces';
-    const collectorExporter = new OTLPTraceExporter();
-    assert.strictEqual(collectorExporter.url, 'foo.traces');
-  });
-  it('should use headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-    const collectorExporter = new OTLPTraceExporter();
-    const actualMetadata =
-      collectorExporter['_transport']['_parameters'].metadata();
-    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
-  });
-  it('should include user agent in header', () => {
-    const collectorExporter = new OTLPTraceExporter();
-    const actualMetadata =
-      collectorExporter['_transport']['_parameters'].metadata();
-    assert.deepStrictEqual(actualMetadata.get('User-Agent'), [
-      `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-    ]);
-  });
-  it('should not override hard-coded headers config with headers defined via env', () => {
-    const metadata = new grpc.Metadata();
-    metadata.set('foo', 'bar');
-    metadata.set('goo', 'lol');
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
-    const collectorExporter = new OTLPTraceExporter({ metadata });
-    const actualMetadata =
-      collectorExporter['_transport']['_parameters'].metadata();
-    assert.deepStrictEqual(actualMetadata.get('foo'), ['bar']);
-    assert.deepStrictEqual(actualMetadata.get('goo'), ['lol']);
-    assert.deepStrictEqual(actualMetadata.get('bar'), ['foo']);
-  });
-});
 
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });

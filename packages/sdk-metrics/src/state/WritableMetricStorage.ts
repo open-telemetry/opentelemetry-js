@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
+import { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { AttributeHashMap } from './HashMap';
 
 /**
@@ -27,7 +27,7 @@ export interface WritableMetricStorage {
   /** Records a measurement. */
   record(
     value: number,
-    attributes: MetricAttributes,
+    attributes: Attributes,
     context: Context,
     recordTime: HrTime
   ): void;
