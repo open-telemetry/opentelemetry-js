@@ -27,10 +27,9 @@ import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
 import {
-  ExplicitBucketHistogramAggregation,
+  AggregationType,
   MeterProvider,
   MetricReader,
-  View,
 } from '@opentelemetry/sdk-metrics';
 import {
   encodeAsString,
@@ -72,10 +71,13 @@ export function setUp() {
   meterProvider = new MeterProvider({
     resource: testResource,
     views: [
-      new View({
-        aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+      {
+        aggregation: {
+          type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+          options: { boundaries: [0, 100] },
+        },
         instrumentName: 'int-histogram',
-      }),
+      },
     ],
     readers: [reader],
   });

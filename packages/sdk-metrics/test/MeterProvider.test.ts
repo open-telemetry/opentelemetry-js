@@ -19,7 +19,6 @@ import {
   MeterProvider,
   InstrumentType,
   DataPointType,
-  ExplicitBucketHistogramAggregation,
   HistogramMetricData,
 } from '../src';
 import {
@@ -30,9 +29,9 @@ import {
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
-import { View } from '../src/view/View';
 import { Meter } from '../src/Meter';
 import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
+import { AggregationType } from '../src/view/AggregationOption';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -139,11 +138,11 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
         views: [
-          new View({
+          {
             name: 'renamed-instrument',
             description: 'my renamed instrument',
             instrumentName: 'non-renamed-instrument',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -208,12 +207,12 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({
+          {
             attributesProcessors: [
               createAllowListAttributesProcessor(['attrib1']),
             ],
             instrumentName: 'non-renamed-instrument',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -276,10 +275,10 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -348,11 +347,11 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         views: [
           // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
-          new View({
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
             meterName: 'meter1',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -421,16 +420,16 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         // Add Views to rename both instruments (of different types) to the same name.
         views: [
-          new View({
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
             meterName: 'meter1',
-          }),
-          new View({
+          },
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-histogram',
             meterName: 'meter1',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -489,14 +488,21 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({
+          {
             instrumentUnit: 'ms',
-            aggregation: new ExplicitBucketHistogramAggregation(msBoundaries),
-          }),
-          new View({
+            // aggregation: new ExplicitBucketHistogramAggregation(msBoundaries),
+            aggregation: {
+              type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+              options: { boundaries: msBoundaries },
+            },
+          },
+          {
             instrumentUnit: 's',
-            aggregation: new ExplicitBucketHistogramAggregation(sBoundaries),
-          }),
+            aggregation: {
+              type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+              options: { boundaries: sBoundaries },
+            },
+          },
         ],
         readers: [reader],
       });

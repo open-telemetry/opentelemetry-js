@@ -26,7 +26,7 @@ import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
 import { ForceFlushOptions, ShutdownOptions } from './types';
-import { View } from './view/View';
+import { View, ViewOptions } from './view/View';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -34,7 +34,7 @@ import { View } from './view/View';
 export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: IResource;
-  views?: View[];
+  views?: ViewOptions[];
   readers?: MetricReader[];
 }
 
@@ -51,8 +51,8 @@ export class MeterProvider implements IMeterProvider {
     );
     this._sharedState = new MeterProviderSharedState(resource);
     if (options?.views != null && options.views.length > 0) {
-      for (const view of options.views) {
-        this._sharedState.viewRegistry.addView(view);
+      for (const viewOption of options.views) {
+        this._sharedState.viewRegistry.addView(new View(viewOption));
       }
     }
 

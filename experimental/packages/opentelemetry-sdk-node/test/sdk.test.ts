@@ -36,7 +36,6 @@ import {
   InstrumentType,
   MeterProvider,
   PeriodicExportingMetricReader,
-  View,
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -432,11 +431,11 @@ describe('Node SDK', () => {
     const sdk = new NodeSDK({
       metricReader: metricReader,
       views: [
-        new View({
+        {
           name: 'test-view',
           instrumentName: 'test_counter',
           instrumentType: InstrumentType.COUNTER,
-        }),
+        },
       ],
       autoDetectResources: false,
     });
