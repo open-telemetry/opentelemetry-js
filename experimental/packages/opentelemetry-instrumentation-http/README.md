@@ -14,7 +14,7 @@ For automatic instrumentation, see the [@opentelemetry/sdk-trace-node](https://g
 ```bash
 npm install --save @opentelemetry/instrumentation-http
 
-
+```
 ## Supported Versions
 
 - Nodejs `>=14`
