@@ -13,7 +13,6 @@ For automatic instrumentation, see the [@opentelemetry/sdk-trace-node](https://g
 
 ```bash
 npm install --save @opentelemetry/instrumentation-http
-
 ```
 ## Supported Versions
 
@@ -42,8 +41,6 @@ provider.register();
 registerInstrumentations({
   instrumentations: [new HttpInstrumentation()],
 });
-
-
 ```
 
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) for a short example.
@@ -143,9 +140,7 @@ Attributes collected:
 | `net.peer.ip`                               | The IP address of the remote client                                            |
 | `net.peer.name`                             | The DNS name or IP address of the remote client                                |
 | `net.peer.port`                             | The port of the remote peer                                                   |
-| `peer.service`                              | The name of the remote service                                                |
-| `service.name`                              | Name of the service that generated the span                                     |
-
+                                            
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
