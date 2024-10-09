@@ -50,7 +50,9 @@ function mergeHeaders(
   return Object.assign(headers, requiredHeaders);
 }
 
-function validateUserProvidedUrl(url: string | undefined): string | undefined {
+export function validateUserProvidedUrl(
+  url: string | undefined
+): string | undefined {
   if (url == null) {
     return undefined;
   }

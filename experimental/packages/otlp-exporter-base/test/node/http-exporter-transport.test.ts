@@ -16,6 +16,7 @@
 
 import { createHttpExporterTransport } from '../../src/platform/node/http-exporter-transport';
 import * as http from 'http';
+import * as net from 'net';
 import * as assert from 'assert';
 import sinon = require('sinon');
 import {
@@ -54,6 +55,52 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
+        headers: {},
+        compression: 'none',
+        agentOptions: {},
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'success');
+      assert.deepEqual(
+        (result as ExportResponseSuccess).data,
+        expectedResponseData
+      );
+    });
+
+    it('returns success on proxied success status', async function () {
+      // arrange
+      const expectedResponseData = Buffer.from([4, 5, 6]);
+      server = http
+        .createServer((_, res) => {
+          res.statusCode = 200;
+          res.write(expectedResponseData);
+          res.end();
+        })
+        .on('connect', (req, socket, head) => {
+          const authorization = req.headers['proxy-authorization'];
+          const credentials = Buffer.from('open:telemetry').toString('base64');
+          if (authorization?.slice('Basic '.length) !== credentials) {
+            socket.write('HTTP/1.1 407');
+            socket.end();
+            return;
+          }
+
+          const [hostname, port] = req.url!.split(':');
+          const proxy = net.connect(Number(port), hostname, () => {
+            socket.write('HTTP/1.1 200\r\n\r\n');
+            proxy.write(head);
+            socket.pipe(proxy).pipe(socket);
+          });
+        });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        proxy: 'http://open:telemetry@localhost:8080',
         headers: {},
         compression: 'none',
         agentOptions: {},

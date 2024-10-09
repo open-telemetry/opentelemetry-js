@@ -26,6 +26,7 @@ import { convertLegacyAgentOptions } from './convert-legacy-agent-options';
 import {
   getHttpConfigurationDefaults,
   mergeOtlpHttpConfigurationWithDefaults,
+  validateUserProvidedUrl,
 } from '../../configuration/otlp-http-configuration';
 import { getHttpConfigurationFromEnvironment } from '../../configuration/otlp-http-env-configuration';
 
@@ -75,6 +76,7 @@ export abstract class OTLPExporterNodeBase<
         compression: actualConfig.compression,
         headers: actualConfig.headers,
         url: actualConfig.url,
+        proxy: validateUserProvidedUrl(config.proxy),
       }),
     });
   }

@@ -40,10 +40,7 @@ class HttpExporterTransport implements IExporterTransport {
         createHttpAgent,
         // eslint-disable-next-line @typescript-eslint/no-var-requires
       } = require('./http-transport-utils');
-      this._agent = createHttpAgent(
-        this._parameters.url,
-        this._parameters.agentOptions
-      );
+      this._agent = createHttpAgent(this._parameters);
       this._send = sendWithHttp;
     }
 

@@ -31,4 +31,5 @@ export interface HttpRequestParameters {
   headers: Record<string, string>;
   compression: 'gzip' | 'none';
   agentOptions: http.AgentOptions | https.AgentOptions;
+  proxy?: string;
 }

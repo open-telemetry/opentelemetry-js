@@ -16,6 +16,7 @@
 import * as http from 'http';
 import * as https from 'https';
 import * as zlib from 'zlib';
+import { TcpNetConnectOpts, Socket } from 'net';
 import { Readable } from 'stream';
 import { HttpRequestParameters } from './http-transport-types';
 import { ExportResponse } from '../../export-response';
@@ -138,11 +139,58 @@ function readableFromUint8Array(buff: string | Uint8Array): Readable {
   return readable;
 }
 
-export function createHttpAgent(
-  rawUrl: string,
-  agentOptions: http.AgentOptions | https.AgentOptions
-) {
-  const parsedUrl = new URL(rawUrl);
+export function createHttpAgent(params: HttpRequestParameters) {
+  const parsedUrl = new URL(params.url);
   const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
-  return new Agent(agentOptions);
+
+  if (!params.proxy) {
+    return new Agent(params.agentOptions);
+  }
+
+  const parsedProxy = new URL(params.proxy);
+
+  const headers: http.OutgoingHttpHeaders = {};
+  if (parsedProxy.username) {
+    const basic = Buffer.from(
+      `${parsedProxy.username}:${parsedProxy.password}`
+    ).toString('base64');
+    headers['Proxy-Authorization'] = `Basic ${basic}`;
+  }
+
+  const request =
+    parsedProxy.protocol === 'http:' ? http.request : https.request;
+
+  class ProxyAgent extends Agent {
+    constructor() {
+      super({ keepAlive: true, ...params.agentOptions });
+    }
+
+    createConnection(
+      options: TcpNetConnectOpts,
+      callback: (err: Error | null, conn?: Socket | null) => void
+    ) {
+      const req = request({
+        method: 'CONNECT',
+        hostname: parsedProxy.hostname,
+        port: parsedProxy.port,
+        headers,
+        path: `${options.host || parsedUrl.hostname}:${options.port}`,
+        timeout: options.timeout,
+      })
+        .on('connect', (res, conn) => {
+          if (res.statusCode === 200) {
+            callback(null, conn);
+          } else {
+            callback(new OTLPExporterError(res.statusMessage, res.statusCode));
+          }
+        })
+        .on('error', callback)
+        .end();
+
+      req.on('timeout', () =>
+        req.socket!.destroy(new Error('Request Timeout'))
+      );
+    }
+  }
+  return new ProxyAgent();
 }
