@@ -29,9 +29,9 @@ detailed instructions, see [development](#development) below.
 ```sh
 git clone https://github.com/open-telemetry/opentelemetry-js.git
 cd opentelemetry-js
-npm install
+npm ci
 npm run compile
-npm test
+npm run test
 ```
 
 ## Pull Request Merge Guidelines
@@ -164,7 +164,7 @@ Most of the commands needed for development are accessed as [npm scripts](https:
 This will install all dependencies for the root project and all modules managed by `npm workspaces`.
 
 ```sh
-npm install
+npm ci
 ```
 
 ### Compile modules
@@ -293,10 +293,10 @@ export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
 /// packages/opentelemetry-core/src/platform/browser/globalThis.ts
 export const _globalThis: typeof globalThis =
   typeof globalThis === 'object' ? globalThis :
-  typeof self === 'object' ? self :
-  typeof window === 'object' ? window :
-  typeof global === 'object' ? global :
-  {} as typeof globalThis;
+    typeof self === 'object' ? self :
+      typeof window === 'object' ? window :
+        typeof global === 'object' ? global :
+          {} as typeof globalThis;
 ```
 
 Even though the implementation may differ, the exported names must be aligned.
