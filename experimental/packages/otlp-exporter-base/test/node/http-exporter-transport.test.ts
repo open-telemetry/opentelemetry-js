@@ -71,7 +71,7 @@ describe('HttpExporterTransport', function () {
       );
     });
 
-    it('returns success on proxied success status', async function () {
+    it('returns success on authenticated proxied success status', async function () {
       // arrange
       const expectedResponseData = Buffer.from([4, 5, 6]);
       server = http
@@ -84,7 +84,7 @@ describe('HttpExporterTransport', function () {
           const authorization = req.headers['proxy-authorization'];
           const credentials = Buffer.from('open:telemetry').toString('base64');
           if (authorization?.slice('Basic '.length) !== credentials) {
-            socket.write('HTTP/1.1 407');
+            socket.write('HTTP/1.1 407 Proxy Authentication Required\r\n\r\n');
             socket.end();
             return;
           }
@@ -114,6 +114,52 @@ describe('HttpExporterTransport', function () {
       assert.deepEqual(
         (result as ExportResponseSuccess).data,
         expectedResponseData
+      );
+    });
+
+    it('returns failure on unauthenticated proxied success status', async function () {
+      // arrange
+      const expectedResponseData = Buffer.from([4, 5, 6]);
+      server = http
+        .createServer((_, res) => {
+          res.statusCode = 200;
+          res.write(expectedResponseData);
+          res.end();
+        })
+        .on('connect', (req, socket, head) => {
+          const authorization = req.headers['proxy-authorization'];
+          const credentials = Buffer.from('open:telemetry').toString('base64');
+          if (authorization?.slice('Basic '.length) !== credentials) {
+            socket.write('HTTP/1.1 407 Proxy Authentication Required\r\n\r\n');
+            socket.end();
+            return;
+          }
+
+          const [hostname, port] = req.url!.split(':');
+          const proxy = net.connect(Number(port), hostname, () => {
+            socket.write('HTTP/1.1 200\r\n\r\n');
+            proxy.write(head);
+            socket.pipe(proxy).pipe(socket);
+          });
+        });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        proxy: 'http://closed:telemetry@localhost:8080',
+        headers: {},
+        compression: 'none',
+        agentOptions: {},
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (result as ExportResponseFailure).error.message,
+        'Proxy Authentication Required'
       );
     });
 
@@ -192,6 +238,42 @@ describe('HttpExporterTransport', function () {
       );
     });
 
+    it('returns failure on proxied non-retryable status', async function () {
+      // arrange
+      server = http
+        .createServer((_, res) => {
+          res.statusCode = 404;
+          res.end();
+        })
+        .on('connect', (req, socket, head) => {
+          const [hostname, port] = req.url!.split(':');
+          const proxy = net.connect(Number(port), hostname, () => {
+            socket.write('HTTP/1.1 200\r\n\r\n');
+            proxy.write(head);
+            socket.pipe(proxy).pipe(socket);
+          });
+        });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        proxy: 'http://localhost:8080',
+        headers: {},
+        compression: 'none',
+        agentOptions: {},
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 1000);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (result as ExportResponseFailure).error.message,
+        'Not Found'
+      );
+    });
+
     it('returns failure when request times out', function (done) {
       // arrange
       const timer = sinon.useFakeTimers();
@@ -205,6 +287,56 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
+        headers: {},
+        compression: 'none',
+        agentOptions: {},
+      });
+
+      // act
+      transport
+        .send(sampleRequestData, 100)
+        .then(result => {
+          // assert
+          assert.strictEqual(result.status, 'failure');
+          assert.strictEqual(
+            (result as ExportResponseFailure).error.message,
+            'Request Timeout'
+          );
+          done();
+        })
+        .catch(error => {
+          done(error);
+        });
+      // pass more time than passed as timeout value
+      timer.tick(200);
+    });
+
+    it('returns failure when proxy request times out', function (done) {
+      // arrange
+      const timer = sinon.useFakeTimers();
+      server = http
+        .createServer((_, res) => {
+          res.statusCode = 200;
+          res.end();
+        })
+        .on('connect', (req, socket, head) =>
+          setTimeout(() => {
+            const [hostname, port] = req.url!.split(':');
+            const proxy = net.connect(Number(port), hostname, () => {
+              socket.write('HTTP/1.1 200\r\n\r\n');
+              proxy.write(head);
+              socket.pipe(proxy).pipe(socket);
+            });
+          }, 1000)
+        )
+        .on('connection', socket =>
+          socket.setTimeout(1000, () => socket.destroy())
+        );
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        proxy: 'http://localhost:8080',
         headers: {},
         compression: 'none',
         agentOptions: {},
@@ -254,11 +386,63 @@ describe('HttpExporterTransport', function () {
       );
     });
 
+    it('returns failure when proxy socket hangs up', async function () {
+      // arrange
+      server = http
+        .createServer((_, res) => {
+          res.statusCode = 200;
+          res.end();
+        })
+        .on('connect', (_, socket) => {
+          socket.destroy();
+        });
+      server.listen(8080);
+
+      const transport = createHttpExporterTransport({
+        url: 'http://localhost:8080',
+        proxy: 'http://localhost:8080',
+        headers: {},
+        compression: 'none',
+        agentOptions: {},
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 100);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (result as ExportResponseFailure).error.message,
+        'socket hang up'
+      );
+    });
+
     it('returns failure when server does not exist', async function () {
       // arrange
       const transport = createHttpExporterTransport({
         // use wrong port
         url: 'http://example.test',
+        headers: {},
+        compression: 'none',
+        agentOptions: {},
+      });
+
+      // act
+      const result = await transport.send(sampleRequestData, 100);
+
+      // assert
+      assert.strictEqual(result.status, 'failure');
+      assert.strictEqual(
+        (result as ExportResponseFailure).error.message,
+        'getaddrinfo ENOTFOUND example.test'
+      );
+    });
+
+    it('returns failure when proxy server does not exist', async function () {
+      // arrange
+      const transport = createHttpExporterTransport({
+        url: 'https://github.com/open-telemetry/opentelemetry-js',
+        proxy: 'http://example.test',
         headers: {},
         compression: 'none',
         agentOptions: {},

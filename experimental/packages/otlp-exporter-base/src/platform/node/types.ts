@@ -24,7 +24,7 @@ import { OTLPExporterConfigBase } from '../../types';
 export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
   keepAlive?: boolean;
   compression?: CompressionAlgorithm;
-  proxy?: string
+  proxy?: string;
   httpAgentOptions?: http.AgentOptions | https.AgentOptions;
 }
 

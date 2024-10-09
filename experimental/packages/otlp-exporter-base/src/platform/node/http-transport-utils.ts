@@ -53,6 +53,7 @@ export function sendWithHttp(
       ...params.headers,
     },
     agent: agent,
+    timeout: timeoutMillis,
   };
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
@@ -82,13 +83,7 @@ export function sendWithHttp(
     });
   });
 
-  req.setTimeout(timeoutMillis, () => {
-    req.destroy();
-    onDone({
-      status: 'failure',
-      error: new Error('Request Timeout'),
-    });
-  });
+  req.on('timeout', () => req.destroy(new Error('Request Timeout')));
   req.on('error', (error: Error | any) => {
     onDone({
       status: 'failure',
@@ -184,12 +179,10 @@ export function createHttpAgent(params: HttpRequestParameters) {
             callback(new OTLPExporterError(res.statusMessage, res.statusCode));
           }
         })
-        .on('error', callback)
         .end();
 
-      req.on('timeout', () =>
-        req.socket!.destroy(new Error('Request Timeout'))
-      );
+      req.on('error', callback);
+      req.on('timeout', () => req.destroy(new Error('Request Timeout')));
     }
   }
   return new ProxyAgent();
