@@ -229,7 +229,7 @@ Packages that are expected to run in the browser have browser specific tests:
 # Run browser-specific test
 npm run test:browser
 
-#Run web worker test
+# Run web worker test
 npm run test:webworker
 ```
 
