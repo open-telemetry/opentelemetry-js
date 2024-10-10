@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "@opentelemetry/api-logs": "0.53.0",
+    "@opentelemetry/sdk-logs": "^0.53.0",
     "@types/shimmer": "^1.2.0",
     "import-in-the-middle": "^1.8.1",
     "require-in-the-middle": "^7.1.1",
