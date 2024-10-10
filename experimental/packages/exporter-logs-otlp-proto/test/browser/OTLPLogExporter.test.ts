@@ -21,9 +21,7 @@ import { OTLPLogExporter } from '../../src/platform/browser/index';
 describe('OTLPLogExporter - web', () => {
   let collectorLogsExporter: OTLPLogExporter;
   describe('constructor', () => {
-    let onInitSpy: any;
     beforeEach(() => {
-      onInitSpy = sinon.stub(OTLPLogExporter.prototype, 'onInit');
       const collectorExporterConfig = {
         hostname: 'foo',
         url: 'http://foo.bar.com',
@@ -35,16 +33,6 @@ describe('OTLPLogExporter - web', () => {
     });
     it('should create an instance', () => {
       assert.ok(typeof collectorLogsExporter !== 'undefined');
-    });
-    it('should call onInit', () => {
-      assert.strictEqual(onInitSpy.callCount, 1);
-    });
-    it('should set hostname', () => {
-      assert.strictEqual(collectorLogsExporter.hostname, 'foo');
-    });
-
-    it('should set url', () => {
-      assert.strictEqual(collectorLogsExporter.url, 'http://foo.bar.com');
     });
   });
 });

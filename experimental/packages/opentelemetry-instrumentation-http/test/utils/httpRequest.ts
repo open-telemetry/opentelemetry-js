@@ -23,6 +23,10 @@ type GetResult = Promise<{
   reqHeaders: http.OutgoingHttpHeaders;
   method: string | undefined;
   address?: string;
+  clientRemotePort?: number;
+  clientRemoteAddress?: string;
+  req: http.OutgoingMessage;
+  res: http.IncomingMessage;
 }>;
 
 function get(input: string | URL, options?: http.RequestOptions): GetResult;
@@ -48,6 +52,10 @@ function get(input: any, options?: any): GetResult {
           resHeaders: res.headers,
           method: res.req.method,
           address: req.socket?.remoteAddress,
+          clientRemotePort: res.req.socket?.localPort,
+          clientRemoteAddress: res.req.socket?.localAddress,
+          req,
+          res,
         });
       });
       resp.on('error', err => {

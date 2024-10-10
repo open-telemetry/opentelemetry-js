@@ -189,7 +189,7 @@ describe('MeterProvider', () => {
       assertPartialDeepStrictEqual(
         resourceMetrics.scopeMetrics[0].metrics[0].dataPoints[0],
         {
-          // MetricAttributes are still there.
+          // Attributes are still there.
           attributes: {
             attrib1: 'attrib_value1',
             attrib2: 'attrib_value2',

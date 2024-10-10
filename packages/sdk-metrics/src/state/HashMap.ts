@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import { hashAttributes } from '../utils';
 
 export interface Hash<ValueType, HashCodeType> {
@@ -84,7 +84,7 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
 }
 
 export class AttributeHashMap<ValueType> extends HashMap<
-  MetricAttributes,
+  Attributes,
   ValueType,
   string
 > {

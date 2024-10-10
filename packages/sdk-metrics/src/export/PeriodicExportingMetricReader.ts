@@ -142,7 +142,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
         .waitForAsyncAttributes?.()
         .then(doExport, err =>
           diag.debug('Error while resolving async portion of resource: ', err)
-        );
+        )
+        .catch(globalErrorHandler);
     } else {
       await doExport();
     }

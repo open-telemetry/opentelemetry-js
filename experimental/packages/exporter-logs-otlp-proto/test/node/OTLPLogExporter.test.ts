@@ -35,7 +35,6 @@ import {
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { VERSION } from '../../src/version';
 import { Root } from 'protobufjs';
 import * as path from 'path';
 
@@ -67,150 +66,12 @@ describe('OTLPLogExporter - node with proto over http', () => {
     sinon.restore();
   });
 
-  describe('when configuring via environment', () => {
-    const envSource = process.env;
-    it('should use url defined in env that ends with root path and append version and signal path', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/logs`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should use url defined in env without checking if path is already present', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/logs';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should use url defined in env and append version and signal', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should override global exporter url with signal url defined in env', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.logs/';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
-    });
-    it('should override url defined in env with url defined in constructor', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      const constructorDefinedEndpoint = 'http://constructor/v1/logs';
-      const collectorExporter = new OTLPLogExporter({
-        url: constructorDefinedEndpoint,
-      });
-      assert.strictEqual(collectorExporter.url, constructorDefinedEndpoint);
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should add root path when signal url defined in env contains no path and no root path', () => {
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}/`
-      );
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains root path but no path', () => {
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains path', () => {
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar/v1/logs';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains path and ends in /', () => {
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = 'http://foo.bar/v1/logs/';
-      const collectorExporter = new OTLPLogExporter();
-      assert.strictEqual(
-        collectorExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = '';
-    });
-    it('should include user-agent header by default', () => {
-      const exporter = new OTLPLogExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers'][
-          'User-Agent'
-        ],
-        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-      );
-    });
-    it('should use headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=bar';
-      const exporter = new OTLPLogExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'bar'
-      );
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should override global headers config with signal headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=boo';
-      const exporter = new OTLPLogExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'boo'
-      );
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['bar'],
-        'foo'
-      );
-      envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = '';
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should override headers defined via env with headers defined in constructor', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const exporter = new OTLPLogExporter({
-        headers: {
-          foo: 'constructor',
-        },
-      });
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'constructor'
-      );
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['bar'],
-        'foo'
-      );
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-  });
-
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
         },
-        hostname: 'foo',
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
@@ -346,7 +207,6 @@ describe('OTLPLogExporter - node with proto over http', () => {
         headers: {
           foo: 'bar',
         },
-        hostname: 'foo',
         url: 'http://foo.bar.com',
         keepAlive: true,
         compression: CompressionAlgorithm.GZIP,
