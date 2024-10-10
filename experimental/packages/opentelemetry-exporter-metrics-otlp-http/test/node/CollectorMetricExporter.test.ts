@@ -21,9 +21,6 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import {
   AggregationTemporalityPreference,
-  CumulativeTemporalitySelector,
-  DeltaTemporalitySelector,
-  LowMemoryTemporalitySelector,
   OTLPMetricExporterOptions,
 } from '../../src';
 
@@ -43,9 +40,9 @@ import {
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 import {
-  Aggregation,
+  AggregationOption,
   AggregationTemporality,
-  ExplicitBucketHistogramAggregation,
+  AggregationType,
   InstrumentType,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
@@ -55,7 +52,6 @@ import {
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
-import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -225,9 +221,13 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
   describe('aggregation', () => {
     it('aggregationSelector calls the selector supplied to the constructor', () => {
-      const aggregation = new ExplicitBucketHistogramAggregation([
-        0, 100, 100000,
-      ]);
+      const aggregation: AggregationOption = {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 100, 100000],
+        },
+      };
+
       const exporter = new OTLPMetricExporter({
         aggregationPreference: _instrumentType => aggregation,
       });
@@ -239,224 +239,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
     it('aggregationSelector returns the default aggregation preference when nothing is supplied', () => {
       const exporter = new OTLPMetricExporter({
-        aggregationPreference: _instrumentType => Aggregation.Default(),
-      });
-      assert.equal(
-        exporter.selectAggregation(InstrumentType.COUNTER),
-        Aggregation.Default()
-      );
-    });
-  });
-
-  describe('when configuring via environment', () => {
-    const envSource = process.env;
-    it('should use url defined in env that ends with root path and append version and signal path', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/metrics`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should use url defined in env without checking if path is already present', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should use url defined in env and append version and signal', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should override global exporter url with signal url defined in env', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics/';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-    });
-    it('should add root path when signal url defined in env contains no path and no root path', () => {
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}/`
-      );
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains root path but no path', () => {
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains path', () => {
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
-        'http://foo.bar/v1/metrics';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-    });
-    it('should not add root path when signal url defined in env contains path and ends in /', () => {
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT =
-        'http://foo.bar/v1/metrics/';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
-      );
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-    });
-    it('should use override url defined in env with url defined in constructor', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-      const constructorDefinedEndpoint = 'http://constructor/v1/metrics';
-      const collectorExporter = new OTLPMetricExporter({
-        url: constructorDefinedEndpoint,
-      });
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        constructorDefinedEndpoint
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    });
-    it('should use headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-      const exporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters'][
-          'headers'
-        ]['foo'],
-        'bar'
-      );
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should include user agent in header', () => {
-      const exporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters'][
-          'headers'
-        ]['User-Agent'],
-        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-      );
-    });
-    it('should override global headers config with signal headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-      const exporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters'][
-          'headers'
-        ]['foo'],
-        'boo'
-      );
-      assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters'][
-          'headers'
-        ]['bar'],
-        'foo'
-      );
-      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should override headers defined via env with headers defined in constructor', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const exporter = new OTLPMetricExporter({
-        headers: {
-          foo: 'constructor',
+        aggregationPreference: _instrumentType => {
+          return { type: AggregationType.DEFAULT };
         },
       });
-      assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters'][
-          'headers'
-        ]['foo'],
-        'constructor'
-      );
-      assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters'][
-          'headers'
-        ]['bar'],
-        'foo'
-      );
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should use delta temporality defined via env', () => {
-      for (const envValue of ['delta', 'DELTA', 'DeLTa', 'delta     ']) {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(
-          exporter['_aggregationTemporalitySelector'],
-          DeltaTemporalitySelector
-        );
-      }
-    });
-    it('should use cumulative temporality defined via env', () => {
-      for (const envValue of [
-        'cumulative',
-        'CUMULATIVE',
-        'CuMULaTIvE',
-        'cumulative    ',
-      ]) {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(
-          exporter['_aggregationTemporalitySelector'],
-          CumulativeTemporalitySelector
-        );
-      }
-    });
-    it('should use low memory temporality defined via env', () => {
-      for (const envValue of [
-        'lowmemory',
-        'LOWMEMORY',
-        'LoWMeMOrY',
-        'lowmemory    ',
-      ]) {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(
-          exporter['_aggregationTemporalitySelector'],
-          LowMemoryTemporalitySelector
-        );
-      }
-    });
-    it('should configure cumulative temporality with invalid value in env', () => {
-      for (const envValue of ['invalid', ' ']) {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(
-          exporter['_aggregationTemporalitySelector'],
-          CumulativeTemporalitySelector
-        );
-      }
-    });
-    it('should respect explicit config over environment variable', () => {
-      envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE =
-        'cumulative';
-      const exporter = new OTLPMetricExporter({
-        temporalityPreference: AggregationTemporalityPreference.DELTA,
-      });
-      assert.strictEqual(
-        exporter['_aggregationTemporalitySelector'],
-        DeltaTemporalitySelector
+      assert.deepStrictEqual(
+        exporter.selectAggregation(InstrumentType.COUNTER),
+        {
+          type: AggregationType.DEFAULT,
+        }
       );
     });
   });
@@ -468,7 +259,6 @@ describe('OTLPMetricExporter - node with json over http', () => {
         headers: {
           foo: 'bar',
         },
-        hostname: 'foo',
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
@@ -674,30 +464,6 @@ describe('OTLPMetricExporter - node with json over http', () => {
           assert.strictEqual(error.code, 400);
           done();
         });
-      });
-    });
-  });
-  describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
-    it('should default to localhost', done => {
-      const collectorExporter = new OTLPMetricExporter();
-      setTimeout(() => {
-        assert.strictEqual(
-          collectorExporter._otlpExporter.url,
-          'http://localhost:4318/v1/metrics'
-        );
-        done();
-      });
-    });
-
-    it('should keep the URL if included', done => {
-      const url = 'http://foo.bar.com';
-      const collectorExporter = new OTLPMetricExporter({
-        url,
-        temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
-      });
-      setTimeout(() => {
-        assert.strictEqual(collectorExporter._otlpExporter.url, url);
-        done();
       });
     });
   });

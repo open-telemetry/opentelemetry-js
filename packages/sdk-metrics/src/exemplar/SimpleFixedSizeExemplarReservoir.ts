@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
+import { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
@@ -37,7 +37,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
   private _findBucketIndex(
     _value: number,
     _timestamp: HrTime,
-    _attributes: MetricAttributes,
+    _attributes: Attributes,
     _ctx: Context
   ) {
     if (this._numMeasurementsSeen < this._size)
@@ -49,7 +49,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
   offer(
     value: number,
     timestamp: HrTime,
-    attributes: MetricAttributes,
+    attributes: Attributes,
     ctx: Context
   ): void {
     const index = this._findBucketIndex(value, timestamp, attributes, ctx);

@@ -25,13 +25,13 @@ import {
   ForceFlushOptions,
   ShutdownOptions,
 } from '../types';
-import { Aggregation } from '../view/Aggregation';
 import {
   AggregationSelector,
   AggregationTemporalitySelector,
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
+import { AggregationOption } from '../view/AggregationOption';
 
 export interface MetricReaderOptions {
   /**
@@ -99,10 +99,10 @@ export abstract class MetricReader {
   }
 
   /**
-   * Select the {@link Aggregation} for the given {@link InstrumentType} for this
+   * Select the {@link AggregationOption} for the given {@link InstrumentType} for this
    * reader.
    */
-  selectAggregation(instrumentType: InstrumentType): Aggregation {
+  selectAggregation(instrumentType: InstrumentType): AggregationOption {
     return this._aggregationSelector(instrumentType);
   }
 

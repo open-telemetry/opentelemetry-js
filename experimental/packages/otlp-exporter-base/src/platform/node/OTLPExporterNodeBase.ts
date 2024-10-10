@@ -16,14 +16,18 @@
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterNodeConfigBase } from './types';
-import { configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExporterTransport } from '../../exporter-transport';
 import { createHttpExporterTransport } from './http-exporter-transport';
 import { OTLPExporterError } from '../../types';
 import { createRetryingTransport } from '../../retrying-transport';
+import { convertLegacyAgentOptions } from './convert-legacy-agent-options';
+import {
+  getHttpConfigurationDefaults,
+  mergeOtlpHttpConfigurationWithDefaults,
+} from '../../configuration/otlp-http-configuration';
+import { getHttpConfigurationFromEnvironment } from '../../configuration/otlp-http-env-configuration';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -34,53 +38,46 @@ export abstract class OTLPExporterNodeBase<
 > extends OTLPExporterBase<OTLPExporterNodeConfigBase, ExportItem> {
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
   private _transport: IExporterTransport;
+  private _timeoutMillis: number;
 
   constructor(
     config: OTLPExporterNodeConfigBase = {},
     serializer: ISerializer<ExportItem[], ServiceResponse>,
-    signalSpecificHeaders: Record<string, string>
+    requiredHeaders: Record<string, string>,
+    signalIdentifier: string,
+    signalResourcePath: string
   ) {
     super(config);
+    const actualConfig = mergeOtlpHttpConfigurationWithDefaults(
+      {
+        url: config.url,
+        headers: config.headers,
+        concurrencyLimit: config.concurrencyLimit,
+        timeoutMillis: config.timeoutMillis,
+        compression: config.compression,
+      },
+      getHttpConfigurationFromEnvironment(signalIdentifier, signalResourcePath),
+      getHttpConfigurationDefaults(requiredHeaders, signalResourcePath)
+    );
+
+    this._timeoutMillis = actualConfig.timeoutMillis;
+    this._concurrencyLimit = actualConfig.concurrencyLimit;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
     this._serializer = serializer;
 
-    // populate keepAlive for use with new settings
-    if (config?.keepAlive != null) {
-      if (config.httpAgentOptions != null) {
-        if (config.httpAgentOptions.keepAlive == null) {
-          // specific setting is not set, populate with non-specific setting.
-          config.httpAgentOptions.keepAlive = config.keepAlive;
-        }
-        // do nothing, use specific setting otherwise
-      } else {
-        // populate specific option if AgentOptions does not exist.
-        config.httpAgentOptions = {
-          keepAlive: config.keepAlive,
-        };
-      }
-    }
-    const nonSignalSpecificHeaders = baggageUtils.parseKeyPairsIntoRecord(
-      getEnv().OTEL_EXPORTER_OTLP_HEADERS
-    );
-
     this._transport = createRetryingTransport({
       transport: createHttpExporterTransport({
-        agentOptions: config.httpAgentOptions ?? { keepAlive: true },
-        compression: configureCompression(config.compression),
-        headers: Object.assign(
-          {},
-          nonSignalSpecificHeaders,
-          signalSpecificHeaders
-        ),
-        url: this.url,
+        agentOptions: convertLegacyAgentOptions(config),
+        compression: actualConfig.compression,
+        headers: actualConfig.headers,
+        url: actualConfig.url,
       }),
     });
   }
-
-  onInit(_config: OTLPExporterNodeConfigBase): void {}
 
   send(
     objects: ExportItem[],
@@ -100,7 +97,7 @@ export abstract class OTLPExporterNodeBase<
     }
 
     const promise = this._transport
-      .send(data, this.timeoutMillis)
+      .send(data, this._timeoutMillis)
       .then(response => {
         if (response.status === 'success') {
           onSuccess();

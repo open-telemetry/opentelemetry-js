@@ -53,7 +53,7 @@
     "@opentelemetry/sdk-metrics": "1.26.0",
     "@opentelemetry/sdk-trace-base": "1.26.0",
     "@opentelemetry/sdk-trace-node": "1.26.0",
-    "@types/mocha": "10.0.7",
+    "@types/mocha": "10.0.8",
     "@types/node": "18.6.5",
     "@types/request-promise-native": "1.0.21",
     "@types/semver": "7.5.8",
@@ -78,6 +78,7 @@
     "@opentelemetry/core": "1.26.0",
     "@opentelemetry/instrumentation": "0.53.0",
     "@opentelemetry/semantic-conventions": "1.27.0",
+    "forwarded-parse": "2.1.2",
     "semver": "^7.5.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http",

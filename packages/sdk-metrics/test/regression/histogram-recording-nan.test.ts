@@ -16,13 +16,13 @@
 
 import * as assert from 'assert';
 import {
-  Aggregation,
   AggregationTemporality,
   MeterProvider,
   MetricReader,
   DataPoint,
   ExponentialHistogram,
   Histogram,
+  AggregationType,
 } from '../../src';
 import { TestMetricReader } from '../export/TestMetricReader';
 
@@ -33,7 +33,7 @@ describe('histogram-recording-nan', () => {
         return AggregationTemporality.CUMULATIVE;
       },
       aggregationSelector(type) {
-        return Aggregation.ExponentialHistogram();
+        return { type: AggregationType.EXPONENTIAL_HISTOGRAM };
       },
     });
     const meterProvider = new MeterProvider({
@@ -65,7 +65,7 @@ describe('histogram-recording-nan', () => {
         return AggregationTemporality.CUMULATIVE;
       },
       aggregationSelector(type) {
-        return Aggregation.Histogram();
+        return { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM };
       },
     });
     const meterProvider = new MeterProvider({

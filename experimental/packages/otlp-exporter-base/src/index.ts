@@ -24,13 +24,7 @@ export {
   OTLPExporterConfigBase,
   ExportServiceError,
 } from './types';
-export {
-  parseHeaders,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
-  configureExporterTimeout,
-  invalidTimeout,
-} from './util';
+export { validateAndNormalizeHeaders } from './util';
 
 export {
   ExportResponse,
@@ -40,3 +34,11 @@ export {
 } from './export-response';
 
 export { IExporterTransport } from './exporter-transport';
+
+export {
+  OtlpSharedConfiguration,
+  mergeOtlpSharedConfigurationWithDefaults,
+  getSharedConfigurationDefaults,
+} from './configuration/shared-configuration';
+
+export { getSharedConfigurationFromEnvironment } from './configuration/shared-env-configuration';

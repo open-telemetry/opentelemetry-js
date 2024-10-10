@@ -28,10 +28,10 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { InstrumentationScope, VERSION } from '@opentelemetry/core';
 import {
-  ExplicitBucketHistogramAggregation,
+  AggregationType,
   MeterProvider,
   MetricReader,
-  View,
+  ViewOptions,
 } from '@opentelemetry/sdk-metrics';
 import {
   encodeAsString,
@@ -59,10 +59,15 @@ class TestMetricReader extends MetricReader {
   }
 }
 
-export const HISTOGRAM_AGGREGATION_VIEW = new View({
-  aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+export const HISTOGRAM_AGGREGATION_VIEW: ViewOptions = {
+  aggregation: {
+    type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+    options: {
+      boundaries: [0, 100],
+    },
+  },
   instrumentName: 'int-histogram',
-});
+};
 
 const defaultResource = Resource.default().merge(
   new Resource({
@@ -83,7 +88,7 @@ export async function collect() {
   return (await reader.collect())!;
 }
 
-export function setUp(views?: View[]) {
+export function setUp(views?: ViewOptions[]) {
   reader = new TestMetricReader();
   meterProvider = new MeterProvider({
     resource: defaultResource,

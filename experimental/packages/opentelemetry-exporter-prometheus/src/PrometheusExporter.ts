@@ -17,8 +17,8 @@
 import { diag } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
 import {
-  Aggregation,
   AggregationTemporality,
+  AggregationType,
   MetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
@@ -60,7 +60,11 @@ export class PrometheusExporter extends MetricReader {
     callback: (error: Error | void) => void = () => {}
   ) {
     super({
-      aggregationSelector: _instrumentType => Aggregation.Default(),
+      aggregationSelector: _instrumentType => {
+        return {
+          type: AggregationType.DEFAULT,
+        };
+      },
       aggregationTemporalitySelector: _instrumentType =>
         AggregationTemporality.CUMULATIVE,
       metricProducers: config.metricProducers,
