@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import { _globalThis } from '@opentelemetry/platform-common';
 import { LoggerProvider } from '../types/LoggerProvider';
-import { _globalThis } from '../platform';
 
 export const GLOBAL_LOGS_API_KEY = Symbol.for('io.opentelemetry.js.api.logs');
 
