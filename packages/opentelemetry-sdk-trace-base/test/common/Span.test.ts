@@ -861,7 +861,7 @@ describe('Span', () => {
 
   it('should drop non-string status message', function () {
     const warnStub = sinon.spy(diag, 'warn');
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
