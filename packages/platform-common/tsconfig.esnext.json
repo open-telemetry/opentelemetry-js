@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.esnext.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build/esnext",
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
