@@ -9,5 +9,9 @@
     "src/**/*.ts",
     "test/**/*.ts"
   ],
-  "references": []
+  "references": [
+    {
+      "path": "../packages/platform-common"
+    }
+  ]
 }

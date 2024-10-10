@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+import { _globalThis } from '@opentelemetry/platform-common';
 import * as assert from 'assert';
-import { getGlobal } from '../../../src/internal/global-utils';
-import { _globalThis } from '../../../src/platform';
 import { NoopContextManager } from '../../../src/context/NoopContextManager';
 import { DiagLogLevel } from '../../../src/diag/types';
+import { getGlobal } from '../../../src/internal/global-utils';
 import sinon = require('sinon');
 
 const api1 = require('../../../src') as typeof import('../../../src');

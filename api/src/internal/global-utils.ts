@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { MeterProvider } from '../metrics/MeterProvider';
+import { _globalThis } from '@opentelemetry/platform-common';
 import { ContextManager } from '../context/types';
 import { DiagLogger } from '../diag/types';
-import { _globalThis } from '../platform';
+import { MeterProvider } from '../metrics/MeterProvider';
 import { TextMapPropagator } from '../propagation/TextMapPropagator';
 import type { TracerProvider } from '../trace/tracer_provider';
 import { VERSION } from '../version';
