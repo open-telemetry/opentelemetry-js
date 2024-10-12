@@ -38,6 +38,9 @@ jobs:
       - run: npm install -g npm@"<10.0.0"
         if: ${{ matrix.node_version == '14' || matrix.node_version == '16' }}
 
+      - name: Setup Nx
+        run: npm run nx:setup
+      
       - name: Bootstrap
         run: npm ci
 

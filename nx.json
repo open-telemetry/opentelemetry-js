@@ -14,17 +14,29 @@
   "cacheDirectory": "./node_modules",
   "targetDefaults": {
     "compile": {
-      "dependsOn": ["protos:generate", "version", "^compile"]
+      "dependsOn": [
+        "protos:generate",
+        "version",
+        "^compile"
+      ]
     },
     "test": {
-      "dependsOn": ["compile"]
+      "dependsOn": [
+        "compile"
+      ]
     },
     "version": {
-      "inputs": ["{projectRoot}/package.json"],
-      "outputs": ["{projectRoot}/src/version.ts"]
+      "inputs": [
+        "{projectRoot}/package.json"
+      ],
+      "outputs": [
+        "{projectRoot}/src/version.ts"
+      ]
     },
     "watch": {
-      "dependsOn": ["compile"]
+      "dependsOn": [
+        "compile"
+      ]
     }
   }
 }
