@@ -18,11 +18,24 @@
         "protos:generate",
         "version",
         "^compile"
+      ],
+      "inputs": [
+        "{projectRoot}/src",
+        "{projectRoot}/test"
+      ],
+      "outputs": [
+        "{projectRoot}/build"
       ]
     },
     "test": {
       "dependsOn": [
         "compile"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "{projectRoot}/src",
+        "{projectRoot}/test"
       ]
     },
     "version": {

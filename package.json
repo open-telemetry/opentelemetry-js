@@ -4,7 +4,8 @@
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "scripts": {
     "precompile": "nx run-many -t version && npm run submodule",
-    "compile": "nx run-many -t protos:generate && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile:old": "nx run-many -t protos:generate && tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "compile": "nx run-many -t compile",
     "prewatch": "npm run precompile",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
