@@ -1,0 +1,30 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "compile",
+          "lint",
+          "version"
+        ]
+      }
+    }
+  },
+  "cacheDirectory": "./node_modules",
+  "targetDefaults": {
+    "compile": {
+      "dependsOn": ["protos:generate", "version", "^compile"]
+    },
+    "test": {
+      "dependsOn": ["compile"]
+    },
+    "version": {
+      "inputs": ["{projectRoot}/package.json"],
+      "outputs": ["{projectRoot}/src/version.ts"]
+    },
+    "watch": {
+      "dependsOn": ["compile"]
+    }
+  }
+}
