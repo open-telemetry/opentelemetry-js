@@ -26,7 +26,7 @@ export interface Logger {
   emit(logRecord: LogRecord): void;
    
   /**
-   * Emit an event. Event Name is required.
+   * Emit an event.
    */
-  emitEvent(name: string, eventRecord?: EventRecord): void;
+  emitEvent(eventRecord: EventRecord): void;
 }

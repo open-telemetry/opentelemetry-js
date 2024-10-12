@@ -21,6 +21,11 @@ import { SeverityNumber } from './LogRecord';
 export interface EventRecord {
 
  /**
+   * The name of the event.
+   */
+ name: string;
+
+ /**
    * The time when the event occurred as UNIX Epoch time in nanoseconds.
    */
  timestamp?: TimeInput;

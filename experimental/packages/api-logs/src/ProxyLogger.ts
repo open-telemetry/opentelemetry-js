@@ -40,8 +40,8 @@ export class ProxyLogger implements Logger {
     this._getLogger().emit(logRecord);
   }
 
-  emitEvent(name: string, eventRecord?: EventRecord): void {
-    this._getLogger().emitEvent(name, eventRecord);
+  emitEvent(eventRecord: EventRecord): void {
+    this._getLogger().emitEvent(eventRecord);
   }
 
   /**

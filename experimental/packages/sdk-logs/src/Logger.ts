@@ -55,20 +55,19 @@ export class Logger implements logsAPI.Logger {
     logRecordInstance._makeReadonly();
   }
 
-  public emitEvent(name: string, eventRecord?: logsAPI.EventRecord): void {
-    const curEvtRecord = eventRecord || {};
-    const attributes = curEvtRecord.attributes || {};
-    attributes['event.name'] = name;
+  public emitEvent(eventRecord: logsAPI.EventRecord): void {
+    const attributes = eventRecord.attributes || {};
+    attributes['event.name'] = eventRecord.name;
 
     const logRecord: logsAPI.LogRecord = {
       attributes: attributes,
-      context: curEvtRecord.context || context.active(),
-      severityNumber: curEvtRecord.severityNumber || SeverityNumber.INFO,
-      timestamp: curEvtRecord.timestamp || Date.now(),
+      context: eventRecord.context || context.active(),
+      severityNumber: eventRecord.severityNumber || SeverityNumber.INFO,
+      timestamp: eventRecord.timestamp || Date.now(),
     };
 
-    if (curEvtRecord.data) {
-      logRecord.body = curEvtRecord.data;
+    if (eventRecord.data) {
+      logRecord.body = eventRecord.data;
     }
 
     this.emit(logRecord);
