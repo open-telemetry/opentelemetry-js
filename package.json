@@ -34,7 +34,6 @@
     "update-ts-configs": "node scripts/update-ts-configs.js",
     "maint:regenerate-test-certs": "nx run-many -t maint:regenerate-test-certs",
     "comment_ci_tasks": "echo scripts intended to be used in CI tasks",
-    "nx:setup": "NX_CACHE_DIR=$(npm get cache) node -e 'var fs=require(\"fs\");var n=require(\"./nx.json\");n.cacheDirectory=process.env.NX_CACHE_DIR;fs.writeFileSync(\"nx.json\",JSON.stringify(n,null,2))'",
     "test:changed": "nx affected -t test --base=main --head=HEAD",
     "test:webworker:changed": "nx affected -t test:webworker --base=main --head=HEAD",
     "test:backcompat:changed": "nx affected -t test:backcompat --base=main --head=HEAD",
