@@ -51,4 +51,9 @@ export interface IResource {
    * @returns the newly merged Resource.
    */
   merge(other: IResource | null): IResource;
+
+  /**
+   * Returns the schema URL of the resource.
+   */
+  getSchemaUrl(): string | undefined; // Add this line
 }

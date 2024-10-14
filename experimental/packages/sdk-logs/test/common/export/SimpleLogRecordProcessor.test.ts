@@ -165,7 +165,7 @@ describe('SimpleLogRecordProcessor', () => {
       const exporter = new InMemoryLogRecordExporter();
       const { processor, logRecord } = setup(
         exporter,
-        new Resource190({ fromold: 'fromold' })
+        new Resource190({ fromold: 'fromold' }) as any
       );
       assert.strictEqual(exporter.getFinishedLogRecords().length, 0);
       processor.onEmit(logRecord);

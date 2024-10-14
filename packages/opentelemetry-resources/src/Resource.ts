@@ -35,6 +35,7 @@ export class Resource implements IResource {
   private _syncAttributes?: ResourceAttributes;
   private _asyncAttributesPromise?: Promise<ResourceAttributes>;
   private _attributes?: ResourceAttributes;
+  private _schemaUrl?: string; // Added schemaUrl property
 
   /**
    * Check if async attributes have resolved. This is useful to avoid awaiting
@@ -67,13 +68,9 @@ export class Resource implements IResource {
   }
 
   constructor(
-    /**
-     * A dictionary of attributes with string keys and values that provide
-     * information about the entity as numbers, strings or booleans
-     * TODO: Consider to add check/validation on attributes.
-     */
     attributes: ResourceAttributes,
-    asyncAttributesPromise?: Promise<ResourceAttributes>
+    asyncAttributesPromise?: Promise<ResourceAttributes>,
+    schemaUrl?: string  // Added schemaUrl parameter
   ) {
     this._attributes = attributes;
     this.asyncAttributesPending = asyncAttributesPromise != null;
@@ -90,6 +87,7 @@ export class Resource implements IResource {
         return {};
       }
     );
+    this._schemaUrl = schemaUrl; // Store the schemaUrl
   }
 
   get attributes(): ResourceAttributes {
@@ -100,6 +98,13 @@ export class Resource implements IResource {
     }
 
     return this._attributes ?? {};
+  }
+
+  /**
+   * Returns the schema URL of the resource.
+   */
+  public getSchemaUrl(): string | undefined {
+    return this._schemaUrl;
   }
 
   /**
@@ -131,11 +136,14 @@ export class Resource implements IResource {
       ...((other as Resource)._syncAttributes ?? other.attributes),
     };
 
+    // Merge schema URLs, handling conflicts
+    const mergedSchemaUrl = this._mergeSchemaUrls(this._schemaUrl, (other as Resource)._schemaUrl);
+
     if (
       !this._asyncAttributesPromise &&
       !(other as Resource)._asyncAttributesPromise
     ) {
-      return new Resource(mergedSyncAttributes);
+      return new Resource(mergedSyncAttributes, undefined, mergedSchemaUrl);
     }
 
     const mergedAttributesPromise = Promise.all([
@@ -151,6 +159,20 @@ export class Resource implements IResource {
       };
     });
 
-    return new Resource(mergedSyncAttributes, mergedAttributesPromise);
+    return new Resource(mergedSyncAttributes, mergedAttributesPromise, mergedSchemaUrl);
+  }
+
+  /**
+   * Helper function to merge schema URLs. If both schema URLs are present and differ,
+   * a warning is logged and the first schema URL is prioritized.
+   */
+  private _mergeSchemaUrls(
+    schemaUrl1?: string,
+    schemaUrl2?: string
+  ): string | undefined {
+    if (schemaUrl1 && schemaUrl2 && schemaUrl1 !== schemaUrl2) {
+      diag.warn('Schema URLs differ. Using the original schema URL.');
+    }
+    return schemaUrl1 || schemaUrl2;
   }
 }
