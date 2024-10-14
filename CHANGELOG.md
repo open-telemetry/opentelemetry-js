@@ -25,7 +25,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :books: (Refine Doc)
 
-* docs: [Browser] Define the support browser runtimes [Issue #4168](https://github.com/open-telemetry/opentelemetry-js/issues/4168) PR:[#5059](https://github.com/open-telemetry/opentelemetry-js/pull/5059) @MSNev
+* docs: [Browser] Define the supported browser runtimes [Issue #4168](https://github.com/open-telemetry/opentelemetry-js/issues/4168) PR:[#5059](https://github.com/open-telemetry/opentelemetry-js/pull/5059) @MSNev
 
 ### :house: (Internal)
 
