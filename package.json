@@ -11,6 +11,7 @@
     "postinstall": "npm run update-ts-configs && echo $(nx show projects || true)",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "version:update": "nx run-many -t version",
+    "pretest": "npm run submodule",
     "test": "nx run-many -t test",
     "test:browser": "nx run-many -t test:browser",
     "test:webworker": "nx run-many -t test:webworker",
