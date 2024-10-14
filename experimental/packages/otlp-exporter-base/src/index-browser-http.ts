@@ -13,21 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type * as http from 'http';
-import type * as https from 'https';
 
-import { OTLPExporterConfigBase } from '../../types';
+export {
+  createOtlpXhrExportDelegate,
+  createOtlpSendBeaconExportDelegate,
+} from './otlp-browser-http-export-delegate';
 
-/**
- * Collector Exporter node base config
- */
-export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
-  keepAlive?: boolean;
-  compression?: CompressionAlgorithm;
-  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
-}
-
-export enum CompressionAlgorithm {
-  NONE = 'none',
-  GZIP = 'gzip',
-}
+export { convertLegacyBrowserHttpOptions } from './configuration/convert-legacy-browser-http-options';
+export { createLegacyOtlpBrowserExportDelegate } from './configuration/create-legacy-browser-delegate';

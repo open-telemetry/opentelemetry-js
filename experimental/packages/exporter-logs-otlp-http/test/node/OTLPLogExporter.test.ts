@@ -30,7 +30,6 @@ import {
 import { PassThrough, Stream } from 'stream';
 import { IExportLogsServiceRequest } from '@opentelemetry/otlp-transformer';
 import { ExportResultCode } from '@opentelemetry/core';
-import { VERSION } from '../../src/version';
 
 let fakeRequest: PassThrough;
 
@@ -57,7 +56,6 @@ class MockedResponse extends Stream {
 }
 
 describe('OTLPLogExporter', () => {
-  let envSource: Record<string, any>;
   let collectorExporter: OTLPLogExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let logs: ReadableLogRecord[];
@@ -70,54 +68,10 @@ describe('OTLPLogExporter', () => {
     sinon.restore();
   });
 
-  if (global.process?.versions?.node === undefined) {
-    envSource = globalThis as unknown as Record<string, any>;
-  } else {
-    envSource = process.env as Record<string, any>;
-  }
-
   describe('constructor', () => {
     it('should create an instance', () => {
       const exporter = new OTLPLogExporter();
       assert.ok(exporter instanceof OTLPLogExporter);
-    });
-
-    it('should include user-agent header by default', () => {
-      const exporter = new OTLPLogExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers'][
-          'User-Agent'
-        ],
-        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-      );
-    });
-
-    it('should use headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS = 'foo=bar';
-      const exporter = new OTLPLogExporter();
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'bar'
-      );
-      delete envSource.OTEL_EXPORTER_OTLP_LOGS_HEADERS;
-    });
-
-    it('should override headers defined via env with headers defined in constructor', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      const exporter = new OTLPLogExporter({
-        headers: {
-          foo: 'constructor',
-        },
-      });
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['foo'],
-        'constructor'
-      );
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers']['bar'],
-        'foo'
-      );
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
   });
 

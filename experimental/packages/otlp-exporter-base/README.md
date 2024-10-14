@@ -7,7 +7,7 @@
 
 **Note: This is an experimental package under active development. New releases may include breaking changes.**
 
-This module provides a base exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
+This module provides base components for OTLP Exporters, both Web and Node.js.
 
 ## Installation
 
@@ -18,10 +18,6 @@ npm install --save @opentelemetry/otlp-exporter-base
 ## GRPC
 
 For GRPC please check [npm-url-grpc]
-
-## PROTOBUF
-
-For PROTOBUF please check [npm-url-proto]
 
 ## Useful links
 

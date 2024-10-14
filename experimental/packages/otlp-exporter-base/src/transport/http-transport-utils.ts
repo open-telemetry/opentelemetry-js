@@ -18,12 +18,12 @@ import * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
 import { HttpRequestParameters } from './http-transport-types';
-import { ExportResponse } from '../../export-response';
+import { ExportResponse } from '../export-response';
 import {
   isExportRetryable,
   parseRetryAfterToMills,
-} from '../../is-export-retryable';
-import { OTLPExporterError } from '../../types';
+} from '../is-export-retryable';
+import { OTLPExporterError } from '../types';
 
 /**
  * Sends data using http
