@@ -20,7 +20,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "prepublishOnly": "npm run compile",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "cross-var nx run version --project=$npm_package_name",
     "prewatch": "node ../../../scripts/version-update.js",
     "test": "nyc mocha test/**/*.test.ts",
     "test:browser": "karma start --single-run",

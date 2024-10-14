@@ -43,6 +43,9 @@
       ],
       "outputs": [
         "{projectRoot}/src/version.ts"
+      ],
+      "dependsOn": [
+        "^version"
       ]
     },
     "watch": {

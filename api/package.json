@@ -29,7 +29,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
-    "precompile": "cross-var lerna run version --scope $npm_package_name --include-dependencies",
+    "precompile": "cross-var nx run version --project=$npm_package_name",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "docs": "typedoc",
     "docs:deploy": "gh-pages --dist docs/out",
