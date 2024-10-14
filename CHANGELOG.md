@@ -110,6 +110,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
   * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
 * fix(exporter-metrics-otlp-grpc): add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc [#4678](https://github.com/open-telemetry/opentelemetry-js/pull/4678) @AkselAllas
+* fix(resources) wait for async attributes for detecting resources [#4687](https://github.com/open-telemetry/opentelemetry-js/pull/4687) @ziolekjj
 
 ## 1.24.0
 
