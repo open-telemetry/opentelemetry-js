@@ -296,7 +296,7 @@ See the [OpenTelemetry registry](https://opentelemetry.io/registry/?language=js&
 
 OpenTelemetry can collect tracing data automatically using instrumentations.
 
-To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, Vendor/Users can [write an instrumentation yourself](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md).
+To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, Vendors/Users can [write an instrumentation themselves](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md).
 
 Currently, OpenTelemetry supports automatic tracing for:
 
