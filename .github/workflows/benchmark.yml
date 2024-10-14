@@ -31,10 +31,7 @@ jobs:
       - name: Bootstrap
         run: npm ci
 
-      - name: Build 🔧
-        run: npm run compile
-
-      - name: Benchmark tests
+      - name: Build 🔧 and Benchmark tests
         run: |
           npm run test:bench
           find . -name .benchmark-results.txt -exec cat {} + > combined_benchmarks.txt

@@ -41,11 +41,9 @@ jobs:
       - name: Bootstrap
         run: npm ci
 
-      - name: Build 🔧
-        run: npm run compile
-
-      - name: Unit tests
+      - name: Build 🔧 and Test
         run: npm run test
+
       - name: Report Coverage
         uses: codecov/codecov-action@v4
         env:
@@ -97,11 +95,9 @@ jobs:
       - name: Bootstrap
         run: npm ci
 
-      - name: Build 🔧
-        run: npm run compile
-
-      - name: Unit tests
+      - name: Build 🔧 and Test
         run: npm run test:browser
+
       - name: Report Coverage
         uses: codecov/codecov-action@v4
         env:
@@ -125,11 +121,9 @@ jobs:
       - name: Bootstrap
         run: npm ci
 
-      - name: Build 🔧
-        run: npm run compile
-
-      - name: Unit tests
+      - name: Build 🔧 and Test
         run: npm run test:webworker
+
       - name: Report Coverage
         uses: codecov/codecov-action@v4
         env:

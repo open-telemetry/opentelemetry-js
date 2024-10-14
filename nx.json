@@ -31,6 +31,21 @@
         "compile"
       ]
     },
+    "test:bench": {
+      "dependsOn": [
+        "compile"
+      ]
+    },
+    "test:browser": {
+      "dependsOn": [
+        "compile"
+      ]
+    },
+    "test:webworker": {
+      "dependsOn": [
+        "compile"
+      ]
+    },
     "lint": {
       "inputs": [
         "{projectRoot}/src",
