@@ -38,10 +38,7 @@ jobs:
         run: npm run compile
 
       - name: Unit tests
-        run: |
-          # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
-          export NODE_OPTIONS=--openssl-legacy-provider
-          npm run test
+        run: npm run test
       - name: Report Coverage
         uses: codecov/codecov-action@v4
         with:
@@ -72,8 +69,6 @@ jobs:
           npm run compile
 
       - name: Unit tests
-        env:
-         NODE_OPTIONS: --openssl-legacy-provider
         run: npm run test
   browser-tests:
     runs-on: ubuntu-latest

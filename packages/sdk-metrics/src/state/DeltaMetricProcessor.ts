@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
+import { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { Maybe } from '../utils';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { AttributeHashMap } from './HashMap';
@@ -36,7 +36,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
 
   record(
     value: number,
-    attributes: MetricAttributes,
+    attributes: Attributes,
     _context: Context,
     collectionTime: HrTime
   ) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, MetricAttributes } from '@opentelemetry/api';
+import { HrTime, Attributes } from '@opentelemetry/api';
 
 /**
  * A representation of an exemplar, which is a sample input measurement.
@@ -26,7 +26,7 @@ export type Exemplar = {
   // The set of key/value pairs that were filtered out by the aggregator, but
   // recorded alongside the original measurement. Only key/value pairs that were
   // filtered out by the aggregator should be included
-  filteredAttributes: MetricAttributes;
+  filteredAttributes: Attributes;
 
   // The value of the measurement that was recorded.
   value: number;

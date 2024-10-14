@@ -15,10 +15,8 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { GRPCQueueItem, OTLPGRPCExporterConfigNode } from './types';
-import { baggageUtils, getEnv } from '@opentelemetry/core';
+import { OTLPGRPCExporterConfigNode } from './types';
 import {
-  CompressionAlgorithm,
   OTLPExporterBase,
   OTLPExporterError,
 } from '@opentelemetry/otlp-exporter-base';
@@ -26,9 +24,13 @@ import {
   createEmptyMetadata,
   GrpcExporterTransport,
 } from './grpc-exporter-transport';
-import { configureCompression, configureCredentials } from './util';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExporterTransport } from '@opentelemetry/otlp-exporter-base';
+import {
+  getOtlpGrpcDefaultConfiguration,
+  mergeOtlpGrpcConfigurationWithDefaults,
+} from './configuration/otlp-grpc-configuration';
+import { getOtlpGrpcConfigurationFromEnv } from './configuration/otlp-grpc-env-configuration';
 
 /**
  * OTLP Exporter abstract base class
@@ -37,71 +39,53 @@ export abstract class OTLPGRPCExporterNodeBase<
   ExportItem,
   ServiceResponse,
 > extends OTLPExporterBase<OTLPGRPCExporterConfigNode, ExportItem> {
-  grpcQueue: GRPCQueueItem<ExportItem>[] = [];
-  compression: CompressionAlgorithm;
   private _transport: IExporterTransport;
   private _serializer: ISerializer<ExportItem[], ServiceResponse>;
+  private _timeoutMillis: number;
 
   constructor(
     config: OTLPGRPCExporterConfigNode = {},
-    signalSpecificMetadata: Record<string, string>,
+    serializer: ISerializer<ExportItem[], ServiceResponse>,
     grpcName: string,
     grpcPath: string,
-    serializer: ISerializer<ExportItem[], ServiceResponse>
+    signalIdentifier: string
   ) {
     super(config);
+    // keep credentials locally in case user updates the reference on the config object
+    const userProvidedCredentials = config.credentials;
+    const actualConfig = mergeOtlpGrpcConfigurationWithDefaults(
+      {
+        url: config.url,
+        metadata: () => {
+          // metadata resolution strategy is merge, so we can return empty here, and it will not override the rest of the settings.
+          return config.metadata ?? createEmptyMetadata();
+        },
+        compression: config.compression,
+        timeoutMillis: config.timeoutMillis,
+        concurrencyLimit: config.concurrencyLimit,
+        credentials:
+          userProvidedCredentials != null
+            ? () => userProvidedCredentials
+            : undefined,
+      },
+      getOtlpGrpcConfigurationFromEnv(signalIdentifier),
+      getOtlpGrpcDefaultConfiguration()
+    );
     this._serializer = serializer;
+    this._timeoutMillis = actualConfig.timeoutMillis;
+    this._concurrencyLimit = actualConfig.concurrencyLimit;
     if (config.headers) {
       diag.warn('Headers cannot be set when using grpc');
     }
-    const nonSignalSpecificMetadata = baggageUtils.parseKeyPairsIntoRecord(
-      getEnv().OTEL_EXPORTER_OTLP_HEADERS
-    );
-    const rawMetadata = Object.assign(
-      {},
-      nonSignalSpecificMetadata,
-      signalSpecificMetadata
-    );
 
-    let credentialProvider = () => {
-      return configureCredentials(undefined, this.getUrlFromConfig(config));
-    };
-
-    if (config.credentials != null) {
-      const credentials = config.credentials;
-      credentialProvider = () => {
-        return credentials;
-      };
-    }
-
-    // Ensure we don't modify the original.
-    const configMetadata = config.metadata?.clone();
-    const metadataProvider = () => {
-      const metadata = configMetadata ?? createEmptyMetadata();
-      for (const [key, value] of Object.entries(rawMetadata)) {
-        // only override with env var data if the key has no values.
-        // not using Metadata.merge() as it will keep both values.
-        if (metadata.get(key).length < 1) {
-          metadata.set(key, value);
-        }
-      }
-
-      return metadata;
-    };
-
-    this.compression = configureCompression(config.compression);
     this._transport = new GrpcExporterTransport({
-      address: this.getDefaultUrl(config),
-      compression: this.compression,
-      credentials: credentialProvider,
+      address: actualConfig.url,
+      compression: actualConfig.compression,
+      credentials: actualConfig.credentials,
       grpcName: grpcName,
       grpcPath: grpcPath,
-      metadata: metadataProvider,
+      metadata: actualConfig.metadata,
     });
-  }
-
-  onInit() {
-    // Intentionally left empty; nothing to do.
   }
 
   override onShutdown() {
@@ -126,7 +110,7 @@ export abstract class OTLPGRPCExporterNodeBase<
     }
 
     const promise = this._transport
-      .send(data, this.timeoutMillis)
+      .send(data, this._timeoutMillis)
       .then(response => {
         if (response.status === 'success') {
           onSuccess();
@@ -146,6 +130,4 @@ export abstract class OTLPGRPCExporterNodeBase<
     };
     promise.then(popPromise, popPromise);
   }
-
-  abstract getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string;
 }

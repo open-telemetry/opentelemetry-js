@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 import {
   OTLPExporterConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
   OTLPExporterNodeBase,
-  parseHeaders,
 } from '@opentelemetry/otlp-exporter-base';
 import {
   IExportLogsServiceResponse,
@@ -34,9 +30,6 @@ const USER_AGENT = {
   'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
-const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/logs';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
-
 /**
  * Collector Trace Exporter for Node
  */
@@ -45,33 +38,15 @@ export class OTLPLogExporter
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config, ProtobufLogsSerializer, {
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-      ),
-      ...parseHeaders(config?.headers),
-      ...USER_AGENT,
-      'Content-Type': 'application/x-protobuf',
-    });
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    const env = getEnv();
-    if (env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT.length > 0) {
-      return appendRootPathToUrlIfNeeded(env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT);
-    }
-
-    if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
-      return appendResourcePathToUrl(
-        env.OTEL_EXPORTER_OTLP_ENDPOINT,
-        DEFAULT_COLLECTOR_RESOURCE_PATH
-      );
-    }
-
-    return DEFAULT_COLLECTOR_URL;
+    super(
+      config,
+      ProtobufLogsSerializer,
+      {
+        ...USER_AGENT,
+        'Content-Type': 'application/x-protobuf',
+      },
+      'LOGS',
+      'v1/logs'
+    );
   }
 }
