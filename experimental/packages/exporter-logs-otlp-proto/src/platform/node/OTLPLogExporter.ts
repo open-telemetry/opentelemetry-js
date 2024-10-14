@@ -15,8 +15,8 @@
  */
 
 import {
-  OTLPExporterConfigBase,
   OTLPExporterNodeBase,
+  OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
   IExportLogsServiceResponse,
@@ -37,7 +37,7 @@ export class OTLPLogExporter
   extends OTLPExporterNodeBase<ReadableLogRecord, IExportLogsServiceResponse>
   implements LogRecordExporter
 {
-  constructor(config: OTLPExporterConfigBase = {}) {
+  constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(
       config,
       ProtobufLogsSerializer,

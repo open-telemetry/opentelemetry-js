@@ -48,6 +48,7 @@ All notable changes to experimental packages in this project will be documented 
     * `OTEL_EXPORTER_OTLP_METRICS_INSECURE`
     * `OTEL_EXPORTER_OTLP_LOGS_INSECURE`
 * fix(sdk-node): use warn instead of error on unknown OTEL_NODE_RESOURCE_DETECTORS values [#5034](https://github.com/open-telemetry/opentelemetry-js/pull/5034)
+* fix(exporter-logs-otlp-proto): Use correct config type in Node constructor
 
 ### :books: (Refine Doc)
 
