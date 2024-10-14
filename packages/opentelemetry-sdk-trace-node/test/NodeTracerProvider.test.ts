@@ -108,7 +108,6 @@ describe('NodeTracerProvider', () => {
         sampler: new AlwaysOnSampler(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
-      assert.ok(span instanceof Span);
       assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
@@ -127,7 +126,6 @@ describe('NodeTracerProvider', () => {
           traceFlags: TraceFlags.NONE,
         })
       );
-      assert.ok(sampledParent instanceof Span);
       assert.strictEqual(
         sampledParent.spanContext().traceFlags,
         TraceFlags.SAMPLED
@@ -141,7 +139,6 @@ describe('NodeTracerProvider', () => {
           {},
           trace.setSpan(ROOT_CONTEXT, sampledParent)
         );
-      assert.ok(span instanceof Span);
       assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });

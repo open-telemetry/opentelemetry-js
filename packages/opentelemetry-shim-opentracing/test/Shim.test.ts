@@ -260,7 +260,7 @@ describe('OpenTracing Shim', () => {
 
         const otSpan = (span as SpanShim).getSpan() as Span;
 
-        const adjustment = otSpan['_performanceOffset'];
+        const adjustment = (otSpan as any)['_performanceOffset'];
 
         assert.strictEqual(otSpan.links.length, 1);
         assert.deepStrictEqual(
@@ -496,7 +496,7 @@ describe('OpenTracing Shim', () => {
     it('sets explicit end timestamp', () => {
       const now = performance.now();
       span.finish(now);
-      const adjustment = otSpan['_performanceOffset'];
+      const adjustment = (otSpan as any)['_performanceOffset'];
       assert.deepStrictEqual(
         hrTimeToMilliseconds(otSpan.endTime),
         now + adjustment + performance.timeOrigin
