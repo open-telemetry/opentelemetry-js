@@ -223,6 +223,16 @@ To run the unit tests continuously in watch mode while developing, use:
 npm run tdd
 ```
 
+Packages that are expected to run in the browser have browser specific tests:
+
+```sh
+# Run browser-specific test
+npm run test:browser
+
+# Run web worker test
+npm run test:webworker
+```
+
 ### Linting
 
 This project uses `eslint` to lint source code. Just like tests and compilation, linting can be done for all packages or only a single package.
