@@ -135,7 +135,7 @@ Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenT
 > Client instrumentation for the browser is **experimental** and mostly **unspecified**. If you are interested in
 > helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig].
 
-Rather that define versions of specific browsers / runtimes, OpenTelemetry sets the minimum supported version based on the
+Rather than define versions of specific browsers / runtimes, OpenTelemetry sets the minimum supported version based on the
 underlying Language features used.
 
 The current minumum language feature support is set as [ECMAScript 2020](https://262.ecma-international.org/11.0/) that are available
