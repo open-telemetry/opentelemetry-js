@@ -147,16 +147,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // promise queue has not reached capacity yet
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -181,9 +181,9 @@ describe('OTLPExportDelegate', function () {
       );
       sinon.assert.notCalled(serializerStubs.deserializeResponse);
       sinon.assert.notCalled(transportStubs.send);
-      sinon.assert.notCalled(promiseQueueStubs.pushPromise);
-      sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-      sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+      sinon.assert.notCalled(promiseHandlerStubs.pushPromise);
+      sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+      sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
       done();
     });
 
@@ -203,16 +203,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // make queue signal that it is full.
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(true),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -234,9 +234,9 @@ describe('OTLPExportDelegate', function () {
       sinon.assert.notCalled(serializerStubs.serializeRequest);
       sinon.assert.notCalled(serializerStubs.deserializeResponse);
       sinon.assert.notCalled(transportStubs.send);
-      sinon.assert.notCalled(promiseQueueStubs.pushPromise);
-      sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-      sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+      sinon.assert.notCalled(promiseHandlerStubs.pushPromise);
+      sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+      sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
       done();
     });
 
@@ -261,16 +261,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // mock a queue that has not yet reached capacity
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -287,9 +287,9 @@ describe('OTLPExportDelegate', function () {
           // assert here as otherwise the promise will not have executed yet
           sinon.assert.calledOnce(serializerStubs.serializeRequest);
           sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseQueueStubs.pushPromise);
-          sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
           done();
         } catch (err) {
           // ensures we throw if there are more calls to result;
@@ -319,16 +319,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // mock a queue that has not yet reached capacity
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -345,9 +345,9 @@ describe('OTLPExportDelegate', function () {
           // assert here as otherwise the promise will not have executed yet
           sinon.assert.calledOnce(serializerStubs.serializeRequest);
           sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseQueueStubs.pushPromise);
-          sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
           done();
         } catch (err) {
           // ensures we throw if there are more calls to result;
@@ -377,16 +377,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // mock a queue that has not yet reached capacity
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -406,9 +406,9 @@ describe('OTLPExportDelegate', function () {
           // assert here as otherwise the promise will not have executed yet
           sinon.assert.calledOnce(serializerStubs.serializeRequest);
           sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseQueueStubs.pushPromise);
-          sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
           done();
         } catch (err) {
           // ensures we throw if there are more calls to result;
@@ -437,16 +437,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // mock a queue that has not yet reached capacity
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -466,9 +466,9 @@ describe('OTLPExportDelegate', function () {
           // assert here as otherwise the promise will not have executed yet
           sinon.assert.calledOnce(serializerStubs.serializeRequest);
           sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseQueueStubs.pushPromise);
-          sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
           done();
         } catch (err) {
           // ensures we throw if there are more calls to result;
@@ -504,16 +504,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // mock a queue that has not yet reached capacity
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -530,9 +530,9 @@ describe('OTLPExportDelegate', function () {
           // assert here as otherwise the promise will not have executed yet
           sinon.assert.calledOnce(serializerStubs.serializeRequest);
           sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseQueueStubs.pushPromise);
-          sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
           done();
         } catch (err) {
           // ensures we throw if there are more calls to result;
@@ -558,16 +558,16 @@ describe('OTLPExportDelegate', function () {
       const mockSerializer = <FakeSerializer>serializerStubs;
 
       // mock a queue that has not yet reached capacity
-      const promiseQueueStubs = {
+      const promiseHandlerStubs = {
         pushPromise: sinon.stub(),
         hasReachedLimit: sinon.stub().returns(false),
         awaitAll: sinon.stub(),
       };
-      const promiseQueue = <IExportPromiseHandler>promiseQueueStubs;
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
 
       const exporter = createOtlpExportDelegate(
         {
-          promiseHandler: promiseQueue,
+          promiseHandler: promiseHandler,
           serializer: mockSerializer,
           transport: mockTransport,
         },
@@ -585,9 +585,9 @@ describe('OTLPExportDelegate', function () {
           sinon.assert.calledOnce(serializerStubs.serializeRequest);
           sinon.assert.notCalled(serializerStubs.deserializeResponse);
           sinon.assert.calledOnce(transportStubs.send);
-          sinon.assert.calledOnce(promiseQueueStubs.pushPromise);
-          sinon.assert.calledOnce(promiseQueueStubs.hasReachedLimit);
-          sinon.assert.notCalled(promiseQueueStubs.awaitAll);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
           done();
         } catch (err) {
           // ensures we throw if there are more calls to result;
