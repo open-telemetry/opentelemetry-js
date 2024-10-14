@@ -142,7 +142,7 @@ The current minumum language feature support is set as [ECMAScript 2020](https:/
 in all modern browsers / runtimes.
 
 This means that if you are targeting or your end-users are using a browser / runtime that does not support ES2020, you will need
-to transpile the code and provide any necessary polyfill's for the missing features to ensure compatibility with your target
+to transpile the code and provide any necessary polyfills for the missing features to ensure compatibility with your target
 environments. Any support issues that arise from using a browser or runtime that does not support ES2020 will be closed as "won't fix".
 
 This minimum support level is subject to change as the project evolves and as the underlying language features evolve.
