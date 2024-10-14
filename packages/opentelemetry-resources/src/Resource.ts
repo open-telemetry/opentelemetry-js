@@ -70,7 +70,7 @@ export class Resource implements IResource {
   constructor(
     attributes: ResourceAttributes,
     asyncAttributesPromise?: Promise<ResourceAttributes>,
-    schemaUrl?: string  // Added schemaUrl parameter
+    schemaUrl: string = '' // Added schemaUrl parameter
   ) {
     this._attributes = attributes;
     this.asyncAttributesPending = asyncAttributesPromise != null;
@@ -103,8 +103,8 @@ export class Resource implements IResource {
   /**
    * Returns the schema URL of the resource.
    */
-  public getSchemaUrl(): string | undefined {
-    return this._schemaUrl;
+  public getSchemaUrl(): string {
+    return this._schemaUrl || ''; // Return schema URL as string
   }
 
   /**
@@ -132,12 +132,12 @@ export class Resource implements IResource {
     // SpanAttributes from other resource overwrite attributes from this resource.
     const mergedSyncAttributes = {
       ...this._syncAttributes,
-      //Support for old resource implementation where _syncAttributes is not defined
+      // Support for old resource implementation where _syncAttributes is not defined
       ...((other as Resource)._syncAttributes ?? other.attributes),
     };
 
     // Merge schema URLs, handling conflicts
-    const mergedSchemaUrl = this._mergeSchemaUrls(this._schemaUrl, (other as Resource)._schemaUrl);
+    const mergedSchemaUrl = this._mergeSchemaUrls(this._schemaUrl || '', (other as Resource)._schemaUrl || '');
 
     if (
       !this._asyncAttributesPromise &&
@@ -153,7 +153,7 @@ export class Resource implements IResource {
       return {
         ...this._syncAttributes,
         ...thisAsyncAttributes,
-        //Support for old resource implementation where _syncAttributes is not defined
+        // Support for old resource implementation where _syncAttributes is not defined
         ...((other as Resource)._syncAttributes ?? other.attributes),
         ...otherAsyncAttributes,
       };
@@ -167,12 +167,12 @@ export class Resource implements IResource {
    * a warning is logged and the first schema URL is prioritized.
    */
   private _mergeSchemaUrls(
-    schemaUrl1?: string,
-    schemaUrl2?: string
-  ): string | undefined {
+    schemaUrl1: string,
+    schemaUrl2: string
+  ): string {
     if (schemaUrl1 && schemaUrl2 && schemaUrl1 !== schemaUrl2) {
       diag.warn('Schema URLs differ. Using the original schema URL.');
     }
-    return schemaUrl1 || schemaUrl2;
+    return schemaUrl1 || schemaUrl2; // Return merged schema URL as string
   }
 }

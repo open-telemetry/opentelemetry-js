@@ -359,47 +359,46 @@ describe('Resource', () => {
     );
     assert.strictEqual(resource.getSchemaUrl(), schemaUrl);
   });
-  
+
   it('should merge resources with different schema URLs', () => {
     const schemaUrl1 = 'https://example.com/schema1';
     const schemaUrl2 = 'https://example.com/schema2';
     const resource1 = new Resource({ 'attr1': 'value1' }, undefined, schemaUrl1);
     const resource2 = new Resource({ 'attr2': 'value2' }, undefined, schemaUrl2);
-  
+
     const debugStub = sinon.spy(diag, 'warn');
     const mergedResource = resource1.merge(resource2);
-  
+
     assert.strictEqual(mergedResource.getSchemaUrl(), schemaUrl1);
     assert.ok(debugStub.calledWithMatch('Schema URLs differ. Using the original schema URL.'));
   });
-  
+
   it('should retain the same schema URL when merging resources with identical URLs', () => {
     const schemaUrl = 'https://example.com/schema';
     const resource1 = new Resource({ 'attr1': 'value1' }, undefined, schemaUrl);
     const resource2 = new Resource({ 'attr2': 'value2' }, undefined, schemaUrl);
-  
+
     const mergedResource = resource1.merge(resource2);
-  
+
     assert.strictEqual(mergedResource.getSchemaUrl(), schemaUrl);
   });
 
   it('should retain schema URL from the resource that has it when merging', () => {
-    const resource1 = new Resource({ 'attr1': 'value1' }, undefined, undefined);
+    const resource1 = new Resource({ 'attr1': 'value1' }, undefined, '');
     const resource2 = new Resource({ 'attr2': 'value2' }, undefined, 'https://example.com/schema');
-  
+
     const mergedResource = resource1.merge(resource2);
-  
+
     assert.strictEqual(mergedResource.getSchemaUrl(), 'https://example.com/schema');
   });
 
-  it('should have undefined schema URL when merging resources with no schema URL', () => {
-    const resource1 = new Resource({ 'attr1': 'value1' }, undefined, undefined);
-    const resource2 = new Resource({ 'attr2': 'value2' }, undefined, undefined);
-  
+  it('should have empty schema URL when merging resources with no schema URL', () => {
+    const resource1 = new Resource({ 'attr1': 'value1' }, undefined, '');
+    const resource2 = new Resource({ 'attr2': 'value2' }, undefined, '');
+
     const mergedResource = resource1.merge(resource2);
-  
-    assert.strictEqual(mergedResource.getSchemaUrl(), undefined);
+
+    assert.strictEqual(mergedResource.getSchemaUrl(), '');
   });
-  
 });
 

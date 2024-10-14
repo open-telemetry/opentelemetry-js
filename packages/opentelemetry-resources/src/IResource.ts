@@ -55,5 +55,5 @@ export interface IResource {
   /**
    * Returns the schema URL of the resource.
    */
-  getSchemaUrl(): string | undefined; // Add this line
+  getSchemaUrl(): string ; // Add this line
 }
