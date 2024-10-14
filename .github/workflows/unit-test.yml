@@ -42,7 +42,7 @@ jobs:
         run: npm ci
 
       - name: Build 🔧 and Test
-        run: npm run test
+        run: npm run test -- --skip-nx-cache
 
       - name: Report Coverage
         uses: codecov/codecov-action@v4
