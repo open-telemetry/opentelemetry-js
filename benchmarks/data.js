@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1728921579431,
+  "lastUpdate": 1728977442783,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -17436,6 +17436,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.28%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7ed67f98c2757652c7292f925cabd7a653c51cd9",
+          "message": "test(otlp-grpc-exporter-base): do not use hard-coded version in tests, touch up changelog entries (#5069)",
+          "timestamp": "2024-10-15T07:21:41Z",
+          "tree_id": "f5191958e3a2bc815266356732c3bcba727ebf49",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/7ed67f98c2757652c7292f925cabd7a653c51cd9"
+        },
+        "date": 1728977441914,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 981904,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11790,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 671287,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 655657,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
