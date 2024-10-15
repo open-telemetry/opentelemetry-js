@@ -9,6 +9,10 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ## Unreleased
 
+### :feature-request:sparkles: (Feature)
+
+* feat(opentelemetry-resources): add schema url [#5070](https://github.com/open-telemetry/opentelemetry-js/pull/5070) @taylorhelene
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)

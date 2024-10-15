@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IResource as ISdkResource } from '@opentelemetry/resources';
-import { toAttributes } from '../common/internal';
-import { IResource } from './types';
 
-export function createResource(resource: ISdkResource): IResource {
-  return {
-    attributes: toAttributes(resource.attributes),
-    droppedAttributesCount: 0,
-    schemaUrl: resource.getSchemaUrl ? resource.getSchemaUrl() : '',
-  };
+import { diag } from '@opentelemetry/api';
+
+/**
+ * Merges two schema URLs. If both schema URLs are present and differ,
+ * a warning is logged and the first schema URL is prioritized.
+ *
+ * @param schemaUrl1 - The first schema URL
+ * @param schemaUrl2 - The second schema URL
+ * @returns The prioritized schema URL
+ */
+
+export function mergeSchemaUrls(
+  schemaUrl1: string,
+  schemaUrl2: string
+): string {
+  if (schemaUrl1 !== schemaUrl2) {
+    diag.warn('Schema URLs differ. Using the original schema URL.');
+  }
+  return schemaUrl1 || schemaUrl2;
 }

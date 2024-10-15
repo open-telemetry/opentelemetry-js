@@ -25,6 +25,7 @@ import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
 import { IResource } from './IResource';
+import { mergeSchemaUrls } from './schemaUrlUtils'; // Import the utility function
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -35,8 +36,7 @@ export class Resource implements IResource {
   private _syncAttributes?: ResourceAttributes;
   private _asyncAttributesPromise?: Promise<ResourceAttributes>;
   private _attributes?: ResourceAttributes;
-  private _schemaUrl?: string; // Added schemaUrl property
-
+  private _schemaUrl?: string;
   /**
    * Check if async attributes have resolved. This is useful to avoid awaiting
    * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
@@ -70,7 +70,7 @@ export class Resource implements IResource {
   constructor(
     attributes: ResourceAttributes,
     asyncAttributesPromise?: Promise<ResourceAttributes>,
-    schemaUrl: string = '' // Added schemaUrl parameter
+    schemaUrl = ''
   ) {
     this._attributes = attributes;
     this.asyncAttributesPending = asyncAttributesPromise != null;
@@ -87,7 +87,7 @@ export class Resource implements IResource {
         return {};
       }
     );
-    this._schemaUrl = schemaUrl; // Store the schemaUrl
+    this._schemaUrl = schemaUrl;
   }
 
   get attributes(): ResourceAttributes {
@@ -136,8 +136,11 @@ export class Resource implements IResource {
       ...((other as Resource)._syncAttributes ?? other.attributes),
     };
 
-    // Merge schema URLs, handling conflicts
-    const mergedSchemaUrl = this._mergeSchemaUrls(this._schemaUrl || '', (other as Resource)._schemaUrl || '');
+    // Merge schema URLs using the utility function
+    const mergedSchemaUrl = mergeSchemaUrls(
+      this._schemaUrl || '',
+      other.getSchemaUrl?.() || ''
+    );
 
     if (
       !this._asyncAttributesPromise &&
@@ -159,20 +162,10 @@ export class Resource implements IResource {
       };
     });
 
-    return new Resource(mergedSyncAttributes, mergedAttributesPromise, mergedSchemaUrl);
-  }
-
-  /**
-   * Helper function to merge schema URLs. If both schema URLs are present and differ,
-   * a warning is logged and the first schema URL is prioritized.
-   */
-  private _mergeSchemaUrls(
-    schemaUrl1: string,
-    schemaUrl2: string
-  ): string {
-    if (schemaUrl1 && schemaUrl2 && schemaUrl1 !== schemaUrl2) {
-      diag.warn('Schema URLs differ. Using the original schema URL.');
-    }
-    return schemaUrl1 || schemaUrl2; // Return merged schema URL as string
+    return new Resource(
+      mergedSyncAttributes,
+      mergedAttributesPromise,
+      mergedSchemaUrl
+    );
   }
 }
