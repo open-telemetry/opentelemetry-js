@@ -22,6 +22,8 @@ import {
 } from '@opentelemetry/otlp-exporter-base';
 
 /**
+ * @deprecated
+ *
  * OTLP Exporter Config for Node
  */
 export interface OTLPGRPCExporterConfigNode extends OTLPExporterConfigBase {

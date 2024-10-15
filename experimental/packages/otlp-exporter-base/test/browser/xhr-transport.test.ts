@@ -16,7 +16,7 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { createXhrTransport } from '../../src/platform/browser/xhr-transport';
+import { createXhrTransport } from '../../src/transport/xhr-transport';
 import {
   ExportResponseRetryable,
   ExportResponseFailure,

@@ -6,13 +6,40 @@
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "repository": "open-telemetry/opentelemetry-js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  "exports": {
+    ".": {
+      "module": "./build/esm/index.js",
+      "esnext": "./build/esnext/index.js",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
+    },
+    "./node-http": {
+      "module": "./build/esm/index-node-http.js",
+      "esnext": "./build/esnext/index-node-http.js",
+      "types": "./build/src/index-node-http.d.ts",
+      "default": "./build/src/index-node-http.js"
+    },
+    "./browser-http": {
+      "module": "./build/esm/index-browser-http.js",
+      "esnext": "./build/esnext/index-browser-http.js",
+      "types": "./build/src/index-browser-http.d.ts",
+      "default": "./build/src/index-browser-http.js"
+    }
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/src/index.d.ts"
+      ],
+      "node-http": [
+        "./build/src/index-node-http.d.ts"
+      ],
+      "browser-http": [
+        "./build/src/index-browser-http.d.ts"
+      ]
+    }
+  },
+  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",

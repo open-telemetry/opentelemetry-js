@@ -17,28 +17,26 @@
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import {
   OTLPExporterConfigBase,
-  OTLPExporterBrowserBase,
+  OTLPExporterBase,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportTraceServiceResponse,
-  JsonTraceSerializer,
-} from '@opentelemetry/otlp-transformer';
-
-const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
+import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer';
+import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
 /**
  * Collector Trace Exporter for Web
  */
 export class OTLPTraceExporter
-  extends OTLPExporterBrowserBase<ReadableSpan, IExportTraceServiceResponse>
+  extends OTLPExporterBase<ReadableSpan[]>
   implements SpanExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(
-      config,
-      JsonTraceSerializer,
-      { 'Content-Type': 'application/json' },
-      DEFAULT_COLLECTOR_RESOURCE_PATH
+      createLegacyOtlpBrowserExportDelegate(
+        config,
+        JsonTraceSerializer,
+        'v1/traces',
+        { 'Content-Type': 'application/json' }
+      )
     );
   }
 }

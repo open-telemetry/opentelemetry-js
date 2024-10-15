@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { IExporterTransport } from '../../exporter-transport';
-import { ExportResponse } from '../../export-response';
+import { IExporterTransport } from '../exporter-transport';
+import { ExportResponse } from '../export-response';
 import { diag } from '@opentelemetry/api';
 
 export interface SendBeaconParameters {

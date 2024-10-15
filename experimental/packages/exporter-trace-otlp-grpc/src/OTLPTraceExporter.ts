@@ -16,28 +16,28 @@
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import {
+  convertLegacyOtlpGrpcOptions,
+  createOtlpGrpcExportDelegate,
   OTLPGRPCExporterConfigNode,
-  OTLPGRPCExporterNodeBase,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import {
-  IExportTraceServiceResponse,
-  ProtobufTraceSerializer,
-} from '@opentelemetry/otlp-transformer';
+import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPGRPCExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
+  extends OTLPExporterBase<ReadableSpan[]>
   implements SpanExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(
-      config,
-      ProtobufTraceSerializer,
-      'TraceExportService',
-      '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
-      'TRACES'
+      createOtlpGrpcExportDelegate(
+        convertLegacyOtlpGrpcOptions(config, 'TRACES'),
+        ProtobufTraceSerializer,
+        'TraceExportService',
+        '/opentelemetry.proto.collector.trace.v1.TraceService/Export'
+      )
     );
   }
 }
