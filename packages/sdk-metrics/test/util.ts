@@ -17,7 +17,7 @@
 import {
   Context,
   BatchObservableCallback,
-  MetricAttributes,
+  Attributes,
   ObservableCallback,
   ValueType,
 } from '@opentelemetry/api';
@@ -42,8 +42,7 @@ import { AggregationTemporality } from '../src/export/AggregationTemporality';
 
 export type Measurement = {
   value: number;
-  // TODO: use common attributes
-  attributes: MetricAttributes;
+  attributes: Attributes;
   context?: Context;
 };
 
@@ -80,7 +79,7 @@ export const validNames = [
 ];
 
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
-export const commonAttributes: MetricAttributes[] = [
+export const commonAttributes: Attributes[] = [
   {},
   { 1: '1' },
   { a: '2' },
@@ -126,7 +125,7 @@ export function assertMetricData(
 
 export function assertDataPoint(
   actual: unknown,
-  attributes: MetricAttributes,
+  attributes: Attributes,
   point: Histogram | number,
   startTime?: HrTime,
   endTime?: HrTime

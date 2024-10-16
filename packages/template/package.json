@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.25.1",
+  "version": "1.26.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -39,7 +39,6 @@
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "test": "nyc mocha test/**/*.test.ts",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
@@ -49,7 +48,6 @@
     "compile": "tsc --build tsconfig.json",
     "clean": "tsc --build --clean tsconfig.json",
     "test:browser": "karma start --single-run",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "watch": "tsc --build --watch tsconfig.json"
   },
   "keywords": [
@@ -87,7 +85,6 @@
   "Add these to devDependencies for testing": {
     "@types/mocha": "9.1.1",
     "@types/sinon": "10.0.13",
-    "codecov": "3.8.3",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
     "sinon": "15.0.0"
