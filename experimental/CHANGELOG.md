@@ -49,6 +49,7 @@ All notable changes to experimental packages in this project will be documented 
     * `OTEL_EXPORTER_OTLP_LOGS_INSECURE`
 * fix(sdk-node): use warn instead of error on unknown OTEL_NODE_RESOURCE_DETECTORS values [#5034](https://github.com/open-telemetry/opentelemetry-js/pull/5034)
 * fix(exporter-logs-otlp-proto): Use correct config type in Node constructor
+* fix(instrumentation-http): Fix instrumentation of `http.get`, `http.request`, `https.get`, and `https.request` when used from ESM code and imported via the `import defaultExport from 'http'` style. [#5024](https://github.com/open-telemetry/opentelemetry-js/issues/5024) @trentm
 
 ### :books: (Refine Doc)
 
