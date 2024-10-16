@@ -26,7 +26,7 @@ import type { IResource } from '@opentelemetry/resources';
 
 import type { ReadableLogRecord } from './export/ReadableLogRecord';
 import type { LogRecordLimits } from './types';
-import { LogAttributes, LogBody } from '@opentelemetry/api-logs';
+import { AnyValue, LogAttributes, LogBody } from '@opentelemetry/api-logs';
 import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState';
 
 export class LogRecord implements ReadableLogRecord {
@@ -112,7 +112,7 @@ export class LogRecord implements ReadableLogRecord {
     this.setAttributes(attributes);
   }
 
-  public setAttribute(key: string, value?: LogAttributes | AttributeValue) {
+  public setAttribute(key: string, value?: AnyValue) {
     if (this._isLogRecordReadonly()) {
       return this;
     }

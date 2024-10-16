@@ -45,8 +45,7 @@ export interface ExportServiceError {
  * Collector Exporter base config
  */
 export interface OTLPExporterConfigBase {
-  headers?: Partial<Record<string, unknown>>;
-  hostname?: string;
+  headers?: Record<string, string>;
   url?: string;
   concurrencyLimit?: number;
   /** Maximum time the OTLP exporter will wait for each batch export.

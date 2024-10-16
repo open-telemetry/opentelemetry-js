@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';
@@ -44,7 +44,7 @@ describe('MultiMetricStorage', () => {
         records: Measurement[] = [];
         record(
           value: number,
-          attributes: MetricAttributes,
+          attributes: Attributes,
           context: api.Context
         ): void {
           this.records.push({ value, attributes, context });
