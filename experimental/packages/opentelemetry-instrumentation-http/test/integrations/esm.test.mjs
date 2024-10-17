@@ -18,8 +18,22 @@
 
 import * as assert from 'assert';
 import * as fs from 'fs';
-import * as http from 'http';
-import * as https from 'https';
+
+import httpA from 'http'; // ESM import style A
+import * as httpB from 'http'; // ESM import style B
+import {
+  createServer as httpCreateServerC,
+  request as httpRequestC,
+  get as httpGetC,
+} from 'http'; // ESM import style C
+
+import httpsA from 'https'; // ESM import style A
+import * as httpsB from 'https'; // ESM import style B
+import {
+  createServer as httpsCreateServerC,
+  request as httpsRequestC,
+  get as httpsGetC,
+} from 'https'; // ESM import style C
 
 import { SpanKind } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -37,183 +51,229 @@ provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 const instrumentation = new HttpInstrumentation();
 instrumentation.setTracerProvider(provider);
 
-describe('HttpInstrumentation ESM Integration tests', () => {
-  let port;
-  let server;
+const httpImports = [
+  {
+    style: 'import http from "http"',
+    createServer: httpA.createServer,
+    request: httpA.request,
+    get: httpA.get,
+  },
+  {
+    style: 'import * as http from "http"',
+    createServer: httpB.createServer,
+    request: httpB.request,
+    get: httpB.get,
+  },
+  {
+    style: 'import {...} from "http"',
+    createServer: httpCreateServerC,
+    request: httpRequestC,
+    get: httpGetC,
+  },
+];
 
-  before(done => {
-    server = http.createServer((req, res) => {
-      req.resume();
-      req.on('end', () => {
-        res.writeHead(200);
-        res.end('pong');
-      });
-    });
+for (let httpImport of httpImports) {
+  describe(`HttpInstrumentation ESM Integration tests (${httpImport.style})`, () => {
+    let port;
+    let server;
 
-    server.listen(0, '127.0.0.1', () => {
-      port = server.address().port;
-      assert.ok(Number.isInteger(port));
-      done();
-    });
-  });
-
-  after(done => {
-    server.close(done);
-  });
-
-  beforeEach(() => {
-    memoryExporter.reset();
-  });
-
-  it('should instrument http requests using http.request', async () => {
-    const spanValidations = {
-      httpStatusCode: 200,
-      httpMethod: 'GET',
-      hostname: '127.0.0.1',
-      pathname: '/http.request',
-      component: 'http',
-    };
-
-    await new Promise(resolve => {
-      const clientReq = http.request(
-        `http://127.0.0.1:${port}/http.request`,
-        clientRes => {
-          spanValidations.resHeaders = clientRes.headers;
-          clientRes.resume();
-          clientRes.on('end', resolve);
-        }
-      );
-      clientReq.end();
-    });
-
-    let spans = memoryExporter.getFinishedSpans();
-    assert.strictEqual(spans.length, 2);
-    const span = spans.find(s => s.kind === SpanKind.CLIENT);
-    assert.strictEqual(span.name, 'GET');
-    assertSpan(span, SpanKind.CLIENT, spanValidations);
-  });
-
-  it('should instrument http requests using http.get', async () => {
-    const spanValidations = {
-      httpStatusCode: 200,
-      httpMethod: 'GET',
-      hostname: '127.0.0.1',
-      pathname: '/http.get',
-      component: 'http',
-    };
-
-    await new Promise(resolve => {
-      http.get(`http://127.0.0.1:${port}/http.get`, clientRes => {
-        spanValidations.resHeaders = clientRes.headers;
-        clientRes.resume();
-        clientRes.on('end', resolve);
-      });
-    });
-
-    let spans = memoryExporter.getFinishedSpans();
-    assert.strictEqual(spans.length, 2);
-    const span = spans.find(s => s.kind === SpanKind.CLIENT);
-    assert.strictEqual(span.name, 'GET');
-    assertSpan(span, SpanKind.CLIENT, spanValidations);
-  });
-});
-
-describe('HttpsInstrumentation ESM Integration tests', () => {
-  let port;
-  let server;
-
-  before(done => {
-    server = https.createServer(
-      {
-        key: fs.readFileSync(
-          new URL('../fixtures/server-key.pem', import.meta.url)
-        ),
-        cert: fs.readFileSync(
-          new URL('../fixtures/server-cert.pem', import.meta.url)
-        ),
-      },
-      (req, res) => {
+    before(done => {
+      server = httpImport.createServer((req, res) => {
         req.resume();
         req.on('end', () => {
           res.writeHead(200);
           res.end('pong');
         });
-      }
-    );
+      });
 
-    server.listen(0, '127.0.0.1', () => {
-      port = server.address().port;
-      assert.ok(Number.isInteger(port));
-      done();
+      server.listen(0, '127.0.0.1', () => {
+        port = server.address().port;
+        assert.ok(Number.isInteger(port));
+        done();
+      });
     });
-  });
 
-  after(done => {
-    server.close(done);
-  });
+    after(done => {
+      server.close(done);
+    });
 
-  beforeEach(() => {
-    memoryExporter.reset();
-  });
+    beforeEach(() => {
+      memoryExporter.reset();
+    });
 
-  it('should instrument https requests using https.request', async () => {
-    const spanValidations = {
-      httpStatusCode: 200,
-      httpMethod: 'GET',
-      hostname: '127.0.0.1',
-      pathname: '/https.request',
-      component: 'https',
-    };
+    it('should instrument http requests using http.request', async () => {
+      const spanValidations = {
+        httpStatusCode: 200,
+        httpMethod: 'GET',
+        hostname: '127.0.0.1',
+        pathname: '/http.request',
+        component: 'http',
+      };
 
-    await new Promise(resolve => {
-      const clientReq = https.request(
-        `https://127.0.0.1:${port}/https.request`,
-        {
-          rejectUnauthorized: false,
-        },
-        clientRes => {
+      await new Promise(resolve => {
+        const clientReq = httpImport.request(
+          `http://127.0.0.1:${port}/http.request`,
+          clientRes => {
+            spanValidations.resHeaders = clientRes.headers;
+            clientRes.resume();
+            clientRes.on('end', resolve);
+          }
+        );
+        clientReq.end();
+      });
+
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 2);
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.strictEqual(span.name, 'GET');
+      assertSpan(span, SpanKind.CLIENT, spanValidations);
+    });
+
+    it('should instrument http requests using http.get', async () => {
+      const spanValidations = {
+        httpStatusCode: 200,
+        httpMethod: 'GET',
+        hostname: '127.0.0.1',
+        pathname: '/http.get',
+        component: 'http',
+      };
+
+      await new Promise(resolve => {
+        httpImport.get(`http://127.0.0.1:${port}/http.get`, clientRes => {
           spanValidations.resHeaders = clientRes.headers;
           clientRes.resume();
           clientRes.on('end', resolve);
-        }
-      );
-      clientReq.end();
+        });
+      });
+
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 2);
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.strictEqual(span.name, 'GET');
+      assertSpan(span, SpanKind.CLIENT, spanValidations);
     });
-
-    let spans = memoryExporter.getFinishedSpans();
-    assert.strictEqual(spans.length, 2);
-    const span = spans.find(s => s.kind === SpanKind.CLIENT);
-    assert.strictEqual(span.name, 'GET');
-    assertSpan(span, SpanKind.CLIENT, spanValidations);
   });
+}
 
-  it('should instrument http requests using https.get', async () => {
-    const spanValidations = {
-      httpStatusCode: 200,
-      httpMethod: 'GET',
-      hostname: '127.0.0.1',
-      pathname: '/https.get',
-      component: 'https',
-    };
+const httpsImports = [
+  {
+    style: 'import https from "https"',
+    createServer: httpsA.createServer,
+    request: httpsA.request,
+    get: httpsA.get,
+  },
+  {
+    style: 'import * as https from "https"',
+    createServer: httpsB.createServer,
+    request: httpsB.request,
+    get: httpsB.get,
+  },
+  {
+    style: 'import {...} from "https"',
+    createServer: httpsCreateServerC,
+    request: httpsRequestC,
+    get: httpsGetC,
+  },
+];
 
-    await new Promise(resolve => {
-      https.get(
-        `https://127.0.0.1:${port}/https.get`,
+for (let httpsImport of httpsImports) {
+  describe(`HttpsInstrumentation ESM Integration tests (${httpsImport.style})`, () => {
+    let port;
+    let server;
+
+    before(done => {
+      server = httpsImport.createServer(
         {
-          rejectUnauthorized: false,
+          key: fs.readFileSync(
+            new URL('../fixtures/server-key.pem', import.meta.url)
+          ),
+          cert: fs.readFileSync(
+            new URL('../fixtures/server-cert.pem', import.meta.url)
+          ),
         },
-        clientRes => {
-          spanValidations.resHeaders = clientRes.headers;
-          clientRes.resume();
-          clientRes.on('end', resolve);
+        (req, res) => {
+          req.resume();
+          req.on('end', () => {
+            res.writeHead(200);
+            res.end('pong');
+          });
         }
       );
+
+      server.listen(0, '127.0.0.1', () => {
+        port = server.address().port;
+        assert.ok(Number.isInteger(port));
+        done();
+      });
     });
 
-    let spans = memoryExporter.getFinishedSpans();
-    assert.strictEqual(spans.length, 2);
-    const span = spans.find(s => s.kind === SpanKind.CLIENT);
-    assert.strictEqual(span.name, 'GET');
-    assertSpan(span, SpanKind.CLIENT, spanValidations);
+    after(done => {
+      server.close(done);
+    });
+
+    beforeEach(() => {
+      memoryExporter.reset();
+    });
+
+    it('should instrument https requests using https.request', async () => {
+      const spanValidations = {
+        httpStatusCode: 200,
+        httpMethod: 'GET',
+        hostname: '127.0.0.1',
+        pathname: '/https.request',
+        component: 'https',
+      };
+
+      await new Promise(resolve => {
+        const clientReq = httpsImport.request(
+          `https://127.0.0.1:${port}/https.request`,
+          {
+            rejectUnauthorized: false,
+          },
+          clientRes => {
+            spanValidations.resHeaders = clientRes.headers;
+            clientRes.resume();
+            clientRes.on('end', resolve);
+          }
+        );
+        clientReq.end();
+      });
+
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 2);
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.strictEqual(span.name, 'GET');
+      assertSpan(span, SpanKind.CLIENT, spanValidations);
+    });
+
+    it('should instrument http requests using https.get', async () => {
+      const spanValidations = {
+        httpStatusCode: 200,
+        httpMethod: 'GET',
+        hostname: '127.0.0.1',
+        pathname: '/https.get',
+        component: 'https',
+      };
+
+      await new Promise(resolve => {
+        httpsImport.get(
+          `https://127.0.0.1:${port}/https.get`,
+          {
+            rejectUnauthorized: false,
+          },
+          clientRes => {
+            spanValidations.resHeaders = clientRes.headers;
+            clientRes.resume();
+            clientRes.on('end', resolve);
+          }
+        );
+      });
+
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 2);
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.strictEqual(span.name, 'GET');
+      assertSpan(span, SpanKind.CLIENT, spanValidations);
+    });
   });
-});
+}

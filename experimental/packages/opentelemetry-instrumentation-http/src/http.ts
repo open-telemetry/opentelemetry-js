@@ -235,17 +235,24 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
             'request',
             this._getPatchOutgoingRequestFunction('http')
           ) as unknown as Func<http.ClientRequest>;
-          this._wrap(
+          const patchedGet = this._wrap(
             moduleExports,
             'get',
             this._getPatchOutgoingGetFunction(patchedRequest)
           );
+          if (isESM) {
+            // To handle `import http from 'http'`, which returns the default
+            // export, we need to set `module.default.*`.
+            (moduleExports as any).default.request = patchedRequest;
+            (moduleExports as any).default.get = patchedGet;
+          }
         }
         if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._wrap(
@@ -275,17 +282,24 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
             'request',
             this._getPatchHttpsOutgoingRequestFunction('https')
           ) as unknown as Func<http.ClientRequest>;
-          this._wrap(
+          const patchedGet = this._wrap(
             moduleExports,
             'get',
             this._getPatchHttpsOutgoingGetFunction(patchedRequest)
           );
+          if (isESM) {
+            // To handle `import https from 'https'`, which returns the default
+            // export, we need to set `module.default.*`.
+            (moduleExports as any).default.request = patchedRequest;
+            (moduleExports as any).default.get = patchedGet;
+          }
         }
         if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._wrap(
