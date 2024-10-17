@@ -53,7 +53,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 The OpenTracing shim does not currently include a scope manager. 
 This feature was never implemented in OpenTracing JS therefore the
 shim does not provide that feature.
-Therefore, scope management should be handled with external tooling.
 
 ## Useful links
 
