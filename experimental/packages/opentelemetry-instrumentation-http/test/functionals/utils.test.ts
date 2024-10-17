@@ -281,7 +281,15 @@ describe('Utility', () => {
   });
 
   describe('isValidOptionsType()', () => {
-    ['', false, true, 1, 0, []].forEach(options => {
+    [
+      '',
+      false,
+      true,
+      1,
+      0,
+      'https://username:password@www.example.com/',
+      [],
+    ].forEach(options => {
       it(`should return false with the following value: ${JSON.stringify(
         options
       )}`, () => {
