@@ -20,7 +20,7 @@ import * as assert from 'assert';
 // If compilation fails at this point then the changes made are breaking.
 class RegressionTestResourceDetector_1_9_1 implements Detector {
   async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
-    return Resource.empty();
+    return Resource.empty() as any;
   }
 }
 

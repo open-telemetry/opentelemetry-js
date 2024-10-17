@@ -23,4 +23,7 @@ export interface IResource {
 
   /** Resource droppedAttributesCount */
   droppedAttributesCount: number;
+
+  /** Schema URL */
+  schemaUrl?: string;
 }
