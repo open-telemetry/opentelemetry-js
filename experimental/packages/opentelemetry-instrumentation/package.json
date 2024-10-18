@@ -93,7 +93,7 @@
     "babel-loader": "8.4.1",
     "babel-plugin-istanbul": "7.0.0",
     "codecov": "3.8.3",
-    "cpx2": "2.0.0",
+    
     "cross-var": "1.1.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.1.0",
