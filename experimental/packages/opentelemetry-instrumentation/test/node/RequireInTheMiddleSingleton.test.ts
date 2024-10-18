@@ -179,6 +179,7 @@ describe('RequireInTheMiddleSingleton', () => {
             baseDir
           );
         }).timeout(30000);
+        
       });
     });
   });
