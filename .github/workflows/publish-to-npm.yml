@@ -1,0 +1,31 @@
+name: Publish packages to NPM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-to-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      - run: npm run compile
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NPM_CONFIG_PROVENANCE: true
+        run: npx lerna publish --concurrency 1 from-package --no-push --no-private --no-git-tag-version --no-verify-access --yes
