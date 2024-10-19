@@ -26,6 +26,7 @@ import {
   createSslCredentials,
 } from '../../src/grpc-exporter-transport';
 import * as fs from 'fs';
+import { VERSION } from '../../src/version';
 
 describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
   describe('metadata', function () {
@@ -56,7 +57,7 @@ describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
         foo: 'foo-user', // does not use fallback if the user has set something
         bar: 'bar-fallback', // uses fallback if there is no value set
         baz: 'baz-user', // does not drop user-set metadata if there is no fallback for it
-        'user-agent': 'OTel-OTLP-Exporter-JavaScript/0.53.0',
+        'user-agent': 'OTel-OTLP-Exporter-JavaScript/' + VERSION,
       });
     });
 
@@ -81,7 +82,7 @@ describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
       );
 
       assert.deepStrictEqual(config.metadata().getMap(), {
-        'user-agent': 'OTel-OTLP-Exporter-JavaScript/0.53.0',
+        'user-agent': 'OTel-OTLP-Exporter-JavaScript/' + VERSION,
       });
     });
 
@@ -94,7 +95,7 @@ describe('mergeOtlpGrpcConfigurationWithDefaults', function () {
       );
 
       assert.deepStrictEqual(config.metadata().getMap(), {
-        'user-agent': 'OTel-OTLP-Exporter-JavaScript/0.53.0',
+        'user-agent': 'OTel-OTLP-Exporter-JavaScript/' + VERSION,
       });
     });
   });
