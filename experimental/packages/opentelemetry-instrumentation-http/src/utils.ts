@@ -26,6 +26,7 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_REQUEST_METHOD_ORIGINAL,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -842,6 +843,7 @@ export const getIncomingRequestAttributesOnResponse = (
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
     oldAttributes[SEMATTRS_HTTP_ROUTE] = rpcMetadata.route;
+    newAttributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
   }
 
   switch (semconvStability) {
