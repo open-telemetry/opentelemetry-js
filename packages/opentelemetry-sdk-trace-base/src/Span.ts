@@ -48,17 +48,23 @@ import {
   SEMATTRS_EXCEPTION_STACKTRACE,
   SEMATTRS_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
+import { ExceptionEventName } from './enums';
 import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
 import { SpanLimits } from './types';
 
 /**
+ * This type provides the properties of @link{ReadableSpan} at the same time
+ * of the Span API
+ */
+export type Span = APISpan & ReadableSpan;
+
+/**
  * This class represents a span.
  */
-export class Span implements APISpan, ReadableSpan {
+export class SpanImpl implements Span {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: SpanContext;

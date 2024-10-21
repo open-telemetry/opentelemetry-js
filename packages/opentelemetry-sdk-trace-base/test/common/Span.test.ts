@@ -42,6 +42,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
+import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
 
 const performanceTimeOrigin: HrTime = [1, 1];
@@ -76,19 +77,19 @@ describe('Span', () => {
   };
 
   it('should create a Span instance', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
       spanContext,
       SpanKind.SERVER
     );
-    assert.ok(span instanceof Span);
+    assert.ok(span instanceof SpanImpl);
     span.end();
   });
 
   it('should have valid startTime', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -102,7 +103,7 @@ describe('Span', () => {
   });
 
   it('should have valid endTime', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -123,7 +124,7 @@ describe('Span', () => {
   });
 
   it('should have a duration', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -135,7 +136,7 @@ describe('Span', () => {
   });
 
   it('should ensure duration is never negative even if provided with inconsistent times', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -149,7 +150,7 @@ describe('Span', () => {
   });
 
   it('should have valid event.time', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -165,7 +166,7 @@ describe('Span', () => {
 
   it('should have an entered time for event', () => {
     const startTime = Date.now();
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -188,7 +189,7 @@ describe('Span', () => {
   describe('when 2nd param is "TimeInput" type', () => {
     it('should have an entered time for event - ', () => {
       const startTime = Date.now();
-      const span = new Span(
+      const span = new SpanImpl(
         tracer,
         ROOT_CONTEXT,
         name,
@@ -210,7 +211,7 @@ describe('Span', () => {
   });
 
   it('should get the span context of span', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -228,7 +229,7 @@ describe('Span', () => {
 
   describe('isRecording', () => {
     it('should return true when span is not ended', () => {
-      const span = new Span(
+      const span = new SpanImpl(
         tracer,
         ROOT_CONTEXT,
         name,
@@ -239,7 +240,7 @@ describe('Span', () => {
       span.end();
     });
     it('should return false when span is ended', () => {
-      const span = new Span(
+      const span = new SpanImpl(
         tracer,
         ROOT_CONTEXT,
         name,
@@ -254,7 +255,7 @@ describe('Span', () => {
   describe('setAttribute', () => {
     describe('when default options set', () => {
       it('should set an attribute', () => {
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -273,7 +274,7 @@ describe('Span', () => {
       });
 
       it('should be able to overwrite attributes', () => {
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -299,7 +300,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -331,7 +332,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -375,7 +376,7 @@ describe('Span', () => {
         });
 
         it('should truncate value when attributes are passed to the constructor', () => {
-          const span = new Span(
+          const span = new SpanImpl(
             tracer,
             ROOT_CONTEXT,
             name,
@@ -399,7 +400,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -436,7 +437,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -464,7 +465,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -516,7 +517,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -556,7 +557,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -588,7 +589,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -624,7 +625,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -680,7 +681,7 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -726,7 +727,7 @@ describe('Span', () => {
 
   describe('setAttributes', () => {
     it('should be able to set multiple attributes', () => {
-      const span = new Span(
+      const span = new SpanImpl(
         tracer,
         ROOT_CONTEXT,
         name,
@@ -743,7 +744,7 @@ describe('Span', () => {
 
   describe('addEvent', () => {
     it('should add an event', () => {
-      const span = new Span(
+      const span = new SpanImpl(
         tracer,
         ROOT_CONTEXT,
         name,
@@ -756,7 +757,7 @@ describe('Span', () => {
     });
 
     it('should sanitize attribute values', () => {
-      const span = new Span(
+      const span = new SpanImpl(
         tracer,
         ROOT_CONTEXT,
         name,
@@ -776,7 +777,7 @@ describe('Span', () => {
   });
 
   it('should drop extra events', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -803,7 +804,7 @@ describe('Span', () => {
   });
 
   it('should store the count of dropped events in droppedEventsCount', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -825,7 +826,7 @@ describe('Span', () => {
       },
     }).getTracer('default');
 
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -841,7 +842,7 @@ describe('Span', () => {
   });
 
   it('should set an error status', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -860,7 +861,7 @@ describe('Span', () => {
 
   it('should drop non-string status message', function () {
     const warnStub = sinon.spy(diag, 'warn');
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -883,7 +884,7 @@ describe('Span', () => {
 
   it('should return ReadableSpan', () => {
     const parentId = '5c1c63257de34c67';
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       'my-span',
@@ -910,7 +911,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with attributes', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       'my-span',
@@ -936,7 +937,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with links', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       'my-span',
@@ -966,7 +967,7 @@ describe('Span', () => {
   });
 
   it('should be possible to add a link after span creation', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       'my-span',
@@ -987,7 +988,7 @@ describe('Span', () => {
   });
 
   it('should be possible to add multiple links after span creation', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       'my-span',
@@ -1018,7 +1019,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with events', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       'my-span',
@@ -1053,7 +1054,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with new status', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -1077,7 +1078,7 @@ describe('Span', () => {
   });
 
   it('should only end a span once', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -1091,7 +1092,7 @@ describe('Span', () => {
   });
 
   it('should update name', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -1107,7 +1108,7 @@ describe('Span', () => {
   });
 
   it('should have ended', () => {
-    const span = new Span(
+    const span = new SpanImpl(
       tracer,
       ROOT_CONTEXT,
       name,
@@ -1211,7 +1212,7 @@ describe('Span', () => {
     invalidExceptions.forEach(key => {
       describe(`when exception is (${JSON.stringify(key)})`, () => {
         it('should NOT record an exception', () => {
-          const span = new Span(
+          const span = new SpanImpl(
             tracer,
             ROOT_CONTEXT,
             name,
@@ -1231,7 +1232,7 @@ describe('Span', () => {
         error = 'boom';
       });
       it('should record an exception', () => {
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -1264,7 +1265,7 @@ describe('Span', () => {
       describe(`when exception type is an object with ${errorObj.description}`, () => {
         const error: Exception = errorObj.obj;
         it('should record an exception', () => {
-          const span = new Span(
+          const span = new SpanImpl(
             tracer,
             ROOT_CONTEXT,
             name,
@@ -1294,7 +1295,7 @@ describe('Span', () => {
 
     describe('when time is provided', () => {
       it('should record an exception with provided time', () => {
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -1312,7 +1313,7 @@ describe('Span', () => {
 
     describe('when exception code is numeric', () => {
       it('should record an exception with string value', () => {
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
@@ -1330,7 +1331,7 @@ describe('Span', () => {
 
     describe('when attributes are specified', () => {
       it('should store specified attributes', () => {
-        const span = new Span(
+        const span = new SpanImpl(
           tracer,
           ROOT_CONTEXT,
           name,
