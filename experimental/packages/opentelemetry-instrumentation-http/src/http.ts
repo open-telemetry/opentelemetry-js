@@ -93,7 +93,7 @@ import {
 } from './utils';
 
 /**
- * Http instrumentation instrumentation for Opentelemetry
+ * `node:http` and `node:https` instrumentation for OpenTelemetry
  */
 export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentationConfig> {
   /** keep track on spans not ended */
