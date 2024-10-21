@@ -21,7 +21,8 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
-  ATTR_HTTP_REQUEST_METHOD, ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PROTOCOL_VERSION,
   ATTR_SERVER_ADDRESS,

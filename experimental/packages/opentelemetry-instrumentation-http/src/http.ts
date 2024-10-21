@@ -78,7 +78,8 @@ import {
   getIncomingRequestAttributes,
   getIncomingRequestAttributesOnResponse,
   getIncomingRequestMetricAttributes,
-  getIncomingRequestMetricAttributesOnResponse, getIncomingStableRequestMetricAttributesOnResponse,
+  getIncomingRequestMetricAttributesOnResponse,
+  getIncomingStableRequestMetricAttributesOnResponse,
   getOutgoingRequestAttributes,
   getOutgoingRequestAttributesOnResponse,
   getOutgoingRequestMetricAttributes,
@@ -416,7 +417,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * @param span representing the current operation
    * @param startTime representing the start time of the request to calculate duration in Metric
    * @param oldMetricAttributes metric attributes for old semantic conventions
-   * @param stableMetricAttributes metric attributes for old semantic conventions
+   * @param stableMetricAttributes metric attributes for new semantic conventions
    */
   private _traceClientRequest(
     request: http.ClientRequest,
