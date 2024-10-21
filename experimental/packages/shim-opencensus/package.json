@@ -15,7 +15,6 @@
     "clean": "tsc --build --clean",
     "tdd": "npm run test -- --extension ts --watch",
     "test": "nyc mocha test/**/*.test.ts",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
@@ -53,10 +52,9 @@
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/context-async-hooks": "1.26.0",
     "@opentelemetry/sdk-trace-base": "1.26.0",
-    "@types/mocha": "10.0.7",
+    "@types/mocha": "10.0.8",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.3",
-    "codecov": "3.8.3",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "mocha": "10.7.3",
@@ -66,7 +64,7 @@
   },
   "peerDependencies": {
     "@opencensus/core": "^0.1.0",
-    "@opentelemetry/api": "^1.0.0"
+    "@opentelemetry/api": "^1.3.0"
   },
   "dependencies": {
     "@opentelemetry/core": "1.26.0",

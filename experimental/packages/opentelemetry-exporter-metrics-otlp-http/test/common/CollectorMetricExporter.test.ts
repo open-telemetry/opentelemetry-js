@@ -36,8 +36,6 @@ class OTLPMetricExporter extends OTLPExporterBase<
   CollectorExporterConfig,
   ResourceMetrics
 > {
-  onInit() {}
-
   onShutdown() {}
 
   send() {}
@@ -62,12 +60,8 @@ describe('OTLPMetricExporter - common', () => {
   });
 
   describe('constructor', () => {
-    let onInitSpy: any;
-
     beforeEach(async () => {
-      onInitSpy = sinon.stub(OTLPMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
-        hostname: 'foo',
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
@@ -85,20 +79,6 @@ describe('OTLPMetricExporter - common', () => {
 
     it('should create an instance', () => {
       assert.ok(typeof collectorExporter !== 'undefined');
-    });
-
-    it('should call onInit', () => {
-      assert.strictEqual(onInitSpy.callCount, 1);
-    });
-
-    describe('when config contains certain params', () => {
-      it('should set hostname', () => {
-        assert.strictEqual(collectorExporter.hostname, 'foo');
-      });
-
-      it('should set url', () => {
-        assert.strictEqual(collectorExporter.url, 'http://foo.bar.com');
-      });
     });
 
     describe('when config is missing certain params', () => {
@@ -180,7 +160,6 @@ describe('OTLPMetricExporter - common', () => {
     beforeEach(() => {
       onShutdownSpy = sinon.stub(OTLPMetricExporter.prototype, 'onShutdown');
       collectorExporterConfig = {
-        hostname: 'foo',
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);

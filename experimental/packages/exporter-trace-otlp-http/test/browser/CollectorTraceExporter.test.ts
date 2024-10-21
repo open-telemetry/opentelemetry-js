@@ -54,12 +54,8 @@ describe('OTLPTraceExporter - web', () => {
   });
 
   describe('constructor', () => {
-    let onInitSpy: any;
-
     beforeEach(() => {
-      onInitSpy = sinon.stub(OTLPTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
-        hostname: 'foo',
         url: 'http://foo.bar.com',
       };
       collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
@@ -68,26 +64,11 @@ describe('OTLPTraceExporter - web', () => {
     it('should create an instance', () => {
       assert.ok(typeof collectorTraceExporter !== 'undefined');
     });
-
-    it('should call onInit', () => {
-      assert.strictEqual(onInitSpy.callCount, 1);
-    });
-
-    describe('when config contains certain params', () => {
-      it('should set hostname', () => {
-        assert.strictEqual(collectorTraceExporter.hostname, 'foo');
-      });
-
-      it('should set url', () => {
-        assert.strictEqual(collectorTraceExporter.url, 'http://foo.bar.com');
-      });
-    });
   });
 
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
-        hostname: 'foo',
         url: 'http://foo.bar.com',
       };
     });
@@ -202,29 +183,36 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {});
 
         queueMicrotask(async () => {
-          const request = server.requests[0];
-          assert.strictEqual(request.method, 'POST');
-          assert.strictEqual(request.url, 'http://foo.bar.com');
+          try {
+            const request = server.requests[0];
+            assert.strictEqual(request.method, 'POST');
+            assert.strictEqual(request.url, 'http://foo.bar.com');
 
-          const body = request.requestBody as Blob;
-          const decoder = new TextDecoder();
-          const json = JSON.parse(
-            decoder.decode(await body.arrayBuffer())
-          ) as IExportTraceServiceRequest;
-          const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+            const body = request.requestBody as Blob;
+            const decoder = new TextDecoder();
+            const json = JSON.parse(
+              decoder.decode(await body.arrayBuffer())
+            ) as IExportTraceServiceRequest;
+            const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
-          assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-          ensureSpanIsCorrect(span1);
+            assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
+            ensureSpanIsCorrect(span1);
 
-          const resource = json.resourceSpans?.[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          ensureWebResourceIsCorrect(resource);
+            const resource = json.resourceSpans?.[0].resource;
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            ensureWebResourceIsCorrect(resource);
 
-          assert.strictEqual(stubBeacon.callCount, 0);
-          ensureExportTraceServiceRequestIsSet(json);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            ensureExportTraceServiceRequestIsSet(json);
 
-          clock.restore();
-          done();
+            clock.restore();
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
 
@@ -496,27 +484,6 @@ describe('OTLPTraceExporter - web', () => {
   });
 });
 
-describe('OTLPTraceExporter - browser (getDefaultUrl)', () => {
-  it('should default to v1/trace', done => {
-    const collectorExporter = new OTLPTraceExporter({});
-    setTimeout(() => {
-      assert.strictEqual(
-        collectorExporter['url'],
-        'http://localhost:4318/v1/traces'
-      );
-      done();
-    });
-  });
-  it('should keep the URL if included', done => {
-    const url = 'http://foo.bar.com';
-    const collectorExporter = new OTLPTraceExporter({ url });
-    setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], url);
-      done();
-    });
-  });
-});
-
 describe('export with retry - real http request destroyed', () => {
   let server: any;
   let collectorTraceExporter: OTLPTraceExporter;
@@ -563,7 +530,7 @@ describe('export with retry - real http request destroyed', () => {
             error.message,
             'Export failed with retryable status'
           );
-          assert.strictEqual(calls, 6);
+          assert.strictEqual(calls, 2);
           done();
         } catch (e) {
           done(e);

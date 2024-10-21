@@ -23,7 +23,7 @@ import {
   TimeoutError,
 } from '../src/utils';
 import { assertRejects } from './test-utils';
-import { MetricAttributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 
 describe('utils', () => {
   afterEach(() => {
@@ -42,7 +42,7 @@ describe('utils', () => {
 
   describe('hashAttributes', () => {
     it('should hash all types of attribute values', () => {
-      const cases: [MetricAttributes, string][] = [
+      const cases: [Attributes, string][] = [
         [{ string: 'bar' }, '[["string","bar"]]'],
         [{ number: 1 }, '[["number",1]]'],
         [{ false: false, true: true }, '[["false",false],["true",true]]'],

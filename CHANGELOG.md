@@ -13,15 +13,27 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat: add processors for adding session.id attribute to spans and logs [#4972](https://github.com/open-telemetry/opentelemetry-js/pull/4972)
+
 ### :bug: (Bug Fix)
 
-- fix(propagator-aws-xray-*): move propagators back to contrib repository [#4966](https://github.com/open-telemetry/opentelemetry-js/pull/4966) @pichlermarc
-  - `@opentelemetry/propagator-aws-xray` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
-  - `@opentelemetry/propagator-aws-xray-lambda` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
+* fix(sdk-trace-base): avoid keeping non-string `status.message` on `Span#setStatus()` [#4999](https://github.com/open-telemetry/opentelemetry-js/pull/4999) @pichlermarc
+* fix(sdk-metrics): Add missing catch and handle error in promise of `PeriodicExportingMetricReader` [#5006](https://github.com/open-telemetry/opentelemetry-js/pull/5006) @jj22ee
+* fix(opentelemetry-core): confusing log extract of composite propagator [#5017](https://github.com/open-telemetry/opentelemetry-js/pull/5017) @rv2673
+* fix(propagator-aws-xray-*): move propagators back to contrib repository [#4966](https://github.com/open-telemetry/opentelemetry-js/pull/4966) @pichlermarc
+  * `@opentelemetry/propagator-aws-xray` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
+  * `@opentelemetry/propagator-aws-xray-lambda` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* deps: set `@opentelemetry/api` dependency min version to 1.3.0 in `examples`, `experimental/packages`, `integration-tests` and `selenium-tests`
+  [#4992](https://github.com/open-telemetry/opentelemetry-js/pull/4992)
+* refactor(sdk-metrics): replace `MetricsAttributes` with `Attributes` [#5021](https://github.com/open-telemetry/opentelemetry-js/pull/5021) @david-luna
+* refactor(instrumentation-http): replace `SpanAttributes` and `MetricsAttributes` with `Attributes` [#5023](https://github.com/open-telemetry/opentelemetry-js/pull/5023) @david-luna
+* chore(exporter-zipkin): remove usages of Span constructor [#5030](https://github.com/open-telemetry/opentelemetry-js/pull/5030) @david-luna
+* test(instrumentation-http): remove usages of `new Span` in tests [#5035](https://github.com/open-telemetry/opentelemetry-js/pull/5035) @david-luna
 
 ## 1.26.0
 
@@ -101,6 +113,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * fix(resources): prevent circular import (resource -> detector -> resource -> ...) [#4653](https://github.com/open-telemetry/opentelemetry-js/pull/4653) @pichlermarc
   * fixes a circular import warning which would appear in rollup when bundling `@opentelemetry/resources`
 * fix(exporter-metrics-otlp-grpc): add explicit otlp-exporter-base dependency to exporter-metrics-otlp-grpc [#4678](https://github.com/open-telemetry/opentelemetry-js/pull/4678) @AkselAllas
+* fix(resources) wait for async attributes for detecting resources [#4687](https://github.com/open-telemetry/opentelemetry-js/pull/4687) @ziolekjj
 
 ## 1.24.0
 

@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-import { CompressionAlgorithm } from './types';
-import { getEnv } from '@opentelemetry/core';
-
-export function configureCompression(
-  compression: CompressionAlgorithm | undefined
-): CompressionAlgorithm {
-  if (compression) {
-    return compression;
-  } else {
-    const definedCompression =
-      getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
-      getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
-    return definedCompression === CompressionAlgorithm.GZIP
-      ? CompressionAlgorithm.GZIP
-      : CompressionAlgorithm.NONE;
-  }
+export interface SessionProvider {
+  getSessionId(): string | null;
 }
