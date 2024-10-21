@@ -28,14 +28,27 @@ import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState'
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
+function prepareResource(
+  mergeWithDefaults: boolean,
+  providedResource: Resource | undefined
+) {
+  const resource = providedResource ?? Resource.empty();
+
+  if (mergeWithDefaults) {
+    return Resource.default().merge(resource);
+  }
+  return resource;
+}
+
 export class LoggerProvider implements logsAPI.LoggerProvider {
   private _shutdownOnce: BindOnceFuture<void>;
   private readonly _sharedState: LoggerProviderSharedState;
 
   constructor(config: LoggerProviderConfig = {}) {
     const mergedConfig = merge({}, loadDefaultConfig(), config);
-    const resource = Resource.default().merge(
-      mergedConfig.resource ?? Resource.empty()
+    const resource = prepareResource(
+      mergedConfig.mergeResourceWithDefaults,
+      config.resource
     );
     this._sharedState = new LoggerProviderSharedState(
       resource,
