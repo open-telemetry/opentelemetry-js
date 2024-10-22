@@ -7,11 +7,19 @@
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  "exports": {
+    ".": {
+      "browser": {
+        "module": "./build/esm/platform/browser/index.js",
+        "esnext": "./build/esnext/platform/browser/index.js",
+        "types": "./build/src/platform/browser/index.d.ts",
+        "default": "./build/src/platform/browser/index.js"
+      },
+      "module": "./build/esm/index.js",
+      "esnext": "./build/esnext/index.js",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
+    }
   },
   "scripts": {
     "prepublishOnly": "npm run compile",

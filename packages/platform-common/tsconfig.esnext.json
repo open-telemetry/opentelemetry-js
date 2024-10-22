@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base.esnext.json",
+  "extends": "../../tsconfig.base.esnext.json",
   "compilerOptions": {
     "outDir": "build/esnext",
     "rootDir": "src",
@@ -8,9 +8,5 @@
   "include": [
     "src/**/*.ts"
   ],
-  "references": [
-    {
-      "path": "../packages/platform-common"
-    }
-  ]
+  "references": []
 }

@@ -188,6 +188,9 @@
       "path": "packages/opentelemetry-shim-opentracing"
     },
     {
+      "path": "packages/platform-common"
+    },
+    {
       "path": "packages/propagator-aws-xray"
     },
     {
