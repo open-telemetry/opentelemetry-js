@@ -257,11 +257,19 @@ cd packages/opentelemetry-module-name
 npm run lint:fix
 ```
 
-Similarly, Markdown files (such as README.md files) can be linted:
+The default lint command will check majority of files, including Markdown files (such as README.md files), but you
+also have the option to check just the Markdown files with:
 
 ```sh
 npm run lint:markdown
 npm run lint:markdown:fix # can automatically fix some Markdown rules
+```
+
+The default command doesn't check the examples folder. To lint just the examples, use the script:
+
+```sh
+npm run lint:examples
+npm run lint:examples:fix # can automatically fix some errors
 ```
 
 ### Generating docs
