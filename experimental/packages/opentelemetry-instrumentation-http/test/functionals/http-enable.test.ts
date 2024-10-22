@@ -182,19 +182,9 @@ describe('HttpInstrumentation', () => {
 
       before(async () => {
         const config: HttpInstrumentationConfig = {
-          ignoreIncomingPaths: [
-            (url: string) => {
-              throw new Error('bad ignoreIncomingPaths function');
-            },
-          ],
           ignoreIncomingRequestHook: _request => {
             throw new Error('bad ignoreIncomingRequestHook function');
           },
-          ignoreOutgoingUrls: [
-            (url: string) => {
-              throw new Error('bad ignoreOutgoingUrls function');
-            },
-          ],
           ignoreOutgoingRequestHook: _request => {
             throw new Error('bad ignoreOutgoingRequestHook function');
           },
@@ -307,21 +297,11 @@ describe('HttpInstrumentation', () => {
 
       before(async () => {
         instrumentation.setConfig({
-          ignoreIncomingPaths: [
-            '/ignored/string',
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith('/ignored/function'),
-          ],
           ignoreIncomingRequestHook: request => {
             return (
               request.headers['user-agent']?.match('ignored-string') != null
             );
           },
-          ignoreOutgoingUrls: [
-            `${protocol}://${hostname}:${serverPort}/ignored/string`,
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith('/ignored/function'),
-          ],
           ignoreOutgoingRequestHook: request => {
             if (request.headers?.['user-agent'] != null) {
               return (
@@ -591,19 +571,7 @@ describe('HttpInstrumentation', () => {
         });
       });
 
-      for (const ignored of ['string', 'function', 'regexp']) {
-        it(`should not trace ignored requests with paths (client and server side) with type ${ignored}`, async () => {
-          const testPath = `/ignored/${ignored}`;
-
-          await httpRequest.get(
-            `${protocol}://${hostname}:${serverPort}${testPath}`
-          );
-          const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 0);
-        });
-      }
-
-      it('should not trace ignored requests with headers (client and server side)', async () => {
+      it('should not trace ignored requests ignore hook', async () => {
         const testValue = 'ignored-string';
 
         await Promise.all([
@@ -617,7 +585,7 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      it('should trace not ignored requests with headers (client and server side)', async () => {
+      it('should trace not ignored requests with ignore hook', async () => {
         await httpRequest.get(`${protocol}://${hostname}:${serverPort}`, {
           headers: {
             'user-agent': 'test-bot',
