@@ -435,7 +435,7 @@ describe('HttpsInstrumentation', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      for (const arg of ['string', {}, new Date()]) {
+      for (const arg of [{}, new Date()]) {
         it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
@@ -671,6 +671,31 @@ describe('HttpsInstrumentation', () => {
           });
         });
         req.end();
+      });
+
+      it('should keep username and password in the request', async () => {
+        await httpsRequest.get(
+          `${protocol}://username:password@${hostname}:${serverPort}/login`
+        );
+      });
+
+      it('should keep query in the request', async () => {
+        await httpsRequest.get(
+          `${protocol}://${hostname}:${serverPort}/withQuery?foo=bar`
+        );
+      });
+
+      it('using an invalid url does throw from client but still creates a span', async () => {
+        try {
+          await httpsRequest.get(
+            `${protocol}://instrumentation.test:string-as-port/`
+          );
+        } catch (e) {
+          assert.match(e.message, /Invalid URL/);
+        }
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
       });
     });
 

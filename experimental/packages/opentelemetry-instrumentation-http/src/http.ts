@@ -757,7 +757,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as http.RequestOptions)
           : undefined;
-      const { method, optionsParsed } = getRequestInfo(options, extraOptions);
+      const { method, invalidUrl, optionsParsed } = getRequestInfo(
+        options,
+        extraOptions
+      );
       /**
        * Node 8's https module directly call the http one so to avoid creating
        * 2 span for the same request we need to check that the protocol is correct
@@ -859,7 +862,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         }
 
         const request: http.ClientRequest = safeExecuteInTheMiddle(
-          () => original.apply(this, [optionsParsed, ...args]),
+          () => {
+            if (invalidUrl) {
+              // we know that the url is invalid, there's no point in injecting context as it will fail validation.
+              // Passing in what the user provided will give the user an error that matches what they'd see without
+              // the instrumentation.
+              return original.apply(this, [options, ...args]);
+            } else {
+              return original.apply(this, [optionsParsed, ...args]);
+            }
+          },
           error => {
             if (error) {
               setSpanWithError(span, error, instrumentation._semconvStability);
