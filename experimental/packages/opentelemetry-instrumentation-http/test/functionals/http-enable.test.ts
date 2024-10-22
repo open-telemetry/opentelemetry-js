@@ -571,7 +571,7 @@ describe('HttpInstrumentation', () => {
         });
       });
 
-      it('should not trace ignored requests ignore hook', async () => {
+      it('should not trace ignored requests when ignore hook returns true', async () => {
         const testValue = 'ignored-string';
 
         await Promise.all([
@@ -585,7 +585,7 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      it('should trace not ignored requests with ignore hook', async () => {
+      it('should trace requests when ignore hook returns false', async () => {
         await httpRequest.get(`${protocol}://${hostname}:${serverPort}`, {
           headers: {
             'user-agent': 'test-bot',

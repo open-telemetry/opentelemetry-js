@@ -421,7 +421,7 @@ describe('HttpsInstrumentation', () => {
         });
       });
 
-      it('should not trace ignored requests with ignore hook', async () => {
+      it('should trace requests when ignore hook returns false', async () => {
         const testValue = 'ignored-string';
 
         await Promise.all([
