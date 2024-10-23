@@ -30,8 +30,10 @@ import {
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
 } from '@opentelemetry/semantic-conventions';
+import { ATTR_HTTP_REQUEST_BODY_SIZE } from '@opentelemetry/semantic-conventions/incubating';
 import {
   addSpanNetworkEvents,
+  getXHRBodyLength,
   getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
@@ -83,6 +85,8 @@ export interface XMLHttpRequestInstrumentationConfig
   applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
   /** Ignore adding network events as span events */
   ignoreNetworkEvents?: boolean;
+  /** Measure outgoing request size */
+  measureRequestSize?: boolean;
 }
 
 /**
@@ -486,6 +490,14 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
+          if (plugin.getConfig().measureRequestSize && args?.[0]) {
+            const body = args[0];
+            const bodyLength = getXHRBodyLength(body);
+            if (bodyLength !== undefined) {
+              currentSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, bodyLength);
+            }
+          }
+
           api.context.with(
             api.trace.setSpan(api.context.active(), currentSpan),
             () => {
