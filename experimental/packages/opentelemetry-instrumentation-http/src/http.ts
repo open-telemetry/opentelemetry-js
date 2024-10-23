@@ -65,7 +65,6 @@ import { errorMonitor } from 'events';
 import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
-  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PROTOCOL_VERSION,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
@@ -80,6 +79,7 @@ import {
   getIncomingRequestAttributesOnResponse,
   getIncomingRequestMetricAttributes,
   getIncomingRequestMetricAttributesOnResponse,
+  getIncomingStableRequestMetricAttributesOnResponse,
   getOutgoingRequestAttributes,
   getOutgoingRequestAttributesOnResponse,
   getOutgoingRequestMetricAttributes,
@@ -93,7 +93,7 @@ import {
 } from './utils';
 
 /**
- * Http instrumentation instrumentation for Opentelemetry
+ * `node:http` and `node:https` instrumentation for OpenTelemetry
  */
 export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentationConfig> {
   /** keep track on spans not ended */
@@ -430,7 +430,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * @param request The original request object.
    * @param span representing the current operation
    * @param startTime representing the start time of the request to calculate duration in Metric
-   * @param oldMetricAttributes metric attributes
+   * @param oldMetricAttributes metric attributes for old semantic conventions
+   * @param stableMetricAttributes metric attributes for new semantic conventions
    */
   private _traceClientRequest(
     request: http.ClientRequest,
@@ -665,12 +666,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         [ATTR_HTTP_REQUEST_METHOD]: spanAttributes[ATTR_HTTP_REQUEST_METHOD],
         [ATTR_URL_SCHEME]: spanAttributes[ATTR_URL_SCHEME],
       };
-
-      // required if and only if one was sent, same as span requirement
-      if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-        stableMetricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-          spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
-      }
 
       // recommended if and only if one was sent, same as span recommendation
       if (spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
@@ -931,6 +926,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       oldMetricAttributes,
       getIncomingRequestMetricAttributesOnResponse(attributes)
     );
+    stableMetricAttributes = Object.assign(
+      stableMetricAttributes,
+      getIncomingStableRequestMetricAttributesOnResponse(attributes)
+    );
 
     this._headerCapture.server.captureResponseHeaders(span, header =>
       response.getHeader(header)
@@ -943,7 +942,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     const route = attributes[SEMATTRS_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
-      stableMetricAttributes[ATTR_HTTP_ROUTE] = route;
     }
 
     if (this.getConfig().applyCustomAttributesOnSpan) {

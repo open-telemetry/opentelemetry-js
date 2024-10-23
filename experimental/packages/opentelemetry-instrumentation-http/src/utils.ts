@@ -26,6 +26,7 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_REQUEST_METHOD_ORIGINAL,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -822,7 +823,7 @@ export const getIncomingRequestAttributesOnResponse = (
   const { socket } = request;
   const { statusCode, statusMessage } = response;
 
-  const newAttributes = {
+  const newAttributes: Attributes = {
     [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
   };
 
@@ -842,6 +843,7 @@ export const getIncomingRequestAttributesOnResponse = (
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
     oldAttributes[SEMATTRS_HTTP_ROUTE] = rpcMetadata.route;
+    newAttributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
   }
 
   switch (semconvStability) {
@@ -868,6 +870,22 @@ export const getIncomingRequestMetricAttributesOnResponse = (
     spanAttributes[SEMATTRS_NET_HOST_PORT];
   if (spanAttributes[SEMATTRS_HTTP_ROUTE] !== undefined) {
     metricAttributes[SEMATTRS_HTTP_ROUTE] = spanAttributes[SEMATTRS_HTTP_ROUTE];
+  }
+  return metricAttributes;
+};
+
+export const getIncomingStableRequestMetricAttributesOnResponse = (
+  spanAttributes: Attributes
+): Attributes => {
+  const metricAttributes: Attributes = {};
+  if (spanAttributes[ATTR_HTTP_ROUTE] !== undefined) {
+    metricAttributes[ATTR_HTTP_ROUTE] = spanAttributes[SEMATTRS_HTTP_ROUTE];
+  }
+
+  // required if and only if one was sent, same as span requirement
+  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
+    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
+      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
   }
   return metricAttributes;
 };
