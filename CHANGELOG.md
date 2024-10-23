@@ -13,6 +13,16 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.27.0
+
+### :rocket: (Enhancement)
+
 * feat: add processors for adding session.id attribute to spans and logs [#4972](https://github.com/open-telemetry/opentelemetry-js/pull/4972)
 
 ### :bug: (Bug Fix)
@@ -24,8 +34,6 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * The [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/6672dbc97ddeb34f36c020a0f0a30323c8bc4d95/specification/context/api-propagators.md?plain=1#L354-L356) prohibits hosting these packages in the core repository
   * `@opentelemetry/propagator-aws-xray` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
   * `@opentelemetry/propagator-aws-xray-lambda` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
