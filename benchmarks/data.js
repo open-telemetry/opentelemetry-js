@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1729697719122,
+  "lastUpdate": 1729700477808,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -17798,6 +17798,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 666342,
             "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "57226464+mercybassey@users.noreply.github.com",
+            "name": "Mercy Bassey",
+            "username": "mercybassey"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "4497ee38310e4413876bef8b952fb5167a8f7ed3",
+          "message": "Added limitation in ot-shim readme (#5072)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-10-23T11:16:24Z",
+          "tree_id": "cc9abf08237c023038b59ee9ed6bf4cd67ef7702",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4497ee38310e4413876bef8b952fb5167a8f7ed3"
+        },
+        "date": 1729700476875,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 967819,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11568,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 725296,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 673463,
+            "range": "±0.32%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
