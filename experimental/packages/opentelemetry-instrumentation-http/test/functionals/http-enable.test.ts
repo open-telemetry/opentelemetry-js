@@ -33,6 +33,7 @@ import {
   ATTR_CLIENT_ADDRESS,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -1134,6 +1135,32 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_SCHEME]: protocol,
         });
       });
+
+      it('should generate semconv 1.27 server spans with route when RPC metadata is available', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}/setroute`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, _] = spans;
+        assert.strictEqual(spans.length, 2);
+
+        const body = JSON.parse(response.data);
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(incomingSpan.attributes, {
+          [ATTR_CLIENT_ADDRESS]: body.address,
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_HTTP_ROUTE]: 'TheRoute',
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
+          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+          [ATTR_URL_PATH]: `${pathname}/setroute`,
+          [ATTR_URL_SCHEME]: protocol,
+        });
+      });
     });
 
     describe('with semconv stability set to http/dup', () => {
@@ -1146,6 +1173,13 @@ describe('HttpInstrumentation', () => {
         instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
         instrumentation.enable();
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/setroute')) {
+            const rpcData = getRPCMetadata(context.active());
+            assert.ok(rpcData != null);
+            assert.strictEqual(rpcData.type, RPCType.HTTP);
+            assert.strictEqual(rpcData.route, undefined);
+            rpcData.route = 'TheRoute';
+          }
           response.setHeader('Content-Type', 'application/json');
           response.end(
             JSON.stringify({ address: getRemoteClientAddress(request) })
@@ -1230,6 +1264,50 @@ describe('HttpInstrumentation', () => {
           [SEMATTRS_HTTP_STATUS_CODE]: 200,
           [SEMATTRS_HTTP_TARGET]: '/test',
           [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
+          [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
+          [SEMATTRS_NET_HOST_IP]: body.address,
+          [SEMATTRS_NET_HOST_NAME]: hostname,
+          [SEMATTRS_NET_HOST_PORT]: serverPort,
+          [SEMATTRS_NET_PEER_IP]: body.address,
+          [SEMATTRS_NET_PEER_PORT]: response.clientRemotePort,
+
+          // unspecified old names
+          [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
+        });
+      });
+
+      it('should create server spans with semconv 1.27 and old 1.7 including http.route if RPC metadata is available', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}/setroute`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const incomingSpan = spans[0];
+        const body = JSON.parse(response.data);
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(incomingSpan.attributes, {
+          // 1.27 attributes
+          [ATTR_CLIENT_ADDRESS]: body.address,
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
+          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+          [ATTR_URL_PATH]: `${pathname}/setroute`,
+          [ATTR_URL_SCHEME]: protocol,
+          [ATTR_HTTP_ROUTE]: 'TheRoute',
+
+          // 1.7 attributes
+          [SEMATTRS_HTTP_FLAVOR]: '1.1',
+          [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
+          [SEMATTRS_HTTP_METHOD]: 'GET',
+          [SEMATTRS_HTTP_SCHEME]: protocol,
+          [SEMATTRS_HTTP_STATUS_CODE]: 200,
+          [SEMATTRS_HTTP_TARGET]: `${pathname}/setroute`,
+          [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}/setroute`,
           [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
           [SEMATTRS_NET_HOST_IP]: body.address,
           [SEMATTRS_NET_HOST_NAME]: hostname,
