@@ -88,6 +88,7 @@ describe('ProxyLogger', () => {
 
     let delegateLogger: Logger;
     let emitCalled: boolean;
+    let emitEventCalled: boolean;
 
     beforeEach(() => {
       emitCalled = false;
@@ -96,7 +97,7 @@ describe('ProxyLogger', () => {
           emitCalled = true;
         },
         emitEvent() {
-          // TODO: add tests
+          emitEventCalled = true;
         }
       };
 
@@ -115,6 +116,12 @@ describe('ProxyLogger', () => {
         body: 'Test',
       });
       assert.ok(emitCalled);
+    });
+    it('should emitEvent from the delegate logger', () => {
+      logger.emitEvent({
+        name: 'Test event',
+      });
+      assert.ok(emitEventCalled);
     });
   });
 });

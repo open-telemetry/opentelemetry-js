@@ -32,4 +32,12 @@ describe('NoopLogger', () => {
       body: 'log body',
     });
   });
+
+  it('calling emitEvent should not crash', () => {
+    const logger = new NoopLoggerProvider().getLogger('test-noop');
+    logger.emitEvent({
+      severityNumber: SeverityNumber.TRACE,
+      name: 'event name',
+    });
+  });
 });
