@@ -22,6 +22,7 @@ export {
   LogRecord,
   SeverityNumber,
 } from './types/LogRecord';
+export { EventRecord } from './types/EventRecord';
 export { LoggerOptions } from './types/LoggerOptions';
 export { AnyValue, AnyValueMap } from './types/AnyValue';
 export { NOOP_LOGGER, NoopLogger } from './NoopLogger';

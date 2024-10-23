@@ -15,20 +15,19 @@
  */
 
 import { Attributes, Context, TimeInput } from '@opentelemetry/api';
-import { AnyValue, SeverityNumber } from '@opentelemetry/api-logs';
+import { AnyValue } from './AnyValue';
+import { SeverityNumber } from './LogRecord';
 
-// NOTE: this file will be moved to api-logs/EventRecord
-
-export interface Event {
-  /**
-   * The time when the event occurred as UNIX Epoch time in nanoseconds.
-   */
-  timestamp?: TimeInput;
-
+export interface EventRecord {
   /**
    * The name of the event.
    */
   name: string;
+
+  /**
+   * The time when the event occurred as UNIX Epoch time in nanoseconds.
+   */
+  timestamp?: TimeInput;
 
   /**
    * Data that describes the event.

@@ -41,3 +41,15 @@ logger.emit({
   body: 'this is a log record body',
   attributes: { 'log.type': 'custom' },
 });
+
+// emit an event record
+logger.emitEvent({
+  name: 'my-domain.my-event',
+  data: {
+    a: 1,
+    b: 'hello',
+    c: {
+      d: 123
+    }
+  },
+});
