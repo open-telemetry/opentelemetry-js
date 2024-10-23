@@ -5,36 +5,98 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-        Please make sure to fill out the entire form below,
-        providing as much context as you can in order to help us
-        triage and track down your bug as quickly as possible.
-
-        Before filing a bug, please be sure you have searched through
-        [existing bugs](https://github.com/open-telemetry/opentelemetry-js/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
-        to see if your bug is already addressed.
-
-        If your bug is related to an instrumentation or plugin in [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
-        please be sure to file it there.
+        > [!IMPORTANT]
+        > **Please read all parts of this form carefully.** By following the instructions carefully, you ensure that we
+        > can get started fixing your bug, instead of being stuck at trying to reproduce your issue. Please provide
+        > ALL requested information, even if you think it does not apply to your problem.
+  - type: markdown
+    attributes:
+      value: |
+        ## Basic Troubleshooting
+  - type: checkboxes
+    id: updated-to-latest
+    attributes:
+      description: |
+        > [!NOTE]
+        > If you depend on experimental packages with a range like `"@opentelemetry/sdk-node": "^0.53.0"` that does **NOT**
+        > pull in any versions other than `@opentelemetry/sdk-node@0.53.x`. `0.54.x` **WILL NOT** be picked up by this constraint due
+        > to the way semantic versioning works for `0.x` packages. This is intentional, see https://semver.org/ for details.
+      label: Updating packages
+      options:
+        - label: I have updated all `@opentelemetry/*` packages but the issue persists
+          required: true
+  - type: dropdown
+    id: esm
+    attributes:
+      description: |
+        **How to find this information:**
+          - check your `package.json`
+            - if you have `"type": "commonjs"` or no `"type"` then you're using CommonJS
+            - if you have `"type": "module"`, you are using ESM - please ensure you have read the [instructions for ESM users](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md) before opening an issue.
+      label: Which module type are you using?
+      multiple: false
+      options:
+        - CommonJS
+        - ESM
+  - type: checkboxes
+    id: bundlng
+    attributes:
+      description: |
+        Bundling removes `require` and `import` statements, which results in most `@opentelemetry/instrumentation-*` packages not working as they rely on the presense
+        of these statements to function.
+      label: Bundling and `@opentelemetry/instrumentation-*`packages
+      options:
+        - label: I understand that `@opentelemetry/instrumentation-*` packages are not intended to work in bundles apps (with a few exceptions).
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Reproduciton
+        > [!IMPORTANT]
+        >  **If you use a third-party package that re-distributes OpenTelemetry, open the bug ticket with that third party unless you can provide steps to reproduce this with pure OpenTelemetry.**
+        >  Digging into third-party distributions of OpenTelemetry is not in scope for this project.
   - type: textarea
     attributes:
       label: What happened?
-      description: Please provide as much detail as you reasonably can.
+      description: |
+        > [!IMPORTANT]
+        > **Please provide as much detail as you reasonably can.**
+        > We all know the complexities of developing with JavaScript/TypeScript. **Be specific** about your setup and **DO NOT** assume that the
+        > person handling your bug report knows how to use your specific combination of tooling. Always provide build instructions and config files.
       value: |
         ## Steps to Reproduce
-
+          <!--
+            Please consider providing a link to a reproducer repository. It is extremely difficult to exactly reproduce problems
+            and doing so can take multiple hours for us. By providing a reproducer you indirectly contribute back to the project
+            and ensure we can get working on fixing your bug as soon as possible instead of spending precious time asking
+            questions and checking responses. You know your tooling and setup and we know OpenTelemetry JavaScript internals.
+            Let's help each other! :)
+         -->
         ## Expected Result
 
         ## Actual Result
 
         ## Additional Details
+         <!--
+           Anything you can think of that will help us reproduce and understad your problem:
+              - details about the behavior of the bug
+              - code to reproduce, if not provided via a repository above (including setting up any frameworks you may be using, we likely don't use the same tech-stack that you're using on the daily)
+              - which tooling you use and how you're using it
+              - config files for your tooling (typescript, bundlers, ...)
+              - how you run your code (example: `node -r otel.js ./index.js`).
+         -->
+
 
     validations:
       required: true
   - type: textarea
     attributes:
       label: OpenTelemetry Setup Code
-      description: Please provide the code you use to set up OpenTelemetry
+      description: |
+        > [!IMPORTANT]
+        > **Please provide the code you use to set up OpenTelemetry.**
+        >  - If you use `@opentelemetry/auto-instrumentations-node/register`, please state so here
+        >  - **If you have provided a reproducer repository above, you may omit this step.**
       placeholder: | # This comes from our README.md
         // tracing.js
 
@@ -75,7 +137,9 @@ body:
   - type: textarea
     attributes:
       label: package.json
-      description: If possible, please provide your full package.json. If not, please provide at least your list of dependencies and their versions, especially OpenTelemetry versions.
+      description: |
+        Please provide your the full package.json needed to reproduce the issue.
+        You may omit this step if you provided a reproducer repository.
       render: "JSON"
       placeholder: |
         {
@@ -95,3 +159,20 @@ body:
       description: |
         Please copy and paste any relevant log output.
       render: shell
+  - type: markdown
+    attributes:
+      value: |
+        ## System Details
+        System Details help us when we cannot reproduce your problem with the information provided above. Sometimes bugs only surface on specific platforms and runtime versions.
+  - type: textarea
+    attributes:
+      label: Operating System and Version
+      placeholder: Ubuntu 24.04, Windows 11 Build 26100.2033, macOS 15.0.1
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Runtime and Version
+      placeholder: Node.js v20.12.1, Node.js v18.18.2, Firefox 130, Chrome 132, ...
+    validations:
+      required: true
