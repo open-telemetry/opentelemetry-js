@@ -57,7 +57,7 @@ export class Logger implements logsAPI.Logger {
 
   public emitEvent(eventRecord: logsAPI.EventRecord): void {
     const attributes = eventRecord.attributes || {};
-    // TODO: change to ATTR_EVENT_NAME, it is under experimental_attributes currently 
+    // TODO: change to ATTR_EVENT_NAME, it is under experimental_attributes currently.
     attributes['event.name'] = eventRecord.name;
 
     const logRecord: logsAPI.LogRecord = {

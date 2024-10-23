@@ -19,7 +19,10 @@ import * as sinon from 'sinon';
 
 import { LogRecord, LoggerProvider, NoopLogRecordProcessor } from '../../src';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
-import { LogRecord as ApiLogRecord, SeverityNumber } from '@opentelemetry/api-logs';
+import {
+  LogRecord as ApiLogRecord,
+  SeverityNumber,
+} from '@opentelemetry/api-logs';
 import { Logger } from '../../src/Logger';
 
 const setup = () => {
@@ -106,7 +109,7 @@ describe('Logger', () => {
         timestamp: now,
       });
 
-      assert.ok(callSpy.called, "onEmit should be called");
+      assert.ok(callSpy.called, 'onEmit should be called');
 
       assert(
         spy.calledWith(
@@ -126,7 +129,6 @@ describe('Logger', () => {
         ),
         'should call onEmit with expected attributes'
       );
-
     });
 
     it('should set defaults', () => {
@@ -138,8 +140,7 @@ describe('Logger', () => {
         name: 'event name',
       });
 
-      assert.ok(callSpy.called, "onEmit should be called");
-
+      assert.ok(callSpy.called, 'onEmit should be called');
       assert(
         spy.calledWith(
           sinon.match({
@@ -157,7 +158,6 @@ describe('Logger', () => {
         ),
         'timestamp should not be empty'
       );
-      
     });
   });
 });
