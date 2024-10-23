@@ -21,6 +21,10 @@ All notable changes to experimental packages in this project will be documented 
     * `appendResourcePathToUrlIfNeeded`
     * `configureExporterTimeout`
     * `invalidTimeout`
+* feat(instrumentation-http)!: remove long deprecated options [#5085](https://github.com/open-telemetry/opentelemetry-js/pull/5085) @pichlermarc
+  * `ignoreIncomingPaths` has been removed, use the more versatile `ignoreIncomingRequestHook` instead.
+  * `ignoreOutgoingUrls` has been removed, use the more versatile `ignoreOutgoingRequestHook` instead.
+  * `isIgnored` utility function was intended for internal use and has been removed without replacement.
 
 ### :rocket: (Enhancement)
 

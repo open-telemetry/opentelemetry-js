@@ -45,7 +45,6 @@ import { Socket } from 'net';
 import { sendRequestTwice } from '../utils/rawRequest';
 
 const protocol = 'http';
-const serverPort = 32345;
 const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
 
@@ -138,14 +137,7 @@ describe('HttpInstrumentation Integration tests', () => {
     });
 
     before(() => {
-      const ignoreConfig = [
-        `${protocol}://${hostname}:${serverPort}/ignored/string`,
-        /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith('/ignored/function'),
-      ];
       instrumentation.setConfig({
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
       instrumentation.enable();
