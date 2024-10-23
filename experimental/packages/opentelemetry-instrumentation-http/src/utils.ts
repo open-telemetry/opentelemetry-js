@@ -147,39 +147,6 @@ export const satisfiesPattern = (
 };
 
 /**
- * Check whether the given request is ignored by configuration
- * It will not re-throw exceptions from `list` provided by the client
- * @param constant e.g URL of request
- * @param [list] List of ignore patterns
- * @param [onException] callback for doing something when an exception has
- *     occurred
- */
-export const isIgnored = (
-  constant: string,
-  list?: IgnoreMatcher[],
-  onException?: (error: unknown) => void
-): boolean => {
-  if (!list) {
-    // No ignored urls - trace everything
-    return false;
-  }
-  // Try/catch outside the loop for failing fast
-  try {
-    for (const pattern of list) {
-      if (satisfiesPattern(constant, pattern)) {
-        return true;
-      }
-    }
-  } catch (e) {
-    if (onException) {
-      onException(e);
-    }
-  }
-
-  return false;
-};
-
-/**
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span

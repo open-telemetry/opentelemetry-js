@@ -46,8 +46,6 @@ import { httpsRequest } from '../utils/httpsRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
 
 const protocol = 'https';
-const serverPort = 42345;
-const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
 
 export const customAttributeFunction = (span: Span): void => {
@@ -139,15 +137,8 @@ describe('HttpsInstrumentation Integration tests', () => {
     });
 
     before(() => {
-      const ignoreConfig = [
-        `${protocol}://${hostname}:${serverPort}/ignored/string`,
-        /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith('/ignored/function'),
-      ];
       propagation.setGlobalPropagator(new DummyPropagation());
       instrumentation.setConfig({
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
       instrumentation.enable();

@@ -51,7 +51,6 @@ export {
   getRequestInfo,
   headerCapture,
   isCompressed,
-  isIgnored,
   isValidOptionsType,
   parseResponseStatus,
   satisfiesPattern,

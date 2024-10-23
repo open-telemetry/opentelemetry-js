@@ -84,18 +84,8 @@ export interface StartOutgoingSpanCustomAttributeFunction {
  * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
 export interface HttpInstrumentationConfig extends InstrumentationConfig {
-  /**
-   * Not trace all incoming requests that match paths
-   * @deprecated use `ignoreIncomingRequestHook` instead
-   */
-  ignoreIncomingPaths?: IgnoreMatcher[];
   /** Not trace all incoming requests that matched with custom function */
   ignoreIncomingRequestHook?: IgnoreIncomingRequestFunction;
-  /**
-   * Not trace all outgoing requests that match urls
-   * @deprecated use `ignoreOutgoingRequestHook` instead
-   */
-  ignoreOutgoingUrls?: IgnoreMatcher[];
   /** Not trace all outgoing requests that matched with custom function */
   ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
   /** If set to true, incoming requests will not be instrumented at all. */

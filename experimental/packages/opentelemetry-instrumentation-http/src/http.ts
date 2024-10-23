@@ -86,7 +86,6 @@ import {
   getOutgoingRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
-  isIgnored,
   isValidOptionsType,
   parseResponseStatus,
   setSpanWithError,
@@ -603,9 +602,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const request = args[0] as http.IncomingMessage;
       const response = args[1] as http.ServerResponse & { socket: Socket };
-      const pathname = request.url
-        ? url.parse(request.url).pathname || '/'
-        : '/';
       const method = request.method || 'GET';
 
       instrumentation._diag.debug(
@@ -613,12 +609,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       );
 
       if (
-        isIgnored(
-          pathname,
-          instrumentation.getConfig().ignoreIncomingPaths,
-          (e: unknown) =>
-            instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
-        ) ||
         safeExecuteInTheMiddle(
           () =>
             instrumentation.getConfig().ignoreIncomingRequestHook?.(request),
@@ -767,10 +757,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as http.RequestOptions)
           : undefined;
-      const { origin, pathname, method, optionsParsed } = getRequestInfo(
-        options,
-        extraOptions
-      );
+      const { method, optionsParsed } = getRequestInfo(options, extraOptions);
       /**
        * Node 8's https module directly call the http one so to avoid creating
        * 2 span for the same request we need to check that the protocol is correct
@@ -785,12 +772,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
 
       if (
-        isIgnored(
-          origin + pathname,
-          instrumentation.getConfig().ignoreOutgoingUrls,
-          (e: unknown) =>
-            instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
-        ) ||
         safeExecuteInTheMiddle(
           () =>
             instrumentation
