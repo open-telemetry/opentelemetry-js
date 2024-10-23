@@ -19,34 +19,39 @@ import { AnyValue } from './AnyValue';
 import { SeverityNumber } from './LogRecord';
 
 export interface EventRecord {
-  /**
+
+ /**
    * The name of the event.
    */
-  name: string;
+ name: string;
 
-  /**
+ /**
    * The time when the event occurred as UNIX Epoch time in nanoseconds.
    */
-  timestamp?: TimeInput;
+ timestamp?: TimeInput;
 
-  /**
-   * Data that describes the event.
-   * Intended to be used by instrumentation libraries.
-   */
-  data?: AnyValue;
+ /**
+  * Data that describes the event.
+  * Intended to be used by instrumentation libraries.
+  */
+ data?: AnyValue;
 
-  /**
-   * Additional attributes that describe the event.
-   */
-  attributes?: Attributes;
+ /**
+  * Additional attributes that describe the event.
+  */
+ attributes?: Attributes;
 
-  /**
-   * Numerical value of the severity.
-   */
-  severityNumber?: SeverityNumber;
+ /**
+  * Numerical value of the severity.
+  */
+ severityNumber?: SeverityNumber;
 
-  /**
-   * The Context associated with the Event.
-   */
-  context?: Context;
+ /**
+  * The Context associated with the Event.
+  */
+ context?: Context;
 }
+
+
+
+
