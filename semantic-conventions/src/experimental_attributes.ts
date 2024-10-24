@@ -1163,7 +1163,7 @@ export const ATTR_CONTAINER_COMMAND_LINE = 'container.command_line' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `cpu.mode`
+ * @deprecated Replaced by `cpu.mode`
  */
 export const ATTR_CONTAINER_CPU_STATE = 'container.cpu.state' as const;
 
@@ -1253,7 +1253,7 @@ export const ATTR_CONTAINER_LABEL = (key: string) => `container.label.${key}`;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `container.label`.
+ * @deprecated Replaced by `container.label`.
  */
 export const ATTR_CONTAINER_LABELS = (key: string) => `container.labels.${key}`;
 
@@ -1444,7 +1444,7 @@ export const ATTR_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT = 'db.cassandra.specu
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.collection.name`.
+ * @deprecated Replaced by `db.collection.name`.
  */
 export const ATTR_DB_CASSANDRA_TABLE = 'db.cassandra.table' as const;
 
@@ -1483,7 +1483,7 @@ export const DB_CLIENT_CONNECTION_STATE_VALUE_USED = "used" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.pool.name`.
+ * @deprecated Replaced by `db.client.connection.pool.name`.
  */
 export const ATTR_DB_CLIENT_CONNECTIONS_POOL_NAME = 'db.client.connections.pool.name' as const;
 
@@ -1494,7 +1494,7 @@ export const ATTR_DB_CLIENT_CONNECTIONS_POOL_NAME = 'db.client.connections.pool.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.state`.
+ * @deprecated Replaced by `db.client.connection.state`.
  */
 export const ATTR_DB_CLIENT_CONNECTIONS_STATE = 'db.client.connections.state' as const;
 
@@ -1530,7 +1530,8 @@ export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * "Replaced by `server.address` and `server.port`."
+ * @deprecated "Replaced by `server.address` and `server.port`."
+
  */
 export const ATTR_DB_CONNECTION_STRING = 'db.connection_string' as const;
 
@@ -1567,7 +1568,7 @@ export const DB_COSMOSDB_CONNECTION_MODE_VALUE_GATEWAY = "gateway" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.collection.name`.
+ * @deprecated Replaced by `db.collection.name`.
  */
 export const ATTR_DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container' as const;
 
@@ -1700,7 +1701,7 @@ export const ATTR_DB_COSMOSDB_SUB_STATUS_CODE = 'db.cosmosdb.sub_status_code' as
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.namespace`.
+ * @deprecated Replaced by `db.namespace`.
  */
 export const ATTR_DB_ELASTICSEARCH_CLUSTER_NAME = 'db.elasticsearch.cluster.name' as const;
 
@@ -1733,7 +1734,7 @@ export const ATTR_DB_ELASTICSEARCH_PATH_PARTS = (key: string) => `db.elasticsear
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Deprecated, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.
+ * @deprecated Deprecated, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.
  */
 export const ATTR_DB_INSTANCE_ID = 'db.instance.id' as const;
 
@@ -1746,7 +1747,7 @@ export const ATTR_DB_INSTANCE_ID = 'db.instance.id' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Removed as not used.
+ * @deprecated Removed as not used.
  */
 export const ATTR_DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname' as const;
 
@@ -1757,7 +1758,7 @@ export const ATTR_DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname' as const
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.collection.name`.
+ * @deprecated Replaced by `db.collection.name`.
  */
 export const ATTR_DB_MONGODB_COLLECTION = 'db.mongodb.collection' as const;
 
@@ -1768,7 +1769,7 @@ export const ATTR_DB_MONGODB_COLLECTION = 'db.mongodb.collection' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Deprecated, no replacement at this time.
+ * @deprecated Deprecated, no replacement at this time.
  */
 export const ATTR_DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name' as const;
 
@@ -1781,7 +1782,7 @@ export const ATTR_DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.namespace`.
+ * @deprecated Replaced by `db.namespace`.
  */
 export const ATTR_DB_NAME = 'db.name' as const;
 
@@ -1811,7 +1812,7 @@ export const ATTR_DB_NAMESPACE = 'db.namespace' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.operation.name`.
+ * @deprecated Replaced by `db.operation.name`.
  */
 export const ATTR_DB_OPERATION = 'db.operation' as const;
 
@@ -1887,7 +1888,7 @@ export const ATTR_DB_QUERY_TEXT = 'db.query.text' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.namespace`.
+ * @deprecated Replaced by `db.namespace`.
  */
 export const ATTR_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index' as const;
 
@@ -1898,7 +1899,7 @@ export const ATTR_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.collection.name`.
+ * @deprecated Replaced by `db.collection.name`.
  */
 export const ATTR_DB_SQL_TABLE = 'db.sql.table' as const;
 
@@ -1911,7 +1912,7 @@ export const ATTR_DB_SQL_TABLE = 'db.sql.table' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.query.text`.
+ * @deprecated Replaced by `db.query.text`.
  */
 export const ATTR_DB_STATEMENT = 'db.statement' as const;
 
@@ -2203,7 +2204,7 @@ export const DB_SYSTEM_VALUE_VERTICA = "vertica" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * No replacement at this time.
+ * @deprecated No replacement at this time.
  */
 export const ATTR_DB_USER = 'db.user' as const;
 
@@ -2216,7 +2217,7 @@ export const ATTR_DB_USER = 'db.user' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Deprecated, use `deployment.environment.name` instead.
+ * @deprecated Deprecated, use `deployment.environment.name` instead.
  */
 export const ATTR_DEPLOYMENT_ENVIRONMENT = 'deployment.environment' as const;
 
@@ -2391,7 +2392,7 @@ export const ATTR_DNS_QUESTION_NAME = 'dns.question.name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `user.id` attribute.
+ * @deprecated Replaced by `user.id` attribute.
  */
 export const ATTR_ENDUSER_ID = 'enduser.id' as const;
 
@@ -2402,7 +2403,7 @@ export const ATTR_ENDUSER_ID = 'enduser.id' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `user.roles` attribute.
+ * @deprecated Replaced by `user.roles` attribute.
  */
 export const ATTR_ENDUSER_ROLE = 'enduser.role' as const;
 
@@ -2413,7 +2414,7 @@ export const ATTR_ENDUSER_ROLE = 'enduser.role' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Removed.
+ * @deprecated Removed.
  */
 export const ATTR_ENDUSER_SCOPE = 'enduser.scope' as const;
 
@@ -3039,7 +3040,7 @@ export const GEN_AI_TOKEN_TYPE_VALUE_COMPLETION = "output" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `gen_ai.usage.output_tokens` attribute.
+ * @deprecated Replaced by `gen_ai.usage.output_tokens` attribute.
  */
 export const ATTR_GEN_AI_USAGE_COMPLETION_TOKENS = 'gen_ai.usage.completion_tokens' as const;
 
@@ -3068,7 +3069,7 @@ export const ATTR_GEN_AI_USAGE_OUTPUT_TOKENS = 'gen_ai.usage.output_tokens' as c
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `gen_ai.usage.input_tokens` attribute.
+ * @deprecated Replaced by `gen_ai.usage.input_tokens` attribute.
  */
 export const ATTR_GEN_AI_USAGE_PROMPT_TOKENS = 'gen_ai.usage.prompt_tokens' as const;
 
@@ -3366,7 +3367,7 @@ export const ATTR_HOST_TYPE = 'host.type' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `client.address`.
+ * @deprecated Replaced by `client.address`.
  */
 export const ATTR_HTTP_CLIENT_IP = 'http.client_ip' as const;
 
@@ -3396,7 +3397,7 @@ export const HTTP_CONNECTION_STATE_VALUE_IDLE = "idle" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.protocol.name`.
+ * @deprecated Replaced by `network.protocol.name`.
  */
 export const ATTR_HTTP_FLAVOR = 'http.flavor' as const;
 
@@ -3437,7 +3438,7 @@ export const HTTP_FLAVOR_VALUE_SPDY = "SPDY" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.
+ * @deprecated Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.
  */
 export const ATTR_HTTP_HOST = 'http.host' as const;
 
@@ -3452,7 +3453,7 @@ export const ATTR_HTTP_HOST = 'http.host' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `http.request.method`.
+ * @deprecated Replaced by `http.request.method`.
  */
 export const ATTR_HTTP_METHOD = 'http.method' as const;
 
@@ -3481,7 +3482,7 @@ export const ATTR_HTTP_REQUEST_SIZE = 'http.request.size' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `http.request.header.content-length`.
+ * @deprecated Replaced by `http.request.header.content-length`.
  */
 export const ATTR_HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length' as const;
 
@@ -3492,7 +3493,7 @@ export const ATTR_HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length' as
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `http.request.body.size`.
+ * @deprecated Replaced by `http.request.body.size`.
  */
 export const ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed' as const;
 
@@ -3521,7 +3522,7 @@ export const ATTR_HTTP_RESPONSE_SIZE = 'http.response.size' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `http.response.header.content-length`.
+ * @deprecated Replaced by `http.response.header.content-length`.
  */
 export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length' as const;
 
@@ -3532,7 +3533,7 @@ export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length' 
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replace by `http.response.body.size`.
+ * @deprecated Replace by `http.response.body.size`.
  */
 export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed' as const;
 
@@ -3545,7 +3546,7 @@ export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_con
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `url.scheme` instead.
+ * @deprecated Replaced by `url.scheme` instead.
  */
 export const ATTR_HTTP_SCHEME = 'http.scheme' as const;
 
@@ -3556,7 +3557,7 @@ export const ATTR_HTTP_SCHEME = 'http.scheme' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `server.address`.
+ * @deprecated Replaced by `server.address`.
  */
 export const ATTR_HTTP_SERVER_NAME = 'http.server_name' as const;
 
@@ -3567,7 +3568,7 @@ export const ATTR_HTTP_SERVER_NAME = 'http.server_name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `http.response.status_code`.
+ * @deprecated Replaced by `http.response.status_code`.
  */
 export const ATTR_HTTP_STATUS_CODE = 'http.status_code' as const;
 
@@ -3578,7 +3579,7 @@ export const ATTR_HTTP_STATUS_CODE = 'http.status_code' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Split to `url.path` and `url.query.
+ * @deprecated Split to `url.path` and `url.query.
  */
 export const ATTR_HTTP_TARGET = 'http.target' as const;
 
@@ -3589,7 +3590,7 @@ export const ATTR_HTTP_TARGET = 'http.target' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `url.full`.
+ * @deprecated Replaced by `url.full`.
  */
 export const ATTR_HTTP_URL = 'http.url' as const;
 
@@ -3602,7 +3603,7 @@ export const ATTR_HTTP_URL = 'http.url' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `user_agent.original`.
+ * @deprecated Replaced by `user_agent.original`.
  */
 export const ATTR_HTTP_USER_AGENT = 'http.user_agent' as const;
 
@@ -3613,7 +3614,7 @@ export const ATTR_HTTP_USER_AGENT = 'http.user_agent' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Moved to a payload field of `device.app.lifecycle`.
+ * @deprecated Moved to a payload field of `device.app.lifecycle`.
  */
 export const ATTR_IOS_STATE = 'ios.state' as const;
 
@@ -3855,7 +3856,7 @@ export const ATTR_K8S_POD_LABEL = (key: string) => `k8s.pod.label.${key}`;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `k8s.pod.label`.
+ * @deprecated Replaced by `k8s.pod.label`.
  */
 export const ATTR_K8S_POD_LABELS = (key: string) => `k8s.pod.labels.${key}`;
 
@@ -4017,7 +4018,7 @@ export const ATTR_LOG_RECORD_UID = 'log.record.uid' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `rpc.message.compressed_size`.
+ * @deprecated Replaced by `rpc.message.compressed_size`.
  */
 export const ATTR_MESSAGE_COMPRESSED_SIZE = 'message.compressed_size' as const;
 
@@ -4026,7 +4027,7 @@ export const ATTR_MESSAGE_COMPRESSED_SIZE = 'message.compressed_size' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `rpc.message.id`.
+ * @deprecated Replaced by `rpc.message.id`.
  */
 export const ATTR_MESSAGE_ID = 'message.id' as const;
 
@@ -4035,7 +4036,7 @@ export const ATTR_MESSAGE_ID = 'message.id' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `rpc.message.type`.
+ * @deprecated Replaced by `rpc.message.type`.
  */
 export const ATTR_MESSAGE_TYPE = 'message.type' as const;
 
@@ -4054,7 +4055,7 @@ export const MESSAGE_TYPE_VALUE_SENT = "SENT" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `rpc.message.uncompressed_size`.
+ * @deprecated Replaced by `rpc.message.uncompressed_size`.
  */
 export const ATTR_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size' as const;
 
@@ -4161,7 +4162,7 @@ export const ATTR_MESSAGING_DESTINATION_TEMPORARY = 'messaging.destination.tempo
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * No replacement at this time.
+ * @deprecated No replacement at this time.
  */
 export const ATTR_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = 'messaging.destination_publish.anonymous' as const;
 
@@ -4174,7 +4175,7 @@ export const ATTR_MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = 'messaging.destinati
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * No replacement at this time.
+ * @deprecated No replacement at this time.
  */
 export const ATTR_MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_publish.name' as const;
 
@@ -4185,7 +4186,8 @@ export const ATTR_MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_pu
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.consumer.group.name`.
+ * @deprecated Replaced by `messaging.consumer.group.name`.
+
  */
 export const ATTR_MESSAGING_EVENTHUBS_CONSUMER_GROUP = 'messaging.eventhubs.consumer.group' as const;
 
@@ -4241,7 +4243,8 @@ export const ATTR_MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY = 'messaging.gcp_pub
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.consumer.group.name`.
+ * @deprecated Replaced by `messaging.consumer.group.name`.
+
  */
 export const ATTR_MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group' as const;
 
@@ -4252,7 +4255,7 @@ export const ATTR_MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.gro
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.destination.partition.id`.
+ * @deprecated Replaced by `messaging.destination.partition.id`.
  */
 export const ATTR_MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition' as const;
 
@@ -4274,7 +4277,8 @@ export const ATTR_MESSAGING_KAFKA_MESSAGE_KEY = 'messaging.kafka.message.key' as
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.kafka.offset`.
+ * @deprecated Replaced by `messaging.kafka.offset`.
+
  */
 export const ATTR_MESSAGING_KAFKA_MESSAGE_OFFSET = 'messaging.kafka.message.offset' as const;
 
@@ -4347,7 +4351,7 @@ export const ATTR_MESSAGING_MESSAGE_ID = 'messaging.message.id' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.operation.type`.
+ * @deprecated Replaced by `messaging.operation.type`.
  */
 export const ATTR_MESSAGING_OPERATION = 'messaging.operation' as const;
 
@@ -4428,7 +4432,8 @@ export const ATTR_MESSAGING_RABBITMQ_MESSAGE_DELIVERY_TAG = 'messaging.rabbitmq.
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
+ * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
+
  */
 export const ATTR_MESSAGING_ROCKETMQ_CLIENT_GROUP = 'messaging.rocketmq.client_group' as const;
 
@@ -4539,7 +4544,8 @@ export const ATTR_MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace' 
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.servicebus.destination.subscription_name`.
+ * @deprecated Replaced by `messaging.servicebus.destination.subscription_name`.
+
  */
 export const ATTR_MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME = 'messaging.servicebus.destination.subscription_name' as const;
 
@@ -4659,7 +4665,7 @@ export const MESSAGING_SYSTEM_VALUE_SERVICEBUS = "servicebus" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.local.address`.
+ * @deprecated Replaced by `network.local.address`.
  */
 export const ATTR_NET_HOST_IP = 'net.host.ip' as const;
 
@@ -4670,7 +4676,7 @@ export const ATTR_NET_HOST_IP = 'net.host.ip' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `server.address`.
+ * @deprecated Replaced by `server.address`.
  */
 export const ATTR_NET_HOST_NAME = 'net.host.name' as const;
 
@@ -4681,7 +4687,7 @@ export const ATTR_NET_HOST_NAME = 'net.host.name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `server.port`.
+ * @deprecated Replaced by `server.port`.
  */
 export const ATTR_NET_HOST_PORT = 'net.host.port' as const;
 
@@ -4692,7 +4698,7 @@ export const ATTR_NET_HOST_PORT = 'net.host.port' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.peer.address`.
+ * @deprecated Replaced by `network.peer.address`.
  */
 export const ATTR_NET_PEER_IP = 'net.peer.ip' as const;
 
@@ -4703,7 +4709,7 @@ export const ATTR_NET_PEER_IP = 'net.peer.ip' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `server.address` on client spans and `client.address` on server spans.
+ * @deprecated Replaced by `server.address` on client spans and `client.address` on server spans.
  */
 export const ATTR_NET_PEER_NAME = 'net.peer.name' as const;
 
@@ -4714,7 +4720,7 @@ export const ATTR_NET_PEER_NAME = 'net.peer.name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `server.port` on client spans and `client.port` on server spans.
+ * @deprecated Replaced by `server.port` on client spans and `client.port` on server spans.
  */
 export const ATTR_NET_PEER_PORT = 'net.peer.port' as const;
 
@@ -4729,7 +4735,7 @@ export const ATTR_NET_PEER_PORT = 'net.peer.port' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.protocol.name`.
+ * @deprecated Replaced by `network.protocol.name`.
  */
 export const ATTR_NET_PROTOCOL_NAME = 'net.protocol.name' as const;
 
@@ -4740,7 +4746,7 @@ export const ATTR_NET_PROTOCOL_NAME = 'net.protocol.name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.protocol.version`.
+ * @deprecated Replaced by `network.protocol.version`.
  */
 export const ATTR_NET_PROTOCOL_VERSION = 'net.protocol.version' as const;
 
@@ -4749,7 +4755,7 @@ export const ATTR_NET_PROTOCOL_VERSION = 'net.protocol.version' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Split to `network.transport` and `network.type`.
+ * @deprecated Split to `network.transport` and `network.type`.
  */
 export const ATTR_NET_SOCK_FAMILY = 'net.sock.family' as const;
 
@@ -4775,7 +4781,7 @@ export const NET_SOCK_FAMILY_VALUE_UNIX = "unix" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.local.address`.
+ * @deprecated Replaced by `network.local.address`.
  */
 export const ATTR_NET_SOCK_HOST_ADDR = 'net.sock.host.addr' as const;
 
@@ -4786,7 +4792,7 @@ export const ATTR_NET_SOCK_HOST_ADDR = 'net.sock.host.addr' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.local.port`.
+ * @deprecated Replaced by `network.local.port`.
  */
 export const ATTR_NET_SOCK_HOST_PORT = 'net.sock.host.port' as const;
 
@@ -4797,7 +4803,7 @@ export const ATTR_NET_SOCK_HOST_PORT = 'net.sock.host.port' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.peer.address`.
+ * @deprecated Replaced by `network.peer.address`.
  */
 export const ATTR_NET_SOCK_PEER_ADDR = 'net.sock.peer.addr' as const;
 
@@ -4808,7 +4814,7 @@ export const ATTR_NET_SOCK_PEER_ADDR = 'net.sock.peer.addr' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Removed.
+ * @deprecated Removed.
  */
 export const ATTR_NET_SOCK_PEER_NAME = 'net.sock.peer.name' as const;
 
@@ -4819,7 +4825,7 @@ export const ATTR_NET_SOCK_PEER_NAME = 'net.sock.peer.name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.peer.port`.
+ * @deprecated Replaced by `network.peer.port`.
  */
 export const ATTR_NET_SOCK_PEER_PORT = 'net.sock.peer.port' as const;
 
@@ -4828,7 +4834,7 @@ export const ATTR_NET_SOCK_PEER_PORT = 'net.sock.peer.port' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `network.transport`.
+ * @deprecated Replaced by `network.transport`.
  */
 export const ATTR_NET_TRANSPORT = 'net.transport' as const;
 
@@ -5208,7 +5214,7 @@ export const ATTR_OS_VERSION = 'os.version' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * use the `otel.scope.name` attribute.
+ * @deprecated use the `otel.scope.name` attribute.
  */
 export const ATTR_OTEL_LIBRARY_NAME = 'otel.library.name' as const;
 
@@ -5219,7 +5225,7 @@ export const ATTR_OTEL_LIBRARY_NAME = 'otel.library.name' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * use the `otel.scope.version` attribute.
+ * @deprecated use the `otel.scope.version` attribute.
  */
 export const ATTR_OTEL_LIBRARY_VERSION = 'otel.library.version' as const;
 
@@ -5239,7 +5245,7 @@ export const ATTR_PEER_SERVICE = 'peer.service' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.pool.name`.
+ * @deprecated Replaced by `db.client.connection.pool.name`.
  */
 export const ATTR_POOL_NAME = 'pool.name' as const;
 
@@ -5294,7 +5300,7 @@ export const PROCESS_CONTEXT_SWITCH_TYPE_VALUE_VOLUNTARY = "voluntary" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `cpu.mode`
+ * @deprecated Replaced by `cpu.mode`
  */
 export const ATTR_PROCESS_CPU_STATE = 'process.cpu.state' as const;
 
@@ -5980,7 +5986,7 @@ export const ATTR_SOURCE_PORT = 'source.port' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.state`.
+ * @deprecated Replaced by `db.client.connection.state`.
  */
 export const ATTR_STATE = 'state' as const;
 
@@ -6012,7 +6018,7 @@ export const ATTR_SYSTEM_CPU_LOGICAL_NUMBER = 'system.cpu.logical_number' as con
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `cpu.mode`
+ * @deprecated Replaced by `cpu.mode`
  */
 export const ATTR_SYSTEM_CPU_STATE = 'system.cpu.state' as const;
 
@@ -6339,7 +6345,7 @@ export const SYSTEM_PROCESS_STATUS_VALUE_STOPPED = "stopped" as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `system.process.status`.
+ * @deprecated Replaced by `system.process.status`.
  */
 export const ATTR_SYSTEM_PROCESSES_STATUS = 'system.processes.status' as const;
 
@@ -6597,7 +6603,7 @@ export const ATTR_TLS_CLIENT_NOT_BEFORE = 'tls.client.not_before' as const;
  *
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `server.address.
+ * @deprecated Replaced by `server.address.
  */
 export const ATTR_TLS_CLIENT_SERVER_NAME = 'tls.client.server_name' as const;
 

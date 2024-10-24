@@ -122,7 +122,7 @@ export const METRIC_DB_CLIENT_CONNECTION_WAIT_TIME = 'db.client.connection.wait_
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.create_time`. Note: the unit also changed from `ms` to `s`.
+ * @deprecated Replaced by `db.client.connection.create_time`. Note: the unit also changed from `ms` to `s`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_CREATE_TIME = 'db.client.connections.create_time' as const;
 
@@ -131,7 +131,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_CREATE_TIME = 'db.client.connections.c
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.idle.max`.
+ * @deprecated Replaced by `db.client.connection.idle.max`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MAX = 'db.client.connections.idle.max' as const;
 
@@ -140,7 +140,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MAX = 'db.client.connections.idle
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.idle.min`.
+ * @deprecated Replaced by `db.client.connection.idle.min`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MIN = 'db.client.connections.idle.min' as const;
 
@@ -149,7 +149,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_IDLE_MIN = 'db.client.connections.idle
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.max`.
+ * @deprecated Replaced by `db.client.connection.max`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_MAX = 'db.client.connections.max' as const;
 
@@ -158,7 +158,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_MAX = 'db.client.connections.max' as c
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.pending_requests`.
+ * @deprecated Replaced by `db.client.connection.pending_requests`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_PENDING_REQUESTS = 'db.client.connections.pending_requests' as const;
 
@@ -167,7 +167,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_PENDING_REQUESTS = 'db.client.connecti
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.timeouts`.
+ * @deprecated Replaced by `db.client.connection.timeouts`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_TIMEOUTS = 'db.client.connections.timeouts' as const;
 
@@ -176,7 +176,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_TIMEOUTS = 'db.client.connections.time
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.count`.
+ * @deprecated Replaced by `db.client.connection.count`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_USAGE = 'db.client.connections.usage' as const;
 
@@ -185,7 +185,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_USAGE = 'db.client.connections.usage' 
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.use_time`. Note: the unit also changed from `ms` to `s`.
+ * @deprecated Replaced by `db.client.connection.use_time`. Note: the unit also changed from `ms` to `s`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_time' as const;
 
@@ -194,7 +194,7 @@ export const METRIC_DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `db.client.connection.wait_time`. Note: the unit also changed from `ms` to `s`.
+ * @deprecated Replaced by `db.client.connection.wait_time`. Note: the unit also changed from `ms` to `s`.
  */
 export const METRIC_DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wait_time' as const;
 
@@ -476,7 +476,7 @@ export const METRIC_JVM_BUFFER_MEMORY_LIMIT = 'jvm.buffer.memory.limit' as const
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `jvm.buffer.memory.used`.
+ * @deprecated Replaced by `jvm.buffer.memory.used`.
  */
 export const METRIC_JVM_BUFFER_MEMORY_USAGE = 'jvm.buffer.memory.usage' as const;
 
@@ -554,7 +554,7 @@ export const METRIC_MESSAGING_PROCESS_DURATION = 'messaging.process.duration' as
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.client.consumed.messages`.
+ * @deprecated Replaced by `messaging.client.consumed.messages`.
  */
 export const METRIC_MESSAGING_PROCESS_MESSAGES = 'messaging.process.messages' as const;
 
@@ -563,7 +563,7 @@ export const METRIC_MESSAGING_PROCESS_MESSAGES = 'messaging.process.messages' as
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.client.operation.duration`.
+ * @deprecated Replaced by `messaging.client.operation.duration`.
  */
 export const METRIC_MESSAGING_PUBLISH_DURATION = 'messaging.publish.duration' as const;
 
@@ -572,7 +572,7 @@ export const METRIC_MESSAGING_PUBLISH_DURATION = 'messaging.publish.duration' as
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.client.produced.messages`.
+ * @deprecated Replaced by `messaging.client.produced.messages`.
  */
 export const METRIC_MESSAGING_PUBLISH_MESSAGES = 'messaging.publish.messages' as const;
 
@@ -581,7 +581,7 @@ export const METRIC_MESSAGING_PUBLISH_MESSAGES = 'messaging.publish.messages' as
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.client.operation.duration`.
+ * @deprecated Replaced by `messaging.client.operation.duration`.
  */
 export const METRIC_MESSAGING_RECEIVE_DURATION = 'messaging.receive.duration' as const;
 
@@ -590,7 +590,7 @@ export const METRIC_MESSAGING_RECEIVE_DURATION = 'messaging.receive.duration' as
  *
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  *
- * @deprecated  * Replaced by `messaging.client.consumed.messages`.
+ * @deprecated Replaced by `messaging.client.consumed.messages`.
  */
 export const METRIC_MESSAGING_RECEIVE_MESSAGES = 'messaging.receive.messages' as const;
 
