@@ -19,27 +19,25 @@ import type {
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
 import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
-import type { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer';
-import { OTLPExporterBrowserBase } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
+import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
 /**
  * Collector Logs Exporter for Web
  */
 export class OTLPLogExporter
-  extends OTLPExporterBrowserBase<ReadableLogRecord, IExportLogsServiceResponse>
+  extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(
-      {
-        ...config,
-      },
-      JsonLogsSerializer,
-      {
-        'Content-Type': 'application/json',
-      },
-      'v1/logs'
+      createLegacyOtlpBrowserExportDelegate(
+        config,
+        JsonLogsSerializer,
+        'v1/logs',
+        { 'Content-Type': 'application/json' }
+      )
     );
   }
 }

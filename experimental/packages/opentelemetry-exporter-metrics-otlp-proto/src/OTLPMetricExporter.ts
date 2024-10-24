@@ -15,42 +15,26 @@
  */
 
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
-import {
-  OTLPExporterNodeConfigBase,
-  OTLPExporterNodeBase,
-} from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportMetricsServiceResponse,
-  ProtobufMetricsSerializer,
-} from '@opentelemetry/otlp-transformer';
+import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
 import { VERSION } from './version';
+import {
+  convertLegacyHttpOptions,
+  createOtlpHttpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
-
-class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<
-  ResourceMetrics,
-  IExportMetricsServiceResponse
-> {
+export class OTLPMetricExporter extends OTLPMetricExporterBase {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(
-      config,
-      ProtobufMetricsSerializer,
-      {
-        ...USER_AGENT,
-        'Content-Type': 'application/x-protobuf',
-      },
-      'METRICS',
-      'v1/metrics'
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config ?? {}, 'METRICS', 'v1/metrics', {
+          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+          'Content-Type': 'application/x-protobuf',
+        }),
+        ProtobufMetricsSerializer
+      ),
+      config
     );
-  }
-}
-
-export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterNodeProxy> {
-  constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(new OTLPMetricExporterNodeProxy(config), config);
   }
 }

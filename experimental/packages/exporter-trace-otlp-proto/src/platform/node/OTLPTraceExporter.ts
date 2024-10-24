@@ -17,35 +17,31 @@
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import {
   OTLPExporterNodeConfigBase,
-  OTLPExporterNodeBase,
+  OTLPExporterBase,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportTraceServiceResponse,
-  ProtobufTraceSerializer,
-} from '@opentelemetry/otlp-transformer';
+import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
+import {
+  createOtlpHttpExportDelegate,
+  convertLegacyHttpOptions,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
 /**
  * Collector Trace Exporter for Node with protobuf
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
+  extends OTLPExporterBase<ReadableSpan[]>
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(
-      config,
-      ProtobufTraceSerializer,
-      {
-        ...USER_AGENT,
-        'Content-Type': 'application/x-protobuf',
-      },
-      'TRACES',
-      'v1/traces'
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config, 'TRACES', 'v1/traces', {
+          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+          'Content-Type': 'application/x-protobuf',
+        }),
+        ProtobufTraceSerializer
+      )
     );
   }
 }

@@ -14,40 +14,42 @@
  * limitations under the License.
  */
 
-import { diag, DiagLogger } from '@opentelemetry/api';
-import * as core from '@opentelemetry/core';
+import * as assert from 'assert';
+import * as http from 'http';
+import * as sinon from 'sinon';
+import * as zlib from 'zlib';
+import { PassThrough, Stream } from 'stream';
+
+import { diag } from '@opentelemetry/api';
 import {
   CompressionAlgorithm,
   OTLPExporterError,
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import * as assert from 'assert';
-import * as http from 'http';
-import * as sinon from 'sinon';
-import { PassThrough, Stream } from 'stream';
-import * as zlib from 'zlib';
+import * as core from '@opentelemetry/core';
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+
+import { MockedResponse } from './nodeHelpers';
 import { OTLPTraceExporter } from '../../src/platform/node';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureSpanIsCorrect,
   mockedReadableSpan,
 } from '../traceHelper';
-import { MockedResponse } from './nodeHelpers';
-import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
 
 const address = 'localhost:1501';
 
-describe('OTLPTraceExporter - node with json over http', () => {
+describe('OTLPTraceExporter - node with json over http', function () {
   let collectorExporter: OTLPTraceExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let stubRequest: sinon.SinonStub;
   let spySetHeader: sinon.SinonSpy;
   let spans: ReadableSpan[];
 
-  afterEach(() => {
+  afterEach(function () {
     fakeRequest = new Stream.PassThrough();
     Object.defineProperty(fakeRequest, 'setTimeout', {
       value: function (_timeout: number) {},
@@ -55,27 +57,20 @@ describe('OTLPTraceExporter - node with json over http', () => {
     sinon.restore();
   });
 
-  describe('instance', () => {
+  describe('instance', function () {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const warnStub = sinon.stub();
-      const nop = () => {};
-      const diagLogger: DiagLogger = {
-        debug: nop,
-        error: nop,
-        info: nop,
-        verbose: nop,
-        warn: warnStub,
-      };
-      diag.setLogger(diagLogger);
+      const warnLoggerSpy = sinon.stub(diag, 'warn');
 
       collectorExporter = new OTLPTraceExporter({
         metadata,
         url: address,
       } as any);
-      const args = warnStub.args[0];
-      assert.strictEqual(args[0], 'Metadata cannot be set when using http');
+      sinon.assert.calledOnce(warnLoggerSpy);
+      sinon.assert.calledOnceWithExactly(
+        warnLoggerSpy,
+        'Metadata cannot be set when using http'
+      );
     });
   });
 

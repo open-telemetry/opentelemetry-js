@@ -192,9 +192,8 @@ describe('OTLPMetricExporter - web', () => {
         collectorExporter.export(metrics, () => {});
 
         queueMicrotask(() => {
-          const response: any = debugStub.args[2][0];
-          assert.strictEqual(response, 'SendBeacon success');
-          assert.strictEqual(errorStub.args.length, 0);
+          sinon.assert.calledWith(debugStub, 'SendBeacon success');
+          sinon.assert.notCalled(errorStub);
 
           done();
         });

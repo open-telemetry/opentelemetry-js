@@ -19,35 +19,30 @@ import type {
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import type { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer';
-import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
-
 import { VERSION } from '../../version';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
+import {
+  convertLegacyHttpOptions,
+  createOtlpHttpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
 /**
  * Collector Logs Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPExporterNodeBase<ReadableLogRecord, IExportLogsServiceResponse>
+  extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(
-      {
-        ...config,
-      },
-      JsonLogsSerializer,
-      {
-        ...USER_AGENT,
-        'Content-Type': 'application/json',
-      },
-      'LOGS',
-      'v1/logs'
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config, 'LOGS', 'v1/logs', {
+          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+          'Content-Type': 'application/json',
+        }),
+        JsonLogsSerializer
+      )
     );
   }
 }

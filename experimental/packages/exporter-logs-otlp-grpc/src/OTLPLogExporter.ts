@@ -16,31 +16,28 @@
 
 import { LogRecordExporter, ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import {
+  convertLegacyOtlpGrpcOptions,
+  createOtlpGrpcExportDelegate,
   OTLPGRPCExporterConfigNode,
-  OTLPGRPCExporterNodeBase,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import {
-  IExportLogsServiceResponse,
-  ProtobufLogsSerializer,
-} from '@opentelemetry/otlp-transformer';
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Logs Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPGRPCExporterNodeBase<
-    ReadableLogRecord,
-    IExportLogsServiceResponse
-  >
+  extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(
-      config,
-      ProtobufLogsSerializer,
-      'LogsExportService',
-      '/opentelemetry.proto.collector.logs.v1.LogsService/Export',
-      'LOGS'
+      createOtlpGrpcExportDelegate(
+        convertLegacyOtlpGrpcOptions(config, 'LOGS'),
+        ProtobufLogsSerializer,
+        'LogsExportService',
+        '/opentelemetry.proto.collector.logs.v1.LogsService/Export'
+      )
     );
   }
 }

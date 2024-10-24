@@ -23,8 +23,8 @@ import type {
 // as they'd be imported before the http/https modules can be wrapped.
 import type * as https from 'https';
 import type * as http from 'http';
-import { ExportResponse } from '../../export-response';
-import { IExporterTransport } from '../../exporter-transport';
+import { ExportResponse } from '../export-response';
+import { IExporterTransport } from '../exporter-transport';
 
 class HttpExporterTransport implements IExporterTransport {
   private _send: sendWithHttp | null = null;

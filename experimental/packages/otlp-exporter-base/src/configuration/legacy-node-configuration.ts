@@ -14,5 +14,26 @@
  * limitations under the License.
  */
 
-export { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
-export { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
+import type * as http from 'http';
+import type * as https from 'https';
+
+import { OTLPExporterConfigBase } from './legacy-base-configuration';
+
+/**
+ * @deprecated
+ *
+ * Collector Exporter node base config
+ */
+export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
+  keepAlive?: boolean;
+  compression?: CompressionAlgorithm;
+  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
+}
+
+/**
+ * @deprecated
+ */
+export enum CompressionAlgorithm {
+  NONE = 'none',
+  GZIP = 'gzip',
+}

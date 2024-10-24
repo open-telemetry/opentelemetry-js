@@ -15,33 +15,33 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
-import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { IExportTraceServiceResponse } from '@opentelemetry/otlp-transformer';
+import {
+  OTLPExporterNodeConfigBase,
+  OTLPExporterBase,
+} from '@opentelemetry/otlp-exporter-base';
 import { VERSION } from '../../version';
 import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
+import {
+  convertLegacyHttpOptions,
+  createOtlpHttpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
 /**
  * Collector Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
+  extends OTLPExporterBase<ReadableSpan[]>
   implements SpanExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(
-      config,
-      JsonTraceSerializer,
-      {
-        ...USER_AGENT,
-        'Content-Type': 'application/json',
-      },
-      'TRACES',
-      'v1/traces'
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config, 'TRACES', 'v1/traces', {
+          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+          'Content-Type': 'application/json',
+        }),
+        JsonTraceSerializer
+      )
     );
   }
 }
