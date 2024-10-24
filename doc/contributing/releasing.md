@@ -25,8 +25,6 @@ We aim to eventually automate this process as much as possible.
 
 ## 3. Publish to NPM
 
-### Publishing
-
 > [!IMPORTANT]
 > This step will publish anything that's on `main` IF AND ONLY IF the version has been bumped. If the version for a package
 > has not been bumped, it will not publish a new version of the package.
