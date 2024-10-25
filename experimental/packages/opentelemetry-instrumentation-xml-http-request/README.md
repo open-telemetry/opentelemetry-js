@@ -88,7 +88,7 @@ Attributes collected:
 | `http.scheme`                               | The URI scheme identifying the used protocol                                   |
 | `http.url`                                  | Full HTTP request URL                                                          |
 | `http.method`                               | HTTP request method                                                            |
-| `http.request.body.size`                    | Uncompressed size of the request body, if any body exists                      |
+| `http.request_content_length_uncompressed`  | Uncompressed size of the request body, if any body exists                      |
 
 ## Example Screenshots
 

@@ -31,8 +31,8 @@ import {
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
-import { ATTR_HTTP_REQUEST_BODY_SIZE } from '@opentelemetry/semantic-conventions/incubating';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
@@ -329,7 +329,10 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
             .then(length => {
               if (!length) return;
 
-              createdSpan.setAttribute(ATTR_HTTP_REQUEST_BODY_SIZE, length);
+              createdSpan.setAttribute(
+                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+                length
+              );
             })
             .catch(error => {
               plugin._diag.warn('getFetchBodyLength', error);
