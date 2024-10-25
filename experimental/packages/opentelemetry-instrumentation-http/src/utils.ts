@@ -771,12 +771,8 @@ export const getIncomingRequestAttributes = (
   const userAgent = headers['user-agent'];
   const ips = headers['x-forwarded-for'];
   const httpVersion = request.httpVersion;
-  // TODO: is there a way host is not set? I don't think so
   const host = headers.host;
-  let hostname = 'localhost';
-  if (host != null && host !== '') {
-    hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1');
-  }
+  const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
 
   const method = request.method;
   const normalizedMethod = normalizeMethod(method);
