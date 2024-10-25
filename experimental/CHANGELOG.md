@@ -29,6 +29,7 @@ All notable changes to experimental packages in this project will be documented 
   * Applies to client and server spans and metrics
   * Generate spans and metrics compliant with Semantic Conventions 1.27+ when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` or `http/dup`
   * Generate spans and metrics backwards compatible with previous attributes when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT contain `http`
+* feat(instrumentation): Track request body size in XHR and Fetch instrumentations [#4706](https://github.com/open-telemetry/opentelemetry-js/pull/4706) @mustafahaddara
 
 ### :bug: (Bug Fix)
 
@@ -81,7 +82,6 @@ All notable changes to experimental packages in this project will be documented 
 * feat(otlp-transformer): Do not limit @opentelemetry/api upper range peerDependency [#4816](https://github.com/open-telemetry/opentelemetry-js/pull/4816) @mydea
 * feat(instrumentation-http): Allow to opt-out of instrumenting incoming/outgoing requests [#4643](https://github.com/open-telemetry/opentelemetry-js/pull/4643) @mydea
 * feat(sampler-jaeger-remote): added support of jaeger-remote-sampler according to this [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#jaegerremotesampler) [#4534](https://github.com/open-telemetry/opentelemetry-js/pull/4589) @legalimpurity
-* feat(instrumentation): Track request body size in XHR and Fetch instrumentations [#4706](https://github.com/open-telemetry/opentelemetry-js/pull/4706) @mustafahaddara
 
 ### :bug: (Bug Fix)
 
