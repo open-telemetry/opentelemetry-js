@@ -8,6 +8,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
+* feat(instrumentation): Track request body size in XHR and Fetch instrumentations [#4706](https://github.com/open-telemetry/opentelemetry-js/pull/4706) @mustafahaddara
 
 ### :bug: (Bug Fix)
 
@@ -45,7 +46,6 @@ All notable changes to experimental packages in this project will be documented 
   * Applies to client and server spans and metrics
   * Generate spans and metrics compliant with Semantic Conventions 1.27+ when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http` or `http/dup`
   * Generate spans and metrics backwards compatible with previous attributes when `OTEL_SEMCONV_STABILITY_OPT_IN` contains `http/dup` or DOES NOT contain `http`
-* feat(instrumentation): Track request body size in XHR and Fetch instrumentations [#4706](https://github.com/open-telemetry/opentelemetry-js/pull/4706) @mustafahaddara
 
 ### :bug: (Bug Fix)
 
