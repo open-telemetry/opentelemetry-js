@@ -56,7 +56,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Bug Reproduciton
+        ## Bug Reproduction
         > [!IMPORTANT]
         >  **If you use a third-party package that re-distributes OpenTelemetry, open the bug ticket with that third party unless you can provide steps to reproduce this with pure OpenTelemetry.**
         >  Digging into third-party distributions of OpenTelemetry is not in scope for this project.
