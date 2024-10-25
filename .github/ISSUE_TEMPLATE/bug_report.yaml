@@ -47,7 +47,7 @@ body:
     id: bundlng
     attributes:
       description: |
-        Bundling removes `require` and `import` statements, which results in most `@opentelemetry/instrumentation-*` packages not working as they rely on the presense
+        Bundling removes `require` and `import` statements, which results in most `@opentelemetry/instrumentation-*` packages not working as they rely on the presence
         of these statements to function.
       label: Bundling and `@opentelemetry/instrumentation-*`packages
       options:
