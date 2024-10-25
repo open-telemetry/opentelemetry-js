@@ -8,7 +8,7 @@ body:
         > [!IMPORTANT]
         > **Please read all parts of this form carefully.** By following the instructions carefully, you ensure that we
         > can get started fixing your bug, instead of being stuck at trying to reproduce your issue. Please provide
-        > ALL requested information, even if you think it does not apply to your problem.
+        > all requested information, even if you think it does not apply to your problem.
   - type: markdown
     attributes:
       value: |
@@ -18,9 +18,10 @@ body:
     attributes:
       description: |
         > [!NOTE]
-        > If you depend on experimental packages with a range like `"@opentelemetry/sdk-node": "^0.53.0"` that does **NOT**
-        > pull in any versions other than `@opentelemetry/sdk-node@0.53.x`. `0.54.x` **WILL NOT** be picked up by this constraint due
-        > to the way semantic versioning works for `0.x` packages. This is intentional, see https://semver.org/ for details.
+        > If you depend on experimental packages with a range like `opentelemetry/sdk-node@^0.53.0` that is equivalent
+        > to `@opentelemetry/sdk-node@0.53.x`, NOT `@opentelemetry/sdk-node@0.x.x`. `0.54.x` **WILL NOT** be picked up
+        > by this constraint due to the way semantic versioning works for `0.x` packages. This is intentional, see
+        > https://semver.org/ for details.
       label: Updating packages
       options:
         - label: I have updated all `@opentelemetry/*` packages but the issue persists
@@ -31,13 +32,17 @@ body:
       description: |
         **How to find this information:**
           - check your `package.json`
-            - if you have `"type": "commonjs"` or no `"type"` then you're using CommonJS
-            - if you have `"type": "module"`, you are using ESM - please ensure you have read the [instructions for ESM users](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md) before opening an issue.
+            - if you have `"type": "commonjs"` or no `"type"` then you're likely using CommonJS
+            - if you have `"type": "module"`, you are likely using ESM - please ensure you have read the [instructions for ESM users](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md) before opening an issue.
+          - other indicators:
+            - using `.js` or `.cjs` (CommonJS)
+            - using `.mjs` (ESM - please ensure you have read the [instructions for ESM users](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md) before opening an issue.)
       label: Which module type are you using?
       multiple: false
       options:
         - CommonJS
         - ESM
+        - I don't know
   - type: checkboxes
     id: bundlng
     attributes:
@@ -94,11 +99,12 @@ body:
       label: OpenTelemetry Setup Code
       description: |
         > [!IMPORTANT]
-        > **Please provide the code you use to set up OpenTelemetry.**
-        >  - If you use `@opentelemetry/auto-instrumentations-node/register`, please state so here
-        >  - **If you have provided a reproducer repository above, you may omit this step.**
+        > **If you have provided a reproducer repository above, you may omit this step.**
+
+        **Please provide the code you use to set up OpenTelemetry.**
+        If you use `@opentelemetry/auto-instrumentations-node/register`, please state so here
       placeholder: | # This comes from our README.md
-        // tracing.js
+        // otel.js
 
         'use strict'
 
@@ -145,7 +151,7 @@ body:
         {
           "name": "my-app",
           "scripts": {
-            "start": "node -r tracing.js app.js"
+            "start": "node -r otel.js app.js"
           },
           "dependencies": {
             "@opentelemetry/api": "^1.3.0",
