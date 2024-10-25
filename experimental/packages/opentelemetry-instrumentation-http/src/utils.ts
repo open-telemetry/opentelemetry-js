@@ -19,6 +19,7 @@ import {
   Span,
   context,
   SpanKind,
+  diag,
 } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
@@ -78,6 +79,10 @@ import {
   SemconvStability,
 } from './types';
 import forwardedParse = require('forwarded-parse');
+
+const logger = diag.createComponentLogger({
+  namespace: '@opentelemetry/instrumentation-http',
+});
 
 /**
  * Get an absolute url
@@ -735,20 +740,38 @@ export function getRemoteClientAddress(
   return null;
 }
 
-function tryGetUrlFromRequest(
+function getInfoFromIncomingMessage(
   component: 'http' | 'https',
   request: IncomingMessage
-): URL | undefined {
+): { pathname?: string; search?: string; toString: () => string } {
   try {
-    // this is the way http.IncomingMessage.url docs recommend to handle this.
-    return new URL(
-      request.url ?? '/',
-      `${component}://${request.headers.host}`
-    );
+    if (request.headers.host) {
+      return new URL(
+        request.url ?? '/',
+        `${component}://${request.headers.host}`
+      );
+    } else {
+      const unsafeParsedUrl = new URL(
+        request.url ?? '/',
+        // using localhost as a workaround to still use the URL constructor for parsing
+        `${component}://localhost`
+      );
+      // since we use localhost as a workaround, ensure we hide the rest of the properties to avoid
+      // our workaround leaking though.
+      return {
+        pathname: unsafeParsedUrl.pathname,
+        search: unsafeParsedUrl.search,
+        toString: function () {
+          // we cannot use the result of unsafeParsedUrl.toString as it's potentially wrong.
+          return unsafeParsedUrl.pathname + unsafeParsedUrl.search;
+        },
+      };
+    }
   } catch (e) {
-    // something is wrong, use undefined
-    // TODO: log here? this should never happens AFAICT - if it ever does it may be good to have logs.
-    return undefined;
+    // something is wrong, use undefined - this *should* never happen, logging
+    // for troubleshooting in case it does happen.
+    logger.verbose('Unable to get URL from request', e);
+    return {};
   }
 }
 
@@ -792,7 +815,7 @@ export const getIncomingRequestAttributes = (
     [ATTR_USER_AGENT_ORIGINAL]: userAgent,
   };
 
-  const parsedUrl = tryGetUrlFromRequest(options.component, request);
+  const parsedUrl = getInfoFromIncomingMessage(options.component, request);
 
   if (parsedUrl?.pathname != null) {
     newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
@@ -812,7 +835,7 @@ export const getIncomingRequestAttributes = (
   }
 
   const oldAttributes: Attributes = {
-    [SEMATTRS_HTTP_URL]: parsedUrl?.toString(),
+    [SEMATTRS_HTTP_URL]: parsedUrl.toString(),
     [SEMATTRS_HTTP_HOST]: host,
     [SEMATTRS_NET_HOST_NAME]: hostname,
     [SEMATTRS_HTTP_METHOD]: method,
