@@ -11,6 +11,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation-http): drop url.parse in favor of URL constructor [#5091](https://github.com/open-telemetry/opentelemetry-js/pull/5091) @pichlermarc
+  * fixes a bug where using cyrillic characters in a client request string URL would throw
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
