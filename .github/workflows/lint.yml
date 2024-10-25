@@ -28,7 +28,6 @@ jobs:
         run: |
           npm run lint
           npm run lint:examples
-          npm run lint:markdown
 
       - name: Lint doc files
         run: |

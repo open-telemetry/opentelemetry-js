@@ -65,7 +65,6 @@ import { errorMonitor } from 'events';
 import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
-  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PROTOCOL_VERSION,
   ATTR_SERVER_ADDRESS,
   ATTR_SERVER_PORT,
@@ -80,20 +79,20 @@ import {
   getIncomingRequestAttributesOnResponse,
   getIncomingRequestMetricAttributes,
   getIncomingRequestMetricAttributesOnResponse,
+  getIncomingStableRequestMetricAttributesOnResponse,
   getOutgoingRequestAttributes,
   getOutgoingRequestAttributesOnResponse,
   getOutgoingRequestMetricAttributes,
   getOutgoingRequestMetricAttributesOnResponse,
   getRequestInfo,
   headerCapture,
-  isIgnored,
   isValidOptionsType,
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
 
 /**
- * Http instrumentation instrumentation for Opentelemetry
+ * `node:http` and `node:https` instrumentation for OpenTelemetry
  */
 export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentationConfig> {
   /** keep track on spans not ended */
@@ -235,17 +234,24 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'http',
       ['*'],
       (moduleExports: Http): Http => {
+        const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
             'request',
             this._getPatchOutgoingRequestFunction('http')
           ) as unknown as Func<http.ClientRequest>;
-          this._wrap(
+          const patchedGet = this._wrap(
             moduleExports,
             'get',
             this._getPatchOutgoingGetFunction(patchedRequest)
           );
+          if (isESM) {
+            // To handle `import http from 'http'`, which returns the default
+            // export, we need to set `module.default.*`.
+            (moduleExports as any).default.request = patchedRequest;
+            (moduleExports as any).default.get = patchedGet;
+          }
         }
         if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._wrap(
@@ -275,17 +281,24 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       'https',
       ['*'],
       (moduleExports: Https): Https => {
+        const isESM = (moduleExports as any)[Symbol.toStringTag] === 'Module';
         if (!this.getConfig().disableOutgoingRequestInstrumentation) {
           const patchedRequest = this._wrap(
             moduleExports,
             'request',
             this._getPatchHttpsOutgoingRequestFunction('https')
           ) as unknown as Func<http.ClientRequest>;
-          this._wrap(
+          const patchedGet = this._wrap(
             moduleExports,
             'get',
             this._getPatchHttpsOutgoingGetFunction(patchedRequest)
           );
+          if (isESM) {
+            // To handle `import https from 'https'`, which returns the default
+            // export, we need to set `module.default.*`.
+            (moduleExports as any).default.request = patchedRequest;
+            (moduleExports as any).default.get = patchedGet;
+          }
         }
         if (!this.getConfig().disableIncomingRequestInstrumentation) {
           this._wrap(
@@ -416,7 +429,8 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * @param request The original request object.
    * @param span representing the current operation
    * @param startTime representing the start time of the request to calculate duration in Metric
-   * @param oldMetricAttributes metric attributes
+   * @param oldMetricAttributes metric attributes for old semantic conventions
+   * @param stableMetricAttributes metric attributes for new semantic conventions
    */
   private _traceClientRequest(
     request: http.ClientRequest,
@@ -588,9 +602,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const request = args[0] as http.IncomingMessage;
       const response = args[1] as http.ServerResponse & { socket: Socket };
-      const pathname = request.url
-        ? url.parse(request.url).pathname || '/'
-        : '/';
       const method = request.method || 'GET';
 
       instrumentation._diag.debug(
@@ -598,12 +609,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       );
 
       if (
-        isIgnored(
-          pathname,
-          instrumentation.getConfig().ignoreIncomingPaths,
-          (e: unknown) =>
-            instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
-        ) ||
         safeExecuteInTheMiddle(
           () =>
             instrumentation.getConfig().ignoreIncomingRequestHook?.(request),
@@ -651,12 +656,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         [ATTR_HTTP_REQUEST_METHOD]: spanAttributes[ATTR_HTTP_REQUEST_METHOD],
         [ATTR_URL_SCHEME]: spanAttributes[ATTR_URL_SCHEME],
       };
-
-      // required if and only if one was sent, same as span requirement
-      if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
-        stableMetricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
-          spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
-      }
 
       // recommended if and only if one was sent, same as span recommendation
       if (spanAttributes[ATTR_NETWORK_PROTOCOL_VERSION]) {
@@ -758,10 +757,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as http.RequestOptions)
           : undefined;
-      const { origin, pathname, method, optionsParsed } = getRequestInfo(
-        options,
-        extraOptions
-      );
+      const { method, optionsParsed } = getRequestInfo(options, extraOptions);
       /**
        * Node 8's https module directly call the http one so to avoid creating
        * 2 span for the same request we need to check that the protocol is correct
@@ -776,12 +772,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       }
 
       if (
-        isIgnored(
-          origin + pathname,
-          instrumentation.getConfig().ignoreOutgoingUrls,
-          (e: unknown) =>
-            instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
-        ) ||
         safeExecuteInTheMiddle(
           () =>
             instrumentation
@@ -917,6 +907,10 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
       oldMetricAttributes,
       getIncomingRequestMetricAttributesOnResponse(attributes)
     );
+    stableMetricAttributes = Object.assign(
+      stableMetricAttributes,
+      getIncomingStableRequestMetricAttributesOnResponse(attributes)
+    );
 
     this._headerCapture.server.captureResponseHeaders(span, header =>
       response.getHeader(header)
@@ -929,7 +923,6 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     const route = attributes[SEMATTRS_HTTP_ROUTE];
     if (route) {
       span.updateName(`${request.method || 'GET'} ${route}`);
-      stableMetricAttributes[ATTR_HTTP_ROUTE] = route;
     }
 
     if (this.getConfig().applyCustomAttributesOnSpan) {

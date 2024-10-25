@@ -26,6 +26,7 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_REQUEST_METHOD_ORIGINAL,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -143,39 +144,6 @@ export const satisfiesPattern = (
   } else {
     throw new TypeError('Pattern is in unsupported datatype');
   }
-};
-
-/**
- * Check whether the given request is ignored by configuration
- * It will not re-throw exceptions from `list` provided by the client
- * @param constant e.g URL of request
- * @param [list] List of ignore patterns
- * @param [onException] callback for doing something when an exception has
- *     occurred
- */
-export const isIgnored = (
-  constant: string,
-  list?: IgnoreMatcher[],
-  onException?: (error: unknown) => void
-): boolean => {
-  if (!list) {
-    // No ignored urls - trace everything
-    return false;
-  }
-  // Try/catch outside the loop for failing fast
-  try {
-    for (const pattern of list) {
-      if (satisfiesPattern(constant, pattern)) {
-        return true;
-      }
-    }
-  } catch (e) {
-    if (onException) {
-      onException(e);
-    }
-  }
-
-  return false;
 };
 
 /**
@@ -822,7 +790,7 @@ export const getIncomingRequestAttributesOnResponse = (
   const { socket } = request;
   const { statusCode, statusMessage } = response;
 
-  const newAttributes = {
+  const newAttributes: Attributes = {
     [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
   };
 
@@ -842,6 +810,7 @@ export const getIncomingRequestAttributesOnResponse = (
 
   if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
     oldAttributes[SEMATTRS_HTTP_ROUTE] = rpcMetadata.route;
+    newAttributes[ATTR_HTTP_ROUTE] = rpcMetadata.route;
   }
 
   switch (semconvStability) {
@@ -868,6 +837,22 @@ export const getIncomingRequestMetricAttributesOnResponse = (
     spanAttributes[SEMATTRS_NET_HOST_PORT];
   if (spanAttributes[SEMATTRS_HTTP_ROUTE] !== undefined) {
     metricAttributes[SEMATTRS_HTTP_ROUTE] = spanAttributes[SEMATTRS_HTTP_ROUTE];
+  }
+  return metricAttributes;
+};
+
+export const getIncomingStableRequestMetricAttributesOnResponse = (
+  spanAttributes: Attributes
+): Attributes => {
+  const metricAttributes: Attributes = {};
+  if (spanAttributes[ATTR_HTTP_ROUTE] !== undefined) {
+    metricAttributes[ATTR_HTTP_ROUTE] = spanAttributes[SEMATTRS_HTTP_ROUTE];
+  }
+
+  // required if and only if one was sent, same as span requirement
+  if (spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE]) {
+    metricAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE] =
+      spanAttributes[ATTR_HTTP_RESPONSE_STATUS_CODE];
   }
   return metricAttributes;
 };
