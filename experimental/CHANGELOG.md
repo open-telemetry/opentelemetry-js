@@ -8,6 +8,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
+
 * feat(instrumentation): Track request body size in XHR and Fetch instrumentations [#4706](https://github.com/open-telemetry/opentelemetry-js/pull/4706) @mustafahaddara
 
 ### :bug: (Bug Fix)
