@@ -29,7 +29,7 @@ import {
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
-  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
@@ -495,7 +495,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             const bodyLength = getXHRBodyLength(body);
             if (bodyLength !== undefined) {
               currentSpan.setAttribute(
-                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
+                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
                 bodyLength
               );
             }
