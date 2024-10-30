@@ -15,6 +15,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: (Internal)
 
+* chore: Minor improvements to formatting of comments. [#5100](https://github.com/open-telemetry/opentelemetry-js/pull/5100) @trentm
+
 ## 1.27.0
 
 * Version bump only
