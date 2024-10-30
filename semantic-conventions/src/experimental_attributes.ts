@@ -1072,7 +1072,7 @@ export const ATTR_CODE_NAMESPACE = 'code.namespace' as const;
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
  * 
- * @example "at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\n at com.example.GenerateTrace.main(GenerateTrace.java:5)"
+ * @example "at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\\n at com.example.GenerateTrace.main(GenerateTrace.java:5)"
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1471,7 +1471,7 @@ export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
 /**
  * Deprecated, use `server.address`, `server.port` attributes instead.
  * 
- * @example "Server=(localdb)\v11.0;Integrated Security=true;"
+ * @example "Server=(localdb)\\v11.0;Integrated Security=true;"
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
@@ -2294,7 +2294,7 @@ export const DISK_IO_DIRECTION_VALUE_WRITE = "write" as const;
  * @example www.example.com
  * @example opentelemetry.io
  * 
- * @note If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
+ * @note If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \\t, \\r, and \\n respectively.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2628,7 +2628,7 @@ export const ATTR_FEATURE_FLAG_VARIANT = 'feature_flag.variant' as const;
  * Directory where the file is located. It should include the drive letter, when appropriate.
  * 
  * @example /home/user
- * @example C:\Program Files\MyApp
+ * @example C:\\Program Files\\MyApp
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2659,7 +2659,7 @@ export const ATTR_FILE_NAME = 'file.name' as const;
  * Full path to the file, including the file name. It should include the drive letter, when appropriate.
  * 
  * @example /home/alice/example.png
- * @example C:\Program Files\MyApp\myapp.exe
+ * @example C:\\Program Files\\MyApp\\myapp.exe
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5111,7 +5111,7 @@ export const ATTR_PROCESS_COMMAND_ARGS = 'process.command_args' as const;
 /**
  * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
  * 
- * @example C:\cmd\otecol --config="my directory\config.yaml"
+ * @example C:\\cmd\\otecol --config="my directory\\config.yaml"
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

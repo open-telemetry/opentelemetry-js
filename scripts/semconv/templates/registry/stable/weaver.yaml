@@ -11,8 +11,9 @@ comment_formats:
     # 'comment' filter should handle those.
     prefix: ' * '
     footer: ' */'
-    indent_first_level_list_items: true
     trim: true
+    indent_first_level_list_items: true
+    escape_backslashes: true
 default_comment_format: jsdoc
 
 templates:
