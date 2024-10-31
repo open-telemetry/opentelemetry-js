@@ -342,7 +342,7 @@ describe('Resource', () => {
       );
       const oldResource = new Resource190({ fromold: 'fromold' });
 
-      const mergedResource = resource.merge(oldResource as any);
+      const mergedResource = resource.merge(oldResource);
       assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
 
       await mergedResource.waitForAsyncAttributes?.();
@@ -369,7 +369,7 @@ describe('Resource', () => {
     const warnStub = sinon.spy(diag, 'warn');
     const mergedResource = resource1.merge(resource2);
 
-    assert.strictEqual(mergedResource.getSchemaUrl(), schemaUrl1);
+    assert.strictEqual(mergedResource.getSchemaUrl?.() ?? '', schemaUrl1);
     assert.ok(
       warnStub.calledWithMatch(
         'Schema URLs differ. Using the original schema URL.'
@@ -384,7 +384,7 @@ describe('Resource', () => {
 
     const mergedResource = resource1.merge(resource2);
 
-    assert.strictEqual(mergedResource.getSchemaUrl(), schemaUrl);
+    assert.strictEqual(mergedResource.getSchemaUrl?.() ?? '', schemaUrl);
   });
 
   it('should retain schema URL from the resource that has it when merging', () => {
@@ -397,10 +397,7 @@ describe('Resource', () => {
 
     const mergedResource = resource1.merge(resource2);
 
-    assert.strictEqual(
-      mergedResource.getSchemaUrl(),
-      'https://example.com/schema'
-    );
+    assert.strictEqual( mergedResource.getSchemaUrl?.() ?? '', 'https://example.com/schema');
   });
 
   it('should have empty schema URL when merging resources with no schema URL', () => {
@@ -409,6 +406,6 @@ describe('Resource', () => {
 
     const mergedResource = resource1.merge(resource2);
 
-    assert.strictEqual(mergedResource.getSchemaUrl(), '');
+    assert.strictEqual(mergedResource.getSchemaUrl?.() ?? '', '');
   });
 });

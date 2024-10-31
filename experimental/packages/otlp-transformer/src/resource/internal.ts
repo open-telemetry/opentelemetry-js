@@ -21,6 +21,5 @@ export function createResource(resource: ISdkResource): IResource {
   return {
     attributes: toAttributes(resource.attributes),
     droppedAttributesCount: 0,
-    schemaUrl: resource.getSchemaUrl ? resource.getSchemaUrl() : '',
-  };
+    schemaUrl: resource.getSchemaUrl?.() || '',  };
 }
