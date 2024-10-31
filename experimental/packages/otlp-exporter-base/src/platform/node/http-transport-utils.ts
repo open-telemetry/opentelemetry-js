@@ -82,6 +82,9 @@ export function sendWithHttp(
   });
 
   req.setTimeout(timeoutMillis, () => {
+    if (req.destroyed) {
+      return;
+    }
     req.destroy();
     onDone({
       status: 'failure',
