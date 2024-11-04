@@ -16,38 +16,36 @@
 
 import { NOOP_LOGGER } from './NoopLogger';
 import { Logger } from './types/Logger';
-import { LoggerOptions } from './types/LoggerOptions';
-import { LogRecord } from './types/LogRecord';
+import { LoggerOptions } from '../types/LoggerOptions';
+import { EventRecord } from './types/EventRecord';
+import { ProxyLogger as BaseProxyLogger } from '../ProxyLogger';
 
-export class ProxyLogger implements Logger {
+export class ProxyLogger extends BaseProxyLogger implements Logger {
   // When a real implementation is provided, this will be it
-  protected _delegate?: Logger;
+  override _delegate?: Logger;
 
   constructor(
-    protected _provider: LoggerDelegator,
-    public readonly name: string,
-    public readonly version?: string | undefined,
-    public readonly options?: LoggerOptions | undefined
-  ) {}
+    override _provider: LoggerDelegator,
+    name: string,
+    version?: string | undefined,
+    options?: LoggerOptions | undefined
+  ) {
+    super(_provider, name, version, options);
+  }
 
   /**
    * Emit a log record. This method should only be used by log appenders.
-   *
    * @param logRecord
    */
-  emit(logRecord: LogRecord): void {
-    this._getLogger().emit(logRecord);
+  emitEvent(eventRecord: EventRecord): void {
+    this._getLogger().emitEvent(eventRecord);
   }
-
-  // emitEvent(eventRecord: EventRecord): void {
-  //   this._getLogger().emitEvent(eventRecord);
-  // }
 
   /**
    * Try to get a logger from the proxy logger provider.
    * If the proxy logger provider has no delegate, return a noop logger.
    */
-  protected _getLogger() {
+  override _getLogger() {
     if (this._delegate) {
       return this._delegate;
     }

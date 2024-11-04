@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { EventRecord } from './EventRecord';
 import { LogRecord } from './LogRecord';
 
 export interface Logger {
@@ -27,5 +26,5 @@ export interface Logger {
   /**
    * Emit an event.
    */
-  emitEvent(eventRecord: EventRecord): void;
+  // emitEvent(eventRecord: EventRecord): void;
 }

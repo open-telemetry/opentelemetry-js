@@ -15,19 +15,23 @@
  */
 
 export { Logger } from './types/Logger';
+export { EventRecord } from './types/EventRecord';
+export { NOOP_LOGGER, NoopLogger } from './NoopLogger';
+export { ProxyLogger } from './ProxyLogger';
+export { NOOP_LOGGER_PROVIDER, NoopLoggerProvider } from './NoopLoggerProvider';
+export { ProxyLoggerProvider } from './ProxyLoggerProvider';
 export { LoggerProvider } from './types/LoggerProvider';
+import { LogsAPI } from './api/logs';
+export const logs = LogsAPI.getInstance();
+
+/**
+ * non experimental exports.
+ */
 export {
   LogAttributes,
   LogBody,
   LogRecord,
   SeverityNumber,
-} from './types/LogRecord';
-export { LoggerOptions } from './types/LoggerOptions';
-export { AnyValue, AnyValueMap } from './types/AnyValue';
-export { NOOP_LOGGER, NoopLogger } from './NoopLogger';
-export { NOOP_LOGGER_PROVIDER, NoopLoggerProvider } from './NoopLoggerProvider';
-export { ProxyLogger } from './ProxyLogger';
-export { ProxyLoggerProvider } from './ProxyLoggerProvider';
-
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+} from '../types/LogRecord';
+export { LoggerOptions } from '../types/LoggerOptions';
+export { AnyValue, AnyValueMap } from '../types/AnyValue';

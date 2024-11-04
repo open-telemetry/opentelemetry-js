@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
+import { LoggerProvider } from './types/LoggerProvider';
 import { Logger } from './types/Logger';
-import { LogRecord } from './types/LogRecord';
+import { LoggerOptions } from '../types/LoggerOptions';
+import { NoopLogger } from './NoopLogger';
 
-export class NoopLogger implements Logger {
-  emit(_logRecord: LogRecord): void {}
-
-  // emitEvent(_eventRecord: EventRecord): void {}
+export class NoopLoggerProvider implements LoggerProvider {
+  getLogger(
+    _name: string,
+    _version?: string | undefined,
+    _options?: LoggerOptions | undefined
+  ): Logger {
+    return new NoopLogger();
+  }
 }
 
-export const NOOP_LOGGER = new NoopLogger();
+export const NOOP_LOGGER_PROVIDER = new NoopLoggerProvider();

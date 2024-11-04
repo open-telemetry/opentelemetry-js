@@ -43,13 +43,13 @@ logger.emit({
 });
 
 // emit an event record
-logger.emitEvent({
-  name: 'my-domain.my-event',
-  data: {
-    a: 1,
-    b: 'hello',
-    c: {
-      d: 123
-    }
-  },
-});
+// logger.emitEvent({
+//   name: 'my-domain.my-event',
+//   data: {
+//     a: 1,
+//     b: 'hello',
+//     c: {
+//       d: 123
+//     }
+//   },
+// });

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { Logger } from './types/Logger';
-import { LogRecord } from './types/LogRecord';
+import { EventRecord } from './EventRecord';
+import { Logger as BaseLogger } from '../../types/Logger';
 
-export class NoopLogger implements Logger {
-  emit(_logRecord: LogRecord): void {}
-
-  // emitEvent(_eventRecord: EventRecord): void {}
+export interface Logger extends BaseLogger {
+  /**
+   * Emit an event.
+   */
+  emitEvent(eventRecord: EventRecord): void;
 }
-
-export const NOOP_LOGGER = new NoopLogger();

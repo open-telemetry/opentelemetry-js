@@ -15,8 +15,8 @@
  */
 
 import { Attributes, Context, TimeInput } from '@opentelemetry/api';
-import { AnyValue } from './AnyValue';
-import { SeverityNumber } from './LogRecord';
+import { AnyValue } from '../../types/AnyValue';
+import { SeverityNumber } from '../../types/LogRecord';
 
 export interface EventRecord {
   /**

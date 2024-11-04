@@ -16,12 +16,18 @@
 
 import { LoggerProvider } from '../types/LoggerProvider';
 import { _globalThis } from '../platform';
+import { LoggerProvider as ExperimentalLoggerProvider } from '../experimental/types/LoggerProvider';
 
 export const GLOBAL_LOGS_API_KEY = Symbol.for('io.opentelemetry.js.api.logs');
+// TODO: confirm the name
+export const GLOBAL_EXPERIMENTAL_LOGS_API_KEY = Symbol.for(
+  'io.opentelemetry.js.api.experimental.logs'
+);
 
 type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{
   [GLOBAL_LOGS_API_KEY]: Get<LoggerProvider>;
+  [GLOBAL_EXPERIMENTAL_LOGS_API_KEY]: Get<ExperimentalLoggerProvider>;
 }>;
 
 export const _global = _globalThis as OtelGlobal;

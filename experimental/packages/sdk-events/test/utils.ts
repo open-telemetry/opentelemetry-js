@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { EventRecord, LogRecord, Logger } from '@opentelemetry/api-logs';
+import { LogRecord, Logger } from '@opentelemetry/api-logs';
 
 export class TestLogger implements Logger {
   emit(logRecord: LogRecord): void {}
-  emitEvent(eventRecord: EventRecord): void {}
+  // emitEvent(eventRecord: EventRecord): void {}
 }
