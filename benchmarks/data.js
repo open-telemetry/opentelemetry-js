@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1729702551497,
+  "lastUpdate": 1730725344955,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -18008,6 +18008,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.28%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "111076986+Annosha@users.noreply.github.com",
+            "name": "Annosha",
+            "username": "Annosha"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "2b73d37c9c949096a707c31c81179ec81d19ee42",
+          "message": "[Fixes # 4533] Replaced cpx2 with local test module (#5077)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>\nCo-authored-by: Raphaël Thériault <113933910+raphael-theriault-swi@users.noreply.github.com>\nCo-authored-by: Jakub Ziółkowski <jakub@rho.co>\nCo-authored-by: David Luna <david.luna@elastic.co>\nCo-authored-by: Trent Mick <trentm@gmail.com>\nCo-authored-by: Marylia Gutierrez <marylia.gutierrez@grafana.com>\nCo-authored-by: Mend Renovate <bot@renovateapp.com>\nCo-authored-by: Mercy Bassey <57226464+mercybassey@users.noreply.github.com>\nCo-authored-by: OpenTelemetry Bot <107717825+opentelemetrybot@users.noreply.github.com>",
+          "timestamp": "2024-11-04T12:54:09Z",
+          "tree_id": "ccf8a6a81bea04b789de48151d199a3b4a3e77d0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/2b73d37c9c949096a707c31c81179ec81d19ee42"
+        },
+        "date": 1730725344087,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 954897,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11741,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 647837,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 646926,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
