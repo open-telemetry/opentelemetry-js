@@ -93,7 +93,7 @@ describe('InMemorySpanExporter', () => {
     });
   });
 
-  it('should reset spans when reset is called', async () => {
+  it('should reset spans when reset is called', () => {
     const root = provider.getTracer('default').startSpan('root');
 
     provider
