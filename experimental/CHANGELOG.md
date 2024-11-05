@@ -17,6 +17,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+## 0.54.1
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): skip malformed forwarded headers. [#5095](https://github.com/open-telemetry/opentelemetry-js/issues/5095) @pmlanger
+
 ## 0.54.0
 
 ### :boom: Breaking Change
