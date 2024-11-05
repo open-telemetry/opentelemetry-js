@@ -16,8 +16,11 @@
 
 import { IExporterTransport } from '../../exporter-transport';
 import { ExportResponse } from '../../export-response';
-import { isExportRetryable, parseRetryAfterToMills } from '../../util';
 import { diag } from '@opentelemetry/api';
+import {
+  isExportRetryable,
+  parseRetryAfterToMills,
+} from '../../is-export-retryable';
 
 export interface XhrRequestParameters {
   url: string;

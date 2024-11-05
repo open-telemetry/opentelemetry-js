@@ -25,7 +25,6 @@ import {
 } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * Collector Trace Exporter for Web
@@ -35,14 +34,11 @@ export class OTLPTraceExporter
   implements SpanExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config, ProtobufTraceSerializer, 'application/x-protobuf');
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return DEFAULT_COLLECTOR_URL;
+    super(
+      config,
+      ProtobufTraceSerializer,
+      { 'Content-Type': 'application/x-protobuf' },
+      DEFAULT_COLLECTOR_RESOURCE_PATH
+    );
   }
 }

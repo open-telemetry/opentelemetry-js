@@ -28,7 +28,10 @@ describe('detectResourcesSync', () => {
   it('handles resource detectors which return Promise<Resource>', async () => {
     const detector: Detector = {
       async detect() {
-        return new Resource({ sync: 'fromsync' });
+        return new Resource(
+          { sync: 'fromsync' },
+          Promise.resolve().then(() => ({ async: 'fromasync' }))
+        );
       },
     };
     const resource = detectResourcesSync({
@@ -38,6 +41,7 @@ describe('detectResourcesSync', () => {
     await resource.waitForAsyncAttributes?.();
     assert.deepStrictEqual(resource.attributes, {
       sync: 'fromsync',
+      async: 'fromasync',
     });
   });
 

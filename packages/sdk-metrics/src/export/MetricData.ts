@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, MetricAttributes, ValueType } from '@opentelemetry/api';
+import { HrTime, Attributes, ValueType } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { IResource } from '@opentelemetry/resources';
 import { InstrumentType } from '../InstrumentDescriptor';
@@ -159,7 +159,7 @@ export interface DataPoint<T> {
   /**
    * The attributes associated with this DataPoint.
    */
-  readonly attributes: MetricAttributes;
+  readonly attributes: Attributes;
   /**
    * The value for this DataPoint. The type of the value is indicated by the
    * {@link DataPointType}.
