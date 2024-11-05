@@ -19,6 +19,7 @@ import {
   SpanKind,
   context,
   Span,
+  diag,
 } from '@opentelemetry/api';
 import {
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
@@ -432,10 +433,14 @@ describe('Utility', () => {
         'user-agent': 'chrome',
         'x-forwarded-for': '<client>, <proxy1>, <proxy2>',
       };
-      const attributes = utils.getIncomingRequestAttributes(request, {
-        component: 'http',
-        semconvStability: SemconvStability.OLD,
-      });
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          semconvStability: SemconvStability.OLD,
+        },
+        diag
+      );
       assert.strictEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
 
@@ -448,10 +453,14 @@ describe('Utility', () => {
       request.headers = {
         'user-agent': 'chrome',
       };
-      const attributes = utils.getIncomingRequestAttributes(request, {
-        component: 'http',
-        semconvStability: SemconvStability.OLD,
-      });
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          semconvStability: SemconvStability.OLD,
+        },
+        diag
+      );
       assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
     });
   });

@@ -632,15 +632,19 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const headers = request.headers;
 
-      const spanAttributes = getIncomingRequestAttributes(request, {
-        component: component,
-        serverName: instrumentation.getConfig().serverName,
-        hookAttributes: instrumentation._callStartSpanHook(
-          request,
-          instrumentation.getConfig().startIncomingSpanHook
-        ),
-        semconvStability: instrumentation._semconvStability,
-      });
+      const spanAttributes = getIncomingRequestAttributes(
+        request,
+        {
+          component: component,
+          serverName: instrumentation.getConfig().serverName,
+          hookAttributes: instrumentation._callStartSpanHook(
+            request,
+            instrumentation.getConfig().startIncomingSpanHook
+          ),
+          semconvStability: instrumentation._semconvStability,
+        },
+        instrumentation._diag
+      );
 
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,

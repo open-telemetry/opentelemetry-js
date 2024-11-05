@@ -19,7 +19,7 @@ import {
   Span,
   context,
   SpanKind,
-  diag,
+  DiagLogger,
 } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
@@ -79,10 +79,6 @@ import {
   SemconvStability,
 } from './types';
 import forwardedParse = require('forwarded-parse');
-
-const logger = diag.createComponentLogger({
-  namespace: '@opentelemetry/instrumentation-http',
-});
 
 /**
  * Get an absolute url
@@ -742,7 +738,8 @@ export function getRemoteClientAddress(
 
 function getInfoFromIncomingMessage(
   component: 'http' | 'https',
-  request: IncomingMessage
+  request: IncomingMessage,
+  logger: DiagLogger
 ): { pathname?: string; search?: string; toString: () => string } {
   try {
     if (request.headers.host) {
@@ -788,7 +785,8 @@ export const getIncomingRequestAttributes = (
     serverName?: string;
     hookAttributes?: Attributes;
     semconvStability: SemconvStability;
-  }
+  },
+  logger: DiagLogger
 ): Attributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
@@ -815,7 +813,11 @@ export const getIncomingRequestAttributes = (
     [ATTR_USER_AGENT_ORIGINAL]: userAgent,
   };
 
-  const parsedUrl = getInfoFromIncomingMessage(options.component, request);
+  const parsedUrl = getInfoFromIncomingMessage(
+    options.component,
+    request,
+    logger
+  );
 
   if (parsedUrl?.pathname != null) {
     newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
