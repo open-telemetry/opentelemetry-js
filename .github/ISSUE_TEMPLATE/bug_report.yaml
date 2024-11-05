@@ -9,6 +9,9 @@ body:
         > **Please read all parts of this form carefully.** By following the instructions carefully, you ensure that we
         > can get started fixing your bug, instead of being stuck at trying to reproduce your issue. Please provide
         > all requested information, even if you think it does not apply to your problem.
+
+        Before filing a bug, please be sure you have searched through [existing open bugs](https://github.com/open-telemetry/opentelemetry-js/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
+        to see if this bug has already been filed.
   - type: markdown
     attributes:
       value: |
@@ -44,7 +47,7 @@ body:
         - ESM
         - I don't know
   - type: checkboxes
-    id: bundlng
+    id: bundling
     attributes:
       description: |
         Bundling removes `require` and `import` statements, which results in most `@opentelemetry/instrumentation-*` packages not working as they rely on the presence
