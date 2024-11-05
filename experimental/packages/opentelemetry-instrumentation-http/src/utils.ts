@@ -572,7 +572,7 @@ function getServerAddress(
 ): { host: string; port?: string } | null {
   const forwardedHeader = request.headers['forwarded'];
   if (forwardedHeader) {
-    for (const entry of forwardedParse(forwardedHeader)) {
+    for (const entry of parseForwardedHeader(forwardedHeader)) {
       if (entry.host) {
         return parseHostHeader(entry.host, entry.proto);
       }
@@ -635,7 +635,7 @@ export function getRemoteClientAddress(
 ): string | null {
   const forwardedHeader = request.headers['forwarded'];
   if (forwardedHeader) {
-    for (const entry of forwardedParse(forwardedHeader)) {
+    for (const entry of parseForwardedHeader(forwardedHeader)) {
       if (entry.for) {
         return entry.for;
       }
@@ -915,4 +915,12 @@ function normalizeMethod(method?: string | null) {
   }
 
   return '_OTHER';
+}
+
+function parseForwardedHeader(header: string): Record<string, string>[] {
+  try {
+    return forwardedParse(header);
+  } catch {
+    return [];
+  }
 }
