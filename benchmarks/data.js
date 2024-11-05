@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1730805015121,
+  "lastUpdate": 1730805165029,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -18216,6 +18216,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.35%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "35333687+paper2@users.noreply.github.com",
+            "name": "zyoshi (kamitsuk)",
+            "username": "paper2"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "33dbde1ede0269f0d4e06bd3612335f1ff1f6918",
+          "message": "add reset function test for InMemorySpanExporter (#5107)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-11-05T11:04:31Z",
+          "tree_id": "8ae3652a31852dc4fc468474f56145b43f3877bf",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/33dbde1ede0269f0d4e06bd3612335f1ff1f6918"
+        },
+        "date": 1730805164193,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 931998,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11591,
+            "range": "±0.35%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 649460,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 675023,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
