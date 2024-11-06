@@ -16,10 +16,12 @@
 
 import * as assert from 'assert';
 
-import { isUrlIgnored } from '../../src';
+import { isUrlAllowed, isUrlIgnored } from '../../src';
 
 const urlIgnored = 'url should be ignored';
 const urlNotIgnored = 'url should NOT be ignored';
+const urlAllowed = 'url should be allowed';
+const urlNotAllowed = 'url should NOT be allowed';
 
 const urlToTest = 'http://myaddress.com/somepath';
 
@@ -82,6 +84,37 @@ describe('Core - Utils - url', () => {
             urlIgnored
           );
         }
+      });
+    });
+  });
+
+  describe('isUrlAllowed', () => {
+    describe('when allowed urls are undefined', () => {
+      it('should return true', () => {
+        assert.strictEqual(isUrlAllowed(urlToTest), true, urlAllowed);
+      });
+    });
+    describe('when allowed urls are empty', () => {
+      it('should return false', () => {
+        assert.strictEqual(isUrlAllowed(urlToTest, []), false, urlAllowed);
+      });
+    });
+    describe('when allowed urls contains test url', () => {
+      it('should return true', () => {
+        assert.strictEqual(
+          isUrlAllowed(urlToTest, ['http://myaddress.com/somepath']),
+          true,
+          urlAllowed
+        );
+      });
+    });
+    describe('when allowed urls does NOT contain test url', () => {
+      it('should return false', () => {
+        assert.strictEqual(
+          isUrlAllowed(urlToTest, ['http://myaddress.com/other']),
+          false,
+          urlNotAllowed
+        );
       });
     });
   });
