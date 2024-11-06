@@ -7,6 +7,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix(instrumentation-http): drop url.parse in favor of URL constructor [#5091](https://github.com/open-telemetry/opentelemetry-js/pull/5091) @pichlermarc
+  * (user-facing): signature of `getRequestInfo()` now requires a `DiagLogger` to be passed at the first position
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
