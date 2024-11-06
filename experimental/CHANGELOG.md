@@ -8,6 +8,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
+
 * feat(instrumentation): Add allowUrls config option to web instrumentation [#4938](https://github.com/open-telemetry/opentelemetry-js/pull/4938) @jairo-mendoza
 
 ### :bug: (Bug Fix)
