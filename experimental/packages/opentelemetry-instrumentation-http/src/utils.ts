@@ -297,10 +297,12 @@ function stringUrlToHttpOptions(
 /**
  * Makes sure options is an url object
  * return an object with default value and parsed options
+ * @param logger component logger
  * @param options original options for the request
  * @param [extraOptions] additional options for the request
  */
 export const getRequestInfo = (
+  logger: DiagLogger,
   options: url.URL | RequestOptions | string,
   extraOptions?: RequestOptions
 ): {
@@ -321,6 +323,10 @@ export const getRequestInfo = (
       pathname = convertedOptions.pathname || '/';
     } catch (e) {
       invalidUrl = true;
+      logger.verbose(
+        'Unable to parse URL provided to HTTP request, using fallback to determine path. Original error:',
+        e
+      );
       // for backward compatibility with how url.parse() behaved.
       optionsParsed = {
         path: options,

@@ -102,7 +102,7 @@ describe('Utility', () => {
         urlParsedWithUndefinedHostAndNullPort,
         whatWgUrl,
       ]) {
-        const result = utils.getRequestInfo(param);
+        const result = utils.getRequestInfo(diag, param);
         assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
         assert.strictEqual(result.optionsParsed.protocol, 'http:');
         assert.strictEqual(result.optionsParsed.path, '/aPath?qu=ry');

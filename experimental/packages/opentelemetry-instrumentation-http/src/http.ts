@@ -762,6 +762,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
           ? (args.shift() as http.RequestOptions)
           : undefined;
       const { method, invalidUrl, optionsParsed } = getRequestInfo(
+        instrumentation._diag,
         options,
         extraOptions
       );
