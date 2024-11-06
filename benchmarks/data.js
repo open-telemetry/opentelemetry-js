@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1730826708516,
+  "lastUpdate": 1730919706176,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -18320,6 +18320,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.46%",
             "unit": "ops/sec",
             "extra": "89 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "serkanozal86@gmail.com",
+            "name": "Serkan ÖZAL",
+            "username": "serkan-ozal"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fe4d368900d565e622195474f84230a2c3612037",
+          "message": "Fix wrapping ESM files with absolute path (#5094)\n\nCo-authored-by: Daniel Dyla <dyladan@users.noreply.github.com>",
+          "timestamp": "2024-11-06T18:52:31Z",
+          "tree_id": "5c22367d42c78d133bc70ed9562042ae5cd68380",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/fe4d368900d565e622195474f84230a2c3612037"
+        },
+        "date": 1730919705336,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 918857,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11792,
+            "range": "±0.16%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 658653,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662657,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
