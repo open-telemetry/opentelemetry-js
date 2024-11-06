@@ -93,6 +93,21 @@ describe('InMemorySpanExporter', () => {
     });
   });
 
+  it('should reset spans when reset is called', () => {
+    const root = provider.getTracer('default').startSpan('root');
+
+    provider
+      .getTracer('default')
+      .startSpan('child', {}, trace.setSpan(context.active(), root))
+      .end();
+    root.end();
+    assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
+
+    memoryExporter.reset();
+
+    assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+  });
+
   it('should return the success result', () => {
     const exporter = new InMemorySpanExporter();
     exporter.export([], (result: ExportResult) => {
