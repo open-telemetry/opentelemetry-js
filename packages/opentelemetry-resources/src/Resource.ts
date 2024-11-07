@@ -93,12 +93,6 @@ export class Resource implements IResource {
   }
 
   get attributes(): ResourceAttributes {
-    if (this.asyncAttributesPending) {
-      diag.error(
-        'Accessing resource attributes before async attributes settled'
-      );
-    }
-
     return this._attributes ?? {};
   }
 
