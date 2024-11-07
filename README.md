@@ -227,12 +227,13 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
+- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 
 *Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
 #### Triager ([@open-telemetry/javascript-triagers](https://github.com/orgs/open-telemetry/teams/javascript-triagers))
 
-- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
+- N/A
 
 *Find more about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
