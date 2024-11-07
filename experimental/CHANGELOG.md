@@ -11,11 +11,15 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(instrumentation): Fix wrapping ESM files with absolute path [#5094](https://github.com/open-telemetry/opentelemetry-js/pull/5094) @serkan-ozal
-
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.54.2
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): Fix wrapping ESM files with absolute path [#5094](https://github.com/open-telemetry/opentelemetry-js/pull/5094) @serkan-ozal
 
 ## 0.54.1
 
