@@ -20,7 +20,7 @@ import {
   isSpanContextValid,
   trace,
   TraceFlags,
-  MetricAttributes,
+  Attributes,
 } from '@opentelemetry/api';
 import { ExemplarFilter } from './ExemplarFilter';
 
@@ -28,7 +28,7 @@ export class WithTraceExemplarFilter implements ExemplarFilter {
   shouldSample(
     value: number,
     timestamp: HrTime,
-    attributes: MetricAttributes,
+    attributes: Attributes,
     ctx: Context
   ): boolean {
     const spanContext = trace.getSpanContext(ctx);

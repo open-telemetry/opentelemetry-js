@@ -32,11 +32,12 @@ import {
   BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  Span,
 } from '../../../src';
+import { SpanImpl } from '../../../src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { Attributes } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 
 describe('SimpleSpanProcessor', () => {
@@ -63,7 +64,7 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
+      const span = new SpanImpl(
         provider.getTracer('default'),
         ROOT_CONTEXT,
         'span-name',
@@ -87,7 +88,7 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       };
-      const span = new Span(
+      const span = new SpanImpl(
         provider.getTracer('default'),
         ROOT_CONTEXT,
         'span-name',
@@ -112,7 +113,7 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
+      const span = new SpanImpl(
         provider.getTracer('default'),
         ROOT_CONTEXT,
         'span-name',
@@ -164,7 +165,7 @@ describe('SimpleSpanProcessor', () => {
       const providerWithAsyncResource = new BasicTracerProvider({
         resource: new Resource(
           {},
-          new Promise<ResourceAttributes>(resolve => {
+          new Promise<Attributes>(resolve => {
             setTimeout(() => resolve({ async: 'fromasync' }), 1);
           })
         ),
@@ -174,7 +175,7 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
+      const span = new SpanImpl(
         providerWithAsyncResource.getTracer('default'),
         ROOT_CONTEXT,
         'span-name',
@@ -205,7 +206,7 @@ describe('SimpleSpanProcessor', () => {
       const providerWithAsyncResource = new BasicTracerProvider({
         resource: new Resource(
           {},
-          new Promise<ResourceAttributes>(resolve => {
+          new Promise<Attributes>(resolve => {
             setTimeout(() => resolve({ async: 'fromasync' }), 1);
           })
         ),
@@ -215,7 +216,7 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
+      const span = new SpanImpl(
         providerWithAsyncResource.getTracer('default'),
         ROOT_CONTEXT,
         'span-name',
@@ -274,7 +275,7 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
+      const span = new SpanImpl(
         provider.getTracer('default'),
         ROOT_CONTEXT,
         'span-name',
@@ -303,7 +304,7 @@ describe('SimpleSpanProcessor', () => {
   //       spanId: '5e0c63257de34c92',
   //       traceFlags: TraceFlags.SAMPLED,
   //     };
-  //     const span = new Span(
+  //     const span = new SpanImpl(
   //       providerWithAsyncResource.getTracer('default'),
   //       ROOT_CONTEXT,
   //       'span-name',

@@ -31,9 +31,9 @@ interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
 }
 
-class TestInstrumentation extends InstrumentationBase {
-  constructor(config: TestInstrumentationConfig & InstrumentationConfig = {}) {
-    super('test', '1.0.0', Object.assign({}, config));
+class TestInstrumentation extends InstrumentationBase<TestInstrumentationConfig> {
+  constructor(config = {}) {
+    super('test', '1.0.0', config);
   }
   override enable() {}
   override disable() {}
@@ -118,7 +118,7 @@ describe('BaseInstrumentation', () => {
   });
 
   describe('getConfig', () => {
-    it('should return instrumentation config', () => {
+    it('should return instrumentation config, "enabled" should be true by default', () => {
       const instrumentation: Instrumentation = new TestInstrumentation({
         isActive: false,
       });
@@ -126,6 +126,7 @@ describe('BaseInstrumentation', () => {
         instrumentation.getConfig() as TestInstrumentationConfig;
       assert.notStrictEqual(configuration, null);
       assert.strictEqual(configuration.isActive, false);
+      assert.strictEqual(configuration.enabled, true);
     });
   });
 
@@ -138,6 +139,18 @@ describe('BaseInstrumentation', () => {
       instrumentation.setConfig(config);
       const configuration =
         instrumentation.getConfig() as TestInstrumentationConfig;
+      assert.strictEqual(configuration.isActive, true);
+    });
+
+    it('should ensure "enabled" defaults to true', () => {
+      const instrumentation: Instrumentation = new TestInstrumentation();
+      const config: TestInstrumentationConfig = {
+        isActive: true,
+      };
+      instrumentation.setConfig(config);
+      const configuration =
+        instrumentation.getConfig() as TestInstrumentationConfig;
+      assert.strictEqual(configuration.enabled, true);
       assert.strictEqual(configuration.isActive, true);
     });
   });

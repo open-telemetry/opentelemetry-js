@@ -15,9 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { MetricAttributes, UpDownCounter } from '@opentelemetry/api';
+import { Attributes, UpDownCounter } from '@opentelemetry/api';
 import {
   AggregationTemporality,
+  AggregationType,
   createMeterProvider,
   DataPoint,
   DataPointType,
@@ -35,7 +36,6 @@ import {
   serviceName,
 } from './util';
 import { Resource } from '@opentelemetry/resources';
-import { AggregationType } from '@opentelemetry/sdk-metrics';
 
 const attributes = {
   foo1: 'bar1',
@@ -627,7 +627,7 @@ describe('PrometheusSerializer', () => {
           NaN: NaN,
           null: null,
           undefined: undefined,
-        } as unknown as MetricAttributes);
+        } as unknown as Attributes);
       });
 
       assert.strictEqual(
@@ -666,7 +666,7 @@ describe('PrometheusSerializer', () => {
           backslashN: '\u005c\u006e', // \n => \\n (\u005c\u005c\u006e)
           backslashDoubleQuote: '\u005c\u0022', // \" => \\\" (\u005c\u005c\u005c\u0022)
           backslashLineFeed: '\u005c\u000a', // \↵ => \\\n (\u005c\u005c\u005c\u006e)
-        } as unknown as MetricAttributes);
+        } as unknown as Attributes);
       });
 
       assert.strictEqual(
@@ -691,7 +691,7 @@ describe('PrometheusSerializer', () => {
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
         counter.add(1, {
           'account-id': '123456',
-        } as unknown as MetricAttributes);
+        } as unknown as Attributes);
       });
 
       assert.strictEqual(result, 'test_total{account_id="123456"} 1\n');

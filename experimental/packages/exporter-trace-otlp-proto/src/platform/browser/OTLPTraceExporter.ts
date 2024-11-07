@@ -15,11 +15,8 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 import {
   OTLPExporterConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
   OTLPExporterBrowserBase,
 } from '@opentelemetry/otlp-exporter-base';
 import {
@@ -28,7 +25,6 @@ import {
 } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * Collector Trace Exporter for Web
@@ -38,35 +34,11 @@ export class OTLPTraceExporter
   implements SpanExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
-    super(config, ProtobufTraceSerializer, 'application/x-protobuf');
-    const env = getEnv();
-    this._headers = Object.assign(
-      this._headers,
-      baggageUtils.parseKeyPairsIntoRecord(
-        env.OTEL_EXPORTER_OTLP_TRACES_HEADERS
-      )
+    super(
+      config,
+      ProtobufTraceSerializer,
+      { 'Content-Type': 'application/x-protobuf' },
+      DEFAULT_COLLECTOR_RESOURCE_PATH
     );
-  }
-
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    const env = getEnv();
-    if (env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0) {
-      return appendRootPathToUrlIfNeeded(
-        env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      );
-    }
-
-    if (env.OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
-      return appendResourcePathToUrl(
-        env.OTEL_EXPORTER_OTLP_ENDPOINT,
-        DEFAULT_COLLECTOR_RESOURCE_PATH
-      );
-    }
-
-    return DEFAULT_COLLECTOR_URL;
   }
 }

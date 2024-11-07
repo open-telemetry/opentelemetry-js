@@ -21,8 +21,8 @@ import {
   HrTime,
   Link,
   Span as APISpan,
-  SpanAttributes,
-  SpanAttributeValue,
+  Attributes,
+  AttributeValue,
   SpanContext,
   SpanKind,
   SpanStatus,
@@ -48,23 +48,29 @@ import {
   SEMATTRS_EXCEPTION_STACKTRACE,
   SEMATTRS_EXCEPTION_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
+import { ExceptionEventName } from './enums';
 import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
 import { SpanLimits } from './types';
 
 /**
+ * This type provides the properties of @link{ReadableSpan} at the same time
+ * of the Span API
+ */
+export type Span = APISpan & ReadableSpan;
+
+/**
  * This class represents a span.
  */
-export class Span implements APISpan, ReadableSpan {
+export class SpanImpl implements Span {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: SpanContext;
   readonly kind: SpanKind;
   readonly parentSpanId?: string;
-  readonly attributes: SpanAttributes = {};
+  readonly attributes: Attributes = {};
   readonly links: Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: HrTime;
@@ -105,7 +111,7 @@ export class Span implements APISpan, ReadableSpan {
     links: Link[] = [],
     startTime?: TimeInput,
     _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
-    attributes?: SpanAttributes
+    attributes?: Attributes
   ) {
     this.name = spanName;
     this._spanContext = spanContext;
@@ -139,7 +145,7 @@ export class Span implements APISpan, ReadableSpan {
     return this._spanContext;
   }
 
-  setAttribute(key: string, value?: SpanAttributeValue): this;
+  setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
     if (value == null || this._isSpanEnded()) return this;
     if (key.length === 0) {
@@ -163,7 +169,7 @@ export class Span implements APISpan, ReadableSpan {
     return this;
   }
 
-  setAttributes(attributes: SpanAttributes): this {
+  setAttributes(attributes: Attributes): this {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
@@ -179,7 +185,7 @@ export class Span implements APISpan, ReadableSpan {
    */
   addEvent(
     name: string,
-    attributesOrStartTime?: SpanAttributes | TimeInput,
+    attributesOrStartTime?: Attributes | TimeInput,
     timeStamp?: TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
@@ -226,7 +232,19 @@ export class Span implements APISpan, ReadableSpan {
 
   setStatus(status: SpanStatus): this {
     if (this._isSpanEnded()) return this;
-    this.status = status;
+    this.status = { ...status };
+
+    // When using try-catch, the caught "error" is of type `any`. When then assigning `any` to `status.message`,
+    // TypeScript will not error. While this can happen during use of any API, it is more common on Span#setStatus()
+    // as it's likely used in a catch-block. Therefore, we validate if `status.message` is actually a string, null, or
+    // undefined to avoid an incorrect type causing issues downstream.
+    if (this.status.message != null && typeof status.message !== 'string') {
+      diag.warn(
+        `Dropping invalid status.message of type '${typeof status.message}', expected 'string'`
+      );
+      delete this.status.message;
+    }
+
     return this;
   }
 
@@ -301,7 +319,7 @@ export class Span implements APISpan, ReadableSpan {
   }
 
   recordException(exception: Exception, time?: TimeInput): void {
-    const attributes: SpanAttributes = {};
+    const attributes: Attributes = {};
     if (typeof exception === 'string') {
       attributes[SEMATTRS_EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
@@ -380,7 +398,7 @@ export class Span implements APISpan, ReadableSpan {
    * @param value Attribute value
    * @returns truncated attribute value if required, otherwise same value
    */
-  private _truncateToSize(value: SpanAttributeValue): SpanAttributeValue {
+  private _truncateToSize(value: AttributeValue): AttributeValue {
     const limit = this._attributeValueLengthLimit;
     // Check limit
     if (limit <= 0) {
