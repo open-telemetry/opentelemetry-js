@@ -7,6 +7,41 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(instrumentation-http)!: reduce public API surface by removing exports and making protected methods private [#5124](https://github.com/open-telemetry/opentelemetry-js/pull/5124) @pichlermarc
+  * (user-facing) the following exports were intended for internal use only and have been removed without replacement
+    * extractHostnameAndPort
+    * getAbsoluteUrl
+    * getIncomingRequestAttributes
+    * getIncomingRequestAttributesOnResponse
+    * getIncomingRequestMetricAttributes
+    * getIncomingRequestMetricAttributesOnResponse
+    * getOutgoingRequestAttributes
+    * getOutgoingRequestAttributesOnResponse
+    * getOutgoingRequestMetricAttributes
+    * getOutgoingRequestMetricAttributesOnResponse
+    * getRequestInfo
+    * headerCapture
+    * isCompressed
+    * isValidOptionsType
+    * parseResponseStatus
+    * satisfiesPattern
+    * setAttributesFromHttpKind
+    * setRequestContentLengthAttribute
+    * setResponseContentLengthAttribute
+    * setSpanWithError
+    * RequestSignature
+    * RequestFunction
+    * ParsedRequestOptions
+    * IgnoreMatcher
+    * Https
+    * HttpRequestArgs
+    * HttpCallbackOptional
+    * HttpCallback
+    * Http
+    * GetFunction
+    * Func
+    * Err
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
