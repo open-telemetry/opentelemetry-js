@@ -54,7 +54,7 @@ body:
         of these statements to function.
       label: Bundling and `@opentelemetry/instrumentation-*`packages
       options:
-        - label: I understand that `@opentelemetry/instrumentation-*` packages are not intended to work in bundles apps (with a few exceptions).
+        - label: I understand that `@opentelemetry/instrumentation-*` packages are not intended to work in bundled apps (with a few exceptions).
           required: true
   - type: markdown
     attributes:
