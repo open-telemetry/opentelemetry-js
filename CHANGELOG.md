@@ -13,6 +13,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* fix(resources): remove diagnostic error when accessing attributes while async attributes are resolving. [#5119](https://github.com/open-telemetry/opentelemetry-js/pull/5119) @seemk
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
