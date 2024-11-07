@@ -32,6 +32,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation-fetch): removes CORS sub-span creation as it was not compliant with ResourceTiming spec @mariomc
 * fix(sampler-jaeger-remote): fixes an issue where package could emit unhandled promise rejections @Just-Sieb
 * fix(otlp-grpc-exporter-base): default compression to `'none'` if env vars `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` and `OTEL_EXPORTER_OTLP_COMPRESSION` are falsy @sjvans
 * fix(sdk-events): remove devDependencies to old `@opentelemetry/api-logs@0.52.0`, `@opentelemetry/api-events@0.52.0` packages [#5013](https://github.com/open-telemetry/opentelemetry-js/pull/5013) @pichlermarc

@@ -33,7 +33,6 @@ import {
 import {
   addSpanNetworkEvents,
   getResource,
-  PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
 } from '@opentelemetry/sdk-trace-web';
@@ -128,27 +127,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     api.propagation.inject(api.context.active(), headers);
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
-    });
-  }
-
-  /**
-   * Add cors pre flight child span
-   * @param span
-   * @param corsPreFlightRequest
-   * @private
-   */
-  private _addChildSpan(
-    span: api.Span,
-    corsPreFlightRequest: PerformanceResourceTiming
-  ): void {
-    api.context.with(api.trace.setSpan(api.context.active(), span), () => {
-      const childSpan = this.tracer.startSpan('CORS Preflight', {
-        startTime: corsPreFlightRequest[PTN.FETCH_START],
-      });
-      if (!this.getConfig().ignoreNetworkEvents) {
-        addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-      }
-      childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
 
@@ -291,11 +269,6 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const mainRequest = resource.mainRequest;
       this._markResourceAsUsed(mainRequest);
 
-      const corsPreFlightRequest = resource.corsPreFlightRequest;
-      if (corsPreFlightRequest) {
-        this._addChildSpan(span, corsPreFlightRequest);
-        this._markResourceAsUsed(corsPreFlightRequest);
-      }
       if (!this.getConfig().ignoreNetworkEvents) {
         addSpanNetworkEvents(span, mainRequest);
       }

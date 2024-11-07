@@ -335,7 +335,7 @@ describe('xhr', () => {
         });
 
         it('should create a span with correct root span', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           assert.strictEqual(
             span.parentSpanId,
             rootSpan.spanContext().spanId,
@@ -344,12 +344,12 @@ describe('xhr', () => {
         });
 
         it('span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           assert.strictEqual(span.name, 'GET', 'span has wrong name');
         });
 
         it('span should have correct kind', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           assert.strictEqual(
             span.kind,
             api.SpanKind.CLIENT,
@@ -358,7 +358,7 @@ describe('xhr', () => {
         });
 
         it('span should have correct attributes', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
 
@@ -404,7 +404,7 @@ describe('xhr', () => {
         });
 
         it('span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           const events = span.events;
           testForCorrectEvents(events, [
             EventNames.METHOD_OPEN,
@@ -420,50 +420,6 @@ describe('xhr', () => {
             EventNames.EVENT_LOAD,
           ]);
           assert.strictEqual(events.length, 11, 'number of events is wrong');
-        });
-
-        it('should create a span for preflight request', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(
-            span.parentSpanId,
-            parentSpan.spanContext().spanId,
-            'parent span is not root span'
-          );
-        });
-
-        it('preflight request span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          assert.strictEqual(
-            span.name,
-            'CORS Preflight',
-            'preflight request span has wrong name'
-          );
-        });
-
-        it('preflight request span should have correct kind', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          assert.strictEqual(
-            span.kind,
-            api.SpanKind.INTERNAL,
-            'span has wrong kind'
-          );
-        });
-
-        it('preflight request span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const events = span.events;
-          assert.strictEqual(events.length, 8, 'number of events is wrong');
-          testForCorrectEvents(events, [
-            PTN.FETCH_START,
-            PTN.DOMAIN_LOOKUP_START,
-            PTN.DOMAIN_LOOKUP_END,
-            PTN.CONNECT_START,
-            PTN.CONNECT_END,
-            PTN.REQUEST_START,
-            PTN.RESPONSE_START,
-            PTN.RESPONSE_END,
-          ]);
         });
 
         it('should NOT clear the resources', () => {
@@ -483,7 +439,7 @@ describe('xhr', () => {
           });
 
           it('span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
             testForCorrectEvents(events, [
               EventNames.METHOD_OPEN,
@@ -500,23 +456,6 @@ describe('xhr', () => {
               EventNames.EVENT_LOAD,
             ]);
             assert.strictEqual(events.length, 12, 'number of events is wrong');
-          });
-
-          it('preflight request span should have correct events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-            const events = span.events;
-            assert.strictEqual(events.length, 9, 'number of events is wrong');
-            testForCorrectEvents(events, [
-              PTN.FETCH_START,
-              PTN.DOMAIN_LOOKUP_START,
-              PTN.DOMAIN_LOOKUP_END,
-              PTN.CONNECT_START,
-              PTN.SECURE_CONNECTION_START,
-              PTN.CONNECT_END,
-              PTN.REQUEST_START,
-              PTN.RESPONSE_START,
-              PTN.RESPONSE_END,
-            ]);
           });
         });
 
@@ -563,8 +502,7 @@ describe('xhr', () => {
               );
             });
             it('should set trace headers', () => {
-              // span at exportSpy.args[0][0][0] is the preflight span
-              const span: api.Span = exportSpy.args[1][0][0];
+              const span: api.Span = exportSpy.args[0][0][0];
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
                 span.spanContext().traceId,
@@ -715,7 +653,7 @@ describe('xhr', () => {
           });
 
           it('should clear previous span information', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[2][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
 
@@ -744,7 +682,7 @@ describe('xhr', () => {
           });
 
           it('span should have custom attribute', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             assert.ok(attributes['xhr-custom-attribute'] === 'bar');
           });
@@ -801,7 +739,7 @@ describe('xhr', () => {
             });
           });
           it('should NOT add network events', () => {
-            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const events = span.events;
             assert.strictEqual(events.length, 3, 'number of events is wrong');
           });

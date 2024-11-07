@@ -93,30 +93,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   init(): void {}
 
   /**
-   * Add cors pre flight child span
-   * @param span
-   * @param corsPreFlightRequest
-   */
-  private _addChildSpan(
-    span: api.Span,
-    corsPreFlightRequest: PerformanceResourceTiming
-  ): void {
-    const childSpan = this.tracer.startSpan(
-      'CORS Preflight',
-      {
-        startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
-      },
-      api.trace.setSpan(api.context.active(), span)
-    );
-    if (!this.getConfig().ignoreNetworkEvents) {
-      web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-    }
-    childSpan.end(
-      corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
-    );
-  }
-
-  /**
    * Adds more attributes to span just before ending it
    * @param span
    * @param response
@@ -253,11 +229,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       const mainRequest = resource.mainRequest;
       this._markResourceAsUsed(mainRequest);
 
-      const corsPreFlightRequest = resource.corsPreFlightRequest;
-      if (corsPreFlightRequest) {
-        this._addChildSpan(span, corsPreFlightRequest);
-        this._markResourceAsUsed(corsPreFlightRequest);
-      }
       if (!this.getConfig().ignoreNetworkEvents) {
         web.addSpanNetworkEvents(span, mainRequest);
       }
