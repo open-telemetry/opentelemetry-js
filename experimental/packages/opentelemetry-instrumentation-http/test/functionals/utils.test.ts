@@ -37,7 +37,7 @@ import {
   IgnoreMatcher,
   ParsedRequestOptions,
   SemconvStability,
-} from '../../src/types';
+} from '../../src/internal-types';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';

@@ -40,15 +40,7 @@ import type * as https from 'https';
 import { Socket } from 'net';
 import * as semver from 'semver';
 import * as url from 'url';
-import {
-  Err,
-  Func,
-  Http,
-  HttpInstrumentationConfig,
-  HttpRequestArgs,
-  Https,
-  SemconvStability,
-} from './types';
+import { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
@@ -90,6 +82,14 @@ import {
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
+import {
+  Err,
+  Func,
+  Http,
+  HttpRequestArgs,
+  Https,
+  SemconvStability,
+} from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -326,7 +326,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /**
    * Creates spans for incoming requests, restoring spans' context if applied.
    */
-  protected _getPatchIncomingRequestFunction(component: 'http' | 'https') {
+  private _getPatchIncomingRequestFunction(component: 'http' | 'https') {
     return (
       original: (event: string, ...args: unknown[]) => boolean
     ): ((this: unknown, event: string, ...args: unknown[]) => boolean) => {
@@ -338,13 +338,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * Creates spans for outgoing requests, sending spans' context for distributed
    * tracing.
    */
-  protected _getPatchOutgoingRequestFunction(component: 'http' | 'https') {
+  private _getPatchOutgoingRequestFunction(component: 'http' | 'https') {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       return this._outgoingRequestFunction(component, original);
     };
   }
 
-  protected _getPatchOutgoingGetFunction(
+  private _getPatchOutgoingGetFunction(
     clientRequest: (
       options: http.RequestOptions | string | url.URL,
       ...args: HttpRequestArgs
