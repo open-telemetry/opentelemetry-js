@@ -88,7 +88,7 @@ instrumentation.disable();
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { getRemoteClientAddress } from '../../src/utils';
-import {SemconvStability} from "../../src/internal-types";
+import { SemconvStability } from '../../src/internal-types';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
