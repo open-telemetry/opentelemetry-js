@@ -9,6 +9,9 @@ body:
         > **Please read all parts of this form carefully.** By following the instructions carefully, you ensure that we
         > can get started fixing your bug, instead of being stuck at trying to reproduce your issue. Please provide
         > all requested information, even if you think it does not apply to your problem.
+        >
+        >  **If you use a third-party package that re-distributes OpenTelemetry, open the bug ticket with that third party unless you can provide steps to reproduce this with pure OpenTelemetry.**
+        >  Digging into third-party distributions of OpenTelemetry is not in scope for this project.
 
         Before filing a bug, please be sure you have searched through [existing open bugs](https://github.com/open-telemetry/opentelemetry-js/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
         to see if this bug has already been filed.
@@ -59,17 +62,13 @@ body:
     attributes:
       value: |
         ## Bug Reproduction
-        > [!IMPORTANT]
-        >  **If you use a third-party package that re-distributes OpenTelemetry, open the bug ticket with that third party unless you can provide steps to reproduce this with pure OpenTelemetry.**
-        >  Digging into third-party distributions of OpenTelemetry is not in scope for this project.
   - type: textarea
     attributes:
       label: What happened?
       description: |
         > [!IMPORTANT]
         > **Please provide as much detail as you reasonably can.**
-        > We all know the complexities of developing with JavaScript/TypeScript. **Be specific** about your setup and **DO NOT** assume that the
-        > person handling your bug report knows how to use your specific combination of tooling. Always provide build instructions and config files.
+        > We all know the complexities of developing with JavaScript/TypeScript. **Be specific** about your setup and **DO NOT** assume that the person handling your bug report knows how to use your specific combination of tooling. Always provide build instructions and config files.
       value: |
         ## Steps to Reproduce
           <!--
@@ -100,11 +99,9 @@ body:
     attributes:
       label: OpenTelemetry Setup Code
       description: |
-        > [!IMPORTANT]
-        > **If you have provided a reproducer repository above, you may omit this step.**
-
-        **Please provide the code you use to set up OpenTelemetry.**
-        If you use `@opentelemetry/auto-instrumentations-node/register`, please state so here
+        Please provide the code you use to set up OpenTelemetry.
+        If you use `@opentelemetry/auto-instrumentations-node/register`, please state so here.
+        You may omit this step if you have provided a reproducer repository.
       placeholder: | # This comes from our README.md
         // otel.js
 
