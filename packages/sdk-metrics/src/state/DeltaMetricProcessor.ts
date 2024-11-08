@@ -31,8 +31,13 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   // TODO: find a reasonable mean to clean the memo;
   // https://github.com/open-telemetry/opentelemetry-specification/pull/2208
   private _cumulativeMemoStorage = new AttributeHashMap<T>();
-
-  constructor(private _aggregator: Aggregator<T>) {}
+  private _cardinalityLimit: number;
+  constructor(
+    private _aggregator: Aggregator<T>,
+    aggregationCardinalityLimit?: number
+  ) {
+    this._cardinalityLimit = aggregationCardinalityLimit ?? 2000;
+  }
 
   record(
     value: number,
@@ -40,6 +45,16 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
     _context: Context,
     collectionTime: HrTime
   ) {
+    if (this._activeCollectionStorage.size >= this._cardinalityLimit) {
+      const overflowAttributes = { 'otel.metric.overflow': true };
+      const overflowAccumulation = this._activeCollectionStorage.getOrDefault(
+        overflowAttributes,
+        () => this._aggregator.createAccumulation(collectionTime)
+      );
+      overflowAccumulation?.record(value);
+      return;
+    }
+
     const accumulation = this._activeCollectionStorage.getOrDefault(
       attributes,
       () => this._aggregator.createAccumulation(collectionTime)

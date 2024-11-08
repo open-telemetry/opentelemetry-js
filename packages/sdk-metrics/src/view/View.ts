@@ -62,6 +62,15 @@ export type ViewOptions = {
    */
   aggregation?: Aggregation;
   /**
+   * Alters the metric stream:
+   * Sets a limit on the number of unique attribute combinations (cardinality) that can be aggregated.
+   * If not provided, the default limit will be used.
+   *
+   * @example <caption>sets the cardinality limit to 1000</caption>
+   * aggregationCardinalityLimit: 1000
+   */
+  aggregationCardinalityLimit?: number;
+  /**
    * Instrument selection criteria:
    * The original type of the Instrument(s).
    *
@@ -138,6 +147,7 @@ export class View {
   readonly attributesProcessor: AttributesProcessor;
   readonly instrumentSelector: InstrumentSelector;
   readonly meterSelector: MeterSelector;
+  readonly aggregationCardinalityLimit?: number;
 
   /**
    * Create a new {@link View} instance.
@@ -182,6 +192,13 @@ export class View {
    * @param viewOptions.meterSchemaUrl
    * Instrument selection criteria:
    *  The schema URL of the Meter. No wildcard support, schema URL must match exactly.
+   * @param viewOptions.aggregationCardinalityLimit
+   * Alters the metric stream:
+   *  Sets a limit on the number of unique attribute combinations (cardinality) that can be aggregated.
+   *  If not provided, the default limit will be used.
+   *
+   * @example <caption>sets the cardinality limit to 1000</caption>
+   * aggregationCardinalityLimit: 1000
    *
    * @example
    * // Create a view that changes the Instrument 'my.instrument' to use to an
@@ -232,5 +249,6 @@ export class View {
       version: viewOptions.meterVersion,
       schemaUrl: viewOptions.meterSchemaUrl,
     });
+    this.aggregationCardinalityLimit = viewOptions.aggregationCardinalityLimit;
   }
 }

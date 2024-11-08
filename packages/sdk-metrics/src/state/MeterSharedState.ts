@@ -142,7 +142,8 @@ export class MeterSharedState {
         viewDescriptor,
         aggregator,
         view.attributesProcessor,
-        this._meterProviderSharedState.metricCollectors
+        this._meterProviderSharedState.metricCollectors,
+        view.aggregationCardinalityLimit
       ) as R;
       this.metricStorageRegistry.register(viewStorage);
       return viewStorage;
@@ -190,6 +191,7 @@ interface MetricStorageConstructor {
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<Maybe<Accumulation>>,
     attributesProcessor: AttributesProcessor,
-    collectors: MetricCollectorHandle[]
+    collectors: MetricCollectorHandle[],
+    aggregationCardinalityLimit?: number
   ): MetricStorage;
 }

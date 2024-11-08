@@ -21,6 +21,7 @@ import {
   DataPointType,
   ExplicitBucketHistogramAggregation,
   HistogramMetricData,
+  DataPoint,
 } from '../src';
 import {
   assertScopeMetrics,
@@ -599,6 +600,93 @@ describe('MeterProvider', () => {
           .dataPoints[0].value.buckets.boundaries,
         sBoundaries
       );
+    });
+  });
+
+  describe('aggregationCardinalityLimit with view should apply the cardinality limit', () => {
+    it('should respect the aggregationCardinalityLimit', async () => {
+      const reader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+        views: [
+          new View({
+            instrumentName: 'test-counter',
+            aggregationCardinalityLimit: 2, // Set cardinality limit to 2
+          }),
+        ],
+      });
+
+      const meter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = meter.createCounter('test-counter');
+
+      // Add values with different attributes
+      counter.add(1, { attr1: 'value1' });
+      counter.add(1, { attr2: 'value2' });
+      counter.add(1, { attr3: 'value3' });
+
+      // Perform collection
+      const { resourceMetrics, errors } = await reader.collect();
+
+      assert.strictEqual(errors.length, 0);
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+
+      const metricData = resourceMetrics.scopeMetrics[0].metrics[0];
+      assert.strictEqual(metricData.dataPoints.length, 3);
+
+      // Check if the overflow data point is present
+      const overflowDataPoint = (
+        metricData.dataPoints as DataPoint<number>[]
+      ).find((dataPoint: DataPoint<number>) =>
+        Object.prototype.hasOwnProperty.call(
+          dataPoint.attributes,
+          'otel.metric.overflow'
+        )
+      );
+      assert.ok(overflowDataPoint);
+      assert.strictEqual(overflowDataPoint.value, 1);
+    });
+  });
+
+  describe('default aggregationCardinalityLimit should apply the cardinality limit', () => {
+    it('should respect the default aggregationCardinalityLimit', async () => {
+      const reader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+      });
+
+      const meter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = meter.createCounter('test-counter');
+
+      // Add values with different attributes
+      for (let i = 0; i < 2002; i++) {
+        const attributes = { [`attr${i}`]: `value${i}` };
+        counter.add(1, attributes);
+      }
+
+      // Perform collection
+      const { resourceMetrics, errors } = await reader.collect();
+
+      assert.strictEqual(errors.length, 0);
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+
+      const metricData = resourceMetrics.scopeMetrics[0].metrics[0];
+      assert.strictEqual(metricData.dataPoints.length, 2001);
+
+      // Check if the overflow data point is present
+      const overflowDataPoint = (
+        metricData.dataPoints as DataPoint<number>[]
+      ).find((dataPoint: DataPoint<number>) =>
+        Object.prototype.hasOwnProperty.call(
+          dataPoint.attributes,
+          'otel.metric.overflow'
+        )
+      );
+      assert.ok(overflowDataPoint);
+      assert.strictEqual(overflowDataPoint.value, 2);
     });
   });
 
