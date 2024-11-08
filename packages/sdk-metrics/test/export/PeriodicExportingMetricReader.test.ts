@@ -355,7 +355,7 @@ describe('PeriodicExportingMetricReader', () => {
       );
     });
 
-    it('should log call global error handler when resolving async attributes fails', async () => {
+    it('should call global error handler when resolving async attributes fails', async () => {
       // arrange
       const expectedError = new Error('resolving async attributes failed');
       const waitForAsyncAttributesStub = sinon.stub().rejects(expectedError);
