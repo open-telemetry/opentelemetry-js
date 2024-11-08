@@ -27,7 +27,11 @@ import { ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
-import {ExportResult, ExportResultCode, setGlobalErrorHandler} from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import {
