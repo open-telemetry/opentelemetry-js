@@ -84,7 +84,7 @@ body:
 
         ## Additional Details
          <!--
-           Anything you can think of that will help us reproduce and understad your problem:
+           Anything you can think of that will help us reproduce and understand your problem:
               - details about the behavior of the bug
               - code to reproduce, if not provided via a repository above (including setting up any frameworks you may be using, we likely don't use the same tech-stack that you're using on the daily)
               - which tooling you use and how you're using it
