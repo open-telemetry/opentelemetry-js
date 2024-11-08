@@ -85,12 +85,19 @@ export class BasicTracerProvider implements TracerProvider {
       resource: this.resource,
     });
 
-    const defaultExporter = this._buildExporterFromEnv();
-    if (defaultExporter !== undefined) {
-      const batchProcessor = new BatchSpanProcessor(defaultExporter);
-      this.activeSpanProcessor = batchProcessor;
+    if (config.spanProcessors?.length) {
+      this._registeredSpanProcessors = [...config.spanProcessors];
+      this.activeSpanProcessor = new MultiSpanProcessor(
+        this._registeredSpanProcessors
+      );
     } else {
-      this.activeSpanProcessor = new NoopSpanProcessor();
+      const defaultExporter = this._buildExporterFromEnv();
+      if (defaultExporter !== undefined) {
+        const batchProcessor = new BatchSpanProcessor(defaultExporter);
+        this.activeSpanProcessor = batchProcessor;
+      } else {
+        this.activeSpanProcessor = new NoopSpanProcessor();
+      }
     }
   }
 
@@ -113,29 +120,6 @@ export class BasicTracerProvider implements TracerProvider {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
-  }
-
-  /**
-   * Adds a new {@link SpanProcessor} to this tracer.
-   * @param spanProcessor the new SpanProcessor to be added.
-   */
-  addSpanProcessor(spanProcessor: SpanProcessor): void {
-    if (this._registeredSpanProcessors.length === 0) {
-      // since we might have enabled by default a batchProcessor, we disable it
-      // before adding the new one
-      this.activeSpanProcessor
-        .shutdown()
-        .catch(err =>
-          diag.error(
-            'Error while trying to shutdown current span processor',
-            err
-          )
-        );
-    }
-    this._registeredSpanProcessors.push(spanProcessor);
-    this.activeSpanProcessor = new MultiSpanProcessor(
-      this._registeredSpanProcessors
-    );
   }
 
   getActiveSpanProcessor(): SpanProcessor {
