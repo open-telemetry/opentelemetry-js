@@ -29,9 +29,9 @@ detailed instructions, see [development](#development) below.
 ```sh
 git clone https://github.com/open-telemetry/opentelemetry-js.git
 cd opentelemetry-js
-npm install
+npm ci
 npm run compile
-npm test
+npm run test
 ```
 
 ## Pull Request Merge Guidelines
@@ -164,7 +164,7 @@ Most of the commands needed for development are accessed as [npm scripts](https:
 This will install all dependencies for the root project and all modules managed by `npm workspaces`.
 
 ```sh
-npm install
+npm ci
 ```
 
 ### Compile modules
@@ -223,6 +223,16 @@ To run the unit tests continuously in watch mode while developing, use:
 npm run tdd
 ```
 
+Packages that are expected to run in the browser have browser specific tests:
+
+```sh
+# Run browser-specific test
+npm run test:browser
+
+# Run web worker test
+npm run test:webworker
+```
+
 ### Linting
 
 This project uses `eslint` to lint source code. Just like tests and compilation, linting can be done for all packages or only a single package.
@@ -247,11 +257,19 @@ cd packages/opentelemetry-module-name
 npm run lint:fix
 ```
 
-Similarly, Markdown files (such as README.md files) can be linted:
+The default lint command will check majority of files, including Markdown files (such as README.md files), but you
+also have the option to check just the Markdown files with:
 
 ```sh
 npm run lint:markdown
 npm run lint:markdown:fix # can automatically fix some Markdown rules
+```
+
+The default command doesn't check the examples folder. To lint just the examples, use the script:
+
+```sh
+npm run lint:examples
+npm run lint:examples:fix # can automatically fix some errors
 ```
 
 ### Generating docs
@@ -293,10 +311,10 @@ export const _globalThis = typeof globalThis === 'object' ? globalThis : global;
 /// packages/opentelemetry-core/src/platform/browser/globalThis.ts
 export const _globalThis: typeof globalThis =
   typeof globalThis === 'object' ? globalThis :
-  typeof self === 'object' ? self :
-  typeof window === 'object' ? window :
-  typeof global === 'object' ? global :
-  {} as typeof globalThis;
+    typeof self === 'object' ? self :
+      typeof window === 'object' ? window :
+        typeof global === 'object' ? global :
+          {} as typeof globalThis;
 ```
 
 Even though the implementation may differ, the exported names must be aligned.

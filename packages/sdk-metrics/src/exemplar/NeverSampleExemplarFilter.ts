@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
+import { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { ExemplarFilter } from './ExemplarFilter';
 
 export class NeverSampleExemplarFilter implements ExemplarFilter {
   shouldSample(
     _value: number,
     _timestamp: HrTime,
-    _attributes: MetricAttributes,
+    _attributes: Attributes,
     _ctx: Context
   ): boolean {
     return false;

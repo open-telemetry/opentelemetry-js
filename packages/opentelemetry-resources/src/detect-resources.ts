@@ -70,6 +70,7 @@ export const detectResourcesSync = (
         if (isPromiseLike<Resource>(resourceOrPromise)) {
           const createPromise = async () => {
             const resolvedResource = await resourceOrPromise;
+            await resolvedResource.waitForAsyncAttributes?.();
             return resolvedResource.attributes;
           };
           resource = new Resource({}, createPromise());

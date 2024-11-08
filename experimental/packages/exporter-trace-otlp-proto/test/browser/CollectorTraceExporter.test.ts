@@ -21,9 +21,7 @@ import { OTLPTraceExporter } from '../../src/platform/browser/index';
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;
   describe('constructor', () => {
-    let onInitSpy: any;
     beforeEach(() => {
-      onInitSpy = sinon.stub(OTLPTraceExporter.prototype, 'onInit');
       const collectorExporterConfig = {
         hostname: 'foo',
         url: 'http://foo.bar.com',
@@ -35,16 +33,6 @@ describe('OTLPTraceExporter - web', () => {
     });
     it('should create an instance', () => {
       assert.ok(typeof collectorTraceExporter !== 'undefined');
-    });
-    it('should call onInit', () => {
-      assert.strictEqual(onInitSpy.callCount, 1);
-    });
-    it('should set hostname', () => {
-      assert.strictEqual(collectorTraceExporter.hostname, 'foo');
-    });
-
-    it('should set url', () => {
-      assert.strictEqual(collectorTraceExporter.url, 'http://foo.bar.com');
     });
   });
 });

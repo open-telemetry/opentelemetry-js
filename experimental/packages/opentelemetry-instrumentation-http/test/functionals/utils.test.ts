@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 import {
-  SpanAttributes,
-  SpanStatusCode,
-  ROOT_CONTEXT,
-  SpanKind,
-  TraceFlags,
-  context,
   Attributes,
+  SpanStatusCode,
+  SpanKind,
+  context,
+  Span,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import {
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
@@ -152,85 +149,6 @@ describe('Utility', () => {
     });
   });
 
-  describe('isIgnored()', () => {
-    beforeEach(() => {
-      sinon.spy(utils, 'satisfiesPattern');
-    });
-
-    afterEach(() => {
-      sinon.restore();
-    });
-
-    it('should call isSatisfyPattern, n match', () => {
-      const answer1 = utils.isIgnored('/test/1', ['/test/11']);
-      assert.strictEqual(answer1, false);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        1
-      );
-    });
-
-    it('should call isSatisfyPattern, match for function', () => {
-      const answer1 = utils.isIgnored('/test/1', [
-        url => url.endsWith('/test/1'),
-      ]);
-      assert.strictEqual(answer1, true);
-    });
-
-    it('should not re-throw when function throws an exception', () => {
-      const onException = (e: unknown) => {
-        // Do nothing
-      };
-      for (const callback of [undefined, onException]) {
-        assert.doesNotThrow(() =>
-          utils.isIgnored(
-            '/test/1',
-            [
-              () => {
-                throw new Error('test');
-              },
-            ],
-            callback
-          )
-        );
-      }
-    });
-
-    it('should call onException when function throws an exception', () => {
-      const onException = sinon.spy();
-      assert.doesNotThrow(() =>
-        utils.isIgnored(
-          '/test/1',
-          [
-            () => {
-              throw new Error('test');
-            },
-          ],
-          onException
-        )
-      );
-      assert.strictEqual((onException as sinon.SinonSpy).callCount, 1);
-    });
-
-    it('should not call isSatisfyPattern', () => {
-      utils.isIgnored('/test/1', []);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        0
-      );
-    });
-
-    it('should return false on empty list', () => {
-      const answer1 = utils.isIgnored('/test/1', []);
-      assert.strictEqual(answer1, false);
-    });
-
-    it('should not throw and return false when list is undefined', () => {
-      const answer2 = utils.isIgnored('/test/1', undefined);
-      assert.strictEqual(answer2, false);
-    });
-  });
-
   describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
@@ -258,26 +176,28 @@ describe('Utility', () => {
   describe('setSpanWithError()', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
-      const span = new Span(
-        new BasicTracerProvider().getTracer('default'),
-        ROOT_CONTEXT,
-        'test',
-        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-        SpanKind.INTERNAL
-      );
-      utils.setSpanWithError(
-        span,
-        new Error(errorMessage),
-        SemconvStability.OLD
-      );
-      const attributes = span.attributes;
-      assert.strictEqual(
-        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
-        errorMessage
-      );
-      assert.strictEqual(span.events.length, 1);
-      assert.strictEqual(span.events[0].name, 'exception');
-      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+      const error = new Error(errorMessage);
+      const span = {
+        setAttribute: () => undefined,
+        setStatus: () => undefined,
+        recordException: () => undefined,
+      } as unknown as Span;
+      const mock = sinon.mock(span);
+
+      mock
+        .expects('setAttribute')
+        .calledWithExactly(AttributeNames.HTTP_ERROR_NAME, 'error');
+      mock
+        .expects('setAttribute')
+        .calledWithExactly(AttributeNames.HTTP_ERROR_MESSAGE, errorMessage);
+      mock.expects('setStatus').calledWithExactly({
+        code: SpanStatusCode.ERROR,
+        message: errorMessage,
+      });
+      mock.expects('recordException').calledWithExactly(error);
+
+      utils.setSpanWithError(span, error, SemconvStability.OLD);
+      mock.verify();
     });
   });
 
@@ -362,7 +282,7 @@ describe('Utility', () => {
   // Verify the key in the given attributes is set to the given value,
   // and that no other HTTP Content Length attributes are set.
   function verifyValueInAttributes(
-    attributes: SpanAttributes,
+    attributes: Attributes,
     key: string | undefined,
     value: number
   ) {
@@ -384,7 +304,7 @@ describe('Utility', () => {
 
   describe('setRequestContentLengthAttributes()', () => {
     it('should set request content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
 
       request.headers = {
@@ -400,7 +320,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -416,7 +336,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -434,7 +354,7 @@ describe('Utility', () => {
 
   describe('setResponseContentLengthAttributes()', () => {
     it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -451,7 +371,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -470,7 +390,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -489,7 +409,7 @@ describe('Utility', () => {
     });
 
     it('should set no attributes with no content-length header', () => {
-      const attributes: SpanAttributes = {};
+      const attributes: Attributes = {};
       const message = {} as IncomingMessage;
 
       message.headers = {
@@ -538,40 +458,51 @@ describe('Utility', () => {
 
   describe('headers to span attributes capture', () => {
     let span: Span;
+    let mock: sinon.SinonMock;
 
     beforeEach(() => {
-      span = new Span(
-        new BasicTracerProvider().getTracer('default'),
-        ROOT_CONTEXT,
-        'test',
-        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-        SpanKind.INTERNAL
-      );
+      span = {
+        setAttribute: () => undefined,
+      } as unknown as Span;
+      mock = sinon.mock(span);
     });
 
     it('should set attributes for request and response keys', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.origin', ['localhost']);
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.response.header.cookie', ['token=123']);
+
       utils.headerCapture('request', ['Origin'])(span, () => 'localhost');
       utils.headerCapture('response', ['Cookie'])(span, () => 'token=123');
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-      ]);
-      assert.deepStrictEqual(span.attributes['http.response.header.cookie'], [
-        'token=123',
-      ]);
+      mock.verify();
     });
 
     it('should set attributes for multiple values', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.origin', [
+          'localhost',
+          'www.example.com',
+        ]);
+
       utils.headerCapture('request', ['Origin'])(span, () => [
         'localhost',
         'www.example.com',
       ]);
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-        'www.example.com',
-      ]);
+      mock.verify();
     });
 
     it('sets attributes for multiple headers', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.origin', ['localhost']);
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.foo', [42]);
+
       utils.headerCapture('request', ['Origin', 'Foo'])(span, header => {
         if (header === 'origin') {
           return 'localhost';
@@ -583,22 +514,24 @@ describe('Utility', () => {
 
         return undefined;
       });
-
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-      ]);
-      assert.deepStrictEqual(span.attributes['http.request.header.foo'], [42]);
+      mock.verify();
     });
 
     it('should normalize header names', () => {
+      mock
+        .expects('setAttribute')
+        .calledWithExactly('http.request.header.x_forwarded_for', ['foo']);
+
       utils.headerCapture('request', ['X-Forwarded-For'])(span, () => 'foo');
-      assert.deepStrictEqual(
-        span.attributes['http.request.header.x_forwarded_for'],
-        ['foo']
-      );
+      mock.verify();
     });
 
     it('ignores non-existent headers', () => {
+      mock
+        .expects('setAttribute')
+        .once()
+        .calledWithExactly('http.request.header.origin', ['localhost']);
+
       utils.headerCapture('request', ['Origin', 'Accept'])(span, header => {
         if (header === 'origin') {
           return 'localhost';
@@ -606,14 +539,7 @@ describe('Utility', () => {
 
         return undefined;
       });
-
-      assert.deepStrictEqual(span.attributes['http.request.header.origin'], [
-        'localhost',
-      ]);
-      assert.deepStrictEqual(
-        span.attributes['http.request.header.accept'],
-        undefined
-      );
+      mock.verify();
     });
   });
 

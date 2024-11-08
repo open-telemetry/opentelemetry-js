@@ -54,7 +54,7 @@ export function getResourceDetectorsFromEnv(): Array<DetectorSync> {
   return resourceDetectorsFromEnv.flatMap(detector => {
     const resourceDetector = resourceDetectors.get(detector);
     if (!resourceDetector) {
-      diag.error(
+      diag.warn(
         `Invalid resource detector "${detector}" specified in the environment variable OTEL_NODE_RESOURCE_DETECTORS`
       );
     }
