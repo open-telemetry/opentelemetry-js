@@ -59,6 +59,6 @@ export const enum SemconvStability {
   STABLE = 0x1,
   /** Emit only old semantic conventions*/
   OLD = 0x2,
-  /** Emit both stable and old semantic convetions */
+  /** Emit both stable and old semantic conventions*/
   DUPLICATE = 0x1 | 0x2,
 }
