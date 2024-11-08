@@ -27,6 +27,8 @@ import {
   SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
   SEMATTRS_HTTP_ROUTE,
   SEMATTRS_HTTP_TARGET,
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_NET_PEER_NAME,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -279,6 +281,39 @@ describe('Utility', () => {
       assert.deepEqual(metricAttributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
   });
+
+  describe('getOutgoingRequestMetricAttributes()', () => {
+    it('should correctly add attributes from span', () => {
+      const spanAttributes: Attributes = {
+        [SEMATTRS_HTTP_METHOD]: 'GET',
+        [SEMATTRS_NET_PEER_NAME]: 'hostname',
+        [SEMATTRS_HTTP_ROUTE]: '/user/:id',
+      };
+      const metricAttributes =
+        utils.getOutgoingRequestMetricAttributes(spanAttributes);
+
+      assert.deepStrictEqual(metricAttributes[SEMATTRS_HTTP_METHOD], 'GET');
+      assert.deepStrictEqual(
+        metricAttributes[SEMATTRS_NET_PEER_NAME],
+        'hostname'
+      );
+      assert.deepStrictEqual(
+        metricAttributes[SEMATTRS_HTTP_ROUTE],
+        '/user/:id'
+      );
+    });
+
+    it('should not add http_route attribute if span does not have it', () => {
+      const spanAttributes: Attributes = {};
+      const metricAttributes =
+        utils.getOutgoingRequestMetricAttributes(spanAttributes);
+      assert.deepStrictEqual(metricAttributes, {
+        [SEMATTRS_HTTP_METHOD]: undefined,
+        [SEMATTRS_NET_PEER_NAME]: undefined,
+      });
+    });
+  });
+
   // Verify the key in the given attributes is set to the given value,
   // and that no other HTTP Content Length attributes are set.
   function verifyValueInAttributes(

@@ -421,6 +421,10 @@ export const getOutgoingRequestMetricAttributes = (
   metricAttributes[SEMATTRS_HTTP_METHOD] = spanAttributes[SEMATTRS_HTTP_METHOD];
   metricAttributes[SEMATTRS_NET_PEER_NAME] =
     spanAttributes[SEMATTRS_NET_PEER_NAME];
+  const route = spanAttributes[SEMATTRS_HTTP_ROUTE];
+  if (route !== undefined) {
+    metricAttributes[SEMATTRS_HTTP_ROUTE] = route;
+  }
   //TODO: http.url attribute, it should substitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
