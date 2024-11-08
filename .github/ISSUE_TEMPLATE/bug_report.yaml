@@ -72,10 +72,8 @@ body:
       value: |
         ## Steps to Reproduce
           <!--
-            Please consider providing a link to a reproducer repository. It is extremely difficult to exactly reproduce problems
-            and doing so can take multiple hours for us. By providing a reproducer you indirectly contribute back to the project
-            and ensure we can get working on fixing your bug as soon as possible instead of spending precious time asking
-            questions and checking responses. You know your tooling and setup and we know OpenTelemetry JavaScript internals.
+            The most effective way to solve a bug is to provide a link to a reproducer repository. It is extremely difficult to exactly reproduce problems
+            and doing so can take multiple hours for us. You know your tooling and setup and we know OpenTelemetry JavaScript internals.
             Let's help each other! :)
          -->
         ## Expected Result
