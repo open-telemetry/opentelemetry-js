@@ -77,7 +77,7 @@ import {
   IgnoreMatcher,
   ParsedRequestOptions,
   SemconvStability,
-} from './types';
+} from './internal-types';
 import forwardedParse = require('forwarded-parse');
 
 /**
