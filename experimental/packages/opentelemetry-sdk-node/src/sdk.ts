@@ -279,6 +279,7 @@ export class NodeSDK {
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
+        mergeResourceWithDefaults: this._mergeResourceWithDefaults,
       });
 
       for (const logRecordProcessor of this._loggerProviderConfig
