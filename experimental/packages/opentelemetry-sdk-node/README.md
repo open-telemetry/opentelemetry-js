@@ -104,7 +104,7 @@ An array of log record processors to register to the logger provider.
 
 ### mergeResourceWithDefaults
 
-Merge user-provided resources be with the default resource. Default `true`.
+Merge user-provided resources with the default resource. Default `true`.
 
 ### metricReader
 
