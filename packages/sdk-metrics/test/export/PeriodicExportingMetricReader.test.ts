@@ -395,6 +395,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       // assert
       sinon.assert.calledOnce(waitForAsyncAttributesStub);
+      sinon.assert.calledOnceWithExactly(errorHandlerStub, expectedError);
     });
 
     it('should throw TimeoutError when forceFlush takes too long', async () => {
