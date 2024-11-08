@@ -40,15 +40,7 @@ import type * as https from 'https';
 import { Socket } from 'net';
 import * as semver from 'semver';
 import * as url from 'url';
-import {
-  Err,
-  Func,
-  Http,
-  HttpInstrumentationConfig,
-  HttpRequestArgs,
-  Https,
-  SemconvStability,
-} from './types';
+import { HttpInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
@@ -90,6 +82,14 @@ import {
   parseResponseStatus,
   setSpanWithError,
 } from './utils';
+import {
+  Err,
+  Func,
+  Http,
+  HttpRequestArgs,
+  Https,
+  SemconvStability,
+} from './internal-types';
 
 /**
  * `node:http` and `node:https` instrumentation for OpenTelemetry
@@ -326,7 +326,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
   /**
    * Creates spans for incoming requests, restoring spans' context if applied.
    */
-  protected _getPatchIncomingRequestFunction(component: 'http' | 'https') {
+  private _getPatchIncomingRequestFunction(component: 'http' | 'https') {
     return (
       original: (event: string, ...args: unknown[]) => boolean
     ): ((this: unknown, event: string, ...args: unknown[]) => boolean) => {
@@ -338,13 +338,13 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
    * Creates spans for outgoing requests, sending spans' context for distributed
    * tracing.
    */
-  protected _getPatchOutgoingRequestFunction(component: 'http' | 'https') {
+  private _getPatchOutgoingRequestFunction(component: 'http' | 'https') {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       return this._outgoingRequestFunction(component, original);
     };
   }
 
-  protected _getPatchOutgoingGetFunction(
+  private _getPatchOutgoingGetFunction(
     clientRequest: (
       options: http.RequestOptions | string | url.URL,
       ...args: HttpRequestArgs
@@ -632,15 +632,19 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
 
       const headers = request.headers;
 
-      const spanAttributes = getIncomingRequestAttributes(request, {
-        component: component,
-        serverName: instrumentation.getConfig().serverName,
-        hookAttributes: instrumentation._callStartSpanHook(
-          request,
-          instrumentation.getConfig().startIncomingSpanHook
-        ),
-        semconvStability: instrumentation._semconvStability,
-      });
+      const spanAttributes = getIncomingRequestAttributes(
+        request,
+        {
+          component: component,
+          serverName: instrumentation.getConfig().serverName,
+          hookAttributes: instrumentation._callStartSpanHook(
+            request,
+            instrumentation.getConfig().startIncomingSpanHook
+          ),
+          semconvStability: instrumentation._semconvStability,
+        },
+        instrumentation._diag
+      );
 
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,
@@ -757,7 +761,11 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as http.RequestOptions)
           : undefined;
-      const { method, optionsParsed } = getRequestInfo(options, extraOptions);
+      const { method, invalidUrl, optionsParsed } = getRequestInfo(
+        instrumentation._diag,
+        options,
+        extraOptions
+      );
       /**
        * Node 8's https module directly call the http one so to avoid creating
        * 2 span for the same request we need to check that the protocol is correct
@@ -859,7 +867,16 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
         }
 
         const request: http.ClientRequest = safeExecuteInTheMiddle(
-          () => original.apply(this, [optionsParsed, ...args]),
+          () => {
+            if (invalidUrl) {
+              // we know that the url is invalid, there's no point in injecting context as it will fail validation.
+              // Passing in what the user provided will give the user an error that matches what they'd see without
+              // the instrumentation.
+              return original.apply(this, [options, ...args]);
+            } else {
+              return original.apply(this, [optionsParsed, ...args]);
+            }
+          },
           error => {
             if (error) {
               setSpanWithError(span, error, instrumentation._semconvStability);

@@ -7,13 +7,63 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(instrumentation-http)!: reduce public API surface by removing exports and making protected methods private [#5124](https://github.com/open-telemetry/opentelemetry-js/pull/5124) @pichlermarc
+  * (user-facing) the following exports were intended for internal use only and have been removed without replacement
+    * extractHostnameAndPort
+    * getAbsoluteUrl
+    * getIncomingRequestAttributes
+    * getIncomingRequestAttributesOnResponse
+    * getIncomingRequestMetricAttributes
+    * getIncomingRequestMetricAttributesOnResponse
+    * getOutgoingRequestAttributes
+    * getOutgoingRequestAttributesOnResponse
+    * getOutgoingRequestMetricAttributes
+    * getOutgoingRequestMetricAttributesOnResponse
+    * getRequestInfo
+    * headerCapture
+    * isCompressed
+    * isValidOptionsType
+    * parseResponseStatus
+    * satisfiesPattern
+    * setAttributesFromHttpKind
+    * setRequestContentLengthAttribute
+    * setResponseContentLengthAttribute
+    * setSpanWithError
+    * RequestSignature
+    * RequestFunction
+    * ParsedRequestOptions
+    * IgnoreMatcher
+    * Https
+    * HttpRequestArgs
+    * HttpCallbackOptional
+    * HttpCallback
+    * Http
+    * GetFunction
+    * Func
+    * Err
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation-http): drop url.parse in favor of URL constructor [#5091](https://github.com/open-telemetry/opentelemetry-js/pull/5091) @pichlermarc
+  * fixes a bug where using cyrillic characters in a client request string URL would throw an exception, whereas an un-instrumented client would accept the same input without throwing an exception
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.54.2
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation): Fix wrapping ESM files with absolute path [#5094](https://github.com/open-telemetry/opentelemetry-js/pull/5094) @serkan-ozal
+
+## 0.54.1
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): skip malformed forwarded headers. [#5095](https://github.com/open-telemetry/opentelemetry-js/issues/5095) @pmlanger
 
 ## 0.54.0
 

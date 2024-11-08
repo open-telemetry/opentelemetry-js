@@ -18,8 +18,15 @@ import * as assert from 'assert';
 import {
   InstrumentationBase,
   InstrumentationNodeModuleDefinition,
+  InstrumentationNodeModuleFile,
 } from '../../build/src/index.js';
 import * as exported from 'test-esm-module';
+import * as exportedAbsolute from './esm/test.mjs';
+
+import path from 'path';
+import url from 'url';
+
+const TEST_DIR_NAME = path.dirname(url.fileURLToPath(import.meta.url));
 
 class TestInstrumentationWrapFn extends InstrumentationBase {
   constructor(config) {
@@ -95,6 +102,45 @@ class TestInstrumentationSimple extends InstrumentationBase {
     );
   }
 }
+
+class TestAbsoluteFileInstrumentationPatchFn extends InstrumentationBase {
+  constructor(config) {
+    super('test-esm-instrumentation', '0.0.1', config);
+  }
+  init() {
+    return new InstrumentationNodeModuleDefinition(
+      path.join(TEST_DIR_NAME, '/esm/test.mjs'),
+      ['*'],
+      undefined,
+      undefined,
+      [
+        new InstrumentationNodeModuleFile(
+          'test',
+          ['*'],
+          moduleExports => {
+            const wrapRetval = this._wrap(moduleExports, 'testFunction', () => {
+              return function wrappedTestFunction() {
+                return 'patched';
+              };
+            });
+            assert.strictEqual(typeof wrapRetval, 'function');
+            assert.strictEqual(
+              wrapRetval.name,
+              'wrappedTestFunction',
+              '_wrap(..., "testFunction", ...) return value is the wrapped function'
+            );
+            return moduleExports;
+          },
+          moduleExports => {
+            this._unwrap(moduleExports, 'testFunction');
+            return moduleExports;
+          }
+        )
+      ]
+    )
+  }
+}
+
 describe('when loading esm module', () => {
   const instrumentationWrap = new TestInstrumentationWrapFn({
     enabled: false,
@@ -139,5 +185,24 @@ describe('when loading esm module', () => {
     instrumentation.disable();
     assert.deepEqual(exported.testFunction(), 'original');
     assert.deepEqual(exported.secondTestFunction(), 'original');
+  });
+
+  it('should patch function from a file with absolute path', async () => {
+    const instrumentation = new TestAbsoluteFileInstrumentationPatchFn({
+      enabled: false,
+    });
+    instrumentation.enable();
+    assert.deepEqual(exportedAbsolute.testFunction(), 'patched');
+  });
+
+  it('should unwrap a patched function from a file with absolute path', async () => {
+    const instrumentation = new TestAbsoluteFileInstrumentationPatchFn({
+      enabled: false,
+    });
+
+    instrumentation.enable();
+    // disable to trigger unwrap
+    instrumentation.disable();
+    assert.deepEqual(exported.testFunction(), 'original');
   });
 });
