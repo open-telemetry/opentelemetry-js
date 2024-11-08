@@ -19,6 +19,7 @@ import {
   Span,
   context,
   SpanKind,
+  DiagLogger,
 } from '@opentelemetry/api';
 import {
   ATTR_CLIENT_ADDRESS,
@@ -236,26 +237,103 @@ export const isCompressed = (
 };
 
 /**
+ * Mimics Node.js conversion of URL strings to RequestOptions expected by
+ * `http.request` and `https.request` APIs.
+ *
+ * See https://github.com/nodejs/node/blob/2505e217bba05fc581b572c685c5cf280a16c5a3/lib/internal/url.js#L1415-L1437
+ *
+ * @param stringUrl
+ * @throws TypeError if the URL is not valid.
+ */
+function stringUrlToHttpOptions(
+  stringUrl: string
+): RequestOptions & { pathname: string } {
+  // This is heavily inspired by Node.js handling of the same situation, trying
+  // to follow it as closely as possible while keeping in mind that we only
+  // deal with string URLs, not URL objects.
+  const {
+    hostname,
+    pathname,
+    port,
+    username,
+    password,
+    search,
+    protocol,
+    hash,
+    href,
+    origin,
+    host,
+  } = new URL(stringUrl);
+
+  const options: RequestOptions & {
+    pathname: string;
+    hash: string;
+    search: string;
+    href: string;
+    origin: string;
+  } = {
+    protocol: protocol,
+    hostname:
+      hostname && hostname[0] === '[' ? hostname.slice(1, -1) : hostname,
+    hash: hash,
+    search: search,
+    pathname: pathname,
+    path: `${pathname || ''}${search || ''}`,
+    href: href,
+    origin: origin,
+    host: host,
+  };
+  if (port !== '') {
+    options.port = Number(port);
+  }
+  if (username || password) {
+    options.auth = `${decodeURIComponent(username)}:${decodeURIComponent(
+      password
+    )}`;
+  }
+  return options;
+}
+
+/**
  * Makes sure options is an url object
  * return an object with default value and parsed options
+ * @param logger component logger
  * @param options original options for the request
  * @param [extraOptions] additional options for the request
  */
 export const getRequestInfo = (
+  logger: DiagLogger,
   options: url.URL | RequestOptions | string,
   extraOptions?: RequestOptions
 ): {
   origin: string;
   pathname: string;
   method: string;
+  invalidUrl: boolean;
   optionsParsed: RequestOptions;
 } => {
-  let pathname = '/';
-  let origin = '';
+  let pathname: string;
+  let origin: string;
   let optionsParsed: RequestOptions;
+  let invalidUrl = false;
   if (typeof options === 'string') {
-    optionsParsed = url.parse(options);
-    pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
+    try {
+      const convertedOptions = stringUrlToHttpOptions(options);
+      optionsParsed = convertedOptions;
+      pathname = convertedOptions.pathname || '/';
+    } catch (e) {
+      invalidUrl = true;
+      logger.verbose(
+        'Unable to parse URL provided to HTTP request, using fallback to determine path. Original error:',
+        e
+      );
+      // for backward compatibility with how url.parse() behaved.
+      optionsParsed = {
+        path: options,
+      };
+      pathname = optionsParsed.path || '/';
+    }
+
     origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host}`;
     if (extraOptions !== undefined) {
       Object.assign(optionsParsed, extraOptions);
@@ -285,16 +363,23 @@ export const getRequestInfo = (
       { protocol: options.host ? 'http:' : undefined },
       options
     );
-    pathname = (options as url.URL).pathname;
-    if (!pathname && optionsParsed.path) {
-      pathname = url.parse(optionsParsed.path).pathname || '/';
-    }
+
     const hostname =
       optionsParsed.host ||
       (optionsParsed.port != null
         ? `${optionsParsed.hostname}${optionsParsed.port}`
         : optionsParsed.hostname);
     origin = `${optionsParsed.protocol || 'http:'}//${hostname}`;
+
+    pathname = (options as url.URL).pathname;
+    if (!pathname && optionsParsed.path) {
+      try {
+        const parsedUrl = new URL(optionsParsed.path, origin);
+        pathname = parsedUrl.pathname || '/';
+      } catch (e) {
+        pathname = '/';
+      }
+    }
   }
 
   // some packages return method in lowercase..
@@ -303,7 +388,7 @@ export const getRequestInfo = (
     ? optionsParsed.method.toUpperCase()
     : 'GET';
 
-  return { origin, pathname, method, optionsParsed };
+  return { origin, pathname, method, optionsParsed, invalidUrl };
 };
 
 /**
@@ -657,6 +742,42 @@ export function getRemoteClientAddress(
   return null;
 }
 
+function getInfoFromIncomingMessage(
+  component: 'http' | 'https',
+  request: IncomingMessage,
+  logger: DiagLogger
+): { pathname?: string; search?: string; toString: () => string } {
+  try {
+    if (request.headers.host) {
+      return new URL(
+        request.url ?? '/',
+        `${component}://${request.headers.host}`
+      );
+    } else {
+      const unsafeParsedUrl = new URL(
+        request.url ?? '/',
+        // using localhost as a workaround to still use the URL constructor for parsing
+        `${component}://localhost`
+      );
+      // since we use localhost as a workaround, ensure we hide the rest of the properties to avoid
+      // our workaround leaking though.
+      return {
+        pathname: unsafeParsedUrl.pathname,
+        search: unsafeParsedUrl.search,
+        toString: function () {
+          // we cannot use the result of unsafeParsedUrl.toString as it's potentially wrong.
+          return unsafeParsedUrl.pathname + unsafeParsedUrl.search;
+        },
+      };
+    }
+  } catch (e) {
+    // something is wrong, use undefined - this *should* never happen, logging
+    // for troubleshooting in case it does happen.
+    logger.verbose('Unable to get URL from request', e);
+    return {};
+  }
+}
+
 /**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
@@ -670,18 +791,15 @@ export const getIncomingRequestAttributes = (
     serverName?: string;
     hookAttributes?: Attributes;
     semconvStability: SemconvStability;
-  }
+  },
+  logger: DiagLogger
 ): Attributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
   const ips = headers['x-forwarded-for'];
   const httpVersion = request.httpVersion;
-  const requestUrl = request.url ? url.parse(request.url) : null;
-  const host = requestUrl?.host || headers.host;
-  const hostname =
-    requestUrl?.hostname ||
-    host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
-    'localhost';
+  const host = headers.host;
+  const hostname = host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
 
   const method = request.method;
   const normalizedMethod = normalizeMethod(method);
@@ -701,8 +819,14 @@ export const getIncomingRequestAttributes = (
     [ATTR_USER_AGENT_ORIGINAL]: userAgent,
   };
 
-  if (requestUrl?.pathname != null) {
-    newAttributes[ATTR_URL_PATH] = requestUrl.pathname;
+  const parsedUrl = getInfoFromIncomingMessage(
+    options.component,
+    request,
+    logger
+  );
+
+  if (parsedUrl?.pathname != null) {
+    newAttributes[ATTR_URL_PATH] = parsedUrl.pathname;
   }
 
   if (remoteClientAddress != null) {
@@ -719,11 +843,7 @@ export const getIncomingRequestAttributes = (
   }
 
   const oldAttributes: Attributes = {
-    [SEMATTRS_HTTP_URL]: getAbsoluteUrl(
-      requestUrl,
-      headers,
-      `${options.component}:`
-    ),
+    [SEMATTRS_HTTP_URL]: parsedUrl.toString(),
     [SEMATTRS_HTTP_HOST]: host,
     [SEMATTRS_NET_HOST_NAME]: hostname,
     [SEMATTRS_HTTP_METHOD]: method,
@@ -738,8 +858,9 @@ export const getIncomingRequestAttributes = (
     oldAttributes[SEMATTRS_HTTP_SERVER_NAME] = serverName;
   }
 
-  if (requestUrl) {
-    oldAttributes[SEMATTRS_HTTP_TARGET] = requestUrl.path || '/';
+  if (parsedUrl?.pathname) {
+    oldAttributes[SEMATTRS_HTTP_TARGET] =
+      parsedUrl?.pathname + parsedUrl?.search || '/';
   }
 
   if (userAgent !== undefined) {
