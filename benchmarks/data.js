@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1730985246183,
+  "lastUpdate": 1731090768324,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -18424,6 +18424,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.38%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "030aff30f7725d0bc024c0b00e83d479167a9f9c",
+          "message": "feat(instrumentation-http)!: reduce public API surface by removing exports and making protected methods private (#5124)\n\nCo-authored-by: Hector Hernandez <39923391+hectorhdzg@users.noreply.github.com>",
+          "timestamp": "2024-11-08T16:39:06Z",
+          "tree_id": "b0aaa212a20bef475e14f1a589ee048b5c703698",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/030aff30f7725d0bc024c0b00e83d479167a9f9c"
+        },
+        "date": 1731090764566,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 975125,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11793,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 649327,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 648374,
+            "range": "±0.31%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
