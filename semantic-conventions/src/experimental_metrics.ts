@@ -525,7 +525,7 @@ export const METRIC_MESSAGING_CLIENT_CONSUMED_MESSAGES = 'messaging.client.consu
 /**
  * Duration of messaging operation initiated by a producer or consumer client.
  * 
- * @note This metric **SHOULD** **NOT** be used to report processing duration - processing duration is reported in `messaging.process.duration` metric.
+ * @note This metric **SHOULD NOT** be used to report processing duration - processing duration is reported in `messaging.process.duration` metric.
  * 
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -534,7 +534,7 @@ export const METRIC_MESSAGING_CLIENT_OPERATION_DURATION = 'messaging.client.oper
 /**
  * Number of messages producer attempted to publish to the broker.
  * 
- * @note This metric **MUST** **NOT** count messages that were created haven't yet been attempted to be published.
+ * @note This metric **MUST NOT** count messages that were created haven't yet been attempted to be published.
  * 
  * @experimental This metric is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

@@ -638,7 +638,7 @@ export const ATTR_BROWSER_MOBILE = 'browser.mobile' as const;
  * @example macOS
  * @example Android
  * 
- * @note This value is intended to be taken from the [UA client hints API](https://wicg.github.io/ua-client-hints/#interface) (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API **SHOULD** **NOT** be used instead and this attribute **SHOULD** be left unset in order for the values to be consistent.
+ * @note This value is intended to be taken from the [UA client hints API](https://wicg.github.io/ua-client-hints/#interface) (`navigator.userAgentData.platform`). If unavailable, the legacy `navigator.platform` API **SHOULD NOT** be used instead and this attribute **SHOULD** be left unset in order for the values to be consistent.
  * The list of possible values is defined in the [W3C User-Agent Client Hints specification](https://wicg.github.io/ua-client-hints/#sec-ch-ua-platform). Note that some (but not all) of these values can overlap with values in the [`os.type` and `os.name` attributes](./os.md). However, for consistency, the values in the `browser.platform` attribute should capture the exact value that the user agent provides.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -1460,9 +1460,9 @@ export const DB_CLIENT_CONNECTIONS_STATE_VALUE_USED = "used" as const;
  * @example public.users
  * @example customers
  * 
- * @note It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
+ * @note It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
  * If the collection name is parsed from the query text, it **SHOULD** be the first collection name found in the query and it **SHOULD** match the value provided in the query text including any schema and database name prefix.
- * For batch operations, if the individual operations are known to have the same collection name then that collection name **SHOULD** be used, otherwise `db.collection.name` **SHOULD** **NOT** be captured.
+ * For batch operations, if the individual operations are known to have the same collection name then that collection name **SHOULD** be used, otherwise `db.collection.name` **SHOULD NOT** be captured.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1730,9 +1730,9 @@ export const ATTR_DB_NAME = 'db.name' as const;
  * @example customers
  * @example test.users
  * 
- * @note If a database system has multiple namespace components, they **SHOULD** be concatenated (potentially using database system specific conventions) from most general to most specific namespace component, and more specific namespaces **SHOULD** **NOT** be captured without the more general namespaces, to ensure that "startswith" queries for the more general namespaces will be valid.
+ * @note If a database system has multiple namespace components, they **SHOULD** be concatenated (potentially using database system specific conventions) from most general to most specific namespace component, and more specific namespaces **SHOULD NOT** be captured without the more general namespaces, to ensure that "startswith" queries for the more general namespaces will be valid.
  * Semantic conventions for individual database systems **SHOULD** document what `db.namespace` means in the context of that system.
- * It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
+ * It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1771,7 +1771,7 @@ export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
  * @example HMSET
  * @example SELECT
  * 
- * @note It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
+ * @note It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
  * If the operation name is parsed from the query text, it **SHOULD** be the first operation name found in the query.
  * For batch operations, if the individual operations are known to have the same operation name then that operation name **SHOULD** be used prepended by `BATCH `, otherwise `db.operation.name` **SHOULD** be `BATCH` or some other database system specific term if more applicable.
  * 
@@ -2227,7 +2227,7 @@ export const ATTR_DESTINATION_PORT = 'destination.port' as const;
  * 
  * @example 2ab2916d-a51f-4ac8-80ee-45ac31a28092
  * 
- * @note The device identifier **MUST** only be defined using the values outlined below. This value is not an advertising identifier and **MUST** **NOT** be used as such. On iOS (Swift or Objective-C), this value **MUST** be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value **MUST** be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
+ * @note The device identifier **MUST** only be defined using the values outlined below. This value is not an advertising identifier and **MUST NOT** be used as such. On iOS (Swift or Objective-C), this value **MUST** be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value **MUST** be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2437,7 +2437,7 @@ export const ATTR_FAAS_INVOCATION_ID = 'faas.invocation_id' as const;
  * 
  * @example "my-function"
  * 
- * @note SHOULD be equal to the `faas.name` resource attribute of the invoked function.
+ * @note **SHOULD** be equal to the `faas.name` resource attribute of the invoked function.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2446,7 +2446,7 @@ export const ATTR_FAAS_INVOKED_NAME = 'faas.invoked_name' as const;
 /**
  * The cloud provider of the invoked function.
  * 
- * @note SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+ * @note **SHOULD** be equal to the `cloud.provider` resource attribute of the invoked function.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2482,7 +2482,7 @@ export const FAAS_INVOKED_PROVIDER_VALUE_TENCENT_CLOUD = "tencent_cloud" as cons
  * 
  * @example "eu-central-1"
  * 
- * @note SHOULD be equal to the `cloud.region` resource attribute of the invoked function.
+ * @note **SHOULD** be equal to the `cloud.region` resource attribute of the invoked function.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2606,7 +2606,7 @@ export const ATTR_FEATURE_FLAG_KEY = 'feature_flag.key' as const;
 export const ATTR_FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name' as const;
 
 /**
- * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
+ * **SHOULD** be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
  * 
  * @example red
  * @example true
@@ -2732,7 +2732,7 @@ export const ATTR_GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name' as const;
  * 
  * @example [{'role': 'assistant', 'content': 'The capital of France is Paris.'}]
  * 
- * @note It's RECOMMENDED to format completions as JSON string matching [OpenAI messages format](https://platform.openai.com/docs/guides/text-generation)
+ * @note It's **RECOMMENDED** to format completions as JSON string matching [OpenAI messages format](https://platform.openai.com/docs/guides/text-generation)
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_GEN_AI_COMPLETION = 'gen_ai.completion' as const;
@@ -2740,7 +2740,7 @@ export const ATTR_GEN_AI_COMPLETION = 'gen_ai.completion' as const;
 /**
  * The name of the operation being performed.
  * 
- * @note If one of the predefined values applies, but specific system uses a different name it's RECOMMENDED to document it in the semantic conventions for specific GenAI system and use system-specific name in the instrumentation. If a different name is not documented, instrumentation libraries **SHOULD** use applicable predefined value.
+ * @note If one of the predefined values applies, but specific system uses a different name it's **RECOMMENDED** to document it in the semantic conventions for specific GenAI system and use system-specific name in the instrumentation. If a different name is not documented, instrumentation libraries **SHOULD** use applicable predefined value.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2761,7 +2761,7 @@ export const GEN_AI_OPERATION_NAME_VALUE_TEXT_COMPLETION = "text_completion" as 
  * 
  * @example [{'role': 'user', 'content': 'What is the capital of France?'}]
  * 
- * @note It's RECOMMENDED to format prompts as JSON string matching [OpenAI messages format](https://platform.openai.com/docs/guides/text-generation)
+ * @note It's **RECOMMENDED** to format prompts as JSON string matching [OpenAI messages format](https://platform.openai.com/docs/guides/text-generation)
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_GEN_AI_PROMPT = 'gen_ai.prompt' as const;
@@ -3935,7 +3935,7 @@ export const ATTR_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size' as con
  * @example 1
  * @example 2
  * 
- * @note Instrumentations **SHOULD** **NOT** set `messaging.batch.message_count` on spans that operate with a single message. When a messaging client library supports both batch and single-message API for the same operation, instrumentations **SHOULD** use `messaging.batch.message_count` for batching APIs and **SHOULD** **NOT** use it for single-message APIs.
+ * @note Instrumentations **SHOULD NOT** set `messaging.batch.message_count` on spans that operate with a single message. When a messaging client library supports both batch and single-message API for the same operation, instrumentations **SHOULD** use `messaging.batch.message_count` for batching APIs and **SHOULD NOT** use it for single-message APIs.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4121,7 +4121,7 @@ export const ATTR_MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.gro
 export const ATTR_MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition' as const;
 
 /**
- * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute **MUST** **NOT** be set.
+ * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute **MUST NOT** be set.
  * 
  * @example "myKey"
  * 
@@ -5636,7 +5636,7 @@ export const ATTR_RPC_JSONRPC_VERSION = 'rpc.jsonrpc.version' as const;
 export const ATTR_RPC_MESSAGE_COMPRESSED_SIZE = 'rpc.message.compressed_size' as const;
 
 /**
- * MUST be calculated as two different counters starting from `1` one for sent messages and one for received message.
+ * **MUST** be calculated as two different counters starting from `1` one for sent messages and one for received message.
  * 
  * @note This way we guarantee that the values will be consistent between different implementations.
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
@@ -5726,7 +5726,7 @@ export const RPC_SYSTEM_VALUE_JAVA_RMI = "java_rmi" as const;
  * 
  * @example 627cc493-f310-47de-96bd-71410b7dec09
  * 
- * @note MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words
+ * @note **MUST** be unique for each instance of the same `service.namespace,service.name` pair (in other words
  * `service.namespace,service.name,service.instance.id` triplet **MUST** be globally unique). The ID helps to
  * distinguish instances of the same service that exist at the same time (e.g. instances of a horizontally scaled
  * service).
@@ -5734,7 +5734,7 @@ export const RPC_SYSTEM_VALUE_JAVA_RMI = "java_rmi" as const;
  * Implementations, such as SDKs, are recommended to generate a random Version 1 or Version 4 [RFC
  * 4122](https://www.ietf.org/rfc/rfc4122.txt) UUID, but are free to use an inherent unique ID as the source of
  * this value if stability is desirable. In that case, the ID **SHOULD** be used as source of a UUID Version 5 and
- * SHOULD use the following UUID as the namespace: `4d63009a-8d0f-11ee-aad7-4c796ed8e320`.
+ * **SHOULD** use the following UUID as the namespace: `4d63009a-8d0f-11ee-aad7-4c796ed8e320`.
  * 
  * UUIDs are typically recommended, as only an opaque value for the purposes of identifying a service instance is
  * needed. Similar to what can be seen in the man page for the
@@ -6012,7 +6012,7 @@ export const SYSTEM_MEMORY_STATE_VALUE_SHARED = "shared" as const;
 export const SYSTEM_MEMORY_STATE_VALUE_USED = "used" as const;
 
 /**
- * A stateless protocol **MUST** **NOT** set this attribute
+ * A stateless protocol **MUST NOT** set this attribute
  * 
  * @example close_wait
  * 
@@ -6632,7 +6632,7 @@ export const ATTR_URL_EXTENSION = 'url.extension' as const;
  * @example search?q=OpenTelemetry
  * 
  * @note In network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
- * `url.original` might contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case password and username **SHOULD** **NOT** be redacted and attribute's value **SHOULD** remain the same.
+ * `url.original` might contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case password and username **SHOULD NOT** be redacted and attribute's value **SHOULD** remain the same.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */

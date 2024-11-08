@@ -120,7 +120,7 @@ export const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = "webjs" as const;
  * If another SDK, like a fork or a vendor-provided implementation, is used, this SDK **MUST** set the
  * `telemetry.sdk.name` attribute to the fully-qualified class or module name of this SDK's main entry point
  * or another suitable identifier depending on the language.
- * The identifier `opentelemetry` is reserved and **MUST** **NOT** be used in this case.
+ * The identifier `opentelemetry` is reserved and **MUST NOT** be used in this case.
  * All custom identifiers **SHOULD** be stable across different versions of an implementation.
  */
 export const ATTR_TELEMETRY_SDK_NAME = 'telemetry.sdk.name' as const;
@@ -248,10 +248,10 @@ export const ATTR_CLIENT_PORT = 'client.port' as const;
  * should be prepared for `error.type` to have high cardinality at query time when no
  * additional filters are applied.
  * 
- * If the operation has completed successfully, instrumentations **SHOULD** **NOT** set `error.type`.
+ * If the operation has completed successfully, instrumentations **SHOULD NOT** set `error.type`.
  * 
  * If a specific domain defines its own set of error identifiers (such as HTTP or gRPC status codes),
- * it's RECOMMENDED to:
+ * it's **RECOMMENDED** to:
  * 
  *   - Use a domain-specific attribute
  *   - Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not.
@@ -264,7 +264,7 @@ export const ATTR_ERROR_TYPE = 'error.type' as const;
 export const ERROR_TYPE_VALUE_OTHER = "_OTHER" as const;
 
 /**
- * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+ * **SHOULD** be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
  * 
  * @note An exception is considered to have escaped (or left) the scope of a span,
  * if that span is ended while the exception is still logically "in flight".
@@ -437,8 +437,8 @@ export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code' as con
  * @example /users/:userID?
  * @example {controller}/{action}/{id?}
  * 
- * @note MUST **NOT** be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can **NOT** substitute it.
- * SHOULD include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
+ * @note **MUST NOT** be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
+ * **SHOULD** include the [application root](/docs/http/http-spans.md#http-server-definitions) if there is one.
  */
 export const ATTR_HTTP_ROUTE = 'http.route' as const;
 
@@ -581,7 +581,7 @@ export const ATTR_NETWORK_PROTOCOL_NAME = 'network.protocol.name' as const;
  * @example 1.1
  * @example 2
  * 
- * @note If protocol version is subject to negotiation (for example using [ALPN](https://www.rfc-editor.org/rfc/rfc7301.html)), this attribute **SHOULD** be set to the negotiated version. If the actual protocol version is not known, this attribute **SHOULD** **NOT** be set.
+ * @note If protocol version is subject to negotiation (for example using [ALPN](https://www.rfc-editor.org/rfc/rfc7301.html)), this attribute **SHOULD** be set to the negotiated version. If the actual protocol version is not known, this attribute **SHOULD NOT** be set.
  */
 export const ATTR_NETWORK_PROTOCOL_VERSION = 'network.protocol.version' as const;
 
@@ -659,7 +659,7 @@ export const ATTR_OTEL_SCOPE_NAME = 'otel.scope.name' as const;
 export const ATTR_OTEL_SCOPE_VERSION = 'otel.scope.version' as const;
 
 /**
- * Name of the code, either "OK" or "ERROR". **MUST** **NOT** be set if the status code is UNSET.
+ * Name of the code, either "OK" or "ERROR". **MUST NOT** be set if the status code is UNSET.
  */
 export const ATTR_OTEL_STATUS_CODE = 'otel.status_code' as const;
 
@@ -707,7 +707,7 @@ export const ATTR_SERVER_PORT = 'server.port' as const;
  * 
  * @example shoppingcart
  * 
- * @note MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value **MUST** be set to `unknown_service`.
+ * @note **MUST** be the same for all instances of horizontally scaled services. If the value was not specified, SDKs **MUST** fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value **MUST** be set to `unknown_service`.
  */
 export const ATTR_SERVICE_NAME = 'service.name' as const;
 
@@ -779,7 +779,7 @@ export const ATTR_URL_FRAGMENT = 'url.fragment' as const;
  * @example //localhost
  * 
  * @note For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it **SHOULD** be included nevertheless.
- * `url.full` **MUST** **NOT** contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password **SHOULD** be redacted and attribute's value **SHOULD** be `https://REDACTED:REDACTED@www.example.com/`.
+ * `url.full` **MUST NOT** contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password **SHOULD** be redacted and attribute's value **SHOULD** be `https://REDACTED:REDACTED@www.example.com/`.
  * `url.full` **SHOULD** capture the absolute URL when it is available (or can be reconstructed). Sensitive content provided in `url.full` **SHOULD** be scrubbed when instrumentations can identify it.
  */
 export const ATTR_URL_FULL = 'url.full' as const;
