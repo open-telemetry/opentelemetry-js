@@ -27,7 +27,7 @@ import { ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import {ExportResult, ExportResultCode, setGlobalErrorHandler} from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import {
@@ -349,6 +349,48 @@ describe('PeriodicExportingMetricReader', () => {
         1,
         'Expected exactly 1 export to happen when awaiting forceFlush'
       );
+    });
+
+    it('should log call global error handler when resolving async attributes fails', async () => {
+      // arrange
+      const expectedError = new Error('resolving async attributes failed');
+      const waitForAsyncAttributesStub = sinon.stub().rejects(expectedError);
+
+      const resourceMetrics: ResourceMetrics = {
+        resource: {
+          attributes: {},
+          merge: sinon.stub(),
+          asyncAttributesPending: true, // ensure we try to await async attributes
+          waitForAsyncAttributes: waitForAsyncAttributesStub, // reject when awaited
+        },
+        scopeMetrics: [],
+      };
+
+      const mockCollectionResult: CollectionResult = {
+        errors: [],
+        resourceMetrics,
+      };
+      const producerStubs: MetricProducer = {
+        collect: sinon.stub().resolves(mockCollectionResult),
+      };
+
+      const exporter = new TestMetricExporter();
+
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 80,
+      });
+
+      reader.setMetricProducer(producerStubs);
+      const errorHandlerStub = sinon.stub();
+      setGlobalErrorHandler(errorHandlerStub);
+
+      // act
+      await reader.forceFlush();
+
+      // assert
+      sinon.assert.calledOnce(waitForAsyncAttributesStub);
     });
 
     it('should throw TimeoutError when forceFlush takes too long', async () => {
