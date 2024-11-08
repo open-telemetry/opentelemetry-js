@@ -57,7 +57,7 @@ export interface Err extends Error {
 export const enum SemconvStability {
   /** Emit only stable semantic conventions */
   STABLE = 0x1,
-  /** Emit only old semantic convetions */
+  /** Emit only old semantic conventions*/
   OLD = 0x2,
   /** Emit both stable and old semantic convetions */
   DUPLICATE = 0x1 | 0x2,
