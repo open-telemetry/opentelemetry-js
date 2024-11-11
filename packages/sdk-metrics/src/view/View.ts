@@ -195,10 +195,7 @@ export class View {
    * @param viewOptions.aggregationCardinalityLimit
    * Alters the metric stream:
    *  Sets a limit on the number of unique attribute combinations (cardinality) that can be aggregated.
-   *  If not provided, the default limit will be used.
-   *
-   * @example <caption>sets the cardinality limit to 1000</caption>
-   * aggregationCardinalityLimit: 1000
+   *  If not provided, the default limit of 2000 will be used.
    *
    * @example
    * // Create a view that changes the Instrument 'my.instrument' to use to an

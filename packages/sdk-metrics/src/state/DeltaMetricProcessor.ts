@@ -36,7 +36,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
     private _aggregator: Aggregator<T>,
     aggregationCardinalityLimit?: number
   ) {
-    this._cardinalityLimit = aggregationCardinalityLimit ?? 2000;
+    this._cardinalityLimit = (aggregationCardinalityLimit ?? 2000) - 1;
   }
 
   record(
