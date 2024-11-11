@@ -163,12 +163,17 @@ export class MeterSharedState {
           if (compatibleStorage != null) {
             return compatibleStorage;
           }
+
           const aggregator = aggregation.createAggregator(descriptor);
+          const cardinalityLimit = collector.selectCardinalityLimit(
+            descriptor.type
+          );
           const storage = new MetricStorageType(
             descriptor,
             aggregator,
             AttributesProcessor.Noop(),
-            [collector]
+            [collector],
+            cardinalityLimit
           ) as R;
           this.metricStorageRegistry.registerForCollector(collector, storage);
           return storage;

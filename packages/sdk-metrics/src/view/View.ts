@@ -171,6 +171,10 @@ export class View {
    * Alters the metric stream:
    *  If provided, the attributes that are not in the list will be ignored.
    *  If not provided, all attribute keys will be used by default.
+   * @param viewOptions.aggregationCardinalityLimit
+   * Alters the metric stream:
+   *  Sets a limit on the number of unique attribute combinations (cardinality) that can be aggregated.
+   *  If not provided, the default limit of 2000 will be used.
    * @param viewOptions.aggregation
    * Alters the metric stream:
    *  Alters the {@link Aggregation} of the metric stream.
@@ -192,10 +196,6 @@ export class View {
    * @param viewOptions.meterSchemaUrl
    * Instrument selection criteria:
    *  The schema URL of the Meter. No wildcard support, schema URL must match exactly.
-   * @param viewOptions.aggregationCardinalityLimit
-   * Alters the metric stream:
-   *  Sets a limit on the number of unique attribute combinations (cardinality) that can be aggregated.
-   *  If not provided, the default limit of 2000 will be used.
    *
    * @example
    * // Create a view that changes the Instrument 'my.instrument' to use to an
