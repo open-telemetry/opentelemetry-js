@@ -132,7 +132,7 @@ describe('HttpsInstrumentation Integration tests', () => {
       });
     });
     const provider = new NodeTracerProvider({
-      spanProcessors: [new SimpleSpanProcessor(memoryExporter)]
+      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
     });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {

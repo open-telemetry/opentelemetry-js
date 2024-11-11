@@ -1133,7 +1133,7 @@ describe('Span', () => {
       };
 
       const provider = new BasicTracerProvider({
-        spanProcessors: [processor]
+        spanProcessors: [processor],
       });
 
       provider.getTracer('default').startSpan('test');
@@ -1152,7 +1152,7 @@ describe('Span', () => {
       };
 
       const provider = new BasicTracerProvider({
-        spanProcessors: [processor]
+        spanProcessors: [processor],
       });
 
       provider
@@ -1173,7 +1173,7 @@ describe('Span', () => {
       };
 
       const provider = new BasicTracerProvider({
-        spanProcessors: [processor]
+        spanProcessors: [processor],
       });
 
       provider.getTracer('default').startSpan('test').end();
@@ -1191,7 +1191,7 @@ describe('Span', () => {
       };
 
       const provider = new BasicTracerProvider({
-        spanProcessors: [processor]
+        spanProcessors: [processor],
       });
 
       const s = provider.getTracer('default').startSpan('test') as Span;

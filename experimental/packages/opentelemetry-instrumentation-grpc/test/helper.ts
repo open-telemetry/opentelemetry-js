@@ -756,7 +756,7 @@ export const runTests = (
 
     describe('enable()', () => {
       const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)]
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -801,7 +801,7 @@ export const runTests = (
 
     describe('disable()', () => {
       const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)]
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -833,7 +833,7 @@ export const runTests = (
 
     describe('Test filtering requests using metadata', () => {
       const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)]
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
       });
       beforeEach(() => {
         memoryExporter.reset();
@@ -941,7 +941,7 @@ export const runTests = (
 
     describe('Test capturing metadata', () => {
       const provider = new NodeTracerProvider({
-        spanProcessors: [new SimpleSpanProcessor(memoryExporter)]
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
       });
 
       const clientMetadata = new Metadata();

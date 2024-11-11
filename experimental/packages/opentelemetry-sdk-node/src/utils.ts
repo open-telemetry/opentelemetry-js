@@ -28,7 +28,13 @@ import {
   processDetectorSync,
   serviceInstanceIdDetectorSync,
 } from '@opentelemetry/resources';
-import { BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor, SpanExporter, SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import {
+  BatchSpanProcessor,
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+  SpanExporter,
+  SpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
 
 const RESOURCE_DETECTOR_ENVIRONMENT = 'env';
 const RESOURCE_DETECTOR_HOST = 'host';
@@ -117,7 +123,7 @@ function getJaegerExporter() {
 }
 
 export function getSpanProcessorsFromEnv(): SpanProcessor[] {
-  const exportersMap = new Map<string,() => SpanExporter>([
+  const exportersMap = new Map<string, () => SpanExporter>([
     ['otlp', () => getOtlpExporterFomEnv()],
     ['zipkin', () => new ZipkinExporter()],
     ['console', () => new ConsoleSpanExporter()],
@@ -130,15 +136,22 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   );
 
   if (traceExportersList[0] === 'none') {
-    diag.warn('OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.');
+    diag.warn(
+      'OTEL_TRACES_EXPORTER contains "none". SDK will not be initialized.'
+    );
     return [];
   }
 
   if (traceExportersList.length === 0) {
     diag.warn('OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.');
     traceExportersList = ['otlp'];
-  } else if (traceExportersList.length > 1 && traceExportersList.includes('none')) {
-    diag.warn('OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.');
+  } else if (
+    traceExportersList.length > 1 &&
+    traceExportersList.includes('none')
+  ) {
+    diag.warn(
+      'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
+    );
     traceExportersList = ['otlp'];
   }
 
@@ -153,9 +166,9 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
 
   for (const exp of exporters) {
     if (exp instanceof ConsoleSpanExporter) {
-      processors.push(new SimpleSpanProcessor(exp))
+      processors.push(new SimpleSpanProcessor(exp));
     } else {
-      processors.push(new BatchSpanProcessor(exp))
+      processors.push(new BatchSpanProcessor(exp));
     }
   }
 

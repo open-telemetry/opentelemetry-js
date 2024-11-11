@@ -1098,10 +1098,7 @@ describe('setup exporter from env', () => {
   let stubLoggerError: Sinon.SinonStub;
 
   beforeEach(() => {
-    spyGetOtlpProtocol = Sinon.spy(
-      sdkUtils,
-      'getOtlpProtocolFomEnv'
-    );
+    spyGetOtlpProtocol = Sinon.spy(sdkUtils, 'getOtlpProtocolFomEnv');
     stubLoggerError = Sinon.stub(diag, 'warn');
   });
   afterEach(() => {

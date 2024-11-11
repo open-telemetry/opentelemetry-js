@@ -770,7 +770,7 @@ describe('BasicTracerProvider', () => {
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
       const tracerProvider = new BasicTracerProvider({
-        spanProcessors: [spanProcessorOne, spanProcessorTwo]
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
       });
 
       tracerProvider
@@ -798,7 +798,7 @@ describe('BasicTracerProvider', () => {
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
       const tracerProvider = new BasicTracerProvider({
-        spanProcessors: [spanProcessorOne, spanProcessorTwo]
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
       });
 
       tracerProvider

@@ -49,7 +49,7 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
     };
 
     const tracerProvider = new BasicTracerProvider({
-      spanProcessors: [spanProcessor]
+      spanProcessors: [spanProcessor],
     });
 
     this._tracer = new Tracer(

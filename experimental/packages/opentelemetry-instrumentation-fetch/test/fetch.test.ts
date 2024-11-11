@@ -255,7 +255,7 @@ describe('fetch', () => {
     fetchInstrumentation = new FetchInstrumentation(config);
     dummySpanExporter = new DummySpanExporter();
     webTracerProviderWithZone = new WebTracerProvider({
-      spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)]
+      spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
     });
     registerInstrumentations({
       tracerProvider: webTracerProviderWithZone,

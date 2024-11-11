@@ -42,9 +42,9 @@ export async function withTestTracerProvider(
   const inMemExporter = new InMemorySpanExporter();
   const tracerProvider = new BasicTracerProvider({
     sampler: new AlwaysOnSampler(),
-    spanProcessors: [new SimpleSpanProcessor(inMemExporter)]
+    spanProcessors: [new SimpleSpanProcessor(inMemExporter)],
   });
-  
+
   await func(tracerProvider);
 
   await tracerProvider.forceFlush();

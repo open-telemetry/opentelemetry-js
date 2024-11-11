@@ -64,7 +64,11 @@ import {
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { getResourceDetectorsFromEnv, getSpanProcessorsFromEnv, filterBlanksAndNulls } from './utils';
+import {
+  getResourceDetectorsFromEnv,
+  getSpanProcessorsFromEnv,
+  filterBlanksAndNulls,
+} from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -248,10 +252,10 @@ export class NodeSDK {
             })
           );
 
-    const spanProcessors = this._tracerProviderConfig ?
-          this._tracerProviderConfig.spanProcessors :
-          getSpanProcessorsFromEnv();
-    
+    const spanProcessors = this._tracerProviderConfig
+      ? this._tracerProviderConfig.spanProcessors
+      : getSpanProcessorsFromEnv();
+
     this._tracerProvider = new NodeTracerProvider({
       ...this._configuration,
       resource: this._resource,

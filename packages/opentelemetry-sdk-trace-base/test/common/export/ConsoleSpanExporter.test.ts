@@ -46,7 +46,7 @@ describe('ConsoleSpanExporter', () => {
         consoleExporter = new ConsoleSpanExporter();
         const basicTracerProvider = new BasicTracerProvider({
           sampler: new AlwaysOnSampler(),
-          spanProcessors: [new SimpleSpanProcessor(consoleExporter)]
+          spanProcessors: [new SimpleSpanProcessor(consoleExporter)],
         });
 
         const spyConsole = sinon.spy(console, 'dir');

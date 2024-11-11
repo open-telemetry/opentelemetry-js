@@ -43,7 +43,7 @@ describe('unmocked xhr', () => {
   beforeEach(() => {
     testSpans = new TestSpanProcessor();
     provider = new WebTracerProvider({
-      spanProcessors: [testSpans]
+      spanProcessors: [testSpans],
     });
     registerInstrumentations({
       instrumentations: [new XMLHttpRequestInstrumentation()],
