@@ -32,7 +32,7 @@ export interface LoggerProviderConfig {
   /**
    * Merge resource with {@link Resource.default()}?
    * Default: {@code true}
-   **/
+   */
   mergeResourceWithDefaults?: boolean;
 }
 
