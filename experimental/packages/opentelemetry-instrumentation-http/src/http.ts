@@ -109,7 +109,7 @@ export class HttpInstrumentation extends InstrumentationBase<HttpInstrumentation
     super('@opentelemetry/instrumentation-http', VERSION, config);
     this._headerCapture = this._createHeaderCapture();
 
-    for (const entry in getEnv().OTEL_SEMCONV_STABILITY_OPT_IN) {
+    for (const entry of getEnv().OTEL_SEMCONV_STABILITY_OPT_IN) {
       if (entry.toLowerCase() === 'http/dup') {
         // http/dup takes highest precedence. If it is found, there is no need to read the rest of the list
         this._semconvStability = SemconvStability.DUPLICATE;
