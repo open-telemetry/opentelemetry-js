@@ -39,7 +39,7 @@ export interface MeterProviderOptions {
   /**
    * Merge resource with {@link Resource.default()}?
    * Default: {@code true}
-   **/
+   */
   mergeResourceWithDefaults?: boolean;
 }
 
