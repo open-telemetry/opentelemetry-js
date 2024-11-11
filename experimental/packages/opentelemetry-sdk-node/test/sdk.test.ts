@@ -54,8 +54,8 @@ import * as assert from 'assert';
 import * as semver from 'semver';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
+import * as sdkUtils from '../src/utils';
 import { env } from 'process';
-import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExporter';
 import {
   envDetector,
   envDetectorSync,
@@ -1099,8 +1099,8 @@ describe('setup exporter from env', () => {
 
   beforeEach(() => {
     spyGetOtlpProtocol = Sinon.spy(
-      TracerProviderWithEnvExporters,
-      'getOtlpProtocol'
+      sdkUtils,
+      'getOtlpProtocolFomEnv'
     );
     stubLoggerError = Sinon.stub(diag, 'warn');
   });
@@ -1114,7 +1114,6 @@ describe('setup exporter from env', () => {
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     await sdk.shutdown();
@@ -1128,9 +1127,6 @@ describe('setup exporter from env', () => {
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
-    assert(
-      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
-    );
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
@@ -1146,9 +1142,6 @@ describe('setup exporter from env', () => {
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
-    assert(
-      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
-    );
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor === false);
@@ -1164,9 +1157,6 @@ describe('setup exporter from env', () => {
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
 
-    assert(
-      sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false
-    );
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
@@ -1181,7 +1171,7 @@ describe('setup exporter from env', () => {
     sdk.start();
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert.ok(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+
     assert.ok(
       sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
     );
@@ -1197,7 +1187,7 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     delete env.OTEL_TRACES_EXPORTER;
@@ -1236,7 +1226,7 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     await sdk.shutdown();
@@ -1248,7 +1238,7 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     env.OTEL_TRACES_EXPORTER = '';
@@ -1262,7 +1252,7 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
 
@@ -1307,7 +1297,7 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
-    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters);
+
     assert(listOfProcessors.length === 3);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     assert(listOfProcessors[1] instanceof BatchSpanProcessor);
@@ -1324,6 +1314,7 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors =
       sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+
     assert(listOfProcessors.length === 2);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
     assert(listOfProcessors[1] instanceof BatchSpanProcessor);

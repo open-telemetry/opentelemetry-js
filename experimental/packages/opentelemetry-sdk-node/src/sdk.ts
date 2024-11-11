@@ -61,11 +61,10 @@ import {
   NodeTracerConfig,
   NodeTracerProvider,
 } from '@opentelemetry/sdk-trace-node';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { getResourceDetectorsFromEnv, filterBlanksAndNulls } from './utils';
+import { getResourceDetectorsFromEnv, getSpanProcessorsFromEnv, filterBlanksAndNulls } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -103,7 +102,7 @@ export class NodeSDK {
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
+  private _tracerProvider?: NodeTracerProvider;
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
@@ -245,36 +244,32 @@ export class NodeSDK {
         ? this._resource
         : this._resource.merge(
             new Resource({
-              [SEMRESATTRS_SERVICE_NAME]: this._serviceName,
+              [ATTR_SERVICE_NAME]: this._serviceName,
             })
           );
 
-    // if there is a tracerProviderConfig (traceExporter/spanProcessor was set manually) or the traceExporter is set manually, use NodeTracerProvider
-    const Provider = this._tracerProviderConfig
-      ? NodeTracerProvider
-      : TracerProviderWithEnvExporters;
-
-    // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations and set them here
-    const tracerProvider = new Provider({
+    const spanProcessors = this._tracerProviderConfig ?
+          this._tracerProviderConfig.spanProcessors :
+          getSpanProcessorsFromEnv();
+    
+    this._tracerProvider = new NodeTracerProvider({
       ...this._configuration,
       resource: this._resource,
+      spanProcessors,
     });
 
-    this._tracerProvider = tracerProvider;
-
-    if (this._tracerProviderConfig) {
-      for (const spanProcessor of this._tracerProviderConfig.spanProcessors) {
-        tracerProvider.addSpanProcessor(spanProcessor);
-      }
+    // TODO: the former class `TracerProviderWithEnvExporters` was doing registration only if
+    // spanProcessors were configured. Should we have this logic here?
+    // if we register anyway the context manager changes and break some tests
+    if (spanProcessors.length > 0) {
+      this._tracerProvider.register({
+        contextManager:
+          this._tracerProviderConfig?.contextManager ??
+          // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
+          this._configuration?.contextManager,
+        propagator: this._tracerProviderConfig?.textMapPropagator,
+      });
     }
-
-    tracerProvider.register({
-      contextManager:
-        this._tracerProviderConfig?.contextManager ??
-        // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
-        this._configuration?.contextManager,
-      propagator: this._tracerProviderConfig?.textMapPropagator,
-    });
 
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
