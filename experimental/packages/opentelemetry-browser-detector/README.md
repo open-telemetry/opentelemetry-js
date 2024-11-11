@@ -24,10 +24,18 @@ async function start(){
   let detectedResources= await detectResources({detectors:[browserDetector]});
   resource=resource.merge(detectedResources);
   const provider = new WebTracerProvider({
-    resource
+    resource,
+    spanProcessors: [
+      new BatchSpanProcessor(
+        new OTLPTraceExporter({ url:CONF.url, headers: {} }),
+        {
+          exportTimeoutMillis: CONF.timeOutMillis,
+          scheduledDelayMillis:CONF.delayMillis
+        }
+      )
+    ]
   });
 
-  provider.addSpanProcessor(new BatchSpanProcessor(new OTLPTraceExporter( {url:CONF.url ,headers:{}}),{exportTimeoutMillis:CONF.timeOutMillis,scheduledDelayMillis:CONF.delayMillis}));
   provider.register({
     // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
     contextManager: new ZoneContextManager(),
