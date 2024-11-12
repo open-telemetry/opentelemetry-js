@@ -25,7 +25,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :house: (Internal)
 
-refactor(sdk-trace-base): add `spanProcessors` property in `TracerConfig` interface. [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXXX) @david-luna
+refactor(sdk-trace-base): add `spanProcessors` property in `TracerConfig` interface. [#5138](https://github.com/open-telemetry/opentelemetry-js/pull/5138) @david-luna
 
 ## 1.27.0
 

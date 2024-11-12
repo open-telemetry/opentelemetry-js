@@ -48,12 +48,14 @@ module.exports = function setup(serviceName) {
   const resource = new Resource({
     [SEMRESATTRS_SERVICE_NAME]: serviceName,
   });
-  const tracerProvider = new NodeTracerProvider({ resource });
-  tracerProvider.addSpanProcessor(
-    new BatchSpanProcessor(new OTLPTraceExporter(), {
-      scheduledDelayMillis: 5000,
-    })
-  );
+  const tracerProvider = new NodeTracerProvider({
+    resource,
+    spanProcessors: [
+      new BatchSpanProcessor(new OTLPTraceExporter(), {
+        scheduledDelayMillis: 5000,
+      })
+    ]
+  });
   tracerProvider.register();
 
   const meterProvider = new MeterProvider({ resource });

@@ -84,7 +84,11 @@ const exporter = new JaegerExporter(options);
 Now, register the exporter.
 
 ```js
-tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
+const tracerProvider = new NodeTracerProvider({
+  spanProcessors: [new BatchSpanProcessor(exporter)]
+})
+
+const tracer = traceProvider.getTracer('my-tracer')
 ```
 
 You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your own.
