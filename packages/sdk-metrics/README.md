@@ -22,12 +22,12 @@ The basic setup of the SDK can be seen as followings:
 
 ```js
 const opentelemetry = require('@opentelemetry/api');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics');
+const { createMeterProvider } = require('@opentelemetry/sdk-metrics');
 
 // To create an instrument, you first need to initialize the Meter provider.
 // NOTE: The default OpenTelemetry meter provider does not record any metric instruments.
 //       Registering a working meter provider allows the API methods to record instruments.
-opentelemetry.metrics.setGlobalMeterProvider(new MeterProvider());
+opentelemetry.metrics.setGlobalMeterProvider(createMeterProvider());
 
 // To record a metric event, we used the global singleton meter to create an instrument.
 const counter = opentelemetry.metrics.getMeter('default').createCounter('foo');
@@ -61,12 +61,12 @@ async function batchObservableCallback(batchObservableResult) {
 Views can be registered when instantiating a `MeterProvider`:
 
 ```js
-const meterProvider = new MeterProvider({
+const meterProvider = new createMeterProvider({
   views: [
     // override the bucket boundaries on `my.histogram` to [0, 50, 100]
-    new View({ aggregation: new ExplicitBucketHistogramAggregation([0, 50, 100]), instrumentName: 'my.histogram'}),
+    { aggregation: { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM, boundaries: [0, 50, 100] }, instrumentName: 'my.histogram'},
     // rename 'my.counter' to 'my.renamed.counter'
-    new View({ name: 'my.renamed.counter', instrumentName: 'my.counter'})
+    { name: 'my.renamed.counter', instrumentName: 'my.counter'},
   ]
 })
 ```

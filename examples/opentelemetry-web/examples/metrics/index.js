@@ -1,6 +1,6 @@
 const { DiagConsoleLogger, DiagLogLevel, diag, metrics } = require('@opentelemetry/api');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const { createMeterProvider, createPeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
@@ -18,13 +18,14 @@ function stopMetrics() {
 function startMetrics() {
   console.log('STARTING METRICS');
 
-  const meterProvider = new MeterProvider();
-  metrics.setGlobalMeterProvider(meterProvider);
+  const meterProvider = createMeterProvider({
+    readers: [createPeriodicExportingMetricReader({
+      exporter: new OTLPMetricExporter(),
+      exportIntervalMillis: 1000
+    })]
+  });
 
-  meterProvider.addMetricReader(createPeriodicExportingMetricReader({
-    exporter: new OTLPMetricExporter(),
-    exportIntervalMillis: 1000
-  }));
+  metrics.setGlobalMeterProvider(meterProvider);
 
   meter = meterProvider.getMeter('example-exporter-collector')
 

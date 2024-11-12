@@ -26,7 +26,7 @@ the [Collector Trace Exporter for web and node][trace-exporter-url].
 The OTLPMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 
 ```js
-import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { createMeterProvider, createPeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 
 const collectorOptions = {
@@ -35,12 +35,14 @@ const collectorOptions = {
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const metricExporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(createPeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = createMeterProvider({
+  readers: [
+    createPeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    })
+  ]
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');
@@ -51,19 +53,21 @@ counter.add(10, { 'key': 'value' });
 ## Metrics in Node
 
 ```js
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const { createMeterProvider, createPeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const metricExporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(createPeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = createMeterProvider({
+  readers: [
+    createPeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    })
+  ]
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');

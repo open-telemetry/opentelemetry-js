@@ -27,7 +27,7 @@ The OTLPMetricsExporter in Node expects the URL to only be the hostname. It will
 options that work with trace also work with metrics.
 
 ```js
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const { createPeriodicExportingMetricReader, createMeterProvider } = require('@opentelemetry/sdk-metrics');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
@@ -36,12 +36,14 @@ const collectorOptions = {
 };
 
 const metricExporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(createPeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = createMeterProvider({
+  readers: [
+    createPeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    })
+  ]
+});
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
   process.on(signal, () => meterProvider.shutdown().catch(console.error));

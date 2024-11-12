@@ -397,17 +397,20 @@ Below an example is given how you can define explicit buckets for a histogram.
 
 ```typescript
 // Define view for the histogram metric
-const histogramView = new View({
-  aggregation: new ExplicitBucketHistogramAggregation([0, 1, 5, 10, 15, 20, 25, 30]),
+const histogramView: ViewOptions = {
+  aggregation: {
+    type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+    boundaries: [0, 1, 5, 10, 15, 20, 25, 30]
+  },
   instrumentName: 'http.server.duration',
   instrumentType: InstrumentType.HISTOGRAM,
-});
+};
 
 // Note, the instrumentName is the same as the name that has been passed for
 // the Meter#createHistogram function
 
 // Create an instance of the metric provider
-const meterProvider = new MeterProvider({
+const meterProvider = createMeterProvider({
   views: [
     histogramView
   ]
@@ -441,20 +444,20 @@ instruments with a specific name:
 The following view drops all instruments that are associated with a meter named `pubsub`:
 
 ```typescript
-const dropView = new View({
-  aggregation: new DropAggregation(),
+const dropView: ViewOptions = {
+  aggregation: { type: AggregationType.DROP },
   meterName: 'pubsub',
-});
+};
 ```
 
 Alternatively, you can also drop instruments with a specific instrument name,
 for example, all instruments of which the name starts with `http`:
 
 ```typescript
-const dropView = new View({
-  aggregation: new DropAggregation(),
+const dropView: ViewOptions = {
+  aggregation: { type: AggregationType.DROP },
   instrumentName: 'http*',
-});
+};
 ```
 
 ### Customizing the metric attributes of instrument
@@ -467,12 +470,12 @@ In the example below will drop all attributes except attribute `environment` for
 all instruments.
 
 ```typescript
-new View({
+const attributeLimitingView: ViewOptions = {
   // only export the attribute 'environment'
-  attributeKeys: ['environment'],
+  attributeProcesssors: [createAllowListAttributesProcessor(['environment'])],
   // apply the view to all instruments
   instrumentName: '*',
-})
+};
 ```
 
 ## Exporting measurements
@@ -497,22 +500,24 @@ to use the Prometheus exporter `PrometheusExporter` which is included in the
 
 ```typescript
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-const { MeterProvider }  = require('@opentelemetry/sdk-metrics');
+const { createMetricReader }  = require('@opentelemetry/sdk-metrics');
 
 // Add your port to the Prometheus options
-const options = { port: 9464 };
+const options = {port: 9464};
 const exporter = new PrometheusExporter(options);
 
 // Creates MeterProvider and installs the exporter as a MetricReader
-const meterProvider = new MeterProvider();
-meterProvider.addMetricReader(exporter);
+const meterProvider = createMeterProvider({
+  readers: [exporter]
+});
+
 const meter = meterProvider.getMeter('example-prometheus');
 
 // Now, start recording data
 const counter = meter.createCounter('metric_name', {
   description: 'Example of a counter'
 });
-counter.add(10, { pid: process.pid });
+counter.add(10, {pid: process.pid});
 ```
 
 In the above example the instantiated `PrometheusExporter` is configured to expose
@@ -534,19 +539,16 @@ The example below shows how you can configure OpenTelemetry JavaScript to use
 the OTLP exporter using http/protobuf.
 
 ```typescript
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const { createMeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-proto');
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const exporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(createPeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = createMeterProvider({
+  readers: [createPeriodicExportingMetricReader({ exporter: metricExporter, exportIntervalMillis: 1000 })],
+});
 
 // Now, start recording data
 const meter = meterProvider.getMeter('example-meter');

@@ -4,12 +4,11 @@ const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
-// const { ConsoleMetricExporter } = require('@opentelemetry/sdk-metrics');
+// const { createConsoleMetricExporter } = require('@opentelemetry/sdk-metrics');
 const {
-  ExponentialHistogramAggregation,
-  MeterProvider,
-  PeriodicExportingMetricReader,
-  View,
+  createMeterProvider,
+  createPeriodicExportingMetricReader,
+  AggregationType,
 } = require('@opentelemetry/sdk-metrics');
 const { Resource } = require('@opentelemetry/resources');
 const {
@@ -25,29 +24,25 @@ const metricExporter = new OTLPMetricExporter({
   // },
 });
 
-// Define view for the exponential histogram metric
-const expHistogramView = new View({
-  aggregation: new ExponentialHistogramAggregation(),
-  // Note, the instrumentName is the same as the name that has been passed for
-  // the Meter#createHistogram function for exponentialHistogram.
-  instrumentName: 'test_exponential_histogram',
-});
 
 // Create an instance of the metric provider
-const meterProvider = new MeterProvider({
+const meterProvider = createMeterProvider({
+  readers: [createPeriodicExportingMetricReader({
+    exporter: metricExporter,
+    // exporter: createConsoleMetricExporter(),
+    exportIntervalMillis: 1000,
+  })],
   resource: new Resource({
     [SEMRESATTRS_SERVICE_NAME]: 'basic-metric-service',
   }),
-  views: [expHistogramView],
+  // Define view for the exponential histogram metric
+  views: [{
+    aggregation: { type: AggregationType.EXPONENTIAL_HISTOGRAM },
+    // Note, the instrumentName is the same as the name that has been passed for
+    // the Meter#createHistogram function for exponentialHistogram.
+    instrumentName: 'test_exponential_histogram',
+  }],
 });
-
-meterProvider.addMetricReader(
-  createPeriodicExportingMetricReader({
-    exporter: metricExporter,
-    // exporter: new ConsoleMetricExporter(),
-    exportIntervalMillis: 1000,
-  })
-);
 
 const meter = meterProvider.getMeter('example-exporter-collector');
 

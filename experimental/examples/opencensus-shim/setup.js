@@ -20,7 +20,7 @@ const {
   NodeTracerProvider,
   BatchSpanProcessor,
 } = require('@opentelemetry/sdk-trace-node');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics');
+const { createMeterProvider } = require('@opentelemetry/sdk-metrics');
 const {
   OTLPTraceExporter,
 } = require('@opentelemetry/exporter-trace-otlp-grpc');
@@ -56,17 +56,20 @@ module.exports = function setup(serviceName) {
   );
   tracerProvider.register();
 
-  const meterProvider = new MeterProvider({ resource });
-  meterProvider.addMetricReader(
-    new PrometheusExporter({
-      metricProducers: [
-        new OpenCensusMetricProducer({
-          openCensusMetricProducerManager:
-            oc.Metrics.getMetricProducerManager(),
-        }),
-      ],
-    })
-  );
+  const meterProvider = createMeterProvider({
+    readers: [
+      new PrometheusExporter({
+        metricProducers: [
+          new OpenCensusMetricProducer({
+            openCensusMetricProducerManager:
+              oc.Metrics.getMetricProducerManager(),
+          }),
+        ],
+      })
+    ],
+    resource
+  });
+
   metrics.setGlobalMeterProvider(meterProvider);
 
   // Start OpenCensus tracing
