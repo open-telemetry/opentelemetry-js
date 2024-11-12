@@ -1414,6 +1414,21 @@ describe('setup exporter from env', () => {
     await sdk.shutdown();
   });
 
+  it('should be able to use console exporter but not http/json exporter', async () => {
+    env.OTEL_TRACES_EXPORTER = 'console, http/json';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+
+    assert(listOfProcessors.length === 1);
+    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    delete env.OTEL_TRACES_EXPORTER;
+    await sdk.shutdown();
+  });
+
   it('should ignore the protocol from env when use the console exporter', async () => {
     env.OTEL_TRACES_EXPORTER = 'console';
     env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
