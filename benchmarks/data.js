@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1731317621653,
+  "lastUpdate": 1731386753695,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -18632,6 +18632,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.55%",
             "unit": "ops/sec",
             "extra": "95 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "76003835+omarHassane@users.noreply.github.com",
+            "name": "Omar Hassane",
+            "username": "omarHassane"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f1ef5960ae9650ce549f2b922182d27c107b807a",
+          "message": "fix(instrumentation-http): iterating through the OTEL_SEMCONV_STABILITY_OPT_IN content instead of the entry indices (#5137)",
+          "timestamp": "2024-11-12T04:36:41Z",
+          "tree_id": "97f487d20eab79fe4c621bf3e5d52153e1a08867",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/f1ef5960ae9650ce549f2b922182d27c107b807a"
+        },
+        "date": 1731386752814,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 932327,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11795,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 684022,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662535,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
