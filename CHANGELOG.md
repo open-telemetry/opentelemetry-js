@@ -17,6 +17,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * default: `true` (no change in behavior)
   * note: `false` will become the default behavior in the next major version in order to comply with [specification requirements](https://github.com/open-telemetry/opentelemetry-specification/blob/f3511a5ccda376dfd1de76dfa086fc9b35b54757/specification/resource/sdk.md?plain=1#L31-L36)
 
+* feat(sdk-trace-base): add `spanProcessors` property in `TracerConfig` interface. [#5138](https://github.com/open-telemetry/opentelemetry-js/pull/5138) @david-luna
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): await exports in `PeriodicExportingMetricReader` when async resource attributes have not yet settled [#5119](https://github.com/open-telemetry/opentelemetry-js/pull/5119/) @pichlermarc

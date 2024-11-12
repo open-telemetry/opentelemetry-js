@@ -41,6 +41,8 @@ import {
   BatchSpanProcessor,
   AlwaysOnSampler,
   AlwaysOffSampler,
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
 } from '../../src';
 
 class DummyPropagator implements TextMapPropagator {
@@ -112,6 +114,24 @@ describe('BasicTracerProvider', () => {
           'Exporter "someExporter" requested through environment variable is unavailable.'
         );
         delete envSource.OTEL_TRACES_EXPORTER;
+      });
+    });
+
+    describe('when user sets span processors', () => {
+      it('should use the span processors defined in the config', () => {
+        const traceExporter = new ConsoleSpanExporter();
+        const spanProcessor = new SimpleSpanProcessor(traceExporter);
+
+        const tracer = new BasicTracerProvider({
+          spanProcessors: [spanProcessor],
+        });
+        assert.ok(
+          tracer['_registeredSpanProcessors'][0] instanceof SimpleSpanProcessor
+        );
+        assert.ok(
+          tracer['_registeredSpanProcessors'][0]['_exporter'] instanceof
+            ConsoleSpanExporter
+        );
       });
     });
 
