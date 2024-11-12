@@ -96,7 +96,7 @@ export class MetricCollector implements MetricProducer {
    * collector.
    */
   selectCardinalityLimit(instrumentType: InstrumentType): number {
-    return this._metricReader.selectCardinalityLimit(instrumentType);
+    return this._metricReader.selectCardinalityLimit.?(instrumentType) ?? 2000;
   }
 }
 
