@@ -7,9 +7,53 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(instrumentation-http)!: reduce public API surface by removing exports and making protected methods private [#5124](https://github.com/open-telemetry/opentelemetry-js/pull/5124) @pichlermarc
+  * (user-facing) the following exports were intended for internal use only and have been removed without replacement
+    * extractHostnameAndPort
+    * getAbsoluteUrl
+    * getIncomingRequestAttributes
+    * getIncomingRequestAttributesOnResponse
+    * getIncomingRequestMetricAttributes
+    * getIncomingRequestMetricAttributesOnResponse
+    * getOutgoingRequestAttributes
+    * getOutgoingRequestAttributesOnResponse
+    * getOutgoingRequestMetricAttributes
+    * getOutgoingRequestMetricAttributesOnResponse
+    * getRequestInfo
+    * headerCapture
+    * isCompressed
+    * isValidOptionsType
+    * parseResponseStatus
+    * satisfiesPattern
+    * setAttributesFromHttpKind
+    * setRequestContentLengthAttribute
+    * setResponseContentLengthAttribute
+    * setSpanWithError
+    * RequestSignature
+    * RequestFunction
+    * ParsedRequestOptions
+    * IgnoreMatcher
+    * Https
+    * HttpRequestArgs
+    * HttpCallbackOptional
+    * HttpCallback
+    * Http
+    * GetFunction
+    * Func
+    * Err
+
 ### :rocket: (Enhancement)
 
+* feat(sdk-node, sdk-logs): add `mergeResourceWithDefaults` flag, which allows opting-out of resources getting merged with the default resource [#4617](https://github.com/open-telemetry/opentelemetry-js/pull/4617)
+  * default: `true`
+  * note: `false` will become the default behavior in a future iteration in order to comply with [specification requirements](https://github.com/open-telemetry/opentelemetry-specification/blob/f3511a5ccda376dfd1de76dfa086fc9b35b54757/specification/resource/sdk.md?plain=1#L31-L36)
+
 ### :bug: (Bug Fix)
+
+* fix(instrumentation-http): Fix the `OTEL_SEMCONV_STABILITY_OPT_IN` variable check. Using `of` instead of `in` [#5137](https://github.com/open-telemetry/opentelemetry-js/pull/5137)
+
+* fix(instrumentation-http): drop url.parse in favor of URL constructor [#5091](https://github.com/open-telemetry/opentelemetry-js/pull/5091) @pichlermarc
+  * fixes a bug where using cyrillic characters in a client request string URL would throw an exception, whereas an un-instrumented client would accept the same input without throwing an exception
 
 ### :books: (Refine Doc)
 

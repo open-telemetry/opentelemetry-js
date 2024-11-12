@@ -48,7 +48,7 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import { SemconvStability } from '../../src/types';
+import { SemconvStability } from '../../src/internal-types';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
