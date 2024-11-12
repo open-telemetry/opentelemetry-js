@@ -123,7 +123,7 @@ describe('PeriodicExportingMetricReader', () => {
   });
 
   describe('constructor', () => {
-    it('should constructcreatePeriodicExportingMetricReader without exceptions', () => {
+    it('should createPeriodicExportingMetricReader without exceptions', () => {
       const exporter = new TestDeltaMetricExporter();
       assert.doesNotThrow(() =>
         createPeriodicExportingMetricReader({
