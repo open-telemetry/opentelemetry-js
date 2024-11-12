@@ -158,7 +158,7 @@ function validateViewOptions(viewOptions: ViewOptions) {
 }
 
 /**
- * Can be passed to a {@link MeterProvider} to select instruments and alter their metric stream.
+ * Internal class to select instruments and alter their metric stream.
  */
 export class View {
   readonly name?: string;
