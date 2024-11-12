@@ -1414,7 +1414,7 @@ describe('setup exporter from env', () => {
   });
 
   it('should be able to use console exporter but not http/json exporter', async () => {
-    env.OTEL_TRACES_EXPORTER = 'http/json';
+    env.OTEL_TRACES_EXPORTER = 'console, http/json';
     const sdk = new NodeSDK();
     sdk.start();
 
