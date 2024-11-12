@@ -18,6 +18,7 @@ import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
 import { IResource } from '@opentelemetry/resources';
 import { IdGenerator } from './IdGenerator';
 import { Sampler } from './Sampler';
+import { SpanProcessor } from './SpanProcessor';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
@@ -54,6 +55,11 @@ export interface TracerConfig {
    * The default value is 30000ms
    */
   forceFlushTimeoutMillis?: number;
+
+  /**
+   * List of SpanProcessor for the tracer
+   */
+  spanProcessors?: SpanProcessor[];
 }
 
 /**
