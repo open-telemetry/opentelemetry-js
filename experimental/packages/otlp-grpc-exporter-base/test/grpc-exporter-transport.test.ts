@@ -15,7 +15,7 @@
  */
 import {
   createEmptyMetadata,
-  createInsecureCredentials,
+  createInsecureCredentials, createOtlpGrpcExporterTransport,
   createSslCredentials,
   GrpcExporterTransport,
   GrpcExporterTransportParameters,
@@ -177,7 +177,7 @@ describe('GrpcExporterTransport', function () {
     });
 
     it('before send() does not error', function () {
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
       transport.shutdown();
 
       // no assertions, just checking that it does not throw any errors.
@@ -221,7 +221,7 @@ describe('GrpcExporterTransport', function () {
     });
 
     it('sends data', async function () {
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
         Buffer.from([1, 2, 3]),
@@ -249,7 +249,7 @@ describe('GrpcExporterTransport', function () {
           error: null,
         };
       };
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
         Buffer.from([]),
@@ -267,7 +267,7 @@ describe('GrpcExporterTransport', function () {
           error: new Error('handled server error'),
         };
       };
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
         Buffer.from([]),
@@ -282,7 +282,7 @@ describe('GrpcExporterTransport', function () {
       serverTestContext.serverResponseProvider = () => {
         throw new Error('unhandled server error');
       };
-      const transport = new GrpcExporterTransport(simpleClientConfig);
+      const transport = createOtlpGrpcExporterTransport(simpleClientConfig);
 
       const result = (await transport.send(
         Buffer.from([]),
@@ -299,7 +299,7 @@ describe('GrpcExporterTransport', function () {
         throw expectedError;
       };
 
-      const transport = new GrpcExporterTransport(config);
+      const transport = createOtlpGrpcExporterTransport(config);
 
       const result = (await transport.send(
         Buffer.from([]),
@@ -316,7 +316,7 @@ describe('GrpcExporterTransport', function () {
         return null as unknown as Metadata;
       };
 
-      const transport = new GrpcExporterTransport(config);
+      const transport = createOtlpGrpcExporterTransport(config);
 
       const result = (await transport.send(
         Buffer.from([]),
@@ -333,7 +333,7 @@ describe('GrpcExporterTransport', function () {
         throw expectedError;
       };
 
-      const transport = new GrpcExporterTransport(config);
+      const transport = createOtlpGrpcExporterTransport(config);
 
       const result = (await transport.send(
         Buffer.from([]),
