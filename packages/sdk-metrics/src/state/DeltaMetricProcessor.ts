@@ -32,11 +32,15 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   // https://github.com/open-telemetry/opentelemetry-specification/pull/2208
   private _cumulativeMemoStorage = new AttributeHashMap<T>();
   private _cardinalityLimit: number;
+  private _overflowAttributes = { 'otel.metric.overflow': true };
+  private _overflowHashCode: string;
+
   constructor(
     private _aggregator: Aggregator<T>,
     aggregationCardinalityLimit?: number
   ) {
     this._cardinalityLimit = (aggregationCardinalityLimit ?? 2000) - 1;
+    this._overflowHashCode = hashAttributes(this._overflowAttributes);
   }
 
   record(
@@ -49,9 +53,8 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
 
     if (!accumulation) {
       if (this._activeCollectionStorage.size >= this._cardinalityLimit) {
-        const overflowAttributes = { 'otel.metric.overflow': true };
         const overflowAccumulation = this._activeCollectionStorage.getOrDefault(
-          overflowAttributes,
+          this._overflowAttributes,
           () => this._aggregator.createAccumulation(collectionTime)
         );
         overflowAccumulation?.record(value);
@@ -87,8 +90,8 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
         } else {
           // If the cardinality limit is reached, we need to change the attributes
           if (this._cumulativeMemoStorage.size >= this._cardinalityLimit) {
-            attributes = { 'otel.metric.overflow': true };
-            hashCode = hashAttributes(attributes);
+            attributes = this._overflowAttributes;
+            hashCode = this._overflowHashCode;
             if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
               const previous = this._cumulativeMemoStorage.get(
                 attributes,
