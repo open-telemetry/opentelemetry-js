@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { createBoundedQueueExportPromiseHandler } from './export-promise-queue';
+import { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { OtlpSharedConfiguration } from './configuration/shared-configuration';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExporterTransport } from './exporter-transport';

@@ -16,7 +16,7 @@
 
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { IExporterTransport } from './exporter-transport';
-import { IExportPromiseHandler } from './export-promise-queue';
+import { IExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterError } from './types';
 

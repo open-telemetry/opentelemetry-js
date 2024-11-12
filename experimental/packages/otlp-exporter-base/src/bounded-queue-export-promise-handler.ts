@@ -20,12 +20,6 @@ export interface IExportPromiseHandler {
   awaitAll(): Promise<void>;
 }
 
-/**
- * Promise queue for keeping track of export promises. Finished promises will be auto-dequeued.
- * Allows for awaiting all promises in the queue.
- *
- * TODO: this still has some confusing behavior on enqueue.
- */
 class BoundedQueueExportPromiseHandler implements IExportPromiseHandler {
   private readonly _concurrencyLimit: number;
   private _sendingPromises: Promise<unknown>[] = [];
@@ -38,6 +32,10 @@ class BoundedQueueExportPromiseHandler implements IExportPromiseHandler {
   }
 
   public pushPromise(promise: Promise<void>): void {
+    if (this.hasReachedLimit()) {
+      throw new Error('Concurrency Limit reached');
+    }
+
     this._sendingPromises.push(promise);
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
@@ -57,6 +55,10 @@ class BoundedQueueExportPromiseHandler implements IExportPromiseHandler {
   }
 }
 
+/**
+ * Promise queue for keeping track of export promises. Finished promises will be auto-dequeued.
+ * Allows for awaiting all promises in the queue.
+ */
 export function createBoundedQueueExportPromiseHandler(options: {
   concurrencyLimit: number;
 }): IExportPromiseHandler {

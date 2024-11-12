@@ -21,7 +21,7 @@ import { ExportResultCode } from '@opentelemetry/core';
 import { createOtlpExportDelegate } from '../../src';
 import { ExportResponse } from '../../src';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { IExportPromiseHandler } from '../../src/export-promise-queue';
+import { IExportPromiseHandler } from '../../src/bounded-queue-export-promise-handler';
 
 interface FakeInternalRepresentation {
   foo: string;

@@ -20,7 +20,7 @@ import {
 import { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { createHttpExporterTransport } from './transport/http-exporter-transport';
-import { createBoundedQueueExportPromiseHandler } from './export-promise-queue';
+import { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { createRetryingTransport } from './retrying-transport';
 
 export function createOtlpHttpExportDelegate<Internal, Response>(

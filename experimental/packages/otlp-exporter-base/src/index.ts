@@ -41,5 +41,5 @@ export {
   createOtlpExportDelegate,
   IOLTPExportDelegate,
 } from './otlp-export-delegate';
-export { createBoundedQueueExportPromiseHandler } from './export-promise-queue';
+export { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
 export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
