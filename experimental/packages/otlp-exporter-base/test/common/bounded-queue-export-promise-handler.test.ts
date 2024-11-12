@@ -96,9 +96,15 @@ describe('BoundedQueueExportPromiseHandler', function () {
     const promiseHandler = createBoundedQueueExportPromiseHandler({
       concurrencyLimit: 3,
     });
-    promiseHandler.pushPromise(Promise.resolve());
-    promiseHandler.pushPromise(Promise.reject());
-    promiseHandler.pushPromise(Promise.resolve());
+    promiseHandler.pushPromise(
+      new Promise(resolve => queueMicrotask(() => resolve()))
+    );
+    promiseHandler.pushPromise(
+      new Promise(resolve => queueMicrotask(() => resolve()))
+    );
+    promiseHandler.pushPromise(
+      new Promise((_, reject) => queueMicrotask(() => reject()))
+    );
     assert.ok(promiseHandler.hasReachedLimit());
 
     await assert.rejects(() => promiseHandler.awaitAll());

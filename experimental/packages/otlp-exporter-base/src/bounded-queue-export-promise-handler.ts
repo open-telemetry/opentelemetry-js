@@ -48,10 +48,8 @@ class BoundedQueueExportPromiseHandler implements IExportPromiseHandler {
     return this._sendingPromises.length >= this._concurrencyLimit;
   }
 
-  public awaitAll(): Promise<void> {
-    return Promise.all(this._sendingPromises).then(() => {
-      /** ignore resolved values */
-    });
+  public async awaitAll(): Promise<void> {
+    await Promise.all(this._sendingPromises);
   }
 }
 
