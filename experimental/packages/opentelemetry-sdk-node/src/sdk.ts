@@ -254,7 +254,6 @@ export class NodeSDK {
     const spanProcessors = this._tracerProviderConfig
       ? this._tracerProviderConfig.spanProcessors
       : getSpanProcessorsFromEnv();
-    
 
     // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations and set them here
     this._tracerProvider = new NodeTracerProvider({

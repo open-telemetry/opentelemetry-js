@@ -123,10 +123,15 @@ describe('BasicTracerProvider', () => {
         const spanProcessor = new SimpleSpanProcessor(traceExporter);
 
         const tracer = new BasicTracerProvider({
-          spanProcessors: [spanProcessor]
+          spanProcessors: [spanProcessor],
         });
-        assert.ok(tracer['_registeredSpanProcessors'][0] instanceof SimpleSpanProcessor);
-        assert.ok(tracer['_registeredSpanProcessors'][0]['_exporter'] instanceof ConsoleSpanExporter);
+        assert.ok(
+          tracer['_registeredSpanProcessors'][0] instanceof SimpleSpanProcessor
+        );
+        assert.ok(
+          tracer['_registeredSpanProcessors'][0]['_exporter'] instanceof
+            ConsoleSpanExporter
+        );
       });
     });
 
