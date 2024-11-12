@@ -15,7 +15,8 @@
  */
 import {
   createEmptyMetadata,
-  createInsecureCredentials, createOtlpGrpcExporterTransport,
+  createInsecureCredentials,
+  createOtlpGrpcExporterTransport,
   createSslCredentials,
   GrpcExporterTransport,
   GrpcExporterTransportParameters,
