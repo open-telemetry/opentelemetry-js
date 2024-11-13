@@ -24,7 +24,7 @@ import {
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
-import { IResource } from './IResource';
+import { Entity, EntityRef, IResource } from './IResource';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -35,6 +35,7 @@ export class Resource implements IResource {
   private _syncAttributes?: ResourceAttributes;
   private _asyncAttributesPromise?: Promise<ResourceAttributes>;
   private _attributes?: ResourceAttributes;
+  public entityRefs: EntityRef[] = [];
 
   /**
    * Check if async attributes have resolved. This is useful to avoid awaiting
@@ -73,9 +74,21 @@ export class Resource implements IResource {
      * TODO: Consider to add check/validation on attributes.
      */
     attributes: ResourceAttributes,
-    asyncAttributesPromise?: Promise<ResourceAttributes>
+    asyncAttributesPromise?: Promise<ResourceAttributes>,
+    entities: Entity[] = [],
   ) {
     this._attributes = attributes;
+
+    this.entityRefs = entities.map(entity => {
+      this._attributes = Object.assign(this._attributes!, entity.attributes, entity.identifier);
+
+      return {
+        type: entity.type,
+        identifyingAttributeKeys: Object.keys(entity.identifier),
+        descriptiveAttributeKeys: Object.keys(entity.attributes),
+      }
+    });
+
     this.asyncAttributesPending = asyncAttributesPromise != null;
     this._syncAttributes = this._attributes ?? {};
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
