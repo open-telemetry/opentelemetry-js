@@ -20,14 +20,14 @@ import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExporterTransport } from './exporter-transport';
 import {
   createOtlpExportDelegate,
-  IOLTPExportDelegate,
+  IOtlpExportDelegate,
 } from './otlp-export-delegate';
 
 export function createOtlpNetworkExportDelegate<Internal, Response>(
   options: OtlpSharedConfiguration,
   serializer: ISerializer<Internal, Response>,
   transport: IExporterTransport
-): IOLTPExportDelegate<Internal> {
+): IOtlpExportDelegate<Internal> {
   return createOtlpExportDelegate(
     {
       transport: transport,

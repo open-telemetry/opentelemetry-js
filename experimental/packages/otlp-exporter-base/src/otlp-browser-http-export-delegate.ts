@@ -15,7 +15,7 @@
  */
 import { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
-import { IOLTPExportDelegate } from './otlp-export-delegate';
+import { IOtlpExportDelegate } from './otlp-export-delegate';
 import { createRetryingTransport } from './retrying-transport';
 import { createXhrTransport } from './transport/xhr-transport';
 import { createSendBeaconTransport } from './transport/send-beacon-transport';
@@ -24,7 +24,7 @@ import { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate'
 export function createOtlpXhrExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
   serializer: ISerializer<Internal, Response>
-): IOLTPExportDelegate<Internal> {
+): IOtlpExportDelegate<Internal> {
   return createOtlpNetworkExportDelegate(
     options,
     serializer,
@@ -37,7 +37,7 @@ export function createOtlpXhrExportDelegate<Internal, Response>(
 export function createOtlpSendBeaconExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
   serializer: ISerializer<Internal, Response>
-): IOLTPExportDelegate<Internal> {
+): IOtlpExportDelegate<Internal> {
   return createOtlpNetworkExportDelegate(
     options,
     serializer,

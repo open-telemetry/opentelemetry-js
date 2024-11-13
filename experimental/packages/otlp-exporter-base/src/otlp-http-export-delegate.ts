@@ -15,7 +15,7 @@
  */
 import {
   createOtlpExportDelegate,
-  IOLTPExportDelegate,
+  IOtlpExportDelegate,
 } from './otlp-export-delegate';
 import { OtlpHttpConfiguration } from './configuration/otlp-http-configuration';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
@@ -26,7 +26,7 @@ import { createRetryingTransport } from './retrying-transport';
 export function createOtlpHttpExportDelegate<Internal, Response>(
   options: OtlpHttpConfiguration,
   serializer: ISerializer<Internal, Response>
-): IOLTPExportDelegate<Internal> {
+): IOtlpExportDelegate<Internal> {
   return createOtlpExportDelegate(
     {
       transport: createRetryingTransport({

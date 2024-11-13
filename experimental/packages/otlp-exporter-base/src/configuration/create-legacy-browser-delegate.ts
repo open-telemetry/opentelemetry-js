@@ -19,7 +19,7 @@ import {
   createOtlpXhrExportDelegate,
 } from '../otlp-browser-http-export-delegate';
 import { convertLegacyBrowserHttpOptions } from './convert-legacy-browser-http-options';
-import { IOLTPExportDelegate } from '../otlp-export-delegate';
+import { IOtlpExportDelegate } from '../otlp-export-delegate';
 import { OTLPExporterConfigBase } from './legacy-base-configuration';
 
 /**
@@ -34,7 +34,7 @@ export function createLegacyOtlpBrowserExportDelegate<Internal, Response>(
   serializer: ISerializer<Internal, Response>,
   signalResourcePath: string,
   requiredHeaders: Record<string, string>
-): IOLTPExportDelegate<Internal> {
+): IOtlpExportDelegate<Internal> {
   const useXhr = !!config.headers || typeof navigator.sendBeacon !== 'function';
 
   const options = convertLegacyBrowserHttpOptions(

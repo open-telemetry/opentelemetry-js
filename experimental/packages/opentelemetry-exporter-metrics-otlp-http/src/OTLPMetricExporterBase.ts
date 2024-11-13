@@ -28,7 +28,7 @@ import {
   AggregationTemporalityPreference,
   OTLPMetricExporterOptions,
 } from './OTLPMetricExporterOptions';
-import { IOLTPExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
 import { diag } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector =
@@ -118,12 +118,12 @@ function chooseAggregationSelector(
 }
 
 export class OTLPMetricExporterBase implements PushMetricExporter {
-  public _delegate: IOLTPExportDelegate<ResourceMetrics[]>;
+  public _delegate: IOtlpExportDelegate<ResourceMetrics[]>;
   private _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private _aggregationSelector: AggregationSelector;
 
   constructor(
-    delegate: IOLTPExportDelegate<ResourceMetrics[]>,
+    delegate: IOtlpExportDelegate<ResourceMetrics[]>,
     config?: OTLPMetricExporterOptions
   ) {
     this._delegate = delegate;

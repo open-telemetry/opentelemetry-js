@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IOLTPExportDelegate, OTLPExporterBase } from '../../src';
+import { IOtlpExportDelegate, OTLPExporterBase } from '../../src';
 
 import * as sinon from 'sinon';
 
@@ -24,7 +24,7 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<string> = {
+      const delegateStubs: IOtlpExportDelegate<string> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
@@ -48,7 +48,7 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<string> = {
+      const delegateStubs: IOtlpExportDelegate<string> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
@@ -72,7 +72,7 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<string> = {
+      const delegateStubs: IOtlpExportDelegate<string> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,

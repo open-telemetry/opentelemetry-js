@@ -23,7 +23,7 @@ import { OTLPExporterError } from './types';
 /**
  * Internally shared export logic for OTLP.
  */
-export interface IOLTPExportDelegate<Internal> {
+export interface IOtlpExportDelegate<Internal> {
   export(
     internalRepresentation: Internal,
     resultCallback: (result: ExportResult) => void
@@ -33,7 +33,7 @@ export interface IOLTPExportDelegate<Internal> {
 }
 
 class OTLPExportDelegate<Internal, Response>
-  implements IOLTPExportDelegate<Internal>
+  implements IOtlpExportDelegate<Internal>
 {
   constructor(
     private _transport: IExporterTransport,
@@ -126,7 +126,7 @@ export function createOtlpExportDelegate<Internal, Response>(
     promiseHandler: IExportPromiseHandler;
   },
   settings: { timeout: number }
-): IOLTPExportDelegate<Internal> {
+): IOtlpExportDelegate<Internal> {
   return new OTLPExportDelegate(
     components.transport,
     components.serializer,

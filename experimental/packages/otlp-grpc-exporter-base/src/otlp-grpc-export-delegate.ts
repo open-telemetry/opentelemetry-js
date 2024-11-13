@@ -16,7 +16,7 @@
 
 import {
   createOtlpNetworkExportDelegate,
-  IOLTPExportDelegate,
+  IOtlpExportDelegate,
 } from '@opentelemetry/otlp-exporter-base';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { OtlpGrpcConfiguration } from './configuration/otlp-grpc-configuration';
@@ -27,7 +27,7 @@ export function createOtlpGrpcExportDelegate<Internal, Response>(
   serializer: ISerializer<Internal, Response>,
   grpcName: string,
   grpcPath: string
-): IOLTPExportDelegate<Internal> {
+): IOtlpExportDelegate<Internal> {
   return createOtlpNetworkExportDelegate(
     options,
     serializer,

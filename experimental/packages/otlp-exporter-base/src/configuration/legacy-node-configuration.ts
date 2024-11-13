@@ -20,8 +20,6 @@ import type * as https from 'https';
 import { OTLPExporterConfigBase } from './legacy-base-configuration';
 
 /**
- * @deprecated
- *
  * Collector Exporter node base config
  */
 export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
@@ -30,9 +28,6 @@ export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
   httpAgentOptions?: http.AgentOptions | https.AgentOptions;
 }
 
-/**
- * @deprecated
- */
 export enum CompressionAlgorithm {
   NONE = 'none',
   GZIP = 'gzip',

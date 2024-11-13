@@ -39,7 +39,7 @@ export {
 export { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
 export {
   createOtlpExportDelegate,
-  IOLTPExportDelegate,
+  IOtlpExportDelegate,
 } from './otlp-export-delegate';
 export { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
 export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { IOLTPExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
 import { OTLPMetricExporterBase } from '../../src/OTLPMetricExporterBase';
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { Resource } from '@opentelemetry/resources';
@@ -26,7 +26,7 @@ describe('OTLPMetricExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<ResourceMetrics[]> = {
+      const delegateStubs: IOtlpExportDelegate<ResourceMetrics[]> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
@@ -50,7 +50,7 @@ describe('OTLPMetricExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<ResourceMetrics[]> = {
+      const delegateStubs: IOtlpExportDelegate<ResourceMetrics[]> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
@@ -74,7 +74,7 @@ describe('OTLPMetricExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<ResourceMetrics[]> = {
+      const delegateStubs: IOtlpExportDelegate<ResourceMetrics[]> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
