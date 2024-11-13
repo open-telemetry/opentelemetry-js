@@ -22,6 +22,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): await exports in `PeriodicExportingMetricReader` when async resource attributes have not yet settled [#5119](https://github.com/open-telemetry/opentelemetry-js/pull/5119/) @pichlermarc
+* fix(sdk-trace): performance.now() may return the same value for consecutive calls [#5150](https://github.com/open-telemetry/opentelemetry-js/pull/5150) @dyladan
 
 ### :books: (Refine Doc)
 

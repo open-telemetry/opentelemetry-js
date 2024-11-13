@@ -280,7 +280,7 @@ export class Span implements APISpan, ReadableSpan {
   }
 
   private _getTime(inp?: TimeInput): HrTime {
-    if (typeof inp === 'number' && inp < otperformance.now()) {
+    if (typeof inp === 'number' && inp <= otperformance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
       return hrTime(inp + this._performanceOffset);
