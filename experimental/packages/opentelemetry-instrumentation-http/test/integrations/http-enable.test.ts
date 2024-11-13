@@ -45,7 +45,6 @@ import { Socket } from 'net';
 import { sendRequestTwice } from '../utils/rawRequest';
 
 const protocol = 'http';
-const serverPort = 32345;
 const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
 
@@ -138,14 +137,7 @@ describe('HttpInstrumentation Integration tests', () => {
     });
 
     before(() => {
-      const ignoreConfig = [
-        `${protocol}://${hostname}:${serverPort}/ignored/string`,
-        /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith('/ignored/function'),
-      ];
       instrumentation.setConfig({
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
       instrumentation.enable();
@@ -281,6 +273,20 @@ describe('HttpInstrumentation Integration tests', () => {
         { headers }
       );
       assert.deepStrictEqual(headers, { 'x-foo': 'foo' });
+      assert.ok(result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
+      assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
+    });
+
+    it('should succeed even with malformed Forwarded header', async () => {
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const headers = { 'x-foo': 'foo', forwarded: 'malformed' };
+      const result = await httpRequest.get(
+        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        { headers }
+      );
+
       assert.ok(result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
       assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
     });

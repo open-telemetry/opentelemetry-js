@@ -48,9 +48,6 @@
       "path": "experimental/packages/otlp-transformer/tsconfig.esnext.json"
     },
     {
-      "path": "experimental/packages/propagator-aws-xray-lambda/tsconfig.esnext.json"
-    },
-    {
       "path": "experimental/packages/sdk-events/tsconfig.esnext.json"
     },
     {
@@ -85,9 +82,6 @@
     },
     {
       "path": "packages/opentelemetry-sdk-trace-web/tsconfig.esnext.json"
-    },
-    {
-      "path": "packages/propagator-aws-xray/tsconfig.esnext.json"
     },
     {
       "path": "packages/sdk-metrics/tsconfig.esnext.json"

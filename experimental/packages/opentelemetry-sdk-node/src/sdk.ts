@@ -63,9 +63,12 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { getResourceDetectorsFromEnv, filterBlanksAndNulls } from './utils';
+import {
+  getResourceDetectorsFromEnv,
+  getSpanProcessorsFromEnv,
+  filterBlanksAndNulls,
+} from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -100,10 +103,11 @@ export class NodeSDK {
 
   private _resource: IResource;
   private _resourceDetectors: Array<Detector | DetectorSync>;
+  private _mergeResourceWithDefaults: boolean;
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
+  private _tracerProvider?: NodeTracerProvider;
   private _loggerProvider?: LoggerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
@@ -135,6 +139,8 @@ export class NodeSDK {
     this._configuration = configuration;
 
     this._resource = configuration.resource ?? new Resource({});
+    this._mergeResourceWithDefaults =
+      configuration.mergeResourceWithDefaults ?? true;
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
@@ -249,36 +255,33 @@ export class NodeSDK {
             })
           );
 
-    // if there is a tracerProviderConfig (traceExporter/spanProcessor was set manually) or the traceExporter is set manually, use NodeTracerProvider
-    const Provider = this._tracerProviderConfig
-      ? NodeTracerProvider
-      : TracerProviderWithEnvExporters;
+    const spanProcessors = this._tracerProviderConfig
+      ? this._tracerProviderConfig.spanProcessors
+      : getSpanProcessorsFromEnv();
 
     // If the Provider is configured with Env Exporters, we need to check if the SDK had any manual configurations and set them here
-    const tracerProvider = new Provider({
+    this._tracerProvider = new NodeTracerProvider({
       ...this._configuration,
       resource: this._resource,
+      mergeResourceWithDefaults: this._mergeResourceWithDefaults,
+      spanProcessors,
     });
 
-    this._tracerProvider = tracerProvider;
-
-    if (this._tracerProviderConfig) {
-      for (const spanProcessor of this._tracerProviderConfig.spanProcessors) {
-        tracerProvider.addSpanProcessor(spanProcessor);
-      }
+    // Only register if there is a span processor
+    if (spanProcessors.length > 0) {
+      this._tracerProvider.register({
+        contextManager:
+          this._tracerProviderConfig?.contextManager ??
+          // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
+          this._configuration?.contextManager,
+        propagator: this._tracerProviderConfig?.textMapPropagator,
+      });
     }
-
-    tracerProvider.register({
-      contextManager:
-        this._tracerProviderConfig?.contextManager ??
-        // _tracerProviderConfig may be undefined if trace-specific settings are not provided - fall back to raw config
-        this._configuration?.contextManager,
-      propagator: this._tracerProviderConfig?.textMapPropagator,
-    });
 
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
+        mergeResourceWithDefaults: this._mergeResourceWithDefaults,
       });
 
       for (const logRecordProcessor of this._loggerProviderConfig
@@ -300,6 +303,7 @@ export class NodeSDK {
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
         readers: readers,
+        mergeResourceWithDefaults: this._mergeResourceWithDefaults,
       });
 
       this._meterProvider = meterProvider;
