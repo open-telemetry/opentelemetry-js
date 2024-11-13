@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IOLTPExportDelegate, OTLPExporterBase } from '../../src';
-
 import * as sinon from 'sinon';
+import { IOLTPExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import { OTLPMetricExporterBase } from '../../src/OTLPMetricExporterBase';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
+import { Resource } from '@opentelemetry/resources';
 
-describe('OTLPExporterBase', function () {
+describe('OTLPMetricExporterBase', function () {
   describe('shutdown', function () {
     it('calls delegate shutdown', async function () {
       // arrange
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<string> = {
+      const delegateStubs: IOLTPExportDelegate<ResourceMetrics[]> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
       };
-      const exporterBase = new OTLPExporterBase(delegateStubs);
+      const exporterBase = new OTLPMetricExporterBase(delegateStubs);
 
       // act
       await exporterBase.shutdown();
@@ -48,12 +50,12 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<string> = {
+      const delegateStubs: IOLTPExportDelegate<ResourceMetrics[]> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
       };
-      const exporterBase = new OTLPExporterBase(delegateStubs);
+      const exporterBase = new OTLPMetricExporterBase(delegateStubs);
 
       // act
       await exporterBase.forceFlush();
@@ -72,13 +74,16 @@ describe('OTLPExporterBase', function () {
       const exportStub = sinon.stub();
       const forceFlushStub = sinon.stub();
       const shutdownStub = sinon.stub();
-      const delegateStubs: IOLTPExportDelegate<string> = {
+      const delegateStubs: IOLTPExportDelegate<ResourceMetrics[]> = {
         export: exportStub,
         forceFlush: forceFlushStub,
         shutdown: shutdownStub,
       };
-      const exporterBase = new OTLPExporterBase(delegateStubs);
-      const expectedExportItem = 'sample-export-item';
+      const exporterBase = new OTLPMetricExporterBase(delegateStubs);
+      const expectedExportItem: ResourceMetrics = {
+        resource: Resource.empty(),
+        scopeMetrics: [],
+      };
       const expectedCallback = sinon.stub();
 
       // act
@@ -87,7 +92,7 @@ describe('OTLPExporterBase', function () {
       // assert
       sinon.assert.calledOnceWithExactly(
         exportStub,
-        expectedExportItem,
+        [expectedExportItem],
         expectedCallback
       );
       // should not do anything with the callback, any interaction with it should happen on the delegate
