@@ -77,7 +77,6 @@ import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-// import { OTLPTraceExporter as OTLPHttpTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import {
   SEMRESATTRS_HOST_NAME,
@@ -1162,6 +1161,7 @@ describe('setup exporter from env', () => {
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
+
   it('should only create one span processor when configured using env vars and config', async () => {
     env.OTEL_TRACES_EXPORTER = 'console';
     const sdk = new NodeSDK({
@@ -1399,6 +1399,21 @@ describe('setup exporter from env', () => {
     assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     assert(listOfProcessors[1] instanceof BatchSpanProcessor);
     assert(listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter);
+    delete env.OTEL_TRACES_EXPORTER;
+    await sdk.shutdown();
+  });
+
+  it('should be able to use console exporter but not http/json exporter', async () => {
+    env.OTEL_TRACES_EXPORTER = 'console, http/json';
+    const sdk = new NodeSDK();
+    sdk.start();
+
+    const listOfProcessors =
+      sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+
+    assert(listOfProcessors.length === 1);
+    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });

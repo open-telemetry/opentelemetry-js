@@ -35,6 +35,12 @@ export interface TracerConfig {
   /** Span Limits */
   spanLimits?: SpanLimits;
 
+  /**
+   * Merge resource with {@link Resource.default()}?
+   * Default: {@code true}
+   **/
+  mergeResourceWithDefaults?: boolean;
+
   /** Resource associated with trace telemetry  */
   resource?: IResource;
 
