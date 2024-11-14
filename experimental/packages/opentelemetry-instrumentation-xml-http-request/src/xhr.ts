@@ -33,7 +33,6 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
-  getXHRBodyLength,
   getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
@@ -46,6 +45,7 @@ import {
   SendFunction,
   XhrMem,
 } from './types';
+import { getXHRBodyLength } from './utils';
 import { VERSION } from './version';
 import { AttributeNames } from './enums/AttributeNames';
 

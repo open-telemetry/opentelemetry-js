@@ -34,6 +34,7 @@ import {
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
+import { getFetchBodyLength } from './utils';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
 
@@ -324,8 +325,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         const spanData = plugin._prepareSpanData(url);
 
         if (plugin.getConfig().measureRequestSize) {
-          web
-            .getFetchBodyLength(...args)
+          getFetchBodyLength(...args)
             .then(length => {
               if (!length) return;
 
