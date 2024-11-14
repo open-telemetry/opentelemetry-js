@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1731598223555,
+  "lastUpdate": 1731601312586,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -18892,6 +18892,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.65%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "mustafa@honeycomb.io",
+            "name": "Mustafa Haddara",
+            "username": "MustafaHaddara"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "c78a02fe7414826df75205d30ba7131d79ada488",
+          "message": "Track request body size in XHR and Fetch instrumentations (#4706)\n\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>",
+          "timestamp": "2024-11-14T15:51:55Z",
+          "tree_id": "7f95f60f016149af287f73cb008417f3d535d50d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/c78a02fe7414826df75205d30ba7131d79ada488"
+        },
+        "date": 1731601311604,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 972745,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11789,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 664084,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 651008,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
