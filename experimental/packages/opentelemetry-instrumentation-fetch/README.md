@@ -68,8 +68,9 @@ Fetch instrumentation plugin has few options available to choose from. You can s
 
 | Options                                                                                                                                                                  | Type                          | Description                                                                             |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------------------------------|
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L64) | `HttpCustomAttributeFunction` | Function for adding custom attributes                                                   |
-| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L67)                      | `boolean`                     | Disable network events being added as span events (network events are added by default) |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L75) | `HttpCustomAttributeFunction` | Function for adding custom attributes                                                   |
+| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L77)         | `boolean`                     | Disable network events being added as span events (network events are added by default) |
+| [`measureRequestSize`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L79)          | `boolean`                     | Measure outgoing request length (outgoing request length is not measured by default)    |
 
 ## Semantic Conventions
 
@@ -79,12 +80,13 @@ Attributes collected:
 
 | Attribute                                   | Short Description                                                              |
 | ------------------------------------------- | ------------------------------------------------------------------------------ |
-| `http.status_code`                          | HTTP response status code                                                       |
+| `http.status_code`                          | HTTP response status code                                                      |
 | `http.host`                                 | The value of the HTTP host header                                              |
 | `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
 | `http.scheme`                               | The URI scheme identifying the used protocol                                   |
 | `http.url`                                  | Full HTTP request URL                                                          |
 | `http.method`                               | HTTP request method                                                            |
+| `http.request_content_length_uncompressed`  | Uncompressed size of the request body, if any body exists                      |
 
 ## Useful links
 
