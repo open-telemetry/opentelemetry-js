@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1731507300765,
+  "lastUpdate": 1731576111660,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -18788,6 +18788,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4afc190d9005f0067568eaedfe4b661b7fc41c3d",
+          "message": "fix(sdk-trace-base): pass BatchSpanProcessor#forceFlush() errors on visibilitychange/pagehide to globalErrorHandler (#5143)\n\nCo-authored-by: Hector Hernandez <39923391+hectorhdzg@users.noreply.github.com>",
+          "timestamp": "2024-11-14T09:13:18Z",
+          "tree_id": "c3d6df9e05e9a3c5990653f0f49f6b0f975c27d2",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4afc190d9005f0067568eaedfe4b661b7fc41c3d"
+        },
+        "date": 1731576110693,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 923872,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11753,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 678470,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 657571,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
           }
         ]
       }
