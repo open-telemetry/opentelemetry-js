@@ -23,5 +23,6 @@
 ### :house: (Internal)
 
 * chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
+* chore: update typescript to version `^5.6.3` [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145) @david-luna
 
 ### :bug: (Bug Fix)
