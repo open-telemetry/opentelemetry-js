@@ -12,14 +12,15 @@ const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-convention
 const providerWithZone = new WebTracerProvider({
   resource: new Resource({
     [SEMRESATTRS_SERVICE_NAME]: 'xml-http-web-service'
-  })
+  }),
+  // Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
+  // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
+  // exporter without delay
+  spanProcessors: [
+    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+    new SimpleSpanProcessor(new OTLPTraceExporter()),
+  ]
 });
-
-// Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
-// to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
-// exporter without delay
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
