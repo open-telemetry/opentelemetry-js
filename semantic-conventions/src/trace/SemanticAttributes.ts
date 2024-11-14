@@ -244,7 +244,7 @@ export const SEMATTRS_DB_MSSQL_INSTANCE_NAME = TMP_DB_MSSQL_INSTANCE_NAME;
 /**
  * The name of the keyspace being accessed. To be used instead of the generic `db.name` attribute.
  *
- * @deprecated use ATTR_DB_CASSANDRA_KEYSPACE
+ * @deprecated use ATTR_DB_NAME
  */
 export const SEMATTRS_DB_CASSANDRA_KEYSPACE = TMP_DB_CASSANDRA_KEYSPACE;
 
@@ -306,7 +306,7 @@ export const SEMATTRS_DB_CASSANDRA_COORDINATOR_DC =
 /**
  * The [HBase namespace](https://hbase.apache.org/book.html#_namespace) being accessed. To be used instead of the generic `db.name` attribute.
  *
- * @deprecated use ATTR_DB_HBASE_NAMESPACE
+ * @deprecated use ATTR_DB_NAME
  */
 export const SEMATTRS_DB_HBASE_NAMESPACE = TMP_DB_HBASE_NAMESPACE;
 
@@ -388,7 +388,7 @@ export const SEMATTRS_FAAS_TRIGGER = TMP_FAAS_TRIGGER;
 /**
  * The execution ID of the current function execution.
  *
- * @deprecated use ATTR_FAAS_EXECUTION
+ * @deprecated use ATTR_FAAS_INVOCATION_ID
  */
 export const SEMATTRS_FAAS_EXECUTION = TMP_FAAS_EXECUTION;
 
@@ -520,14 +520,14 @@ export const SEMATTRS_NET_HOST_NAME = TMP_NET_HOST_NAME;
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated use ATTR_NET_HOST_CONNECTION_TYPE
+ * @deprecated use ATTR_NETWORK_CONNECTION_TYPE
  */
 export const SEMATTRS_NET_HOST_CONNECTION_TYPE = TMP_NET_HOST_CONNECTION_TYPE;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated use ATTR_NET_HOST_CONNECTION_SUBTYPE
+ * @deprecated use ATTR_NETWORK_CONNECTION_SUBTYPE
  */
 export const SEMATTRS_NET_HOST_CONNECTION_SUBTYPE =
   TMP_NET_HOST_CONNECTION_SUBTYPE;
@@ -535,28 +535,28 @@ export const SEMATTRS_NET_HOST_CONNECTION_SUBTYPE =
 /**
  * The name of the mobile carrier.
  *
- * @deprecated use ATTR_NET_HOST_CARRIER_NAME
+ * @deprecated use ATTR_NETWORK_CARRIER_NAME
  */
 export const SEMATTRS_NET_HOST_CARRIER_NAME = TMP_NET_HOST_CARRIER_NAME;
 
 /**
  * The mobile carrier country code.
  *
- * @deprecated use ATTR_NET_HOST_CARRIER_MCC
+ * @deprecated use ATTR_NETWORK_CARRIER_MCC
  */
 export const SEMATTRS_NET_HOST_CARRIER_MCC = TMP_NET_HOST_CARRIER_MCC;
 
 /**
  * The mobile carrier network code.
  *
- * @deprecated use ATTR_NET_HOST_CARRIER_MNC
+ * @deprecated use ATTR_NETWORK_CARRIER_MNC
  */
 export const SEMATTRS_NET_HOST_CARRIER_MNC = TMP_NET_HOST_CARRIER_MNC;
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
  *
- * @deprecated use ATTR_NET_HOST_CARRIER_ICC
+ * @deprecated use ATTR_NETWORK_CARRIER_ICC
  */
 export const SEMATTRS_NET_HOST_CARRIER_ICC = TMP_NET_HOST_CARRIER_ICC;
 
@@ -936,14 +936,14 @@ export const SEMATTRS_MESSAGING_SYSTEM = TMP_MESSAGING_SYSTEM;
 /**
  * The message destination name. This might be equal to the span name but is required nevertheless.
  *
- * @deprecated use ATTR_MESSAGING_DESTINATION
+ * @deprecated use ATTR_MESSAGING_DESTINATION_NAME
  */
 export const SEMATTRS_MESSAGING_DESTINATION = TMP_MESSAGING_DESTINATION;
 
 /**
  * The kind of message destination.
  *
- * @deprecated use ATTR_MESSAGING_DESTINATION_KIND
+ * @deprecated Removed in semconv v1.20.0.
  */
 export const SEMATTRS_MESSAGING_DESTINATION_KIND =
   TMP_MESSAGING_DESTINATION_KIND;
@@ -951,7 +951,7 @@ export const SEMATTRS_MESSAGING_DESTINATION_KIND =
 /**
  * A boolean that is true if the message destination is temporary.
  *
- * @deprecated use ATTR_MESSAGING_TEMP_DESTINATION
+ * @deprecated use ATTR_MESSAGING_DESTINATION_TEMPORARY
  */
 export const SEMATTRS_MESSAGING_TEMP_DESTINATION =
   TMP_MESSAGING_TEMP_DESTINATION;
@@ -959,14 +959,14 @@ export const SEMATTRS_MESSAGING_TEMP_DESTINATION =
 /**
  * The name of the transport protocol.
  *
- * @deprecated use ATTR_MESSAGING_PROTOCOL
+ * @deprecated use ATTR_NETWORK_PROTOCOL_NAME
  */
 export const SEMATTRS_MESSAGING_PROTOCOL = TMP_MESSAGING_PROTOCOL;
 
 /**
  * The version of the transport protocol.
  *
- * @deprecated use ATTR_MESSAGING_PROTOCOL_VERSION
+ * @deprecated use ATTR_NETWORK_PROTOCOL_VERSION
  */
 export const SEMATTRS_MESSAGING_PROTOCOL_VERSION =
   TMP_MESSAGING_PROTOCOL_VERSION;
@@ -974,7 +974,7 @@ export const SEMATTRS_MESSAGING_PROTOCOL_VERSION =
 /**
  * Connection string.
  *
- * @deprecated use ATTR_MESSAGING_URL
+ * @deprecated Removed in semconv v1.17.0.
  */
 export const SEMATTRS_MESSAGING_URL = TMP_MESSAGING_URL;
 
@@ -988,14 +988,14 @@ export const SEMATTRS_MESSAGING_MESSAGE_ID = TMP_MESSAGING_MESSAGE_ID;
 /**
  * The [conversation ID](#conversations) identifying the conversation to which the message belongs, represented as a string. Sometimes called &#34;Correlation ID&#34;.
  *
- * @deprecated use ATTR_MESSAGING_CONVERSATION_ID
+ * @deprecated use ATTR_MESSAGING_MESSAGE_CONVERSATION_ID
  */
 export const SEMATTRS_MESSAGING_CONVERSATION_ID = TMP_MESSAGING_CONVERSATION_ID;
 
 /**
  * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
  *
- * @deprecated use ATTR_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES
+ * @deprecated use ATTR_MESSAGING_MESSAGE_BODY_SIZE
  */
 export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES =
   TMP_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES;
@@ -1003,7 +1003,7 @@ export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES =
 /**
  * The compressed size of the message payload in bytes.
  *
- * @deprecated use ATTR_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES
+ * @deprecated Removed in semconv v1.22.0.
  */
 export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES =
   TMP_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES;
@@ -1018,14 +1018,14 @@ export const SEMATTRS_MESSAGING_OPERATION = TMP_MESSAGING_OPERATION;
 /**
  * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer_group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer_group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
  *
- * @deprecated use ATTR_MESSAGING_CONSUMER_ID
+ * @deprecated Removed in semconv v1.21.0.
  */
 export const SEMATTRS_MESSAGING_CONSUMER_ID = TMP_MESSAGING_CONSUMER_ID;
 
 /**
  * RabbitMQ message routing key.
  *
- * @deprecated use ATTR_MESSAGING_RABBITMQ_ROUTING_KEY
+ * @deprecated use ATTR_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY
  */
 export const SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY =
   TMP_MESSAGING_RABBITMQ_ROUTING_KEY;
@@ -1051,21 +1051,21 @@ export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP =
 /**
  * Client Id for the Consumer or Producer that is handling the message.
  *
- * @deprecated use ATTR_MESSAGING_KAFKA_CLIENT_ID
+ * @deprecated use ATTR_MESSAGING_CLIENT_ID
  */
 export const SEMATTRS_MESSAGING_KAFKA_CLIENT_ID = TMP_MESSAGING_KAFKA_CLIENT_ID;
 
 /**
  * Partition the message is sent to.
  *
- * @deprecated use ATTR_MESSAGING_KAFKA_PARTITION
+ * @deprecated use ATTR_MESSAGING_KAFKA_DESTINATION_PARTITION
  */
 export const SEMATTRS_MESSAGING_KAFKA_PARTITION = TMP_MESSAGING_KAFKA_PARTITION;
 
 /**
  * A boolean that is true if the message is a tombstone.
  *
- * @deprecated use ATTR_MESSAGING_KAFKA_TOMBSTONE
+ * @deprecated use ATTR_MESSAGING_KAFKA_MESSAGE_TOMBSTONE
  */
 export const SEMATTRS_MESSAGING_KAFKA_TOMBSTONE = TMP_MESSAGING_KAFKA_TOMBSTONE;
 
@@ -3035,14 +3035,14 @@ export const NETTRANSPORTVALUES_IP_UDP = TMP_NETTRANSPORTVALUES_IP_UDP;
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUE_IP.
+ * @deprecated Removed in v1.21.0.
  */
 export const NETTRANSPORTVALUES_IP = TMP_NETTRANSPORTVALUES_IP;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUE_UNIX.
+ * @deprecated Removed in v1.21.0.
  */
 export const NETTRANSPORTVALUES_UNIX = TMP_NETTRANSPORTVALUES_UNIX;
 
@@ -3128,7 +3128,7 @@ const TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN = 'unknown';
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_WIFI.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_WIFI.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIFI =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIFI;
@@ -3136,7 +3136,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_WIFI =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_WIRED.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_WIRED.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIRED =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIRED;
@@ -3144,7 +3144,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_WIRED =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_CELL.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_CELL.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_CELL =
   TMP_NETHOSTCONNECTIONTYPEVALUES_CELL;
@@ -3152,7 +3152,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_CELL =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_UNAVAILABLE.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_UNAVAILABLE.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE;
@@ -3160,7 +3160,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NET_HOST_CONNECTION_TYPE_VALUE_UNKNOWN.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_UNKNOWN.
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNKNOWN =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN;
@@ -3234,7 +3234,7 @@ const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA = 'lte_ca';
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_GPRS.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_GPRS.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GPRS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GPRS;
@@ -3242,7 +3242,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_GPRS =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EDGE.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EDGE.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EDGE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EDGE;
@@ -3250,7 +3250,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EDGE =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_UMTS.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_UMTS.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_UMTS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_UMTS;
@@ -3258,7 +3258,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_UMTS =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_CDMA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA;
@@ -3266,7 +3266,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EVDO_0.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_0.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0;
@@ -3274,7 +3274,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EVDO_A.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_A.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A;
@@ -3282,7 +3282,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_CDMA2000_1XRTT.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA2000_1XRTT.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT;
@@ -3290,7 +3290,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSDPA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSDPA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA;
@@ -3298,7 +3298,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSUPA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSUPA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA;
@@ -3306,7 +3306,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSPA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSPA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPA;
@@ -3314,7 +3314,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_IDEN.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_IDEN.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IDEN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IDEN;
@@ -3322,7 +3322,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_IDEN =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EVDO_B.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_B.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B;
@@ -3330,7 +3330,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_LTE.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_LTE.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE;
@@ -3338,7 +3338,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_EHRPD.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EHRPD.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD;
@@ -3346,7 +3346,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_HSPAP.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSPAP.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP;
@@ -3354,7 +3354,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_GSM.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_GSM.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GSM =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GSM;
@@ -3362,7 +3362,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_GSM =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_TD_SCDMA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_TD_SCDMA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA;
@@ -3370,7 +3370,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_IWLAN.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_IWLAN.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN;
@@ -3378,7 +3378,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_NR.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_NR.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NR =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NR;
@@ -3386,7 +3386,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_NR =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_NRNSA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_NRNSA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA;
@@ -3394,7 +3394,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NET_HOST_CONNECTION_SUBTYPE_VALUE_LTE_CA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_LTE_CA.
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA;
@@ -3611,7 +3611,7 @@ const TMP_MESSAGINGDESTINATIONKINDVALUES_TOPIC = 'topic';
 /**
  * The kind of message destination.
  *
- * @deprecated Use MESSAGING_DESTINATION_KIND_VALUE_QUEUE.
+ * @deprecated Removed in semconv v1.20.0.
  */
 export const MESSAGINGDESTINATIONKINDVALUES_QUEUE =
   TMP_MESSAGINGDESTINATIONKINDVALUES_QUEUE;
@@ -3619,7 +3619,7 @@ export const MESSAGINGDESTINATIONKINDVALUES_QUEUE =
 /**
  * The kind of message destination.
  *
- * @deprecated Use MESSAGING_DESTINATION_KIND_VALUE_TOPIC.
+ * @deprecated Removed in semconv v1.20.0.
  */
 export const MESSAGINGDESTINATIONKINDVALUES_TOPIC =
   TMP_MESSAGINGDESTINATIONKINDVALUES_TOPIC;
@@ -3662,7 +3662,7 @@ const TMP_MESSAGINGOPERATIONVALUES_PROCESS = 'process';
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  *
- * @deprecated Use MESSAGING_OPERATION_VALUE_RECEIVE.
+ * @deprecated Use MESSAGING_OPERATION_TYPE_VALUE_RECEIVE.
  */
 export const MESSAGINGOPERATIONVALUES_RECEIVE =
   TMP_MESSAGINGOPERATIONVALUES_RECEIVE;
@@ -3670,7 +3670,7 @@ export const MESSAGINGOPERATIONVALUES_RECEIVE =
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  *
- * @deprecated Use MESSAGING_OPERATION_VALUE_PROCESS.
+ * @deprecated Use MESSAGING_OPERATION_TYPE_VALUE_PROCESS.
  */
 export const MESSAGINGOPERATIONVALUES_PROCESS =
   TMP_MESSAGINGOPERATIONVALUES_PROCESS;
