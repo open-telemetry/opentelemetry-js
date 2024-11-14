@@ -68,11 +68,11 @@ export const ProtobufLogsSerializer: ISerializer<
 };
 
 export const ProtobufMetricsSerializer: ISerializer<
-  ResourceMetrics[],
+  ResourceMetrics,
   IExportMetricsServiceResponse
 > = {
-  serializeRequest: (arg: ResourceMetrics[]) => {
-    const request = createExportMetricsServiceRequest(arg);
+  serializeRequest: (arg: ResourceMetrics) => {
+    const request = createExportMetricsServiceRequest([arg]);
     return metricsRequestType.encode(request).finish();
   },
   deserializeResponse: (arg: Uint8Array) => {
