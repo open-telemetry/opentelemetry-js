@@ -23,7 +23,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 * fix(sdk-metrics): await exports in `PeriodicExportingMetricReader` when async resource attributes have not yet settled [#5119](https://github.com/open-telemetry/opentelemetry-js/pull/5119/) @pichlermarc
 * fix(sdk-trace-base): pass BatchSpanProcessor#forceFlush() errors on visibilitychange/pagehide to globalErrorHandler [#5143](https://github.com/open-telemetry/opentelemetry-js/pull/5143) @pichlermarc
-  * fixes a bug where switching tabs with a failing exporter would cause an unhandled error
+  * fixes a bug where switching browser tabs with a failing exporter would cause an unhandled error
 
 ### :books: (Refine Doc)
 
