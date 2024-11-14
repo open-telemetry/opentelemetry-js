@@ -1116,6 +1116,7 @@ describe('setup exporter from env', () => {
     assert(listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter);
     await sdk.shutdown();
   });
+
   it('should ignore default env exporter when user provides exporter in sdk config', async () => {
     const traceExporter = new ConsoleSpanExporter();
     const sdk = new NodeSDK({
@@ -1130,6 +1131,7 @@ describe('setup exporter from env', () => {
     assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     await sdk.shutdown();
   });
+
   it('should ignore default env exporter when user provides span processor in sdk config', async () => {
     const traceExporter = new ConsoleSpanExporter();
     const spanProcessor = new SimpleSpanProcessor(traceExporter);
@@ -1145,6 +1147,7 @@ describe('setup exporter from env', () => {
     assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     await sdk.shutdown();
   });
+
   it('should ignore exporter form env if another is provided in sdk config', async () => {
     env.OTEL_TRACES_EXPORTER = 'console';
     const traceExporter = new OTLPTraceExporter();
@@ -1180,6 +1183,7 @@ describe('setup exporter from env', () => {
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
+
   it('should use otlp exporter and defined exporter protocol env value', async () => {
     env.OTEL_TRACES_EXPORTER = 'otlp';
     env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
@@ -1196,6 +1200,7 @@ describe('setup exporter from env', () => {
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
   });
+
   it('sohuld use exporter and processor from env, signal specific env for protocol takes precedence', async () => {
     env.OTEL_TRACES_EXPORTER = 'otlp';
     env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/protobuf';
@@ -1288,6 +1293,7 @@ describe('setup exporter from env', () => {
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
+
   it('should be able to setup zipkin exporter', async () => {
     env.OTEL_TRACES_EXPORTER = 'zipkin';
     env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
