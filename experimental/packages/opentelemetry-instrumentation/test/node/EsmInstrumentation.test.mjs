@@ -160,6 +160,7 @@ describe('when loading esm module', function () {
   });
 
   it('should unwrap a patched function', async function () {
+    // Test skipped due to https://github.com/nodejs/import-in-the-middle/pull/153 breaking unwrap functionality
     this.skip();
     instrumentationWrap.enable();
     // disable to trigger unwrap
@@ -178,6 +179,7 @@ describe('when loading esm module', function () {
   });
 
   it('should unwrap multiple functions with massunwrap', async function () {
+    // Test skipped due to https://github.com/nodejs/import-in-the-middle/pull/153 breaking unwrap functionality
     this.skip();
     const instrumentation = new TestInstrumentationMasswrapFn({
       enabled: false,
@@ -198,6 +200,7 @@ describe('when loading esm module', function () {
   });
 
   it('should unwrap a patched function from a file with absolute path', async function () {
+    // Test skipped due to https://github.com/nodejs/import-in-the-middle/pull/153 breaking unwrap functionality
     this.skip();
     const instrumentation = new TestAbsoluteFileInstrumentationPatchFn({
       enabled: false,
