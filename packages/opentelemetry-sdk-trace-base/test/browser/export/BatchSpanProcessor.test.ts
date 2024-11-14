@@ -19,6 +19,10 @@ import * as sinon from 'sinon';
 import { SpanExporter } from '../../../src';
 import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
 import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExporter';
+import {
+  loggingErrorHandler,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
 
 /**
  * VisibilityState has been removed from TypeScript 4.6.0+
@@ -37,19 +41,25 @@ describeDocument('BatchSpanProcessor - web main context', () => {
   let forceFlushSpy: sinon.SinonStub;
   let visibilityChangeEvent: Event;
   let pageHideEvent: Event;
+  let globalErrorHandlerStub: sinon.SinonStub;
 
   beforeEach(() => {
     sinon.replaceGetter(document, 'visibilityState', () => visibilityState);
     visibilityState = 'visible';
     exporter = new TestTracingSpanExporter();
     processor = new BatchSpanProcessor(exporter, {});
-    forceFlushSpy = sinon.stub(processor, 'forceFlush');
+    forceFlushSpy = sinon
+      .stub(processor, 'forceFlush')
+      .returns(Promise.resolve());
     visibilityChangeEvent = new Event('visibilitychange');
     pageHideEvent = new Event('pagehide');
+    globalErrorHandlerStub = sinon.stub();
+    setGlobalErrorHandler(globalErrorHandlerStub);
   });
 
   afterEach(async () => {
     sinon.restore();
+    setGlobalErrorHandler(loggingErrorHandler());
   });
 
   describe('when document becomes hidden', () => {
@@ -58,6 +68,26 @@ describeDocument('BatchSpanProcessor - web main context', () => {
         assert.strictEqual(forceFlushSpy.callCount, 0);
         hideDocument();
         assert.strictEqual(forceFlushSpy.callCount, 1);
+      });
+
+      it('should catch any error thrown by forceFlush', done => {
+        const forceFlushError = new Error('forceFlush failed');
+        forceFlushSpy.rejects(forceFlushError);
+        hideDocument();
+        sinon.assert.calledOnce(forceFlushSpy);
+
+        // queue a microtask since hideDocument() returns before forceFlush() rejects
+        queueMicrotask(() => {
+          try {
+            sinon.assert.calledOnceWithExactly(
+              globalErrorHandlerStub,
+              forceFlushError
+            );
+            done();
+          } catch (e) {
+            done(e);
+          }
+        });
       });
 
       describe('AND shutdown has been called', () => {
@@ -74,7 +104,7 @@ describeDocument('BatchSpanProcessor - web main context', () => {
           processor = new BatchSpanProcessor(exporter, {
             disableAutoFlushOnDocumentHide: false,
           });
-          forceFlushSpy = sinon.stub(processor, 'forceFlush');
+          forceFlushSpy = sinon.stub(processor, 'forceFlush').resolves();
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 1);
@@ -84,7 +114,7 @@ describeDocument('BatchSpanProcessor - web main context', () => {
           processor = new BatchSpanProcessor(exporter, {
             disableAutoFlushOnDocumentHide: true,
           });
-          forceFlushSpy = sinon.stub(processor, 'forceFlush');
+          forceFlushSpy = sinon.stub(processor, 'forceFlush').resolves();
           assert.strictEqual(forceFlushSpy.callCount, 0);
           hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 0);
