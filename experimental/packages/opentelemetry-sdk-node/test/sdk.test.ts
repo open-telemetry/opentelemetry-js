@@ -1105,6 +1105,7 @@ describe('setup exporter from env', () => {
   afterEach(() => {
     stubLoggerError.restore();
   });
+
   it('should use default exporter when nor env neither SDK config is given', async () => {
     const sdk = new NodeSDK();
     sdk.start();
@@ -1218,6 +1219,7 @@ describe('setup exporter from env', () => {
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
   });
+
   it('should use noop span processor when user sets env exporter to none', async () => {
     env.OTEL_TRACES_EXPORTER = 'none';
     const sdk = new NodeSDK();
@@ -1238,6 +1240,7 @@ describe('setup exporter from env', () => {
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
+
   it('should use default otlp exporter when empty value is provided for exporter via env', async () => {
     env.OTEL_TRACES_EXPORTER = '';
     const sdk = new NodeSDK();
