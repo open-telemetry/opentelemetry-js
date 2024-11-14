@@ -32,6 +32,7 @@ import * as sinon from 'sinon';
 import { Meter } from '../src/Meter';
 import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
 import { AggregationType } from '../src/view/AggregationOption';
+import { Resource } from '@opentelemetry/resources';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -47,6 +48,66 @@ describe('MeterProvider', () => {
     it('construct with resource', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
       assert(meterProvider instanceof MeterProvider);
+    });
+
+    it('should use default resource when no resource is passed', async function () {
+      const reader = new TestMetricReader();
+
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+      });
+
+      // Create meter and instrument, otherwise nothing will export
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const { resourceMetrics } = await reader.collect();
+      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+    });
+
+    it('should not merge with defaults when flag is set to false', async function () {
+      const reader = new TestMetricReader();
+      const expectedResource = new Resource({ foo: 'bar' });
+
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        resource: expectedResource,
+        mergeResourceWithDefaults: false,
+      });
+
+      // Create meter and instrument, otherwise nothing will export
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const { resourceMetrics } = await reader.collect();
+      assert.deepStrictEqual(resourceMetrics.resource, expectedResource);
+    });
+
+    it('should merge with defaults when flag is set to true', async function () {
+      const reader = new TestMetricReader();
+      const providedResource = new Resource({ foo: 'bar' });
+
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        resource: providedResource,
+        mergeResourceWithDefaults: true,
+      });
+
+      // Create meter and instrument, otherwise nothing will export
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const { resourceMetrics } = await reader.collect();
+      assert.deepStrictEqual(
+        resourceMetrics.resource,
+        Resource.default().merge(providedResource)
+      );
     });
   });
 

@@ -41,6 +41,8 @@ import {
   BatchSpanProcessor,
   AlwaysOnSampler,
   AlwaysOffSampler,
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
 } from '../../src';
 import { SpanImpl } from '../../src/Span';
 
@@ -113,6 +115,24 @@ describe('BasicTracerProvider', () => {
           'Exporter "someExporter" requested through environment variable is unavailable.'
         );
         delete envSource.OTEL_TRACES_EXPORTER;
+      });
+    });
+
+    describe('when user sets span processors', () => {
+      it('should use the span processors defined in the config', () => {
+        const traceExporter = new ConsoleSpanExporter();
+        const spanProcessor = new SimpleSpanProcessor(traceExporter);
+
+        const tracer = new BasicTracerProvider({
+          spanProcessors: [spanProcessor],
+        });
+        assert.ok(
+          tracer['_registeredSpanProcessors'][0] instanceof SimpleSpanProcessor
+        );
+        assert.ok(
+          tracer['_registeredSpanProcessors'][0]['_exporter'] instanceof
+            ConsoleSpanExporter
+        );
       });
     });
 
@@ -767,12 +787,11 @@ describe('BasicTracerProvider', () => {
       );
       forceFlushStub.resolves();
 
-      const tracerProvider = new BasicTracerProvider();
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-
-      tracerProvider.addSpanProcessor(spanProcessorOne);
-      tracerProvider.addSpanProcessor(spanProcessorTwo);
+      const tracerProvider = new BasicTracerProvider({
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
+      });
 
       tracerProvider
         .forceFlush()
@@ -796,11 +815,11 @@ describe('BasicTracerProvider', () => {
       );
       forceFlushStub.returns(Promise.reject('Error'));
 
-      const tracerProvider = new BasicTracerProvider();
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-      tracerProvider.addSpanProcessor(spanProcessorOne);
-      tracerProvider.addSpanProcessor(spanProcessorTwo);
+      const tracerProvider = new BasicTracerProvider({
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
+      });
 
       tracerProvider
         .forceFlush()
@@ -830,9 +849,30 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.resource', () => {
-    it('should return a Resource', () => {
+    it('should use the default resource when no resource is provided', function () {
       const tracerProvider = new BasicTracerProvider();
-      assert.ok(tracerProvider.resource instanceof Resource);
+      assert.deepStrictEqual(tracerProvider.resource, Resource.default());
+    });
+
+    it('should not merge with defaults when flag is set to false', function () {
+      const expectedResource = new Resource({ foo: 'bar' });
+      const tracerProvider = new BasicTracerProvider({
+        mergeResourceWithDefaults: false,
+        resource: expectedResource,
+      });
+      assert.deepStrictEqual(tracerProvider.resource, expectedResource);
+    });
+
+    it('should merge with defaults when flag is set to true', function () {
+      const providedResource = new Resource({ foo: 'bar' });
+      const tracerProvider = new BasicTracerProvider({
+        mergeResourceWithDefaults: true,
+        resource: providedResource,
+      });
+      assert.deepStrictEqual(
+        tracerProvider.resource,
+        Resource.default().merge(providedResource)
+      );
     });
   });
 

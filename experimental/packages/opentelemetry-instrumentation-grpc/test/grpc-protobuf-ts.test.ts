@@ -154,9 +154,10 @@ function shouldNotCreateSpans(
 describe('#grpc-protobuf', () => {
   let client: GrpcTesterClient;
   let server: grpc.Server;
-  const provider = new NodeTracerProvider();
   let contextManager: ContextManager;
-  provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+  const provider = new NodeTracerProvider({
+    spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+  });
 
   before(() => {
     propagation.setGlobalPropagator(new W3CTraceContextPropagator());

@@ -13,21 +13,15 @@ const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const EXPORTER = process.env.EXPORTER || '';
 
 module.exports = (serviceName) => {
+  const useZipkin = EXPORTER.toLowerCase().startsWith('z');
+  const exporter = useZipkin ? new ZipkinExporter() : new JaegerExporter();
   const provider = new NodeTracerProvider({
     resource: new Resource({
       [SEMRESATTRS_SERVICE_NAME]: serviceName,
     }),
+    spanProcessors: [new SimpleSpanProcessor(exporter)]
   });
-
-  let exporter;
-  if (EXPORTER.toLowerCase().startsWith('z')) {
-    exporter = new ZipkinExporter();
-  } else {
-    exporter = new JaegerExporter();
-  }
-
-  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-
+  
   // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
   provider.register();
 

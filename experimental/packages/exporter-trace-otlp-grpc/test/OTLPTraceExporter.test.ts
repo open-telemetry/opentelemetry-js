@@ -138,8 +138,10 @@ const testCollectorExporter = (params: TestParams) => {
         metadata: metadata,
       });
 
-      const provider = new BasicTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+      // @ts-expect-error -- we need to create a provider to test the exporter
+      const provider = new BasicTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(collectorExporter)],
+      });
       done();
     });
 
@@ -271,8 +273,10 @@ const testCollectorExporter = (params: TestParams) => {
           compression: CompressionAlgorithm.GZIP,
         });
 
-        const provider = new BasicTracerProvider();
-        provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+        // @ts-expect-error -- we need to create a provider to test the exporter
+        const provider = new BasicTracerProvider({
+          spanProcessors: [new SimpleSpanProcessor(collectorExporter)],
+        });
       });
       it('should successfully send the spans', done => {
         const responseSpy = sinon.spy();

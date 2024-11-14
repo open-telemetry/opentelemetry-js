@@ -259,8 +259,9 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider();
-    tp.addSpanProcessor(sp);
+    const tp = new BasicTracerProvider({
+      spanProcessors: [sp],
+    });
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
@@ -289,8 +290,9 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider();
-    tp.addSpanProcessor(sp);
+    const tp = new BasicTracerProvider({
+      spanProcessors: [sp],
+    });
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
