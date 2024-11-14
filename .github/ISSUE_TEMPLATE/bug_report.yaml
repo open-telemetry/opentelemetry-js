@@ -45,6 +45,7 @@ body:
               - which tooling you use and how you're using it
               - config files for your tooling (typescript, bundlers, ...)
               - how you run your code (example: `node -r otel.js ./index.js`).
+              - which module type you are you using (`module` or `commonjs`)
          -->
 
 
@@ -129,10 +130,10 @@ body:
       label: Operating System and Version
       placeholder: Ubuntu 24.04, Windows 11 Build 26100.2033, macOS 15.0.1
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: Runtime and Version
       placeholder: Node.js v20.12.1, Node.js v18.18.2, Firefox 130, Chrome 132, ...
     validations:
-      required: true
+      required: false
