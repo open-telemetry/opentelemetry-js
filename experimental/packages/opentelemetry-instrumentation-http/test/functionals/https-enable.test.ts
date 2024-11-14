@@ -65,10 +65,11 @@ const hostname = 'localhost';
 const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const provider = new BasicTracerProvider();
+const provider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+});
 instrumentation.setTracerProvider(provider);
 const tracer = provider.getTracer('test-https');
-provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 function doNock(
   hostname: string,

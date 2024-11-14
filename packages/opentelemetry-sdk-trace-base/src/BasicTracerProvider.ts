@@ -126,30 +126,6 @@ export class BasicTracerProvider implements TracerProvider {
     return this._tracers.get(key)!;
   }
 
-  /**
-   * @deprecated please use {@link TracerConfig} spanProcessors property
-   * Adds a new {@link SpanProcessor} to this tracer.
-   * @param spanProcessor the new SpanProcessor to be added.
-   */
-  addSpanProcessor(spanProcessor: SpanProcessor): void {
-    if (this._registeredSpanProcessors.length === 0) {
-      // since we might have enabled by default a batchProcessor, we disable it
-      // before adding the new one
-      this.activeSpanProcessor
-        .shutdown()
-        .catch(err =>
-          diag.error(
-            'Error while trying to shutdown current span processor',
-            err
-          )
-        );
-    }
-    this._registeredSpanProcessors.push(spanProcessor);
-    this.activeSpanProcessor = new MultiSpanProcessor(
-      this._registeredSpanProcessors
-    );
-  }
-
   getActiveSpanProcessor(): SpanProcessor {
     return this.activeSpanProcessor;
   }

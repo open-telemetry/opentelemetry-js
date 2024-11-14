@@ -755,8 +755,9 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -799,8 +800,9 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -830,8 +832,9 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -859,7 +862,9 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const provider = new NodeTracerProvider();
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,
         UnaryMethod: false,
@@ -868,7 +873,6 @@ export const runTests = (
         ServerStreamMethod: true,
         BidiStreamMethod: false,
       };
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -936,8 +940,9 @@ export const runTests = (
     });
 
     describe('Test capturing metadata', () => {
-      const provider = new NodeTracerProvider();
-      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      const provider = new NodeTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+      });
 
       const clientMetadata = new Metadata();
       clientMetadata.add('client_metadata_key', 'client_metadata_value');

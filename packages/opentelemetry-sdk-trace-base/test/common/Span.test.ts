@@ -1132,9 +1132,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       provider.getTracer('default').startSpan('test');
       assert.ok(started);
@@ -1151,9 +1151,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       provider
         .getTracer('default')
@@ -1172,9 +1172,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       provider.getTracer('default').startSpan('test').end();
       assert.ok(ended);
@@ -1190,9 +1190,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       const s = provider.getTracer('default').startSpan('test') as Span;
       assert.ok(s.attributes.attr);

@@ -787,12 +787,11 @@ describe('BasicTracerProvider', () => {
       );
       forceFlushStub.resolves();
 
-      const tracerProvider = new BasicTracerProvider();
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-
-      tracerProvider.addSpanProcessor(spanProcessorOne);
-      tracerProvider.addSpanProcessor(spanProcessorTwo);
+      const tracerProvider = new BasicTracerProvider({
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
+      });
 
       tracerProvider
         .forceFlush()
@@ -816,11 +815,11 @@ describe('BasicTracerProvider', () => {
       );
       forceFlushStub.returns(Promise.reject('Error'));
 
-      const tracerProvider = new BasicTracerProvider();
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-      tracerProvider.addSpanProcessor(spanProcessorOne);
-      tracerProvider.addSpanProcessor(spanProcessorTwo);
+      const tracerProvider = new BasicTracerProvider({
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
+      });
 
       tracerProvider
         .forceFlush()

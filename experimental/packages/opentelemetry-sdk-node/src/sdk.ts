@@ -61,7 +61,7 @@ import {
   NodeTracerConfig,
   NodeTracerProvider,
 } from '@opentelemetry/sdk-trace-node';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 import {
@@ -251,7 +251,7 @@ export class NodeSDK {
         ? this._resource
         : this._resource.merge(
             new Resource({
-              [SEMRESATTRS_SERVICE_NAME]: this._serviceName,
+              [ATTR_SERVICE_NAME]: this._serviceName,
             })
           );
 
