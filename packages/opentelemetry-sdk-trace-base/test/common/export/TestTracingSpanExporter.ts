@@ -35,8 +35,6 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
   constructor() {
     super();
 
-    const tracerProvider = new BasicTracerProvider();
-
     const spanProcessor: SpanProcessor = {
       forceFlush: () => {
         return Promise.resolve();
@@ -50,7 +48,9 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
       },
     };
 
-    tracerProvider.addSpanProcessor(spanProcessor);
+    const tracerProvider = new BasicTracerProvider({
+      spanProcessors: [spanProcessor],
+    });
 
     this._tracer = new Tracer(
       { name: 'default', version: '0.0.1' },

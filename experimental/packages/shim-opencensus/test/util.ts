@@ -39,11 +39,11 @@ export async function withTestTracer(
 export async function withTestTracerProvider(
   func: (otelTracerProvider: TracerProvider) => void | Promise<void>
 ): Promise<ReadableSpan[]> {
+  const inMemExporter = new InMemorySpanExporter();
   const tracerProvider = new BasicTracerProvider({
     sampler: new AlwaysOnSampler(),
+    spanProcessors: [new SimpleSpanProcessor(inMemExporter)],
   });
-  const inMemExporter = new InMemorySpanExporter();
-  tracerProvider.addSpanProcessor(new SimpleSpanProcessor(inMemExporter));
 
   await func(tracerProvider);
 

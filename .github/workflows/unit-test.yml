@@ -41,6 +41,8 @@ jobs:
         run: npm run test
       - name: Report Coverage
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           verbose: true
   node-windows-tests:
@@ -95,6 +97,8 @@ jobs:
         run: npm run test:browser
       - name: Report Coverage
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           verbose: true
   webworker-tests:
@@ -121,6 +125,8 @@ jobs:
         run: npm run test:webworker
       - name: Report Coverage
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           verbose: true
   api-eol-node-test:

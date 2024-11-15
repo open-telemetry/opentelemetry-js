@@ -55,8 +55,9 @@ describe('Packages', () => {
     context.disable();
   });
   describe('get', () => {
-    const provider = new NodeTracerProvider();
-    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    const provider = new NodeTracerProvider({
+      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
       memoryExporter.reset();
