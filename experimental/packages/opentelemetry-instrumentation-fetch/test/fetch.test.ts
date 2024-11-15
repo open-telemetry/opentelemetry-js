@@ -49,6 +49,7 @@ import {
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
 
 class DummySpanExporter implements tracing.SpanExporter {
@@ -70,6 +71,19 @@ const getData = (url: string, method?: string) => {
       foo: 'bar',
       Accept: 'application/json',
       'Content-Type': 'application/json',
+    },
+  });
+};
+
+const ENCODER = new TextEncoder();
+const textToReadableStream = (msg: string): ReadableStream => {
+  return new ReadableStream({
+    start: controller => {
+      controller.enqueue(ENCODER.encode(msg));
+      controller.close();
+    },
+    cancel: controller => {
+      controller.close();
     },
   });
 };
@@ -163,6 +177,7 @@ function testForCorrectEvents(
 describe('fetch', () => {
   let contextManager: ZoneContextManager;
   let lastResponse: any | undefined;
+  let requestBody: any | undefined;
   let webTracerWithZone: api.Tracer;
   let webTracerProviderWithZone: WebTracerProvider;
   let dummySpanExporter: DummySpanExporter;
@@ -179,12 +194,13 @@ describe('fetch', () => {
   const clearData = () => {
     sinon.restore();
     lastResponse = undefined;
+    requestBody = undefined;
   };
 
   const prepareData = async (
     fileUrl: string,
+    apiCall: () => Promise<any>,
     config: FetchInstrumentationConfig,
-    method?: string,
     disablePerfObserver?: boolean,
     disableGetEntries?: boolean
   ) => {
@@ -200,6 +216,25 @@ describe('fetch', () => {
           url: fileUrl,
         };
         response.headers = Object.assign({}, init.headers);
+
+        // get the request body
+        if (typeof input === 'string') {
+          const body = init.body;
+          if (body instanceof ReadableStream) {
+            const decoder = new TextDecoder();
+            requestBody = '';
+            const read = async () => {
+              for await (const c of body) {
+                requestBody += decoder.decode(c);
+              }
+            };
+            read();
+          } else {
+            requestBody = init.body;
+          }
+        } else {
+          input.text().then(r => (requestBody = r));
+        }
 
         if (init instanceof Request) {
           // Passing request as 2nd argument causes missing body bug (#2411)
@@ -288,7 +323,7 @@ describe('fetch', () => {
       async () => {
         fakeNow = 0;
         try {
-          const responsePromise = getData(fileUrl, method);
+          const responsePromise = apiCall();
           fakeNow = 300;
           const response = await responsePromise;
 
@@ -332,7 +367,9 @@ describe('fetch', () => {
   describe('when request is successful', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = [url];
-      await prepareData(url, { propagateTraceHeaderCorsUrls });
+      await prepareData(url, () => getData(url), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
 
     afterEach(() => {
@@ -374,44 +411,61 @@ describe('fetch', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
-
-      assert.ok(
-        attributes[keys[0]] !== '',
+      assert.notStrictEqual(
+        attributes[AttributeNames.COMPONENT],
+        '',
         `attributes ${AttributeNames.COMPONENT} is not defined`
       );
+
       assert.strictEqual(
-        attributes[keys[1]],
+        attributes[SEMATTRS_HTTP_METHOD],
         'GET',
         `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
-        attributes[keys[2]],
+        attributes[SEMATTRS_HTTP_URL],
         url,
         `attributes ${SEMATTRS_HTTP_URL} is wrong`
       );
       assert.strictEqual(
-        attributes[keys[3]],
+        attributes[SEMATTRS_HTTP_STATUS_CODE],
         200,
         `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
       );
+      const statusText = attributes[AttributeNames.HTTP_STATUS_TEXT];
       assert.ok(
-        attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
+        statusText === 'OK' || statusText === '',
         `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.ok(
-        (attributes[keys[5]] as string).indexOf('localhost') === 0,
+        (attributes[SEMATTRS_HTTP_HOST] as string).indexOf('localhost') === 0,
         `attributes ${SEMATTRS_HTTP_HOST} is wrong`
       );
+
+      const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
       assert.ok(
-        attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+        httpScheme === 'http' || httpScheme === 'https',
         `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
       );
-      assert.ok(
-        attributes[keys[7]] !== '',
+      assert.notStrictEqual(
+        attributes[SEMATTRS_HTTP_USER_AGENT],
+        '',
         `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
       );
-      assert.ok(
-        (attributes[keys[8]] as number) > 0,
+      const requestContentLength = attributes[
+        SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+      ] as number;
+      assert.strictEqual(
+        requestContentLength,
+        undefined,
+        `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+      );
+      const responseContentLength = attributes[
+        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+      ] as number;
+      assert.strictEqual(
+        responseContentLength,
+        30,
         `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
@@ -568,7 +622,7 @@ describe('fetch', () => {
         diagLogger.debug = spyDebug;
         api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
         clearData();
-        await prepareData(url, {});
+        await prepareData(url, () => getData(url), {});
       });
       afterEach(() => {
         sinon.restore();
@@ -600,10 +654,203 @@ describe('fetch', () => {
     });
   });
 
+  describe('post data', () => {
+    describe('url and config object when request body measurement is disabled', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () =>
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ hello: 'world' }),
+            }),
+          {}
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+          undefined
+        );
+      });
+    });
+
+    describe('url and config object', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () =>
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ hello: 'world' }),
+            }),
+          {
+            measureRequestSize: true,
+          }
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+          17
+        );
+      });
+    });
+
+    describe('url and config object with stream', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () =>
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: textToReadableStream('{"hello":"world"}'),
+            }),
+          {
+            measureRequestSize: true,
+          }
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+          17
+        );
+      });
+    });
+
+    describe('single request object', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () => {
+            const req = new Request(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: '{"hello":"world"}',
+            });
+            return fetch(req);
+          },
+          {
+            measureRequestSize: true,
+          }
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, '{"hello":"world"}');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+          17
+        );
+      });
+    });
+
+    describe('single request object with urlparams', () => {
+      beforeEach(async () => {
+        await prepareData(
+          url,
+          () => {
+            const body = new URLSearchParams();
+            body.append('hello', 'world');
+            const req = new Request(url, {
+              method: 'POST',
+              headers: {
+                foo: 'bar',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body,
+            });
+            return fetch(req);
+          },
+          {
+            measureRequestSize: true,
+          }
+        );
+      });
+
+      afterEach(() => {
+        clearData();
+      });
+
+      it('should post data', async () => {
+        assert.strictEqual(requestBody, 'hello=world');
+
+        const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        const attributes = span.attributes;
+
+        assert.strictEqual(
+          attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+          11
+        );
+      });
+    });
+  });
+
   describe('when request is secure and successful', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = [secureUrl];
-      await prepareData(secureUrl, { propagateTraceHeaderCorsUrls });
+      await prepareData(secureUrl, () => getData(secureUrl), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
 
     afterEach(() => {
@@ -652,7 +899,7 @@ describe('fetch', () => {
     ) => {
       const propagateTraceHeaderCorsUrls = [url];
 
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         applyCustomAttributesOnSpan,
       });
@@ -720,7 +967,7 @@ describe('fetch', () => {
   describe('when url is ignored', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         ignoreUrls: [propagateTraceHeaderCorsUrls],
       });
@@ -747,7 +994,7 @@ describe('fetch', () => {
   describe('when clearTimingResources is TRUE', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         clearTimingResources: true,
       });
@@ -767,7 +1014,9 @@ describe('fetch', () => {
   describe('when request is NOT successful (wrong url)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = badUrl;
-      await prepareData(badUrl, { propagateTraceHeaderCorsUrls });
+      await prepareData(badUrl, () => getData(badUrl), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
     afterEach(() => {
       clearData();
@@ -785,7 +1034,9 @@ describe('fetch', () => {
   describe('when request is NOT successful (405)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, { propagateTraceHeaderCorsUrls }, 'DELETE');
+      await prepareData(url, () => getData(url, 'DELETE'), {
+        propagateTraceHeaderCorsUrls,
+      });
     });
     afterEach(() => {
       clearData();
@@ -806,7 +1057,7 @@ describe('fetch', () => {
       // All above tests test it already but just in case
       // lets explicitly turn getEntriesByType off so we can be sure
       // that the perf entries come from the observer.
-      await prepareData(url, {}, undefined, false, true);
+      await prepareData(url, () => getData(url), {}, false, true);
     });
     afterEach(() => {
       clearData();
@@ -838,7 +1089,7 @@ describe('fetch', () => {
 
   describe('when fetching with relative url', () => {
     beforeEach(async () => {
-      await prepareData('/get', {}, undefined, false, true);
+      await prepareData('/get', () => getData('/get'), {}, false, true);
     });
     afterEach(() => {
       clearData();
@@ -882,7 +1133,7 @@ describe('fetch', () => {
 
   describe('when PerformanceObserver is undefined', () => {
     beforeEach(async () => {
-      await prepareData(url, {}, undefined, true, false);
+      await prepareData(url, () => getData(url), {}, true, false);
     });
 
     afterEach(() => {
@@ -914,7 +1165,7 @@ describe('fetch', () => {
 
   describe('when PerformanceObserver and performance.getEntriesByType are undefined', () => {
     beforeEach(async () => {
-      await prepareData(url, {}, undefined, true, true);
+      await prepareData(url, () => getData(url), {}, true, true);
     });
     afterEach(() => {
       clearData();
@@ -949,7 +1200,7 @@ describe('fetch', () => {
 
   describe('when network events are ignored', () => {
     beforeEach(async () => {
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         ignoreNetworkEvents: true,
       });
     });

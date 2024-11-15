@@ -261,7 +261,7 @@ export const SEMRESATTRS_CONTAINER_IMAGE_NAME = TMP_CONTAINER_IMAGE_NAME;
 /**
  * Container image tag.
  *
- * @deprecated use ATTR_CONTAINER_IMAGE_TAG
+ * @deprecated use ATTR_CONTAINER_IMAGE_TAGS
  */
 export const SEMRESATTRS_CONTAINER_IMAGE_TAG = TMP_CONTAINER_IMAGE_TAG;
 
@@ -326,7 +326,7 @@ part of the ARN is not available without calling another AWS API
 which may be deemed too slow for a short-running lambda function.
 As an alternative, consider setting `faas.id` as a span attribute instead.
 *
-* @deprecated use ATTR_FAAS_ID
+* @deprecated use ATTR_CLOUD_RESOURCE_ID
 */
 export const SEMRESATTRS_FAAS_ID = TMP_FAAS_ID;
 
@@ -704,7 +704,7 @@ export const SEMRESATTRS_TELEMETRY_SDK_VERSION = TMP_TELEMETRY_SDK_VERSION;
 /**
  * The version string of the auto instrumentation agent, if used.
  *
- * @deprecated use ATTR_TELEMETRY_AUTO_VERSION
+ * @deprecated use ATTR_TELEMETRY_DISTRO_VERSION
  */
 export const SEMRESATTRS_TELEMETRY_AUTO_VERSION = TMP_TELEMETRY_AUTO_VERSION;
 

@@ -15,6 +15,7 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :house: (Internal)
 
+* chore: Update the comments of some deprecated constants to point to the currently relevant replacement constant, if any. [#5160](https://github.com/open-telemetry/opentelemetry-js/pull/5160) @trentm
 * chore: Minor improvements to formatting of comments. [#5100](https://github.com/open-telemetry/opentelemetry-js/pull/5100) @trentm
 
 ## 1.27.0
