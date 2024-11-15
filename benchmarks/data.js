@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1731665190928,
+  "lastUpdate": 1731665271681,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -19098,6 +19098,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 680970,
             "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1aa158bf987fa2d5e6447575f039dc0400438b08",
+          "message": "chore(deps): update babel monorepo (#5161)",
+          "timestamp": "2024-11-15T09:56:21Z",
+          "tree_id": "e4ff613c0c3b5881e61348cc7be3dbfb70555ba5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/1aa158bf987fa2d5e6447575f039dc0400438b08"
+        },
+        "date": 1731665270719,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 924130,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11536,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 663489,
+            "range": "±0.84%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 653815,
+            "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "96 samples"
           }
