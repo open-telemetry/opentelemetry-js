@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1731605556756,
+  "lastUpdate": 1731665190928,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -19048,6 +19048,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.21%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0c268e71274239d0b622110c7fca18612146dce4",
+          "message": "feat: improve bug template (#5086)\n\nCo-authored-by: Marylia Gutierrez <maryliag@gmail.com>\nCo-authored-by: Trent Mick <trentm@gmail.com>\nCo-authored-by: Jamie Danielson <jamieedanielson@gmail.com>",
+          "timestamp": "2024-11-15T09:32:10Z",
+          "tree_id": "b4945eb70948e7d16e1ed82bd9d2167f6b071117",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0c268e71274239d0b622110c7fca18612146dce4"
+        },
+        "date": 1731665189942,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 972776,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11889,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 701782,
+            "range": "±0.61%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 680970,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
