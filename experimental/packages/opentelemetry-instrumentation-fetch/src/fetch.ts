@@ -31,8 +31,10 @@ import {
   SEMATTRS_HTTP_SCHEME,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
+import { getFetchBodyLength } from './utils';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
 
@@ -74,6 +76,8 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
   // Ignore adding network events as span events
   ignoreNetworkEvents?: boolean;
+  /** Measure outgoing request size */
+  measureRequestSize?: boolean;
 }
 
 /**
@@ -319,6 +323,21 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
           return original.apply(this, args);
         }
         const spanData = plugin._prepareSpanData(url);
+
+        if (plugin.getConfig().measureRequestSize) {
+          getFetchBodyLength(...args)
+            .then(length => {
+              if (!length) return;
+
+              createdSpan.setAttribute(
+                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+                length
+              );
+            })
+            .catch(error => {
+              plugin._diag.warn('getFetchBodyLength', error);
+            });
+        }
 
         function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);

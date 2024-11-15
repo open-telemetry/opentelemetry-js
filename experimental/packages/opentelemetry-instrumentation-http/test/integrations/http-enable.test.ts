@@ -277,6 +277,20 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
     });
 
+    it('should succeed even with malformed Forwarded header', async () => {
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const headers = { 'x-foo': 'foo', forwarded: 'malformed' };
+      const result = await httpRequest.get(
+        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        { headers }
+      );
+
+      assert.ok(result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
+      assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
+    });
+
     it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
