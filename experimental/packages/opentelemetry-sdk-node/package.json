@@ -79,7 +79,7 @@
     "semver": "7.6.3",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
-    "typescript": "^5.6.3"
+    "typescript": "5.6.3"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-node",
   "sideEffects": false

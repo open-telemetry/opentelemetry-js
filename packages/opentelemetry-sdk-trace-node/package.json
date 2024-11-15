@@ -57,7 +57,7 @@
     "mocha": "10.7.3",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
-    "typescript": "^5.6.3"
+    "typescript": "5.6.3"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"

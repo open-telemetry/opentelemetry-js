@@ -73,7 +73,7 @@
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
-    "typescript": "^5.6.3",
+    "typescript": "5.6.3",
     "webpack": "5.94.0",
     "webpack-cli": "5.1.4",
     "webpack-merge": "5.10.0"
