@@ -67,7 +67,7 @@ export function convertLegacyHttpOptions(
   return mergeOtlpHttpConfigurationWithDefaults(
     {
       url: config.url,
-      headers: config.headers,
+      headers: () => config.headers ?? {},
       concurrencyLimit: config.concurrencyLimit,
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,

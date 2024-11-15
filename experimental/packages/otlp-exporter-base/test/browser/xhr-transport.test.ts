@@ -26,11 +26,11 @@ import { ensureHeadersContain } from '../testHelper';
 
 const testTransportParameters = {
   url: 'http://example.test',
-  headers: {
+  headers: () => ({
     foo: 'foo-value',
     bar: 'bar-value',
     'Content-Type': 'application/json',
-  },
+  }),
 };
 
 const requestTimeout = 1000;

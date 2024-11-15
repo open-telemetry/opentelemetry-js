@@ -36,7 +36,7 @@ export function convertLegacyBrowserHttpOptions(
     {
       url: config.url,
       timeoutMillis: config.timeoutMillis,
-      headers: config.headers,
+      headers: () => config.headers ?? {},
       concurrencyLimit: config.concurrencyLimit,
     },
     {}, // no fallback for browser case
