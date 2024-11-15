@@ -28,7 +28,6 @@ Exported constants follow this naming scheme:
 
 The `ATTR`, `METRIC`, and `VALUE` static strings were used to facilitate readability and filtering in auto-complete lists in IDEs.
 
-
 ## Usage
 
 ### Stable SemConv
@@ -81,12 +80,11 @@ const span = tracer.startSpan(spanName, spanOptions)
   });
 ```
 
-
 ## Deprecations
 
 There are two main types of deprecations in this package:
 
-1. "semconv deprecations": The process of defining the OpenTelemetry [Semantic Conventions](semconv-docs) sometimes involves deprecating a particular field name as conventions are [stabilized](semconv-stability). For example, the [stabilization of HTTP conventions](semconv-http-stabilization) included deprecating the `http.url` span attribute in favor of `url.full`. When using this JS package, that appears as a deprecation of the `ATTR_HTTP_URL` export in favour of `ATTR_URL_FULL`.
+1. "semconv deprecations": The process of defining the OpenTelemetry [Semantic Conventions][semconv-docs] sometimes involves deprecating a particular field name as conventions are [stabilized][semconv-stability]. For example, the [stabilization of HTTP conventions][semconv-http-stabilization] included deprecating the `http.url` span attribute in favor of `url.full`. When using this JS package, that appears as a deprecation of the `ATTR_HTTP_URL` export in favour of `ATTR_URL_FULL`.
 2. "JS package deprecations": Independently, this JavaScript package has twice changed how it exports the Semantic Conventions constants, e.g. `ATTR_HTTP_URL` instead of `SEMATTRS_HTTP_URL`. The two older forms are still included in 1.x versions of this package for backwards compatibility. The rest of this section shows how to migrate to the latest form.
 
 ### Migrating from `SEMATTRS_*`, `SEMRESATTRS_*`, ...
@@ -96,6 +94,7 @@ Deprecated as of `@opentelemetry/semantic-conventions@1.26.0`.
 Before v1.26.0, constants for each semconv attribute were exported, prefixed with `SEMRESATTRS_` (if defined as a Resource Attribute) or `SEMATTRS_`. As well, constants were exported for each value in an enumeration, of the form `${attributeName}VALUES_${enumValue}`. For example:
 
 **Deprecated usage:**
+
 ```js
 import {
   SEMRESATTRS_SERVICE_NAME,
@@ -117,7 +116,7 @@ console.log(SEMATTRS_DB_SYSTEM); // migrate to 'ATTR_DB_SYSTEM' (in incubating [
 console.log(DBSYSTEMVALUES_POSTGRESQL); // migrate to 'DB_SYSTEM_VALUE_POSTGRESQL' (in incubating [*])
 ```
 
-See [Migrated usage][] below.
+See [Migrated usage](#migrated-usage) below.
 
 ### Migrating from `SemanticAttributes.*`, `SemanticResourceAttributes.*`, ...
 
@@ -126,6 +125,7 @@ Deprecated as of `@opentelemetry/semantic-conventions@1.0.0`.
 Before v1.0.0, constants were exported in namespace objects `SemanticResourceAttributes` and `SemanticAttributes`, and a namespace object for enumerated values for some fields (e.g. `DbSystemValues` for values of the 'db.system' enum). For example:
 
 **Deprecated usage:**
+
 ```js
 import {
   SemanticAttributes,
@@ -146,8 +146,7 @@ console.log(SemanticAttributes.DB_SYSTEM); // migrate to 'ATTR_DB_SYSTEM' (in in
 console.log(DbSystemValues.POSTGRESQL); // migrate to 'DB_SYSTEM_VALUE_POSTGRESQL' (in incubating [*])
 ```
 
-See [Migrated usage][] below.
-
+See [Migrated usage](#migrated-usage) below.
 
 ### Migrated usage
 
@@ -175,12 +174,11 @@ console.log(DB_SYSTEM_VALUE_POSTGRESQL);
 ```
 
 **What is "incubating"?**
-The first three fields ('service.name', 'http.route', 'http.client.request.duration') are *stable* in semantic conventions, the latter two are not. Besides changing the export names, `@opentelemetry/semantic-conventions@1.26.0` also separated stable and unstable into separate module entry points: stable conventions are imported `from '@opentelemetry/semantic-conventions'` and unstable `from '@opentelemetry/semantic-conventions/incubating'`. The name "incubating" was chosen to match the same named used by the Java and Python semantic-conventions packages.
+The first three fields ('service.name', 'http.route', 'http.client.request.duration') are _stable_ in semantic conventions, the latter two are not. Besides changing the export names, `@opentelemetry/semantic-conventions@1.26.0` also separated stable and unstable into separate module entry points: stable conventions are imported `from '@opentelemetry/semantic-conventions'` and unstable `from '@opentelemetry/semantic-conventions/incubating'`. The name "incubating" was chosen to match the same named used by the Java and Python semantic-conventions packages.
 
-It is recommended that if you are using exports from *incubating*, that you **pin the version** in your package.json dependencies (e.g. via `npm install --save-exact @opentelemetry/semantic-conventions`), rather than using a caret dependency. This is because the removal of exports from the *incubating* entry point is *not considered a breaking change* and hence can happen in a minor version.
+It is recommended that if you are using exports from _incubating_, that you **pin the version** in your package.json dependencies (e.g. via `npm install --save-exact @opentelemetry/semantic-conventions`), rather than using a caret dependency. This is because the removal of exports from the _incubating_ entry point is _not considered a breaking change_ and hence can happen in a minor version.
 
-Note: The *incubating* entry point also exports all stable fields, so the above example could be changed to import all five constants `from '@opentelemetry/semantic-conventions/incubating'`.
-
+Note: The _incubating_ entry point also exports all stable fields, so the above example could be changed to import all five constants `from '@opentelemetry/semantic-conventions/incubating'`.
 
 ## Useful links
 
