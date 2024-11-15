@@ -52,9 +52,9 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): Fix the `OTEL_SEMCONV_STABILITY_OPT_IN` variable check. Using `of` instead of `in` [#5137](https://github.com/open-telemetry/opentelemetry-js/pull/5137)
-
 * fix(instrumentation-http): drop url.parse in favor of URL constructor [#5091](https://github.com/open-telemetry/opentelemetry-js/pull/5091) @pichlermarc
   * fixes a bug where using cyrillic characters in a client request string URL would throw an exception, whereas an un-instrumented client would accept the same input without throwing an exception
+* fix(otlp-exporter-base): fix unhandled error when writing to destroyed http request [#5163](https://github.com/open-telemetry/opentelemetry-js/pull/5163) @pichlermarc
 
 ### :books: (Refine Doc)
 
