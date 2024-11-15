@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import * as http from 'http';
-import { compressAndSend } from '../../src/platform/node/http-transport-utils';
 import * as assert from 'assert';
+import { compressAndSend } from '../../src/platform/node/http-transport-utils';
 
 describe('compressAndSend', function () {
   it('compressAndSend on destroyed request should handle error', function (done) {
