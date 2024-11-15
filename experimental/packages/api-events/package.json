@@ -80,7 +80,7 @@
     "nyc": "15.1.0",
     "ts-loader": "9.5.1",
     "typescript": "4.4.4",
-    "webpack": "5.94.0"
+    "webpack": "5.96.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-events",
   "sideEffects": false
