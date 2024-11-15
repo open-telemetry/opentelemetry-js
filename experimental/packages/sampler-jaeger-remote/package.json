@@ -56,7 +56,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "lerna": "6.6.2",
-    "mocha": "10.2.0",
+    "mocha": "10.8.2",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "8.4.0",
