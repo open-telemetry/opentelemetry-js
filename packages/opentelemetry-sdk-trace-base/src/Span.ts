@@ -364,8 +364,10 @@ export class Span implements APISpan, ReadableSpan {
   private _isSpanEnded(): boolean {
     if (this._ended) {
       diag.warn(
-        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
+        `Cannot execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}. Change log level to debug for stack trace.`
       );
+      // Adding a debug log to capture the stack trace
+      diag.debug(`Stack trace for ended span operation: ${new Error().stack}`);
     }
     return this._ended;
   }

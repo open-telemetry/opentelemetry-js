@@ -250,6 +250,32 @@ describe('Span', () => {
       assert.ok(span.isRecording() === false);
     });
   });
+    it('should log a warning and a debug message when span is ended', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
+      span.end(); // End the span to set it to ended state
+  
+      const warnStub = sinon.spy(diag, 'warn');
+      const debugStub = sinon.spy(diag, 'debug');
+  
+      // Call the method that checks if the span is ended
+      span['_isSpanEnded']();
+  
+      // Assert that the warning log was called with the expected message
+      sinon.assert.calledOnce(warnStub);
+      sinon.assert.calledWith(warnStub, sinon.match(/Cannot execute the operation on ended Span/));
+  
+      // Assert that the debug log was called and contains a stack trace
+      sinon.assert.calledOnce(debugStub);
+      const debugMessage = debugStub.getCall(0).args[0];
+      assert.ok(debugMessage.startsWith('Stack trace for ended span operation:'));
+    });
+  });
 
   describe('setAttribute', () => {
     describe('when default options set', () => {
