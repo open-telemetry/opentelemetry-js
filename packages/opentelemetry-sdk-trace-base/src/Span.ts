@@ -369,12 +369,18 @@ export class SpanImpl implements Span {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
-      diag.warn(
-        `Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`
-      );
+        const error = new Error(`Operation attempted on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`);
+        
+        diag.warn(
+            `Cannot execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}. Change log level to debug for stack trace.`,
+            error // Pass the error object as the second argument
+        );
+        
+        // Optionally, you can still log the stack trace for additional context
+        diag.debug(`Stack trace for ended span operation: ${error.stack}`);
     }
     return this._ended;
-  }
+}
 
   // Utility function to truncate given value within size
   // for value type of string, will truncate to given limit
