@@ -60,8 +60,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.27.0",
-    "@opentelemetry/otlp-transformer": "0.54.2"
+    "@opentelemetry/core": "^1.27.0",
+    "@opentelemetry/otlp-transformer": "^0.54.2"
   },
   "devDependencies": {
     "@babel/core": "7.26.0",
