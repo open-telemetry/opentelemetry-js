@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1731920149463,
+  "lastUpdate": 1731920385129,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -19360,6 +19360,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.38%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dyladan@users.noreply.github.com",
+            "name": "Daniel Dyla",
+            "username": "dyladan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "d3630afb35c532956392e2adbef95d0a7043fda8",
+          "message": "doc: document breaking change in 0.54 (#5169)\n\nCo-authored-by: Marc Pichler <marcpi@edu.aau.at>",
+          "timestamp": "2024-11-18T08:50:56Z",
+          "tree_id": "3ddc485193b76551eb2c8b904acc98c2bc18e4d5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/d3630afb35c532956392e2adbef95d0a7043fda8"
+        },
+        "date": 1731920384254,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 971732,
+            "range": "±0.33%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11882,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 703803,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 672276,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
