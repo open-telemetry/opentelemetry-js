@@ -203,6 +203,13 @@ cd packages/opentelemetry-module-name
 npm run watch
 ```
 
+#### TypeScript version
+
+TypeScript version used to compile the pacakges is `v5.6.3`. If you plan to make your own instrumentation script
+in a `.ts` file it is recommended to use same version or higher.
+
+<!-- TODO: add update policy --> 
+
 ### Running tests
 
 Similar to compilations, tests can be run from the root to run all tests or from a single module to run only the tests for that module.
