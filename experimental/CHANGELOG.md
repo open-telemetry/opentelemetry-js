@@ -83,6 +83,7 @@ All notable changes to experimental packages in this project will be documented 
   * (user-facing) `url` was intended for internal use and has been removed from all exporters
   * (user-facing) `timeoutMillis` was intended for internal use and has been removed from all exporters
   * (user-facing) `onInit` was intended for internal use and has been removed from all exporters
+  * (user-facing) OTLP exporter config `headers` type changed from `Partial<Record<string, unknown>>` to `Record<string, string>`
 * feat(otlp-exporter-base)!: do not export functions that are intended for internal use [#4971](https://github.com/open-telemetry/opentelemetry-js/pull/4971) @pichlermarc
   * Drops the following functions and types that were intended for internal use from the package exports:
     * `parseHeaders`
