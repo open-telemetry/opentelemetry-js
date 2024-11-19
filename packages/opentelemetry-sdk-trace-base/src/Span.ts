@@ -97,10 +97,8 @@ export class SpanImpl implements Span {
   private readonly _startTimeProvided: boolean;
 
   /**
-   * Constructs a new Span instance.
-   *
-   * @deprecated calling Span constructor directly is not supported. Please use tracer.startSpan.
-   * */
+   * Constructs a new SpanImpl instance.
+   */
   constructor(
     parentTracer: Tracer,
     context: Context,
