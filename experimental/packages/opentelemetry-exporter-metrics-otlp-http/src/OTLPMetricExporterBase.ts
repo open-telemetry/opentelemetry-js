@@ -28,7 +28,7 @@ import {
   AggregationTemporalityPreference,
   OTLPMetricExporterOptions,
 } from './OTLPMetricExporterOptions';
-import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
+import { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
 import { diag } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector =
@@ -117,16 +117,16 @@ function chooseAggregationSelector(
   }
 }
 
-export class OTLPMetricExporterBase<
-  T extends OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics>,
-> implements PushMetricExporter
-{
-  public _otlpExporter: T;
+export class OTLPMetricExporterBase implements PushMetricExporter {
+  public _delegate: IOtlpExportDelegate<ResourceMetrics[]>;
   private _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private _aggregationSelector: AggregationSelector;
 
-  constructor(exporter: T, config?: OTLPMetricExporterOptions) {
-    this._otlpExporter = exporter;
+  constructor(
+    delegate: IOtlpExportDelegate<ResourceMetrics[]>,
+    config?: OTLPMetricExporterOptions
+  ) {
+    this._delegate = delegate;
     this._aggregationSelector = chooseAggregationSelector(config);
     this._aggregationTemporalitySelector = chooseTemporalitySelector(
       config?.temporalityPreference
@@ -137,15 +137,15 @@ export class OTLPMetricExporterBase<
     metrics: ResourceMetrics,
     resultCallback: (result: ExportResult) => void
   ): void {
-    this._otlpExporter.export([metrics], resultCallback);
+    this._delegate.export([metrics], resultCallback);
   }
 
   async shutdown(): Promise<void> {
-    await this._otlpExporter.shutdown();
+    await this._delegate.shutdown();
   }
 
   forceFlush(): Promise<void> {
-    return Promise.resolve();
+    return this._delegate.forceFlush();
   }
 
   selectAggregation(instrumentType: InstrumentType): Aggregation {

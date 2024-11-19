@@ -15,7 +15,7 @@
  */
 import * as http from 'http';
 import * as assert from 'assert';
-import { compressAndSend } from '../../src/platform/node/http-transport-utils';
+import { compressAndSend } from '../../src/transport/http-transport-utils';
 
 describe('compressAndSend', function () {
   it('compressAndSend on destroyed request should handle error', function (done) {
