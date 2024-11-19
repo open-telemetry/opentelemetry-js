@@ -55,6 +55,7 @@ loggerProvider.addLogRecordProcessor(createSessionLogRecordProcessor(sessionMana
 The above implementation can be customized by providing different implementations of SessionStore and SessionIdGenerator.
 
 ### Observing sessions
+
 The SessionManager class provides a mechanism for observing sessions. This is useful when other components should be notified when a session is started or ended.
 
 ```js
