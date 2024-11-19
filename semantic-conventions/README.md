@@ -180,7 +180,7 @@ console.log(DB_SYSTEM_VALUE_POSTGRESQL);
 
 The first three fields in the preceding code sample ('service.name', 'http.route', 'http.client.request.duration') are _stable_ in semantic conventions, the latter two are not. Version 1.26.0 of this package separated stable and unstable into separate module entry points: stable conventions are imported `from '@opentelemetry/semantic-conventions'` and unstable `from '@opentelemetry/semantic-conventions/incubating'`. The name "incubating" is [suggested by the Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#semantic-conventions-artifact-structure).
 
-It is recommended that if you are using exports from _incubating_, that you **pin the version** in your package.json dependencies (e.g. via `npm install --save-exact @opentelemetry/semantic-conventions`) *or* that you copy the relevant definitions into your code base. This is because the removal of exports from the _incubating_ entry point is _not considered a breaking change_ and hence can happen in a minor version.
+It is recommended that if you are using exports from _incubating_, that you **pin the version** in your package.json dependencies (e.g. via `npm install --save-exact @opentelemetry/semantic-conventions`) _or_ that you copy the relevant definitions into your code base. This is because the removal of exports from the _incubating_ entry point is _not considered a breaking change_ and hence can happen in a minor version.
 
 Note: The _incubating_ entry point also exports all stable fields, so the above example could be changed to import all five constants `from '@opentelemetry/semantic-conventions/incubating'`.
 
