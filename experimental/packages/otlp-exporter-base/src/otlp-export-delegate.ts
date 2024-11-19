@@ -19,6 +19,7 @@ import { IExporterTransport } from './exporter-transport';
 import { IExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterError } from './types';
+import { diag, DiagLogger } from '@opentelemetry/api';
 
 /**
  * Internally shared export logic for OTLP.
@@ -35,17 +36,24 @@ export interface IOtlpExportDelegate<Internal> {
 class OTLPExportDelegate<Internal, Response>
   implements IOtlpExportDelegate<Internal>
 {
+  private _diagLogger: DiagLogger;
   constructor(
     private _transport: IExporterTransport,
     private _serializer: ISerializer<Internal, Response>,
     private _promiseQueue: IExportPromiseHandler,
     private _timeout: number
-  ) {}
+  ) {
+    this._diagLogger = diag.createComponentLogger({
+      namespace: 'OTLPExportDelegate',
+    });
+  }
 
   export(
     internalRepresentation: Internal,
     resultCallback: (result: ExportResult) => void
   ): void {
+    this._diagLogger.debug('items to be sent', internalRepresentation);
+
     // don't do any work if too many exports are in progress.
     if (this._promiseQueue.hasReachedLimit()) {
       resultCallback({
@@ -110,6 +118,7 @@ class OTLPExportDelegate<Internal, Response>
   }
 
   async shutdown(): Promise<void> {
+    this._diagLogger.debug('shutdown started');
     await this.forceFlush();
     this._transport.shutdown();
   }
