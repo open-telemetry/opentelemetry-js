@@ -174,7 +174,7 @@ console.log(DB_SYSTEM_VALUE_POSTGRESQL);
 ```
 
 **What is "incubating"?**
-The first three fields ('service.name', 'http.route', 'http.client.request.duration') are _stable_ in semantic conventions, the latter two are not. Besides changing the export names, `@opentelemetry/semantic-conventions@1.26.0` also separated stable and unstable into separate module entry points: stable conventions are imported `from '@opentelemetry/semantic-conventions'` and unstable `from '@opentelemetry/semantic-conventions/incubating'`. The name "incubating" was chosen to match the same named used by the Java and Python semantic-conventions packages.
+The first three fields ('service.name', 'http.route', 'http.client.request.duration') are _stable_ in semantic conventions, the latter two are not. Besides changing the export names, `@opentelemetry/semantic-conventions@1.26.0` also separated stable and unstable into separate module entry points: stable conventions are imported `from '@opentelemetry/semantic-conventions'` and unstable `from '@opentelemetry/semantic-conventions/incubating'`. The name "incubating" was chosen to match the same name used by the Java and Python semantic-conventions packages.
 
 It is recommended that if you are using exports from _incubating_, that you **pin the version** in your package.json dependencies (e.g. via `npm install --save-exact @opentelemetry/semantic-conventions`), rather than using a caret dependency. This is because the removal of exports from the _incubating_ entry point is _not considered a breaking change_ and hence can happen in a minor version.
 
