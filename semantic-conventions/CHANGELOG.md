@@ -9,7 +9,7 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: (Enhancement)
 
-* feat: update semantic conventions to 1.28.0 @trentm
+* feat: update semantic conventions to 1.28.0 [#5181](https://github.com/open-telemetry/opentelemetry-js/pull/5181) @trentm
 
 ### :bug: (Bug Fix)
 
