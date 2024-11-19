@@ -9,6 +9,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :rocket: (Enhancement)
 
+* feat: update semantic conventions to 1.28.0 @trentm
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
