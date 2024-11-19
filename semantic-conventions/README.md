@@ -18,7 +18,7 @@ This package has 2 separate entry-points:
 - The main entry-point, `@opentelemetry/semantic-conventions`, includes only stable semantic conventions.
   This entry-point follows semantic versioning 2.0: it will not include breaking changes except with a change in the major version number.
 - The "incubating" entry-point, `@opentelemetry/semantic-conventions/incubating`, contains unstable semantic conventions (sometimes called "experimental") and, for convenience, a re-export of the stable semantic conventions.
-  This entry-point _NOT_ subject to the restrictions of semantic versioning and _MAY_ contain breaking changes in minor releases.
+  This entry-point is _NOT_ subject to the restrictions of semantic versioning and _MAY_ contain breaking changes in minor releases.
 
 Exported constants follow this naming scheme:
 
