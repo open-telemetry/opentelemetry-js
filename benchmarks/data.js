@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732034973949,
+  "lastUpdate": 1732035081435,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -19722,6 +19722,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 654156,
             "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0ee9a276944393f399422bbf4822e354e89ff7e0",
+          "message": "chore(deps): update dependency gh-pages to v6.2.0 (#5174)",
+          "timestamp": "2024-11-19T16:37:58Z",
+          "tree_id": "94d3b4c7d3088c8fafe6c322c06c78e9e88639fc",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0ee9a276944393f399422bbf4822e354e89ff7e0"
+        },
+        "date": 1732035080567,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 926262,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11671,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 698427,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 663809,
+            "range": "±0.26%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
