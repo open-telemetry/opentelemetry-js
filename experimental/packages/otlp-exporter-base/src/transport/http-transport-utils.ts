@@ -111,7 +111,7 @@ export function sendWithHttp(
   });
 }
 
-function compressAndSend(
+export function compressAndSend(
   req: http.ClientRequest,
   compression: 'gzip' | 'none',
   data: Uint8Array,
@@ -127,7 +127,7 @@ function compressAndSend(
       .on('error', onError);
   }
 
-  dataStream.pipe(req);
+  dataStream.pipe(req).on('error', onError);
 }
 
 function readableFromUint8Array(buff: string | Uint8Array): Readable {

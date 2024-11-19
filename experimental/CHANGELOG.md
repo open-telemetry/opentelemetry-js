@@ -7,6 +7,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.55.0
+
+### :boom: Breaking Change
+
 * feat(instrumentation-http)!: reduce public API surface by removing exports and making protected methods private [#5124](https://github.com/open-telemetry/opentelemetry-js/pull/5124) @pichlermarc
   * (user-facing) the following exports were intended for internal use only and have been removed without replacement
     * extractHostnameAndPort
@@ -56,17 +68,14 @@ All notable changes to experimental packages in this project will be documented 
 * feat(sdk-node, sdk-logs): add `mergeResourceWithDefaults` flag, which allows opting-out of resources getting merged with the default resource [#4617](https://github.com/open-telemetry/opentelemetry-js/pull/4617)
   * default: `true`
   * note: `false` will become the default behavior in a future iteration in order to comply with [specification requirements](https://github.com/open-telemetry/opentelemetry-specification/blob/f3511a5ccda376dfd1de76dfa086fc9b35b54757/specification/resource/sdk.md?plain=1#L31-L36)
+* feat(instrumentation): Track request body size in XHR and Fetch instrumentations [#4706](https://github.com/open-telemetry/opentelemetry-js/pull/4706) @mustafahaddara
 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): Fix the `OTEL_SEMCONV_STABILITY_OPT_IN` variable check. Using `of` instead of `in` [#5137](https://github.com/open-telemetry/opentelemetry-js/pull/5137)
-
 * fix(instrumentation-http): drop url.parse in favor of URL constructor [#5091](https://github.com/open-telemetry/opentelemetry-js/pull/5091) @pichlermarc
   * fixes a bug where using cyrillic characters in a client request string URL would throw an exception, whereas an un-instrumented client would accept the same input without throwing an exception
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(otlp-exporter-base): fix unhandled error when writing to destroyed http request [#5163](https://github.com/open-telemetry/opentelemetry-js/pull/5163) @pichlermarc
 
 ## 0.54.2
 
@@ -91,6 +100,7 @@ All notable changes to experimental packages in this project will be documented 
   * (user-facing) `url` was intended for internal use and has been removed from all exporters
   * (user-facing) `timeoutMillis` was intended for internal use and has been removed from all exporters
   * (user-facing) `onInit` was intended for internal use and has been removed from all exporters
+  * (user-facing) OTLP exporter config `headers` type changed from `Partial<Record<string, unknown>>` to `Record<string, string>`
 * feat(otlp-exporter-base)!: do not export functions that are intended for internal use [#4971](https://github.com/open-telemetry/opentelemetry-js/pull/4971) @pichlermarc
   * Drops the following functions and types that were intended for internal use from the package exports:
     * `parseHeaders`
