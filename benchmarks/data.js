@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732034866045,
+  "lastUpdate": 1732034973949,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -19672,6 +19672,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.41%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8ad130409817a1a699aa78118c71aa5e2a453177",
+          "message": "chore(deps): update dependency linkinator to v6.1.2 (#5175)",
+          "timestamp": "2024-11-19T16:20:32Z",
+          "tree_id": "554284148cd4249d9a6121b3bf2c4130e205929d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/8ad130409817a1a699aa78118c71aa5e2a453177"
+        },
+        "date": 1732034973103,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 980997,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12119,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 708214,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 654156,
+            "range": "±0.51%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
