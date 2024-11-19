@@ -41,7 +41,6 @@ import {
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { VERSION } from '../src/version';
 import { Root } from 'protobufjs';
 import * as path from 'path';
 
@@ -74,18 +73,6 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       value: function (_timeout: number) {},
     });
     sinon.restore();
-  });
-
-  describe('default behavior for headers', () => {
-    const exporter = new OTLPMetricExporter();
-    it('should include user agent in header', () => {
-      assert.strictEqual(
-        exporter._otlpExporter['_transport']['_transport']['_parameters'][
-          'headers'
-        ]['User-Agent'],
-        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-      );
-    });
   });
 
   describe('export', () => {
@@ -276,7 +263,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
 
       collectorExporter.export(metrics, result => {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
-        assert.strictEqual(spyLoggerError.args.length, 0);
+        sinon.assert.notCalled(spyLoggerError);
         done();
       });
     });

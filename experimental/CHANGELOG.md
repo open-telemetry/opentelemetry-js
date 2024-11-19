@@ -53,6 +53,15 @@ All notable changes to experimental packages in this project will be documented 
     * GetFunction
     * Func
     * Err
+* feat(otlp-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031)
+  * `OTLPExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
+  * `OTLPExporterBrowserBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
+  * `ExportServiceError` was intended for internal use and has been dropped from exports
+  * `validateAndNormalizeHeaders` was intended for internal use and has been dropped from exports
+  * `OTLPExporterBase` all properties are now private, the constructor now takes an `IOTLPExportDelegate`, the type parameter for config type has been dropped.
+    * This type is scheduled for removal in a future version of this package, please treat all exporters as `SpanExporter`, `PushMetricExporter` or `LogRecordExporter`, based on their respective type.
+* feat(otlp-grpc-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031)
+  * `OTLPGRPCExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase` from `@opentelemetry/otlp-exporter-base`)
 
 ### :rocket: (Enhancement)
 

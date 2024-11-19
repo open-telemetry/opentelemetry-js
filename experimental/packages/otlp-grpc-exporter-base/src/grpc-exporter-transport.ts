@@ -177,3 +177,9 @@ export class GrpcExporterTransport implements IExporterTransport {
     });
   }
 }
+
+export function createOtlpGrpcExporterTransport(
+  options: GrpcExporterTransportParameters
+): IExporterTransport {
+  return new GrpcExporterTransport(options);
+}
