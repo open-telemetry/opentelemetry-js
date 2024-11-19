@@ -17,6 +17,7 @@ import { baggageUtils } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
 import { OtlpHttpConfiguration } from './otlp-http-configuration';
+import { wrapStaticHeadersInFunction } from './shared-configuration';
 
 function getStaticHeadersFromEnv(
   signalIdentifier: string
@@ -47,16 +48,6 @@ function getStaticHeadersFromEnv(
     baggageUtils.parseKeyPairsIntoRecord(nonSignalSpecificRawHeaders),
     baggageUtils.parseKeyPairsIntoRecord(signalSpecificRawHeaders)
   );
-}
-
-function wrapStaticHeadersInFunction(
-  headers: Record<string, string> | undefined
-): (() => Record<string, string>) | undefined {
-  if (headers == null) {
-    return undefined;
-  }
-
-  return () => headers;
 }
 
 function appendRootPathToUrlIfNeeded(url: string): string | undefined {
