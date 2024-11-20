@@ -16,10 +16,10 @@
 
 import { diag } from '@opentelemetry/api';
 import {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
-  SEMRESATTRS_TELEMETRY_SDK_NAME,
-  SEMRESATTRS_TELEMETRY_SDK_VERSION,
+  ATTR_SERVICE_NAME,
+  ATTR_TELEMETRY_SDK_LANGUAGE,
+  ATTR_TELEMETRY_SDK_NAME,
+  ATTR_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
@@ -56,13 +56,10 @@ export class Resource implements IResource {
    */
   static default(): IResource {
     return new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: defaultServiceName(),
-      [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
-      [SEMRESATTRS_TELEMETRY_SDK_NAME]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
-      [SEMRESATTRS_TELEMETRY_SDK_VERSION]:
-        SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
+      [ATTR_SERVICE_NAME]: defaultServiceName(),
+      [ATTR_TELEMETRY_SDK_LANGUAGE]: SDK_INFO[ATTR_TELEMETRY_SDK_LANGUAGE],
+      [ATTR_TELEMETRY_SDK_NAME]: SDK_INFO[ATTR_TELEMETRY_SDK_NAME],
+      [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
     });
   }
 

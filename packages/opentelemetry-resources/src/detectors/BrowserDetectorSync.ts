@@ -15,10 +15,10 @@
  */
 
 import {
-  SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION,
-  SEMRESATTRS_PROCESS_RUNTIME_NAME,
-  SEMRESATTRS_PROCESS_RUNTIME_VERSION,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_PROCESS_RUNTIME_DESCRIPTION,
+  ATTR_PROCESS_RUNTIME_NAME,
+  ATTR_PROCESS_RUNTIME_VERSION,
+} from '@opentelemetry/semantic-conventions/incubating';
 import { DetectorSync, ResourceAttributes } from '../types';
 import { diag } from '@opentelemetry/api';
 import { ResourceDetectionConfig } from '../config';
@@ -40,9 +40,9 @@ class BrowserDetectorSync implements DetectorSync {
       return Resource.empty();
     }
     const browserResource: ResourceAttributes = {
-      [SEMRESATTRS_PROCESS_RUNTIME_NAME]: 'browser',
-      [SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
-      [SEMRESATTRS_PROCESS_RUNTIME_VERSION]: navigator.userAgent,
+      [ATTR_PROCESS_RUNTIME_NAME]: 'browser',
+      [ATTR_PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
+      [ATTR_PROCESS_RUNTIME_VERSION]: navigator.userAgent,
     };
     return this._getResourceAttributes(browserResource, config);
   }
@@ -57,7 +57,7 @@ class BrowserDetectorSync implements DetectorSync {
     browserResource: ResourceAttributes,
     _config?: ResourceDetectionConfig
   ) {
-    if (browserResource[SEMRESATTRS_PROCESS_RUNTIME_VERSION] === '') {
+    if (browserResource[ATTR_PROCESS_RUNTIME_VERSION] === '') {
       diag.debug(
         'BrowserDetector failed: Unable to find required browser resources. '
       );

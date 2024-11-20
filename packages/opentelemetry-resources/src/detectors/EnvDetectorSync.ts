@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../Resource';
 import { DetectorSync, ResourceAttributes } from '../types';
 import { ResourceDetectionConfig } from '../config';
@@ -70,7 +70,7 @@ class EnvDetectorSync implements DetectorSync {
     }
 
     if (serviceName) {
-      attributes[SEMRESATTRS_SERVICE_NAME] = serviceName;
+      attributes[ATTR_SERVICE_NAME] = serviceName;
     }
 
     return new Resource(attributes);
