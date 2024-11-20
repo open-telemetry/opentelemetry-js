@@ -58,9 +58,15 @@ describe('MetricStorageRegistry', () => {
     selectAggregationTemporality: () => {
       throw new Error('should not be invoked');
     },
+    selectCardinalityLimit: () => {
+      throw new Error('should not be invoked');
+    },
   };
   const collectorHandle2: MetricCollectorHandle = {
     selectAggregationTemporality: () => {
+      throw new Error('should not be invoked');
+    },
+    selectCardinalityLimit: () => {
       throw new Error('should not be invoked');
     },
   };

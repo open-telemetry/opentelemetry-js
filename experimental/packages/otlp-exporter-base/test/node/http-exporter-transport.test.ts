@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { createHttpExporterTransport } from '../../src/platform/node/http-exporter-transport';
+import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
 import * as http from 'http';
 import * as assert from 'assert';
 import sinon = require('sinon');
@@ -54,7 +54,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -80,7 +80,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -104,7 +104,7 @@ describe('HttpExporterTransport', function () {
       // act
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -129,7 +129,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -158,7 +158,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -191,7 +191,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -212,7 +212,7 @@ describe('HttpExporterTransport', function () {
       const transport = createHttpExporterTransport({
         // use wrong port
         url: 'http://example.test',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -262,7 +262,7 @@ describe('HttpExporterTransport', function () {
       // act
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: { foo: 'foo-value', bar: 'bar-value' },
+        headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'none',
         agentOptions: {},
       });
@@ -311,7 +311,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: { foo: 'foo-value', bar: 'bar-value' },
+        headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'gzip',
         agentOptions: {},
       });

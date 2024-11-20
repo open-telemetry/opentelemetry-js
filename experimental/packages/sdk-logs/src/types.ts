@@ -28,6 +28,12 @@ export interface LoggerProviderConfig {
 
   /** Log Record Limits*/
   logRecordLimits?: LogRecordLimits;
+
+  /**
+   * Merge resource with {@link Resource.default()}?
+   * Default: {@code true}
+   */
+  mergeResourceWithDefaults?: boolean;
 }
 
 export interface LogRecordLimits {

@@ -16,7 +16,7 @@
 
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { createXhrTransport } from '../../src/platform/browser/xhr-transport';
+import { createXhrTransport } from '../../src/transport/xhr-transport';
 import {
   ExportResponseRetryable,
   ExportResponseFailure,
@@ -26,11 +26,11 @@ import { ensureHeadersContain } from '../testHelper';
 
 const testTransportParameters = {
   url: 'http://example.test',
-  headers: {
+  headers: () => ({
     foo: 'foo-value',
     bar: 'bar-value',
     'Content-Type': 'application/json',
-  },
+  }),
 };
 
 const requestTimeout = 1000;
