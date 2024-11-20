@@ -14,4 +14,22 @@
  * limitations under the License.
  */
 
-export { OTLPExporterBrowserBase } from './OTLPExporterBrowserBase';
+// NOTE: do not change these imports to be actual imports, otherwise they WILL break `@opentelemetry/instrumentation-http`
+import type * as http from 'http';
+import type * as https from 'https';
+
+import { OTLPExporterConfigBase } from './legacy-base-configuration';
+
+/**
+ * Collector Exporter node base config
+ */
+export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
+  keepAlive?: boolean;
+  compression?: CompressionAlgorithm;
+  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
+}
+
+export enum CompressionAlgorithm {
+  NONE = 'none',
+  GZIP = 'gzip',
+}

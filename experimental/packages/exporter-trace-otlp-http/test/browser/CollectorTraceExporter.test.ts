@@ -133,9 +133,8 @@ describe('OTLPTraceExporter - web', () => {
 
         queueMicrotask(() => {
           try {
-            const response: any = spyLoggerDebug.args[2][0];
-            assert.strictEqual(response, 'SendBeacon success');
-            assert.strictEqual(spyLoggerError.args.length, 0);
+            sinon.assert.calledWith(spyLoggerDebug, 'SendBeacon success');
+            sinon.assert.notCalled(spyLoggerError);
 
             done();
           } catch (e) {
@@ -277,81 +276,6 @@ describe('OTLPTraceExporter - web', () => {
 
           assert.strictEqual(stubBeacon.callCount, 0);
           clock.restore();
-          done();
-        });
-      });
-    });
-  });
-
-  describe('export - common', () => {
-    let spySend: any;
-    beforeEach(() => {
-      spySend = sinon.stub(OTLPTraceExporter.prototype, 'send');
-      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
-    });
-
-    it('should export spans as otlpTypes.Spans', done => {
-      const spans: ReadableSpan[] = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
-
-      collectorTraceExporter.export(spans, () => {});
-      setTimeout(() => {
-        const span1 = spySend.args[0][0][0] as ReadableSpan;
-        assert.deepStrictEqual(spans[0], span1);
-        done();
-      });
-      assert.strictEqual(spySend.callCount, 1);
-    });
-
-    describe('when exporter is shutdown', () => {
-      it(
-        'should not export anything but return callback with code' +
-          ' "FailedNotRetryable"',
-        async () => {
-          const spans: ReadableSpan[] = [];
-          spans.push(Object.assign({}, mockedReadableSpan));
-          await collectorTraceExporter.shutdown();
-          spySend.resetHistory();
-
-          const callbackSpy = sinon.spy();
-          collectorTraceExporter.export(spans, callbackSpy);
-          const returnCode = callbackSpy.args[0][0];
-
-          assert.strictEqual(
-            returnCode.code,
-            ExportResultCode.FAILED,
-            'return value is wrong'
-          );
-          assert.strictEqual(spySend.callCount, 0, 'should not call send');
-        }
-      );
-    });
-    describe('when an error occurs', () => {
-      it('should return failed export result', done => {
-        const spans: ReadableSpan[] = [];
-        spans.push(Object.assign({}, mockedReadableSpan));
-        spySend.throws({
-          code: 100,
-          details: 'Test error',
-          metadata: {},
-          message: 'Non-retryable',
-          stack: 'Stack',
-        });
-        const callbackSpy = sinon.spy();
-        collectorTraceExporter.export(spans, callbackSpy);
-        setTimeout(() => {
-          const returnCode = callbackSpy.args[0][0];
-          assert.strictEqual(
-            returnCode.code,
-            ExportResultCode.FAILED,
-            'return value is wrong'
-          );
-          assert.strictEqual(
-            returnCode.error.message,
-            'Non-retryable',
-            'return error message is wrong'
-          );
-          assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();
         });
       });

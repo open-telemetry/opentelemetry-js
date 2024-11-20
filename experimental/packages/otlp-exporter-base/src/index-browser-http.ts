@@ -14,5 +14,10 @@
  * limitations under the License.
  */
 
-export { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
-export { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
+export {
+  createOtlpXhrExportDelegate,
+  createOtlpSendBeaconExportDelegate,
+} from './otlp-browser-http-export-delegate';
+
+export { convertLegacyBrowserHttpOptions } from './configuration/convert-legacy-browser-http-options';
+export { createLegacyOtlpBrowserExportDelegate } from './configuration/create-legacy-browser-delegate';
