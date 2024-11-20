@@ -788,11 +788,11 @@ describe('Metrics', () => {
 
   describe('ProtobufMetricsSerializer', function () {
     it('serializes an export request', () => {
-      const serialized = ProtobufMetricsSerializer.serializeRequest([
+      const serialized = ProtobufMetricsSerializer.serializeRequest(
         createResourceMetrics([
           createCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+        ])
+      );
       assert.ok(serialized, 'serialized response is undefined');
       const decoded =
         root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.decode(
@@ -873,11 +873,11 @@ describe('Metrics', () => {
 
   describe('JsonMetricsSerializer', function () {
     it('serializes an export request', () => {
-      const serialized = JsonMetricsSerializer.serializeRequest([
+      const serialized = JsonMetricsSerializer.serializeRequest(
         createResourceMetrics([
           createCounterData(10, AggregationTemporality.DELTA),
-        ]),
-      ]);
+        ])
+      );
 
       const decoder = new TextDecoder();
       const expected = {
