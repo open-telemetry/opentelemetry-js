@@ -173,35 +173,35 @@ const TMP_MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
  *
  * Note: This may be different from `faas.id` if an alias is involved.
  *
- * @deprecated use ATTR_AWS_LAMBDA_INVOKED_ARN
+ * @deprecated Use ATTR_AWS_LAMBDA_INVOKED_ARN in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_LAMBDA_INVOKED_ARN = TMP_AWS_LAMBDA_INVOKED_ARN;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated use ATTR_DB_SYSTEM
+ * @deprecated Use ATTR_DB_SYSTEM in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_SYSTEM = TMP_DB_SYSTEM;
 
 /**
  * The connection string used to connect to the database. It is recommended to remove embedded credentials.
  *
- * @deprecated use ATTR_DB_CONNECTION_STRING
+ * @deprecated Use ATTR_DB_CONNECTION_STRING in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CONNECTION_STRING = TMP_DB_CONNECTION_STRING;
 
 /**
  * Username for accessing the database.
  *
- * @deprecated use ATTR_DB_USER
+ * @deprecated Use ATTR_DB_USER in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_USER = TMP_DB_USER;
 
 /**
  * The fully-qualified class name of the [Java Database Connectivity (JDBC)](https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/) driver used to connect.
  *
- * @deprecated use ATTR_DB_JDBC_DRIVER_CLASSNAME
+ * @deprecated Use ATTR_DB_JDBC_DRIVER_CLASSNAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
 
@@ -210,7 +210,7 @@ export const SEMATTRS_DB_JDBC_DRIVER_CLASSNAME = TMP_DB_JDBC_DRIVER_CLASSNAME;
  *
  * Note: In some SQL databases, the database name to be used is called &#34;schema name&#34;.
  *
- * @deprecated use ATTR_DB_NAME
+ * @deprecated Use ATTR_DB_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_NAME = TMP_DB_NAME;
 
@@ -219,7 +219,7 @@ export const SEMATTRS_DB_NAME = TMP_DB_NAME;
  *
  * Note: The value may be sanitized to exclude sensitive information.
  *
- * @deprecated use ATTR_DB_STATEMENT
+ * @deprecated Use ATTR_DB_STATEMENT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
 
@@ -228,7 +228,7 @@ export const SEMATTRS_DB_STATEMENT = TMP_DB_STATEMENT;
  *
  * Note: When setting this to an SQL keyword, it is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if the operation name is provided by the library being instrumented. If the SQL statement has an ambiguous operation, or performs more than one operation, this value may be omitted.
  *
- * @deprecated use ATTR_DB_OPERATION
+ * @deprecated Use ATTR_DB_OPERATION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
 
@@ -237,28 +237,28 @@ export const SEMATTRS_DB_OPERATION = TMP_DB_OPERATION;
  *
  * Note: If setting a `db.mssql.instance_name`, `net.peer.port` is no longer required (but still recommended if non-standard).
  *
- * @deprecated use ATTR_DB_MSSQL_INSTANCE_NAME
+ * @deprecated Use ATTR_DB_MSSQL_INSTANCE_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_MSSQL_INSTANCE_NAME = TMP_DB_MSSQL_INSTANCE_NAME;
 
 /**
  * The name of the keyspace being accessed. To be used instead of the generic `db.name` attribute.
  *
- * @deprecated use ATTR_DB_NAME
+ * @deprecated Use ATTR_DB_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_KEYSPACE = TMP_DB_CASSANDRA_KEYSPACE;
 
 /**
  * The fetch size used for paging, i.e. how many rows will be returned at once.
  *
- * @deprecated use ATTR_DB_CASSANDRA_PAGE_SIZE
+ * @deprecated Use ATTR_DB_CASSANDRA_PAGE_SIZE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_PAGE_SIZE = TMP_DB_CASSANDRA_PAGE_SIZE;
 
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated use ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL
+ * @deprecated Use ATTR_DB_CASSANDRA_CONSISTENCY_LEVEL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
   TMP_DB_CASSANDRA_CONSISTENCY_LEVEL;
@@ -268,21 +268,21 @@ export const SEMATTRS_DB_CASSANDRA_CONSISTENCY_LEVEL =
  *
  * Note: This mirrors the db.sql.table attribute but references cassandra rather than sql. It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
  *
- * @deprecated use ATTR_DB_CASSANDRA_TABLE
+ * @deprecated Use ATTR_DB_CASSANDRA_TABLE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_TABLE = TMP_DB_CASSANDRA_TABLE;
 
 /**
  * Whether or not the query is idempotent.
  *
- * @deprecated use ATTR_DB_CASSANDRA_IDEMPOTENCE
+ * @deprecated Use ATTR_DB_CASSANDRA_IDEMPOTENCE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_IDEMPOTENCE = TMP_DB_CASSANDRA_IDEMPOTENCE;
 
 /**
  * The number of times a query was speculatively executed. Not set or `0` if the query was not executed speculatively.
  *
- * @deprecated use ATTR_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT
+ * @deprecated Use ATTR_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
   TMP_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT;
@@ -290,7 +290,7 @@ export const SEMATTRS_DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
 /**
  * The ID of the coordinating node for a query.
  *
- * @deprecated use ATTR_DB_CASSANDRA_COORDINATOR_ID
+ * @deprecated Use ATTR_DB_CASSANDRA_COORDINATOR_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_COORDINATOR_ID =
   TMP_DB_CASSANDRA_COORDINATOR_ID;
@@ -298,7 +298,7 @@ export const SEMATTRS_DB_CASSANDRA_COORDINATOR_ID =
 /**
  * The data center of the coordinating node for a query.
  *
- * @deprecated use ATTR_DB_CASSANDRA_COORDINATOR_DC
+ * @deprecated Use ATTR_DB_CASSANDRA_COORDINATOR_DC in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_CASSANDRA_COORDINATOR_DC =
   TMP_DB_CASSANDRA_COORDINATOR_DC;
@@ -306,21 +306,21 @@ export const SEMATTRS_DB_CASSANDRA_COORDINATOR_DC =
 /**
  * The [HBase namespace](https://hbase.apache.org/book.html#_namespace) being accessed. To be used instead of the generic `db.name` attribute.
  *
- * @deprecated use ATTR_DB_NAME
+ * @deprecated Use ATTR_DB_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_HBASE_NAMESPACE = TMP_DB_HBASE_NAMESPACE;
 
 /**
  * The index of the database being accessed as used in the [`SELECT` command](https://redis.io/commands/select), provided as an integer. To be used instead of the generic `db.name` attribute.
  *
- * @deprecated use ATTR_DB_REDIS_DATABASE_INDEX
+ * @deprecated Use ATTR_DB_REDIS_DATABASE_INDEX in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_REDIS_DATABASE_INDEX = TMP_DB_REDIS_DATABASE_INDEX;
 
 /**
  * The collection being accessed within the database stated in `db.name`.
  *
- * @deprecated use ATTR_DB_MONGODB_COLLECTION
+ * @deprecated Use ATTR_DB_MONGODB_COLLECTION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
 
@@ -329,28 +329,28 @@ export const SEMATTRS_DB_MONGODB_COLLECTION = TMP_DB_MONGODB_COLLECTION;
  *
  * Note: It is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if it is provided by the library being instrumented. If the operation is acting upon an anonymous table, or more than one table, this value MUST NOT be set.
  *
- * @deprecated use ATTR_DB_SQL_TABLE
+ * @deprecated Use ATTR_DB_SQL_TABLE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_DB_SQL_TABLE = TMP_DB_SQL_TABLE;
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
  *
- * @deprecated use ATTR_EXCEPTION_TYPE
+ * @deprecated Use ATTR_EXCEPTION_TYPE.
  */
 export const SEMATTRS_EXCEPTION_TYPE = TMP_EXCEPTION_TYPE;
 
 /**
  * The exception message.
  *
- * @deprecated use ATTR_EXCEPTION_MESSAGE
+ * @deprecated Use ATTR_EXCEPTION_MESSAGE.
  */
 export const SEMATTRS_EXCEPTION_MESSAGE = TMP_EXCEPTION_MESSAGE;
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
  *
- * @deprecated use ATTR_EXCEPTION_STACKTRACE
+ * @deprecated Use ATTR_EXCEPTION_STACKTRACE.
  */
 export const SEMATTRS_EXCEPTION_STACKTRACE = TMP_EXCEPTION_STACKTRACE;
 
@@ -374,70 +374,70 @@ even if the `exception.escaped` attribute was not set or set to false,
 since the event might have been recorded at a time where it was not
 clear whether the exception will escape.
 *
-* @deprecated use ATTR_EXCEPTION_ESCAPED
+* @deprecated Use ATTR_EXCEPTION_ESCAPED.
 */
 export const SEMATTRS_EXCEPTION_ESCAPED = TMP_EXCEPTION_ESCAPED;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated use ATTR_FAAS_TRIGGER
+ * @deprecated Use ATTR_FAAS_TRIGGER in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_TRIGGER = TMP_FAAS_TRIGGER;
 
 /**
  * The execution ID of the current function execution.
  *
- * @deprecated use ATTR_FAAS_INVOCATION_ID
+ * @deprecated Use ATTR_FAAS_INVOCATION_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_EXECUTION = TMP_FAAS_EXECUTION;
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
  *
- * @deprecated use ATTR_FAAS_DOCUMENT_COLLECTION
+ * @deprecated Use ATTR_FAAS_DOCUMENT_COLLECTION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_DOCUMENT_COLLECTION = TMP_FAAS_DOCUMENT_COLLECTION;
 
 /**
  * Describes the type of the operation that was performed on the data.
  *
- * @deprecated use ATTR_FAAS_DOCUMENT_OPERATION
+ * @deprecated Use ATTR_FAAS_DOCUMENT_OPERATION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_DOCUMENT_OPERATION = TMP_FAAS_DOCUMENT_OPERATION;
 
 /**
  * A string containing the time when the data was accessed in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
  *
- * @deprecated use ATTR_FAAS_DOCUMENT_TIME
+ * @deprecated Use ATTR_FAAS_DOCUMENT_TIME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_DOCUMENT_TIME = TMP_FAAS_DOCUMENT_TIME;
 
 /**
  * The document name/table subjected to the operation. For example, in Cloud Storage or S3 is the name of the file, and in Cosmos DB the table name.
  *
- * @deprecated use ATTR_FAAS_DOCUMENT_NAME
+ * @deprecated Use ATTR_FAAS_DOCUMENT_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_DOCUMENT_NAME = TMP_FAAS_DOCUMENT_NAME;
 
 /**
  * A string containing the function invocation time in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
  *
- * @deprecated use ATTR_FAAS_TIME
+ * @deprecated Use ATTR_FAAS_TIME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_TIME = TMP_FAAS_TIME;
 
 /**
  * A string containing the schedule period as [Cron Expression](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm).
  *
- * @deprecated use ATTR_FAAS_CRON
+ * @deprecated Use ATTR_FAAS_CRON in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_CRON = TMP_FAAS_CRON;
 
 /**
  * A boolean that is true if the serverless function is executed for the first time (aka cold-start).
  *
- * @deprecated use ATTR_FAAS_COLDSTART
+ * @deprecated Use ATTR_FAAS_COLDSTART in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
 
@@ -446,7 +446,7 @@ export const SEMATTRS_FAAS_COLDSTART = TMP_FAAS_COLDSTART;
  *
  * Note: SHOULD be equal to the `faas.name` resource attribute of the invoked function.
  *
- * @deprecated use ATTR_FAAS_INVOKED_NAME
+ * @deprecated Use ATTR_FAAS_INVOKED_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
 
@@ -455,7 +455,7 @@ export const SEMATTRS_FAAS_INVOKED_NAME = TMP_FAAS_INVOKED_NAME;
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated use ATTR_FAAS_INVOKED_PROVIDER
+ * @deprecated Use ATTR_FAAS_INVOKED_PROVIDER in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
 
@@ -464,70 +464,70 @@ export const SEMATTRS_FAAS_INVOKED_PROVIDER = TMP_FAAS_INVOKED_PROVIDER;
  *
  * Note: SHOULD be equal to the `cloud.region` resource attribute of the invoked function.
  *
- * @deprecated use ATTR_FAAS_INVOKED_REGION
+ * @deprecated Use ATTR_FAAS_INVOKED_REGION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_FAAS_INVOKED_REGION = TMP_FAAS_INVOKED_REGION;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated use ATTR_NET_TRANSPORT
+ * @deprecated Use ATTR_NET_TRANSPORT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_TRANSPORT = TMP_NET_TRANSPORT;
 
 /**
  * Remote address of the peer (dotted decimal for IPv4 or [RFC5952](https://tools.ietf.org/html/rfc5952) for IPv6).
  *
- * @deprecated use ATTR_NET_PEER_IP
+ * @deprecated Use ATTR_NET_PEER_IP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_PEER_IP = TMP_NET_PEER_IP;
 
 /**
  * Remote port number.
  *
- * @deprecated use ATTR_NET_PEER_PORT
+ * @deprecated Use ATTR_NET_PEER_PORT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_PEER_PORT = TMP_NET_PEER_PORT;
 
 /**
  * Remote hostname or similar, see note below.
  *
- * @deprecated use ATTR_NET_PEER_NAME
+ * @deprecated Use ATTR_NET_PEER_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_PEER_NAME = TMP_NET_PEER_NAME;
 
 /**
  * Like `net.peer.ip` but for the host IP. Useful in case of a multi-IP host.
  *
- * @deprecated use ATTR_NET_HOST_IP
+ * @deprecated Use ATTR_NET_HOST_IP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_IP = TMP_NET_HOST_IP;
 
 /**
  * Like `net.peer.port` but for the host port.
  *
- * @deprecated use ATTR_NET_HOST_PORT
+ * @deprecated Use ATTR_NET_HOST_PORT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_PORT = TMP_NET_HOST_PORT;
 
 /**
  * Local hostname or similar, see note below.
  *
- * @deprecated use ATTR_NET_HOST_NAME
+ * @deprecated Use ATTR_NET_HOST_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_NAME = TMP_NET_HOST_NAME;
 
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated use ATTR_NETWORK_CONNECTION_TYPE
+ * @deprecated Use ATTR_NETWORK_CONNECTION_TYPE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_CONNECTION_TYPE = TMP_NET_HOST_CONNECTION_TYPE;
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated use ATTR_NETWORK_CONNECTION_SUBTYPE
+ * @deprecated Use ATTR_NETWORK_CONNECTION_SUBTYPE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_CONNECTION_SUBTYPE =
   TMP_NET_HOST_CONNECTION_SUBTYPE;
@@ -535,105 +535,105 @@ export const SEMATTRS_NET_HOST_CONNECTION_SUBTYPE =
 /**
  * The name of the mobile carrier.
  *
- * @deprecated use ATTR_NETWORK_CARRIER_NAME
+ * @deprecated Use ATTR_NETWORK_CARRIER_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_CARRIER_NAME = TMP_NET_HOST_CARRIER_NAME;
 
 /**
  * The mobile carrier country code.
  *
- * @deprecated use ATTR_NETWORK_CARRIER_MCC
+ * @deprecated Use ATTR_NETWORK_CARRIER_MCC in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_CARRIER_MCC = TMP_NET_HOST_CARRIER_MCC;
 
 /**
  * The mobile carrier network code.
  *
- * @deprecated use ATTR_NETWORK_CARRIER_MNC
+ * @deprecated Use ATTR_NETWORK_CARRIER_MNC in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_CARRIER_MNC = TMP_NET_HOST_CARRIER_MNC;
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
  *
- * @deprecated use ATTR_NETWORK_CARRIER_ICC
+ * @deprecated Use ATTR_NETWORK_CARRIER_ICC in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_NET_HOST_CARRIER_ICC = TMP_NET_HOST_CARRIER_ICC;
 
 /**
  * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
  *
- * @deprecated use ATTR_PEER_SERVICE
+ * @deprecated Use ATTR_PEER_SERVICE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_PEER_SERVICE = TMP_PEER_SERVICE;
 
 /**
  * Username or client_id extracted from the access token or [Authorization](https://tools.ietf.org/html/rfc7235#section-4.2) header in the inbound request from outside the system.
  *
- * @deprecated use ATTR_ENDUSER_ID
+ * @deprecated Use ATTR_ENDUSER_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_ENDUSER_ID = TMP_ENDUSER_ID;
 
 /**
  * Actual/assumed role the client is making the request under extracted from token or application security context.
  *
- * @deprecated use ATTR_ENDUSER_ROLE
+ * @deprecated Use ATTR_ENDUSER_ROLE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_ENDUSER_ROLE = TMP_ENDUSER_ROLE;
 
 /**
  * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
  *
- * @deprecated use ATTR_ENDUSER_SCOPE
+ * @deprecated Use ATTR_ENDUSER_SCOPE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_ENDUSER_SCOPE = TMP_ENDUSER_SCOPE;
 
 /**
  * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
  *
- * @deprecated use ATTR_THREAD_ID
+ * @deprecated Use ATTR_THREAD_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_THREAD_ID = TMP_THREAD_ID;
 
 /**
  * Current thread name.
  *
- * @deprecated use ATTR_THREAD_NAME
+ * @deprecated Use ATTR_THREAD_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_THREAD_NAME = TMP_THREAD_NAME;
 
 /**
  * The method or function name, or equivalent (usually rightmost part of the code unit&#39;s name).
  *
- * @deprecated use ATTR_CODE_FUNCTION
+ * @deprecated Use ATTR_CODE_FUNCTION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_CODE_FUNCTION = TMP_CODE_FUNCTION;
 
 /**
  * The &#34;namespace&#34; within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
  *
- * @deprecated use ATTR_CODE_NAMESPACE
+ * @deprecated Use ATTR_CODE_NAMESPACE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_CODE_NAMESPACE = TMP_CODE_NAMESPACE;
 
 /**
  * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
  *
- * @deprecated use ATTR_CODE_FILEPATH
+ * @deprecated Use ATTR_CODE_FILEPATH in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_CODE_FILEPATH = TMP_CODE_FILEPATH;
 
 /**
  * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
  *
- * @deprecated use ATTR_CODE_LINENO
+ * @deprecated Use ATTR_CODE_LINENO in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_CODE_LINENO = TMP_CODE_LINENO;
 
 /**
  * HTTP request method.
  *
- * @deprecated use ATTR_HTTP_METHOD
+ * @deprecated Use ATTR_HTTP_METHOD in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
 
@@ -642,14 +642,14 @@ export const SEMATTRS_HTTP_METHOD = TMP_HTTP_METHOD;
  *
  * Note: `http.url` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case the attribute&#39;s value should be `https://www.example.com/`.
  *
- * @deprecated use ATTR_HTTP_URL
+ * @deprecated Use ATTR_HTTP_URL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_URL = TMP_HTTP_URL;
 
 /**
  * The full request target as passed in a HTTP request line or equivalent.
  *
- * @deprecated use ATTR_HTTP_TARGET
+ * @deprecated Use ATTR_HTTP_TARGET in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
 
@@ -658,21 +658,21 @@ export const SEMATTRS_HTTP_TARGET = TMP_HTTP_TARGET;
  *
  * Note: When the header is present but empty the attribute SHOULD be set to the empty string. Note that this is a valid situation that is expected in certain cases, according the aforementioned [section of RFC 7230](https://tools.ietf.org/html/rfc7230#section-5.4). When the header is not set the attribute MUST NOT be set.
  *
- * @deprecated use ATTR_HTTP_HOST
+ * @deprecated Use ATTR_HTTP_HOST in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_HOST = TMP_HTTP_HOST;
 
 /**
  * The URI scheme identifying the used protocol.
  *
- * @deprecated use ATTR_HTTP_SCHEME
+ * @deprecated Use ATTR_HTTP_SCHEME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_SCHEME = TMP_HTTP_SCHEME;
 
 /**
  * [HTTP response status code](https://tools.ietf.org/html/rfc7231#section-6).
  *
- * @deprecated use ATTR_HTTP_STATUS_CODE
+ * @deprecated Use ATTR_HTTP_STATUS_CODE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
 
@@ -681,21 +681,21 @@ export const SEMATTRS_HTTP_STATUS_CODE = TMP_HTTP_STATUS_CODE;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated use ATTR_HTTP_FLAVOR
+ * @deprecated Use ATTR_HTTP_FLAVOR in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_FLAVOR = TMP_HTTP_FLAVOR;
 
 /**
  * Value of the [HTTP User-Agent](https://tools.ietf.org/html/rfc7231#section-5.5.3) header sent by the client.
  *
- * @deprecated use ATTR_HTTP_USER_AGENT
+ * @deprecated Use ATTR_HTTP_USER_AGENT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_USER_AGENT = TMP_HTTP_USER_AGENT;
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
  *
- * @deprecated use ATTR_HTTP_REQUEST_CONTENT_LENGTH
+ * @deprecated Use ATTR_HTTP_REQUEST_CONTENT_LENGTH in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH =
   TMP_HTTP_REQUEST_CONTENT_LENGTH;
@@ -703,7 +703,7 @@ export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH =
 /**
  * The size of the uncompressed request payload body after transport decoding. Not set if transport encoding not used.
  *
- * @deprecated use ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+ * @deprecated Use ATTR_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED =
   TMP_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED;
@@ -711,7 +711,7 @@ export const SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED =
 /**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding headers and is often, but not always, present as the [Content-Length](https://tools.ietf.org/html/rfc7230#section-3.3.2) header. For requests using transport encoding, this should be the compressed size.
  *
- * @deprecated use ATTR_HTTP_RESPONSE_CONTENT_LENGTH
+ * @deprecated Use ATTR_HTTP_RESPONSE_CONTENT_LENGTH in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH =
   TMP_HTTP_RESPONSE_CONTENT_LENGTH;
@@ -719,7 +719,7 @@ export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH =
 /**
  * The size of the uncompressed response payload body after transport decoding. Not set if transport encoding not used.
  *
- * @deprecated use ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+ * @deprecated Use ATTR_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
   TMP_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED;
@@ -729,14 +729,14 @@ export const SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
  *
  * Note: `http.url` is usually not readily available on the server side but would have to be assembled in a cumbersome and sometimes lossy process from other information (see e.g. open-telemetry/opentelemetry-python/pull/148). It is thus preferred to supply the raw data that is available.
  *
- * @deprecated use ATTR_HTTP_SERVER_NAME
+ * @deprecated Use ATTR_HTTP_SERVER_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_HTTP_SERVER_NAME = TMP_HTTP_SERVER_NAME;
 
 /**
  * The matched route (path template).
  *
- * @deprecated use ATTR_HTTP_ROUTE
+ * @deprecated Use ATTR_HTTP_ROUTE.
  */
 export const SEMATTRS_HTTP_ROUTE = TMP_HTTP_ROUTE;
 
@@ -755,21 +755,21 @@ comes from a proxy, reverse proxy, or the actual client. Setting
 one is at least somewhat confident that the address is not that of
 the closest proxy.
 *
-* @deprecated use ATTR_HTTP_CLIENT_IP
+* @deprecated Use ATTR_HTTP_CLIENT_IP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
 */
 export const SEMATTRS_HTTP_CLIENT_IP = TMP_HTTP_CLIENT_IP;
 
 /**
  * The keys in the `RequestItems` object field.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_TABLE_NAMES
+ * @deprecated Use ATTR_AWS_DYNAMODB_TABLE_NAMES in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_TABLE_NAMES = TMP_AWS_DYNAMODB_TABLE_NAMES;
 
 /**
  * The JSON-serialized value of each item in the `ConsumedCapacity` response field.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_CONSUMED_CAPACITY
+ * @deprecated Use ATTR_AWS_DYNAMODB_CONSUMED_CAPACITY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY =
   TMP_AWS_DYNAMODB_CONSUMED_CAPACITY;
@@ -777,7 +777,7 @@ export const SEMATTRS_AWS_DYNAMODB_CONSUMED_CAPACITY =
 /**
  * The JSON-serialized value of the `ItemCollectionMetrics` response field.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_ITEM_COLLECTION_METRICS
+ * @deprecated Use ATTR_AWS_DYNAMODB_ITEM_COLLECTION_METRICS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
   TMP_AWS_DYNAMODB_ITEM_COLLECTION_METRICS;
@@ -785,7 +785,7 @@ export const SEMATTRS_AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
 /**
  * The value of the `ProvisionedThroughput.ReadCapacityUnits` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY
+ * @deprecated Use ATTR_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
   TMP_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY;
@@ -793,7 +793,7 @@ export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
 /**
  * The value of the `ProvisionedThroughput.WriteCapacityUnits` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY
+ * @deprecated Use ATTR_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
   TMP_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY;
@@ -801,7 +801,7 @@ export const SEMATTRS_AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
 /**
  * The value of the `ConsistentRead` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_CONSISTENT_READ
+ * @deprecated Use ATTR_AWS_DYNAMODB_CONSISTENT_READ in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_CONSISTENT_READ =
   TMP_AWS_DYNAMODB_CONSISTENT_READ;
@@ -809,21 +809,21 @@ export const SEMATTRS_AWS_DYNAMODB_CONSISTENT_READ =
 /**
  * The value of the `ProjectionExpression` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_PROJECTION
+ * @deprecated Use ATTR_AWS_DYNAMODB_PROJECTION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_PROJECTION = TMP_AWS_DYNAMODB_PROJECTION;
 
 /**
  * The value of the `Limit` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_LIMIT
+ * @deprecated Use ATTR_AWS_DYNAMODB_LIMIT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_LIMIT = TMP_AWS_DYNAMODB_LIMIT;
 
 /**
  * The value of the `AttributesToGet` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_ATTRIBUTES_TO_GET
+ * @deprecated Use ATTR_AWS_DYNAMODB_ATTRIBUTES_TO_GET in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET =
   TMP_AWS_DYNAMODB_ATTRIBUTES_TO_GET;
@@ -831,21 +831,21 @@ export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTES_TO_GET =
 /**
  * The value of the `IndexName` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_INDEX_NAME
+ * @deprecated Use ATTR_AWS_DYNAMODB_INDEX_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_INDEX_NAME = TMP_AWS_DYNAMODB_INDEX_NAME;
 
 /**
  * The value of the `Select` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_SELECT
+ * @deprecated Use ATTR_AWS_DYNAMODB_SELECT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_SELECT = TMP_AWS_DYNAMODB_SELECT;
 
 /**
  * The JSON-serialized value of each item of the `GlobalSecondaryIndexes` request field.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES
+ * @deprecated Use ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
   TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES;
@@ -853,7 +853,7 @@ export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
 /**
  * The JSON-serialized value of each item of the `LocalSecondaryIndexes` request field.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES
+ * @deprecated Use ATTR_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
   TMP_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES;
@@ -861,7 +861,7 @@ export const SEMATTRS_AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
 /**
  * The value of the `ExclusiveStartTableName` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_EXCLUSIVE_START_TABLE
+ * @deprecated Use ATTR_AWS_DYNAMODB_EXCLUSIVE_START_TABLE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
   TMP_AWS_DYNAMODB_EXCLUSIVE_START_TABLE;
@@ -869,28 +869,28 @@ export const SEMATTRS_AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
 /**
  * The the number of items in the `TableNames` response parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_TABLE_COUNT
+ * @deprecated Use ATTR_AWS_DYNAMODB_TABLE_COUNT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_TABLE_COUNT = TMP_AWS_DYNAMODB_TABLE_COUNT;
 
 /**
  * The value of the `ScanIndexForward` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_SCAN_FORWARD
+ * @deprecated Use ATTR_AWS_DYNAMODB_SCAN_FORWARD in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_SCAN_FORWARD = TMP_AWS_DYNAMODB_SCAN_FORWARD;
 
 /**
  * The value of the `Segment` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_SEGMENT
+ * @deprecated Use ATTR_AWS_DYNAMODB_SEGMENT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_SEGMENT = TMP_AWS_DYNAMODB_SEGMENT;
 
 /**
  * The value of the `TotalSegments` request parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_TOTAL_SEGMENTS
+ * @deprecated Use ATTR_AWS_DYNAMODB_TOTAL_SEGMENTS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS =
   TMP_AWS_DYNAMODB_TOTAL_SEGMENTS;
@@ -898,14 +898,14 @@ export const SEMATTRS_AWS_DYNAMODB_TOTAL_SEGMENTS =
 /**
  * The value of the `Count` response parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_COUNT
+ * @deprecated Use ATTR_AWS_DYNAMODB_COUNT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_COUNT = TMP_AWS_DYNAMODB_COUNT;
 
 /**
  * The value of the `ScannedCount` response parameter.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_SCANNED_COUNT
+ * @deprecated Use ATTR_AWS_DYNAMODB_SCANNED_COUNT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_SCANNED_COUNT =
   TMP_AWS_DYNAMODB_SCANNED_COUNT;
@@ -913,7 +913,7 @@ export const SEMATTRS_AWS_DYNAMODB_SCANNED_COUNT =
 /**
  * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS
+ * @deprecated Use ATTR_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
   TMP_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS;
@@ -921,7 +921,7 @@ export const SEMATTRS_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
 /**
  * The JSON-serialized value of each item in the the `GlobalSecondaryIndexUpdates` request field.
  *
- * @deprecated use ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES
+ * @deprecated Use ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
   TMP_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES;
@@ -929,14 +929,14 @@ export const SEMATTRS_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
 /**
  * A string identifying the messaging system.
  *
- * @deprecated use ATTR_MESSAGING_SYSTEM
+ * @deprecated Use ATTR_MESSAGING_SYSTEM in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_SYSTEM = TMP_MESSAGING_SYSTEM;
 
 /**
  * The message destination name. This might be equal to the span name but is required nevertheless.
  *
- * @deprecated use ATTR_MESSAGING_DESTINATION_NAME
+ * @deprecated Use ATTR_MESSAGING_DESTINATION_NAME in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_DESTINATION = TMP_MESSAGING_DESTINATION;
 
@@ -951,7 +951,7 @@ export const SEMATTRS_MESSAGING_DESTINATION_KIND =
 /**
  * A boolean that is true if the message destination is temporary.
  *
- * @deprecated use ATTR_MESSAGING_DESTINATION_TEMPORARY
+ * @deprecated Use ATTR_MESSAGING_DESTINATION_TEMPORARY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_TEMP_DESTINATION =
   TMP_MESSAGING_TEMP_DESTINATION;
@@ -959,14 +959,14 @@ export const SEMATTRS_MESSAGING_TEMP_DESTINATION =
 /**
  * The name of the transport protocol.
  *
- * @deprecated use ATTR_NETWORK_PROTOCOL_NAME
+ * @deprecated Use ATTR_NETWORK_PROTOCOL_NAME.
  */
 export const SEMATTRS_MESSAGING_PROTOCOL = TMP_MESSAGING_PROTOCOL;
 
 /**
  * The version of the transport protocol.
  *
- * @deprecated use ATTR_NETWORK_PROTOCOL_VERSION
+ * @deprecated Use ATTR_NETWORK_PROTOCOL_VERSION.
  */
 export const SEMATTRS_MESSAGING_PROTOCOL_VERSION =
   TMP_MESSAGING_PROTOCOL_VERSION;
@@ -981,21 +981,21 @@ export const SEMATTRS_MESSAGING_URL = TMP_MESSAGING_URL;
 /**
  * A value used by the messaging system as an identifier for the message, represented as a string.
  *
- * @deprecated use ATTR_MESSAGING_MESSAGE_ID
+ * @deprecated Use ATTR_MESSAGING_MESSAGE_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_MESSAGE_ID = TMP_MESSAGING_MESSAGE_ID;
 
 /**
  * The [conversation ID](#conversations) identifying the conversation to which the message belongs, represented as a string. Sometimes called &#34;Correlation ID&#34;.
  *
- * @deprecated use ATTR_MESSAGING_MESSAGE_CONVERSATION_ID
+ * @deprecated Use ATTR_MESSAGING_MESSAGE_CONVERSATION_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_CONVERSATION_ID = TMP_MESSAGING_CONVERSATION_ID;
 
 /**
  * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
  *
- * @deprecated use ATTR_MESSAGING_MESSAGE_BODY_SIZE
+ * @deprecated Use ATTR_MESSAGING_MESSAGE_BODY_SIZE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES =
   TMP_MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES;
@@ -1011,7 +1011,7 @@ export const SEMATTRS_MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES =
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  *
- * @deprecated use ATTR_MESSAGING_OPERATION
+ * @deprecated Use ATTR_MESSAGING_OPERATION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_OPERATION = TMP_MESSAGING_OPERATION;
 
@@ -1025,7 +1025,7 @@ export const SEMATTRS_MESSAGING_CONSUMER_ID = TMP_MESSAGING_CONSUMER_ID;
 /**
  * RabbitMQ message routing key.
  *
- * @deprecated use ATTR_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY
+ * @deprecated Use ATTR_MESSAGING_RABBITMQ_DESTINATION_ROUTING_KEY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY =
   TMP_MESSAGING_RABBITMQ_ROUTING_KEY;
@@ -1035,7 +1035,7 @@ export const SEMATTRS_MESSAGING_RABBITMQ_ROUTING_KEY =
  *
  * Note: If the key type is not string, it&#39;s string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don&#39;t include its value.
  *
- * @deprecated use ATTR_MESSAGING_KAFKA_MESSAGE_KEY
+ * @deprecated Use ATTR_MESSAGING_KAFKA_MESSAGE_KEY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_KEY =
   TMP_MESSAGING_KAFKA_MESSAGE_KEY;
@@ -1043,7 +1043,7 @@ export const SEMATTRS_MESSAGING_KAFKA_MESSAGE_KEY =
 /**
  * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not producers.
  *
- * @deprecated use ATTR_MESSAGING_KAFKA_CONSUMER_GROUP
+ * @deprecated Use ATTR_MESSAGING_KAFKA_CONSUMER_GROUP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP =
   TMP_MESSAGING_KAFKA_CONSUMER_GROUP;
@@ -1051,28 +1051,28 @@ export const SEMATTRS_MESSAGING_KAFKA_CONSUMER_GROUP =
 /**
  * Client Id for the Consumer or Producer that is handling the message.
  *
- * @deprecated use ATTR_MESSAGING_CLIENT_ID
+ * @deprecated Use ATTR_MESSAGING_CLIENT_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_KAFKA_CLIENT_ID = TMP_MESSAGING_KAFKA_CLIENT_ID;
 
 /**
  * Partition the message is sent to.
  *
- * @deprecated use ATTR_MESSAGING_KAFKA_DESTINATION_PARTITION
+ * @deprecated Use ATTR_MESSAGING_KAFKA_DESTINATION_PARTITION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_KAFKA_PARTITION = TMP_MESSAGING_KAFKA_PARTITION;
 
 /**
  * A boolean that is true if the message is a tombstone.
  *
- * @deprecated use ATTR_MESSAGING_KAFKA_MESSAGE_TOMBSTONE
+ * @deprecated Use ATTR_MESSAGING_KAFKA_MESSAGE_TOMBSTONE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGING_KAFKA_TOMBSTONE = TMP_MESSAGING_KAFKA_TOMBSTONE;
 
 /**
  * A string identifying the remoting system.
  *
- * @deprecated use ATTR_RPC_SYSTEM
+ * @deprecated Use ATTR_RPC_SYSTEM in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
 
@@ -1081,7 +1081,7 @@ export const SEMATTRS_RPC_SYSTEM = TMP_RPC_SYSTEM;
  *
  * Note: This is the logical name of the service from the RPC interface perspective, which can be different from the name of any implementing class. The `code.namespace` attribute may be used to store the latter (despite the attribute name, it may include a class name; e.g., class with method actually executing the call on the server side, RPC client stub class on the client side).
  *
- * @deprecated use ATTR_RPC_SERVICE
+ * @deprecated Use ATTR_RPC_SERVICE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
 
@@ -1090,49 +1090,49 @@ export const SEMATTRS_RPC_SERVICE = TMP_RPC_SERVICE;
  *
  * Note: This is the logical name of the method from the RPC interface perspective, which can be different from the name of any implementing method/function. The `code.function` attribute may be used to store the latter (e.g., method actually executing the call on the server side, RPC client stub method on the client side).
  *
- * @deprecated use ATTR_RPC_METHOD
+ * @deprecated Use ATTR_RPC_METHOD in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_METHOD = TMP_RPC_METHOD;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated use ATTR_RPC_GRPC_STATUS_CODE
+ * @deprecated Use ATTR_RPC_GRPC_STATUS_CODE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_GRPC_STATUS_CODE = TMP_RPC_GRPC_STATUS_CODE;
 
 /**
  * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 does not specify this, the value can be omitted.
  *
- * @deprecated use ATTR_RPC_JSONRPC_VERSION
+ * @deprecated Use ATTR_RPC_JSONRPC_VERSION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_JSONRPC_VERSION = TMP_RPC_JSONRPC_VERSION;
 
 /**
  * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
  *
- * @deprecated use ATTR_RPC_JSONRPC_REQUEST_ID
+ * @deprecated Use ATTR_RPC_JSONRPC_REQUEST_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_JSONRPC_REQUEST_ID = TMP_RPC_JSONRPC_REQUEST_ID;
 
 /**
  * `error.code` property of response if it is an error response.
  *
- * @deprecated use ATTR_RPC_JSONRPC_ERROR_CODE
+ * @deprecated Use ATTR_RPC_JSONRPC_ERROR_CODE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_JSONRPC_ERROR_CODE = TMP_RPC_JSONRPC_ERROR_CODE;
 
 /**
  * `error.message` property of response if it is an error response.
  *
- * @deprecated use ATTR_RPC_JSONRPC_ERROR_MESSAGE
+ * @deprecated Use ATTR_RPC_JSONRPC_ERROR_MESSAGE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_RPC_JSONRPC_ERROR_MESSAGE = TMP_RPC_JSONRPC_ERROR_MESSAGE;
 
 /**
  * Whether this is a received or sent message.
  *
- * @deprecated use ATTR_MESSAGE_TYPE
+ * @deprecated Use ATTR_MESSAGE_TYPE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
 
@@ -1141,21 +1141,21 @@ export const SEMATTRS_MESSAGE_TYPE = TMP_MESSAGE_TYPE;
  *
  * Note: This way we guarantee that the values will be consistent between different implementations.
  *
- * @deprecated use ATTR_MESSAGE_ID
+ * @deprecated Use ATTR_MESSAGE_ID in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGE_ID = TMP_MESSAGE_ID;
 
 /**
  * Compressed size of the message in bytes.
  *
- * @deprecated use ATTR_MESSAGE_COMPRESSED_SIZE
+ * @deprecated Use ATTR_MESSAGE_COMPRESSED_SIZE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGE_COMPRESSED_SIZE = TMP_MESSAGE_COMPRESSED_SIZE;
 
 /**
  * Uncompressed size of the message in bytes.
  *
- * @deprecated use ATTR_MESSAGE_UNCOMPRESSED_SIZE
+ * @deprecated Use ATTR_MESSAGE_UNCOMPRESSED_SIZE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const SEMATTRS_MESSAGE_UNCOMPRESSED_SIZE = TMP_MESSAGE_UNCOMPRESSED_SIZE;
 
@@ -2068,329 +2068,329 @@ const TMP_DBSYSTEMVALUES_COCKROACHDB = 'cockroachdb';
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_OTHER_SQL.
+ * @deprecated Use DB_SYSTEM_VALUE_OTHER_SQL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_OTHER_SQL = TMP_DBSYSTEMVALUES_OTHER_SQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_MSSQL.
+ * @deprecated Use DB_SYSTEM_VALUE_MSSQL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_MSSQL = TMP_DBSYSTEMVALUES_MSSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_MYSQL.
+ * @deprecated Use DB_SYSTEM_VALUE_MYSQL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_MYSQL = TMP_DBSYSTEMVALUES_MYSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_ORACLE.
+ * @deprecated Use DB_SYSTEM_VALUE_ORACLE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_ORACLE = TMP_DBSYSTEMVALUES_ORACLE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_DB2.
+ * @deprecated Use DB_SYSTEM_VALUE_DB2 in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_DB2 = TMP_DBSYSTEMVALUES_DB2;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_POSTGRESQL.
+ * @deprecated Use DB_SYSTEM_VALUE_POSTGRESQL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_POSTGRESQL = TMP_DBSYSTEMVALUES_POSTGRESQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_REDSHIFT.
+ * @deprecated Use DB_SYSTEM_VALUE_REDSHIFT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_REDSHIFT = TMP_DBSYSTEMVALUES_REDSHIFT;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_HIVE.
+ * @deprecated Use DB_SYSTEM_VALUE_HIVE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_HIVE = TMP_DBSYSTEMVALUES_HIVE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_CLOUDSCAPE.
+ * @deprecated Use DB_SYSTEM_VALUE_CLOUDSCAPE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_CLOUDSCAPE = TMP_DBSYSTEMVALUES_CLOUDSCAPE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_HSQLDB.
+ * @deprecated Use DB_SYSTEM_VALUE_HSQLDB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_HSQLDB = TMP_DBSYSTEMVALUES_HSQLDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_PROGRESS.
+ * @deprecated Use DB_SYSTEM_VALUE_PROGRESS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_PROGRESS = TMP_DBSYSTEMVALUES_PROGRESS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_MAXDB.
+ * @deprecated Use DB_SYSTEM_VALUE_MAXDB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_MAXDB = TMP_DBSYSTEMVALUES_MAXDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_HANADB.
+ * @deprecated Use DB_SYSTEM_VALUE_HANADB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_HANADB = TMP_DBSYSTEMVALUES_HANADB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_INGRES.
+ * @deprecated Use DB_SYSTEM_VALUE_INGRES in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_INGRES = TMP_DBSYSTEMVALUES_INGRES;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_FIRSTSQL.
+ * @deprecated Use DB_SYSTEM_VALUE_FIRSTSQL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_FIRSTSQL = TMP_DBSYSTEMVALUES_FIRSTSQL;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_EDB.
+ * @deprecated Use DB_SYSTEM_VALUE_EDB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_EDB = TMP_DBSYSTEMVALUES_EDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_CACHE.
+ * @deprecated Use DB_SYSTEM_VALUE_CACHE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_CACHE = TMP_DBSYSTEMVALUES_CACHE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_ADABAS.
+ * @deprecated Use DB_SYSTEM_VALUE_ADABAS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_ADABAS = TMP_DBSYSTEMVALUES_ADABAS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_FIREBIRD.
+ * @deprecated Use DB_SYSTEM_VALUE_FIREBIRD in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_FIREBIRD = TMP_DBSYSTEMVALUES_FIREBIRD;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_DERBY.
+ * @deprecated Use DB_SYSTEM_VALUE_DERBY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_DERBY = TMP_DBSYSTEMVALUES_DERBY;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_FILEMAKER.
+ * @deprecated Use DB_SYSTEM_VALUE_FILEMAKER in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_FILEMAKER = TMP_DBSYSTEMVALUES_FILEMAKER;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_INFORMIX.
+ * @deprecated Use DB_SYSTEM_VALUE_INFORMIX in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_INFORMIX = TMP_DBSYSTEMVALUES_INFORMIX;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_INSTANTDB.
+ * @deprecated Use DB_SYSTEM_VALUE_INSTANTDB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_INSTANTDB = TMP_DBSYSTEMVALUES_INSTANTDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_INTERBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_INTERBASE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_INTERBASE = TMP_DBSYSTEMVALUES_INTERBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_MARIADB.
+ * @deprecated Use DB_SYSTEM_VALUE_MARIADB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_MARIADB = TMP_DBSYSTEMVALUES_MARIADB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_NETEZZA.
+ * @deprecated Use DB_SYSTEM_VALUE_NETEZZA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_NETEZZA = TMP_DBSYSTEMVALUES_NETEZZA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_PERVASIVE.
+ * @deprecated Use DB_SYSTEM_VALUE_PERVASIVE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_PERVASIVE = TMP_DBSYSTEMVALUES_PERVASIVE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_POINTBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_POINTBASE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_POINTBASE = TMP_DBSYSTEMVALUES_POINTBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_SQLITE.
+ * @deprecated Use DB_SYSTEM_VALUE_SQLITE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_SQLITE = TMP_DBSYSTEMVALUES_SQLITE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_SYBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_SYBASE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_SYBASE = TMP_DBSYSTEMVALUES_SYBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_TERADATA.
+ * @deprecated Use DB_SYSTEM_VALUE_TERADATA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_TERADATA = TMP_DBSYSTEMVALUES_TERADATA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_VERTICA.
+ * @deprecated Use DB_SYSTEM_VALUE_VERTICA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_VERTICA = TMP_DBSYSTEMVALUES_VERTICA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_H2.
+ * @deprecated Use DB_SYSTEM_VALUE_H2 in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_H2 = TMP_DBSYSTEMVALUES_H2;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_COLDFUSION.
+ * @deprecated Use DB_SYSTEM_VALUE_COLDFUSION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_COLDFUSION = TMP_DBSYSTEMVALUES_COLDFUSION;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_CASSANDRA.
+ * @deprecated Use DB_SYSTEM_VALUE_CASSANDRA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_CASSANDRA = TMP_DBSYSTEMVALUES_CASSANDRA;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_HBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_HBASE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_HBASE = TMP_DBSYSTEMVALUES_HBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_MONGODB.
+ * @deprecated Use DB_SYSTEM_VALUE_MONGODB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_MONGODB = TMP_DBSYSTEMVALUES_MONGODB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_REDIS.
+ * @deprecated Use DB_SYSTEM_VALUE_REDIS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_REDIS = TMP_DBSYSTEMVALUES_REDIS;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_COUCHBASE.
+ * @deprecated Use DB_SYSTEM_VALUE_COUCHBASE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_COUCHBASE = TMP_DBSYSTEMVALUES_COUCHBASE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_COUCHDB.
+ * @deprecated Use DB_SYSTEM_VALUE_COUCHDB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_COUCHDB = TMP_DBSYSTEMVALUES_COUCHDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_COSMOSDB.
+ * @deprecated Use DB_SYSTEM_VALUE_COSMOSDB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_COSMOSDB = TMP_DBSYSTEMVALUES_COSMOSDB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_DYNAMODB.
+ * @deprecated Use DB_SYSTEM_VALUE_DYNAMODB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_DYNAMODB = TMP_DBSYSTEMVALUES_DYNAMODB;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_NEO4J.
+ * @deprecated Use DB_SYSTEM_VALUE_NEO4J in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_NEO4J = TMP_DBSYSTEMVALUES_NEO4J;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_GEODE.
+ * @deprecated Use DB_SYSTEM_VALUE_GEODE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_GEODE = TMP_DBSYSTEMVALUES_GEODE;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_ELASTICSEARCH.
+ * @deprecated Use DB_SYSTEM_VALUE_ELASTICSEARCH in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_ELASTICSEARCH = TMP_DBSYSTEMVALUES_ELASTICSEARCH;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_MEMCACHED.
+ * @deprecated Use DB_SYSTEM_VALUE_MEMCACHED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_MEMCACHED = TMP_DBSYSTEMVALUES_MEMCACHED;
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
  *
- * @deprecated Use DB_SYSTEM_VALUE_COCKROACHDB.
+ * @deprecated Use DB_SYSTEM_VALUE_COCKROACHDB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBSYSTEMVALUES_COCKROACHDB = TMP_DBSYSTEMVALUES_COCKROACHDB;
 
@@ -2621,7 +2621,7 @@ const TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL = 'local_serial';
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ALL.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ALL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ALL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ALL;
@@ -2629,7 +2629,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_ALL =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_EACH_QUORUM.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_EACH_QUORUM in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM;
@@ -2637,7 +2637,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_EACH_QUORUM =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_QUORUM.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_QUORUM in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM;
@@ -2645,7 +2645,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_QUORUM =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_QUORUM.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_QUORUM in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM;
@@ -2653,7 +2653,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_QUORUM =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ONE.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ONE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ONE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ONE;
@@ -2661,7 +2661,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_ONE =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_TWO.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_TWO in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_TWO =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_TWO;
@@ -2669,7 +2669,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_TWO =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_THREE.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_THREE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_THREE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_THREE;
@@ -2677,7 +2677,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_THREE =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_ONE.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_ONE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE;
@@ -2685,7 +2685,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_ONE =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ANY.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_ANY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_ANY =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_ANY;
@@ -2693,7 +2693,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_ANY =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_SERIAL.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_SERIAL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL;
@@ -2701,7 +2701,7 @@ export const DBCASSANDRACONSISTENCYLEVELVALUES_SERIAL =
 /**
  * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
  *
- * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_SERIAL.
+ * @deprecated Use DB_CASSANDRA_CONSISTENCY_LEVEL_VALUE_LOCAL_SERIAL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL =
   TMP_DBCASSANDRACONSISTENCYLEVELVALUES_LOCAL_SERIAL;
@@ -2783,35 +2783,35 @@ const TMP_FAASTRIGGERVALUES_OTHER = 'other';
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUE_DATASOURCE.
+ * @deprecated Use FAAS_TRIGGER_VALUE_DATASOURCE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASTRIGGERVALUES_DATASOURCE = TMP_FAASTRIGGERVALUES_DATASOURCE;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUE_HTTP.
+ * @deprecated Use FAAS_TRIGGER_VALUE_HTTP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASTRIGGERVALUES_HTTP = TMP_FAASTRIGGERVALUES_HTTP;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUE_PUBSUB.
+ * @deprecated Use FAAS_TRIGGER_VALUE_PUBSUB in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASTRIGGERVALUES_PUBSUB = TMP_FAASTRIGGERVALUES_PUBSUB;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUE_TIMER.
+ * @deprecated Use FAAS_TRIGGER_VALUE_TIMER in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASTRIGGERVALUES_TIMER = TMP_FAASTRIGGERVALUES_TIMER;
 
 /**
  * Type of the trigger on which the function is executed.
  *
- * @deprecated Use FAAS_TRIGGER_VALUE_OTHER.
+ * @deprecated Use FAAS_TRIGGER_VALUE_OTHER in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASTRIGGERVALUES_OTHER = TMP_FAASTRIGGERVALUES_OTHER;
 
@@ -2866,7 +2866,7 @@ const TMP_FAASDOCUMENTOPERATIONVALUES_DELETE = 'delete';
 /**
  * Describes the type of the operation that was performed on the data.
  *
- * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_INSERT.
+ * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_INSERT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASDOCUMENTOPERATIONVALUES_INSERT =
   TMP_FAASDOCUMENTOPERATIONVALUES_INSERT;
@@ -2874,7 +2874,7 @@ export const FAASDOCUMENTOPERATIONVALUES_INSERT =
 /**
  * Describes the type of the operation that was performed on the data.
  *
- * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_EDIT.
+ * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_EDIT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASDOCUMENTOPERATIONVALUES_EDIT =
   TMP_FAASDOCUMENTOPERATIONVALUES_EDIT;
@@ -2882,7 +2882,7 @@ export const FAASDOCUMENTOPERATIONVALUES_EDIT =
 /**
  * Describes the type of the operation that was performed on the data.
  *
- * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_DELETE.
+ * @deprecated Use FAAS_DOCUMENT_OPERATION_VALUE_DELETE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASDOCUMENTOPERATIONVALUES_DELETE =
   TMP_FAASDOCUMENTOPERATIONVALUES_DELETE;
@@ -2935,7 +2935,7 @@ const TMP_FAASINVOKEDPROVIDERVALUES_GCP = 'gcp';
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_ALIBABA_CLOUD.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_ALIBABA_CLOUD in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD =
   TMP_FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD;
@@ -2945,7 +2945,7 @@ export const FAASINVOKEDPROVIDERVALUES_ALIBABA_CLOUD =
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_AWS.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_AWS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASINVOKEDPROVIDERVALUES_AWS = TMP_FAASINVOKEDPROVIDERVALUES_AWS;
 
@@ -2954,7 +2954,7 @@ export const FAASINVOKEDPROVIDERVALUES_AWS = TMP_FAASINVOKEDPROVIDERVALUES_AWS;
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_AZURE.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_AZURE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASINVOKEDPROVIDERVALUES_AZURE =
   TMP_FAASINVOKEDPROVIDERVALUES_AZURE;
@@ -2964,7 +2964,7 @@ export const FAASINVOKEDPROVIDERVALUES_AZURE =
  *
  * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
  *
- * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_GCP.
+ * @deprecated Use FAAS_INVOKED_PROVIDER_VALUE_GCP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const FAASINVOKEDPROVIDERVALUES_GCP = TMP_FAASINVOKEDPROVIDERVALUES_GCP;
 
@@ -3021,14 +3021,14 @@ const TMP_NETTRANSPORTVALUES_OTHER = 'other';
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUE_IP_TCP.
+ * @deprecated Use NET_TRANSPORT_VALUE_IP_TCP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETTRANSPORTVALUES_IP_TCP = TMP_NETTRANSPORTVALUES_IP_TCP;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUE_IP_UDP.
+ * @deprecated Use NET_TRANSPORT_VALUE_IP_UDP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETTRANSPORTVALUES_IP_UDP = TMP_NETTRANSPORTVALUES_IP_UDP;
 
@@ -3049,21 +3049,21 @@ export const NETTRANSPORTVALUES_UNIX = TMP_NETTRANSPORTVALUES_UNIX;
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUE_PIPE.
+ * @deprecated Use NET_TRANSPORT_VALUE_PIPE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETTRANSPORTVALUES_PIPE = TMP_NETTRANSPORTVALUES_PIPE;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUE_INPROC.
+ * @deprecated Use NET_TRANSPORT_VALUE_INPROC in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETTRANSPORTVALUES_INPROC = TMP_NETTRANSPORTVALUES_INPROC;
 
 /**
  * Transport protocol used. See note below.
  *
- * @deprecated Use NET_TRANSPORT_VALUE_OTHER.
+ * @deprecated Use NET_TRANSPORT_VALUE_OTHER in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETTRANSPORTVALUES_OTHER = TMP_NETTRANSPORTVALUES_OTHER;
 
@@ -3128,7 +3128,7 @@ const TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN = 'unknown';
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_WIFI.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_WIFI in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIFI =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIFI;
@@ -3136,7 +3136,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_WIFI =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_WIRED.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_WIRED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONTYPEVALUES_WIRED =
   TMP_NETHOSTCONNECTIONTYPEVALUES_WIRED;
@@ -3144,7 +3144,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_WIRED =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_CELL.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_CELL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONTYPEVALUES_CELL =
   TMP_NETHOSTCONNECTIONTYPEVALUES_CELL;
@@ -3152,7 +3152,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_CELL =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_UNAVAILABLE.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_UNAVAILABLE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE;
@@ -3160,7 +3160,7 @@ export const NETHOSTCONNECTIONTYPEVALUES_UNAVAILABLE =
 /**
  * The internet connection type currently being used by the host.
  *
- * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_UNKNOWN.
+ * @deprecated Use NETWORK_CONNECTION_TYPE_VALUE_UNKNOWN in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONTYPEVALUES_UNKNOWN =
   TMP_NETHOSTCONNECTIONTYPEVALUES_UNKNOWN;
@@ -3234,7 +3234,7 @@ const TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA = 'lte_ca';
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_GPRS.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_GPRS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GPRS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GPRS;
@@ -3242,7 +3242,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_GPRS =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EDGE.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EDGE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EDGE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EDGE;
@@ -3250,7 +3250,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EDGE =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_UMTS.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_UMTS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_UMTS =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_UMTS;
@@ -3258,7 +3258,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_UMTS =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA;
@@ -3266,7 +3266,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_0.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_0 in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0;
@@ -3274,7 +3274,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_0 =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_A.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_A in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A;
@@ -3282,7 +3282,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_A =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA2000_1XRTT.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_CDMA2000_1XRTT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT;
@@ -3290,7 +3290,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_CDMA2000_1XRTT =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSDPA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSDPA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA;
@@ -3298,7 +3298,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSDPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSUPA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSUPA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA;
@@ -3306,7 +3306,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSUPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSPA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSPA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPA;
@@ -3314,7 +3314,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_IDEN.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_IDEN in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IDEN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IDEN;
@@ -3322,7 +3322,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_IDEN =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_B.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EVDO_B in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B;
@@ -3330,7 +3330,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EVDO_B =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_LTE.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_LTE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE;
@@ -3338,7 +3338,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EHRPD.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_EHRPD in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD;
@@ -3346,7 +3346,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_EHRPD =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSPAP.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_HSPAP in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP;
@@ -3354,7 +3354,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_HSPAP =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_GSM.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_GSM in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_GSM =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_GSM;
@@ -3362,7 +3362,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_GSM =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_TD_SCDMA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_TD_SCDMA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA;
@@ -3370,7 +3370,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_TD_SCDMA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_IWLAN.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_IWLAN in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN;
@@ -3378,7 +3378,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_IWLAN =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_NR.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_NR in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NR =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NR;
@@ -3386,7 +3386,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_NR =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_NRNSA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_NRNSA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA;
@@ -3394,7 +3394,7 @@ export const NETHOSTCONNECTIONSUBTYPEVALUES_NRNSA =
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
  *
- * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_LTE_CA.
+ * @deprecated Use NETWORK_CONNECTION_SUBTYPE_VALUE_LTE_CA in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA =
   TMP_NETHOSTCONNECTIONSUBTYPEVALUES_LTE_CA;
@@ -3520,7 +3520,7 @@ const TMP_HTTPFLAVORVALUES_QUIC = 'QUIC';
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_1_0.
+ * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_1_0 in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const HTTPFLAVORVALUES_HTTP_1_0 = TMP_HTTPFLAVORVALUES_HTTP_1_0;
 
@@ -3529,7 +3529,7 @@ export const HTTPFLAVORVALUES_HTTP_1_0 = TMP_HTTPFLAVORVALUES_HTTP_1_0;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_1_1.
+ * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_1_1 in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const HTTPFLAVORVALUES_HTTP_1_1 = TMP_HTTPFLAVORVALUES_HTTP_1_1;
 
@@ -3538,7 +3538,7 @@ export const HTTPFLAVORVALUES_HTTP_1_1 = TMP_HTTPFLAVORVALUES_HTTP_1_1;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_2_0.
+ * @deprecated Use HTTP_FLAVOR_VALUE_HTTP_2_0 in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const HTTPFLAVORVALUES_HTTP_2_0 = TMP_HTTPFLAVORVALUES_HTTP_2_0;
 
@@ -3547,7 +3547,7 @@ export const HTTPFLAVORVALUES_HTTP_2_0 = TMP_HTTPFLAVORVALUES_HTTP_2_0;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUE_SPDY.
+ * @deprecated Use HTTP_FLAVOR_VALUE_SPDY in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const HTTPFLAVORVALUES_SPDY = TMP_HTTPFLAVORVALUES_SPDY;
 
@@ -3556,7 +3556,7 @@ export const HTTPFLAVORVALUES_SPDY = TMP_HTTPFLAVORVALUES_SPDY;
  *
  * Note: If `net.transport` is not specified, it can be assumed to be `IP.TCP` except if `http.flavor` is `QUIC`, in which case `IP.UDP` is assumed.
  *
- * @deprecated Use HTTP_FLAVOR_VALUE_QUIC.
+ * @deprecated Use HTTP_FLAVOR_VALUE_QUIC in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const HTTPFLAVORVALUES_QUIC = TMP_HTTPFLAVORVALUES_QUIC;
 
@@ -3662,7 +3662,7 @@ const TMP_MESSAGINGOPERATIONVALUES_PROCESS = 'process';
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  *
- * @deprecated Use MESSAGING_OPERATION_TYPE_VALUE_RECEIVE.
+ * @deprecated Use MESSAGING_OPERATION_TYPE_VALUE_RECEIVE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const MESSAGINGOPERATIONVALUES_RECEIVE =
   TMP_MESSAGINGOPERATIONVALUES_RECEIVE;
@@ -3670,7 +3670,7 @@ export const MESSAGINGOPERATIONVALUES_RECEIVE =
 /**
  * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
  *
- * @deprecated Use MESSAGING_OPERATION_TYPE_VALUE_PROCESS.
+ * @deprecated Use MESSAGING_OPERATION_TYPE_VALUE_PROCESS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const MESSAGINGOPERATIONVALUES_PROCESS =
   TMP_MESSAGINGOPERATIONVALUES_PROCESS;
@@ -3728,14 +3728,14 @@ const TMP_RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED = 16;
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_OK.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_OK in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_OK = TMP_RPCGRPCSTATUSCODEVALUES_OK;
 
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_CANCELLED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_CANCELLED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_CANCELLED =
   TMP_RPCGRPCSTATUSCODEVALUES_CANCELLED;
@@ -3743,7 +3743,7 @@ export const RPCGRPCSTATUSCODEVALUES_CANCELLED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNKNOWN.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNKNOWN in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_UNKNOWN =
   TMP_RPCGRPCSTATUSCODEVALUES_UNKNOWN;
@@ -3751,7 +3751,7 @@ export const RPCGRPCSTATUSCODEVALUES_UNKNOWN =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_INVALID_ARGUMENT.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_INVALID_ARGUMENT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT =
   TMP_RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT;
@@ -3759,7 +3759,7 @@ export const RPCGRPCSTATUSCODEVALUES_INVALID_ARGUMENT =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_DEADLINE_EXCEEDED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_DEADLINE_EXCEEDED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED =
   TMP_RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED;
@@ -3767,7 +3767,7 @@ export const RPCGRPCSTATUSCODEVALUES_DEADLINE_EXCEEDED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_NOT_FOUND.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_NOT_FOUND in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_NOT_FOUND =
   TMP_RPCGRPCSTATUSCODEVALUES_NOT_FOUND;
@@ -3775,7 +3775,7 @@ export const RPCGRPCSTATUSCODEVALUES_NOT_FOUND =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_ALREADY_EXISTS.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_ALREADY_EXISTS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS =
   TMP_RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS;
@@ -3783,7 +3783,7 @@ export const RPCGRPCSTATUSCODEVALUES_ALREADY_EXISTS =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_PERMISSION_DENIED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_PERMISSION_DENIED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED =
   TMP_RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED;
@@ -3791,7 +3791,7 @@ export const RPCGRPCSTATUSCODEVALUES_PERMISSION_DENIED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_RESOURCE_EXHAUSTED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_RESOURCE_EXHAUSTED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED =
   TMP_RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED;
@@ -3799,7 +3799,7 @@ export const RPCGRPCSTATUSCODEVALUES_RESOURCE_EXHAUSTED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_FAILED_PRECONDITION.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_FAILED_PRECONDITION in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION =
   TMP_RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION;
@@ -3807,7 +3807,7 @@ export const RPCGRPCSTATUSCODEVALUES_FAILED_PRECONDITION =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_ABORTED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_ABORTED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_ABORTED =
   TMP_RPCGRPCSTATUSCODEVALUES_ABORTED;
@@ -3815,7 +3815,7 @@ export const RPCGRPCSTATUSCODEVALUES_ABORTED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_OUT_OF_RANGE.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_OUT_OF_RANGE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE =
   TMP_RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE;
@@ -3823,7 +3823,7 @@ export const RPCGRPCSTATUSCODEVALUES_OUT_OF_RANGE =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNIMPLEMENTED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNIMPLEMENTED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED =
   TMP_RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED;
@@ -3831,7 +3831,7 @@ export const RPCGRPCSTATUSCODEVALUES_UNIMPLEMENTED =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_INTERNAL.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_INTERNAL in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_INTERNAL =
   TMP_RPCGRPCSTATUSCODEVALUES_INTERNAL;
@@ -3839,7 +3839,7 @@ export const RPCGRPCSTATUSCODEVALUES_INTERNAL =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNAVAILABLE.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNAVAILABLE in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_UNAVAILABLE =
   TMP_RPCGRPCSTATUSCODEVALUES_UNAVAILABLE;
@@ -3847,7 +3847,7 @@ export const RPCGRPCSTATUSCODEVALUES_UNAVAILABLE =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_DATA_LOSS.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_DATA_LOSS in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_DATA_LOSS =
   TMP_RPCGRPCSTATUSCODEVALUES_DATA_LOSS;
@@ -3855,7 +3855,7 @@ export const RPCGRPCSTATUSCODEVALUES_DATA_LOSS =
 /**
  * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
  *
- * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNAUTHENTICATED.
+ * @deprecated Use RPC_GRPC_STATUS_CODE_VALUE_UNAUTHENTICATED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED =
   TMP_RPCGRPCSTATUSCODEVALUES_UNAUTHENTICATED;
@@ -3957,14 +3957,14 @@ const TMP_MESSAGETYPEVALUES_RECEIVED = 'RECEIVED';
 /**
  * Whether this is a received or sent message.
  *
- * @deprecated Use MESSAGE_TYPE_VALUE_SENT.
+ * @deprecated Use MESSAGE_TYPE_VALUE_SENT in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const MESSAGETYPEVALUES_SENT = TMP_MESSAGETYPEVALUES_SENT;
 
 /**
  * Whether this is a received or sent message.
  *
- * @deprecated Use MESSAGE_TYPE_VALUE_RECEIVED.
+ * @deprecated Use MESSAGE_TYPE_VALUE_RECEIVED in [incubating entry-point]({@link https://github.com/open-telemetry/opentelemetry-js/blob/main/semantic-conventions/README.md#unstable-semconv}).
  */
 export const MESSAGETYPEVALUES_RECEIVED = TMP_MESSAGETYPEVALUES_RECEIVED;
 
