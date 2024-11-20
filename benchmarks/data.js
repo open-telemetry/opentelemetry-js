@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732114997404,
+  "lastUpdate": 1732119527900,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -19880,6 +19880,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.23%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "p.versockas@gmail.com",
+            "name": "Povilas Versockas",
+            "username": "povilasv"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a834861418de8d162f9842e9d5640d19ed3a68a8",
+          "message": "feat(sdk-metrics): add aggregation cardinality limit (#5128)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-11-20T16:08:54Z",
+          "tree_id": "f00ce50f5c8d736be6c5866aca133feec869e067",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a834861418de8d162f9842e9d5640d19ed3a68a8"
+        },
+        "date": 1732119527128,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 960806,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11861,
+            "range": "±0.15%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 670883,
+            "range": "±1.30%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 660326,
+            "range": "±0.25%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
