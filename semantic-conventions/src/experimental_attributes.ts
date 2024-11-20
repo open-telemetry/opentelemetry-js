@@ -44,6 +44,8 @@ export const ATTR_ANDROID_OS_API_LEVEL = 'android.os.api_level' as const;
  * @note The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ * 
+ * @deprecated Replaced by `device.app.lifecycle`.
  */
 export const ATTR_ANDROID_STATE = 'android.state' as const;
 
@@ -151,7 +153,7 @@ export const ATTR_ARTIFACT_VERSION = 'artifact.version' as const;
 /**
  * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
  * 
- * @example { "AttributeName": "string", "AttributeType": "string" }
+ * @example ["{ "AttributeName": "string", "AttributeType": "string" }"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -160,8 +162,7 @@ export const ATTR_AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS = 'aws.dynamodb.attribute_d
 /**
  * The value of the `AttributesToGet` request parameter.
  * 
- * @example lives
- * @example id
+ * @example ["lives", "id"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -177,7 +178,7 @@ export const ATTR_AWS_DYNAMODB_CONSISTENT_READ = 'aws.dynamodb.consistent_read' 
 /**
  * The JSON-serialized value of each item in the `ConsumedCapacity` response field.
  * 
- * @example { "CapacityUnits": number, "GlobalSecondaryIndexes": { "string" : { "CapacityUnits": number, "ReadCapacityUnits": number, "WriteCapacityUnits": number } }, "LocalSecondaryIndexes": { "string" : { "CapacityUnits": number, "ReadCapacityUnits": number, "WriteCapacityUnits": number } }, "ReadCapacityUnits": number, "Table": { "CapacityUnits": number, "ReadCapacityUnits": number, "WriteCapacityUnits": number }, "TableName": "string", "WriteCapacityUnits": number }
+ * @example ["{ "CapacityUnits": number, "GlobalSecondaryIndexes": { "string" : { "CapacityUnits": number, "ReadCapacityUnits": number, "WriteCapacityUnits": number } }, "LocalSecondaryIndexes": { "string" : { "CapacityUnits": number, "ReadCapacityUnits": number, "WriteCapacityUnits": number } }, "ReadCapacityUnits": number, "Table": { "CapacityUnits": number, "ReadCapacityUnits": number, "WriteCapacityUnits": number }, "TableName": "string", "WriteCapacityUnits": number }"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -205,7 +206,7 @@ export const ATTR_AWS_DYNAMODB_EXCLUSIVE_START_TABLE = 'aws.dynamodb.exclusive_s
 /**
  * The JSON-serialized value of each item in the `GlobalSecondaryIndexUpdates` request field.
  * 
- * @example { "Create": { "IndexName": "string", "KeySchema": [ { "AttributeName": "string", "KeyType": "string" } ], "Projection": { "NonKeyAttributes": [ "string" ], "ProjectionType": "string" }, "ProvisionedThroughput": { "ReadCapacityUnits": number, "WriteCapacityUnits": number } }
+ * @example ["{ "Create": { "IndexName": "string", "KeySchema": [ { "AttributeName": "string", "KeyType": "string" } ], "Projection": { "NonKeyAttributes": [ "string" ], "ProjectionType": "string" }, "ProvisionedThroughput": { "ReadCapacityUnits": number, "WriteCapacityUnits": number } }"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -214,7 +215,7 @@ export const ATTR_AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES = 'aws.dynamodb.gl
 /**
  * The JSON-serialized value of each item of the `GlobalSecondaryIndexes` request field
  * 
- * @example { "IndexName": "string", "KeySchema": [ { "AttributeName": "string", "KeyType": "string" } ], "Projection": { "NonKeyAttributes": [ "string" ], "ProjectionType": "string" }, "ProvisionedThroughput": { "ReadCapacityUnits": number, "WriteCapacityUnits": number } }
+ * @example ["{ "IndexName": "string", "KeySchema": [ { "AttributeName": "string", "KeyType": "string" } ], "Projection": { "NonKeyAttributes": [ "string" ], "ProjectionType": "string" }, "ProvisionedThroughput": { "ReadCapacityUnits": number, "WriteCapacityUnits": number } }"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -250,7 +251,7 @@ export const ATTR_AWS_DYNAMODB_LIMIT = 'aws.dynamodb.limit' as const;
 /**
  * The JSON-serialized value of each item of the `LocalSecondaryIndexes` request field.
  * 
- * @example { "IndexArn": "string", "IndexName": "string", "IndexSizeBytes": number, "ItemCount": number, "KeySchema": [ { "AttributeName": "string", "KeyType": "string" } ], "Projection": { "NonKeyAttributes": [ "string" ], "ProjectionType": "string" } }
+ * @example ["{ "IndexArn": "string", "IndexName": "string", "IndexSizeBytes": number, "ItemCount": number, "KeySchema": [ { "AttributeName": "string", "KeyType": "string" } ], "Projection": { "NonKeyAttributes": [ "string" ], "ProjectionType": "string" } }"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -334,8 +335,7 @@ export const ATTR_AWS_DYNAMODB_TABLE_COUNT = 'aws.dynamodb.table_count' as const
 /**
  * The keys in the `RequestItems` object field.
  * 
- * @example Users
- * @example Cats
+ * @example ["Users", "Cats"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -436,7 +436,7 @@ export const ATTR_AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn' as const;
 /**
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
  * 
- * @example arn:aws:logs:us-west-1:123456789012:log-group:/aws/my/group:*
+ * @example ["arn:aws:logs:us-west-1:123456789012:log-group:/aws/my/group:*"]
  * 
  * @note See the [log group ARN format documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format).
  * 
@@ -447,8 +447,7 @@ export const ATTR_AWS_LOG_GROUP_ARNS = 'aws.log.group.arns' as const;
 /**
  * The name(s) of the AWS log group(s) an application is writing to.
  * 
- * @example /aws/lambda/my-function
- * @example opentelemetry-service
+ * @example ["/aws/lambda/my-function", "opentelemetry-service"]
  * 
  * @note Multiple log groups must be supported for cases like multi-container applications, where a single application has sidecar containers, and each write to their own log group.
  * 
@@ -459,7 +458,7 @@ export const ATTR_AWS_LOG_GROUP_NAMES = 'aws.log.group.names' as const;
 /**
  * The ARN(s) of the AWS log stream(s).
  * 
- * @example arn:aws:logs:us-west-1:123456789012:log-group:/aws/my/group:log-stream:logs/main/10838bed-421f-43ef-870a-f43feacbbb5b
+ * @example ["arn:aws:logs:us-west-1:123456789012:log-group:/aws/my/group:log-stream:logs/main/10838bed-421f-43ef-870a-f43feacbbb5b"]
  * 
  * @note See the [log stream ARN format documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format). One log group can contain several log streams, so these ARNs necessarily identify both a log group and a log stream.
  * 
@@ -470,7 +469,7 @@ export const ATTR_AWS_LOG_STREAM_ARNS = 'aws.log.stream.arns' as const;
 /**
  * The name(s) of the AWS log stream(s) an application is writing to.
  * 
- * @example logs/main/10838bed-421f-43ef-870a-f43feacbbb5b
+ * @example ["logs/main/10838bed-421f-43ef-870a-f43feacbbb5b"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -587,6 +586,17 @@ export const ATTR_AWS_S3_PART_NUMBER = 'aws.s3.part_number' as const;
 export const ATTR_AWS_S3_UPLOAD_ID = 'aws.s3.upload_id' as const;
 
 /**
+ * [Azure Resource Provider Namespace](https://learn.microsoft.com/azure/azure-resource-manager/management/azure-services-resource-providers) as recognized by the client.
+ * 
+ * @example Microsoft.Storage
+ * @example Microsoft.KeyVault
+ * @example Microsoft.ServiceBus
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_AZ_NAMESPACE = 'az.namespace' as const;
+
+/**
  * The unique identifier of the service request. It's generated by the Azure service and returned with the response.
  * 
  * @example 00000000-0000-0000-0000-000000000000
@@ -598,9 +608,7 @@ export const ATTR_AZ_SERVICE_REQUEST_ID = 'az.service_request_id' as const;
 /**
  * Array of brand name and version separated by a space
  * 
- * @example  Not A;Brand 99
- * @example Chromium 99
- * @example Chrome 99
+ * @example [" Not A;Brand 99", "Chromium 99", "Chrome 99"]
  * 
  * @note This value is intended to be taken from the [UA client hints API](https://wicg.github.io/ua-client-hints/#interface) (`navigator.userAgentData.brands`).
  * 
@@ -951,7 +959,7 @@ export const ATTR_CLOUD_REGION = 'cloud.region' as const;
  * 
  * @example arn:aws:lambda:REGION:ACCOUNT_ID:function:my-function
  * @example //run.googleapis.com/projects/PROJECT_ID/locations/LOCATION_ID/services/SERVICE_ID
- * @example /subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
+ * @example /subscriptions/<SUBSCRIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>
  * 
  * @note On some cloud providers, it may not be possible to determine the full ID at startup,
  * so it may be necessary to set `cloud.resource_id` as a span attribute instead.
@@ -967,7 +975,7 @@ export const ATTR_CLOUD_REGION = 'cloud.region' as const;
  *   - **GCP:** The [URI of the resource](https://cloud.google.com/iam/docs/full-resource-names)
  *   - **Azure:** The [Fully Qualified Resource ID](https://docs.microsoft.com/rest/api/resources/resources/get-by-id) of the invoked function,
  *     *not* the function app, having the form
- *     `/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
+ *     `/subscriptions/<SUBSCRIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
  *     This means that a span attribute **MUST** be used, as an Azure function app can host multiple functions that would usually share
  *     a TracerProvider.
  * 
@@ -1025,6 +1033,165 @@ export const ATTR_CLOUDEVENTS_EVENT_SUBJECT = 'cloudevents.event_subject' as con
 export const ATTR_CLOUDEVENTS_EVENT_TYPE = 'cloudevents.event_type' as const;
 
 /**
+ * The guid of the application.
+ * 
+ * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+ * 
+ * @note Application instrumentation should use the value from environment
+ * variable `VCAP_APPLICATION.application_id`. This is the same value as
+ * reported by `cf app <app-name> --guid`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_APP_ID = 'cloudfoundry.app.id' as const;
+
+/**
+ * The index of the application instance. 0 when just one instance is active.
+ * 
+ * @example 0
+ * @example 1
+ * 
+ * @note CloudFoundry defines the `instance_id` in the [Loggegator v2 envelope](https://github.com/cloudfoundry/loggregator-api#v2-envelope).
+ * It is used for logs and metrics emitted by CloudFoundry. It is
+ * supposed to contain the application instance index for applications
+ * deployed on the runtime.
+ * 
+ * Application instrumentation should use the value from environment
+ * variable `CF_INSTANCE_INDEX`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_APP_INSTANCE_ID = 'cloudfoundry.app.instance.id' as const;
+
+/**
+ * The name of the application.
+ * 
+ * @example my-app-name
+ * 
+ * @note Application instrumentation should use the value from environment
+ * variable `VCAP_APPLICATION.application_name`. This is the same value
+ * as reported by `cf apps`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_APP_NAME = 'cloudfoundry.app.name' as const;
+
+/**
+ * The guid of the CloudFoundry org the application is running in.
+ * 
+ * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+ * 
+ * @note Application instrumentation should use the value from environment
+ * variable `VCAP_APPLICATION.org_id`. This is the same value as
+ * reported by `cf org <org-name> --guid`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_ORG_ID = 'cloudfoundry.org.id' as const;
+
+/**
+ * The name of the CloudFoundry organization the app is running in.
+ * 
+ * @example my-org-name
+ * 
+ * @note Application instrumentation should use the value from environment
+ * variable `VCAP_APPLICATION.org_name`. This is the same value as
+ * reported by `cf orgs`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_ORG_NAME = 'cloudfoundry.org.name' as const;
+
+/**
+ * The UID identifying the process.
+ * 
+ * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+ * 
+ * @note Application instrumentation should use the value from environment
+ * variable `VCAP_APPLICATION.process_id`. It is supposed to be equal to
+ * `VCAP_APPLICATION.app_id` for applications deployed to the runtime.
+ * For system components, this could be the actual PID.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_PROCESS_ID = 'cloudfoundry.process.id' as const;
+
+/**
+ * The type of process.
+ * 
+ * @example web
+ * 
+ * @note CloudFoundry applications can consist of multiple jobs. Usually the
+ * main process will be of type `web`. There can be additional background
+ * tasks or side-cars with different process types.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_PROCESS_TYPE = 'cloudfoundry.process.type' as const;
+
+/**
+ * The guid of the CloudFoundry space the application is running in.
+ * 
+ * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+ * 
+ * @note Application instrumentation should use the value from environment
+ * variable `VCAP_APPLICATION.space_id`. This is the same value as
+ * reported by `cf space <space-name> --guid`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_SPACE_ID = 'cloudfoundry.space.id' as const;
+
+/**
+ * The name of the CloudFoundry space the application is running in.
+ * 
+ * @example my-space-name
+ * 
+ * @note Application instrumentation should use the value from environment
+ * variable `VCAP_APPLICATION.space_name`. This is the same value as
+ * reported by `cf spaces`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_SPACE_NAME = 'cloudfoundry.space.name' as const;
+
+/**
+ * A guid or another name describing the event source.
+ * 
+ * @example cf/gorouter
+ * 
+ * @note CloudFoundry defines the `source_id` in the [Loggregator v2 envelope](https://github.com/cloudfoundry/loggregator-api#v2-envelope).
+ * It is used for logs and metrics emitted by CloudFoundry. It is
+ * supposed to contain the component name, e.g. "gorouter", for
+ * CloudFoundry components.
+ * 
+ * When system components are instrumented, values from the
+ * [Bosh spec](https://bosh.io/docs/jobs/#properties-spec)
+ * should be used. The `system.id` should be set to
+ * `spec.deployment/spec.name`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_SYSTEM_ID = 'cloudfoundry.system.id' as const;
+
+/**
+ * A guid describing the concrete instance of the event source.
+ * 
+ * @example 218fc5a9-a5f1-4b54-aa05-46717d0ab26d
+ * 
+ * @note CloudFoundry defines the `instance_id` in the [Loggregator v2 envelope](https://github.com/cloudfoundry/loggregator-api#v2-envelope).
+ * It is used for logs and metrics emitted by CloudFoundry. It is
+ * supposed to contain the vm id for CloudFoundry components.
+ * 
+ * When system components are instrumented, values from the
+ * [Bosh spec](https://bosh.io/docs/jobs/#properties-spec)
+ * should be used. The `system.instance.id` should be set to `spec.id`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CLOUDFOUNDRY_SYSTEM_INSTANCE_ID = 'cloudfoundry.system.instance.id' as const;
+
+/**
  * The column number in `code.filepath` best representing the operation. It **SHOULD** point within the code unit named in `code.function`.
  * 
  * @example 16
@@ -1072,7 +1239,7 @@ export const ATTR_CODE_NAMESPACE = 'code.namespace' as const;
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
  * 
- * @example "at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\\n at com.example.GenerateTrace.main(GenerateTrace.java:5)"
+ * @example "at com.example.GenerateTrace.methodB(GenerateTrace.java:13)\\n at com.example.GenerateTrace.methodA(GenerateTrace.java:9)\\n at com.example.GenerateTrace.main(GenerateTrace.java:5)\\n"
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1090,16 +1257,16 @@ export const ATTR_CODE_STACKTRACE = 'code.stacktrace' as const;
 export const ATTR_CONTAINER_COMMAND = 'container.command' as const;
 
 /**
- * All the command arguments (including the command/executable itself) run by the container. [2]
+ * All the command arguments (including the command/executable itself) run by the container.
  * 
- * @example otelcontribcol, --config, config.yaml
+ * @example ["otelcontribcol", "--config", "config.yaml"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_CONTAINER_COMMAND_ARGS = 'container.command_args' as const;
 
 /**
- * The full command run by the container as a single string representing the full command. [2]
+ * The full command run by the container as a single string representing the full command.
  * 
  * @example otelcontribcol --config config.yaml
  * 
@@ -1135,7 +1302,29 @@ export const CONTAINER_CPU_STATE_VALUE_SYSTEM = "system" as const;
 export const CONTAINER_CPU_STATE_VALUE_USER = "user" as const;
 
 /**
- * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/reference/run/#container-identification). The UUID might be abbreviated.
+ * The name of the CSI ([Container Storage Interface](https://github.com/container-storage-interface/spec)) plugin used by the volume.
+ * 
+ * @example pd.csi.storage.gke.io
+ * 
+ * @note This can sometimes be referred to as a "driver" in CSI implementations. This should represent the `name` field of the GetPluginInfo RPC.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CONTAINER_CSI_PLUGIN_NAME = 'container.csi.plugin.name' as const;
+
+/**
+ * The unique volume ID returned by the CSI ([Container Storage Interface](https://github.com/container-storage-interface/spec)) plugin.
+ * 
+ * @example projects/my-gcp-project/zones/my-gcp-zone/disks/my-gcp-disk
+ * 
+ * @note This can sometimes be referred to as a "volume handle" in CSI implementations. This should represent the `Volume.volume_id` field in CSI spec.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_CONTAINER_CSI_VOLUME_ID = 'container.csi.volume.id' as const;
+
+/**
+ * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/containers/run/#container-identification). The UUID might be abbreviated.
  * 
  * @example a3bf90e006b2
  * 
@@ -1168,8 +1357,7 @@ export const ATTR_CONTAINER_IMAGE_NAME = 'container.image.name' as const;
 /**
  * Repo digests of the container image as provided by the container runtime.
  * 
- * @example example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb
- * @example internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578
+ * @example ["example@sha256:afcc7f1ac1b49db317a7196c902e61c6c3c4607d63599ee1a82d702d249a0ccb", "internal.registry.example.com:5000/example@sha256:b69959407d21e8a062e0416bf13405bb2b71ed7a84dde4158ebafacfa06f5578"]
  * 
  * @note [Docker](https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageInspect) and [CRI](https://github.com/kubernetes/cri-api/blob/c75ef5b473bbe2d0a4fc92f82235efd665ea8e9f/pkg/apis/runtime/v1/api.proto#L1237-L1238) report those under the `RepoDigests` field.
  * 
@@ -1180,8 +1368,7 @@ export const ATTR_CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests' 
 /**
  * Container image tags. An example can be found in [Docker Image Inspect](https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageInspect). Should be only the `<tag>` section of the full name for example from `registry.example.com/my-org/my-image:<tag>`.
  * 
- * @example v1.27.1
- * @example 3.5.7-0
+ * @example ["v1.27.1", "3.5.7-0"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1463,6 +1650,7 @@ export const DB_CLIENT_CONNECTIONS_STATE_VALUE_USED = "used" as const;
  * @note It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
  * If the collection name is parsed from the query text, it **SHOULD** be the first collection name found in the query and it **SHOULD** match the value provided in the query text including any schema and database name prefix.
  * For batch operations, if the individual operations are known to have the same collection name then that collection name **SHOULD** be used, otherwise `db.collection.name` **SHOULD NOT** be captured.
+ * This attribute has stability level RELEASE CANDIDATE.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1475,7 +1663,7 @@ export const ATTR_DB_COLLECTION_NAME = 'db.collection.name' as const;
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
- * @deprecated "Replaced by `server.address` and `server.port`."
+ * @deprecated Replaced by `server.address` and `server.port`.
  */
 export const ATTR_DB_CONNECTION_STRING = 'db.connection_string' as const;
 
@@ -1517,86 +1705,86 @@ export const DB_COSMOSDB_CONNECTION_MODE_VALUE_GATEWAY = "gateway" as const;
 export const ATTR_DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container' as const;
 
 /**
- * CosmosDB Operation Type.
+ * Cosmos DB Operation Type.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type' as const;
 
 /**
-  * Enum value "Batch" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "batch" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_BATCH = "Batch" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_BATCH = "batch" as const;
 
 /**
-  * Enum value "Create" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "create" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_CREATE = "Create" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_CREATE = "create" as const;
 
 /**
-  * Enum value "Delete" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "delete" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_DELETE = "Delete" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_DELETE = "delete" as const;
 
 /**
-  * Enum value "Execute" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "execute" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE = "Execute" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE = "execute" as const;
 
 /**
-  * Enum value "ExecuteJavaScript" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "execute_javascript" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE_JAVASCRIPT = "ExecuteJavaScript" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_EXECUTE_JAVASCRIPT = "execute_javascript" as const;
 
 /**
-  * Enum value "Head" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "head" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD = "Head" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD = "head" as const;
 
 /**
-  * Enum value "HeadFeed" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "head_feed" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD_FEED = "HeadFeed" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_HEAD_FEED = "head_feed" as const;
 
 /**
-  * Enum value "Invalid" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "invalid" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_INVALID = "Invalid" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_INVALID = "invalid" as const;
 
 /**
-  * Enum value "Patch" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "patch" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_PATCH = "Patch" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_PATCH = "patch" as const;
 
 /**
-  * Enum value "Query" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "query" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY = "Query" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY = "query" as const;
 
 /**
-  * Enum value "QueryPlan" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "query_plan" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY_PLAN = "QueryPlan" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_QUERY_PLAN = "query_plan" as const;
 
 /**
-  * Enum value "Read" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "read" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_READ = "Read" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_READ = "read" as const;
 
 /**
-  * Enum value "ReadFeed" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "read_feed" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_READ_FEED = "ReadFeed" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_READ_FEED = "read_feed" as const;
 
 /**
-  * Enum value "Replace" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "replace" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_REPLACE = "Replace" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_REPLACE = "replace" as const;
 
 /**
-  * Enum value "Upsert" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
+  * Enum value "upsert" for attribute {@link ATTR_DB_COSMOSDB_OPERATION_TYPE}.
   */
-export const DB_COSMOSDB_OPERATION_TYPE_VALUE_UPSERT = "Upsert" as const;
+export const DB_COSMOSDB_OPERATION_TYPE_VALUE_UPSERT = "upsert" as const;
 
 /**
  * RU consumed for that operation
@@ -1616,12 +1804,14 @@ export const ATTR_DB_COSMOSDB_REQUEST_CHARGE = 'db.cosmosdb.request_charge' as c
 export const ATTR_DB_COSMOSDB_REQUEST_CONTENT_LENGTH = 'db.cosmosdb.request_content_length' as const;
 
 /**
- * Cosmos DB status code.
+ * Deprecated, use `db.response.status_code` instead.
  * 
  * @example 200
  * @example 201
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ * 
+ * @deprecated Replaced by `db.response.status_code`.
  */
 export const ATTR_DB_COSMOSDB_STATUS_CODE = 'db.cosmosdb.status_code' as const;
 
@@ -1733,6 +1923,7 @@ export const ATTR_DB_NAME = 'db.name' as const;
  * @note If a database system has multiple namespace components, they **SHOULD** be concatenated (potentially using database system specific conventions) from most general to most specific namespace component, and more specific namespaces **SHOULD NOT** be captured without the more general namespaces, to ensure that "startswith" queries for the more general namespaces will be valid.
  * Semantic conventions for individual database systems **SHOULD** document what `db.namespace` means in the context of that system.
  * It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
+ * This attribute has stability level RELEASE CANDIDATE.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1752,13 +1943,14 @@ export const ATTR_DB_NAMESPACE = 'db.namespace' as const;
 export const ATTR_DB_OPERATION = 'db.operation' as const;
 
 /**
- * The number of queries included in a [batch operation](/docs/database/database-spans.md#batch-operations).
+ * The number of queries included in a batch operation.
  * 
  * @example 2
  * @example 3
  * @example 4
  * 
  * @note Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` **SHOULD** never be `1`.
+ * This attribute has stability level RELEASE CANDIDATE.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1774,6 +1966,7 @@ export const ATTR_DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size' as const;
  * @note It is **RECOMMENDED** to capture the value as provided by the application without attempting to do any case normalization.
  * If the operation name is parsed from the query text, it **SHOULD** be the first operation name found in the query.
  * For batch operations, if the individual operations are known to have the same operation name then that operation name **SHOULD** be used prepended by `BATCH `, otherwise `db.operation.name` **SHOULD** be `BATCH` or some other database system specific term if more applicable.
+ * This attribute has stability level RELEASE CANDIDATE.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1787,6 +1980,7 @@ export const ATTR_DB_OPERATION_NAME = 'db.operation.name' as const;
  * 
  * @note Query parameters should only be captured when `db.query.text` is parameterized with placeholders.
  * If a parameter has no name and instead is referenced only by index, then `<key>` **SHOULD** be the 0-based index.
+ * This attribute has stability level RELEASE CANDIDATE.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1801,6 +1995,7 @@ export const ATTR_DB_QUERY_PARAMETER = (key: string) => `db.query.parameter.${ke
  * @note For sanitization see [Sanitization of `db.query.text`](../../docs/database/database-spans.md#sanitization-of-dbquerytext).
  * For batch operations, if the individual operations are known to have the same query text then that query text **SHOULD** be used, otherwise all of the individual query texts **SHOULD** be concatenated with separator `; ` or some other database system specific separator if more applicable.
  * Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
+ * This attribute has stability level RELEASE CANDIDATE.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -1818,6 +2013,22 @@ export const ATTR_DB_QUERY_TEXT = 'db.query.text' as const;
  * @deprecated Replaced by `db.namespace`.
  */
 export const ATTR_DB_REDIS_DATABASE_INDEX = 'db.redis.database_index' as const;
+
+/**
+ * Database response status code.
+ * 
+ * @example 102
+ * @example ORA-17002
+ * @example 08P01
+ * @example 404
+ * 
+ * @note The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
+ * Semantic conventions for individual database systems **SHOULD** document what `db.response.status_code` means in the context of that system.
+ * This attribute has stability level RELEASE CANDIDATE.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_DB_RESPONSE_STATUS_CODE = 'db.response.status_code' as const;
 
 /**
  * Deprecated, use `db.collection.name` instead.
@@ -1846,6 +2057,7 @@ export const ATTR_DB_STATEMENT = 'db.statement' as const;
  * The database management system (DBMS) product as identified by the client instrumentation.
  * 
  * @note The actual DBMS may differ from the one identified by the client. For example, when using PostgreSQL client libraries to connect to a CockroachDB, the `db.system` is set to `postgresql` based on the instrumentation's best knowledge.
+ * This attribute has stability level RELEASE CANDIDATE.
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2301,6 +2513,42 @@ export const DISK_IO_DIRECTION_VALUE_WRITE = "write" as const;
 export const ATTR_DNS_QUESTION_NAME = 'dns.question.name' as const;
 
 /**
+ * Name of the garbage collector managed heap generation.
+ * 
+ * @example gen0
+ * @example gen1
+ * @example gen2
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_DOTNET_GC_HEAP_GENERATION = 'dotnet.gc.heap.generation' as const;
+
+/**
+  * Enum value "gen0" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN0 = "gen0" as const;
+
+/**
+  * Enum value "gen1" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN1 = "gen1" as const;
+
+/**
+  * Enum value "gen2" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_GEN2 = "gen2" as const;
+
+/**
+  * Enum value "loh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_LOH = "loh" as const;
+
+/**
+  * Enum value "poh" for attribute {@link ATTR_DOTNET_GC_HEAP_GENERATION}.
+  */
+export const DOTNET_GC_HEAP_GENERATION_VALUE_POH = "poh" as const;
+
+/**
  * Deprecated, use `user.id` instead.
  * 
  * @example "username"
@@ -2625,6 +2873,50 @@ export const ATTR_FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name' as c
 export const ATTR_FEATURE_FLAG_VARIANT = 'feature_flag.variant' as const;
 
 /**
+ * Time when the file was last accessed, in ISO 8601 format.
+ * 
+ * @example 2021-01-01T12:00:00Z
+ * 
+ * @note This attribute might not be supported by some file systems — NFS, FAT32, in embedded OS, etc.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_ACCESSED = 'file.accessed' as const;
+
+/**
+ * Array of file attributes.
+ * 
+ * @example ["readonly", "hidden"]
+ * 
+ * @note Attributes names depend on the OS or file system. Here’s a non-exhaustive list of values expected for this attribute: `archive`, `compressed`, `directory`, `encrypted`, `execute`, `hidden`, `immutable`, `journaled`, `read`, `readonly`, `symbolic link`, `system`, `temporary`, `write`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_ATTRIBUTES = 'file.attributes' as const;
+
+/**
+ * Time when the file attributes or metadata was last changed, in ISO 8601 format.
+ * 
+ * @example 2021-01-01T12:00:00Z
+ * 
+ * @note `file.changed` captures the time when any of the file's properties or attributes (including the content) are changed, while `file.modified` captures the timestamp when the file content is modified.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_CHANGED = 'file.changed' as const;
+
+/**
+ * Time when the file was created, in ISO 8601 format.
+ * 
+ * @example 2021-01-01T12:00:00Z
+ * 
+ * @note This attribute might not be supported by some file systems — NFS, FAT32, in embedded OS, etc.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_CREATED = 'file.created' as const;
+
+/**
  * Directory where the file is located. It should include the drive letter, when appropriate.
  * 
  * @example /home/user
@@ -2647,6 +2939,63 @@ export const ATTR_FILE_DIRECTORY = 'file.directory' as const;
 export const ATTR_FILE_EXTENSION = 'file.extension' as const;
 
 /**
+ * Name of the fork. A fork is additional data associated with a filesystem object.
+ * 
+ * @example Zone.Identifer
+ * 
+ * @note On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
+ * On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: C:\\path\\to\\filename.extension:some_fork_name, and some_fork_name is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_FORK_NAME = 'file.fork_name' as const;
+
+/**
+ * Primary Group ID (GID) of the file.
+ * 
+ * @example 1000
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_GROUP_ID = 'file.group.id' as const;
+
+/**
+ * Primary group name of the file.
+ * 
+ * @example users
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_GROUP_NAME = 'file.group.name' as const;
+
+/**
+ * Inode representing the file in the filesystem.
+ * 
+ * @example 256383
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_INODE = 'file.inode' as const;
+
+/**
+ * Mode of the file in octal representation.
+ * 
+ * @example 0640
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_MODE = 'file.mode' as const;
+
+/**
+ * Time when the file content was last modified, in ISO 8601 format.
+ * 
+ * @example 2021-01-01T12:00:00Z
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_MODIFIED = 'file.modified' as const;
+
+/**
  * Name of the file including the extension, without the directory.
  * 
  * @example example.png
@@ -2654,6 +3003,24 @@ export const ATTR_FILE_EXTENSION = 'file.extension' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_FILE_NAME = 'file.name' as const;
+
+/**
+ * The user ID (UID) or security identifier (SID) of the file owner.
+ * 
+ * @example 1000
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_OWNER_ID = 'file.owner.id' as const;
+
+/**
+ * Username of the file owner.
+ * 
+ * @example root
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_OWNER_NAME = 'file.owner.name' as const;
 
 /**
  * Full path to the file, including the file name. It should include the drive letter, when appropriate.
@@ -2671,6 +3038,17 @@ export const ATTR_FILE_PATH = 'file.path' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_FILE_SIZE = 'file.size' as const;
+
+/**
+ * Path to the target of a symbolic link.
+ * 
+ * @example /usr/bin/python3
+ * 
+ * @note This attribute is only applicable to symbolic links.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_FILE_SYMBOLIC_LINK_TARGET_PATH = 'file.symbolic_link.target_path' as const;
 
 /**
  * Identifies the Google Cloud service for which the official client library is intended.
@@ -2728,14 +3106,78 @@ export const ATTR_GCP_GCE_INSTANCE_HOSTNAME = 'gcp.gce.instance.hostname' as con
 export const ATTR_GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name' as const;
 
 /**
- * The full response received from the GenAI model.
+ * Deprecated, use Event API to report completions contents.
  * 
  * @example [{'role': 'assistant', 'content': 'The capital of France is Paris.'}]
  * 
- * @note It's **RECOMMENDED** to format completions as JSON string matching [OpenAI messages format](https://platform.openai.com/docs/guides/text-generation)
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ * 
+ * @deprecated Removed, no replacement at this time.
  */
 export const ATTR_GEN_AI_COMPLETION = 'gen_ai.completion' as const;
+
+/**
+ * The response format that is requested.
+ * 
+ * @example json
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT = 'gen_ai.openai.request.response_format' as const;
+
+/**
+  * Enum value "json_object" for attribute {@link ATTR_GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT}.
+  */
+export const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_VALUE_JSON_OBJECT = "json_object" as const;
+
+/**
+  * Enum value "json_schema" for attribute {@link ATTR_GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT}.
+  */
+export const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_VALUE_JSON_SCHEMA = "json_schema" as const;
+
+/**
+  * Enum value "text" for attribute {@link ATTR_GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT}.
+  */
+export const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT_VALUE_TEXT = "text" as const;
+
+/**
+ * Requests with same seed value more likely to return same result.
+ * 
+ * @example 100
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed' as const;
+
+/**
+ * The service tier requested. May be a specific tier, detault, or auto.
+ * 
+ * @example auto
+ * @example default
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER = 'gen_ai.openai.request.service_tier' as const;
+
+/**
+  * Enum value "auto" for attribute {@link ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER}.
+  */
+export const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_VALUE_AUTO = "auto" as const;
+
+/**
+  * Enum value "default" for attribute {@link ATTR_GEN_AI_OPENAI_REQUEST_SERVICE_TIER}.
+  */
+export const GEN_AI_OPENAI_REQUEST_SERVICE_TIER_VALUE_DEFAULT = "default" as const;
+
+/**
+ * The service tier used for the response.
+ * 
+ * @example scale
+ * @example detault
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_GEN_AI_OPENAI_RESPONSE_SERVICE_TIER = 'gen_ai.openai.response.service_tier' as const;
 
 /**
  * The name of the operation being performed.
@@ -2757,12 +3199,13 @@ export const GEN_AI_OPERATION_NAME_VALUE_CHAT = "chat" as const;
 export const GEN_AI_OPERATION_NAME_VALUE_TEXT_COMPLETION = "text_completion" as const;
 
 /**
- * The full prompt sent to the GenAI model.
+ * Deprecated, use Event API to report prompt contents.
  * 
  * @example [{'role': 'user', 'content': 'What is the capital of France?'}]
  * 
- * @note It's **RECOMMENDED** to format prompts as JSON string matching [OpenAI messages format](https://platform.openai.com/docs/guides/text-generation)
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ * 
+ * @deprecated Removed, no replacement at this time.
  */
 export const ATTR_GEN_AI_PROMPT = 'gen_ai.prompt' as const;
 
@@ -2805,8 +3248,7 @@ export const ATTR_GEN_AI_REQUEST_PRESENCE_PENALTY = 'gen_ai.request.presence_pen
 /**
  * List of sequences that the model will use to stop generating further tokens.
  * 
- * @example forest
- * @example lived
+ * @example ["forest", "lived"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -2842,7 +3284,8 @@ export const ATTR_GEN_AI_REQUEST_TOP_P = 'gen_ai.request.top_p' as const;
 /**
  * Array of reasons the model stopped generating tokens, corresponding to each generation received.
  * 
- * @example stop
+ * @example ["stop"]
+ * @example ["stop", "length"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -3203,8 +3646,7 @@ export const ATTR_HOST_IMAGE_VERSION = 'host.image.version' as const;
 /**
  * Available IP addresses of the host, excluding loopback interfaces.
  * 
- * @example 192.168.1.140
- * @example fe80::abc2:4a28:737a:609e
+ * @example ["192.168.1.140", "fe80::abc2:4a28:737a:609e"]
  * 
  * @note IPv4 Addresses **MUST** be specified in dotted-quad notation. IPv6 addresses **MUST** be specified in the [RFC 5952](https://www.rfc-editor.org/rfc/rfc5952.html) format.
  * 
@@ -3215,8 +3657,7 @@ export const ATTR_HOST_IP = 'host.ip' as const;
 /**
  * Available MAC addresses of the host, excluding loopback interfaces.
  * 
- * @example AC-DE-48-23-45-67
- * @example AC-DE-48-23-45-67-01-9F
+ * @example ["AC-DE-48-23-45-67", "AC-DE-48-23-45-67-01-9F"]
  * 
  * @note MAC Addresses **MUST** be represented in [IEEE RA hexadecimal form](https://standards.ieee.org/wp-content/uploads/import/documents/tutorials/eui.pdf): as hyphen-separated octets in uppercase hexadecimal form from most to least significant.
  * 
@@ -3355,13 +3796,13 @@ export const ATTR_HTTP_REQUEST_BODY_SIZE = 'http.request.body.size' as const;
 export const ATTR_HTTP_REQUEST_SIZE = 'http.request.size' as const;
 
 /**
- * Deprecated, use `http.request.header.content-length` instead.
+ * Deprecated, use `http.request.header.<key>` instead.
  * 
  * @example 3495
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
- * @deprecated Replaced by `http.request.header.content-length`.
+ * @deprecated Replaced by `http.request.header.<key>`.
  */
 export const ATTR_HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length' as const;
 
@@ -3395,13 +3836,13 @@ export const ATTR_HTTP_RESPONSE_BODY_SIZE = 'http.response.body.size' as const;
 export const ATTR_HTTP_RESPONSE_SIZE = 'http.response.size' as const;
 
 /**
- * Deprecated, use `http.response.header.content-length` instead.
+ * Deprecated, use `http.response.header.<key>` instead.
  * 
  * @example 3495
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
- * @deprecated Replaced by `http.response.header.content-length`.
+ * @deprecated Replaced by `http.response.header.<key>`.
  */
 export const ATTR_HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length' as const;
 
@@ -3483,6 +3924,134 @@ export const ATTR_HTTP_URL = 'http.url' as const;
  * @deprecated Replaced by `user_agent.original`.
  */
 export const ATTR_HTTP_USER_AGENT = 'http.user_agent' as const;
+
+/**
+ * An identifier for the hardware component, unique within the monitored host
+ * 
+ * @example win32battery_battery_testsysa33_1
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_ID = 'hw.id' as const;
+
+/**
+ * An easily-recognizable name for the hardware component
+ * 
+ * @example eth0
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_NAME = 'hw.name' as const;
+
+/**
+ * Unique identifier of the parent component (typically the `hw.id` attribute of the enclosure, or disk controller)
+ * 
+ * @example dellStorage_perc_0
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_PARENT = 'hw.parent' as const;
+
+/**
+ * The current state of the component
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_STATE = 'hw.state' as const;
+
+/**
+  * Enum value "degraded" for attribute {@link ATTR_HW_STATE}.
+  */
+export const HW_STATE_VALUE_DEGRADED = "degraded" as const;
+
+/**
+  * Enum value "failed" for attribute {@link ATTR_HW_STATE}.
+  */
+export const HW_STATE_VALUE_FAILED = "failed" as const;
+
+/**
+  * Enum value "ok" for attribute {@link ATTR_HW_STATE}.
+  */
+export const HW_STATE_VALUE_OK = "ok" as const;
+
+/**
+ * Type of the component
+ * 
+ * @note Describes the category of the hardware component for which `hw.state` is being reported. For example, `hw.type=temperature` along with `hw.state=degraded` would indicate that the temperature of the hardware component has been reported as `degraded`.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_HW_TYPE = 'hw.type' as const;
+
+/**
+  * Enum value "battery" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_BATTERY = "battery" as const;
+
+/**
+  * Enum value "cpu" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_CPU = "cpu" as const;
+
+/**
+  * Enum value "disk_controller" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_DISK_CONTROLLER = "disk_controller" as const;
+
+/**
+  * Enum value "enclosure" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_ENCLOSURE = "enclosure" as const;
+
+/**
+  * Enum value "fan" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_FAN = "fan" as const;
+
+/**
+  * Enum value "gpu" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_GPU = "gpu" as const;
+
+/**
+  * Enum value "logical_disk" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_LOGICAL_DISK = "logical_disk" as const;
+
+/**
+  * Enum value "memory" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_MEMORY = "memory" as const;
+
+/**
+  * Enum value "network" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_NETWORK = "network" as const;
+
+/**
+  * Enum value "physical_disk" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_PHYSICAL_DISK = "physical_disk" as const;
+
+/**
+  * Enum value "power_supply" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_POWER_SUPPLY = "power_supply" as const;
+
+/**
+  * Enum value "tape_drive" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_TAPE_DRIVE = "tape_drive" as const;
+
+/**
+  * Enum value "temperature" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_TEMPERATURE = "temperature" as const;
+
+/**
+  * Enum value "voltage" for attribute {@link ATTR_HW_TYPE}.
+  */
+export const HW_TYPE_VALUE_VOLTAGE = "voltage" as const;
 
 /**
  * Deprecated use the `device.app.lifecycle` event definition including `ios.state` as a payload field instead.
@@ -3786,6 +4355,55 @@ export const ATTR_K8S_STATEFULSET_NAME = 'k8s.statefulset.name' as const;
 export const ATTR_K8S_STATEFULSET_UID = 'k8s.statefulset.uid' as const;
 
 /**
+ * The name of the K8s volume.
+ * 
+ * @example volume0
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_K8S_VOLUME_NAME = 'k8s.volume.name' as const;
+
+/**
+ * The type of the K8s volume.
+ * 
+ * @example emptyDir
+ * @example persistentVolumeClaim
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_K8S_VOLUME_TYPE = 'k8s.volume.type' as const;
+
+/**
+  * Enum value "configMap" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
+  */
+export const K8S_VOLUME_TYPE_VALUE_CONFIG_MAP = "configMap" as const;
+
+/**
+  * Enum value "downwardAPI" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
+  */
+export const K8S_VOLUME_TYPE_VALUE_DOWNWARD_API = "downwardAPI" as const;
+
+/**
+  * Enum value "emptyDir" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
+  */
+export const K8S_VOLUME_TYPE_VALUE_EMPTY_DIR = "emptyDir" as const;
+
+/**
+  * Enum value "local" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
+  */
+export const K8S_VOLUME_TYPE_VALUE_LOCAL = "local" as const;
+
+/**
+  * Enum value "persistentVolumeClaim" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
+  */
+export const K8S_VOLUME_TYPE_VALUE_PERSISTENT_VOLUME_CLAIM = "persistentVolumeClaim" as const;
+
+/**
+  * Enum value "secret" for attribute {@link ATTR_K8S_VOLUME_TYPE}.
+  */
+export const K8S_VOLUME_TYPE_VALUE_SECRET = "secret" as const;
+
+/**
  * The Linux Slab memory state
  * 
  * @example reclaimable
@@ -3859,7 +4477,7 @@ export const LOG_IOSTREAM_VALUE_STDERR = "stderr" as const;
 export const LOG_IOSTREAM_VALUE_STDOUT = "stdout" as const;
 
 /**
- * The complete orignal Log Record.
+ * The complete original Log Record.
  * 
  * @example 77 <86>1 2015-08-06T21:58:59.694Z 192.168.2.133 inactive - - - Something happened
  * @example [INFO] 8/3/24 12:34:56 Something happened
@@ -4258,6 +4876,11 @@ export const MESSAGING_OPERATION_TYPE_VALUE_PUBLISH = "publish" as const;
 export const MESSAGING_OPERATION_TYPE_VALUE_RECEIVE = "receive" as const;
 
 /**
+  * Enum value "send" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
+  */
+export const MESSAGING_OPERATION_TYPE_VALUE_SEND = "send" as const;
+
+/**
   * Enum value "settle" for attribute {@link ATTR_MESSAGING_OPERATION_TYPE}.
   */
 export const MESSAGING_OPERATION_TYPE_VALUE_SETTLE = "settle" as const;
@@ -4338,8 +4961,7 @@ export const ATTR_MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message
 /**
  * Key(s) of message, another way to mark message besides message id.
  * 
- * @example keyA
- * @example keyB
+ * @example ["keyA", "keyB"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -4391,13 +5013,13 @@ export const MESSAGING_ROCKETMQ_MESSAGE_TYPE_VALUE_TRANSACTION = "transaction" a
 export const ATTR_MESSAGING_ROCKETMQ_NAMESPACE = 'messaging.rocketmq.namespace' as const;
 
 /**
- * Deprecated, use `messaging.servicebus.destination.subscription_name` instead.
+ * Deprecated, use `messaging.destination.subscription.name` instead.
  * 
  * @example "subscription-a"
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
- * @deprecated Replaced by `messaging.servicebus.destination.subscription_name`.
+ * @deprecated Replaced by `messaging.destination.subscription.name`.
  */
 export const ATTR_MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME = 'messaging.servicebus.destination.subscription_name' as const;
 
@@ -4917,6 +5539,23 @@ export const NETWORK_IO_DIRECTION_VALUE_RECEIVE = "receive" as const;
 export const NETWORK_IO_DIRECTION_VALUE_TRANSMIT = "transmit" as const;
 
 /**
+ * The state of event loop time.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_NODEJS_EVENTLOOP_STATE = 'nodejs.eventloop.state' as const;
+
+/**
+  * Enum value "active" for attribute {@link ATTR_NODEJS_EVENTLOOP_STATE}.
+  */
+export const NODEJS_EVENTLOOP_STATE_VALUE_ACTIVE = "active" as const;
+
+/**
+  * Enum value "idle" for attribute {@link ATTR_NODEJS_EVENTLOOP_STATE}.
+  */
+export const NODEJS_EVENTLOOP_STATE_VALUE_IDLE = "idle" as const;
+
+/**
  * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
  * 
  * @example sha256:e4ca62c0d62f3e886e684806dfe9d4e0cda60d54986898173c1083856cfda0f4
@@ -5052,20 +5691,24 @@ export const OS_TYPE_VALUE_Z_OS = "z_os" as const;
 export const ATTR_OS_VERSION = 'os.version' as const;
 
 /**
+ * Deprecated. Use the `otel.scope.name` attribute
+ * 
  * @example io.opentelemetry.contrib.mongodb
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
- * @deprecated use the `otel.scope.name` attribute.
+ * @deprecated Use the `otel.scope.name` attribute.
  */
 export const ATTR_OTEL_LIBRARY_NAME = 'otel.library.name' as const;
 
 /**
+ * Deprecated. Use the `otel.scope.version` attribute.
+ * 
  * @example 1.0.0
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
- * @deprecated use the `otel.scope.version` attribute.
+ * @deprecated Use the `otel.scope.version` attribute.
  */
 export const ATTR_OTEL_LIBRARY_VERSION = 'otel.library.version' as const;
 
@@ -5090,6 +5733,17 @@ export const ATTR_PEER_SERVICE = 'peer.service' as const;
 export const ATTR_POOL_NAME = 'pool.name' as const;
 
 /**
+ * Length of the process.command_args array
+ * 
+ * @example 4
+ * 
+ * @note This field can be useful for querying or performing bucket analysis on how many arguments were provided to start a process. More arguments may be an indication of suspicious activity.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_ARGS_COUNT = 'process.args_count' as const;
+
+/**
  * The command used to launch the process (i.e. the command name). On Linux based systems, can be set to the zeroth string in `proc/[pid]/cmdline`. On Windows, can be set to the first parameter extracted from `GetCommandLineW`.
  * 
  * @example cmd/otelcol
@@ -5101,8 +5755,7 @@ export const ATTR_PROCESS_COMMAND = 'process.command' as const;
 /**
  * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
  * 
- * @example cmd/otecol
- * @example --config=config.yaml
+ * @example ["cmd/otecol", "--config=config.yaml"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -5166,6 +5819,33 @@ export const PROCESS_CPU_STATE_VALUE_WAIT = "wait" as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_PROCESS_CREATION_TIME = 'process.creation.time' as const;
+
+/**
+ * The GNU build ID as found in the `.note.gnu.build-id` ELF section (hex string).
+ * 
+ * @example c89b11207f6479603b0d49bf291c092c2b719293
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_EXECUTABLE_BUILD_ID_GNU = 'process.executable.build_id.gnu' as const;
+
+/**
+ * The Go build ID as retrieved by `go tool buildid <go executable>`.
+ * 
+ * @example foh3mEXu7BLZjsN9pOwG/kATcXlYVCDEFouRMQed_/WwRFB1hPo9LBkekthSPG/x8hMC8emW2cCjXD0_1aY
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_EXECUTABLE_BUILD_ID_GO = 'process.executable.build_id.go' as const;
+
+/**
+ * Profiling specific build ID for executables. See the OTel specification for Profiles for more information.
+ * 
+ * @example 600DCAFE4A110000F2BF38C493F5FB92
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_EXECUTABLE_BUILD_ID_PROFILING = 'process.executable.build_id.profiling' as const;
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
@@ -5336,6 +6016,19 @@ export const ATTR_PROCESS_SAVED_USER_NAME = 'process.saved_user.name' as const;
 export const ATTR_PROCESS_SESSION_LEADER_PID = 'process.session_leader.pid' as const;
 
 /**
+ * Process title (proctitle)
+ * 
+ * @example cat /etc/hostname
+ * @example xfce4-session
+ * @example bash
+ * 
+ * @note In many Unix-like systems, process title (proctitle), is the string that represents the name or command line of a running process, displayed by system monitoring tools like ps, top, and htop.
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_TITLE = 'process.title' as const;
+
+/**
  * The effective user ID (EUID) of the process.
  * 
  * @example 1001
@@ -5363,6 +6056,69 @@ export const ATTR_PROCESS_USER_NAME = 'process.user.name' as const;
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
 export const ATTR_PROCESS_VPID = 'process.vpid' as const;
+
+/**
+ * The working directory of the process.
+ * 
+ * @example /root
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROCESS_WORKING_DIRECTORY = 'process.working_directory' as const;
+
+/**
+ * Describes the interpreter or compiler of a single frame.
+ * 
+ * @example cpython
+ * 
+ * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
+ */
+export const ATTR_PROFILE_FRAME_TYPE = 'profile.frame.type' as const;
+
+/**
+  * Enum value "cpython" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_CPYTHON = "cpython" as const;
+
+/**
+  * Enum value "dotnet" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_DOTNET = "dotnet" as const;
+
+/**
+  * Enum value "jvm" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_JVM = "jvm" as const;
+
+/**
+  * Enum value "kernel" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_KERNEL = "kernel" as const;
+
+/**
+  * Enum value "native" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_NATIVE = "native" as const;
+
+/**
+  * Enum value "perl" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_PERL = "perl" as const;
+
+/**
+  * Enum value "php" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_PHP = "php" as const;
+
+/**
+  * Enum value "ruby" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_RUBY = "ruby" as const;
+
+/**
+  * Enum value "v8js" for attribute {@link ATTR_PROFILE_FRAME_TYPE}.
+  */
+export const PROFILE_FRAME_TYPE_VALUE_V8JS = "v8js" as const;
 
 /**
  * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
@@ -6344,8 +7100,7 @@ export const ATTR_TLS_CLIENT_CERTIFICATE = 'tls.client.certificate' as const;
 /**
  * Array of PEM-encoded certificates that make up the certificate chain offered by the client. This is usually mutually-exclusive of `client.certificate` since that value should be the first certificate in the chain.
  * 
- * @example MII...
- * @example MI...
+ * @example ["MII...", "MI..."]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -6421,7 +7176,7 @@ export const ATTR_TLS_CLIENT_NOT_BEFORE = 'tls.client.not_before' as const;
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  * 
- * @deprecated Replaced by `server.address.
+ * @deprecated Replaced by `server.address`.
  */
 export const ATTR_TLS_CLIENT_SERVER_NAME = 'tls.client.server_name' as const;
 
@@ -6437,9 +7192,7 @@ export const ATTR_TLS_CLIENT_SUBJECT = 'tls.client.subject' as const;
 /**
  * Array of ciphers offered by the client during the client hello.
  * 
- * @example TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
- * @example TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
- * @example ...
+ * @example ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -6520,8 +7273,7 @@ export const ATTR_TLS_SERVER_CERTIFICATE = 'tls.server.certificate' as const;
 /**
  * Array of PEM-encoded certificates that make up the certificate chain offered by the server. This is usually mutually-exclusive of `server.certificate` since that value should be the first certificate in the chain.
  * 
- * @example MII...
- * @example MI...
+ * @example ["MII...", "MI..."]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
@@ -6744,8 +7496,7 @@ export const ATTR_USER_NAME = 'user.name' as const;
 /**
  * Array of user roles at the time of the event.
  * 
- * @example admin
- * @example reporting_user
+ * @example ["admin", "reporting_user"]
  * 
  * @experimental This attribute is experimental and is subject to breaking changes in minor releases of `@opentelemetry/semantic-conventions`.
  */
