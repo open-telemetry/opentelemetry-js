@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExportResult, getEnv } from '@opentelemetry/core';
+import { getEnv } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   AggregationTemporalitySelector,
@@ -28,7 +28,10 @@ import {
   AggregationTemporalityPreference,
   OTLPMetricExporterOptions,
 } from './OTLPMetricExporterOptions';
-import { IOtlpExportDelegate } from '@opentelemetry/otlp-exporter-base';
+import {
+  IOtlpExportDelegate,
+  OTLPExporterBase,
+} from '@opentelemetry/otlp-exporter-base';
 import { diag } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector =
@@ -117,35 +120,22 @@ function chooseAggregationSelector(
   }
 }
 
-export class OTLPMetricExporterBase implements PushMetricExporter {
-  public _delegate: IOtlpExportDelegate<ResourceMetrics[]>;
-  private _aggregationTemporalitySelector: AggregationTemporalitySelector;
-  private _aggregationSelector: AggregationSelector;
+export class OTLPMetricExporterBase
+  extends OTLPExporterBase<ResourceMetrics>
+  implements PushMetricExporter
+{
+  private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
+  private readonly _aggregationSelector: AggregationSelector;
 
   constructor(
-    delegate: IOtlpExportDelegate<ResourceMetrics[]>,
+    delegate: IOtlpExportDelegate<ResourceMetrics>,
     config?: OTLPMetricExporterOptions
   ) {
-    this._delegate = delegate;
+    super(delegate);
     this._aggregationSelector = chooseAggregationSelector(config);
     this._aggregationTemporalitySelector = chooseTemporalitySelector(
       config?.temporalityPreference
     );
-  }
-
-  export(
-    metrics: ResourceMetrics,
-    resultCallback: (result: ExportResult) => void
-  ): void {
-    this._delegate.export([metrics], resultCallback);
-  }
-
-  async shutdown(): Promise<void> {
-    await this._delegate.shutdown();
-  }
-
-  forceFlush(): Promise<void> {
-    return this._delegate.forceFlush();
   }
 
   selectAggregation(instrumentType: InstrumentType): Aggregation {
