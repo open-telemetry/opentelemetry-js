@@ -17,8 +17,11 @@ import { baggageUtils } from '@opentelemetry/core';
 import { diag } from '@opentelemetry/api';
 import { getSharedConfigurationFromEnvironment } from './shared-env-configuration';
 import { OtlpHttpConfiguration } from './otlp-http-configuration';
+import { wrapStaticHeadersInFunction } from './shared-configuration';
 
-function getHeadersFromEnv(signalIdentifier: string) {
+function getStaticHeadersFromEnv(
+  signalIdentifier: string
+): Record<string, string> | undefined {
   const signalSpecificRawHeaders =
     process.env[`OTEL_EXPORTER_OTLP_${signalIdentifier}_HEADERS`]?.trim();
   const nonSignalSpecificRawHeaders =
@@ -126,6 +129,8 @@ export function getHttpConfigurationFromEnvironment(
     url:
       getSpecificUrlFromEnv(signalIdentifier) ??
       getNonSpecificUrlFromEnv(signalResourcePath),
-    headers: getHeadersFromEnv(signalIdentifier),
+    headers: wrapStaticHeadersInFunction(
+      getStaticHeadersFromEnv(signalIdentifier)
+    ),
   };
 }

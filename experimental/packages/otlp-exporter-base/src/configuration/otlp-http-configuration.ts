@@ -27,32 +27,34 @@ import type * as https from 'https';
 
 export interface OtlpHttpConfiguration extends OtlpSharedConfiguration {
   url: string;
-  headers: Record<string, string>;
+  headers: () => Record<string, string>;
   agentOptions: http.AgentOptions | https.AgentOptions;
 }
 
 function mergeHeaders(
-  userProvidedHeaders: Record<string, string> | undefined | null,
-  fallbackHeaders: Record<string, string> | undefined | null,
-  defaultHeaders: Record<string, string>
-): Record<string, string> {
+  userProvidedHeaders: (() => Record<string, string>) | undefined | null,
+  fallbackHeaders: (() => Record<string, string>) | undefined | null,
+  defaultHeaders: () => Record<string, string>
+): () => Record<string, string> {
   const requiredHeaders = {
-    ...defaultHeaders,
+    ...defaultHeaders(),
   };
   const headers = {};
 
-  // add fallback ones first
-  if (fallbackHeaders != null) {
-    Object.assign(headers, fallbackHeaders);
-  }
+  return () => {
+    // add fallback ones first
+    if (fallbackHeaders != null) {
+      Object.assign(headers, fallbackHeaders());
+    }
 
-  // override with user-provided ones
-  if (userProvidedHeaders != null) {
-    Object.assign(headers, userProvidedHeaders);
-  }
+    // override with user-provided ones
+    if (userProvidedHeaders != null) {
+      Object.assign(headers, userProvidedHeaders());
+    }
 
-  // override required ones.
-  return Object.assign(headers, requiredHeaders);
+    // override required ones.
+    return Object.assign(headers, requiredHeaders);
+  };
 }
 
 function validateUserProvidedUrl(url: string | undefined): string | undefined {
@@ -107,7 +109,7 @@ export function getHttpConfigurationDefaults(
 ): OtlpHttpConfiguration {
   return {
     ...getSharedConfigurationDefaults(),
-    headers: requiredHeaders,
+    headers: () => requiredHeaders,
     url: 'http://localhost:4318/' + signalResourcePath,
     agentOptions: { keepAlive: true },
   };

@@ -19,6 +19,7 @@ import {
   OtlpHttpConfiguration,
 } from './otlp-http-configuration';
 import { OTLPExporterNodeConfigBase } from './legacy-node-configuration';
+import { wrapStaticHeadersInFunction } from './shared-configuration';
 
 /**
  * @deprecated this will be removed in 2.0
@@ -36,7 +37,7 @@ export function convertLegacyBrowserHttpOptions(
     {
       url: config.url,
       timeoutMillis: config.timeoutMillis,
-      headers: config.headers,
+      headers: wrapStaticHeadersInFunction(config.headers),
       concurrencyLimit: config.concurrencyLimit,
     },
     {}, // no fallback for browser case
