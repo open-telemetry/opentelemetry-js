@@ -21,7 +21,7 @@ import {
   createInsecureCredentials,
   createSslCredentials,
 } from '../grpc-exporter-transport';
-import { getSharedConfigurationFromEnvironment } from '@opentelemetry/otlp-exporter-base';
+import { getSharedConfigurationFromEnvironment } from '@opentelemetry/otlp-exporter-base/node-http';
 import * as fs from 'fs';
 import * as path from 'path';
 import { diag } from '@opentelemetry/api';

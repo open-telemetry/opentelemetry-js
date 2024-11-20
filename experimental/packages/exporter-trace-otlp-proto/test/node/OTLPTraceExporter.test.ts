@@ -36,7 +36,6 @@ import {
 } from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 import { Root } from 'protobufjs';
-import { VERSION } from '../../src/version';
 import * as path from 'path';
 
 const dir = path.resolve(__dirname, '../../../otlp-transformer/protos');
@@ -67,18 +66,6 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       value: function (_timeout: number) {},
     });
     sinon.restore();
-  });
-
-  describe('default behavior for headers', () => {
-    const exporter = new OTLPTraceExporter();
-    it('should include user agent in header', () => {
-      assert.strictEqual(
-        exporter['_transport']['_transport']['_parameters']['headers'][
-          'User-Agent'
-        ],
-        `OTel-OTLP-Exporter-JavaScript/${VERSION}`
-      );
-    });
   });
 
   describe('export', () => {

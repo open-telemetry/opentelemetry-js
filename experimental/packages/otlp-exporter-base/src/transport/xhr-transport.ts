@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { IExporterTransport } from '../../exporter-transport';
-import { ExportResponse } from '../../export-response';
+import { IExporterTransport } from '../exporter-transport';
+import { ExportResponse } from '../export-response';
 import { diag } from '@opentelemetry/api';
 import {
   isExportRetryable,
   parseRetryAfterToMills,
-} from '../../is-export-retryable';
+} from '../is-export-retryable';
 
 export interface XhrRequestParameters {
   url: string;

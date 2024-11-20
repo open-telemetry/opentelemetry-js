@@ -13,21 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type * as http from 'http';
-import type * as https from 'https';
-
-import { OTLPExporterConfigBase } from '../../types';
-
-/**
- * Collector Exporter node base config
- */
-export interface OTLPExporterNodeConfigBase extends OTLPExporterConfigBase {
-  keepAlive?: boolean;
-  compression?: CompressionAlgorithm;
-  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
-}
-
-export enum CompressionAlgorithm {
-  NONE = 'none',
-  GZIP = 'gzip',
+export interface OTLPExporterConfigBase {
+  headers?: Record<string, string>;
+  url?: string;
+  concurrencyLimit?: number;
+  /** Maximum time the OTLP exporter will wait for each batch export.
+   * The default value is 10000ms. */
+  timeoutMillis?: number;
 }

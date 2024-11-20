@@ -15,38 +15,34 @@
  */
 
 import {
-  OTLPExporterNodeBase,
+  OTLPExporterBase,
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
 import {
-  IExportLogsServiceResponse,
-  ProtobufLogsSerializer,
-} from '@opentelemetry/otlp-transformer';
+  convertLegacyHttpOptions,
+  createOtlpHttpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
 import { ReadableLogRecord, LogRecordExporter } from '@opentelemetry/sdk-logs';
 import { VERSION } from '../../version';
 
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
-
 /**
- * Collector Trace Exporter for Node
+ * OTLP Log Protobuf Exporter for Node.js
  */
 export class OTLPLogExporter
-  extends OTLPExporterNodeBase<ReadableLogRecord, IExportLogsServiceResponse>
+  extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(
-      config,
-      ProtobufLogsSerializer,
-      {
-        ...USER_AGENT,
-        'Content-Type': 'application/x-protobuf',
-      },
-      'LOGS',
-      'v1/logs'
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config, 'LOGS', 'v1/logs', {
+          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+          'Content-Type': 'application/x-protobuf',
+        }),
+        ProtobufLogsSerializer
+      )
     );
   }
 }
