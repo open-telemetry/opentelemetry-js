@@ -68,7 +68,7 @@
   "dependencies": {
     "@opentelemetry/sdk-logs": "0.55.0",
     "@opentelemetry/sdk-trace-base": "1.28.0",
-    "@opentelemetry/semantic-conventions": "1.27.0"
+    "@opentelemetry/semantic-conventions": "1.28.0"
   },
   "devDependencies": {
     "@babel/core": "7.26.0",
