@@ -9,6 +9,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+feat(otlp-exporter-base): handle OTLP partial success [#5183](https://github.com/open-telemetry/opentelemetry-js/pull/5183) @pichlermarc
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
