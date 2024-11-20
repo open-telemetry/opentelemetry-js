@@ -21,6 +21,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :house: (Internal)
 
+* chore(resources): Update semconv usage to modern `ATTR_` export names. [#5187](https://github.com/open-telemetry/opentelemetry-js/pull/5187)
+
 ## 1.28.0
 
 ### :rocket: (Enhancement)
