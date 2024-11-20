@@ -25,5 +25,4 @@
 * chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
 * refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5177) @david-luna
 
-
 ### :bug: (Bug Fix)
