@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ATTR_OS_TYPE,
-  ATTR_OS_VERSION,
-} from '@opentelemetry/semantic-conventions/incubating';
+import { ATTR_OS_TYPE, ATTR_OS_VERSION } from '../../../semconv';
 import { Resource } from '../../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';

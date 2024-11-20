@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ATTR_SERVICE_INSTANCE_ID } from '@opentelemetry/semantic-conventions/incubating';
+import { ATTR_SERVICE_INSTANCE_ID } from '../../../semconv';
 import { Resource } from '../../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';

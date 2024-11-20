@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ATTR_HOST_ARCH,
-  ATTR_HOST_ID,
-  ATTR_HOST_NAME,
-} from '@opentelemetry/semantic-conventions/incubating';
+import { ATTR_HOST_ARCH, ATTR_HOST_ID, ATTR_HOST_NAME } from '../../../semconv';
 import { Resource } from '../../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';

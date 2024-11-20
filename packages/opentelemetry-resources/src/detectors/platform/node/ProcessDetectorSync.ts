@@ -25,7 +25,7 @@ import {
   ATTR_PROCESS_RUNTIME_DESCRIPTION,
   ATTR_PROCESS_RUNTIME_NAME,
   ATTR_PROCESS_RUNTIME_VERSION,
-} from '@opentelemetry/semantic-conventions/incubating';
+} from '../../../semconv';
 import { Resource } from '../../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';
