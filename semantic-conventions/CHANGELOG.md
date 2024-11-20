@@ -13,6 +13,8 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :books: (Refine Doc)
 
+* chore: Improve documentation on entry-points (top-level and "incubating") and on deprecations. [#5025](https://github.com/open-telemetry/opentelemetry-js/issues/5025) @trentm
+
 ### :house: (Internal)
 
 * chore: Update the comments of some deprecated constants to point to the currently relevant replacement constant, if any. [#5160](https://github.com/open-telemetry/opentelemetry-js/pull/5160) @trentm
