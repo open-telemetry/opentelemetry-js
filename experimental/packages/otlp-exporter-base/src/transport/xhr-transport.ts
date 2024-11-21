@@ -24,7 +24,7 @@ import {
 
 export interface XhrRequestParameters {
   url: string;
-  headers: Record<string, string>;
+  headers: () => Record<string, string>;
 }
 
 class XhrTransport implements IExporterTransport {
@@ -35,7 +35,8 @@ class XhrTransport implements IExporterTransport {
       const xhr = new XMLHttpRequest();
       xhr.timeout = timeoutMillis;
       xhr.open('POST', this._parameters.url);
-      Object.entries(this._parameters.headers).forEach(([k, v]) => {
+      const headers = this._parameters.headers();
+      Object.entries(headers).forEach(([k, v]) => {
         xhr.setRequestHeader(k, v);
       });
 
@@ -80,9 +81,7 @@ class XhrTransport implements IExporterTransport {
         });
       };
 
-      xhr.send(
-        new Blob([data], { type: this._parameters.headers['Content-Type'] })
-      );
+      xhr.send(new Blob([data], { type: headers['Content-Type'] }));
     });
   }
 

@@ -32,6 +32,7 @@ import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
+import { CardinalitySelector } from './CardinalitySelector';
 
 export interface MetricReaderOptions {
   /**
@@ -45,6 +46,11 @@ export interface MetricReaderOptions {
    * not configured, cumulative is used for all instruments.
    */
   aggregationTemporalitySelector?: AggregationTemporalitySelector;
+  /**
+   * Cardinality selector based on metric instrument types. If not configured,
+   * a default value is used.
+   */
+  cardinalitySelector?: CardinalitySelector;
   /**
    * **Note, this option is experimental**. Additional MetricProducers to use as a source of
    * aggregated metric data in addition to the SDK's metric data. The resource returned by
@@ -68,6 +74,7 @@ export abstract class MetricReader {
   private _sdkMetricProducer?: MetricProducer;
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
+  private readonly _cardinalitySelector?: CardinalitySelector;
 
   constructor(options?: MetricReaderOptions) {
     this._aggregationSelector =
@@ -76,6 +83,7 @@ export abstract class MetricReader {
       options?.aggregationTemporalitySelector ??
       DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
     this._metricProducers = options?.metricProducers ?? [];
+    this._cardinalitySelector = options?.cardinalitySelector;
   }
 
   /**
@@ -114,6 +122,16 @@ export abstract class MetricReader {
     instrumentType: InstrumentType
   ): AggregationTemporality {
     return this._aggregationTemporalitySelector(instrumentType);
+  }
+
+  /**
+   * Select the cardinality limit for the given {@link InstrumentType} for this
+   * reader.
+   */
+  selectCardinalityLimit(instrumentType: InstrumentType): number {
+    return this._cardinalitySelector
+      ? this._cardinalitySelector(instrumentType)
+      : 2000; // default value if no selector is provided
   }
 
   /**

@@ -49,7 +49,7 @@ export function sendWithHttp(
     path: parsedUrl.pathname,
     method: 'POST',
     headers: {
-      ...params.headers,
+      ...params.headers(),
     },
     agent: agent,
   };

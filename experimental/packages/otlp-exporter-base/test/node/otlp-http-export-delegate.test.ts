@@ -58,7 +58,7 @@ describe('createOtlpHttpExportDelegate', function () {
         agentOptions: {},
         compression: 'none',
         concurrencyLimit: 30,
-        headers: {},
+        headers: () => ({}),
         timeoutMillis: 1000,
       },
       serializer

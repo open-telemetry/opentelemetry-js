@@ -27,7 +27,7 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
     timeoutMillis: 1,
     compression: 'none',
     concurrencyLimit: 2,
-    headers: { 'User-Agent': 'default-user-agent' },
+    headers: () => ({ 'User-Agent': 'default-user-agent' }),
     agentOptions: { keepAlive: true },
   };
 
@@ -35,14 +35,14 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
     it('merges headers instead of overriding', function () {
       const config = mergeOtlpHttpConfigurationWithDefaults(
         {
-          headers: { foo: 'user' },
+          headers: () => ({ foo: 'user' }),
         },
         {
-          headers: { foo: 'fallback', bar: 'fallback' },
+          headers: () => ({ foo: 'fallback', bar: 'fallback' }),
         },
         testDefaults
       );
-      assert.deepStrictEqual(config.headers, {
+      assert.deepStrictEqual(config.headers(), {
         'User-Agent': 'default-user-agent',
         foo: 'user',
         bar: 'fallback',
@@ -52,14 +52,14 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
     it('does not override default (required) header', function () {
       const config = mergeOtlpHttpConfigurationWithDefaults(
         {
-          headers: { 'User-Agent': 'custom' },
+          headers: () => ({ 'User-Agent': 'custom' }),
         },
         {
-          headers: { 'User-Agent': 'custom-fallback' },
+          headers: () => ({ 'User-Agent': 'custom-fallback' }),
         },
         testDefaults
       );
-      assert.deepStrictEqual(config.headers, {
+      assert.deepStrictEqual(config.headers(), {
         'User-Agent': 'default-user-agent',
       });
     });
@@ -69,12 +69,16 @@ describe('mergeOtlpHttpConfigurationWithDefaults', function () {
         {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore simulating plain JavaScript usage, ignoring types
-          headers: { foo: 'foo-user-provided', bar: undefined, baz: null },
+          headers: () => ({
+            foo: 'foo-user-provided',
+            bar: undefined,
+            baz: null,
+          }),
         },
         {},
         testDefaults
       );
-      assert.deepStrictEqual(config.headers, {
+      assert.deepStrictEqual(config.headers(), {
         foo: 'foo-user-provided',
         baz: 'null',
         'User-Agent': 'default-user-agent',
