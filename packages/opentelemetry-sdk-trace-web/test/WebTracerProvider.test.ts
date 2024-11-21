@@ -85,6 +85,45 @@ describe('WebTracerProvider', () => {
       );
     });
 
+    describe('when contextManager is "ZoneContextManager multiple async operations"', () => {
+      it('should correctly return the contexts for 2 async actions', done => {
+        const webTracerWithZone = new WebTracerProvider().getTracer('default');
+
+        const rootSpan = webTracerWithZone.startSpan('rootSpan');
+
+        context.with(trace.setSpan(context.active(), rootSpan), () => {
+          assert.ok(
+            trace.getSpan(context.active()) === rootSpan,
+            'Current span is rootSpan'
+          );
+          const concurrentSpan1 =
+            webTracerWithZone.startSpan('concurrentSpan1');
+          const concurrentSpan2 =
+            webTracerWithZone.startSpan('concurrentSpan2');
+
+          context.with(trace.setSpan(context.active(), concurrentSpan1), () => {
+            setTimeout(() => {
+              assert.ok(
+                trace.getSpan(context.active()) === concurrentSpan1,
+                'Current span is concurrentSpan1'
+              );
+            }, 10);
+          });
+
+          context.with(trace.setSpan(context.active(), concurrentSpan2), () => {
+            setTimeout(() => {
+              assert.ok(
+                trace.getSpan(context.active()) === concurrentSpan2,
+                'Current span is concurrentSpan2'
+              );
+              done();
+            }, 20);
+          });
+        });
+      });
+    });
+
+
     describe('when contextManager is "ZoneContextManager"', () => {
       it('should correctly return the contexts for 2 parallel actions', done => {
         const webTracerWithZone = new WebTracerProvider().getTracer('default');
