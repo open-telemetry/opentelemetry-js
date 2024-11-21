@@ -67,10 +67,9 @@ export class BasicTracerProvider implements TracerProvider {
   >();
 
   private readonly _config: TracerConfig;
-  private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
 
-  private activeSpanProcessor: SpanProcessor;
+  private activeSpanProcessor: MultiSpanProcessor;
   readonly resource: IResource;
 
   constructor(config: TracerConfig = {}) {
@@ -89,20 +88,20 @@ export class BasicTracerProvider implements TracerProvider {
       resource: this.resource,
     });
 
+    const spanProcessors: SpanProcessor[] = [];
+
     if (config.spanProcessors?.length) {
-      this._registeredSpanProcessors = [...config.spanProcessors];
-      this.activeSpanProcessor = new MultiSpanProcessor(
-        this._registeredSpanProcessors
-      );
+      spanProcessors.push(...config.spanProcessors);
     } else {
       const defaultExporter = this._buildExporterFromEnv();
-      if (defaultExporter !== undefined) {
-        const batchProcessor = new BatchSpanProcessor(defaultExporter);
-        this.activeSpanProcessor = batchProcessor;
-      } else {
-        this.activeSpanProcessor = new NoopSpanProcessor();
-      }
+      spanProcessors.push(
+        defaultExporter
+          ? new BatchSpanProcessor(defaultExporter)
+          : new NoopSpanProcessor()
+      );
     }
+
+    this.activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
   }
 
   getTracer(
@@ -154,7 +153,7 @@ export class BasicTracerProvider implements TracerProvider {
 
   forceFlush(): Promise<void> {
     const timeout = this._config.forceFlushTimeoutMillis;
-    const promises = this._registeredSpanProcessors.map(
+    const promises = this.activeSpanProcessor['_spanProcessors'].map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {
           let state: ForceFlushState;
