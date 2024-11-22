@@ -16,13 +16,13 @@ All notable changes to experimental packages in this project will be documented 
     * This type is scheduled for removal in a future version of this package, please treat all exporters as `SpanExporter`, `PushMetricExporter` or `LogRecordExporter`, based on their respective type.
 * feat(otlp-grpc-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031) @pichlermarc
   * `OTLPGRPCExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase` from `@opentelemetry/otlp-exporter-base`)
-* feat(otlp-exporter-base): internally accept a http header provider function only [#5179](https://github.com/open-telemetry/opentelemetry-js/pull/5179) @pichlermarc
 * feat(otlp-transformer)!: accept `ResourceMetrics` in serializers instead of `ResourceMetrics[]`
   * (user-facing): `ProtobufMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
   * (user-facing): `JsonMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
 
-
 ### :rocket: (Enhancement)
+
+* feat(otlp-exporter-base): internally accept a http header provider function only [#5179](https://github.com/open-telemetry/opentelemetry-js/pull/5179) @pichlermarc
 
 ### :bug: (Bug Fix)
 
