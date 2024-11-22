@@ -124,77 +124,76 @@ function configureMetricProviderFromEnv(): MetricReader[] {
       `OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.`
     );
     return metricReaders;
-  } else {
-    enabledExporters.forEach(exporter => {
-      if (exporter === 'otlp') {
-        const protocol =
-          process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?.trim() ||
-          process.env.OTEL_EXPORTER_OTLP_PROTOCOL?.trim();
-
-        const exportIntervalMillis = getValueInMillis(
-          'OTEL_METRIC_EXPORT_INTERVAL',
-          60000
-        );
-        const exportTimeoutMillis = getValueInMillis(
-          'OTEL_METRIC_EXPORT_TIMEOUT',
-          30000
-        );
-
-        switch (protocol) {
-          case 'grpc':
-            metricReaders.push(
-              new PeriodicExportingMetricReader({
-                exporter: new OTLPGrpcMetricExporter(),
-                exportIntervalMillis: exportIntervalMillis,
-                exportTimeoutMillis: exportTimeoutMillis,
-              })
-            );
-            break;
-          case 'http/json':
-            metricReaders.push(
-              new PeriodicExportingMetricReader({
-                exporter: new OTLPHttpMetricExporter(),
-                exportIntervalMillis: exportIntervalMillis,
-                exportTimeoutMillis: exportTimeoutMillis,
-              })
-            );
-            break;
-          case 'http/protobuf':
-            metricReaders.push(
-              new PeriodicExportingMetricReader({
-                exporter: new OTLPProtoMetricExporter(),
-                exportIntervalMillis: exportIntervalMillis,
-                exportTimeoutMillis: exportTimeoutMillis,
-              })
-            );
-            break;
-          default:
-            diag.warn(
-              `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
-            );
-            metricReaders.push(
-              new PeriodicExportingMetricReader({
-                exporter: new OTLPProtoMetricExporter(),
-                exportIntervalMillis: exportIntervalMillis,
-                exportTimeoutMillis: exportTimeoutMillis,
-              })
-            );
-        }
-      } else if (exporter === 'console') {
-        metricReaders.push(
-          new PeriodicExportingMetricReader({
-            exporter: new ConsoleMetricExporter(),
-          })
-        );
-      } else if (exporter === 'prometheus') {
-        metricReaders.push(new PrometheusMetricExporter());
-      } else {
-        diag.warn(
-          `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
-        );
-      }
-    });
   }
+  enabledExporters.forEach(exporter => {
+    if (exporter === 'otlp') {
+      const protocol =
+        process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?.trim() ||
+        process.env.OTEL_EXPORTER_OTLP_PROTOCOL?.trim();
+
+      const exportIntervalMillis = getValueInMillis(
+        'OTEL_METRIC_EXPORT_INTERVAL',
+        60000
+      );
+      const exportTimeoutMillis = getValueInMillis(
+        'OTEL_METRIC_EXPORT_TIMEOUT',
+        30000
+      );
+
+      switch (protocol) {
+        case 'grpc':
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPGrpcMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+          break;
+        case 'http/json':
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPHttpMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+          break;
+        case 'http/protobuf':
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPProtoMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+          break;
+        default:
+          diag.warn(
+            `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
+          );
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPProtoMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+      }
+    } else if (exporter === 'console') {
+      metricReaders.push(
+        new PeriodicExportingMetricReader({
+          exporter: new ConsoleMetricExporter(),
+        })
+      );
+    } else if (exporter === 'prometheus') {
+      metricReaders.push(new PrometheusMetricExporter());
+    } else {
+      diag.warn(
+        `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
+      );
+    }
+  });
 
   return metricReaders;
 }
