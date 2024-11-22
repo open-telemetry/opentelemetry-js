@@ -665,8 +665,8 @@ describe('BasicTracerProvider', () => {
       const tracerProvider = new BasicTracerProvider();
       const tracer = tracerProvider.getTracer('default');
       const span = tracer.startSpan('my-span') as Span;
-      assert.strictEqual(tracer.resource, tracerProvider.resource);
-      assert.strictEqual(span.resource, tracerProvider.resource);
+      assert.strictEqual(tracer['_resource'], tracerProvider['_resource']);
+      assert.strictEqual(span.resource, tracerProvider['_resource']);
     });
 
     it('should start a span with name and options', () => {
@@ -929,7 +929,7 @@ describe('BasicTracerProvider', () => {
   describe('.resource', () => {
     it('should use the default resource when no resource is provided', function () {
       const tracerProvider = new BasicTracerProvider();
-      assert.deepStrictEqual(tracerProvider.resource, Resource.default());
+      assert.deepStrictEqual(tracerProvider['_resource'], Resource.default());
     });
 
     it('should not merge with defaults when flag is set to false', function () {
@@ -938,7 +938,7 @@ describe('BasicTracerProvider', () => {
         mergeResourceWithDefaults: false,
         resource: expectedResource,
       });
-      assert.deepStrictEqual(tracerProvider.resource, expectedResource);
+      assert.deepStrictEqual(tracerProvider['_resource'], expectedResource);
     });
 
     it('should merge with defaults when flag is set to true', function () {
@@ -948,7 +948,7 @@ describe('BasicTracerProvider', () => {
         resource: providedResource,
       });
       assert.deepStrictEqual(
-        tracerProvider.resource,
+        tracerProvider['_resource'],
         Resource.default().merge(providedResource)
       );
     });
@@ -958,7 +958,7 @@ describe('BasicTracerProvider', () => {
     it('should trigger shutdown when manually invoked', () => {
       const tracerProvider = new BasicTracerProvider();
       const shutdownStub = sinon.stub(
-        tracerProvider.getActiveSpanProcessor(),
+        tracerProvider['activeSpanProcessor'],
         'shutdown'
       );
       tracerProvider.shutdown();
