@@ -153,7 +153,7 @@ export class Tracer implements api.Tracer {
       attributes: initAttributes,
       startTime: options.startTime,
       spanProcessor: this._spanProcessor,
-      spanLimits: this.getSpanLimits(),
+      spanLimits: this._spanLimits,
     });
     return span;
   }
