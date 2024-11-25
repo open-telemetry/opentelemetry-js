@@ -17,13 +17,13 @@
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
-
-import { OTLPLogExporter } from '../../src/platform/node';
-import {
-  LoggerProvider,
-  SimpleLogRecordProcessor,
-} from '@opentelemetry/sdk-logs';
 import { Stream } from 'stream';
+
+import {
+  BasicTracerProvider,
+  SimpleSpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
+import { OTLPTraceExporter } from '../../src/platform/node';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -32,7 +32,7 @@ import { Stream } from 'stream';
  * - `@opentelemetry/otlp-transformer`: Everything regarding serialization and transforming internal representations to OTLP
  */
 
-describe('OTLPLogExporter', () => {
+describe('OTLPTraceExporter', () => {
   describe('export', () => {
     afterEach(() => {
       sinon.restore();
@@ -62,13 +62,12 @@ describe('OTLPLogExporter', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
-      const loggerProvider = new LoggerProvider();
-      loggerProvider.addLogRecordProcessor(
-        new SimpleLogRecordProcessor(new OTLPLogExporter())
-      );
-
-      loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
-      loggerProvider.shutdown();
+      new BasicTracerProvider({
+        spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
+      })
+        .getTracer('test-tracer')
+        .startSpan('test-span')
+        .end();
     });
   });
 });
