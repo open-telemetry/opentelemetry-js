@@ -35,7 +35,8 @@ export function createLoggingPartialSuccessResponseHandler<
       if (
         response == null ||
         !isPartialSuccessResponse(response) ||
-        response.partialSuccess == null
+        response.partialSuccess == null ||
+        Object.keys(response.partialSuccess).length === 0
       ) {
         return;
       }

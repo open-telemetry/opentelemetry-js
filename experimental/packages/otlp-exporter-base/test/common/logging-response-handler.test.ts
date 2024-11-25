@@ -70,8 +70,8 @@ describe('loggingResponseHandler', function () {
     sinon.assert.notCalled(warn);
   });
 
-  it('should warn when a response is defined but partialSuccess is empty object', function () {
-    // note: it is not permitted for the server to return such a response, but it may happen anyway
+  it('should not warn when a response is defined but partialSuccess is empty object', function () {
+    // note: this is the common case for the OTel collector's OTLP receiver, client should treat is as full success
     // arrange
     const { warn } = registerMockDiagLogger();
     const handler = createLoggingPartialSuccessResponseHandler();
@@ -81,10 +81,6 @@ describe('loggingResponseHandler', function () {
     handler.handleResponse(response);
 
     //assert
-    sinon.assert.calledOnceWithExactly(
-      warn,
-      'Received Partial Success response:',
-      JSON.stringify(response.partialSuccess)
-    );
+    sinon.assert.notCalled(warn);
   });
 });
