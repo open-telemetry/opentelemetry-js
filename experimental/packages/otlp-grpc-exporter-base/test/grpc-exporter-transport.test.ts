@@ -380,7 +380,7 @@ describe('GrpcExporterTransport', function () {
       });
     });
     describe('uds', function () {
-      let shutdownHandle: () => void | undefined;
+      let shutdownHandle: (() => void) | undefined;
       const serverTestContext: ServerTestContext = {
         requests: [],
         serverResponseProvider: () => {
@@ -397,7 +397,7 @@ describe('GrpcExporterTransport', function () {
       });
 
       afterEach(function () {
-        shutdownHandle();
+        shutdownHandle?.();
 
         // clear context
         serverTestContext.requests = [];
