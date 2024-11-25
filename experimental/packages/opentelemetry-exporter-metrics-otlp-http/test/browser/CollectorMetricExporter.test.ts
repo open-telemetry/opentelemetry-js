@@ -240,77 +240,84 @@ describe('OTLPMetricExporter - web', () => {
         collectorExporter.export(metrics, () => {});
 
         queueMicrotask(async () => {
-          const request = server.requests[0];
-          assert.strictEqual(request.method, 'POST');
-          assert.strictEqual(request.url, 'http://foo.bar.com');
+          try {
+            const request = server.requests[0];
+            assert.strictEqual(request.method, 'POST');
+            assert.strictEqual(request.url, 'http://foo.bar.com');
 
-          const body = request.requestBody;
-          const decoder = new TextDecoder();
-          const json = JSON.parse(
-            decoder.decode(await body.arrayBuffer())
-          ) as IExportMetricsServiceRequest;
-          // The order of the metrics is not guaranteed.
-          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'int-counter'
-          );
-          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'double-observable-gauge2'
-          );
-          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
-            it => it.descriptor.name === 'int-histogram'
-          );
+            const body = request.requestBody;
+            const json = JSON.parse(
+              new TextDecoder().decode(body)
+            ) as IExportMetricsServiceRequest;
+            // The order of the metrics is not guaranteed.
+            const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(
+              it => it.descriptor.name === 'int-counter'
+            );
+            const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(
+              it => it.descriptor.name === 'double-observable-gauge2'
+            );
+            const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(
+              it => it.descriptor.name === 'int-histogram'
+            );
 
-          const metric1 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
-          const metric2 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
-          const metric3 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
+            const metric1 =
+              json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+            const metric2 =
+              json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+            const metric3 =
+              json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
-          assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
-          ensureCounterIsCorrect(
-            metric1,
-            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime,
-            metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
-              .startTime
-          );
+            assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
+            ensureCounterIsCorrect(
+              metric1,
+              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+                .endTime,
+              metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0]
+                .startTime
+            );
 
-          assert.ok(
-            typeof metric2 !== 'undefined',
-            "second metric doesn't exist"
-          );
-          ensureObservableGaugeIsCorrect(
-            metric2,
-            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-              .endTime,
-            metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
-              .startTime,
-            6,
-            'double-observable-gauge2'
-          );
+            assert.ok(
+              typeof metric2 !== 'undefined',
+              "second metric doesn't exist"
+            );
+            ensureObservableGaugeIsCorrect(
+              metric2,
+              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+                .endTime,
+              metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0]
+                .startTime,
+              6,
+              'double-observable-gauge2'
+            );
 
-          assert.ok(
-            typeof metric3 !== 'undefined',
-            "third metric doesn't exist"
-          );
-          ensureHistogramIsCorrect(
-            metric3,
-            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-              .endTime,
-            metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
-              .startTime,
-            [0, 100],
-            [0, 2, 0]
-          );
+            assert.ok(
+              typeof metric3 !== 'undefined',
+              "third metric doesn't exist"
+            );
+            ensureHistogramIsCorrect(
+              metric3,
+              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+                .endTime,
+              metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0]
+                .startTime,
+              [0, 100],
+              [0, 2, 0]
+            );
 
-          const resource = json.resourceMetrics[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          ensureWebResourceIsCorrect(resource);
+            const resource = json.resourceMetrics[0].resource;
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            ensureWebResourceIsCorrect(resource);
 
-          assert.strictEqual(stubBeacon.callCount, 0);
-          ensureExportMetricsServiceRequestIsSet(json);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            ensureExportMetricsServiceRequestIsSet(json);
 
-          done();
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
 
