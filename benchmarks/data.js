@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732526652125,
+  "lastUpdate": 1732545252174,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -20294,6 +20294,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 655681,
             "range": "±0.19%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e250a0f30b3fa0c79bb9b9503f61be0a82201d51",
+          "message": "chore: update prettier to 3.3.3 (#5195)\n\nCo-authored-by: Mend Renovate <bot@renovateapp.com>",
+          "timestamp": "2024-11-25T14:18:25Z",
+          "tree_id": "012214df3614a0a237c8ca6086b04cf1264f0c15",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e250a0f30b3fa0c79bb9b9503f61be0a82201d51"
+        },
+        "date": 1732545251224,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 997257,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 12031,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 682526,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 662008,
+            "range": "±0.32%",
             "unit": "ops/sec",
             "extra": "100 samples"
           }
