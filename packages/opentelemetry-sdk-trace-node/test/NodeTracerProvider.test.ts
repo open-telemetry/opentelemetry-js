@@ -302,11 +302,23 @@ describe('NodeTracerProvider', () => {
 
       const provider = new CustomTracerProvider({});
       provider.register();
-      const processor = provider.getActiveSpanProcessor();
-      assert(processor instanceof BatchSpanProcessor);
-      // @ts-expect-error access configured to verify its the correct one
-      const exporter = processor._exporter;
-      assert(exporter instanceof DummyExporter);
+
+      assert.ok(
+        provider['activeSpanProcessor'].constructor.name ===
+          'MultiSpanProcessor'
+      );
+      assert.ok(
+        provider['activeSpanProcessor']['_spanProcessors'].length === 1
+      );
+      assert.ok(
+        provider['activeSpanProcessor']['_spanProcessors'][0] instanceof
+          BatchSpanProcessor
+      );
+      assert.ok(
+        provider['activeSpanProcessor']['_spanProcessors'][0][
+          '_exporter'
+        ] instanceof DummyExporter
+      );
 
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });
@@ -347,11 +359,23 @@ describe('NodeTracerProvider', () => {
 
       const provider = new CustomTracerProvider({});
       provider.register();
-      const processor = provider.getActiveSpanProcessor();
-      assert(processor instanceof BatchSpanProcessor);
-      // @ts-expect-error access configured to verify its the correct one
-      const exporter = processor._exporter;
-      assert(exporter instanceof DummyExporter);
+
+      assert.ok(
+        provider['activeSpanProcessor'].constructor.name ===
+          'MultiSpanProcessor'
+      );
+      assert.ok(
+        provider['activeSpanProcessor']['_spanProcessors'].length === 1
+      );
+      assert.ok(
+        provider['activeSpanProcessor']['_spanProcessors'][0] instanceof
+          BatchSpanProcessor
+      );
+      assert.ok(
+        provider['activeSpanProcessor']['_spanProcessors'][0][
+          '_exporter'
+        ] instanceof DummyExporter
+      );
 
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });
