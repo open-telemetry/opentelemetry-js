@@ -187,10 +187,9 @@ describe('OTLPTraceExporter - web', () => {
             assert.strictEqual(request.method, 'POST');
             assert.strictEqual(request.url, 'http://foo.bar.com');
 
-            const body = request.requestBody as Blob;
-            const decoder = new TextDecoder();
+            const body = request.requestBody as Uint8Array;
             const json = JSON.parse(
-              decoder.decode(await body.arrayBuffer())
+              new TextDecoder().decode(body)
             ) as IExportTraceServiceRequest;
             const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
@@ -340,14 +339,18 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {});
 
         queueMicrotask(() => {
-          const [{ requestHeaders }] = server.requests;
+          try {
+            const [{ requestHeaders: requestHeaders }] = server.requests;
 
-          ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(stubBeacon.callCount, 0);
-          assert.strictEqual(stubOpen.callCount, 0);
-
-          clock.restore();
-          done();
+            ensureHeadersContain(requestHeaders, customHeaders);
+            assert.strictEqual(stubBeacon.callCount, 0);
+            assert.strictEqual(stubOpen.callCount, 0);
+            done();
+          } catch (e) {
+            done(e);
+          } finally {
+            clock.restore();
+          }
         });
       });
       it('should log the timeout request error message', done => {

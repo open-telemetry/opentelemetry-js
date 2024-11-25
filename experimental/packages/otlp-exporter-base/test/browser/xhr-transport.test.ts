@@ -65,10 +65,7 @@ describe('XhrTransport', function () {
             undefined
           );
           assert.strictEqual(request.url, testTransportParameters.url);
-          assert.strictEqual(
-            (request.requestBody as unknown as Blob).type,
-            'application/json'
-          );
+          assert.strictEqual(request.requestBody, testPayload);
           ensureHeadersContain(request.requestHeaders, {
             foo: 'foo-value',
             bar: 'bar-value',
