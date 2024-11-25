@@ -68,9 +68,9 @@ export class BasicTracerProvider implements TracerProvider {
 
   private readonly _config: TracerConfig;
   private readonly _tracers: Map<string, Tracer> = new Map();
+  private readonly _resource: IResource;
 
   private activeSpanProcessor: MultiSpanProcessor;
-  readonly resource: IResource;
 
   constructor(config: TracerConfig = {}) {
     const mergedConfig = merge(
@@ -78,14 +78,14 @@ export class BasicTracerProvider implements TracerProvider {
       loadDefaultConfig(),
       reconfigureLimits(config)
     );
-    this.resource = mergedConfig.resource ?? Resource.empty();
+    this._resource = mergedConfig.resource ?? Resource.empty();
 
     if (mergedConfig.mergeResourceWithDefaults) {
-      this.resource = Resource.default().merge(this.resource);
+      this._resource = Resource.default().merge(this._resource);
     }
 
     this._config = Object.assign({}, mergedConfig, {
-      resource: this.resource,
+      resource: this._resource,
     });
 
     const spanProcessors: SpanProcessor[] = [];
@@ -116,17 +116,14 @@ export class BasicTracerProvider implements TracerProvider {
         new Tracer(
           { name, version, schemaUrl: options?.schemaUrl },
           this._config,
-          this
+          this._resource,
+          this.activeSpanProcessor
         )
       );
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
-  }
-
-  getActiveSpanProcessor(): SpanProcessor {
-    return this.activeSpanProcessor;
   }
 
   /**

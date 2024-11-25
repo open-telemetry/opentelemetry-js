@@ -262,7 +262,7 @@ describe('Node SDK', () => {
 
       assert.ok(nodeTracerProvider instanceof NodeTracerProvider);
 
-      const spanProcessor = nodeTracerProvider.getActiveSpanProcessor() as any;
+      const spanProcessor = nodeTracerProvider['activeSpanProcessor'] as any;
 
       assert(
         spanProcessor.constructor.name === 'MultiSpanProcessor',
@@ -1117,7 +1117,7 @@ describe('setup exporter from env', () => {
 
     assert(tracerProvider instanceof NodeTracerProvider);
 
-    const activeSpanProcessor = tracerProvider.getActiveSpanProcessor();
+    const activeSpanProcessor = tracerProvider['activeSpanProcessor'];
 
     assert(activeSpanProcessor.constructor.name === 'MultiSpanProcessor');
 
