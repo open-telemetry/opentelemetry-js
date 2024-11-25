@@ -389,6 +389,10 @@ describe('GrpcExporterTransport', function () {
       };
 
       beforeEach(async function () {
+        // skip uds tests on windows
+        if (process.platform === 'win32') {
+          this.skip();
+        }
         shutdownHandle = await startUdsServer(serverTestContext);
       });
 
@@ -403,11 +407,6 @@ describe('GrpcExporterTransport', function () {
       });
 
       it('sends data', async function () {
-        // skip uds tests on windows
-        if (process.platform === 'win32') {
-          this.skip();
-        }
-
         const transport = createOtlpGrpcExporterTransport({
           ...simpleClientConfig,
           address: 'unix:///tmp/otlp-test.sock',
