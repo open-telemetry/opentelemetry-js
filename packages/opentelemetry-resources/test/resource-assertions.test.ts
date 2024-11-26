@@ -53,21 +53,21 @@ import {
 } from './util/resource-assertions';
 
 describe('assertCloudResource', () => {
-  it('requires one cloud label', () => {
+  it('requires one cloud label', async () => {
     const resource = new Resource({
       [SEMRESATTRS_CLOUD_PROVIDER]: 'gcp',
     });
-    assertCloudResource(resource, {});
+    assertCloudResource(await resource.attributes, {});
   });
 
-  it('validates optional attributes', () => {
+  it('validates optional attributes', async () => {
     const resource = new Resource({
       [SEMRESATTRS_CLOUD_PROVIDER]: 'gcp',
       [SEMRESATTRS_CLOUD_ACCOUNT_ID]: 'opentelemetry',
       [SEMRESATTRS_CLOUD_REGION]: 'us-central1',
       [SEMRESATTRS_CLOUD_AVAILABILITY_ZONE]: 'us-central1-a',
     });
-    assertCloudResource(resource, {
+    assertCloudResource(await resource.attributes, {
       provider: 'gcp',
       accountId: 'opentelemetry',
       region: 'us-central1',
@@ -77,21 +77,21 @@ describe('assertCloudResource', () => {
 });
 
 describe('assertContainerResource', () => {
-  it('requires one container label', () => {
+  it('requires one container label', async () => {
     const resource = new Resource({
       [SEMRESATTRS_CONTAINER_NAME]: 'opentelemetry-autoconf',
     });
-    assertContainerResource(resource, {});
+    assertContainerResource(await resource.attributes, {});
   });
 
-  it('validates optional attributes', () => {
+  it('validates optional attributes', async () => {
     const resource = new Resource({
       [SEMRESATTRS_CONTAINER_NAME]: 'opentelemetry-autoconf',
       [SEMRESATTRS_CONTAINER_ID]: 'abc',
       [SEMRESATTRS_CONTAINER_IMAGE_NAME]: 'gcr.io/opentelemetry/operator',
       [SEMRESATTRS_CONTAINER_IMAGE_TAG]: '0.1',
     });
-    assertContainerResource(resource, {
+    assertContainerResource(await resource.attributes, {
       name: 'opentelemetry-autoconf',
       id: 'abc',
       imageName: 'gcr.io/opentelemetry/operator',
@@ -101,14 +101,14 @@ describe('assertContainerResource', () => {
 });
 
 describe('assertHostResource', () => {
-  it('requires one host label', () => {
+  it('requires one host label', async () => {
     const resource = new Resource({
       [SEMRESATTRS_HOST_ID]: 'opentelemetry-test-id',
     });
-    assertHostResource(resource, {});
+    assertHostResource(await resource.attributes, {});
   });
 
-  it('validates optional attributes', () => {
+  it('validates optional attributes', async () => {
     const resource = new Resource({
       [SEMRESATTRS_HOST_ID]: 'opentelemetry-test-id',
       [SEMRESATTRS_HOST_NAME]: 'opentelemetry-test-name',
@@ -118,7 +118,7 @@ describe('assertHostResource', () => {
       [SEMRESATTRS_HOST_IMAGE_ID]: 'ami-07b06b442921831e5',
       [SEMRESATTRS_HOST_IMAGE_VERSION]: '0.1',
     });
-    assertHostResource(resource, {
+    assertHostResource(await resource.attributes, {
       hostName: 'opentelemetry-test-hostname',
       id: 'opentelemetry-test-id',
       name: 'opentelemetry-test-name',
@@ -131,21 +131,21 @@ describe('assertHostResource', () => {
 });
 
 describe('assertK8sResource', () => {
-  it('requires one k8s label', () => {
+  it('requires one k8s label', async () => {
     const resource = new Resource({
       [SEMRESATTRS_K8S_CLUSTER_NAME]: 'opentelemetry-cluster',
     });
-    assertK8sResource(resource, {});
+    assertK8sResource(await resource.attributes, {});
   });
 
-  it('validates optional attributes', () => {
+  it('validates optional attributes', async () => {
     const resource = new Resource({
       [SEMRESATTRS_K8S_CLUSTER_NAME]: 'opentelemetry-cluster',
       [SEMRESATTRS_K8S_NAMESPACE_NAME]: 'default',
       [SEMRESATTRS_K8S_POD_NAME]: 'opentelemetry-pod-autoconf',
       [SEMRESATTRS_K8S_DEPLOYMENT_NAME]: 'opentelemetry',
     });
-    assertK8sResource(resource, {
+    assertK8sResource(await resource.attributes, {
       clusterName: 'opentelemetry-cluster',
       namespaceName: 'default',
       podName: 'opentelemetry-pod-autoconf',
@@ -155,7 +155,7 @@ describe('assertK8sResource', () => {
 });
 
 describe('assertTelemetrySDKResource', () => {
-  it('uses default validations', () => {
+  it('uses default validations', async () => {
     const resource = new Resource({
       [SEMRESATTRS_TELEMETRY_SDK_NAME]:
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_NAME],
@@ -164,16 +164,16 @@ describe('assertTelemetrySDKResource', () => {
       [SEMRESATTRS_TELEMETRY_SDK_VERSION]:
         SDK_INFO[SEMRESATTRS_TELEMETRY_SDK_VERSION],
     });
-    assertTelemetrySDKResource(resource, {});
+    assertTelemetrySDKResource(await resource.attributes, {});
   });
 
-  it('validates optional attributes', () => {
+  it('validates optional attributes', async () => {
     const resource = new Resource({
       [SEMRESATTRS_TELEMETRY_SDK_NAME]: 'opentelemetry',
       [SEMRESATTRS_TELEMETRY_SDK_LANGUAGE]: 'nodejs',
       [SEMRESATTRS_TELEMETRY_SDK_VERSION]: '0.1.0',
     });
-    assertTelemetrySDKResource(resource, {
+    assertTelemetrySDKResource(await resource.attributes, {
       name: 'opentelemetry',
       language: 'nodejs',
       version: '0.1.0',
@@ -182,25 +182,25 @@ describe('assertTelemetrySDKResource', () => {
 });
 
 describe('assertServiceResource', () => {
-  it('validates required attributes', () => {
+  it('validates required attributes', async () => {
     const resource = new Resource({
       [SEMRESATTRS_SERVICE_NAME]: 'shoppingcart',
       [SEMRESATTRS_SERVICE_INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
     });
-    assertServiceResource(resource, {
+    assertServiceResource(await resource.attributes, {
       name: 'shoppingcart',
       instanceId: '627cc493-f310-47de-96bd-71410b7dec09',
     });
   });
 
-  it('validates optional attributes', () => {
+  it('validates optional attributes', async () => {
     const resource = new Resource({
       [SEMRESATTRS_SERVICE_NAME]: 'shoppingcart',
       [SEMRESATTRS_SERVICE_INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
       [SEMRESATTRS_SERVICE_NAMESPACE]: 'shop',
       [SEMRESATTRS_SERVICE_VERSION]: '0.1.0',
     });
-    assertServiceResource(resource, {
+    assertServiceResource(await resource.attributes, {
       name: 'shoppingcart',
       instanceId: '627cc493-f310-47de-96bd-71410b7dec09',
       namespace: 'shop',

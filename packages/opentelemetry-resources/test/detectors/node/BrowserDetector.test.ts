@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import { IResource } from '../../../src';
-import { browserDetector } from '../../../src/detectors/BrowserDetector';
+import { browserDetectorSync } from '../../../src';
 import { describeNode } from '../../util';
 import { assertEmptyResource } from '../../util/resource-assertions';
 
 describeNode('browserDetector()', () => {
   it('should return empty resources if window.document is missing', async () => {
-    const resource: IResource = await browserDetector.detect();
-    assertEmptyResource(resource);
+    const resource: IResource = await browserDetectorSync.detect();
+    assertEmptyResource(await resource.attributes);
   });
 });

@@ -23,24 +23,9 @@ import { Attributes } from '@opentelemetry/api';
  */
 export interface IResource {
   /**
-   * Check if async attributes have resolved. This is useful to avoid awaiting
-   * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
-   *
-   * @returns true if the resource "attributes" property is not yet settled to its final value
+   * @returns the Resource's attributes wrapped in a promise.
    */
-  asyncAttributesPending?: boolean;
-
-  /**
-   * @returns the Resource's attributes.
-   */
-  readonly attributes: Attributes;
-
-  /**
-   * Returns a promise that will never be rejected. Resolves when all async attributes have finished being added to
-   * this Resource's attributes. This is useful in exporters to block until resource detection
-   * has finished.
-   */
-  waitForAsyncAttributes?(): Promise<void>;
+  readonly attributes: Promise<Attributes>;
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource

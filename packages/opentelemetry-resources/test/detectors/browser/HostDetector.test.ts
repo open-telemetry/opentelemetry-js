@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { hostDetector, IResource } from '../../../src';
+import { hostDetectorSync } from '../../../src';
 import { assertEmptyResource } from '../../util/resource-assertions';
 import { describeBrowser } from '../../util';
 
@@ -24,7 +24,7 @@ describeBrowser('hostDetector() on web browser', () => {
   });
 
   it('should return empty resource', async () => {
-    const resource: IResource = await hostDetector.detect();
-    assertEmptyResource(resource);
+    const resource = await hostDetectorSync.detect();
+    assertEmptyResource(await resource.attributes);
   });
 });

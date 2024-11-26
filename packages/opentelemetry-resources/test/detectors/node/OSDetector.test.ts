@@ -21,9 +21,9 @@ import {
   SEMRESATTRS_OS_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import { describeNode } from '../../util';
-import { osDetector, IResource } from '../../../src';
+import { osDetectorSync } from '../../../src';
 
-describeNode('osDetector() on Node.js', () => {
+describeNode('osDetectorSync() on Node.js', () => {
   afterEach(() => {
     sinon.restore();
   });
@@ -34,11 +34,12 @@ describeNode('osDetector() on Node.js', () => {
     sinon.stub(os, 'platform').returns('win32');
     sinon.stub(os, 'release').returns('2.2.1(0.289/5/3)');
 
-    const resource: IResource = await osDetector.detect();
+    const resource = await osDetectorSync.detect();
+    const attributes = await resource.attributes;
 
-    assert.strictEqual(resource.attributes[SEMRESATTRS_OS_TYPE], 'windows');
+    assert.strictEqual(attributes[SEMRESATTRS_OS_TYPE], 'windows');
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_OS_VERSION],
+      attributes[SEMRESATTRS_OS_VERSION],
       '2.2.1(0.289/5/3)'
     );
   });
@@ -48,10 +49,11 @@ describeNode('osDetector() on Node.js', () => {
 
     sinon.stub(os, 'platform').returns('some-unknown-platform');
 
-    const resource: IResource = await osDetector.detect();
+    const resource = await osDetectorSync.detect();
+    const attributes = await resource.attributes;
 
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_OS_TYPE],
+      attributes[SEMRESATTRS_OS_TYPE],
       'some-unknown-platform'
     );
   });

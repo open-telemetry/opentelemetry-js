@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 export {
-  hostDetector,
   hostDetectorSync,
-  osDetector,
   osDetectorSync,
-  processDetector,
   processDetectorSync,
   serviceInstanceIdDetectorSync,
 } from './node';

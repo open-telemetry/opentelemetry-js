@@ -16,7 +16,6 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { IResource } from '../../src/IResource';
 import {
   SEMRESATTRS_CLOUD_ACCOUNT_ID,
   SEMRESATTRS_CLOUD_AVAILABILITY_ZONE,
@@ -57,6 +56,7 @@ import {
   SEMRESATTRS_WEBENGINE_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import * as semconv from '@opentelemetry/semantic-conventions';
+import { Attributes } from '@opentelemetry/api';
 
 /**
  * Test utility method to validate a cloud resource
@@ -65,7 +65,7 @@ import * as semconv from '@opentelemetry/semantic-conventions';
  * @param validations validations for the resource attributes
  */
 export const assertCloudResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     provider?: string;
     accountId?: string;
@@ -73,25 +73,25 @@ export const assertCloudResource = (
     zone?: string;
   }
 ) => {
-  assertHasOneLabel('CLOUD', resource);
+  assertHasOneLabel('CLOUD', attributes);
   if (validations.provider)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CLOUD_PROVIDER],
+      attributes[SEMRESATTRS_CLOUD_PROVIDER],
       validations.provider
     );
   if (validations.accountId)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CLOUD_ACCOUNT_ID],
+      attributes[SEMRESATTRS_CLOUD_ACCOUNT_ID],
       validations.accountId
     );
   if (validations.region)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CLOUD_REGION],
+      attributes[SEMRESATTRS_CLOUD_REGION],
       validations.region
     );
   if (validations.zone)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CLOUD_AVAILABILITY_ZONE],
+      attributes[SEMRESATTRS_CLOUD_AVAILABILITY_ZONE],
       validations.zone
     );
 };
@@ -103,7 +103,7 @@ export const assertCloudResource = (
  * @param validations validations for the resource attributes
  */
 export const assertContainerResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     name?: string;
     id?: string;
@@ -111,25 +111,25 @@ export const assertContainerResource = (
     imageTag?: string;
   }
 ) => {
-  assertHasOneLabel('CONTAINER', resource);
+  assertHasOneLabel('CONTAINER', attributes);
   if (validations.name)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CONTAINER_NAME],
+      attributes[SEMRESATTRS_CONTAINER_NAME],
       validations.name
     );
   if (validations.id)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CONTAINER_ID],
+      attributes[SEMRESATTRS_CONTAINER_ID],
       validations.id
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CONTAINER_IMAGE_NAME],
+      attributes[SEMRESATTRS_CONTAINER_IMAGE_NAME],
       validations.imageName
     );
   if (validations.imageTag)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_CONTAINER_IMAGE_TAG],
+      attributes[SEMRESATTRS_CONTAINER_IMAGE_TAG],
       validations.imageTag
     );
 };
@@ -141,7 +141,7 @@ export const assertContainerResource = (
  * @param validations validations for the resource attributes
  */
 export const assertHostResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     hostName?: string;
     id?: string;
@@ -152,35 +152,35 @@ export const assertHostResource = (
     imageVersion?: string;
   }
 ) => {
-  assertHasOneLabel('HOST', resource);
+  assertHasOneLabel('HOST', attributes);
   if (validations.id)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_ID],
+      attributes[SEMRESATTRS_HOST_ID],
       validations.id
     );
   if (validations.name)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_NAME],
+      attributes[SEMRESATTRS_HOST_NAME],
       validations.name
     );
   if (validations.hostType)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_TYPE],
+      attributes[SEMRESATTRS_HOST_TYPE],
       validations.hostType
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_IMAGE_NAME],
+      attributes[SEMRESATTRS_HOST_IMAGE_NAME],
       validations.imageName
     );
   if (validations.imageId)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_IMAGE_ID],
+      attributes[SEMRESATTRS_HOST_IMAGE_ID],
       validations.imageId
     );
   if (validations.imageVersion)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_HOST_IMAGE_VERSION],
+      attributes[SEMRESATTRS_HOST_IMAGE_VERSION],
       validations.imageVersion
     );
 };
@@ -192,7 +192,7 @@ export const assertHostResource = (
  * @param validations validations for the resource attributes
  */
 export const assertK8sResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     clusterName?: string;
     namespaceName?: string;
@@ -200,25 +200,25 @@ export const assertK8sResource = (
     deploymentName?: string;
   }
 ) => {
-  assertHasOneLabel('K8S', resource);
+  assertHasOneLabel('K8S', attributes);
   if (validations.clusterName)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_K8S_CLUSTER_NAME],
+      attributes[SEMRESATTRS_K8S_CLUSTER_NAME],
       validations.clusterName
     );
   if (validations.namespaceName)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_K8S_NAMESPACE_NAME],
+      attributes[SEMRESATTRS_K8S_NAMESPACE_NAME],
       validations.namespaceName
     );
   if (validations.podName)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_K8S_POD_NAME],
+      attributes[SEMRESATTRS_K8S_POD_NAME],
       validations.podName
     );
   if (validations.deploymentName)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_K8S_DEPLOYMENT_NAME],
+      attributes[SEMRESATTRS_K8S_DEPLOYMENT_NAME],
       validations.deploymentName
     );
 };
@@ -230,7 +230,7 @@ export const assertK8sResource = (
  * @param validations validations for the resource attributes
  */
 export const assertTelemetrySDKResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     name?: string;
     language?: string;
@@ -246,17 +246,17 @@ export const assertTelemetrySDKResource = (
 
   if (validations.name)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
+      attributes[SEMRESATTRS_TELEMETRY_SDK_NAME],
       validations.name
     );
   if (validations.language)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
+      attributes[SEMRESATTRS_TELEMETRY_SDK_LANGUAGE],
       validations.language
     );
   if (validations.version)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION],
+      attributes[SEMRESATTRS_TELEMETRY_SDK_VERSION],
       validations.version
     );
 };
@@ -268,7 +268,7 @@ export const assertTelemetrySDKResource = (
  * @param validations validations for the resource attributes
  */
 export const assertServiceResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     name: string;
     instanceId: string;
@@ -277,21 +277,21 @@ export const assertServiceResource = (
   }
 ) => {
   assert.strictEqual(
-    resource.attributes[SEMRESATTRS_SERVICE_NAME],
+    attributes[SEMRESATTRS_SERVICE_NAME],
     validations.name
   );
   assert.strictEqual(
-    resource.attributes[SEMRESATTRS_SERVICE_INSTANCE_ID],
+    attributes[SEMRESATTRS_SERVICE_INSTANCE_ID],
     validations.instanceId
   );
   if (validations.namespace)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_SERVICE_NAMESPACE],
+      attributes[SEMRESATTRS_SERVICE_NAMESPACE],
       validations.namespace
     );
   if (validations.version)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_SERVICE_VERSION],
+      attributes[SEMRESATTRS_SERVICE_VERSION],
       validations.version
     );
 };
@@ -303,7 +303,7 @@ export const assertServiceResource = (
  * @param validations validations for the resource attributes
  */
 export const assertResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     pid?: number;
     name?: string;
@@ -317,61 +317,61 @@ export const assertResource = (
   }
 ) => {
   assert.strictEqual(
-    resource.attributes[SEMRESATTRS_PROCESS_PID],
+    attributes[SEMRESATTRS_PROCESS_PID],
     validations.pid
   );
   if (validations.name) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_EXECUTABLE_NAME],
+      attributes[SEMRESATTRS_PROCESS_EXECUTABLE_NAME],
       validations.name
     );
   }
   if (validations.command) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_COMMAND],
+      attributes[SEMRESATTRS_PROCESS_COMMAND],
       validations.command
     );
   }
   if (validations.commandArgs) {
     assert.deepStrictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_COMMAND_ARGS],
+      attributes[SEMRESATTRS_PROCESS_COMMAND_ARGS],
       validations.commandArgs
     );
   }
   if (validations.executablePath) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_EXECUTABLE_PATH],
+      attributes[SEMRESATTRS_PROCESS_EXECUTABLE_PATH],
       validations.executablePath
     );
   }
   if (validations.owner) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_OWNER],
+      attributes[SEMRESATTRS_PROCESS_OWNER],
       validations.owner
     );
   }
   if (validations.version) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_RUNTIME_VERSION],
+      attributes[SEMRESATTRS_PROCESS_RUNTIME_VERSION],
       validations.version
     );
   }
   if (validations.runtimeName) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_RUNTIME_NAME],
+      attributes[SEMRESATTRS_PROCESS_RUNTIME_NAME],
       validations.runtimeName
     );
   }
   if (validations.runtimeDescription) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION],
+      attributes[SEMRESATTRS_PROCESS_RUNTIME_DESCRIPTION],
       validations.runtimeDescription
     );
   }
 };
 
 export const assertWebEngineResource = (
-  resource: IResource,
+  attributes: Attributes,
   validations: {
     name?: string;
     version?: string;
@@ -380,19 +380,19 @@ export const assertWebEngineResource = (
 ) => {
   if (validations.name) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_WEBENGINE_NAME],
+      attributes[SEMRESATTRS_WEBENGINE_NAME],
       validations.name
     );
   }
   if (validations.version) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_WEBENGINE_VERSION],
+      attributes[SEMRESATTRS_WEBENGINE_VERSION],
       validations.version
     );
   }
   if (validations.description) {
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_WEBENGINE_DESCRIPTION],
+      attributes[SEMRESATTRS_WEBENGINE_DESCRIPTION],
       validations.description
     );
   }
@@ -401,17 +401,17 @@ export const assertWebEngineResource = (
 /**
  * Test utility method to validate an empty resource
  *
- * @param resource the Resource to validate
+ * @param attributes the Resource's attributes to validate
  */
-export const assertEmptyResource = (resource: IResource) => {
-  assert.strictEqual(Object.keys(resource.attributes).length, 0);
+export const assertEmptyResource = (attributes: Attributes) => {
+  assert.strictEqual(Object.keys(attributes).length, 0);
 };
 
 /**
  * Assert that the `resource` has at least one known attribute with the given
  * `prefix`. By "known", we mean it is an attribute defined in semconv.
  */
-const assertHasOneLabel = (prefix: string, resource: IResource): void => {
+const assertHasOneLabel = (prefix: string, attributes: Attributes,): void => {
   const semconvModPrefix = `SEMRESATTRS_${prefix.toUpperCase()}_`;
   const knownAttrs: Set<string> = new Set(
     Object.entries(semconv)
@@ -420,7 +420,7 @@ const assertHasOneLabel = (prefix: string, resource: IResource): void => {
       )
       .map(([, v]) => v as string)
   );
-  const hasAttrs = Object.keys(resource.attributes).filter(k =>
+  const hasAttrs = Object.keys(attributes).filter(k =>
     knownAttrs.has(k)
   );
   assert.ok(
