@@ -32,7 +32,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
-* chore(otlp-exporter-*-grpc): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5196) @pichlermarc
+* chore(otlp-exporter-\*-grpc): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5196) @pichlermarc
 
 ## 0.55.0
 
