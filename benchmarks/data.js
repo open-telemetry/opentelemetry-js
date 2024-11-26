@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732616148618,
+  "lastUpdate": 1732619772701,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -20504,6 +20504,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.61%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e80879e093638e97c3df81bd331d28a52dbfb6ce",
+          "message": "fix(deps): update dependency axios to v1.7.8 (#5202)",
+          "timestamp": "2024-11-26T11:06:05Z",
+          "tree_id": "dbeb844b346562394e3e4083d079feb3140fb09b",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e80879e093638e97c3df81bd331d28a52dbfb6ce"
+        },
+        "date": 1732619771843,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 945362,
+            "range": "±0.41%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11823,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 696433,
+            "range": "±0.18%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 676696,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "101 samples"
           }
         ]
       }
