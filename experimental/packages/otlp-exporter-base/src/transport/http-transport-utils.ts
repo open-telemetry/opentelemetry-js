@@ -72,7 +72,11 @@ export function sendWithHttp(
           retryInMillis: parseRetryAfterToMills(res.headers['retry-after']),
         });
       } else {
-        const error = new OTLPExporterError(res.statusMessage, res.statusCode);
+        const error = new OTLPExporterError(
+          res.statusMessage,
+          res.statusCode,
+          Buffer.concat(responseData).toString()
+        );
         onDone({
           status: 'failure',
           error,
