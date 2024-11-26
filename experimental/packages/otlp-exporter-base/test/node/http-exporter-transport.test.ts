@@ -22,9 +22,9 @@ import {
   ExportResponseRetryable,
   ExportResponseFailure,
   ExportResponseSuccess,
+  OTLPExporterError,
 } from '../../src';
 import * as zlib from 'zlib';
-import {OTLPExporterError} from "../../build/esnext";
 
 const sampleRequestData = new Uint8Array([1, 2, 3]);
 
