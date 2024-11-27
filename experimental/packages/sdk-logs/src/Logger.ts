@@ -53,23 +53,4 @@ export class Logger implements logsAPI.Logger {
      */
     logRecordInstance._makeReadonly();
   }
-
-  // public emitEvent(eventRecord: logsAPI.EventRecord): void {
-  //   const attributes = eventRecord.attributes || {};
-  //   // TODO: change to ATTR_EVENT_NAME, it is under experimental_attributes currently.
-  //   attributes['event.name'] = eventRecord.name;
-
-  //   const logRecord: logsAPI.LogRecord = {
-  //     attributes: attributes,
-  //     context: eventRecord.context || context.active(),
-  //     severityNumber: eventRecord.severityNumber || SeverityNumber.INFO,
-  //     timestamp: eventRecord.timestamp || Date.now(),
-  //   };
-
-  //   if (eventRecord.data) {
-  //     logRecord.body = eventRecord.data;
-  //   }
-
-  //   this.emit(logRecord);
-  // }
 }
