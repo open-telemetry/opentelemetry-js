@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732619772701,
+  "lastUpdate": 1732701254406,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -20556,6 +20556,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.49%",
             "unit": "ops/sec",
             "extra": "101 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "16024985+trivikr@users.noreply.github.com",
+            "name": "Trivikram Kamat",
+            "username": "trivikr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "561f8ad3a3b50c61f643d13a42bcd9c2006a6b57",
+          "message": "fix(docs): broken link for community contribution lifecycle and processes (#5206)",
+          "timestamp": "2024-11-27T09:14:23Z",
+          "tree_id": "0c763dd69c17c1203143530a22fea8959d83aec2",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/561f8ad3a3b50c61f643d13a42bcd9c2006a6b57"
+        },
+        "date": 1732701253535,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 957539,
+            "range": "±0.42%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11505,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 687230,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 639862,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
