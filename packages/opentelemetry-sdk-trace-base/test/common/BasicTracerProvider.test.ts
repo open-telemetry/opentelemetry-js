@@ -92,12 +92,12 @@ describe('BasicTracerProvider', () => {
 
       it('should use noop span processor by default', () => {
         const tracer = new BasicTracerProvider();
-        assert.ok(tracer['activeSpanProcessor'] instanceof MultiSpanProcessor);
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'].length === 1
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
         );
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'][0] instanceof
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
             NoopSpanProcessor
         );
       });
@@ -105,12 +105,12 @@ describe('BasicTracerProvider', () => {
         const errorStub = sinon.spy(diag, 'error');
         const tracer = new BasicTracerProvider();
 
-        assert.ok(tracer['activeSpanProcessor'] instanceof MultiSpanProcessor);
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'].length === 1
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
         );
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'][0] instanceof
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
             NoopSpanProcessor
         );
         sinon.assert.notCalled(errorStub);
@@ -123,12 +123,12 @@ describe('BasicTracerProvider', () => {
         const errorStub = sinon.spy(diag, 'error');
         const tracer = new BasicTracerProvider();
 
-        assert.ok(tracer['activeSpanProcessor'] instanceof MultiSpanProcessor);
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'].length === 1
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
         );
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'][0] instanceof
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
             NoopSpanProcessor
         );
         sinon.assert.calledWith(
@@ -147,16 +147,16 @@ describe('BasicTracerProvider', () => {
           spanProcessors: [spanProcessor],
         });
 
-        assert.ok(tracer['activeSpanProcessor'] instanceof MultiSpanProcessor);
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'].length === 1
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
         );
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'][0] instanceof
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
             SimpleSpanProcessor
         );
         assert.ok(
-          tracer['activeSpanProcessor']['_spanProcessors'][0][
+          tracer['_activeSpanProcessor']['_spanProcessors'][0][
             '_exporter'
           ] instanceof ConsoleSpanExporter
         );
@@ -466,16 +466,16 @@ describe('BasicTracerProvider', () => {
       /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
       provider.register();
 
-      assert.ok(provider['activeSpanProcessor'] instanceof MultiSpanProcessor);
+      assert.ok(provider['_activeSpanProcessor'] instanceof MultiSpanProcessor);
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'].length === 1
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0] instanceof
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
           BatchSpanProcessor
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0][
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
           '_exporter'
         ] instanceof DummyExporter
       );
@@ -521,16 +521,16 @@ describe('BasicTracerProvider', () => {
       const provider = new CustomTracerProvider({});
       provider.register();
 
-      assert.ok(provider['activeSpanProcessor'] instanceof MultiSpanProcessor);
+      assert.ok(provider['_activeSpanProcessor'] instanceof MultiSpanProcessor);
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'].length === 1
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0] instanceof
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
           BatchSpanProcessor
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0][
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
           '_exporter'
         ] instanceof DummyExporter
       );
@@ -635,17 +635,17 @@ describe('BasicTracerProvider', () => {
         provider.register();
 
         assert.ok(
-          provider['activeSpanProcessor'] instanceof MultiSpanProcessor
+          provider['_activeSpanProcessor'] instanceof MultiSpanProcessor
         );
         assert.ok(
-          provider['activeSpanProcessor']['_spanProcessors'].length === 1
+          provider['_activeSpanProcessor']['_spanProcessors'].length === 1
         );
         assert.ok(
-          provider['activeSpanProcessor']['_spanProcessors'][0] instanceof
+          provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
             BatchSpanProcessor
         );
         assert.ok(
-          provider['activeSpanProcessor']['_spanProcessors'][0][
+          provider['_activeSpanProcessor']['_spanProcessors'][0][
             '_exporter'
           ] instanceof InMemorySpanExporter
         );
@@ -958,7 +958,7 @@ describe('BasicTracerProvider', () => {
     it('should trigger shutdown when manually invoked', () => {
       const tracerProvider = new BasicTracerProvider();
       const shutdownStub = sinon.stub(
-        tracerProvider['activeSpanProcessor'],
+        tracerProvider['_activeSpanProcessor'],
         'shutdown'
       );
       tracerProvider.shutdown();
