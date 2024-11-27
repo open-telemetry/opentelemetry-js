@@ -38,7 +38,11 @@ export class ProxyLogger extends BaseProxyLogger implements Logger {
    * @param logRecord
    */
   emitEvent(eventRecord: EventRecord): void {
-    this._getLogger().emitEvent(eventRecord);
+    const logger = this._getLogger();
+    // make sure that emitEvent function exists
+    if (typeof logger.emitEvent === 'function') {
+      this._getLogger().emitEvent(eventRecord);
+    }
   }
 
   /**

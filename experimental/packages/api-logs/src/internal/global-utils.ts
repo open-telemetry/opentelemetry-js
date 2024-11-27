@@ -19,7 +19,7 @@ import { _globalThis } from '../platform';
 import { LoggerProvider as ExperimentalLoggerProvider } from '../experimental/types/LoggerProvider';
 
 export const GLOBAL_LOGS_API_KEY = Symbol.for('io.opentelemetry.js.api.logs');
-// TODO: confirm the name
+// NOTE: added extra global key for experimental logs
 export const GLOBAL_EXPERIMENTAL_LOGS_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.experimental.logs'
 );

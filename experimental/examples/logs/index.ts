@@ -21,6 +21,12 @@ import {
   ConsoleLogRecordExporter,
   SimpleLogRecordProcessor,
 } from '@opentelemetry/sdk-logs';
+import {logs as experimentalLogs } from '@opentelemetry/api-logs/experimental';
+import {
+  LoggerProvider as ExperimentalLoggerProvider,
+  ConsoleLogRecordExporter as ExperimentalConsoleLogRecordExporter,
+  SimpleLogRecordProcessor as ExperimentalSimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs/experimental';
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
@@ -42,14 +48,24 @@ logger.emit({
   attributes: { 'log.type': 'custom' },
 });
 
-// emit an event record
-// logger.emitEvent({
-//   name: 'my-domain.my-event',
-//   data: {
-//     a: 1,
-//     b: 'hello',
-//     c: {
-//       d: 123
-//     }
-//   },
-// });
+
+// emit an event record from experimental logger
+const experimentalLoggerProvider = new ExperimentalLoggerProvider();
+experimentalLoggerProvider.addLogRecordProcessor(
+  new ExperimentalSimpleLogRecordProcessor(new ExperimentalConsoleLogRecordExporter())
+);
+
+experimentalLogs.setGlobalLoggerProvider(experimentalLoggerProvider);
+
+const experimentalLogger = experimentalLogs.getLogger('example', '1.0.0');
+
+experimentalLogger.emitEvent({
+  name: 'my-domain.my-event',
+  data: {
+    a: 1,
+    b: 'hello',
+    c: {
+      d: 123
+    }
+  },
+});

@@ -23,8 +23,4 @@ export interface Logger {
    * @param logRecord
    */
   emit(logRecord: LogRecord): void;
-  /**
-   * Emit an event.
-   */
-  // emitEvent(eventRecord: EventRecord): void;
 }

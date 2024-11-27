@@ -16,12 +16,12 @@
 
 import { Logger } from './Logger';
 import { LoggerOptions } from '../../types/LoggerOptions';
-// import { LoggerProvider as BaseLoggerProvider } from '../../types/LoggerProvider';
+import { LoggerProvider as BaseLoggerProvider } from '../../types/LoggerProvider';
 
 /**
  * A registry for creating named {@link Logger}s.
  */
-export interface LoggerProvider {
+export interface LoggerProvider extends BaseLoggerProvider {
   /**
    * Returns a Logger, creating one if one with the given name, version, and
    * schemaUrl pair is not already created.

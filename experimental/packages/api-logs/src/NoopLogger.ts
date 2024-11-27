@@ -19,8 +19,6 @@ import { LogRecord } from './types/LogRecord';
 
 export class NoopLogger implements Logger {
   emit(_logRecord: LogRecord): void {}
-
-  // emitEvent(_eventRecord: EventRecord): void {}
 }
 
 export const NOOP_LOGGER = new NoopLogger();

@@ -19,9 +19,10 @@ import { IResource } from '@opentelemetry/resources';
 import { LogRecordProcessor } from '../LogRecordProcessor';
 import { LogRecordLimits } from '../types';
 import { NoopLogRecordProcessor } from '../export/NoopLogRecordProcessor';
+import { Logger as ExperimentalLogger } from '@opentelemetry/api-logs/experimental';
 
 export class LoggerProviderSharedState {
-  readonly loggers: Map<string, Logger> = new Map();
+  readonly loggers: Map<string, Logger | ExperimentalLogger> = new Map();
   activeProcessor: LogRecordProcessor;
   readonly registeredLogRecordProcessors: LogRecordProcessor[] = [];
 

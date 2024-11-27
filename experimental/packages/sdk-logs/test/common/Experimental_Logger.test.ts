@@ -17,10 +17,14 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LogRecord, LoggerProvider, NoopLogRecordProcessor } from '../../src';
+import { LogRecord, NoopLogRecordProcessor } from '../../src';
 import { ROOT_CONTEXT, TraceFlags, context, trace } from '@opentelemetry/api';
-import { LogRecord as ApiLogRecord } from '@opentelemetry/api-logs';
-import { Logger } from '../../src/Logger';
+import {
+  LogRecord as ApiLogRecord,
+  SeverityNumber,
+} from '@opentelemetry/api-logs/experimental';
+import { Logger } from '../../src/Experimental_Logger';
+import { LoggerProvider } from '../../src/Experimental_LoggerProvider';
 
 const setup = () => {
   const loggerProvider = new LoggerProvider();
@@ -31,8 +35,11 @@ const setup = () => {
   }) as Logger;
   return { logger, logProcessor };
 };
+describe('Experimental Logger', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
 
-describe('Logger', () => {
   describe('constructor', () => {
     it('should create an instance', () => {
       const { logger } = setup();
@@ -83,6 +90,78 @@ describe('Logger', () => {
       const callSpy = sinon.spy(logProcessor, 'onEmit');
       logger.emit(logRecordData);
       assert.ok(callSpy.calledWith(sinon.match.any, activeContext));
+    });
+  });
+
+  describe('emitEvent', () => {
+    it('should emit an event Record instance', () => {
+      const { logger, logProcessor } = setup();
+      const now = Date.now();
+      const spy = sinon.spy(logger, 'emit');
+      const callSpy = sinon.spy(logProcessor, 'onEmit');
+      logger.emitEvent({
+        name: 'event name',
+        data: {
+          a: 1,
+          b: 2,
+        },
+        attributes: {
+          c: 3,
+          d: 4,
+        },
+        severityNumber: SeverityNumber.ERROR,
+        timestamp: now,
+      });
+
+      assert.ok(callSpy.called, 'onEmit should be called');
+
+      assert(
+        spy.calledWith(
+          sinon.match({
+            attributes: {
+              'event.name': 'event name',
+              c: 3,
+              d: 4,
+            },
+            body: {
+              a: 1,
+              b: 2,
+            },
+            severityNumber: SeverityNumber.ERROR,
+            timestamp: now,
+          })
+        ),
+        'should call onEmit with expected attributes'
+      );
+    });
+
+    it('should set defaults', () => {
+      const { logger, logProcessor } = setup();
+      const spy = sinon.spy(logger, 'emit');
+      const callSpy = sinon.spy(logProcessor, 'onEmit');
+
+      logger.emitEvent({
+        name: 'event name',
+      });
+
+      assert.ok(callSpy.called, 'onEmit should be called');
+      assert(
+        spy.calledWith(
+          sinon.match({
+            severityNumber: SeverityNumber.INFO,
+          })
+        ),
+        'severityNumber should be set to INFO'
+      );
+
+      assert(
+        spy.calledWith(
+          sinon.match((value: any) => {
+            return value.timestamp !== undefined;
+          })
+        ),
+        'timestamp should not be empty'
+      );
     });
   });
 });

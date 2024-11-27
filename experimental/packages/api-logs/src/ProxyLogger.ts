@@ -39,10 +39,6 @@ export class ProxyLogger implements Logger {
     this._getLogger().emit(logRecord);
   }
 
-  // emitEvent(eventRecord: EventRecord): void {
-  //   this._getLogger().emitEvent(eventRecord);
-  // }
-
   /**
    * Try to get a logger from the proxy logger provider.
    * If the proxy logger provider has no delegate, return a noop logger.
