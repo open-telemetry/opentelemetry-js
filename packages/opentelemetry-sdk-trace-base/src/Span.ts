@@ -377,7 +377,7 @@ export class Span implements APISpan, ReadableSpan {
     if (value.length <= limit) {
       return value;
     }
-    return value.substr(0, limit);
+    return value.substring(0, limit);
   }
 
   /**
