@@ -67,6 +67,6 @@
     "@opentelemetry/sdk-metrics": "1.28.0",
     "@opentelemetry/sdk-trace-base": "1.28.0",
     "@opentelemetry/sdk-trace-web": "1.28.0",
-    "zone.js": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0"
+    "zone.js": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0"
   }
 }
