@@ -25,6 +25,6 @@
 
 * chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
 * refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
-* refactor(sdk-trace-base): rename `BasicTracerProvider.activeSpanProcessor` private property. [#XXXX](https://github.com/open-telemetry/opentelemetry-js/pull/XXX) @david-luna
+* refactor(sdk-trace-base): rename `BasicTracerProvider.activeSpanProcessor` private property. [#5211](https://github.com/open-telemetry/opentelemetry-js/pull/5211) @david-luna
 
 ### :bug: (Bug Fix)
