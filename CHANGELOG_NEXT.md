@@ -16,6 +16,7 @@
 * refactor(sdk-trace-base)!: remove `new Span` constructor in favor of `Tracer.startSpan` API [#5048](https://github.com/open-telemetry/opentelemetry-js/pull/5048) @david-luna
 * refactor(sdk-trace-base)!: remove `BasicTracerProvider.addSpanProcessor` API in favor of constructor options. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
 * refactor(sdk-trace-base)!: make `resource` property private in `BasicTracerProvider` and remove `getActiveSpanProcessor` API. [#5192](https://github.com/open-telemetry/opentelemetry-js/pull/5192) @david-luna
+* chore!: update typescript to version `5.6.3` [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145) @david-luna
 
 ### :rocket: (Enhancement)
 
@@ -25,6 +26,5 @@
 
 * chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
 * refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5177) @david-luna
-* chore: update typescript to version `^5.6.3` [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145) @david-luna
 
 ### :bug: (Bug Fix)
