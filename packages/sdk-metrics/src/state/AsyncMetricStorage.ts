@@ -43,10 +43,14 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
     _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: AttributesProcessor,
-    collectorHandles: MetricCollectorHandle[]
+    collectorHandles: MetricCollectorHandle[],
+    private _aggregationCardinalityLimit?: number
   ) {
     super(_instrumentDescriptor);
-    this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
+    this._deltaMetricStorage = new DeltaMetricProcessor(
+      aggregator,
+      this._aggregationCardinalityLimit
+    );
     this._temporalMetricStorage = new TemporalMetricProcessor(
       aggregator,
       collectorHandles

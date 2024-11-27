@@ -25,8 +25,9 @@ import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xm
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const providerWithZone = new WebTracerProvider();
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+const providerWithZone = new WebTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+});
 
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
@@ -70,8 +71,25 @@ XHR instrumentation plugin has few options available to choose from. You can set
 
 | Options                                                                                                                                                                           | Type                         | Description                                                                             |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|-----------------------------------------------------------------------------------------|
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L76) | `XHRCustomAttributeFunction` | Function for adding custom attributes                                                   |
-| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L78)         | `boolean`                    | Disable network events being added as span events (network events are added by default) |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L85) | `XHRCustomAttributeFunction` | Function for adding custom attributes                                                   |
+| [`ignoreNetworkEvents`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L87)         | `boolean`                    | Disable network events being added as span events (network events are added by default) |
+| [`measureRequestSize`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-xml-http-request/src/xhr.ts#L89)          | `boolean`                    | Measure outgoing request length (outgoing request length is not measured by default)    |
+
+## Semantic Conventions
+
+This package uses `@opentelemetry/semantic-conventions` version `1.22+`, which implements Semantic Convention [Version 1.7.0](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/semantic_conventions/README.md)
+
+Attributes collected:
+
+| Attribute                                   | Short Description                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| `http.status_code`                          | HTTP response status code                                                      |
+| `http.host`                                 | The value of the HTTP host header                                              |
+| `http.user_agent`                           | Value of the HTTP User-Agent header sent by the client                         |
+| `http.scheme`                               | The URI scheme identifying the used protocol                                   |
+| `http.url`                                  | Full HTTP request URL                                                          |
+| `http.method`                               | HTTP request method                                                            |
+| `http.request_content_length_uncompressed`  | Uncompressed size of the request body, if any body exists                      |
 
 ## Example Screenshots
 

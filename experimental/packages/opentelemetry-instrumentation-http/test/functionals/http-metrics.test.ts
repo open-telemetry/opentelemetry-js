@@ -22,6 +22,7 @@ import {
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   ATTR_HTTP_REQUEST_METHOD,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PROTOCOL_VERSION,
   ATTR_SERVER_ADDRESS,
@@ -47,7 +48,7 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import { SemconvStability } from '../../src/types';
+import { SemconvStability } from '../../src/internal-types';
 import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
@@ -181,7 +182,7 @@ describe('metrics', () => {
     });
   });
 
-  describe('with no semconv stability set to stable', () => {
+  describe('with semconv stability set to stable', () => {
     before(() => {
       instrumentation['_semconvStability'] = SemconvStability.STABLE;
     });
@@ -217,7 +218,9 @@ describe('metrics', () => {
       assert.deepStrictEqual(metrics[0].dataPoints[0].attributes, {
         [ATTR_HTTP_REQUEST_METHOD]: 'GET',
         [ATTR_URL_SCHEME]: 'http',
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
         [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+        [ATTR_HTTP_ROUTE]: 'TheRoute',
       });
 
       assert.strictEqual(metrics[1].dataPointType, DataPointType.HISTOGRAM);
@@ -244,7 +247,7 @@ describe('metrics', () => {
     });
   });
 
-  describe('with no semconv stability set to duplicate', () => {
+  describe('with semconv stability set to duplicate', () => {
     before(() => {
       instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
     });
@@ -353,6 +356,7 @@ describe('metrics', () => {
       assert.deepStrictEqual(metrics[2].dataPoints[0].attributes, {
         [ATTR_HTTP_REQUEST_METHOD]: 'GET',
         [ATTR_URL_SCHEME]: 'http',
+        [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
         [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
         [ATTR_HTTP_ROUTE]: 'TheRoute',
       });

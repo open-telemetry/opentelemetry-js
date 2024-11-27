@@ -47,8 +47,9 @@ function createSpan() {
   span.end();
 }
 
-const tracerProvider = new BasicTracerProvider();
-tracerProvider.addSpanProcessor(new BatchSpanProcessor(new NoopExporter()));
+const tracerProvider = new BasicTracerProvider({
+  spanProcessors: [new BatchSpanProcessor(new NoopExporter())]
+});
 const tracer = tracerProvider.getTracer('test')
 
 const suite = new Benchmark.Suite('BatchSpanProcessor');

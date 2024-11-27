@@ -21,6 +21,7 @@ import {
   DataPointType,
   ExplicitBucketHistogramAggregation,
   HistogramMetricData,
+  DataPoint,
 } from '../src';
 import {
   assertScopeMetrics,
@@ -32,6 +33,7 @@ import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
 import { View } from '../src/view/View';
 import { Meter } from '../src/Meter';
+import { Resource } from '@opentelemetry/resources';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -47,6 +49,66 @@ describe('MeterProvider', () => {
     it('construct with resource', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
       assert(meterProvider instanceof MeterProvider);
+    });
+
+    it('should use default resource when no resource is passed', async function () {
+      const reader = new TestMetricReader();
+
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+      });
+
+      // Create meter and instrument, otherwise nothing will export
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const { resourceMetrics } = await reader.collect();
+      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
+    });
+
+    it('should not merge with defaults when flag is set to false', async function () {
+      const reader = new TestMetricReader();
+      const expectedResource = new Resource({ foo: 'bar' });
+
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        resource: expectedResource,
+        mergeResourceWithDefaults: false,
+      });
+
+      // Create meter and instrument, otherwise nothing will export
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const { resourceMetrics } = await reader.collect();
+      assert.deepStrictEqual(resourceMetrics.resource, expectedResource);
+    });
+
+    it('should merge with defaults when flag is set to true', async function () {
+      const reader = new TestMetricReader();
+      const providedResource = new Resource({ foo: 'bar' });
+
+      const meterProvider = new MeterProvider({
+        readers: [reader],
+        resource: providedResource,
+        mergeResourceWithDefaults: true,
+      });
+
+      // Create meter and instrument, otherwise nothing will export
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const { resourceMetrics } = await reader.collect();
+      assert.deepStrictEqual(
+        resourceMetrics.resource,
+        Resource.default().merge(providedResource)
+      );
     });
   });
 
@@ -538,6 +600,184 @@ describe('MeterProvider', () => {
           .dataPoints[0].value.buckets.boundaries,
         sBoundaries
       );
+    });
+  });
+
+  describe('aggregationCardinalityLimit with view should apply the cardinality limit', () => {
+    it('should respect the aggregationCardinalityLimit', async () => {
+      const reader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+        views: [
+          new View({
+            instrumentName: 'test-counter',
+            aggregationCardinalityLimit: 2, // Set cardinality limit to 2
+          }),
+        ],
+      });
+
+      const meter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = meter.createCounter('test-counter');
+
+      // Add values with different attributes
+      counter.add(1, { attr1: 'value1' });
+      counter.add(1, { attr2: 'value2' });
+      counter.add(1, { attr3: 'value3' });
+      counter.add(1, { attr1: 'value1' });
+
+      // Perform collection
+      const { resourceMetrics, errors } = await reader.collect();
+
+      assert.strictEqual(errors.length, 0);
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+
+      const metricData = resourceMetrics.scopeMetrics[0].metrics[0];
+      assert.strictEqual(metricData.dataPoints.length, 2);
+
+      // Check if the overflow data point is present
+      const overflowDataPoint = (
+        metricData.dataPoints as DataPoint<number>[]
+      ).find((dataPoint: DataPoint<number>) =>
+        Object.prototype.hasOwnProperty.call(
+          dataPoint.attributes,
+          'otel.metric.overflow'
+        )
+      );
+      assert.ok(overflowDataPoint);
+      assert.strictEqual(overflowDataPoint.value, 2);
+    });
+
+    it('should respect the aggregationCardinalityLimit for observable counter', async () => {
+      const reader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+        views: [
+          new View({
+            instrumentName: 'test-observable-counter',
+            aggregationCardinalityLimit: 2, // Set cardinality limit to 2
+          }),
+        ],
+      });
+
+      const meter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const observableCounter = meter.createObservableCounter(
+        'test-observable-counter'
+      );
+      observableCounter.addCallback(observableResult => {
+        observableResult.observe(1, { attr1: 'value1' });
+        observableResult.observe(2, { attr2: 'value2' });
+        observableResult.observe(3, { attr3: 'value3' });
+        observableResult.observe(4, { attr1: 'value1' });
+      });
+
+      // Perform collection
+      const { resourceMetrics, errors } = await reader.collect();
+
+      assert.strictEqual(errors.length, 0);
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+
+      const metricData = resourceMetrics.scopeMetrics[0].metrics[0];
+      assert.strictEqual(metricData.dataPoints.length, 2);
+
+      // Check if the overflow data point is present
+      const overflowDataPoint = (
+        metricData.dataPoints as DataPoint<number>[]
+      ).find((dataPoint: DataPoint<number>) =>
+        Object.prototype.hasOwnProperty.call(
+          dataPoint.attributes,
+          'otel.metric.overflow'
+        )
+      );
+      assert.ok(overflowDataPoint);
+      assert.strictEqual(overflowDataPoint.value, 3);
+    });
+  });
+
+  describe('aggregationCardinalityLimit via MetricReader should apply the cardinality limit', () => {
+    it('should respect the aggregationCardinalityLimit set via MetricReader', async () => {
+      const reader = new TestMetricReader({
+        cardinalitySelector: (instrumentType: InstrumentType) => 2, // Set cardinality limit to 2 via cardinalitySelector
+      });
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+      });
+
+      const meter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = meter.createCounter('test-counter');
+
+      // Add values with different attributes
+      counter.add(1, { attr1: 'value1' });
+      counter.add(1, { attr2: 'value2' });
+      counter.add(1, { attr3: 'value3' });
+      counter.add(1, { attr1: 'value1' });
+
+      // Perform collection
+      const { resourceMetrics, errors } = await reader.collect();
+
+      assert.strictEqual(errors.length, 0);
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+
+      const metricData = resourceMetrics.scopeMetrics[0].metrics[0];
+      assert.strictEqual(metricData.dataPoints.length, 2);
+
+      // Check if the overflow data point is present
+      const overflowDataPoint = (
+        metricData.dataPoints as DataPoint<number>[]
+      ).find((dataPoint: DataPoint<number>) =>
+        Object.prototype.hasOwnProperty.call(
+          dataPoint.attributes,
+          'otel.metric.overflow'
+        )
+      );
+      assert.ok(overflowDataPoint);
+      assert.strictEqual(overflowDataPoint.value, 2);
+    });
+  });
+
+  describe('default aggregationCardinalityLimit should apply the cardinality limit', () => {
+    it('should respect the default aggregationCardinalityLimit', async () => {
+      const reader = new TestMetricReader();
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        readers: [reader],
+      });
+
+      const meter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = meter.createCounter('test-counter');
+
+      // Add values with different attributes
+      for (let i = 0; i < 2001; i++) {
+        const attributes = { [`attr${i}`]: `value${i}` };
+        counter.add(1, attributes);
+      }
+
+      // Perform collection
+      const { resourceMetrics, errors } = await reader.collect();
+
+      assert.strictEqual(errors.length, 0);
+      assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+      assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+
+      const metricData = resourceMetrics.scopeMetrics[0].metrics[0];
+      assert.strictEqual(metricData.dataPoints.length, 2000);
+
+      // Check if the overflow data point is present
+      const overflowDataPoint = (
+        metricData.dataPoints as DataPoint<number>[]
+      ).find((dataPoint: DataPoint<number>) =>
+        Object.prototype.hasOwnProperty.call(
+          dataPoint.attributes,
+          'otel.metric.overflow'
+        )
+      );
+      assert.ok(overflowDataPoint);
+      assert.strictEqual(overflowDataPoint.value, 2);
     });
   });
 

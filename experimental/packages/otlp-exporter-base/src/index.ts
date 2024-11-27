@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
- * TODO: Replace export * with named exports before next major version
- */
-export * from './platform';
 export { OTLPExporterBase } from './OTLPExporterBase';
-export {
-  OTLPExporterError,
-  OTLPExporterConfigBase,
-  ExportServiceError,
-} from './types';
-export { validateAndNormalizeHeaders } from './util';
+export { OTLPExporterError } from './types';
 
 export {
   ExportResponse,
@@ -41,4 +32,14 @@ export {
   getSharedConfigurationDefaults,
 } from './configuration/shared-configuration';
 
-export { getSharedConfigurationFromEnvironment } from './configuration/shared-env-configuration';
+export {
+  OTLPExporterNodeConfigBase,
+  CompressionAlgorithm,
+} from './configuration/legacy-node-configuration';
+export { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
+export {
+  createOtlpExportDelegate,
+  IOtlpExportDelegate,
+} from './otlp-export-delegate';
+export { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
+export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';

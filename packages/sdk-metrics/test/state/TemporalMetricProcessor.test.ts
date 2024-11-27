@@ -31,14 +31,17 @@ import {
 
 const deltaCollector1: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
+  selectCardinalityLimit: () => 2000,
 };
 
 const deltaCollector2: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
+  selectCardinalityLimit: () => 2000,
 };
 
 const cumulativeCollector1: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
+  selectCardinalityLimit: () => 2000,
 };
 
 describe('TemporalMetricProcessor', () => {

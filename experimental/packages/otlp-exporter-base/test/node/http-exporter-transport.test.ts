@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { createHttpExporterTransport } from '../../src/platform/node/http-exporter-transport';
+import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
 import * as http from 'http';
 import * as assert from 'assert';
 import sinon = require('sinon');
@@ -22,6 +22,7 @@ import {
   ExportResponseRetryable,
   ExportResponseFailure,
   ExportResponseSuccess,
+  OTLPExporterError,
 } from '../../src';
 import * as zlib from 'zlib';
 
@@ -54,7 +55,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -80,7 +81,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -104,7 +105,7 @@ describe('HttpExporterTransport', function () {
       // act
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -123,13 +124,13 @@ describe('HttpExporterTransport', function () {
       // arrange
       server = http.createServer((_, res) => {
         res.statusCode = 404;
-        res.end();
+        res.end('response-body');
       });
       server.listen(8080);
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -142,6 +143,14 @@ describe('HttpExporterTransport', function () {
       assert.strictEqual(
         (result as ExportResponseFailure).error.message,
         'Not Found'
+      );
+      assert.strictEqual(
+        ((result as ExportResponseFailure).error as OTLPExporterError).data,
+        'response-body'
+      );
+      assert.strictEqual(
+        ((result as ExportResponseFailure).error as OTLPExporterError).code,
+        404
       );
     });
 
@@ -158,7 +167,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -191,7 +200,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -212,7 +221,7 @@ describe('HttpExporterTransport', function () {
       const transport = createHttpExporterTransport({
         // use wrong port
         url: 'http://example.test',
-        headers: {},
+        headers: () => ({}),
         compression: 'none',
         agentOptions: {},
       });
@@ -262,7 +271,7 @@ describe('HttpExporterTransport', function () {
       // act
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: { foo: 'foo-value', bar: 'bar-value' },
+        headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'none',
         agentOptions: {},
       });
@@ -311,7 +320,7 @@ describe('HttpExporterTransport', function () {
 
       const transport = createHttpExporterTransport({
         url: 'http://localhost:8080',
-        headers: { foo: 'foo-value', bar: 'bar-value' },
+        headers: () => ({ foo: 'foo-value', bar: 'bar-value' }),
         compression: 'gzip',
         agentOptions: {},
       });

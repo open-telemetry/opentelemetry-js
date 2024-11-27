@@ -19,6 +19,7 @@ import {
   SpanKind,
   context,
   Span,
+  diag,
 } from '@opentelemetry/api';
 import {
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH,
@@ -37,7 +38,7 @@ import {
   IgnoreMatcher,
   ParsedRequestOptions,
   SemconvStability,
-} from '../../src/types';
+} from '../../src/internal-types';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
@@ -101,7 +102,7 @@ describe('Utility', () => {
         urlParsedWithUndefinedHostAndNullPort,
         whatWgUrl,
       ]) {
-        const result = utils.getRequestInfo(param);
+        const result = utils.getRequestInfo(diag, param);
         assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
         assert.strictEqual(result.optionsParsed.protocol, 'http:');
         assert.strictEqual(result.optionsParsed.path, '/aPath?qu=ry');
@@ -145,85 +146,6 @@ describe('Utility', () => {
         '/test/home',
         (url: string) => url !== '/test/home'
       );
-      assert.strictEqual(answer2, false);
-    });
-  });
-
-  describe('isIgnored()', () => {
-    beforeEach(() => {
-      sinon.spy(utils, 'satisfiesPattern');
-    });
-
-    afterEach(() => {
-      sinon.restore();
-    });
-
-    it('should call isSatisfyPattern, n match', () => {
-      const answer1 = utils.isIgnored('/test/1', ['/test/11']);
-      assert.strictEqual(answer1, false);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        1
-      );
-    });
-
-    it('should call isSatisfyPattern, match for function', () => {
-      const answer1 = utils.isIgnored('/test/1', [
-        url => url.endsWith('/test/1'),
-      ]);
-      assert.strictEqual(answer1, true);
-    });
-
-    it('should not re-throw when function throws an exception', () => {
-      const onException = (e: unknown) => {
-        // Do nothing
-      };
-      for (const callback of [undefined, onException]) {
-        assert.doesNotThrow(() =>
-          utils.isIgnored(
-            '/test/1',
-            [
-              () => {
-                throw new Error('test');
-              },
-            ],
-            callback
-          )
-        );
-      }
-    });
-
-    it('should call onException when function throws an exception', () => {
-      const onException = sinon.spy();
-      assert.doesNotThrow(() =>
-        utils.isIgnored(
-          '/test/1',
-          [
-            () => {
-              throw new Error('test');
-            },
-          ],
-          onException
-        )
-      );
-      assert.strictEqual((onException as sinon.SinonSpy).callCount, 1);
-    });
-
-    it('should not call isSatisfyPattern', () => {
-      utils.isIgnored('/test/1', []);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        0
-      );
-    });
-
-    it('should return false on empty list', () => {
-      const answer1 = utils.isIgnored('/test/1', []);
-      assert.strictEqual(answer1, false);
-    });
-
-    it('should not throw and return false when list is undefined', () => {
-      const answer2 = utils.isIgnored('/test/1', undefined);
       assert.strictEqual(answer2, false);
     });
   });
@@ -511,10 +433,14 @@ describe('Utility', () => {
         'user-agent': 'chrome',
         'x-forwarded-for': '<client>, <proxy1>, <proxy2>',
       };
-      const attributes = utils.getIncomingRequestAttributes(request, {
-        component: 'http',
-        semconvStability: SemconvStability.OLD,
-      });
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          semconvStability: SemconvStability.OLD,
+        },
+        diag
+      );
       assert.strictEqual(attributes[SEMATTRS_HTTP_ROUTE], undefined);
     });
 
@@ -527,10 +453,14 @@ describe('Utility', () => {
       request.headers = {
         'user-agent': 'chrome',
       };
-      const attributes = utils.getIncomingRequestAttributes(request, {
-        component: 'http',
-        semconvStability: SemconvStability.OLD,
-      });
+      const attributes = utils.getIncomingRequestAttributes(
+        request,
+        {
+          component: 'http',
+          semconvStability: SemconvStability.OLD,
+        },
+        diag
+      );
       assert.strictEqual(attributes[SEMATTRS_HTTP_TARGET], '/user/?q=val');
     });
   });

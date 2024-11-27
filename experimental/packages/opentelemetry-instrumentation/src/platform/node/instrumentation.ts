@@ -287,6 +287,11 @@ export abstract class InstrumentationBase<
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
+        if (!baseDir && path.isAbsolute(name)) {
+          const parsedPath = path.parse(name);
+          name = parsedPath.name;
+          baseDir = parsedPath.dir;
+        }
         return this._onRequire<typeof exports>(module, exports, name, baseDir);
       };
       const onRequire: OnRequireFn = (exports, name, baseDir) => {

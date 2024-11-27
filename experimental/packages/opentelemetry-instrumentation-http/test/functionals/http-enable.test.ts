@@ -33,6 +33,7 @@ import {
   ATTR_CLIENT_ADDRESS,
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
+  ATTR_HTTP_ROUTE,
   ATTR_NETWORK_PEER_ADDRESS,
   ATTR_NETWORK_PEER_PORT,
   ATTR_NETWORK_PROTOCOL_VERSION,
@@ -65,7 +66,7 @@ import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
-import { HttpInstrumentationConfig, SemconvStability } from '../../src/types';
+import { HttpInstrumentationConfig } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
@@ -87,6 +88,7 @@ instrumentation.disable();
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { getRemoteClientAddress } from '../../src/utils';
+import { SemconvStability } from '../../src/internal-types';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -182,19 +184,9 @@ describe('HttpInstrumentation', () => {
 
       before(async () => {
         const config: HttpInstrumentationConfig = {
-          ignoreIncomingPaths: [
-            (url: string) => {
-              throw new Error('bad ignoreIncomingPaths function');
-            },
-          ],
           ignoreIncomingRequestHook: _request => {
             throw new Error('bad ignoreIncomingRequestHook function');
           },
-          ignoreOutgoingUrls: [
-            (url: string) => {
-              throw new Error('bad ignoreOutgoingUrls function');
-            },
-          ],
           ignoreOutgoingRequestHook: _request => {
             throw new Error('bad ignoreOutgoingRequestHook function');
           },
@@ -307,21 +299,11 @@ describe('HttpInstrumentation', () => {
 
       before(async () => {
         instrumentation.setConfig({
-          ignoreIncomingPaths: [
-            '/ignored/string',
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith('/ignored/function'),
-          ],
           ignoreIncomingRequestHook: request => {
             return (
               request.headers['user-agent']?.match('ignored-string') != null
             );
           },
-          ignoreOutgoingUrls: [
-            `${protocol}://${hostname}:${serverPort}/ignored/string`,
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith('/ignored/function'),
-          ],
           ignoreOutgoingRequestHook: request => {
             if (request.headers?.['user-agent'] != null) {
               return (
@@ -367,6 +349,15 @@ describe('HttpInstrumentation', () => {
             assert.strictEqual(rpcData.type, RPCType.HTTP);
             assert.strictEqual(rpcData.route, undefined);
             rpcData.route = 'TheRoute';
+          }
+          if (request.url?.includes('/login')) {
+            assert.strictEqual(
+              request.headers.authorization,
+              'Basic ' + Buffer.from('username:password').toString('base64')
+            );
+          }
+          if (request.url?.includes('/withQuery')) {
+            assert.match(request.url, /withQuery\?foo=bar$/);
           }
           response.end('Test Server Response');
         });
@@ -591,19 +582,7 @@ describe('HttpInstrumentation', () => {
         });
       });
 
-      for (const ignored of ['string', 'function', 'regexp']) {
-        it(`should not trace ignored requests with paths (client and server side) with type ${ignored}`, async () => {
-          const testPath = `/ignored/${ignored}`;
-
-          await httpRequest.get(
-            `${protocol}://${hostname}:${serverPort}${testPath}`
-          );
-          const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 0);
-        });
-      }
-
-      it('should not trace ignored requests with headers (client and server side)', async () => {
+      it('should not trace ignored requests when ignore hook returns true', async () => {
         const testValue = 'ignored-string';
 
         await Promise.all([
@@ -617,7 +596,7 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      it('should trace not ignored requests with headers (client and server side)', async () => {
+      it('should trace requests when ignore hook returns false', async () => {
         await httpRequest.get(`${protocol}://${hostname}:${serverPort}`, {
           headers: {
             'user-agent': 'test-bot',
@@ -627,7 +606,7 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans.length, 2);
       });
 
-      for (const arg of ['string', {}, new Date()]) {
+      for (const arg of [{}, new Date()]) {
         it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
@@ -1035,6 +1014,34 @@ describe('HttpInstrumentation', () => {
 
         assert.deepStrictEqual(warnMessages, []);
       });
+
+      it('should not throw with cyrillic characters in the request path', async () => {
+        // see https://github.com/open-telemetry/opentelemetry-js/issues/5060
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}/привет`);
+      });
+
+      it('should keep username and password in the request', async () => {
+        await httpRequest.get(
+          `${protocol}://username:password@${hostname}:${serverPort}/login`
+        );
+      });
+
+      it('should keep query in the request', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/withQuery?foo=bar`
+        );
+      });
+
+      it('using an invalid url does throw from client but still creates a span', async () => {
+        try {
+          await httpRequest.get(`http://instrumentation.test:string-as-port/`);
+        } catch (e) {
+          assert.match(e.message, /Invalid URL/);
+        }
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+      });
     });
 
     describe('with semconv stability set to http', () => {
@@ -1134,6 +1141,32 @@ describe('HttpInstrumentation', () => {
           [ATTR_URL_SCHEME]: protocol,
         });
       });
+
+      it('should generate semconv 1.27 server spans with route when RPC metadata is available', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}/setroute`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, _] = spans;
+        assert.strictEqual(spans.length, 2);
+
+        const body = JSON.parse(response.data);
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(incomingSpan.attributes, {
+          [ATTR_CLIENT_ADDRESS]: body.address,
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_HTTP_ROUTE]: 'TheRoute',
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
+          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+          [ATTR_URL_PATH]: `${pathname}/setroute`,
+          [ATTR_URL_SCHEME]: protocol,
+        });
+      });
     });
 
     describe('with semconv stability set to http/dup', () => {
@@ -1146,6 +1179,13 @@ describe('HttpInstrumentation', () => {
         instrumentation['_semconvStability'] = SemconvStability.DUPLICATE;
         instrumentation.enable();
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/setroute')) {
+            const rpcData = getRPCMetadata(context.active());
+            assert.ok(rpcData != null);
+            assert.strictEqual(rpcData.type, RPCType.HTTP);
+            assert.strictEqual(rpcData.route, undefined);
+            rpcData.route = 'TheRoute';
+          }
           response.setHeader('Content-Type', 'application/json');
           response.end(
             JSON.stringify({ address: getRemoteClientAddress(request) })
@@ -1230,6 +1270,50 @@ describe('HttpInstrumentation', () => {
           [SEMATTRS_HTTP_STATUS_CODE]: 200,
           [SEMATTRS_HTTP_TARGET]: '/test',
           [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}`,
+          [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
+          [SEMATTRS_NET_HOST_IP]: body.address,
+          [SEMATTRS_NET_HOST_NAME]: hostname,
+          [SEMATTRS_NET_HOST_PORT]: serverPort,
+          [SEMATTRS_NET_PEER_IP]: body.address,
+          [SEMATTRS_NET_PEER_PORT]: response.clientRemotePort,
+
+          // unspecified old names
+          [AttributeNames.HTTP_STATUS_TEXT]: 'OK',
+        });
+      });
+
+      it('should create server spans with semconv 1.27 and old 1.7 including http.route if RPC metadata is available', async () => {
+        const response = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}/setroute`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+        const incomingSpan = spans[0];
+        const body = JSON.parse(response.data);
+
+        // should have only required and recommended attributes for semconv 1.27
+        assert.deepStrictEqual(incomingSpan.attributes, {
+          // 1.27 attributes
+          [ATTR_CLIENT_ADDRESS]: body.address,
+          [ATTR_HTTP_REQUEST_METHOD]: HTTP_REQUEST_METHOD_VALUE_GET,
+          [ATTR_SERVER_ADDRESS]: hostname,
+          [ATTR_SERVER_PORT]: serverPort,
+          [ATTR_HTTP_RESPONSE_STATUS_CODE]: 200,
+          [ATTR_NETWORK_PEER_ADDRESS]: body.address,
+          [ATTR_NETWORK_PEER_PORT]: response.clientRemotePort,
+          [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
+          [ATTR_URL_PATH]: `${pathname}/setroute`,
+          [ATTR_URL_SCHEME]: protocol,
+          [ATTR_HTTP_ROUTE]: 'TheRoute',
+
+          // 1.7 attributes
+          [SEMATTRS_HTTP_FLAVOR]: '1.1',
+          [SEMATTRS_HTTP_HOST]: `${hostname}:${serverPort}`,
+          [SEMATTRS_HTTP_METHOD]: 'GET',
+          [SEMATTRS_HTTP_SCHEME]: protocol,
+          [SEMATTRS_HTTP_STATUS_CODE]: 200,
+          [SEMATTRS_HTTP_TARGET]: `${pathname}/setroute`,
+          [SEMATTRS_HTTP_URL]: `http://${hostname}:${serverPort}${pathname}/setroute`,
           [SEMATTRS_NET_TRANSPORT]: 'ip_tcp',
           [SEMATTRS_NET_HOST_IP]: body.address,
           [SEMATTRS_NET_HOST_NAME]: hostname,

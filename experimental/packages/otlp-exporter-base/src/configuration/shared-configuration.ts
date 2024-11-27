@@ -41,6 +41,16 @@ export function validateTimeoutMillis(timeoutMillis: number) {
   );
 }
 
+export function wrapStaticHeadersInFunction(
+  headers: Record<string, string> | undefined
+): (() => Record<string, string>) | undefined {
+  if (headers == null) {
+    return undefined;
+  }
+
+  return () => headers;
+}
+
 /**
  * @param userProvidedConfiguration  Configuration options provided by the user in code.
  * @param fallbackConfiguration Fallback to use when the {@link userProvidedConfiguration} does not specify an option.
