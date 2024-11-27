@@ -830,7 +830,7 @@ describe('Node SDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceInstanceIdIsUUID(resource as Resource);
       delete process.env.OTEL_NODE_RESOURCE_DETECTORS;
       await sdk.shutdown();
     });
@@ -850,7 +850,7 @@ describe('Node SDK', () => {
       const resource = sdk['_resource'];
       await resource.waitForAsyncAttributes?.();
 
-      assertServiceInstanceIdIsUUID(resource);
+      assertServiceInstanceIdIsUUID(resource as Resource);
       await sdk.shutdown();
     });
   });

@@ -19,8 +19,11 @@ import { IKeyValue } from '../common/types';
 /** Properties of a Resource. */
 export interface IResource {
   /** Resource attributes */
-  attributes: IKeyValue[];
+  attributes: IKeyValue[]; 
 
   /** Resource droppedAttributesCount */
   droppedAttributesCount: number;
+
+  /** Schema URL */
+  schemaUrl?: string;
 }
