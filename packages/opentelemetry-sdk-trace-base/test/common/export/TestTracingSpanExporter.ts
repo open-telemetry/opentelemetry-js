@@ -56,7 +56,7 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOnSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
   }
 
