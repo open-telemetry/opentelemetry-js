@@ -113,6 +113,24 @@ describe('InMemoryMetricExporter', () => {
     await metricReader.shutdown();
   });
 
+  it('should get no metrics after shutdown', async () => {
+    const counter = meter.createCounter('counter_total', {
+      description: 'a test description',
+    });
+    const counterAttribute = { key1: 'attributeValue1' };
+    counter.add(10, counterAttribute);
+
+    const exportedMetrics = await waitForNumberOfExports(exporter, 1);
+    assert.ok(exportedMetrics.length > 0);
+
+    await exporter.shutdown();
+
+    const otherMetrics = exporter.getMetrics();
+    assert.ok(otherMetrics.length === 0);
+
+    await metricReader.shutdown();
+  });
+
   it('should be able to access metric', async () => {
     const counter = meter.createCounter('counter_total', {
       description: 'a test description',
