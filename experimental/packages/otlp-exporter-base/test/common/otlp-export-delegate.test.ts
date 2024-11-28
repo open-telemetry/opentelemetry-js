@@ -22,13 +22,14 @@ import { createOtlpExportDelegate } from '../../src/otlp-export-delegate';
 import { ExportResponse } from '../../src';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExportPromiseHandler } from '../../src/bounded-queue-export-promise-handler';
+import { registerMockDiagLogger } from './test-utils';
 
 interface FakeInternalRepresentation {
   foo: string;
 }
 
 interface FakeSignalResponse {
-  baz: string;
+  partialSuccess?: { foo: string };
 }
 
 type FakeSerializer = ISerializer<
@@ -491,9 +492,7 @@ describe('OTLPExportDelegate', function () {
       };
       const mockTransport = <IExporterTransport>transportStubs;
 
-      const response: FakeSignalResponse = {
-        baz: 'partial success',
-      };
+      const response: FakeSignalResponse = {};
 
       const serializerStubs = {
         // simulate that the serializer returns something to send
@@ -528,6 +527,144 @@ describe('OTLPExportDelegate', function () {
           assert.strictEqual(result.error, undefined);
 
           // assert here as otherwise the promise will not have executed yet
+          sinon.assert.calledOnce(serializerStubs.serializeRequest);
+          sinon.assert.calledOnce(transportStubs.send);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+          done();
+        } catch (err) {
+          // ensures we throw if there are more calls to result;
+          done(err);
+        }
+      });
+    });
+
+    it('returns success even if response cannot be deserialized', function (done) {
+      const { warn } = registerMockDiagLogger();
+      // returns mock success response (empty body)
+      const exportResponse: ExportResponse = {
+        data: Uint8Array.from([]),
+        status: 'success',
+      };
+
+      // transport does not need to do anything in this case.
+      const transportStubs = {
+        send: sinon.stub().returns(Promise.resolve(exportResponse)),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+
+      const serializerStubs = {
+        // simulate that the serializer returns something to send
+        serializeRequest: sinon.stub().returns(Uint8Array.from([1])),
+        // simulate that it returns a partial success (response with contents)
+        deserializeResponse: sinon.stub().throws(new Error()),
+      };
+      const mockSerializer = <FakeSerializer>serializerStubs;
+
+      // mock a queue that has not yet reached capacity
+      const promiseHandlerStubs = {
+        pushPromise: sinon.stub(),
+        hasReachedLimit: sinon.stub().returns(false),
+        awaitAll: sinon.stub(),
+      };
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+
+      const exporter = createOtlpExportDelegate(
+        {
+          promiseHandler: promiseHandler,
+          serializer: mockSerializer,
+          transport: mockTransport,
+        },
+        {
+          timeout: 1000,
+        }
+      );
+
+      exporter.export(internalRepresentation, result => {
+        try {
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+          assert.strictEqual(result.error, undefined);
+
+          // assert here as otherwise the promise will not have executed yet
+          sinon.assert.calledOnceWithMatch(
+            warn,
+            'OTLPExportDelegate',
+            'Export succeeded but could not deserialize response - is the response specification compliant?',
+            sinon.match.instanceOf(Error),
+            exportResponse.data
+          );
+          sinon.assert.calledOnce(serializerStubs.serializeRequest);
+          sinon.assert.calledOnce(transportStubs.send);
+          sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
+          sinon.assert.calledOnce(promiseHandlerStubs.hasReachedLimit);
+          sinon.assert.notCalled(promiseHandlerStubs.awaitAll);
+          done();
+        } catch (err) {
+          // ensures we throw if there are more calls to result;
+          done(err);
+        }
+      });
+    });
+
+    it('returns success and warns on partial success response', function (done) {
+      const { warn } = registerMockDiagLogger();
+      // returns mock success response (empty body)
+      const exportResponse: ExportResponse = {
+        data: Uint8Array.from([]),
+        status: 'success',
+      };
+
+      // transport does not need to do anything in this case.
+      const transportStubs = {
+        send: sinon.stub().returns(Promise.resolve(exportResponse)),
+        shutdown: sinon.stub(),
+      };
+      const mockTransport = <IExporterTransport>transportStubs;
+
+      const partialSuccessResponse: FakeSignalResponse = {
+        partialSuccess: { foo: 'bar' },
+      };
+
+      const serializerStubs = {
+        // simulate that the serializer returns something to send
+        serializeRequest: sinon.stub().returns(Uint8Array.from([1])),
+        // simulate that it returns a partial success (response with contents)
+        deserializeResponse: sinon.stub().returns(partialSuccessResponse),
+      };
+      const mockSerializer = <FakeSerializer>serializerStubs;
+
+      // mock a queue that has not yet reached capacity
+      const promiseHandlerStubs = {
+        pushPromise: sinon.stub(),
+        hasReachedLimit: sinon.stub().returns(false),
+        awaitAll: sinon.stub(),
+      };
+      const promiseHandler = <IExportPromiseHandler>promiseHandlerStubs;
+
+      const exporter = createOtlpExportDelegate(
+        {
+          promiseHandler: promiseHandler,
+          serializer: mockSerializer,
+          transport: mockTransport,
+        },
+        {
+          timeout: 1000,
+        }
+      );
+
+      exporter.export(internalRepresentation, result => {
+        try {
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+          assert.strictEqual(result.error, undefined);
+
+          // assert here as otherwise the promise will not have executed yet
+          sinon.assert.calledOnceWithMatch(
+            warn,
+            'Received Partial Success response:',
+            JSON.stringify(partialSuccessResponse.partialSuccess)
+          );
           sinon.assert.calledOnce(serializerStubs.serializeRequest);
           sinon.assert.calledOnce(transportStubs.send);
           sinon.assert.calledOnce(promiseHandlerStubs.pushPromise);
