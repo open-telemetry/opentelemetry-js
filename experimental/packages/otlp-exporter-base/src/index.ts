@@ -37,9 +37,5 @@ export {
   CompressionAlgorithm,
 } from './configuration/legacy-node-configuration';
 export { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
-export {
-  createOtlpExportDelegate,
-  IOtlpExportDelegate,
-} from './otlp-export-delegate';
-export { createBoundedQueueExportPromiseHandler } from './bounded-queue-export-promise-handler';
+export { IOtlpExportDelegate } from './otlp-export-delegate';
 export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';
