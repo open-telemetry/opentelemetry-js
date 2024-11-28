@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import {
+  MeterProvider,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-
-import { OTLPLogExporter } from '../../src/platform/browser';
-import {
-  LoggerProvider,
-  SimpleLogRecordProcessor,
-} from '@opentelemetry/sdk-logs';
+import { OTLPMetricExporter } from '../../src/platform/browser';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
@@ -29,7 +29,7 @@ import {
  * - `@opentelemetry/otlp-transformer`: Everything regarding serialization and transforming internal representations to OTLP
  */
 
-describe('OTLPLogExporter', function () {
+describe('OTLPMetricExporter', function () {
   afterEach(() => {
     sinon.restore();
   });
@@ -39,14 +39,21 @@ describe('OTLPLogExporter', function () {
       it('should successfully send data using sendBeacon', async function () {
         // arrange
         const stubBeacon = sinon.stub(navigator, 'sendBeacon');
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(new OTLPLogExporter())
-        );
+        const meterProvider = new MeterProvider({
+          readers: [
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPMetricExporter(),
+            }),
+          ],
+        });
 
         // act
-        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
-        await loggerProvider.shutdown();
+        meterProvider
+          .getMeter('test-meter')
+          .createCounter('test-counter')
+          .add(1);
+        await meterProvider.forceFlush();
+        await meterProvider.shutdown();
 
         // assert
         const args = stubBeacon.args[0];
@@ -68,18 +75,25 @@ describe('OTLPLogExporter', function () {
       it('should successfully send data using XMLHttpRequest', async function () {
         // arrange
         const server = sinon.fakeServer.create();
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(new OTLPLogExporter())
-        );
+        server.respondWith('OK');
+        server.respondImmediately = true;
+        server.autoRespond = true;
+        const meterProvider = new MeterProvider({
+          readers: [
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPMetricExporter(),
+            }),
+          ],
+        });
 
         // act
-        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
-        queueMicrotask(() => {
-          // simulate success response
-          server.requests[0].respond(200, {}, '');
-        });
-        await loggerProvider.shutdown();
+        meterProvider
+          .getMeter('test-meter')
+          .createCounter('test-counter')
+          .add(1);
+
+        await meterProvider.forceFlush();
+        await meterProvider.shutdown();
 
         // assert
         const request = server.requests[0];

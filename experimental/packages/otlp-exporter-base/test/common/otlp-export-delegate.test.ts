@@ -18,7 +18,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { IExporterTransport } from '../../src';
 import { ExportResultCode } from '@opentelemetry/core';
-import { createOtlpExportDelegate } from '../../src';
+import { createOtlpExportDelegate } from '../../src/otlp-export-delegate';
 import { ExportResponse } from '../../src';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { IExportPromiseHandler } from '../../src/bounded-queue-export-promise-handler';

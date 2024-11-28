@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import {
+  BasicTracerProvider,
+  SimpleSpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-
-import { OTLPLogExporter } from '../../src/platform/browser';
-import {
-  LoggerProvider,
-  SimpleLogRecordProcessor,
-} from '@opentelemetry/sdk-logs';
+import { OTLPTraceExporter } from '../../src/platform/browser/index';
 
 /*
  * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
  * check if the correct components are used. Use the following packages to test details:
- * - `@opentelemetry/oltp-exporter-base`: OTLP common exporter logic (handling of concurrent exports, ...), HTTP transport code
+ * - `@opentelemetry/oltp-exporter-base`: OTLP common exporter logic (handling of concurrent exports, ...)
  * - `@opentelemetry/otlp-transformer`: Everything regarding serialization and transforming internal representations to OTLP
+ * - `@opentelemetry/otlp-grpc-exporter-base`: gRPC transport
  */
 
-describe('OTLPLogExporter', function () {
+describe('OTLPTraceExporter', () => {
   afterEach(() => {
     sinon.restore();
   });
@@ -39,14 +40,13 @@ describe('OTLPLogExporter', function () {
       it('should successfully send data using sendBeacon', async function () {
         // arrange
         const stubBeacon = sinon.stub(navigator, 'sendBeacon');
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(new OTLPLogExporter())
-        );
+        const tracerProvider = new BasicTracerProvider({
+          spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
+        });
 
         // act
-        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
-        await loggerProvider.shutdown();
+        tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
+        await tracerProvider.shutdown();
 
         // assert
         const args = stubBeacon.args[0];
@@ -68,18 +68,17 @@ describe('OTLPLogExporter', function () {
       it('should successfully send data using XMLHttpRequest', async function () {
         // arrange
         const server = sinon.fakeServer.create();
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(
-          new SimpleLogRecordProcessor(new OTLPLogExporter())
-        );
+        const tracerProvider = new BasicTracerProvider({
+          spanProcessors: [new SimpleSpanProcessor(new OTLPTraceExporter())],
+        });
 
         // act
-        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+        tracerProvider.getTracer('test-tracer').startSpan('test-span').end();
         queueMicrotask(() => {
           // simulate success response
           server.requests[0].respond(200, {}, '');
         });
-        await loggerProvider.shutdown();
+        await tracerProvider.shutdown();
 
         // assert
         const request = server.requests[0];
