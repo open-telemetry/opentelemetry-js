@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1732733472742,
+  "lastUpdate": 1732816243342,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -20816,6 +20816,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.24%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fc94e4669a94e688204a919165a020323fc1d5c2",
+          "message": "feat(otlp-exporter-base): implement partial success handling (#5183)",
+          "timestamp": "2024-11-28T17:42:15Z",
+          "tree_id": "070e68491e66959d4bd50baca1b677b2d78a44fa",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/fc94e4669a94e688204a919165a020323fc1d5c2"
+        },
+        "date": 1732816242475,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 951064,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11605,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 717140,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 667214,
+            "range": "±0.49%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
