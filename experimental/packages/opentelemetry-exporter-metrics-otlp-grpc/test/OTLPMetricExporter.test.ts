@@ -53,6 +53,7 @@ const udsAddr = 'unix:///tmp/otlp-metrics.sock';
 type TestParams = {
   address?: string;
   useTLS?: boolean;
+  useDefaultResource?: boolean;
   metadata?: grpc.Metadata;
 };
 
@@ -60,7 +61,7 @@ const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
 const testOTLPMetricExporter = (params: TestParams) => {
-  const { address = httpAddr, useTLS, metadata } = params;
+  const { address = httpAddr, useTLS, metadata, useDefaultResource } = params;
   return describe(`OTLPMetricExporter - node ${
     useTLS ? 'with' : 'without'
   } TLS, ${metadata ? 'with' : 'without'} metadata, target ${address}`, () => {
@@ -143,7 +144,7 @@ const testOTLPMetricExporter = (params: TestParams) => {
         temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
       });
 
-      setUp();
+      setUp(!!useDefaultResource);
 
       const counter = mockCounter();
       mockObservableGauge(observableResult => {
@@ -290,7 +291,7 @@ const testOTLPMetricExporter = (params: TestParams) => {
             ['0', '2', '0']
           );
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          ensureResourceIsCorrect(resource);
+          ensureResourceIsCorrect(resource, !!useDefaultResource);
 
           ensureMetadataIsCorrect(reqMetadata, metadata);
 
@@ -304,5 +305,6 @@ const testOTLPMetricExporter = (params: TestParams) => {
 testOTLPMetricExporter({ useTLS: true });
 testOTLPMetricExporter({ useTLS: false });
 testOTLPMetricExporter({ metadata });
+testOTLPMetricExporter({ useDefaultResource: true });
 // skip UDS tests on windows
 process.platform !== 'win32' && testOTLPMetricExporter({ address: udsAddr });

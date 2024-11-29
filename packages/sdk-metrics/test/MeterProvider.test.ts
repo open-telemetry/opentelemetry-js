@@ -67,14 +67,13 @@ describe('MeterProvider', () => {
       assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
     });
 
-    it('should not merge with defaults when flag is set to false', async function () {
+    it('should use the resource passed in constructor', async function () {
       const reader = new TestMetricReader();
       const expectedResource = new Resource({ foo: 'bar' });
 
       const meterProvider = new MeterProvider({
         readers: [reader],
         resource: expectedResource,
-        mergeResourceWithDefaults: false,
       });
 
       // Create meter and instrument, otherwise nothing will export
@@ -87,14 +86,10 @@ describe('MeterProvider', () => {
       assert.deepStrictEqual(resourceMetrics.resource, expectedResource);
     });
 
-    it('should merge with defaults when flag is set to true', async function () {
+    it('should use default resource if not passed in constructor', async function () {
       const reader = new TestMetricReader();
-      const providedResource = new Resource({ foo: 'bar' });
-
       const meterProvider = new MeterProvider({
         readers: [reader],
-        resource: providedResource,
-        mergeResourceWithDefaults: true,
       });
 
       // Create meter and instrument, otherwise nothing will export
@@ -104,10 +99,7 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(
-        resourceMetrics.resource,
-        Resource.default().merge(providedResource)
-      );
+      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
     });
   });
 
