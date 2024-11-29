@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 export interface OTLPExporterConfigBase {
-  headers?: Record<string, string>;
+  headers?: Record<string, string> | (() => Record<string, string>);
   url?: string;
   concurrencyLimit?: number;
   /** Maximum time the OTLP exporter will wait for each batch export.
