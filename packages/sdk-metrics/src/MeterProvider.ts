@@ -47,7 +47,7 @@ export class MeterProvider implements IMeterProvider {
 
   constructor(options?: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(
-      options?.resource ?? Resource.default(),
+      options?.resource ?? Resource.default()
     );
     if (options?.views != null && options.views.length > 0) {
       for (const viewOption of options.views) {

@@ -73,7 +73,7 @@ describe('MeterProvider', () => {
 
       const meterProvider = new MeterProvider({
         readers: [reader],
-        resource: expectedResource
+        resource: expectedResource,
       });
 
       // Create meter and instrument, otherwise nothing will export
@@ -99,10 +99,7 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(
-        resourceMetrics.resource,
-        Resource.default()
-      );
+      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
     });
   });
 

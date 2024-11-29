@@ -937,10 +937,7 @@ describe('BasicTracerProvider', () => {
       const tracerProvider = new BasicTracerProvider({
         resource: providedResource,
       });
-      assert.deepStrictEqual(
-        tracerProvider['_resource'],
-        providedResource
-      );
+      assert.deepStrictEqual(tracerProvider['_resource'], providedResource);
     });
   });
 

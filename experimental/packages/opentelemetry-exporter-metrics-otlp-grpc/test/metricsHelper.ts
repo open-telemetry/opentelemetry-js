@@ -211,7 +211,10 @@ export function ensureExportedHistogramIsCorrect(
   assert.deepStrictEqual(dp.explicitBounds, explicitBounds);
 }
 
-export function ensureResourceIsCorrect(resource: IResource, checkDefault: boolean) {
+export function ensureResourceIsCorrect(
+  resource: IResource,
+  checkDefault: boolean
+) {
   if (checkDefault) {
     assert.deepStrictEqual(resource, {
       attributes: [

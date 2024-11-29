@@ -103,7 +103,7 @@ export class NodeSDK {
 
   private _resource: IResource;
   private _resourceDetectors: Array<Detector | DetectorSync>;
-  
+
   private _autoDetectResources: boolean;
 
   private _tracerProvider?: NodeTracerProvider;
