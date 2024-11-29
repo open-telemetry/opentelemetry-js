@@ -66,10 +66,10 @@ export async function collect() {
   return (await reader.collect())!;
 }
 
-export function setUp() {
+export function setUp(useDefaultResource: boolean) {
   reader = new TestMetricReader();
   meterProvider = new MeterProvider({
-    resource: testResource,
+    resource: useDefaultResource ? undefined : testResource,
     views: [
       {
         aggregation: {
@@ -211,61 +211,69 @@ export function ensureExportedHistogramIsCorrect(
   assert.deepStrictEqual(dp.explicitBounds, explicitBounds);
 }
 
-export function ensureResourceIsCorrect(resource: IResource) {
-  assert.deepStrictEqual(resource, {
-    attributes: [
-      {
-        key: 'service.name',
-        value: {
-          stringValue: `unknown_service:${process.argv0}`,
-          value: 'stringValue',
+export function ensureResourceIsCorrect(resource: IResource, checkDefault: boolean) {
+  if (checkDefault) {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service.name',
+          value: {
+            stringValue: `unknown_service:${process.argv0}`,
+            value: 'stringValue',
+          },
         },
-      },
-      {
-        key: 'telemetry.sdk.language',
-        value: {
-          stringValue: 'nodejs',
-          value: 'stringValue',
+        {
+          key: 'telemetry.sdk.language',
+          value: {
+            stringValue: 'nodejs',
+            value: 'stringValue',
+          },
         },
-      },
-      {
-        key: 'telemetry.sdk.name',
-        value: {
-          stringValue: 'opentelemetry',
-          value: 'stringValue',
+        {
+          key: 'telemetry.sdk.name',
+          value: {
+            stringValue: 'opentelemetry',
+            value: 'stringValue',
+          },
         },
-      },
-      {
-        key: 'telemetry.sdk.version',
-        value: {
-          stringValue: VERSION,
-          value: 'stringValue',
+        {
+          key: 'telemetry.sdk.version',
+          value: {
+            stringValue: VERSION,
+            value: 'stringValue',
+          },
         },
-      },
-      {
-        key: 'service',
-        value: {
-          stringValue: 'ui',
-          value: 'stringValue',
+      ],
+      droppedAttributesCount: 0,
+    });
+  } else {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service',
+          value: {
+            stringValue: 'ui',
+            value: 'stringValue',
+          },
         },
-      },
-      {
-        key: 'version',
-        value: {
-          intValue: '1',
-          value: 'intValue',
+        {
+          key: 'version',
+          value: {
+            intValue: '1',
+            value: 'intValue',
+          },
         },
-      },
-      {
-        key: 'cost',
-        value: {
-          doubleValue: 112.12,
-          value: 'doubleValue',
+        {
+          key: 'cost',
+          value: {
+            doubleValue: 112.12,
+            value: 'doubleValue',
+          },
         },
-      },
-    ],
-    droppedAttributesCount: 0,
-  });
+      ],
+      droppedAttributesCount: 0,
+    });
+  }
 }
 
 export function ensureMetadataIsCorrect(
