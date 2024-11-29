@@ -35,11 +35,9 @@ class HttpExporterTransport implements IExporterTransport {
   async send(data: Uint8Array, timeoutMillis: number): Promise<ExportResponse> {
     if (this._send == null) {
       // Lazy require to ensure that http/https is not required before instrumentations can wrap it.
-      const {
-        sendWithHttp,
-        createHttpAgent,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-      } = require('./http-transport-utils');
+      const { sendWithHttp, createHttpAgent } = await import(
+        './http-transport-utils'
+      );
       this._agent = createHttpAgent(
         this._parameters.url,
         this._parameters.agentOptions
