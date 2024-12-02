@@ -112,7 +112,7 @@ export {
 export { merge } from './utils/merge';
 export { TracesSamplerValues } from './utils/sampling';
 export { TimeoutError, callWithTimeout } from './utils/timeout';
-export { isUrlAllowed, isUrlIgnored, urlMatches } from './utils/url';
+export { isUrlIgnored, urlMatches } from './utils/url';
 export { isWrapped } from './utils/wrap';
 export { BindOnceFuture } from './utils/callback';
 export { VERSION } from './version';
