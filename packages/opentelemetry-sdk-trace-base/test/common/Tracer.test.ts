@@ -115,7 +115,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     assert.ok(tracer instanceof Tracer);
   });
@@ -125,7 +125,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     assert.strictEqual(
       tracer['_sampler'].toString(),
@@ -138,7 +138,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOffSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span1');
     assert.ok(!span.isRecording());
@@ -150,7 +150,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOnSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span2');
     assert.ok(span.isRecording());
@@ -162,7 +162,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span3');
     assert.strictEqual((span as Span).attributes.testAttribute, 'foobar');
@@ -175,7 +175,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler(traceState) },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('stateSpan');
     assert.strictEqual(span.spanContext().traceState, traceState);
@@ -186,7 +186,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
 
     const lib: InstrumentationLibrary = tracer.instrumentationLibrary;
@@ -203,7 +203,7 @@ describe('Tracer', () => {
         { name: 'default', version: '0.0.1' },
         { sampler: new TestSampler() },
         tracerProvider['_resource'],
-        tracerProvider['activeSpanProcessor']
+        tracerProvider['_activeSpanProcessor']
       );
 
       const span = tracer.startSpan('span3', undefined, context);
@@ -227,7 +227,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan(
       'aSpan',
@@ -249,7 +249,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan(
       'aSpan',
@@ -279,7 +279,7 @@ describe('Tracer', () => {
       { name: 'default' },
       { sampler },
       tp['_resource'],
-      tp['activeSpanProcessor']
+      tp['_activeSpanProcessor']
     );
     const span = tracer.startSpan('a', {}, context) as Span;
     assert.strictEqual(span.parentSpanId, parent.spanId);
@@ -315,7 +315,7 @@ describe('Tracer', () => {
       { name: 'default' },
       { sampler },
       tp['_resource'],
-      tp['activeSpanProcessor']
+      tp['_activeSpanProcessor']
     );
     const span = tracer.startSpan('a', { root: true }, context) as Span;
     assert.strictEqual(span.parentSpanId, undefined);
@@ -334,7 +334,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('my-span');
     const context = span.spanContext();
@@ -349,7 +349,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('my-span');
     const context = span.spanContext();
@@ -364,7 +364,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('my-span');
     const context = span.spanContext();
@@ -377,7 +377,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
 
     const spy = sinon.spy(tracer, 'startSpan');
@@ -401,7 +401,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
 
     const spy = sinon.spy(tracer, 'startSpan');
@@ -429,7 +429,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
 
     const ctxKey = createContextKey('foo');
@@ -465,7 +465,7 @@ describe('Tracer', () => {
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider['_resource'],
-      tracerProvider['activeSpanProcessor']
+      tracerProvider['_activeSpanProcessor']
     );
 
     const attributes = {
