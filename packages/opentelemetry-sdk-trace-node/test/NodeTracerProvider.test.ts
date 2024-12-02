@@ -304,18 +304,18 @@ describe('NodeTracerProvider', () => {
       provider.register();
 
       assert.ok(
-        provider['activeSpanProcessor'].constructor.name ===
+        provider['_activeSpanProcessor'].constructor.name ===
           'MultiSpanProcessor'
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'].length === 1
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0] instanceof
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
           BatchSpanProcessor
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0][
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
           '_exporter'
         ] instanceof DummyExporter
       );
@@ -361,18 +361,18 @@ describe('NodeTracerProvider', () => {
       provider.register();
 
       assert.ok(
-        provider['activeSpanProcessor'].constructor.name ===
+        provider['_activeSpanProcessor'].constructor.name ===
           'MultiSpanProcessor'
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'].length === 1
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0] instanceof
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
           BatchSpanProcessor
       );
       assert.ok(
-        provider['activeSpanProcessor']['_spanProcessors'][0][
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
           '_exporter'
         ] instanceof DummyExporter
       );
