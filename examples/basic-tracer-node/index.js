@@ -6,18 +6,19 @@ const { SEMRESATTRS_SERVICE_NAME } = require('@opentelemetry/semantic-convention
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 
-const provider = new BasicTracerProvider({
-  resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
-  }),
-});
-
 // Configure span processor to send spans to the exporter
 const exporter = new JaegerExporter({
   endpoint: 'http://localhost:14268/api/traces',
 });
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+const provider = new BasicTracerProvider({
+  resource: new Resource({
+    [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
+  }),
+  spanProcessors: [
+    new SimpleSpanProcessor(exporter),
+    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+  ]
+});
 
 /**
  * Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings.

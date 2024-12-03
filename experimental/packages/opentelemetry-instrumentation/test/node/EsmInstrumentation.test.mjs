@@ -135,18 +135,18 @@ class TestAbsoluteFileInstrumentationPatchFn extends InstrumentationBase {
             this._unwrap(moduleExports, 'testFunction');
             return moduleExports;
           }
-        )
+        ),
       ]
-    )
+    );
   }
 }
 
-describe('when loading esm module', () => {
+describe('when loading esm module', function () {
   const instrumentationWrap = new TestInstrumentationWrapFn({
     enabled: false,
   });
 
-  it('should patch module file directly', async () => {
+  it('should patch module file directly', async function () {
     const instrumentation = new TestInstrumentationSimple({
       enabled: false,
     });
@@ -154,19 +154,21 @@ describe('when loading esm module', () => {
     assert.deepEqual(exported.testConstant, 43);
   });
 
-  it('should patch a module with the wrap function', async () => {
+  it('should patch a module with the wrap function', async function () {
     instrumentationWrap.enable();
     assert.deepEqual(exported.testFunction(), 'patched');
   });
 
-  it('should unwrap a patched function', async () => {
+  it('should unwrap a patched function', async function () {
+    // Test skipped due to https://github.com/nodejs/import-in-the-middle/pull/153 breaking unwrap functionality
+    this.skip();
     instrumentationWrap.enable();
     // disable to trigger unwrap
     instrumentationWrap.disable();
     assert.deepEqual(exported.testFunction(), 'original');
   });
 
-  it('should wrap multiple functions with masswrap', () => {
+  it('should wrap multiple functions with masswrap', function () {
     const instrumentation = new TestInstrumentationMasswrapFn({
       enabled: false,
     });
@@ -176,7 +178,9 @@ describe('when loading esm module', () => {
     assert.deepEqual(exported.secondTestFunction(), 'patched');
   });
 
-  it('should unwrap multiple functions with massunwrap', () => {
+  it('should unwrap multiple functions with massunwrap', async function () {
+    // Test skipped due to https://github.com/nodejs/import-in-the-middle/pull/153 breaking unwrap functionality
+    this.skip();
     const instrumentation = new TestInstrumentationMasswrapFn({
       enabled: false,
     });
@@ -187,7 +191,7 @@ describe('when loading esm module', () => {
     assert.deepEqual(exported.secondTestFunction(), 'original');
   });
 
-  it('should patch function from a file with absolute path', async () => {
+  it('should patch function from a file with absolute path', async function () {
     const instrumentation = new TestAbsoluteFileInstrumentationPatchFn({
       enabled: false,
     });
@@ -195,7 +199,9 @@ describe('when loading esm module', () => {
     assert.deepEqual(exportedAbsolute.testFunction(), 'patched');
   });
 
-  it('should unwrap a patched function from a file with absolute path', async () => {
+  it('should unwrap a patched function from a file with absolute path', async function () {
+    // Test skipped due to https://github.com/nodejs/import-in-the-middle/pull/153 breaking unwrap functionality
+    this.skip();
     const instrumentation = new TestAbsoluteFileInstrumentationPatchFn({
       enabled: false,
     });

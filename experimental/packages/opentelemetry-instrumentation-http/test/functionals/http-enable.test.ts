@@ -66,7 +66,7 @@ import * as assert from 'assert';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
-import { HttpInstrumentationConfig, SemconvStability } from '../../src/types';
+import { HttpInstrumentationConfig } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
@@ -88,6 +88,7 @@ instrumentation.disable();
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { getRemoteClientAddress } from '../../src/utils';
+import { SemconvStability } from '../../src/internal-types';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -349,6 +350,15 @@ describe('HttpInstrumentation', () => {
             assert.strictEqual(rpcData.route, undefined);
             rpcData.route = 'TheRoute';
           }
+          if (request.url?.includes('/login')) {
+            assert.strictEqual(
+              request.headers.authorization,
+              'Basic ' + Buffer.from('username:password').toString('base64')
+            );
+          }
+          if (request.url?.includes('/withQuery')) {
+            assert.match(request.url, /withQuery\?foo=bar$/);
+          }
           response.end('Test Server Response');
         });
 
@@ -596,7 +606,7 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans.length, 2);
       });
 
-      for (const arg of ['string', {}, new Date()]) {
+      for (const arg of [{}, new Date()]) {
         it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
@@ -1003,6 +1013,34 @@ describe('HttpInstrumentation', () => {
         diag.disable();
 
         assert.deepStrictEqual(warnMessages, []);
+      });
+
+      it('should not throw with cyrillic characters in the request path', async () => {
+        // see https://github.com/open-telemetry/opentelemetry-js/issues/5060
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}/привет`);
+      });
+
+      it('should keep username and password in the request', async () => {
+        await httpRequest.get(
+          `${protocol}://username:password@${hostname}:${serverPort}/login`
+        );
+      });
+
+      it('should keep query in the request', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}/withQuery?foo=bar`
+        );
+      });
+
+      it('using an invalid url does throw from client but still creates a span', async () => {
+        try {
+          await httpRequest.get(`http://instrumentation.test:string-as-port/`);
+        } catch (e) {
+          assert.match(e.message, /Invalid URL/);
+        }
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
       });
     });
 
