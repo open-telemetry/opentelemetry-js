@@ -99,7 +99,7 @@ export function addSpanNetworkEvents(
   resource: PerformanceEntries,
   ignoreNetworkEvents = false
 ): void {
-  if(!ignoreNetworkEvents) {
+  if (!ignoreNetworkEvents) {
     addSpanNetworkEvent(span, PTN.FETCH_START, resource);
     addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
     addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
