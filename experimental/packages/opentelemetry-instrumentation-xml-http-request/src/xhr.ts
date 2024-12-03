@@ -23,9 +23,9 @@ import {
 } from '@opentelemetry/instrumentation';
 import {
   hrTime,
-  isUrlAllowed,
   isUrlIgnored,
   otperformance,
+  urlMatches,
 } from '@opentelemetry/core';
 import {
   SEMATTRS_HTTP_HOST,
@@ -330,6 +330,27 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   }
 
   /**
+   * Check if {@param url} should be allowed when comparing against {@param allowedUrls}
+   * @param url
+   * @param allowedUrls
+   */
+  private _isUrlAllowed(
+    url: string,
+    allowedUrls: Array<string | RegExp> | undefined
+  ): boolean {
+    if (!allowedUrls) {
+      return true;
+    }
+
+    for (const allowedUrl of allowedUrls) {
+      if (urlMatches(url, allowedUrl)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Creates a new span when method "open" is called
    * @param xhr
    * @param url
@@ -341,7 +362,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     url: string,
     method: string
   ): api.Span | undefined {
-    if (!isUrlAllowed(url, this.getConfig().allowUrls)) {
+    if (!this._isUrlAllowed(url, this.getConfig().allowUrls)) {
       this._diag.debug('ignoring span as url does not match an allowed url');
       return;
     }

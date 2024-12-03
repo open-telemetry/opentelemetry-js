@@ -202,11 +202,14 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
    * @param url
    * @param allowedUrls
    */
-  private _isUrlAllowed(url: string, allowedUrls: Array<string | RegExp> | undefined): boolean {
+  private _isUrlAllowed(
+    url: string,
+    allowedUrls: Array<string | RegExp> | undefined
+  ): boolean {
     if (!allowedUrls) {
       return true;
     }
-    
+
     for (const allowedUrl of allowedUrls) {
       if (core.urlMatches(url, allowedUrl)) {
         return true;
