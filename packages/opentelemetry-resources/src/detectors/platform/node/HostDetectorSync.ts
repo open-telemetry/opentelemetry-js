@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  SEMRESATTRS_HOST_ARCH,
-  SEMRESATTRS_HOST_ID,
-  SEMRESATTRS_HOST_NAME,
-} from '@opentelemetry/semantic-conventions';
+import { ATTR_HOST_ARCH, ATTR_HOST_ID, ATTR_HOST_NAME } from '../../../semconv';
 import { Resource } from '../../../Resource';
 import { DetectorSync, ResourceAttributes } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';
@@ -33,8 +29,8 @@ import { getMachineId } from './machine-id/getMachineId';
 class HostDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): Resource {
     const attributes: ResourceAttributes = {
-      [SEMRESATTRS_HOST_NAME]: hostname(),
-      [SEMRESATTRS_HOST_ARCH]: normalizeArch(arch()),
+      [ATTR_HOST_NAME]: hostname(),
+      [ATTR_HOST_ARCH]: normalizeArch(arch()),
     };
 
     return new Resource(attributes, this._getAsyncAttributes());
@@ -44,7 +40,7 @@ class HostDetectorSync implements DetectorSync {
     return getMachineId().then(machineId => {
       const attributes: ResourceAttributes = {};
       if (machineId) {
-        attributes[SEMRESATTRS_HOST_ID] = machineId;
+        attributes[ATTR_HOST_ID] = machineId;
       }
       return attributes;
     });
