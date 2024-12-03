@@ -198,6 +198,24 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
   }
 
   /**
+   * Check if {@param url} should be allowed when comparing against {@param allowedUrls}
+   * @param url
+   * @param allowedUrls
+   */
+  private _isUrlAllowed(url: string, allowedUrls: Array<string | RegExp> | undefined): boolean {
+    if (!allowedUrls) {
+      return true;
+    }
+    
+    for (const allowedUrl of allowedUrls) {
+      if (core.urlMatches(url, allowedUrl)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Creates a new span
    * @param url
    * @param options
@@ -206,7 +224,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     url: string,
     options: Partial<Request | RequestInit> = {}
   ): api.Span | undefined {
-    if (!core.isUrlAllowed(url, this.getConfig().allowUrls)) {
+    if (!this._isUrlAllowed(url, this.getConfig().allowUrls)) {
       this._diag.debug('ignoring span as url does not match an allowed url');
       return;
     }
