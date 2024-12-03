@@ -13,26 +13,82 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPLogExporter } from '../../src/platform/browser/index';
 
-describe('OTLPLogExporter - web', () => {
-  let collectorLogsExporter: OTLPLogExporter;
-  describe('constructor', () => {
-    beforeEach(() => {
-      const collectorExporterConfig = {
-        hostname: 'foo',
-        url: 'http://foo.bar.com',
-      };
-      collectorLogsExporter = new OTLPLogExporter(collectorExporterConfig);
+import { OTLPLogExporter } from '../../src/platform/browser';
+import {
+  LoggerProvider,
+  SimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
+
+/*
+ * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
+ * check if the correct components are used. Use the following packages to test details:
+ * - `@opentelemetry/oltp-exporter-base`: OTLP common exporter logic (handling of concurrent exports, ...), HTTP transport code
+ * - `@opentelemetry/otlp-transformer`: Everything regarding serialization and transforming internal representations to OTLP
+ */
+
+describe('OTLPLogExporter', function () {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  describe('export', function () {
+    describe('when sendBeacon is available', function () {
+      it('should successfully send data using sendBeacon', async function () {
+        // arrange
+        const stubBeacon = sinon.stub(navigator, 'sendBeacon');
+        const loggerProvider = new LoggerProvider();
+        loggerProvider.addLogRecordProcessor(
+          new SimpleLogRecordProcessor(new OTLPLogExporter())
+        );
+
+        // act
+        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+        await loggerProvider.shutdown();
+
+        // assert
+        const args = stubBeacon.args[0];
+        const blob: Blob = args[1] as unknown as Blob;
+        const body = await blob.text();
+        assert.throws(
+          () => JSON.parse(body),
+          'expected requestBody to be in protobuf format, but parsing as JSON succeeded'
+        );
+      });
     });
-    afterEach(() => {
-      sinon.restore();
-    });
-    it('should create an instance', () => {
-      assert.ok(typeof collectorLogsExporter !== 'undefined');
+
+    describe('when sendBeacon is not available', function () {
+      beforeEach(function () {
+        // fake sendBeacon not being available
+        (window.navigator as any).sendBeacon = false;
+      });
+
+      it('should successfully send data using XMLHttpRequest', async function () {
+        // arrange
+        const server = sinon.fakeServer.create();
+        const loggerProvider = new LoggerProvider();
+        loggerProvider.addLogRecordProcessor(
+          new SimpleLogRecordProcessor(new OTLPLogExporter())
+        );
+
+        // act
+        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+        queueMicrotask(() => {
+          // simulate success response
+          server.requests[0].respond(200, {}, '');
+        });
+        await loggerProvider.shutdown();
+
+        // assert
+        const request = server.requests[0];
+        const body = request.requestBody as unknown as Uint8Array;
+        assert.throws(
+          () => JSON.parse(new TextDecoder().decode(body)),
+          'expected requestBody to be in protobuf format, but parsing as JSON succeeded'
+        );
+      });
     });
   });
 });

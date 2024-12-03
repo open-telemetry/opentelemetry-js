@@ -11,6 +11,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
+* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)

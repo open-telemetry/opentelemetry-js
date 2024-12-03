@@ -23,6 +23,7 @@ import { getHttpConfigurationFromEnvironment } from './otlp-http-env-configurati
 import type * as http from 'http';
 import type * as https from 'https';
 import { diag } from '@opentelemetry/api';
+import { wrapStaticHeadersInFunction } from './shared-configuration';
 
 function convertLegacyAgentOptions(
   config: OTLPExporterNodeConfigBase
@@ -67,7 +68,7 @@ export function convertLegacyHttpOptions(
   return mergeOtlpHttpConfigurationWithDefaults(
     {
       url: config.url,
-      headers: config.headers,
+      headers: wrapStaticHeadersInFunction(config.headers),
       concurrencyLimit: config.concurrencyLimit,
       timeoutMillis: config.timeoutMillis,
       compression: config.compression,

@@ -28,7 +28,7 @@ export type sendWithHttp = (
 
 export interface HttpRequestParameters {
   url: string;
-  headers: Record<string, string>;
+  headers: () => Record<string, string>;
   compression: 'gzip' | 'none';
   agentOptions: http.AgentOptions | https.AgentOptions;
 }

@@ -14,26 +14,8 @@
  * limitations under the License.
  */
 
-import { Stream } from 'stream';
-
-export class MockedResponse extends Stream {
-  constructor(
-    private _code: number,
-    private _msg?: string
-  ) {
-    super();
-  }
-
-  send(data: Uint8Array) {
-    this.emit('data', data);
-    this.emit('end');
-  }
-
-  get statusCode() {
-    return this._code;
-  }
-
-  get statusMessage() {
-    return this._msg;
-  }
-}
+import { InstrumentType } from '../InstrumentDescriptor';
+/**
+ * Cardinality Limit selector based on metric instrument types.
+ */
+export type CardinalitySelector = (instrumentType: InstrumentType) => number;

@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-import { Stream } from 'stream';
-
-export class MockedResponse extends Stream {
-  constructor(
-    private _code: number,
-    private _msg?: string
-  ) {
-    super();
-  }
-
-  send(data: Uint8Array) {
-    this.emit('data', data);
-    this.emit('end');
-  }
-
-  get statusCode() {
-    return this._code;
-  }
-
-  get statusMessage() {
-    return this._msg;
-  }
+/**
+ * Generic export response handler. Can be implemented to handle export responses like partial success.
+ */
+export interface IOtlpResponseHandler<Response> {
+  /**
+   * Handles an OTLP export response.
+   * Implementations MUST NOT throw.
+   * @param response
+   */
+  handleResponse(response: Response): void;
 }

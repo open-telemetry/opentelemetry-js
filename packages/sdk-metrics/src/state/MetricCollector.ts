@@ -90,6 +90,14 @@ export class MetricCollector implements MetricProducer {
   selectAggregation(instrumentType: InstrumentType) {
     return this._metricReader.selectAggregation(instrumentType);
   }
+
+  /**
+   * Select the cardinality limit for the given {@link InstrumentType} for this
+   * collector.
+   */
+  selectCardinalityLimit(instrumentType: InstrumentType): number {
+    return this._metricReader.selectCardinalityLimit?.(instrumentType) ?? 2000;
+  }
 }
 
 /**
@@ -98,4 +106,5 @@ export class MetricCollector implements MetricProducer {
  */
 export interface MetricCollectorHandle {
   selectAggregationTemporality: AggregationTemporalitySelector;
+  selectCardinalityLimit(instrumentType: InstrumentType): number;
 }
