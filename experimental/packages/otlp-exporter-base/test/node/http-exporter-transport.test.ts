@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { createHttpExporterTransport } from '../../src/platform/node/http-exporter-transport';
+import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
 import * as http from 'http';
 import * as assert from 'assert';
 import sinon = require('sinon');
