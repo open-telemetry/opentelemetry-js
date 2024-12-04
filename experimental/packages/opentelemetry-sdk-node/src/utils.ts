@@ -78,7 +78,7 @@ export function filterBlanksAndNulls(list: string[]): string[] {
   return list.map(item => item.trim()).filter(s => s !== 'null' && s !== '');
 }
 
-export function getOtlpProtocolFomEnv(): string {
+export function getOtlpProtocolFromEnv(): string {
   const parsedEnvValues = getEnvWithoutDefaults();
 
   return (
@@ -89,8 +89,8 @@ export function getOtlpProtocolFomEnv(): string {
   );
 }
 
-function getOtlpExporterFomEnv(): SpanExporter {
-  const protocol = getOtlpProtocolFomEnv();
+function getOtlpExporterFromEnv(): SpanExporter {
+  const protocol = getOtlpProtocolFromEnv();
 
   switch (protocol) {
     case 'grpc':
@@ -124,7 +124,7 @@ function getJaegerExporter() {
 
 export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   const exportersMap = new Map<string, () => SpanExporter>([
-    ['otlp', () => getOtlpExporterFomEnv()],
+    ['otlp', () => getOtlpExporterFromEnv()],
     ['zipkin', () => new ZipkinExporter()],
     ['console', () => new ConsoleSpanExporter()],
     ['jaeger', () => getJaegerExporter()],

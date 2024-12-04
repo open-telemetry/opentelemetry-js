@@ -43,11 +43,11 @@ export const JsonTraceSerializer: ISerializer<
 };
 
 export const JsonMetricsSerializer: ISerializer<
-  ResourceMetrics[],
+  ResourceMetrics,
   IExportMetricsServiceResponse
 > = {
-  serializeRequest: (arg: ResourceMetrics[]) => {
-    const request = createExportMetricsServiceRequest(arg, {
+  serializeRequest: (arg: ResourceMetrics) => {
+    const request = createExportMetricsServiceRequest([arg], {
       useLongBits: false,
     });
     const encoder = new TextEncoder();

@@ -15,7 +15,7 @@
  */
 
 /* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
- * TODO: Replace export * with named exports before next major version
+ * TODO: Replace wildcard export with named exports before next major version
  */
 export * as api from '@opentelemetry/api';
 export * as contextBase from '@opentelemetry/api';

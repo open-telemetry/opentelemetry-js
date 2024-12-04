@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
- * TODO: Replace export * with named exports before next major version
- */
-export * from './platform';
-export * from './OTLPMetricExporterOptions';
-export * from './OTLPMetricExporterBase';
+export { OTLPMetricExporter } from './platform';
+export {
+  OTLPMetricExporterOptions,
+  AggregationTemporalityPreference,
+} from './OTLPMetricExporterOptions';
+export {
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
+  LowMemoryTemporalitySelector,
+  OTLPMetricExporterBase,
+} from './OTLPMetricExporterBase';

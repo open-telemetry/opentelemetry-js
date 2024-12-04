@@ -49,7 +49,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers, {
+      assert.deepEqual(config.headers?.(), {
         key1: 'metrics',
         key2: 'value2',
       });
@@ -62,7 +62,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers, {
+      assert.deepEqual(config.headers?.(), {
         key1: 'value1',
         key2: 'value2',
       });
@@ -76,7 +76,7 @@ describe('getHttpConfigurationFromEnvironment', function () {
         'METRICS',
         'v1/metrics'
       );
-      assert.deepEqual(config.headers, {
+      assert.deepEqual(config.headers?.(), {
         key1: 'value1',
         key2: 'value2',
       });
