@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733132245215,
+  "lastUpdate": 1733273535946,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -20920,6 +20920,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b0f73ea11d22f65dc2b2bfe9ddcb0890ea74f533",
+          "message": "fix: de-confuse Nuxt build tooling by not using  'export *' in comments (#5227)",
+          "timestamp": "2024-12-03T21:59:48Z",
+          "tree_id": "c258a9870566a390544395d77a33e1f4a5accf9c",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b0f73ea11d22f65dc2b2bfe9ddcb0890ea74f533"
+        },
+        "date": 1733273535097,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 941783,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 11735,
+            "range": "±0.55%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 637872,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 637129,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
