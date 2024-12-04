@@ -19,6 +19,8 @@ import { IExporterTransport } from './exporter-transport';
 import { IExportPromiseHandler } from './bounded-queue-export-promise-handler';
 import { ISerializer } from '@opentelemetry/otlp-transformer';
 import { OTLPExporterError } from './types';
+import { IOtlpResponseHandler } from './response-handler';
+import { createLoggingPartialSuccessResponseHandler } from './logging-response-handler';
 import { diag, DiagLogger } from '@opentelemetry/api';
 
 /**
@@ -40,6 +42,7 @@ class OTLPExportDelegate<Internal, Response>
   constructor(
     private _transport: IExporterTransport,
     private _serializer: ISerializer<Internal, Response>,
+    private _responseHandler: IOtlpResponseHandler<Response>,
     private _promiseQueue: IExportPromiseHandler,
     private _timeout: number
   ) {
@@ -79,6 +82,19 @@ class OTLPExportDelegate<Internal, Response>
       this._transport.send(serializedRequest, this._timeout).then(
         response => {
           if (response.status === 'success') {
+            if (response.data != null) {
+              try {
+                this._responseHandler.handleResponse(
+                  this._serializer.deserializeResponse(response.data)
+                );
+              } catch (e) {
+                this._diagLogger.warn(
+                  'Export succeeded but could not deserialize response - is the response specification compliant?',
+                  e,
+                  response.data
+                );
+              }
+            }
             // No matter the response, we can consider the export still successful.
             resultCallback({
               code: ExportResultCode.SUCCESS,
@@ -139,6 +155,7 @@ export function createOtlpExportDelegate<Internal, Response>(
   return new OTLPExportDelegate(
     components.transport,
     components.serializer,
+    createLoggingPartialSuccessResponseHandler(),
     components.promiseHandler,
     settings.timeout
   );

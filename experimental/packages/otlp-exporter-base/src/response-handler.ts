@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
- * TODO: Replace wildcard export with named exports before next major version
+/**
+ * Generic export response handler. Can be implemented to handle export responses like partial success.
  */
-export * from './OTLPLogExporter';
+export interface IOtlpResponseHandler<Response> {
+  /**
+   * Handles an OTLP export response.
+   * Implementations MUST NOT throw.
+   * @param response
+   */
+  handleResponse(response: Response): void;
+}

@@ -13,8 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as sinon from 'sinon';
+import { diag } from '@opentelemetry/api';
 
-/* eslint no-restricted-syntax: ["warn", "ExportAllDeclaration"] --
- * TODO: Replace wildcard export with named exports before next major version
- */
-export * from './OTLPLogExporter';
+export function registerMockDiagLogger() {
+  // arrange
+  const stubs = {
+    verbose: sinon.stub(),
+    debug: sinon.stub(),
+    info: sinon.stub(),
+    warn: sinon.stub(),
+    error: sinon.stub(),
+  };
+  diag.setLogger(stubs);
+  stubs.warn.resetHistory(); // reset history setLogger will warn if another has already been set
+
+  return stubs;
+}

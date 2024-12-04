@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { convertLegacyHttpOptions } from '../../../src/configuration/convert-legacy-node-http-options';
+import { registerMockDiagLogger } from '../../common/test-utils';
 
 describe('convertLegacyHttpOptions', function () {
   afterEach(function () {
@@ -26,14 +25,7 @@ describe('convertLegacyHttpOptions', function () {
   });
 
   it('should warn when used with metadata', function () {
-    const warnStub = sinon.stub();
-    diag.setLogger({
-      verbose: sinon.stub(),
-      debug: sinon.stub(),
-      info: sinon.stub(),
-      warn: warnStub,
-      error: sinon.stub(),
-    });
+    const { warn } = registerMockDiagLogger();
 
     convertLegacyHttpOptions(
       { metadata: { foo: 'bar' } } as any,
@@ -43,7 +35,7 @@ describe('convertLegacyHttpOptions', function () {
     );
 
     sinon.assert.calledOnceWithExactly(
-      warnStub,
+      warn,
       'Metadata cannot be set when using http'
     );
   });
