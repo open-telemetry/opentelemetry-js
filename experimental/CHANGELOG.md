@@ -7,6 +7,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.56.0
+
+### :boom: Breaking Change
+
 * feat(otlp-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031) @pichlermarc
   * `OTLPExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
   * `OTLPExporterBrowserBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
@@ -19,6 +31,60 @@ All notable changes to experimental packages in this project will be documented 
 * feat(otlp-transformer)!: accept `ResourceMetrics` in serializers instead of `ResourceMetrics[]`
   * (user-facing): `ProtobufMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
   * (user-facing): `JsonMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
+* feat(otlp-transformer)!: remove internal types and functions from public API @pichlermarc
+  * (user-facing): the following types and functions were intended for internal use and have been removed from exports
+    * `OtlpEncodingOptions`
+    * `IKeyValueList`
+    * `IKeyValue`
+    * `IInstrumentationScope`
+    * `IArrayValue`
+    * `LongBits`
+    * `IAnyValue`
+    * `Fixed64`
+    * `SpanContextEncodeFunction`
+    * `toLongBits`
+    * `OptionalSpanContextEncodeFunction`
+    * `getOtlpEncoder`
+    * `Encoder`
+    * `HrTimeEncodeFunction`
+    * `encodeAsLongBits`
+    * `encodeAsString`
+    * `hrTimeToNanos`
+    * `IValueAtQuantile`
+    * `ISummaryDataPoint`
+    * `ISummary`
+    * `ISum`
+    * `IScopeMetrics`
+    * `IResourceMetrics`
+    * `INumberDataPoint`
+    * `IHistogramDataPoint`
+    * `IHistogram`
+    * `IExponentialHistogramDataPoint`
+    * `IExponentialHistogram`
+    * `IMetric`
+    * `IGauge`
+    * `IExemplar`
+    * `EAggregationTemporality`
+    * `IExportMetricsServiceRequest`
+    * `IBuckets`
+    * `IResource`
+    * `IStatus`
+    * `EStatusCode`
+    * `ILink`
+    * `IEvent`
+    * `IScopeSpans`
+    * `ISpan`
+    * `IResourceSpans`
+    * `ESpanKind`
+    * `IExportTraceServiceRequest`
+    * `IScopeLogs`
+    * `IExportLogsServiceRequest`
+    * `IResourceLogs`
+    * `ILogRecord`
+    * `ESeverityNumber`
+    * `createExportTraceServiceRequest`
+    * `createExportMetricsServiceRequest`
+    * `createExportLogsServiceRequest`
 
 ### :rocket: (Enhancement)
 
@@ -31,8 +97,6 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(otlp-exporter-\*): de-confuse Nuxt build tooling by not using 'export *' in comments [#5227](https://github.com/open-telemetry/opentelemetry-js/pull/5227) @pichlermarc
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 

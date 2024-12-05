@@ -11,15 +11,21 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
-* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
-
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): do not load OTEL_ env vars on module load, but when needed [#5224](https://github.com/open-telemetry/opentelemetry-js/pull/5224)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.29.0
+
+### :boom: Breaking Change
+
+* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
 
 ## 1.28.0
 
