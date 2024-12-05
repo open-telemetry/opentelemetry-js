@@ -87,7 +87,7 @@
     "sinon": "15.1.2",
     "size-limit": "^11.0.1",
     "ts-node": "10.9.2",
-    "typescript": "5.6.3"
+    "typescript": "5.0.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions",
   "sideEffects": false
