@@ -106,8 +106,8 @@ const checkEqual =
     x instanceof Array && y instanceof Array
       ? arrayIsEqual(requestEqual)(x as any)(y as any)
       : !(x instanceof Array) && !(y instanceof Array)
-      ? requestEqual(x)(y)
-      : false;
+        ? requestEqual(x)(y)
+        : false;
 
 const replicate = (request: TestRequestResponse) => {
   const result: TestRequestResponse[] = [];

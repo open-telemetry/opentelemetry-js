@@ -286,7 +286,7 @@ export class SpanImpl implements Span {
   }
 
   private _getTime(inp?: TimeInput): HrTime {
-    if (typeof inp === 'number' && inp < otperformance.now()) {
+    if (typeof inp === 'number' && inp <= otperformance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
       return hrTime(inp + this._performanceOffset);
@@ -383,7 +383,7 @@ export class SpanImpl implements Span {
     if (value.length <= limit) {
       return value;
     }
-    return value.substr(0, limit);
+    return value.substring(0, limit);
   }
 
   /**

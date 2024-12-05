@@ -1,18 +1,45 @@
 {
   "name": "@opentelemetry/otlp-exporter-base",
-  "version": "0.54.2",
+  "version": "0.56.0",
   "description": "OpenTelemetry OTLP Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
-  "repository": "open-telemetry/opentelemetry-js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  "exports": {
+    ".": {
+      "module": "./build/esm/index.js",
+      "esnext": "./build/esnext/index.js",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
+    },
+    "./node-http": {
+      "module": "./build/esm/index-node-http.js",
+      "esnext": "./build/esnext/index-node-http.js",
+      "types": "./build/src/index-node-http.d.ts",
+      "default": "./build/src/index-node-http.js"
+    },
+    "./browser-http": {
+      "module": "./build/esm/index-browser-http.js",
+      "esnext": "./build/esnext/index-browser-http.js",
+      "types": "./build/src/index-browser-http.d.ts",
+      "default": "./build/src/index-browser-http.js"
+    }
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/src/index.d.ts"
+      ],
+      "node-http": [
+        "./build/src/index-node-http.d.ts"
+      ],
+      "browser-http": [
+        "./build/src/index-browser-http.d.ts"
+      ]
+    }
+  },
+  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
@@ -60,14 +87,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.27.0",
-    "@opentelemetry/otlp-transformer": "0.54.2"
+    "@opentelemetry/core": "1.29.0",
+    "@opentelemetry/otlp-transformer": "0.56.0"
   },
   "devDependencies": {
-    "@babel/core": "7.25.2",
-    "@babel/preset-env": "7.25.4",
+    "@babel/core": "7.26.0",
+    "@babel/preset-env": "7.26.0",
     "@opentelemetry/api": "1.9.0",
-    "@types/mocha": "10.0.8",
+    "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
     "@types/sinon": "17.0.3",
     "babel-plugin-istanbul": "7.0.0",
@@ -79,12 +106,12 @@
     "karma-spec-reporter": "0.0.36",
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
-    "mocha": "10.7.3",
+    "mocha": "10.8.2",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.1",
     "typescript": "4.4.4",
-    "webpack": "5.94.0",
+    "webpack": "5.96.1",
     "webpack-cli": "5.1.4",
     "webpack-merge": "5.10.0"
   },
