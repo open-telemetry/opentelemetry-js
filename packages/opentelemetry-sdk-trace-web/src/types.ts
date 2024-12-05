@@ -49,10 +49,9 @@ export interface PerformanceLegacy {
 
 /**
  * This interface is used in {@link getResource} function to return
- *     main request and it's corresponding PreFlight request
+ *     main request
  */
 export interface PerformanceResourceTimingInfo {
-  corsPreFlightRequest?: PerformanceResourceTiming;
   mainRequest?: PerformanceResourceTiming;
 }
 

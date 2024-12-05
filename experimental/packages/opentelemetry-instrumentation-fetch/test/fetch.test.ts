@@ -139,7 +139,6 @@ function createFakePerformanceObs(url: string) {
       const resources: PerformanceObserverEntryList = {
         getEntries(): PerformanceEntryList {
           return [
-            createResource({ name: absoluteUrl }) as any,
             createMainResource({ name: absoluteUrl }) as any,
           ];
         },
@@ -264,9 +263,6 @@ describe('fetch', () => {
 
     const resources: PerformanceResourceTiming[] = [];
     resources.push(
-      createResource({
-        name: fileUrl,
-      }),
       createMainResource({
         name: fileUrl,
       })
@@ -389,7 +385,7 @@ describe('fetch', () => {
     });
 
     it('should create a span with correct root span', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.spanContext().spanId,
@@ -398,17 +394,17 @@ describe('fetch', () => {
     });
 
     it('span should have correct name', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
     });
 
     it('span should have correct kind', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(span.kind, api.SpanKind.CLIENT, 'span has wrong kind');
     });
 
     it('span should have correct attributes', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
       assert.notStrictEqual(
@@ -473,50 +469,6 @@ describe('fetch', () => {
     });
 
     it('span should have correct events', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-      const events = span.events;
-      assert.strictEqual(events.length, 8, 'number of events is wrong');
-      testForCorrectEvents(events, [
-        PTN.FETCH_START,
-        PTN.DOMAIN_LOOKUP_START,
-        PTN.DOMAIN_LOOKUP_END,
-        PTN.CONNECT_START,
-        PTN.CONNECT_END,
-        PTN.REQUEST_START,
-        PTN.RESPONSE_START,
-        PTN.RESPONSE_END,
-      ]);
-    });
-
-    it('should create a span for preflight request', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-      const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
-      assert.strictEqual(
-        span.parentSpanId,
-        parentSpan.spanContext().spanId,
-        'parent span is not root span'
-      );
-    });
-
-    it('preflight request span should have correct name', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-      assert.strictEqual(
-        span.name,
-        'CORS Preflight',
-        'preflight request span has wrong name'
-      );
-    });
-
-    it('preflight request span should have correct kind', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-      assert.strictEqual(
-        span.kind,
-        api.SpanKind.INTERNAL,
-        'span has wrong kind'
-      );
-    });
-
-    it('preflight request span should have correct events', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 8, 'number of events is wrong');
@@ -533,7 +485,7 @@ describe('fetch', () => {
     });
 
     it('should set trace headers', () => {
-      const span: api.Span = exportSpy.args[1][0][0];
+      const span: api.Span = exportSpy.args[0][0][0];
       assert.strictEqual(
         lastResponse.headers[X_B3_TRACE_ID],
         span.spanContext().traceId,
@@ -858,7 +810,7 @@ describe('fetch', () => {
     });
 
     it('span should have correct events', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 9, 'number of events is wrong');
       testForCorrectEvents(events, [
@@ -913,7 +865,7 @@ describe('fetch', () => {
       await prepare(url, span => {
         span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
       });
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const attributes = span.attributes;
 
       assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
@@ -923,7 +875,7 @@ describe('fetch', () => {
       await prepare(badUrl, span => {
         span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
       });
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const attributes = span.attributes;
 
       assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
@@ -1022,7 +974,7 @@ describe('fetch', () => {
       clearData();
     });
     it('should create a span with correct root span', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.spanContext().spanId,
@@ -1043,7 +995,7 @@ describe('fetch', () => {
     });
 
     it('should create a span with correct root span', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.spanContext().spanId,
@@ -1068,7 +1020,7 @@ describe('fetch', () => {
 
       assert.strictEqual(
         exportSpy.args.length,
-        2,
+        1,
         `Wrong number of spans: ${exportSpy.args.length}`
       );
 
@@ -1146,7 +1098,7 @@ describe('fetch', () => {
 
       assert.strictEqual(
         exportSpy.args.length,
-        2,
+        1,
         `Wrong number of spans: ${exportSpy.args.length}`
       );
       assert.strictEqual(events.length, 8, 'number of events is wrong');
@@ -1208,7 +1160,7 @@ describe('fetch', () => {
       clearData();
     });
     it('should NOT add network events', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 0, 'number of events is wrong');
     });

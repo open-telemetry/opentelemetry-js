@@ -180,84 +180,9 @@ export function getResource(
     initiatorType
   );
 
-  if (filteredResources.length === 0) {
-    return {
-      mainRequest: undefined,
-    };
+  return {
+    mainRequest: filteredResources?.[0]
   }
-  if (filteredResources.length === 1) {
-    return {
-      mainRequest: filteredResources[0],
-    };
-  }
-  const sorted = sortResources(filteredResources);
-
-  if (parsedSpanUrl.origin !== getOrigin() && sorted.length > 1) {
-    let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
-    let mainRequest: PerformanceResourceTiming = findMainRequest(
-      sorted,
-      corsPreFlightRequest[PTN.RESPONSE_END],
-      endTimeHR
-    );
-
-    const responseEnd = corsPreFlightRequest[PTN.RESPONSE_END];
-    const fetchStart = mainRequest[PTN.FETCH_START];
-
-    // no corsPreFlightRequest
-    if (fetchStart < responseEnd) {
-      mainRequest = corsPreFlightRequest;
-      corsPreFlightRequest = undefined;
-    }
-
-    return {
-      corsPreFlightRequest,
-      mainRequest,
-    };
-  } else {
-    return {
-      mainRequest: filteredResources[0],
-    };
-  }
-}
-
-/**
- * Will find the main request skipping the cors pre flight requests
- * @param resources
- * @param corsPreFlightRequestEndTime
- * @param spanEndTimeHR
- */
-function findMainRequest(
-  resources: PerformanceResourceTiming[],
-  corsPreFlightRequestEndTime: number,
-  spanEndTimeHR: api.HrTime
-): PerformanceResourceTiming {
-  const spanEndTime = hrTimeToNanoseconds(spanEndTimeHR);
-  const minTime = hrTimeToNanoseconds(
-    timeInputToHrTime(corsPreFlightRequestEndTime)
-  );
-
-  let mainRequest: PerformanceResourceTiming = resources[1];
-  let bestGap;
-
-  const length = resources.length;
-  for (let i = 1; i < length; i++) {
-    const resource = resources[i];
-    const resourceStartTime = hrTimeToNanoseconds(
-      timeInputToHrTime(resource[PTN.FETCH_START])
-    );
-
-    const resourceEndTime = hrTimeToNanoseconds(
-      timeInputToHrTime(resource[PTN.RESPONSE_END])
-    );
-
-    const currentGap = spanEndTime - resourceEndTime;
-
-    if (resourceStartTime >= minTime && (!bestGap || currentGap < bestGap)) {
-      bestGap = currentGap;
-      mainRequest = resource;
-    }
-  }
-  return mainRequest;
 }
 
 /**
