@@ -42,10 +42,14 @@ export function validateTimeoutMillis(timeoutMillis: number) {
 }
 
 export function wrapStaticHeadersInFunction(
-  headers: Record<string, string> | undefined
+  headers: Record<string, string> | (() => Record<string, string>) | undefined
 ): (() => Record<string, string>) | undefined {
   if (headers == null) {
     return undefined;
+  }
+
+  if (headers instanceof Function) {
+    return headers;
   }
 
   return () => headers;
