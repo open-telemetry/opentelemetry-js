@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733341229106,
+  "lastUpdate": 1733404752862,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21128,6 +21128,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.55%",
             "unit": "ops/sec",
             "extra": "94 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a761a8c4cf21f553ebbf9bd1b3690fa2577d9963",
+          "message": "feat(otlp-transformer)!: remove internal types and functions from public API (#5200)",
+          "timestamp": "2024-12-05T13:11:01Z",
+          "tree_id": "cc25b289af6e6c99939d2ea9cc18110027db4170",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/a761a8c4cf21f553ebbf9bd1b3690fa2577d9963"
+        },
+        "date": 1733404751985,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 682500,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 658106,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
