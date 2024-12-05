@@ -22,7 +22,6 @@ import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from './sampler/ParentBasedSampler';
 import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
 
-const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
 const DEFAULT_RATIO = 1;
 
@@ -36,24 +35,25 @@ const DEFAULT_RATIO = 1;
 // object needs to be wrapped in this function and called when needed otherwise
 // envs are parsed before tests are ran - causes tests using these envs to fail
 export function loadDefaultConfig() {
-  const _env = getEnv();
+  const env = getEnv();
 
   return {
     sampler: buildSamplerFromEnv(env),
     forceFlushTimeoutMillis: 30000,
     generalLimits: {
-      attributeValueLengthLimit: _env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: _env.OTEL_ATTRIBUTE_COUNT_LIMIT,
+      attributeValueLengthLimit: env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeCountLimit: env.OTEL_ATTRIBUTE_COUNT_LIMIT,
     },
     spanLimits: {
-      attributeValueLengthLimit: _env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-      attributeCountLimit: _env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
-      linkCountLimit: _env.OTEL_SPAN_LINK_COUNT_LIMIT,
-      eventCountLimit: _env.OTEL_SPAN_EVENT_COUNT_LIMIT,
+      attributeValueLengthLimit: env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeCountLimit: env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
+      linkCountLimit: env.OTEL_SPAN_LINK_COUNT_LIMIT,
+      eventCountLimit: env.OTEL_SPAN_EVENT_COUNT_LIMIT,
       attributePerEventCountLimit:
-        _env.OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT,
-      attributePerLinkCountLimit: _env.OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
+        env.OTEL_SPAN_ATTRIBUTE_PER_EVENT_COUNT_LIMIT,
+      attributePerLinkCountLimit: env.OTEL_SPAN_ATTRIBUTE_PER_LINK_COUNT_LIMIT,
     },
+    mergeResourceWithDefaults: true,
   };
 }
 

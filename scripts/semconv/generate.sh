@@ -5,9 +5,11 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
-# freeze the spec version to make SpanAttributess generation reproducible
-SPEC_VERSION=v1.27.0
-GENERATOR_VERSION=0.8.0
+# Get latest version by running `git tag -l --sort=version:refname | tail -1`
+# ... in git@github.com:open-telemetry/semantic-conventions.git
+SPEC_VERSION=v1.28.0
+# ... in git@github.com:open-telemetry/weaver.git
+GENERATOR_VERSION=v0.10.0
 
 # When running on windows and your are getting references to ";C" (like Telemetry;C)
 # then this is an issue with the bash shell, so first run the following in your shell:

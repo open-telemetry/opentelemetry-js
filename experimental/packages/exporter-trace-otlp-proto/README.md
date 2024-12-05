@@ -32,9 +32,10 @@ const collectorOptions = {
   }, //an optional object containing custom headers to be sent with each request will only work with http
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 

@@ -11,10 +11,13 @@ import { registerInstrumentations } from '@opentelemetry/instrumentation';
  * @return {WebTracerProvider}
  */
 export function loadOtel(instrumentations) {
-  const provider = new WebTracerProvider();
   const memoryExporter = new InMemorySpanExporter();
-  provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-  provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+  const provider = new WebTracerProvider({
+    spanProcessors: [
+      new SimpleSpanProcessor(memoryExporter),
+      new SimpleSpanProcessor(new ConsoleSpanExporter()),
+    ]
+  });
   provider.register({
     contextManager: new ZoneContextManager(),
   });
