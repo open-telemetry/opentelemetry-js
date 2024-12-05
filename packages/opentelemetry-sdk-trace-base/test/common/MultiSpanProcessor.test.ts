@@ -63,7 +63,7 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, 0);
     span.end();
     assert.strictEqual(processor1.spans.length, 1);
-    tracerProvider['activeSpanProcessor'].shutdown();
+    tracerProvider['_activeSpanProcessor'].shutdown();
   });
 
   it('should handle two span processor', async () => {
