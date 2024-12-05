@@ -203,19 +203,15 @@ cd packages/opentelemetry-module-name
 npm run watch
 ```
 
-#### TypeScript version
+#### TypeScript version & update policy
 
-TypeScript version used to compile the pacakges is `v5.6.3`. If you plan to make your own instrumentation script
-in a `.ts` file it is recommended to use same version or higher.
+TypeScript version used to compile the pacakges is `v5.0.4`. If you plan to use any of the packages from this
+repository to make your own application or package instrumentation it is recommended to use same version or higher.
 
-<!-- TODO: review the update policy -->
-Also TypeScript is meant to be updated in compatible verisons of `5.x`. However there could be scenarios
-where we might don't want to update the minor version:
+As update policy OpenTelemetry JS will follow DefinitelyType's support policy for TypeScript (https://github.com/DefinitelyTyped/DefinitelyTyped#support-window)
+which sets a support window of 2 years.
+Reference: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890
 
-- breaking changes in `lib.d.ts`: each release of TypeScript may come with a section of changes
-  in `lib.d.ts` file ([example](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#lib.d.ts-changes)). These changes
-  include DOM and other platform types that, if breaking, could break our compilation or even compilation
-  of our coonsumers if re-export them.
 
 ### Running tests
 
