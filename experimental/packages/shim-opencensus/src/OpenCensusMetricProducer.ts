@@ -46,8 +46,8 @@ interface OpenCensusMetricProducerOptions {
  *
  * @example
  * ```
- * const meterProvider = new MeterProvider();
- * const reader = new PeriodicExportingMetricReader({
+ * const meterProvider = createMeterProvider();
+ * const reader = createPeriodicExportingMetricReader({
  *   metricProducers: [new OpenCensusMetricProducer()],
  *   exporter: exporter,
  * });

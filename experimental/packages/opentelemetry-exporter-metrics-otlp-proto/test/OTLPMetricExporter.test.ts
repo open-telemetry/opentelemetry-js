@@ -20,8 +20,8 @@ import * as sinon from 'sinon';
 
 import { OTLPMetricExporter } from '../src/';
 import {
-  MeterProvider,
-  PeriodicExportingMetricReader,
+  createMeterProvider,
+  createPeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { Stream } from 'stream';
 
@@ -64,9 +64,9 @@ describe('OTLPMetricExporter', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         readers: [
-          new PeriodicExportingMetricReader({
+          createPeriodicExportingMetricReader({
             exporter: new OTLPMetricExporter(),
           }),
         ],

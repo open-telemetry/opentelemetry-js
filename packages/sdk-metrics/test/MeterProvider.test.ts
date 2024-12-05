@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import {
-  MeterProvider,
+  createMeterProvider,
   InstrumentType,
   DataPointType,
   HistogramMetricData,
@@ -42,19 +42,17 @@ describe('MeterProvider', () => {
 
   describe('constructor', () => {
     it('should construct without exceptions', () => {
-      const meterProvider = new MeterProvider();
-      assert(meterProvider instanceof MeterProvider);
+      createMeterProvider();
     });
 
     it('construct with resource', () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-      assert(meterProvider instanceof MeterProvider);
+      createMeterProvider({ resource: defaultResource });
     });
 
     it('should use default resource when no resource is passed', async function () {
       const reader = new TestMetricReader();
 
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         readers: [reader],
       });
 
@@ -72,7 +70,7 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
       const expectedResource = new Resource({ foo: 'bar' });
 
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         readers: [reader],
         resource: expectedResource,
         mergeResourceWithDefaults: false,
@@ -92,7 +90,7 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
       const providedResource = new Resource({ foo: 'bar' });
 
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         readers: [reader],
         resource: providedResource,
         mergeResourceWithDefaults: true,
@@ -114,20 +112,20 @@ describe('MeterProvider', () => {
 
   describe('getMeter', () => {
     it('should get a meter', () => {
-      const meterProvider = new MeterProvider();
+      const meterProvider = createMeterProvider();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
       assert(meter instanceof Meter);
     });
 
     it('should get an identical meter on duplicated calls', () => {
-      const meterProvider = new MeterProvider();
+      const meterProvider = createMeterProvider();
       const meter1 = meterProvider.getMeter('meter1', '1.0.0');
       const meter2 = meterProvider.getMeter('meter1', '1.0.0');
       assert.strictEqual(meter1, meter2);
     });
 
     it('get a noop meter on shutdown', () => {
-      const meterProvider = new MeterProvider();
+      const meterProvider = createMeterProvider();
       meterProvider.shutdown();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
       // returned tracer should be no-op, not instance of Meter (from SDK)
@@ -136,7 +134,7 @@ describe('MeterProvider', () => {
 
     it('get meter with same identity', async () => {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader],
       });
@@ -196,7 +194,7 @@ describe('MeterProvider', () => {
   describe('addView', () => {
     it('with existing instrument should rename', async () => {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
         views: [
@@ -266,7 +264,7 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
 
       // Add view to drop all attributes except 'attrib1'
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         views: [
           {
@@ -334,7 +332,7 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
 
       // Add view that renames 'test-counter' to 'renamed-instrument'
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         views: [
           {
@@ -405,7 +403,7 @@ describe('MeterProvider', () => {
 
     it('with meter name should apply view to only the selected meter', async () => {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         views: [
           // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
@@ -478,7 +476,7 @@ describe('MeterProvider', () => {
 
     it('with different instrument types does not throw', async () => {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         // Add Views to rename both instruments (of different types) to the same name.
         views: [
@@ -547,7 +545,7 @@ describe('MeterProvider', () => {
 
       const reader = new TestMetricReader();
 
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         views: [
           {
@@ -615,7 +613,7 @@ describe('MeterProvider', () => {
   describe('aggregationCardinalityLimit with view should apply the cardinality limit', () => {
     it('should respect the aggregationCardinalityLimit', async () => {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader],
         views: [
@@ -660,7 +658,7 @@ describe('MeterProvider', () => {
 
     it('should respect the aggregationCardinalityLimit for observable counter', async () => {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader],
         views: [
@@ -711,7 +709,7 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader({
         cardinalitySelector: (instrumentType: InstrumentType) => 2, // Set cardinality limit to 2 via cardinalitySelector
       });
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader],
       });
@@ -752,7 +750,7 @@ describe('MeterProvider', () => {
   describe('default aggregationCardinalityLimit should apply the cardinality limit', () => {
     it('should respect the default aggregationCardinalityLimit', async () => {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader],
       });
@@ -796,7 +794,7 @@ describe('MeterProvider', () => {
       const reader2 = new TestMetricReader();
       const reader1ShutdownSpy = sinon.spy(reader1, 'shutdown');
       const reader2ShutdownSpy = sinon.spy(reader2, 'shutdown');
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader1, reader2],
       });
@@ -822,7 +820,7 @@ describe('MeterProvider', () => {
       const reader2 = new TestMetricReader();
       const reader1ForceFlushSpy = sinon.spy(reader1, 'forceFlush');
       const reader2ForceFlushSpy = sinon.spy(reader2, 'forceFlush');
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader1, reader2],
       });

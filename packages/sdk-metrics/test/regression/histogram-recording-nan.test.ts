@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import {
   AggregationTemporality,
-  MeterProvider,
+  createMeterProvider,
   MetricReader,
   DataPoint,
   ExponentialHistogram,
@@ -36,7 +36,7 @@ describe('histogram-recording-nan', () => {
         return { type: AggregationType.EXPONENTIAL_HISTOGRAM };
       },
     });
-    const meterProvider = new MeterProvider({
+    const meterProvider = createMeterProvider({
       readers: [reader],
     });
 
@@ -68,7 +68,7 @@ describe('histogram-recording-nan', () => {
         return { type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM };
       },
     });
-    const meterProvider = new MeterProvider({
+    const meterProvider = createMeterProvider({
       readers: [reader],
     });
 

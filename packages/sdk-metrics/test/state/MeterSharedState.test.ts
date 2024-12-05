@@ -17,12 +17,12 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  MeterProvider,
   DataPointType,
   MetricReader,
   InstrumentType,
   AggregationType,
   ViewOptions,
+  createMeterProvider,
 } from '../../src';
 import {
   assertMetricData,
@@ -45,7 +45,7 @@ describe('MeterSharedState', () => {
 
   describe('registerMetricStorage', () => {
     function setupMeter(views?: ViewOptions[], readers?: MetricReader[]) {
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         views,
         readers: readers,
@@ -55,10 +55,14 @@ describe('MeterSharedState', () => {
 
       return {
         meter,
-        meterSharedState: meterProvider['_sharedState'].getMeterSharedState({
+        meterSharedState: (meterProvider as any)[
+          '_sharedState'
+        ].getMeterSharedState({
           name: 'test-meter',
         }),
-        collectors: Array.from(meterProvider['_sharedState'].metricCollectors),
+        collectors: Array.from(
+          (meterProvider as any)['_sharedState'].metricCollectors
+        ),
       };
     }
 
@@ -188,7 +192,7 @@ describe('MeterSharedState', () => {
       const cumulativeReader = new TestMetricReader();
       const deltaReader = new TestDeltaMetricReader();
 
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         views: views,
         readers: [cumulativeReader, deltaReader],

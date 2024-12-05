@@ -35,7 +35,7 @@ interface ConsoleMetricExporterOptions {
  */
 
 /* eslint-disable no-console */
-export class ConsoleMetricExporter implements PushMetricExporter {
+class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = false;
   protected _temporalitySelector: AggregationTemporalitySelector;
 
@@ -91,4 +91,10 @@ export class ConsoleMetricExporter implements PushMetricExporter {
 
     done({ code: ExportResultCode.SUCCESS });
   }
+}
+
+export function createConsoleMetricExporter(
+  options?: ConsoleMetricExporterOptions
+): PushMetricExporter {
+  return new ConsoleMetricExporter(options);
 }

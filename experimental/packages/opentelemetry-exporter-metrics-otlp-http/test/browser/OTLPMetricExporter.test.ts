@@ -15,8 +15,8 @@
  */
 
 import {
-  MeterProvider,
-  PeriodicExportingMetricReader,
+  createMeterProvider,
+  createPeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -39,9 +39,9 @@ describe('OTLPMetricExporter', function () {
       it('should successfully send data using sendBeacon', async function () {
         // arrange
         const stubBeacon = sinon.stub(navigator, 'sendBeacon');
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           readers: [
-            new PeriodicExportingMetricReader({
+            createPeriodicExportingMetricReader({
               exporter: new OTLPMetricExporter(),
             }),
           ],
@@ -78,9 +78,9 @@ describe('OTLPMetricExporter', function () {
         server.respondWith('OK');
         server.respondImmediately = true;
         server.autoRespond = true;
-        const meterProvider = new MeterProvider({
+        const meterProvider = createMeterProvider({
           readers: [
-            new PeriodicExportingMetricReader({
+            createPeriodicExportingMetricReader({
               exporter: new OTLPMetricExporter(),
             }),
           ],

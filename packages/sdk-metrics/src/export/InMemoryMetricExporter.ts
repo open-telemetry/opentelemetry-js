@@ -26,7 +26,7 @@ import { PushMetricExporter } from './MetricExporter';
  * which accumulates metrics data in the local memory and
  * allows to inspect it (useful for e.g. unit tests).
  */
-export class InMemoryMetricExporter implements PushMetricExporter {
+class InMemoryMetricExporter implements PushMetricExporter {
   protected _shutdown = false;
   protected _aggregationTemporality: AggregationTemporality;
   private _metrics: ResourceMetrics[] = [];
@@ -78,4 +78,18 @@ export class InMemoryMetricExporter implements PushMetricExporter {
     this._shutdown = true;
     return Promise.resolve();
   }
+}
+
+/**
+ * Creates an In-memory Metrics Exporter. A Push Metric Exporter
+ * which accumulates metrics data in the local memory and
+ * allows to inspect it (useful for e.g. unit tests).
+ */
+export function createInMemoryMetricExporter(options: {
+  aggregationTemporality: AggregationTemporality;
+}): PushMetricExporter & {
+  reset(): void;
+  getMetrics(): ResourceMetrics[];
+} {
+  return new InMemoryMetricExporter(options.aggregationTemporality);
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics');
+const { MeterProvider, createMeterProvider} = require('@opentelemetry/sdk-metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
@@ -16,8 +16,9 @@ const exporter = new PrometheusExporter({}, () => {
 });
 
 // Creates MeterProvider and installs the exporter as a MetricReader
-const meterProvider = new MeterProvider();
-meterProvider.addMetricReader(exporter);
+const meterProvider = createMeterProvider({
+  readers: [exporter]
+});
 const meter = meterProvider.getMeter('example-prometheus');
 
 // Creates metric instruments
