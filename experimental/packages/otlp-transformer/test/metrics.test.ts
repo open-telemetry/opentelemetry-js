@@ -26,13 +26,9 @@ import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
 import { EAggregationTemporality } from '../src/metrics/types';
 import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import {
-  encodeAsString,
-  encodeAsLongBits,
-  ProtobufMetricsSerializer,
-  JsonMetricsSerializer,
-} from '../src';
+import { ProtobufMetricsSerializer, JsonMetricsSerializer } from '../src';
 import * as root from '../src/generated/root';
+import { encodeAsLongBits, encodeAsString } from '../src/common';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
