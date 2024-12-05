@@ -42,10 +42,14 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: IAttributesProcessor,
-    collectorHandles: MetricCollectorHandle[]
+    collectorHandles: MetricCollectorHandle[],
+    private _aggregationCardinalityLimit?: number
   ) {
     super(instrumentDescriptor);
-    this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
+    this._deltaMetricStorage = new DeltaMetricProcessor(
+      aggregator,
+      this._aggregationCardinalityLimit
+    );
     this._temporalMetricStorage = new TemporalMetricProcessor(
       aggregator,
       collectorHandles

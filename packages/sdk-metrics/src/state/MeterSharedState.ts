@@ -145,7 +145,8 @@ export class MeterSharedState {
         viewDescriptor,
         aggregator,
         view.attributesProcessor,
-        this._meterProviderSharedState.metricCollectors
+        this._meterProviderSharedState.metricCollectors,
+        view.aggregationCardinalityLimit
       ) as R;
       this.metricStorageRegistry.register(viewStorage);
       return viewStorage;
@@ -165,12 +166,17 @@ export class MeterSharedState {
           if (compatibleStorage != null) {
             return compatibleStorage;
           }
+
           const aggregator = aggregation.createAggregator(descriptor);
+          const cardinalityLimit = collector.selectCardinalityLimit(
+            descriptor.type
+          );
           const storage = new MetricStorageType(
             descriptor,
             aggregator,
             createNoopAttributesProcessor(),
-            [collector]
+            [collector],
+            cardinalityLimit
           ) as R;
           this.metricStorageRegistry.registerForCollector(collector, storage);
           return storage;
@@ -193,6 +199,7 @@ interface MetricStorageConstructor {
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<Maybe<Accumulation>>,
     attributesProcessor: IAttributesProcessor,
-    collectors: MetricCollectorHandle[]
+    collectors: MetricCollectorHandle[],
+    aggregationCardinalityLimit?: number
   ): MetricStorage;
 }

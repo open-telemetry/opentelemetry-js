@@ -52,7 +52,6 @@ import { ReadableSpan } from './export/ReadableSpan';
 import { ExceptionEventName } from './enums';
 import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
-import { Tracer } from './Tracer';
 import { SpanLimits } from './types';
 
 /**
@@ -60,6 +59,21 @@ import { SpanLimits } from './types';
  * of the Span API
  */
 export type Span = APISpan & ReadableSpan;
+
+interface SpanOptions {
+  resource: IResource;
+  scope: InstrumentationLibrary;
+  context: Context;
+  spanContext: SpanContext;
+  name: string;
+  kind: SpanKind;
+  parentSpanId?: string;
+  links?: Link[];
+  startTime?: TimeInput;
+  attributes?: Attributes;
+  spanLimits: SpanLimits;
+  spanProcessor: SpanProcessor;
+}
 
 /**
  * This class represents a span.
@@ -97,48 +111,34 @@ export class SpanImpl implements Span {
   private readonly _startTimeProvided: boolean;
 
   /**
-   * Constructs a new Span instance.
-   *
-   * @deprecated calling Span constructor directly is not supported. Please use tracer.startSpan.
-   * */
-  constructor(
-    parentTracer: Tracer,
-    context: Context,
-    spanName: string,
-    spanContext: SpanContext,
-    kind: SpanKind,
-    parentSpanId?: string,
-    links: Link[] = [],
-    startTime?: TimeInput,
-    _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
-    attributes?: Attributes
-  ) {
-    this.name = spanName;
-    this._spanContext = spanContext;
-    this.parentSpanId = parentSpanId;
-    this.kind = kind;
-    this.links = links;
-
+   * Constructs a new SpanImpl instance.
+   */
+  constructor(opts: SpanOptions) {
     const now = Date.now();
+
+    this._spanContext = opts.spanContext;
     this._performanceStartTime = otperformance.now();
     this._performanceOffset =
       now - (this._performanceStartTime + getTimeOrigin());
-    this._startTimeProvided = startTime != null;
-
-    this.startTime = this._getTime(startTime ?? now);
-
-    this.resource = parentTracer.resource;
-    this.instrumentationLibrary = parentTracer.instrumentationLibrary;
-    this._spanLimits = parentTracer.getSpanLimits();
+    this._startTimeProvided = opts.startTime != null;
+    this._spanLimits = opts.spanLimits;
     this._attributeValueLengthLimit =
       this._spanLimits.attributeValueLengthLimit || 0;
+    this._spanProcessor = opts.spanProcessor;
 
-    if (attributes != null) {
-      this.setAttributes(attributes);
+    this.name = opts.name;
+    this.parentSpanId = opts.parentSpanId;
+    this.kind = opts.kind;
+    this.links = opts.links || [];
+    this.startTime = this._getTime(opts.startTime ?? now);
+    this.resource = opts.resource;
+    this.instrumentationLibrary = opts.scope;
+
+    if (opts.attributes != null) {
+      this.setAttributes(opts.attributes);
     }
 
-    this._spanProcessor = parentTracer.getActiveSpanProcessor();
-    this._spanProcessor.onStart(this, context);
+    this._spanProcessor.onStart(this, opts.context);
   }
 
   spanContext(): SpanContext {
@@ -286,7 +286,7 @@ export class SpanImpl implements Span {
   }
 
   private _getTime(inp?: TimeInput): HrTime {
-    if (typeof inp === 'number' && inp < otperformance.now()) {
+    if (typeof inp === 'number' && inp <= otperformance.now()) {
       // must be a performance timestamp
       // apply correction and convert to hrtime
       return hrTime(inp + this._performanceOffset);
@@ -383,7 +383,7 @@ export class SpanImpl implements Span {
     if (value.length <= limit) {
       return value;
     }
-    return value.substr(0, limit);
+    return value.substring(0, limit);
   }
 
   /**

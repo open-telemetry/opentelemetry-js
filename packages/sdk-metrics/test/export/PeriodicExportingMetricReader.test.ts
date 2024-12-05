@@ -335,7 +335,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       const exporter = new TestMetricExporter();
 
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -380,7 +380,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       const exporter = new TestMetricExporter();
 
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
