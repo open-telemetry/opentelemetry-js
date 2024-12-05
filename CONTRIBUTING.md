@@ -208,10 +208,9 @@ npm run watch
 TypeScript version used to compile the pacakges is `v5.0.4`. If you plan to use any of the packages from this
 repository to make your own application or package instrumentation it is recommended to use same version or higher.
 
-As update policy OpenTelemetry JS will follow DefinitelyType's support policy for TypeScript (https://github.com/DefinitelyTyped/DefinitelyTyped#support-window)
+<!-- Ref: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890 -->
+As update policy OpenTelemetry JS will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window)
 which sets a support window of 2 years.
-Reference: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890
-
 
 ### Running tests
 
