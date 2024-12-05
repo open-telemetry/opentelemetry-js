@@ -967,7 +967,7 @@ describe('fetch', () => {
   describe('when url is allowed', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         allowUrls: [propagateTraceHeaderCorsUrls],
       });
@@ -985,7 +985,7 @@ describe('fetch', () => {
 
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      await prepareData(url, {
+      await prepareData(url, () => getData(url), {
         propagateTraceHeaderCorsUrls,
         allowUrls: [otherUrl],
       });
