@@ -33,10 +33,8 @@ import { IResource, Resource } from '@opentelemetry/resources';
 import { SpanProcessor, Tracer } from '.';
 import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import { NoopSpanProcessor } from './export/NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
 import { SpanExporter } from './export/SpanExporter';
-import { BatchSpanProcessor } from './platform';
 import { reconfigureLimits } from './utility';
 
 export type PROPAGATOR_FACTORY = () => TextMapPropagator;
@@ -60,11 +58,6 @@ export class BasicTracerProvider implements TracerProvider {
     ['tracecontext', () => new W3CTraceContextPropagator()],
     ['baggage', () => new W3CBaggagePropagator()],
   ]);
-
-  protected static readonly _registeredExporters = new Map<
-    string,
-    EXPORTER_FACTORY
-  >();
 
   private readonly _config: TracerConfig;
   private readonly _tracers: Map<string, Tracer> = new Map();
@@ -91,13 +84,6 @@ export class BasicTracerProvider implements TracerProvider {
 
     if (config.spanProcessors?.length) {
       spanProcessors.push(...config.spanProcessors);
-    } else {
-      const defaultExporter = this._buildExporterFromEnv();
-      spanProcessors.push(
-        defaultExporter
-          ? new BatchSpanProcessor(defaultExporter)
-          : new NoopSpanProcessor()
-      );
     }
 
     this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
@@ -213,12 +199,6 @@ export class BasicTracerProvider implements TracerProvider {
     )._registeredPropagators.get(name)?.();
   }
 
-  protected _getSpanExporter(name: string): SpanExporter | undefined {
-    return (
-      this.constructor as typeof BasicTracerProvider
-    )._registeredExporters.get(name)?.();
-  }
-
   protected _buildPropagatorFromEnv(): TextMapPropagator | undefined {
     // per spec, propagators from env must be deduplicated
     const uniquePropagatorNames = Array.from(
@@ -254,17 +234,5 @@ export class BasicTracerProvider implements TracerProvider {
         propagators: validPropagators,
       });
     }
-  }
-
-  protected _buildExporterFromEnv(): SpanExporter | undefined {
-    const exporterName = getEnv().OTEL_TRACES_EXPORTER;
-    if (exporterName === 'none' || exporterName === '') return;
-    const exporter = this._getSpanExporter(exporterName);
-    if (!exporter) {
-      diag.error(
-        `Exporter "${exporterName}" requested through environment variable is unavailable.`
-      );
-    }
-    return exporter;
   }
 }
