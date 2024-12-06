@@ -92,7 +92,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 16
+          node-version: 22
 
       - name: Bootstrap
         run: npm ci
@@ -120,7 +120,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: 16
+          node-version: 22
 
       - name: Bootstrap
         run: npm ci
