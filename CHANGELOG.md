@@ -17,6 +17,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :bug: (Bug Fix)
 
+* fix(otlp-exporter-base): improve bundling for Node.js with rollup by using dynamic imports over require for lazy-loading
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
