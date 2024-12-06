@@ -26,6 +26,17 @@ import { StackContextManager } from './StackContextManager';
  */
 export type WebTracerConfig = TracerConfig;
 
+/*function registerWebTracerProvider(tracerProvider: TracerProvider, config?: SDKRegistrationConfig = {}){
+  if (config.contextManager === undefined) {
+    config.contextManager = new StackContextManager();
+  }
+  if (config.contextManager) {
+    config.contextManager.enable();
+  }
+
+  super.register(config);
+}*/
+
 /**
  * This class represents a web tracer with {@link StackContextManager}
  */
