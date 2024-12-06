@@ -857,6 +857,19 @@ describe('xhr', () => {
             const events = span.events;
             assert.strictEqual(events.length, 3, 'number of events is wrong');
           });
+
+          it('should still add the CONTENT_LENGTH attribute', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const attributes = span.attributes;
+            const responseContentLength = attributes[
+              SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+            ] as number;
+            assert.strictEqual(
+              responseContentLength,
+              30,
+              `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+            );
+          });
         });
       });
 

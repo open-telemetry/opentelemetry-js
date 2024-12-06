@@ -149,9 +149,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      if (!this.getConfig().ignoreNetworkEvents) {
-        addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-      }
+      addSpanNetworkEvents(
+        childSpan,
+        corsPreFlightRequest,
+        this.getConfig().ignoreNetworkEvents
+      );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -300,9 +302,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      if (!this.getConfig().ignoreNetworkEvents) {
-        addSpanNetworkEvents(span, mainRequest);
-      }
+      addSpanNetworkEvents(
+        span,
+        mainRequest,
+        this.getConfig().ignoreNetworkEvents
+      );
     }
   }
 
