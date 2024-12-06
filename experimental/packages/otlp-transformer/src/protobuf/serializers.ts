@@ -54,6 +54,9 @@ const traceResponseType = root.opentelemetry.proto.collector.trace.v1
 const traceRequestType = root.opentelemetry.proto.collector.trace.v1
   .ExportTraceServiceRequest as ExportType<IExportTraceServiceRequest>;
 
+/*
+ * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
+ */
 export const ProtobufLogsSerializer: ISerializer<
   ReadableLogRecord[],
   IExportLogsServiceResponse

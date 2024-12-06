@@ -59,6 +59,9 @@ export const JsonMetricsSerializer: ISerializer<
   },
 };
 
+/*
+ * @experimental this serializer may receive breaking changes in minor versions, pin this package's version when using this constant
+ */
 export const JsonLogsSerializer: ISerializer<
   ReadableLogRecord[],
   IExportLogsServiceResponse
