@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733428301309,
+  "lastUpdate": 1733476495229,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21204,6 +21204,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.90%",
             "unit": "ops/sec",
             "extra": "88 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "484af40805e7e0d4e4ab6f2c43f14954ea1f7c3f",
+          "message": "fix(deps): update dependency express to v4.21.2 (#5238)",
+          "timestamp": "2024-12-06T09:07:41Z",
+          "tree_id": "d1f705b3f538ec54b787815ea7f99daed34fdc94",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/484af40805e7e0d4e4ab6f2c43f14954ea1f7c3f"
+        },
+        "date": 1733476494383,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 689685,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 657965,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
           }
         ]
       }
