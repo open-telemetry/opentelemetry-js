@@ -7,6 +7,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.56.0
+
+### :boom: Breaking Change
+
 * feat(otlp-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031) @pichlermarc
   * `OTLPExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
   * `OTLPExporterBrowserBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
@@ -22,6 +34,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(otlp-exporter-base): handle OTLP partial success [#5183](https://github.com/open-telemetry/opentelemetry-js/pull/5183) @pichlermarc
 * feat(otlp-exporter-base): internally accept a http header provider function only [#5179](https://github.com/open-telemetry/opentelemetry-js/pull/5179) @pichlermarc
 * refactor(otlp-exporter-base): don't create blob before sending xhr [#5193](https://github.com/open-telemetry/opentelemetry-js/pull/5193) @pichlermarc
   * improves compatibility with some unsupported runtimes
@@ -29,7 +42,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-### :books: (Refine Doc)
+* fix(otlp-exporter-\*): de-confuse Nuxt build tooling by not using 'export *' in comments [#5227](https://github.com/open-telemetry/opentelemetry-js/pull/5227) @pichlermarc
 
 ### :house: (Internal)
 

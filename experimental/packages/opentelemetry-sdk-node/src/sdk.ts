@@ -48,7 +48,11 @@ import {
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
+import {
+  MeterProvider,
+  MetricReader,
+  ViewOptions,
+} from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
   SpanProcessor,
@@ -57,7 +61,7 @@ import {
   NodeTracerConfig,
   NodeTracerProvider,
 } from '@opentelemetry/sdk-trace-node';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 import {
@@ -74,9 +78,9 @@ export type MeterProviderConfig = {
    */
   reader?: MetricReader;
   /**
-   * List of {@link View}s that should be passed to the MeterProvider
+   * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
-  views?: View[];
+  views?: ViewOptions[];
 };
 
 export type LoggerProviderConfig = {
@@ -247,7 +251,7 @@ export class NodeSDK {
         ? this._resource
         : this._resource.merge(
             new Resource({
-              [SEMRESATTRS_SERVICE_NAME]: this._serviceName,
+              [ATTR_SERVICE_NAME]: this._serviceName,
             })
           );
 

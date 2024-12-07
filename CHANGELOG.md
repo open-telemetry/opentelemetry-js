@@ -11,16 +11,23 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
-* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
 * fix(sdk-metrics): InMemoryMetricExporter clear metrics after shutdown to align with other exporters [#5131](https://github.com/open-telemetry/opentelemetry-js/issues/5131) @paper2
 
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): do not load OTEL_ env vars on module load, but when needed [#5224](https://github.com/open-telemetry/opentelemetry-js/pull/5224)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 1.29.0
+
+### :boom: Breaking Change
+
+* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
 
 ## 1.28.0
 
@@ -54,6 +61,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * The [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/6672dbc97ddeb34f36c020a0f0a30323c8bc4d95/specification/context/api-propagators.md?plain=1#L354-L356) prohibits hosting these packages in the core repository
   * `@opentelemetry/propagator-aws-xray` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
   * `@opentelemetry/propagator-aws-xray-lambda` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
+
+* docs: [Browser] Define the supported browser runtimes [Issue #4168](https://github.com/open-telemetry/opentelemetry-js/issues/4168) PR:[#5059](https://github.com/open-telemetry/opentelemetry-js/pull/5059) @MSNev
 
 ### :house: (Internal)
 

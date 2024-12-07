@@ -17,13 +17,13 @@
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
-import { AggregationTemporalityPreference } from '../../src';
 
+import { AggregationTemporalityPreference } from '../../src';
 import { OTLPMetricExporter } from '../../src/platform/node';
 import {
-  Aggregation,
+  AggregationOption,
   AggregationTemporality,
-  ExplicitBucketHistogramAggregation,
+  AggregationType,
   InstrumentType,
   MeterProvider,
   PeriodicExportingMetricReader,
@@ -150,9 +150,12 @@ describe('OTLPMetricExporter', () => {
 
   describe('aggregation', () => {
     it('aggregationSelector calls the selector supplied to the constructor', () => {
-      const aggregation = new ExplicitBucketHistogramAggregation([
-        0, 100, 100000,
-      ]);
+      const aggregation: AggregationOption = {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: {
+          boundaries: [0, 100, 100000],
+        },
+      };
       const exporter = new OTLPMetricExporter({
         aggregationPreference: _instrumentType => aggregation,
       });
@@ -164,11 +167,15 @@ describe('OTLPMetricExporter', () => {
 
     it('aggregationSelector returns the default aggregation preference when nothing is supplied', () => {
       const exporter = new OTLPMetricExporter({
-        aggregationPreference: _instrumentType => Aggregation.Default(),
+        aggregationPreference: _instrumentType => ({
+          type: AggregationType.DEFAULT,
+        }),
       });
-      assert.equal(
+      assert.deepStrictEqual(
         exporter.selectAggregation(InstrumentType.COUNTER),
-        Aggregation.Default()
+        {
+          type: AggregationType.DEFAULT,
+        }
       );
     });
   });

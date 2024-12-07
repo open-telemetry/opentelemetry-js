@@ -17,7 +17,7 @@
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { SDK_INFO } from '@opentelemetry/core';
-import { Resource, ResourceAttributes } from '../src';
+import { Resource } from '../src';
 import {
   SEMRESATTRS_SERVICE_NAME,
   SEMRESATTRS_TELEMETRY_SDK_LANGUAGE,
@@ -25,7 +25,7 @@ import {
   SEMRESATTRS_TELEMETRY_SDK_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import { describeBrowser, describeNode } from './util';
-import { diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
 import { Resource as Resource190 } from '@opentelemetry/resources_1.9.0';
 
 describe('Resource', () => {
@@ -167,7 +167,7 @@ describe('Resource', () => {
 
     it('should merge async attributes into sync attributes once resolved', async () => {
       //async attributes that resolve after 1 ms
-      const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
+      const asyncAttributes = new Promise<Attributes>(resolve => {
         setTimeout(
           () => resolve({ async: 'fromasync', shared: 'fromasync' }),
           1
@@ -248,7 +248,7 @@ describe('Resource', () => {
       );
 
       //async attributes that resolve after 1 ms
-      const asyncAttributes = new Promise<ResourceAttributes>(resolve => {
+      const asyncAttributes = new Promise<Attributes>(resolve => {
         setTimeout(
           () => resolve({ promise2: 'promise2val', shared: 'promise2val' }),
           1

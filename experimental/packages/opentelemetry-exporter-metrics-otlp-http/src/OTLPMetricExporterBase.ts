@@ -21,8 +21,9 @@ import {
   InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
-  Aggregation,
   AggregationSelector,
+  AggregationOption,
+  AggregationType,
 } from '@opentelemetry/sdk-metrics';
 import {
   AggregationTemporalityPreference,
@@ -116,7 +117,11 @@ function chooseAggregationSelector(
   if (config?.aggregationPreference) {
     return config.aggregationPreference;
   } else {
-    return (_instrumentType: any) => Aggregation.Default();
+    return (_instrumentType: any) => {
+      return {
+        type: AggregationType.DEFAULT,
+      };
+    };
   }
 }
 
@@ -138,7 +143,7 @@ export class OTLPMetricExporterBase
     );
   }
 
-  selectAggregation(instrumentType: InstrumentType): Aggregation {
+  selectAggregation(instrumentType: InstrumentType): AggregationOption {
     return this._aggregationSelector(instrumentType);
   }
 
