@@ -133,6 +133,13 @@ export class MeterProvider implements IMeterProvider {
       return;
     }
 
+    try {
+      await this.forceFlush();
+    } catch (e) {
+      // log the error and continue with shutdown
+      diag.warn('error flushing data during shutdown', e);
+    }
+
     this._shutdown = true;
 
     await Promise.all(
