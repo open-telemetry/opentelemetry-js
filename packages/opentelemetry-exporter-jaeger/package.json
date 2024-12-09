@@ -55,7 +55,7 @@
     "nock": "13.3.8",
     "nyc": "15.1.0",
     "sinon": "15.1.2",
-    "typescript": "4.4.4"
+    "typescript": "5.0.4"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
