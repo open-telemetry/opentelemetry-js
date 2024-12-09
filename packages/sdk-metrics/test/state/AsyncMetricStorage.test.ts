@@ -34,10 +34,12 @@ import { HrTime } from '@opentelemetry/api';
 
 const deltaCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
+  selectCardinalityLimit: () => 2000,
 };
 
 const cumulativeCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
+  selectCardinalityLimit: () => 2000,
 };
 
 describe('AsyncMetricStorage', () => {

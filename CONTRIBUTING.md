@@ -79,7 +79,7 @@ Reporting bugs is an important contribution. Please make sure to include:
 ### Before you start
 
 Please read project contribution
-[guide](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md)
+[guide](https://github.com/open-telemetry/community/blob/main/guides/contributor)
 for general practices for OpenTelemetry project.
 
 #### Conventional commit
@@ -145,7 +145,7 @@ git merge upstream/main
 
 Remember to always work in a branch of your local copy, as you might otherwise have to contend with conflicts in main.
 
-Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#github-workflow) section of general project contributing guide.
+Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/main/guides/contributor/processes.md#github-workflow) section of general project contributing guide.
 
 ## Development
 

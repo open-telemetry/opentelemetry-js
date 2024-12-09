@@ -31,7 +31,9 @@ describe('parseHeaders', function () {
       foo2: 'bar',
       foo3: 1,
     };
-    const result = validateAndNormalizeHeaders(headers);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore simulating plain JS usage
+    const result = validateAndNormalizeHeaders(() => headers)();
     assert.deepStrictEqual(result, {
       foo2: 'bar',
       foo3: '1',
@@ -44,7 +46,7 @@ describe('parseHeaders', function () {
   });
 
   it('should parse undefined', function () {
-    const result = validateAndNormalizeHeaders(undefined);
+    const result = validateAndNormalizeHeaders(undefined)();
     assert.deepStrictEqual(result, {});
   });
 });
