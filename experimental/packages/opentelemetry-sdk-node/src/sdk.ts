@@ -137,7 +137,7 @@ export class NodeSDK {
 
     this._configuration = configuration;
 
-    this._resource = configuration.resource ?? new Resource({});
+    this._resource = configuration.resource ?? Resource.default();
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
