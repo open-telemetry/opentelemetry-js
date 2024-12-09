@@ -152,20 +152,20 @@ The below table describes which versions of each set of packages are expected to
 | 1.28.x          | 0.55.x                |
 | 1.27.x          | 0.54.x                |
 | 1.25.x          | 0.52.x                |
+| 1.24.x          | 0.51.x                |
 
 <details>
 <summary>Older version compatibility matrix</summary>
 
 <table>
 <tr><th>Stable Packages</th>                            <th>Experimental Packages</th></tr>
-<tr><td>1.24.x</td>                                                    <td>0.51.x</td></tr>
 <tr><td>1.23.x</td>                                                    <td>0.50.x</td></tr>
 <tr><td>1.22.x</td>                                                    <td>0.49.x</td></tr>
 <tr><td>1.21.x</td>                                                    <td>0.48.x</td></tr>
 <tr><td>1.20.x</td>                                                    <td>0.47.x</td></tr>
 <tr><td>1.19.x</td>                                                    <td>0.46.x</td></tr>
 <tr><td>1.18.x</td>                                                    <td>0.45.x</td></tr>
-<tr><td>1.17.x</td>                                                    <td>0.44.x</td></tr>
+<tr><td>1.17.x</td>                                                    <td>0.43.x, 0.44.x</td></tr>
 <tr><td>1.16.x</td>                                                    <td>0.42.x</td></tr>
 <tr><td>1.15.x</td>                                                    <td>0.41.x</td></tr>
 <tr><td>1.14.x</td>                                                    <td>0.40.x</td></tr>
