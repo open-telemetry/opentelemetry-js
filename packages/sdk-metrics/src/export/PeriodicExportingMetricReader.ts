@@ -161,7 +161,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     if (this._interval) {
       clearInterval(this._interval);
     }
-
+    await this.onForceFlush();
     await this._exporter.shutdown();
   }
 }
