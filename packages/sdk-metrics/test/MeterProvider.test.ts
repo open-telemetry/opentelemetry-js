@@ -835,11 +835,10 @@ describe('MeterProvider', () => {
         timeoutMillis: 5678,
       });
 
-      await meterProvider.shutdown(); // <-- this will call forceFlush() internally
+      await meterProvider.shutdown();
       await meterProvider.forceFlush();
-      assert.strictEqual(reader1ForceFlushSpy.callCount, 3);
-      assert.strictEqual(reader2ForceFlushSpy.callCount, 3);
-
+      assert.strictEqual(reader1ForceFlushSpy.callCount, 2);
+      assert.strictEqual(reader2ForceFlushSpy.callCount, 2);
     });
   });
 });

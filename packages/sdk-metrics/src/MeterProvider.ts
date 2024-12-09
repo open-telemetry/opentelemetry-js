@@ -122,7 +122,7 @@ export class MeterProvider implements IMeterProvider {
   }
 
   /**
-   * Flush all buffered data and shut down the MeterProvider and all registered
+   * Shut down the MeterProvider and all registered
    * MetricReaders.
    *
    * Returns a promise which is resolved when all flushes are complete.
@@ -131,13 +131,6 @@ export class MeterProvider implements IMeterProvider {
     if (this._shutdown) {
       diag.warn('shutdown may only be called once per MeterProvider');
       return;
-    }
-
-    try {
-      await this.forceFlush();
-    } catch (e) {
-      // log the error and continue with shutdown
-      diag.warn('error flushing data during shutdown', e);
     }
 
     this._shutdown = true;
