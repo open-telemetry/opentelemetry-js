@@ -25,6 +25,7 @@ import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 import { defaultServiceName } from './platform';
 import { IResource } from './IResource';
+import { mergeSchemaUrls } from './schemaUrlUtils'; // Import the utility function
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -35,7 +36,7 @@ export class Resource implements IResource {
   private _syncAttributes?: ResourceAttributes;
   private _asyncAttributesPromise?: Promise<ResourceAttributes>;
   private _attributes?: ResourceAttributes;
-
+  private _schemaUrl?: string;
   /**
    * Check if async attributes have resolved. This is useful to avoid awaiting
    * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
@@ -67,13 +68,9 @@ export class Resource implements IResource {
   }
 
   constructor(
-    /**
-     * A dictionary of attributes with string keys and values that provide
-     * information about the entity as numbers, strings or booleans
-     * TODO: Consider to add check/validation on attributes.
-     */
     attributes: ResourceAttributes,
-    asyncAttributesPromise?: Promise<ResourceAttributes>
+    asyncAttributesPromise?: Promise<ResourceAttributes>,
+    schemaUrl = ''
   ) {
     this._attributes = attributes;
     this.asyncAttributesPending = asyncAttributesPromise != null;
@@ -90,6 +87,7 @@ export class Resource implements IResource {
         return {};
       }
     );
+    this._schemaUrl = schemaUrl;
   }
 
   get attributes(): ResourceAttributes {
@@ -100,6 +98,13 @@ export class Resource implements IResource {
     }
 
     return this._attributes ?? {};
+  }
+
+  /**
+   * Returns the schema URL of the resource.
+   */
+  public getSchemaUrl(): string {
+    return this._schemaUrl || ''; // Return schema URL as string
   }
 
   /**
@@ -127,15 +132,21 @@ export class Resource implements IResource {
     // SpanAttributes from other resource overwrite attributes from this resource.
     const mergedSyncAttributes = {
       ...this._syncAttributes,
-      //Support for old resource implementation where _syncAttributes is not defined
+      // Support for old resource implementation where _syncAttributes is not defined
       ...((other as Resource)._syncAttributes ?? other.attributes),
     };
+
+    // Merge schema URLs using the utility function
+    const mergedSchemaUrl = mergeSchemaUrls(
+      this._schemaUrl || '',
+      other.getSchemaUrl?.() || ''
+    );
 
     if (
       !this._asyncAttributesPromise &&
       !(other as Resource)._asyncAttributesPromise
     ) {
-      return new Resource(mergedSyncAttributes);
+      return new Resource(mergedSyncAttributes, undefined, mergedSchemaUrl);
     }
 
     const mergedAttributesPromise = Promise.all([
@@ -145,12 +156,16 @@ export class Resource implements IResource {
       return {
         ...this._syncAttributes,
         ...thisAsyncAttributes,
-        //Support for old resource implementation where _syncAttributes is not defined
+        // Support for old resource implementation where _syncAttributes is not defined
         ...((other as Resource)._syncAttributes ?? other.attributes),
         ...otherAsyncAttributes,
       };
     });
 
-    return new Resource(mergedSyncAttributes, mergedAttributesPromise);
+    return new Resource(
+      mergedSyncAttributes,
+      mergedAttributesPromise,
+      mergedSchemaUrl
+    );
   }
 }
