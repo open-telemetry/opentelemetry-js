@@ -936,7 +936,7 @@ describe('Node SDK', () => {
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(resource, Resource.empty());
+        assert.deepStrictEqual(resource, Resource.default());
         await sdk.shutdown();
       });
     });
