@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733476495229,
+  "lastUpdate": 1733762919347,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21239,6 +21239,44 @@ window.BENCHMARK_DATA = {
           {
             "name": "BatchSpanProcessor process span",
             "value": 657965,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9328790c5449f1b68d851225f79f5416b0d95e0f",
+          "message": "docs: document compatible versions (#5246)",
+          "timestamp": "2024-12-09T16:41:37Z",
+          "tree_id": "4d9c909fd9246ddba317c3d815fe4784bdb3f128",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/9328790c5449f1b68d851225f79f5416b0d95e0f"
+        },
+        "date": 1733762918488,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 684152,
+            "range": "±0.57%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 642028,
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "96 samples"
