@@ -17,97 +17,77 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 
 import { OTLPLogExporter } from '../../src/platform/browser';
-import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
-import { mockedReadableLogRecord } from '../logHelper';
-import { ExportResultCode } from '@opentelemetry/core';
+import {
+  LoggerProvider,
+  SimpleLogRecordProcessor,
+} from '@opentelemetry/sdk-logs';
 
-describe('OTLPLogExporter', () => {
-  let collectorExporter: OTLPLogExporter;
-  let collectorExporterConfig: OTLPExporterConfigBase;
+/*
+ * NOTE: Tests here are not intended to test the underlying components directly. They are intended as a quick
+ * check if the correct components are used. Use the following packages to test details:
+ * - `@opentelemetry/oltp-exporter-base`: OTLP common exporter logic (handling of concurrent exports, ...), HTTP transport code
+ * - `@opentelemetry/otlp-transformer`: Everything regarding serialization and transforming internal representations to OTLP
+ */
 
+describe('OTLPLogExporter', function () {
   afterEach(() => {
     sinon.restore();
   });
 
-  describe('constructor', () => {
-    it('should create an instance', () => {
-      const exporter = new OTLPLogExporter();
-      assert.ok(exporter instanceof OTLPLogExporter);
-    });
-  });
+  describe('export', function () {
+    describe('when sendBeacon is available', function () {
+      it('should successfully send data using sendBeacon', async function () {
+        // arrange
+        const stubBeacon = sinon.stub(navigator, 'sendBeacon');
+        const loggerProvider = new LoggerProvider();
+        loggerProvider.addLogRecordProcessor(
+          new SimpleLogRecordProcessor(new OTLPLogExporter())
+        );
 
-  describe('export - common', () => {
-    let spySend: any;
-    beforeEach(() => {
-      spySend = sinon.stub(OTLPLogExporter.prototype, 'send');
-      collectorExporter = new OTLPLogExporter(collectorExporterConfig);
-    });
+        // act
+        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+        await loggerProvider.shutdown();
 
-    it('should export spans as otlpTypes.Spans', done => {
-      const logs: ReadableLogRecord[] = [];
-      logs.push(Object.assign({}, mockedReadableLogRecord));
-
-      collectorExporter.export(logs, () => {});
-      setTimeout(() => {
-        const log = spySend.args[0][0][0] as ReadableLogRecord;
-        assert.deepStrictEqual(logs[0], log);
-        done();
+        // assert
+        const args = stubBeacon.args[0];
+        const blob: Blob = args[1] as unknown as Blob;
+        const body = await blob.text();
+        assert.doesNotThrow(
+          () => JSON.parse(body),
+          'expected requestBody to be in JSON format, but parsing failed'
+        );
       });
-      assert.strictEqual(spySend.callCount, 1);
     });
 
-    describe('when exporter is shutdown', () => {
-      it(
-        'should not export anything but return callback with code' +
-          ' "FailedNotRetryable"',
-        async () => {
-          const spans: ReadableLogRecord[] = [];
-          spans.push(Object.assign({}, mockedReadableLogRecord));
-          await collectorExporter.shutdown();
-          spySend.resetHistory();
+    describe('when sendBeacon is not available', function () {
+      beforeEach(function () {
+        // fake sendBeacon not being available
+        (window.navigator as any).sendBeacon = false;
+      });
 
-          const callbackSpy = sinon.spy();
-          collectorExporter.export(spans, callbackSpy);
-          const returnCode = callbackSpy.args[0][0];
+      it('should successfully send data using XMLHttpRequest', async function () {
+        // arrange
+        const server = sinon.fakeServer.create();
+        const loggerProvider = new LoggerProvider();
+        loggerProvider.addLogRecordProcessor(
+          new SimpleLogRecordProcessor(new OTLPLogExporter())
+        );
 
-          assert.strictEqual(
-            returnCode.code,
-            ExportResultCode.FAILED,
-            'return value is wrong'
-          );
-          assert.strictEqual(spySend.callCount, 0, 'should not call send');
-        }
-      );
-    });
-    describe('when an error occurs', () => {
-      it('should return failed export result', done => {
-        const spans: ReadableLogRecord[] = [];
-        spans.push(Object.assign({}, mockedReadableLogRecord));
-        spySend.throws({
-          code: 100,
-          details: 'Test error',
-          metadata: {},
-          message: 'Non-retryable',
-          stack: 'Stack',
+        // act
+        loggerProvider.getLogger('test-logger').emit({ body: 'test-body' });
+        queueMicrotask(() => {
+          // simulate success response
+          server.requests[0].respond(200, {}, '');
         });
-        const callbackSpy = sinon.spy();
-        collectorExporter.export(spans, callbackSpy);
-        setTimeout(() => {
-          const returnCode = callbackSpy.args[0][0];
-          assert.strictEqual(
-            returnCode.code,
-            ExportResultCode.FAILED,
-            'return value is wrong'
-          );
-          assert.strictEqual(
-            returnCode.error.message,
-            'Non-retryable',
-            'return error message is wrong'
-          );
-          assert.strictEqual(spySend.callCount, 1, 'should call send');
-          done();
-        });
+        await loggerProvider.shutdown();
+
+        // assert
+        const request = server.requests[0];
+        const body = request.requestBody as unknown as Uint8Array;
+        assert.doesNotThrow(
+          () => JSON.parse(new TextDecoder().decode(body)),
+          'expected requestBody to be in JSON format, but parsing failed'
+        );
       });
     });
   });
