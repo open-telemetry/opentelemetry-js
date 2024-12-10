@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733762919347,
+  "lastUpdate": 1733824021536,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21280,6 +21280,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.27%",
             "unit": "ops/sec",
             "extra": "96 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5387343986d780bed88f539744138a024453b53a",
+          "message": "test(api): longer timeout for API tree-shaking tests (#5247)",
+          "timestamp": "2024-12-10T09:11:45Z",
+          "tree_id": "9264d51940b480a300428f83f24098bba4dfde0a",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/5387343986d780bed88f539744138a024453b53a"
+        },
+        "date": 1733824020676,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 635245,
+            "range": "±1.36%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 639285,
+            "range": "±0.38%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
           }
         ]
       }
