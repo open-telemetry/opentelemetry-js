@@ -17,18 +17,14 @@ import { HrTime, TraceFlags } from '@opentelemetry/api';
 import { InstrumentationScope, hexToBinary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import {
-  createExportLogsServiceRequest,
-  ESeverityNumber,
-  IExportLogsServiceRequest,
-  ProtobufLogsSerializer,
-  JsonLogsSerializer,
-  OtlpEncodingOptions,
-} from '../src';
+import { ProtobufLogsSerializer, JsonLogsSerializer } from '../src';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { toBase64 } from './utils';
 import * as root from '../src/generated/root';
+import { OtlpEncodingOptions } from '../src/common/types';
+import { ESeverityNumber, IExportLogsServiceRequest } from '../src/logs/types';
+import { createExportLogsServiceRequest } from '../src/logs';
 
 function createExpectedLogJson(
   options: OtlpEncodingOptions
