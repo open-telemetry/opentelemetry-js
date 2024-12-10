@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733857707998,
+  "lastUpdate": 1733858012791,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21354,6 +21354,44 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 663368,
             "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "887ff1cd6e3f795f703e40a9fbe89b3cba7e88c3",
+          "message": "docs: re-categoize misplaced changelog entry (#5248)",
+          "timestamp": "2024-12-10T15:53:32Z",
+          "tree_id": "86c62f9936329333fcd31acc3ee6d8a0052ec6dd",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/887ff1cd6e3f795f703e40a9fbe89b3cba7e88c3"
+        },
+        "date": 1733858011900,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 683894,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 674274,
+            "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
