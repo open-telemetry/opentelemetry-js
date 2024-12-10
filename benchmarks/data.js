@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733824021536,
+  "lastUpdate": 1733857707998,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21318,6 +21318,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.38%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "michele@azzolari.it",
+            "name": "Michele Azzolari",
+            "username": "macno"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "79e28759f053a730ff2091403e50dd130e3edb55",
+          "message": "feat(sdk-metrics): PeriodicExportingMetricReader now flushes pending tasks at shutdown (#5242)",
+          "timestamp": "2024-12-10T15:52:18Z",
+          "tree_id": "5b6ddc8ffd40eeabe8f2bd23d2684e03616235d0",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/79e28759f053a730ff2091403e50dd130e3edb55"
+        },
+        "date": 1733857707098,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 687169,
+            "range": "±0.70%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 663368,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
