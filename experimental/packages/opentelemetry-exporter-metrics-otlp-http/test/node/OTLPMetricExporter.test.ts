@@ -214,8 +214,9 @@ describe('OTLPMetricExporter', () => {
       meterProvider.getMeter('test-meter').createCounter('test-counter').add(1);
 
       // act
-      meterProvider.forceFlush();
-      meterProvider.shutdown();
+      meterProvider.forceFlush().then(() => {
+        return meterProvider.shutdown();
+      });
     });
   });
 });
