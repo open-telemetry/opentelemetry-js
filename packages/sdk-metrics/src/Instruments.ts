@@ -22,6 +22,7 @@ import {
   ValueType,
   UpDownCounter,
   Counter,
+  Gauge,
   Histogram,
   Observable,
   ObservableCallback,
@@ -36,7 +37,6 @@ import {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
 } from './state/WritableMetricStorage';
-import { Gauge } from './types';
 
 export class SyncInstrument {
   constructor(
