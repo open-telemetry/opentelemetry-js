@@ -1,24 +1,23 @@
-import { Entity } from "./IResource";
-import { Detector } from "./types";
+import { Resource } from './Resource';
 
-type ResourceProviderConfig {
-    entityDetectors: EntityDetector[];
-}
-
-interface EntityDetector {
-    detect(): Entity;
-}
-
+/**
+ * A Registry which provides the {@link Resource} to the SDK.
+ * 
+ * Note: this does not do much initially, but eventually will be extended for resource mutation over time.
+ * */
 export class ResourceProvider {
-    private _detectors: Array<EntityDetector | Detector>;
+  private _resource: Resource;
 
-    constructor(config: Partial<ResourceProviderConfig> = {}) {
-        this._detectors = config.entityDetectors ? [...config.entityDetectors] : [];
-    }
+  constructor(resource: Resource) {
+    this._resource = resource;
+  }
 
-    public detect() {
-        for (const detector of this._detectors) {
-            const res = detector.detect();
-        }
-    }
+  /**
+   * Provides the currently discovered {@link Resource}.
+   *
+   * @return the Resource.
+   */
+  getResource(): Resource {
+    return this._resource;
+  }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
+// import { EntityRef } from './entity';
 import { ResourceAttributes } from './types';
 
 /**
@@ -43,7 +43,7 @@ export interface IResource {
    */
   waitForAsyncAttributes?(): Promise<void>;
 
-  readonly entityRefs: EntityRef[];
+  // readonly entityRefs: EntityRef[];
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
@@ -54,20 +54,4 @@ export interface IResource {
    * @returns the newly merged Resource.
    */
   merge(other: IResource | null): IResource;
-}
-
-export interface EntityRef {
-  type: string;
-
-  identifyingAttributeKeys: string[];
-
-  descriptiveAttributeKeys: string[];
-}
-
-export interface Entity {
-  type: string;
-
-  identifier: Attributes;
-
-  attributes: Attributes;
 }

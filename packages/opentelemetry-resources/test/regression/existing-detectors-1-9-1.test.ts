@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Resource, Detector, ResourceDetectionConfig } from '../../src';
+import { Resource, Detector, ResourceDetectionConfig, IResource } from '../../src';
 import * as assert from 'assert';
 
 // DO NOT MODIFY THIS DETECTOR: Previous detectors used Resource as IResource did not yet exist.
 // If compilation fails at this point then the changes made are breaking.
 class RegressionTestResourceDetector_1_9_1 implements Detector {
-  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
+  async detect(_config?: ResourceDetectionConfig): Promise<IResource> {
     return Resource.empty();
   }
 }

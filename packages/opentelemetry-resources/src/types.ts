@@ -15,8 +15,9 @@
  */
 
 import { ResourceDetectionConfig } from './config';
-import { SpanAttributes } from '@opentelemetry/api';
+import { AttributeValue, SpanAttributes } from '@opentelemetry/api';
 import { IResource } from './IResource';
+import { Attributes } from '@opentelemetry/api';
 
 /**
  * Interface for Resource attributes.
@@ -35,7 +36,30 @@ export interface Detector {
 /**
  * Interface for a synchronous Resource Detector. In order to detect attributes asynchronously, a detector
  * can pass a Promise as the second parameter to the Resource constructor.
+ * 
+ * @deprecated please use {@link ResourceEntityDetector}
  */
 export interface DetectorSync {
   detect(config?: ResourceDetectionConfig): IResource;
 }
+
+export interface ResourceEntityDetector {
+  detect(): IDetectedResource;
+}
+
+export type IDetectedResource = {
+  resourceAttributes: DetectedResourceAttributes;
+  entities: IDetectedEntity[];
+}
+
+export type IDetectedEntity = {
+  type: string;
+  schema_url?: string;
+  identifier: Attributes;
+  attributes?: DetectedResourceAttributes;
+}
+
+/**
+ * Represents a set of detected synchronous and asynchronous resource attributes.
+ */
+export type DetectedResourceAttributes = Record<string, AttributeValue | Promise<AttributeValue>>;
