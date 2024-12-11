@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { MetricOptions, ValueType, diag } from '@opentelemetry/api';
+import {
+  MetricAdvice,
+  MetricOptions,
+  ValueType,
+  diag,
+} from '@opentelemetry/api';
 import { View } from './view/View';
 import { equalsCaseInsensitive } from './utils';
 
@@ -44,18 +49,11 @@ export interface InstrumentDescriptor {
   readonly type: InstrumentType;
   readonly valueType: ValueType;
   /**
-   * @experimental
+   * See {@link MetricAdvice}
    *
-   * This is intentionally not using the API's type as it's only available from @opentelemetry/api 1.7.0 and up.
-   * In SDK 2.0 we'll be able to bump the minimum API version and remove this workaround.
+   * @experimental
    */
-  readonly advice: {
-    /**
-     * Hint the explicit bucket boundaries for SDK if the metric has been
-     * aggregated with a HistogramAggregator.
-     */
-    explicitBucketBoundaries?: number[];
-  };
+  readonly advice: MetricAdvice;
 }
 
 export function createInstrumentDescriptor(
