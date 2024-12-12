@@ -19,6 +19,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 * fix(sdk-trace-base): do not load OTEL_ env vars on module load, but when needed [#5224](https://github.com/open-telemetry/opentelemetry-js/pull/5224)
 
+* fix(instrumentation-xhr, instrumentation-fetch): content length attributes no longer get removed with `ignoreNetworkEvents: true` being set [#5229](https://github.com/open-telemetry/opentelemetry-js/issues/5229)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

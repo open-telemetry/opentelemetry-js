@@ -89,28 +89,32 @@ export function addSpanNetworkEvent(
 }
 
 /**
- * Helper function for adding network events
+ * Helper function for adding network events and content length attributes
  * @param span
  * @param resource
+ * @param ignoreNetworkEvents
  */
 export function addSpanNetworkEvents(
   span: api.Span,
-  resource: PerformanceEntries
+  resource: PerformanceEntries,
+  ignoreNetworkEvents = false
 ): void {
-  addSpanNetworkEvent(span, PTN.FETCH_START, resource);
-  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
-  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
-  addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-  if (
-    hasKey(resource as PerformanceResourceTiming, 'name') &&
-    (resource as PerformanceResourceTiming)['name'].startsWith('https:')
-  ) {
-    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  if (!ignoreNetworkEvents) {
+    addSpanNetworkEvent(span, PTN.FETCH_START, resource);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
+    addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
+    if (
+      hasKey(resource as PerformanceResourceTiming, 'name') &&
+      (resource as PerformanceResourceTiming)['name'].startsWith('https:')
+    ) {
+      addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+    }
+    addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
+    addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
+    addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
+    addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
   }
-  addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
-  addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
-  addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
-  addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
   const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
   if (encodedLength !== undefined) {
     span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
