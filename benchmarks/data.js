@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733858012791,
+  "lastUpdate": 1734000903323,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21394,6 +21394,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.22%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "61d5a0e291db26c2af638274947081b29db3f0ca",
+          "message": "chore(deps): update dependency chromedriver to v131.0.3 (#5255)",
+          "timestamp": "2024-12-12T10:46:43Z",
+          "tree_id": "a7117b600a69cd4c90c1ea3527268250d52d7804",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/61d5a0e291db26c2af638274947081b29db3f0ca"
+        },
+        "date": 1734000902411,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 686683,
+            "range": "±0.20%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 644380,
+            "range": "±0.66%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
