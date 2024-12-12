@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1734000903323,
+  "lastUpdate": 1734018379645,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21432,6 +21432,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.66%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "trentm@gmail.com",
+            "name": "Trent Mick",
+            "username": "trentm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "bdee949b8ac551f8993696db5385c3d488efc1a5",
+          "message": "doc(semantic-conventions): clarify suggested usage of *unstable* semconv (#5256)",
+          "timestamp": "2024-12-12T15:07:44Z",
+          "tree_id": "b1d419fa3ee1d7323d1071caf9b5e4dc5d4d4dcf",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bdee949b8ac551f8993696db5385c3d488efc1a5"
+        },
+        "date": 1734018378713,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 703929,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 665642,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
           }
         ]
       }
