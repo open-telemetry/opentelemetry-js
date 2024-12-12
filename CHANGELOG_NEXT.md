@@ -16,6 +16,7 @@
 * refactor(sdk-trace-base)!: remove `new Span` constructor in favor of `Tracer.startSpan` API [#5048](https://github.com/open-telemetry/opentelemetry-js/pull/5048) @david-luna
 * refactor(sdk-trace-base)!: remove `BasicTracerProvider.addSpanProcessor` API in favor of constructor options. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
 * refactor(sdk-trace-base)!: make `resource` property private in `BasicTracerProvider` and remove `getActiveSpanProcessor` API. [#5192](https://github.com/open-telemetry/opentelemetry-js/pull/5192) @david-luna
+* feat(sdk-trace-web)!: content length attributes are no longer added in `addSpanNetworkEvents`. Logic has been moved to new method `addSpanContentLengthAttributes` [#5257](https://github.com/open-telemetry/opentelemetry-js/pull/5257) @arriIsHere
 
 ### :rocket: (Enhancement)
 
