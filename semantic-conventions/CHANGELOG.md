@@ -11,8 +11,6 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :bug: (Bug Fix)
 
-* bug: content length attributes no longer get removed with `ignoreNetworkEvents: true` being set [#5229](https://github.com/open-telemetry/opentelemetry-js/issues/5229)
-
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
