@@ -27,6 +27,7 @@ export {
   URLLike,
   addSpanNetworkEvent,
   addSpanNetworkEvents,
+  addSpanContentLengthAttributes,
   getElementXPath,
   getResource,
   hasKey,

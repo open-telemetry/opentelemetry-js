@@ -111,6 +111,17 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
+}
+
+/**
+ * Helper function for adding content length attributes to a network span
+ * @param span
+ * @param resource
+ */
+export function addSpanContentLengthAttributes(
+  span: api.Span,
+  resource: PerformanceEntries
+): void {
   const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
   if (encodedLength !== undefined) {
     span.setAttribute(SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH, encodedLength);
