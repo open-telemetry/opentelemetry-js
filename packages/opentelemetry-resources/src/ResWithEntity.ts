@@ -17,7 +17,7 @@
 import { Attributes, AttributeValue, diag } from '@opentelemetry/api';
 import { Entity, EntityRef, mergeEntities } from './entity';
 import { DetectedResourceAttributes, ResourceAttributes } from './types';
-import { isPromiseLike } from './utils';
+import { identity, isPromiseLike } from './utils';
 
 export class ResWithEntity {
   private _rawAttributes: [string, AttributeValue | Promise<AttributeValue>][];
@@ -48,16 +48,13 @@ export class ResWithEntity {
 
         return [
           k,
-          v.then(
-            v => v,
-            err => {
-              diag.debug(
-                "a resource's async attributes promise rejected: %s",
-                err
-              );
-              return [k, undefined];
-            }
-          ),
+          v.then(identity, err => {
+            diag.debug(
+              "a resource's async attributes promise rejected: %s",
+              err
+            );
+            return [k, undefined];
+          }),
         ];
       }
 

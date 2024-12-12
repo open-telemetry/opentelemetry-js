@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Resource, Detector, ResourceDetectionConfig, IResource } from '../../src';
+import {
+  Resource,
+  Detector,
+  ResourceDetectionConfig,
+  IResource,
+} from '../../src';
 import * as assert from 'assert';
 
 // DO NOT MODIFY THIS DETECTOR: Previous detectors used Resource as IResource did not yet exist.
