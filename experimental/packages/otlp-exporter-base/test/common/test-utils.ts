@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPTraceExporter } from '../../src/platform/browser/index';
+import { diag } from '@opentelemetry/api';
 
-describe('OTLPTraceExporter - web', () => {
-  let collectorTraceExporter: OTLPTraceExporter;
-  describe('constructor', () => {
-    beforeEach(() => {
-      const collectorExporterConfig = {
-        hostname: 'foo',
-        url: 'http://foo.bar.com',
-      };
-      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
-    });
-    afterEach(() => {
-      sinon.restore();
-    });
-    it('should create an instance', () => {
-      assert.ok(typeof collectorTraceExporter !== 'undefined');
-    });
-  });
-});
+export function registerMockDiagLogger() {
+  // arrange
+  const stubs = {
+    verbose: sinon.stub(),
+    debug: sinon.stub(),
+    info: sinon.stub(),
+    warn: sinon.stub(),
+    error: sinon.stub(),
+  };
+  diag.setLogger(stubs);
+  stubs.warn.resetHistory(); // reset history setLogger will warn if another has already been set
+
+  return stubs;
+}

@@ -7,6 +7,20 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.56.0
+
+### :boom: Breaking Change
+
 * feat(otlp-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031) @pichlermarc
   * `OTLPExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
   * `OTLPExporterBrowserBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
@@ -19,17 +33,78 @@ All notable changes to experimental packages in this project will be documented 
 * feat(otlp-transformer)!: accept `ResourceMetrics` in serializers instead of `ResourceMetrics[]`
   * (user-facing): `ProtobufMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
   * (user-facing): `JsonMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
+* feat(otlp-transformer)!: remove internal types and functions from public API @pichlermarc
+  * (user-facing): the following types and functions were intended for internal use and have been removed from exports
+    * `OtlpEncodingOptions`
+    * `IKeyValueList`
+    * `IKeyValue`
+    * `IInstrumentationScope`
+    * `IArrayValue`
+    * `LongBits`
+    * `IAnyValue`
+    * `Fixed64`
+    * `SpanContextEncodeFunction`
+    * `toLongBits`
+    * `OptionalSpanContextEncodeFunction`
+    * `getOtlpEncoder`
+    * `Encoder`
+    * `HrTimeEncodeFunction`
+    * `encodeAsLongBits`
+    * `encodeAsString`
+    * `hrTimeToNanos`
+    * `IValueAtQuantile`
+    * `ISummaryDataPoint`
+    * `ISummary`
+    * `ISum`
+    * `IScopeMetrics`
+    * `IResourceMetrics`
+    * `INumberDataPoint`
+    * `IHistogramDataPoint`
+    * `IHistogram`
+    * `IExponentialHistogramDataPoint`
+    * `IExponentialHistogram`
+    * `IMetric`
+    * `IGauge`
+    * `IExemplar`
+    * `EAggregationTemporality`
+    * `IExportMetricsServiceRequest`
+    * `IBuckets`
+    * `IResource`
+    * `IStatus`
+    * `EStatusCode`
+    * `ILink`
+    * `IEvent`
+    * `IScopeSpans`
+    * `ISpan`
+    * `IResourceSpans`
+    * `ESpanKind`
+    * `IExportTraceServiceRequest`
+    * `IScopeLogs`
+    * `IExportLogsServiceRequest`
+    * `IResourceLogs`
+    * `ILogRecord`
+    * `ESeverityNumber`
+    * `createExportTraceServiceRequest`
+    * `createExportMetricsServiceRequest`
+    * `createExportLogsServiceRequest`
 
 ### :rocket: (Enhancement)
 
+* feat(otlp-exporter-base): handle OTLP partial success [#5183](https://github.com/open-telemetry/opentelemetry-js/pull/5183) @pichlermarc
 * feat(otlp-exporter-base): internally accept a http header provider function only [#5179](https://github.com/open-telemetry/opentelemetry-js/pull/5179) @pichlermarc
-* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
+* refactor(otlp-exporter-base): don't create blob before sending xhr [#5193](https://github.com/open-telemetry/opentelemetry-js/pull/5193) @pichlermarc
+  * improves compatibility with some unsupported runtimes
+* feat(otlp-exporter-base): add http response body to exporter error [#5204](https://github.com/open-telemetry/opentelemetry-js/pull/5204) @pichlermarc
 
 ### :bug: (Bug Fix)
 
-### :books: (Refine Doc)
+* fix(otlp-exporter-\*): de-confuse Nuxt build tooling by not using 'export *' in comments [#5227](https://github.com/open-telemetry/opentelemetry-js/pull/5227) @pichlermarc
 
 ### :house: (Internal)
+
+* chore(otlp-exporter-\*-grpc): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5196) @pichlermarc
+* chore(otlp-exporter-\*-http): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5198) @pichlermarc
+* chore(otlp-exporter-\*-proto): clean up tests [#5196](https://github.com/open-telemetry/opentelemetry-js/pull/5199) @pichlermarc
 
 ## 0.55.0
 

@@ -22,6 +22,7 @@ import {
   ExportResponseRetryable,
   ExportResponseFailure,
   ExportResponseSuccess,
+  OTLPExporterError,
 } from '../../src';
 import * as zlib from 'zlib';
 
@@ -123,7 +124,7 @@ describe('HttpExporterTransport', function () {
       // arrange
       server = http.createServer((_, res) => {
         res.statusCode = 404;
-        res.end();
+        res.end('response-body');
       });
       server.listen(8080);
 
@@ -142,6 +143,14 @@ describe('HttpExporterTransport', function () {
       assert.strictEqual(
         (result as ExportResponseFailure).error.message,
         'Not Found'
+      );
+      assert.strictEqual(
+        ((result as ExportResponseFailure).error as OTLPExporterError).data,
+        'response-body'
+      );
+      assert.strictEqual(
+        ((result as ExportResponseFailure).error as OTLPExporterError).code,
+        404
       );
     });
 

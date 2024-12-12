@@ -81,7 +81,7 @@ class XhrTransport implements IExporterTransport {
         });
       };
 
-      xhr.send(new Blob([data], { type: headers['Content-Type'] }));
+      xhr.send(data);
     });
   }
 
