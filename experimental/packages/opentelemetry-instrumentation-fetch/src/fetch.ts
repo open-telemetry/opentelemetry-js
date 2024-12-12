@@ -115,6 +115,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
     if (!this.getConfig().ignoreNetworkEvents) {
       web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
     }
+    web.addSpanContentLengthAttributes(childSpan, corsPreFlightRequest);
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
     );
@@ -265,6 +266,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       if (!this.getConfig().ignoreNetworkEvents) {
         web.addSpanNetworkEvents(span, mainRequest);
       }
+      web.addSpanContentLengthAttributes(span, mainRequest);
     }
   }
 
