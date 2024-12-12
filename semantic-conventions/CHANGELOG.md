@@ -13,7 +13,7 @@ All notable changes to the semantic-conventions package will be documented in th
 
 ### :books: (Refine Doc)
 
-* docs: Document suggested usage of unstable semconv: copy relevant definitions into your code base.
+* docs: Document suggested usage of unstable semconv: copy relevant definitions into your code base. [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5182) @trentm
 
 ### :house: (Internal)
 
