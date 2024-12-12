@@ -17,7 +17,7 @@
 import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer';
+import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer/json';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
 /**

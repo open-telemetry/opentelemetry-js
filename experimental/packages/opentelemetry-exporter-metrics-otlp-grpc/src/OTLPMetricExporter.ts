@@ -23,7 +23,7 @@ import {
   createOtlpGrpcExportDelegate,
   OTLPGRPCExporterConfigNode,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer';
+import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer/protobuf';
 
 /**
  * OTLP-gRPC metric exporter

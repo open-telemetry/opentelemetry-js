@@ -18,7 +18,7 @@ import {
   OTLPExporterBase,
   OTLPExporterNodeConfigBase,
 } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer/protobuf';
 import {
   convertLegacyHttpOptions,
   createOtlpHttpExportDelegate,

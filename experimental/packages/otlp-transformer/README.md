@@ -21,7 +21,7 @@ npm install @opentelemetry/api
 
 ### Serialize Traces/Metrics/Logs
 
-This module exports functions to serialize traces, metrics and logs from the OpenTelemetry SDK into protocol buffers which can be sent over HTTP to the OpenTelemetry collector or a compatible receiver.
+This package exports functions to serialize traces, metrics and logs from the OpenTelemetry SDK into OTLP JSON format, which can be sent over HTTP to the OpenTelemetry collector or a compatible receiver.
 
 ```typescript
 import {
@@ -30,10 +30,85 @@ import {
   createExportLogsServiceRequest,
 } from '@opentelemetry/otlp-transformer';
 
-const serializedSpans = createExportTraceServiceRequest(readableSpans);
-const serializedMetrics = createExportMetricsServiceRequest(readableMetrics);
-const serializedLogs = createExportLogsServiceRequest(readableLogRecords);
+const serializableSpans = createExportTraceServiceRequest(readableSpans);
+const serializableMetrics = createExportMetricsServiceRequest(readableMetrics);
+const serializableLogs = createExportLogsServiceRequest(readableLogRecords);
 ```
+
+Note that these functions return JSON-serializable objects (i.e. JavaScript objects that can be passed into `JSON.stringify(...)`) adhering to the OTLP JSON format, not the serialized JSON-text payload themselves.
+
+### Protobuf (Binary) Serializers
+
+Additionally, this package also exports serializers to serialize traces, metrics and logs into the export requests using the OTLP binary protobuf format, as well as deserializing the corresponding binary response payloads.
+
+```typescript
+import {
+  ProtobufTraceSerializer,
+  ProtobufMetricsSerializer,
+  ProtobufLogsSerializer,
+} from '@opentelemetry/otlp-transformer/protobuf';
+
+const serializedSpans: Uint8Array =
+  ProtobufTraceSerializer.serializeRequest(readableSpans);
+const serializedMetrics: Uint8Array =
+  ProtobufMetricsSerializer.serializeRequest(readableMetrics);
+const serializedLogs: Uint8Array =
+  ProtobufLogsSerializer.serializeRequest(readableLogRecords);
+
+// ...
+
+const deserializedTraceResponse = ProtobufTraceSerializer.deserializeResponse(
+  serializedTraceResponse /* Uint8Array */
+);
+const deserializedMetricsResponse =
+  ProtobufMetricsSerializer.deserializeResponse(
+    serializedTraceResponse /* Uint8Array */
+  );
+const deserializedLogsResponse = ProtobufLogsSerializer.deserializeResponse(
+  serializedTraceResponse /* Uint8Array */
+);
+```
+
+### JSON Serializers
+
+For feature parity, this package also exports JSON serializers with the same interfaces:
+
+```typescript
+import {
+  JsonTraceSerializer,
+  JsonMetricsSerializer,
+  JsonLogsSerializer,
+} from '@opentelemetry/otlp-transformer/json';
+
+const serializedSpans: Uint8Array =
+  JsonTraceSerializer.serializeRequest(readableSpans);
+const serializedMetrics: Uint8Array =
+  JsonMetricsSerializer.serializeRequest(readableMetrics);
+const serializedLogs: Uint8Array =
+  JsonLogsSerializer.serializeRequest(readableLogRecords);
+
+// ...
+
+const deserializedTraceResponse = JsonTraceSerializer.deserializeResponse(
+  serializedTraceResponse /* Uint8Array */
+);
+const deserializedMetricsResponse = JsonMetricsSerializer.deserializeResponse(
+  serializedTraceResponse /* Uint8Array */
+);
+const deserializedLogsResponse = JsonLogsSerializer.deserializeResponse(
+  serializedTraceResponse /* Uint8Array */
+);
+```
+
+Unlike the `createExport*Request` functions (and similar to the binary protobuf serializers), these serializer methods return the _serialized_ bytes directly, skipping the need to further serialize them with `JSON.stringify(...)`.
+
+Among other things, the `Uint8Array` can be used directly as the `body` of a `fetch()` request. Likewise, a `Uint8Array` of the response body can be obtained from `await response.bytes()`.
+
+### Experimental Features
+
+As we iterate towards the stabilization of this package, certain features are expected to remain in experimental status. These features are subject to changes and breakages between minor versions of the package, even after the package itself reaches version `1.0`.
+
+These features are exported from the `@opentelemetry/otlp-transformer/experimental` entrypoint. Currently, this entrypoint is empty, as the entire package is considered experimental at the moment. It is expected to be utilized as part of upcoming stabilization efforts.
 
 ## Useful links
 
