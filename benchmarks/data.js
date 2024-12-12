@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1734018379645,
+  "lastUpdate": 1734018478714,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21468,6 +21468,44 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 665642,
             "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arriblais@gmail.com",
+            "name": "Arriana Blais",
+            "username": "arriIsHere"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "e4d9c213f6d431952b7c21f24e3ba782b3ab876a",
+          "message": "fix(instrumentation-fetch, instrumentation-xml-http-request) content length attributes now prese (#5230)",
+          "timestamp": "2024-12-12T15:35:41Z",
+          "tree_id": "5462127f1d261a50772b29caefcebde1b141996f",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e4d9c213f6d431952b7c21f24e3ba782b3ab876a"
+        },
+        "date": 1734018477831,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 657184,
+            "range": "±0.54%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 663023,
+            "range": "±0.31%",
             "unit": "ops/sec",
             "extra": "100 samples"
           }
