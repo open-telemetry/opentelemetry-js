@@ -101,8 +101,7 @@ npm install --save-exact @opentelemetry/semantic-conventions
 Then, import directly from `@opentelemetry/semantic-conventions/incubating`.
 This is **not** recommended.
 
-In some languages having multiple versions of a package in a single application is not possible. This *is* possible in JavaScript. The primary argument against pinning this package is that it can easily lead to many copies being installed in an application's `node_modules/...`, which can cause significant disk usage. In a disk-constrained environment, such as AWS Lambda Layers, that can be a blocker.
-
+In some languages having multiple versions of a package in a single application is not possible. This _is_ possible in JavaScript. The primary argument against pinning this package is that it can easily lead to many copies being installed in an application's `node_modules/...`, which can cause significant disk usage. In a disk-constrained environment, such as AWS Lambda Layers, that can be a blocker.
 
 ## Deprecations
 
@@ -206,7 +205,6 @@ console.log(ATTR_DB_SYSTEM);    // 'db.system'
 // 'postgresql' enum value for 'db.system' attribute
 console.log(DB_SYSTEM_VALUE_POSTGRESQL);
 ```
-
 
 ## Useful links
 
