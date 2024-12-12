@@ -127,6 +127,35 @@ describe('utils', () => {
       } as PerformanceResourceTiming);
       assert.strictEqual(addEventSpy.callCount, 9);
     });
+
+    it('should ignore network events when ignoreNetworkEvents is true', () => {
+      const addEventSpy = sinon.spy();
+      const setAttributeSpy = sinon.spy();
+      const span = {
+        addEvent: addEventSpy,
+        setAttribute: setAttributeSpy,
+      } as unknown as tracing.Span;
+      const entries = {
+        [PTN.FETCH_START]: 123,
+        [PTN.DOMAIN_LOOKUP_START]: 123,
+        [PTN.DOMAIN_LOOKUP_END]: 123,
+        [PTN.CONNECT_START]: 123,
+        [PTN.SECURE_CONNECTION_START]: 123,
+        [PTN.CONNECT_END]: 123,
+        [PTN.REQUEST_START]: 123,
+        [PTN.RESPONSE_START]: 123,
+        [PTN.RESPONSE_END]: 123,
+        [PTN.DECODED_BODY_SIZE]: 123,
+        [PTN.ENCODED_BODY_SIZE]: 61,
+      } as PerformanceEntries;
+
+      assert.strictEqual(addEventSpy.callCount, 0);
+
+      addSpanNetworkEvents(span, entries, true);
+      assert.strictEqual(setAttributeSpy.callCount, 2);
+      //secure connect start should not be added to non-https resource
+      assert.strictEqual(addEventSpy.callCount, 0);
+    });
     it('should only include encoded size when content encoding is being used', () => {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
