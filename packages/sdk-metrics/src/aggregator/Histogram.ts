@@ -23,10 +23,10 @@ import {
 import {
   DataPointType,
   HistogramMetricData,
+  InstrumentType,
   MetricDescriptor,
 } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentType } from '../InstrumentDescriptor';
 import { binarySearchUB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 

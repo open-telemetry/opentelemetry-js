@@ -24,11 +24,9 @@ import {
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
-  InstrumentDescriptor,
   InstrumentType,
-} from '../src/InstrumentDescriptor';
-import {
   MetricData,
   DataPoint,
   DataPointType,
