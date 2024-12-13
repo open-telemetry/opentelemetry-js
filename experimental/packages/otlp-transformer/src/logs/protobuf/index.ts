@@ -14,8 +14,4 @@
  * limitations under the License.
  */
 
-// IMPORTANT: exports added here are public
-export {
-  IExportTracePartialSuccess,
-  IExportTraceServiceResponse,
-} from './export-response';
+export { ProtobufLogsSerializer } from './logs';

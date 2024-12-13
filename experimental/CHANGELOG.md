@@ -17,6 +17,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* refactor(otlp-transformer): re-structure package to prepare for separate entrypoints [#5264](https://github.com/open-telemetry/opentelemetry-js/pull/5264) @pichlermarc
+
 ## 0.56.0
 
 ### :boom: Breaking Change
