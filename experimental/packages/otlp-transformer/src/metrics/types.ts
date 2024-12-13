@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Fixed64, IInstrumentationScope, IKeyValue } from '../common/types';
-import { IResource } from '../resource/types';
-
-/** Properties of an ExportMetricsServiceRequest. */
-export interface IExportMetricsServiceRequest {
-  /** ExportMetricsServiceRequest resourceMetrics */
-  resourceMetrics: IResourceMetrics[];
-}
+import { TFixed64, TInstrumentationScope, TKeyValue } from '../common/types';
+import { TResource } from '../resource/types';
+import { Type, type Static } from "@sinclair/typebox";
 
 export interface IExportMetricsServiceResponse {
   /** ExportMetricsServiceResponse partialSuccess */
@@ -35,270 +30,12 @@ export interface IExportMetricsPartialSuccess {
   errorMessage?: string;
 }
 
-/** Properties of a ResourceMetrics. */
-export interface IResourceMetrics {
-  /** ResourceMetrics resource */
-  resource?: IResource;
-
-  /** ResourceMetrics scopeMetrics */
-  scopeMetrics: IScopeMetrics[];
-
-  /** ResourceMetrics schemaUrl */
-  schemaUrl?: string;
-}
-
-/** Properties of an IScopeMetrics. */
-export interface IScopeMetrics {
-  /** ScopeMetrics scope */
-  scope?: IInstrumentationScope;
-
-  /** ScopeMetrics metrics */
-  metrics: IMetric[];
-
-  /** ScopeMetrics schemaUrl */
-  schemaUrl?: string;
-}
-
-/** Properties of a Metric. */
-export interface IMetric {
-  /** Metric name */
-  name: string;
-
-  /** Metric description */
-  description?: string;
-
-  /** Metric unit */
-  unit?: string;
-
-  /** Metric gauge */
-  gauge?: IGauge;
-
-  /** Metric sum */
-  sum?: ISum;
-
-  /** Metric histogram */
-  histogram?: IHistogram;
-
-  /** Metric exponentialHistogram */
-  exponentialHistogram?: IExponentialHistogram;
-
-  /** Metric summary */
-  summary?: ISummary;
-}
-
-/** Properties of a Gauge. */
-export interface IGauge {
-  /** Gauge dataPoints */
-  dataPoints: INumberDataPoint[];
-}
-
-/** Properties of a Sum. */
-export interface ISum {
-  /** Sum dataPoints */
-  dataPoints: INumberDataPoint[];
-
-  /** Sum aggregationTemporality */
-  aggregationTemporality: EAggregationTemporality;
-
-  /** Sum isMonotonic */
-  isMonotonic?: boolean | null;
-}
-
-/** Properties of a Histogram. */
-export interface IHistogram {
-  /** Histogram dataPoints */
-  dataPoints: IHistogramDataPoint[];
-
-  /** Histogram aggregationTemporality */
-  aggregationTemporality?: EAggregationTemporality;
-}
-
-/** Properties of an ExponentialHistogram. */
-export interface IExponentialHistogram {
-  /** ExponentialHistogram dataPoints */
-  dataPoints: IExponentialHistogramDataPoint[];
-
-  /** ExponentialHistogram aggregationTemporality */
-  aggregationTemporality?: EAggregationTemporality;
-}
-
-/** Properties of a Summary. */
-export interface ISummary {
-  /** Summary dataPoints */
-  dataPoints: ISummaryDataPoint[];
-}
-
-/** Properties of a NumberDataPoint. */
-export interface INumberDataPoint {
-  /** NumberDataPoint attributes */
-  attributes: IKeyValue[];
-
-  /** NumberDataPoint startTimeUnixNano */
-  startTimeUnixNano?: Fixed64;
-
-  /** NumberDataPoint timeUnixNano */
-  timeUnixNano?: Fixed64;
-
-  /** NumberDataPoint asDouble */
-  asDouble?: number | null;
-
-  /** NumberDataPoint asInt */
-  asInt?: number;
-
-  /** NumberDataPoint exemplars */
-  exemplars?: IExemplar[];
-
-  /** NumberDataPoint flags */
-  flags?: number;
-}
-
-/** Properties of a HistogramDataPoint. */
-export interface IHistogramDataPoint {
-  /** HistogramDataPoint attributes */
-  attributes?: IKeyValue[];
-
-  /** HistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: Fixed64;
-
-  /** HistogramDataPoint timeUnixNano */
-  timeUnixNano?: Fixed64;
-
-  /** HistogramDataPoint count */
-  count?: number;
-
-  /** HistogramDataPoint sum */
-  sum?: number;
-
-  /** HistogramDataPoint bucketCounts */
-  bucketCounts?: number[];
-
-  /** HistogramDataPoint explicitBounds */
-  explicitBounds?: number[];
-
-  /** HistogramDataPoint exemplars */
-  exemplars?: IExemplar[];
-
-  /** HistogramDataPoint flags */
-  flags?: number;
-
-  /** HistogramDataPoint min */
-  min?: number;
-
-  /** HistogramDataPoint max */
-  max?: number;
-}
-
-/** Properties of an ExponentialHistogramDataPoint. */
-export interface IExponentialHistogramDataPoint {
-  /** ExponentialHistogramDataPoint attributes */
-  attributes?: IKeyValue[];
-
-  /** ExponentialHistogramDataPoint startTimeUnixNano */
-  startTimeUnixNano?: Fixed64;
-
-  /** ExponentialHistogramDataPoint timeUnixNano */
-  timeUnixNano?: Fixed64;
-
-  /** ExponentialHistogramDataPoint count */
-  count?: number;
-
-  /** ExponentialHistogramDataPoint sum */
-  sum?: number;
-
-  /** ExponentialHistogramDataPoint scale */
-  scale?: number;
-
-  /** ExponentialHistogramDataPoint zeroCount */
-  zeroCount?: number;
-
-  /** ExponentialHistogramDataPoint positive */
-  positive?: IBuckets;
-
-  /** ExponentialHistogramDataPoint negative */
-  negative?: IBuckets;
-
-  /** ExponentialHistogramDataPoint flags */
-  flags?: number;
-
-  /** ExponentialHistogramDataPoint exemplars */
-  exemplars?: IExemplar[];
-
-  /** ExponentialHistogramDataPoint min */
-  min?: number;
-
-  /** ExponentialHistogramDataPoint max */
-  max?: number;
-}
-
-/** Properties of a SummaryDataPoint. */
-export interface ISummaryDataPoint {
-  /** SummaryDataPoint attributes */
-  attributes?: IKeyValue[];
-
-  /** SummaryDataPoint startTimeUnixNano */
-  startTimeUnixNano?: number;
-
-  /** SummaryDataPoint timeUnixNano */
-  timeUnixNano?: string;
-
-  /** SummaryDataPoint count */
-  count?: number;
-
-  /** SummaryDataPoint sum */
-  sum?: number;
-
-  /** SummaryDataPoint quantileValues */
-  quantileValues?: IValueAtQuantile[];
-
-  /** SummaryDataPoint flags */
-  flags?: number;
-}
-
-/** Properties of a ValueAtQuantile. */
-export interface IValueAtQuantile {
-  /** ValueAtQuantile quantile */
-  quantile?: number;
-
-  /** ValueAtQuantile value */
-  value?: number;
-}
-
-/** Properties of a Buckets. */
-export interface IBuckets {
-  /** Buckets offset */
-  offset?: number;
-
-  /** Buckets bucketCounts */
-  bucketCounts?: number[];
-}
-
-/** Properties of an Exemplar. */
-export interface IExemplar {
-  /** Exemplar filteredAttributes */
-  filteredAttributes?: IKeyValue[];
-
-  /** Exemplar timeUnixNano */
-  timeUnixNano?: string;
-
-  /** Exemplar asDouble */
-  asDouble?: number;
-
-  /** Exemplar asInt */
-  asInt?: number;
-
-  /** Exemplar spanId */
-  spanId?: string | Uint8Array;
-
-  /** Exemplar traceId */
-  traceId?: string | Uint8Array;
-}
-
 /**
  * AggregationTemporality defines how a metric aggregator reports aggregated
  * values. It describes how those values relate to the time interval over
  * which they are aggregated.
  */
-export const enum EAggregationTemporality {
+export enum EAggregationTemporality {
   /* UNSPECIFIED is the default AggregationTemporality, it MUST not be used. */
   AGGREGATION_TEMPORALITY_UNSPECIFIED = 0,
 
@@ -365,3 +102,158 @@ export const enum EAggregationTemporality {
   value was reset (e.g. Prometheus). */
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2,
 }
+
+export const OtelMetricTypes = Type.Module({
+  IExportMetricsServiceRequest: Type.Object({
+    resourceMetrics: Type.Array(Type.Ref("IResourceMetrics")),
+  }),
+  IResourceMetrics: Type.Object({
+    resource: Type.Optional(TResource),
+    scopeMetrics: Type.Array(Type.Ref("IScopeMetrics")),
+    schemaUrl: Type.Optional(Type.String()),
+  }),
+  IScopeMetrics: Type.Object({
+    scope: Type.Optional(TInstrumentationScope),
+    metrics: Type.Array(Type.Ref("IMetric")),
+    schemaUrl: Type.Optional(Type.String()),
+  }),
+  IMetric: Type.Object({
+    name: Type.String(),
+    description: Type.Optional(Type.String()),
+    unit: Type.Optional(Type.String()),
+    gauge: Type.Optional(Type.Ref("IGauge")),
+    sum: Type.Optional(Type.Ref("ISum")),
+    histogram: Type.Optional(Type.Ref("IHistogram")),
+    exponentialHistogram: Type.Optional(Type.Ref("IExponentialHistogram")),
+    summary: Type.Optional(Type.Ref("ISummary")),
+  }),
+  IGauge: Type.Object({
+    dataPoints: Type.Array(Type.Ref("INumberDataPoint")),
+  }),
+  ISum: Type.Object({
+    dataPoints: Type.Array(Type.Ref("INumberDataPoint")),
+    aggregationTemporality: Type.Enum(EAggregationTemporality),
+    isMonotonic: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+  }),
+  IHistogram: Type.Object({
+    dataPoints: Type.Array(Type.Ref("IHistogramDataPoint")),
+    aggregationTemporality: Type.Optional(Type.Enum(EAggregationTemporality)),
+  }),
+  IExponentialHistogram: Type.Object({
+    dataPoints: Type.Array(Type.Ref("IExponentialHistogramDataPoint")),
+    aggregationTemporality: Type.Optional(Type.Enum(EAggregationTemporality)),
+  }),
+  ISummary: Type.Object({
+    dataPoints: Type.Array(Type.Ref("ISummaryDataPoint")),
+  }),
+  INumberDataPoint: Type.Object({
+    attributes: Type.Array(TKeyValue),
+    startTimeUnixNano: Type.Optional(TFixed64),
+    timeUnixNano: Type.Optional(TFixed64),
+    asDouble: Type.Optional(Type.Union([Type.Number(), Type.Null()])),
+    asInt: Type.Optional(Type.Number()),
+    exemplars: Type.Optional(Type.Array(Type.Ref("IExemplar"))),
+    flags: Type.Optional(Type.Number()),
+  }),
+  IHistogramDataPoint: Type.Object({
+    attributes: Type.Optional(Type.Array(TKeyValue)),
+    startTimeUnixNano: Type.Optional(TFixed64),
+    timeUnixNano: Type.Optional(TFixed64),
+    count: Type.Optional(Type.Number()),
+    sum: Type.Optional(Type.Number()),
+    bucketCounts: Type.Optional(Type.Array(Type.Number())),
+    explicitBounds: Type.Optional(Type.Array(Type.Number())),
+    exemplars: Type.Optional(Type.Array(Type.Ref("IExemplar"))),
+    flags: Type.Optional(Type.Number()),
+    min: Type.Optional(Type.Number()),
+    max: Type.Optional(Type.Number()),
+  }),
+  IExponentialHistogramDataPoint: Type.Object({
+    attributes: Type.Optional(Type.Array(TKeyValue)),
+    startTimeUnixNano: Type.Optional(TFixed64),
+    timeUnixNano: Type.Optional(TFixed64),
+    count: Type.Optional(Type.Number()),
+    sum: Type.Optional(Type.Number()),
+    scale: Type.Optional(Type.Number()),
+    zeroCount: Type.Optional(Type.Number()),
+    positive: Type.Optional(Type.Ref("IBuckets")),
+    negative: Type.Optional(Type.Ref("IBuckets")),
+    flags: Type.Optional(Type.Number()),
+    exemplars: Type.Optional(Type.Array(Type.Ref("IExemplar"))),
+    min: Type.Optional(Type.Number()),
+    max: Type.Optional(Type.Number()),
+  }),
+  ISummaryDataPoint: Type.Object({
+    attributes: Type.Optional(Type.Array(TKeyValue)),
+    startTimeUnixNano: Type.Optional(Type.Number()),
+    timeUnixNano: Type.Optional(Type.String()),
+    count: Type.Optional(Type.Number()),
+    sum: Type.Optional(Type.Number()),
+    quantileValues: Type.Optional(Type.Array(Type.Ref("IValueAtQuantile"))),
+    flags: Type.Optional(Type.Number()),
+  }),
+  IValueAtQuantile: Type.Object({
+    quantile: Type.Optional(Type.Number()),
+    value: Type.Optional(Type.Number()),
+  }),
+  IBuckets: Type.Object({
+    offset: Type.Optional(Type.Number()),
+    bucketCounts: Type.Optional(Type.Array(Type.Number())),
+  }),
+  IExemplar: Type.Object({
+    filteredAttributes: Type.Optional(Type.Array(TKeyValue)),
+    timeUnixNano: Type.Optional(Type.String()),
+    asDouble: Type.Optional(Type.Number()),
+    asInt: Type.Optional(Type.Number()),
+    spanId: Type.Optional(Type.Union([Type.String(), Type.Uint8Array()])),
+    traceId: Type.Optional(Type.Union([Type.String(), Type.Uint8Array()])),
+  }),
+});
+
+export const TExportMetricsServiceRequest = OtelMetricTypes.Import("IExportMetricsServiceRequest");
+export type IExportMetricsServiceRequest = Static<typeof TExportMetricsServiceRequest>;
+
+export const TResourceMetrics = OtelMetricTypes.Import("IResourceMetrics");
+export type IResourceMetrics = Static<typeof TResourceMetrics>;
+
+export const TScopeMetrics = OtelMetricTypes.Import("IScopeMetrics");
+export type IScopeMetrics = Static<typeof TScopeMetrics>;
+
+export const TMetric = OtelMetricTypes.Import("IMetric");
+export type IMetric = Static<typeof TMetric>;
+
+export const TGauge = OtelMetricTypes.Import("IGauge");
+export type IGauge = Static<typeof TGauge>;
+
+export const TSum = OtelMetricTypes.Import("ISum");
+export type ISum = Static<typeof TSum>;
+
+export const THistogram = OtelMetricTypes.Import("IHistogram");
+export type IHistogram = Static<typeof THistogram>;
+
+export const TExponentialHistogram = OtelMetricTypes.Import("IExponentialHistogram");
+export type IExponentialHistogram = Static<typeof TExponentialHistogram>;
+
+export const TSummary = OtelMetricTypes.Import("ISummary");
+export type ISummary = Static<typeof TSummary>;
+
+export const TNumberDataPoint = OtelMetricTypes.Import("INumberDataPoint");
+export type INumberDataPoint = Static<typeof TNumberDataPoint>;
+
+export const THistogramDataPoint = OtelMetricTypes.Import("IHistogramDataPoint");
+export type IHistogramDataPoint = Static<typeof THistogramDataPoint>;
+
+export const TExponentialHistogramDataPoint = OtelMetricTypes.Import("IExponentialHistogramDataPoint");
+export type IExponentialHistogramDataPoint = Static<typeof TExponentialHistogramDataPoint>;
+
+export const TSummaryDataPoint = OtelMetricTypes.Import("ISummaryDataPoint");
+export type ISummaryDataPoint = Static<typeof TSummaryDataPoint>;
+
+export const TValueAtQuantile = OtelMetricTypes.Import("IValueAtQuantile");
+export type IValueAtQuantile = Static<typeof TValueAtQuantile>;
+
+export const TBuckets = OtelMetricTypes.Import("IBuckets");
+export type IBuckets = Static<typeof TBuckets>;
+
+export const TExemplar = OtelMetricTypes.Import("IExemplar");
+export type IExemplar = Static<typeof TExemplar>;

@@ -14,72 +14,71 @@
  * limitations under the License.
  */
 
-/** Properties of an InstrumentationScope. */
-export interface IInstrumentationScope {
-  /** InstrumentationScope name */
-  name: string;
+import { Type, type Static } from "@sinclair/typebox";
 
-  /** InstrumentationScope version */
-  version?: string;
+export const OtelCommonTypes = Type.Module({
+  ResourceAttributes: Type.Object({
+    key: Type.String(),
+    value: Type.Any(),
+  }),
+  IResource: Type.Object({
+    attributes: Type.Array(Type.Ref("ResourceAttributes")),
+  }),
+  IKeyValue: Type.Object({
+    key: Type.String(),
+    value: Type.Ref("IAnyValue"),
+  }),
+  IKeyValueList: Type.Object({
+    values: Type.Array(Type.Ref("IKeyValue")),
+  }),
+  IArrayValue: Type.Object({
+    values: Type.Array(Type.Ref("IAnyValue")),
+  }),
+  IAnyValue: Type.Object({
+    stringValue: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+    boolValue: Type.Optional(Type.Union([Type.Boolean(), Type.Null()])),
+    intValue: Type.Optional(Type.Union([Type.Number(), Type.Null()])),
+    doubleValue: Type.Optional(Type.Union([Type.Number(), Type.Null()])),
+    arrayValue: Type.Optional(Type.Ref("IArrayValue")),
+    kvlistValue: Type.Optional(Type.Ref("IKeyValueList")),
+    bytesValue: Type.Optional(Type.Uint8Array()),
+  }),
+  IInstrumentationScope: Type.Object({
+    name: Type.String(),
+    version: Type.Optional(Type.String()),
+    attributes: Type.Optional(Type.Array(Type.Ref("IKeyValue"))),
+    droppedAttributesCount: Type.Optional(Type.Number()),
+  }),
+  LongBits: Type.Object({
+    low: Type.Number(),
+    high: Type.Number(),
+  }),
+  Fixed64: Type.Union([Type.Ref("LongBits"), Type.String(), Type.Number()]),
+});
 
-  /** InstrumentationScope attributes */
-  attributes?: IKeyValue[];
+export const TResourceAttributes = OtelCommonTypes.Import("ResourceAttributes");
+export type ResourceAttributes = Static<typeof TResourceAttributes>;
 
-  /** InstrumentationScope droppedAttributesCount */
-  droppedAttributesCount?: number;
-}
+export const TKeyValue = OtelCommonTypes.Import("IKeyValue");
+export type IKeyValue = Static<typeof TKeyValue>;
 
-/** Properties of a KeyValue. */
-export interface IKeyValue {
-  /** KeyValue key */
-  key: string;
+export const TKeyValueList = OtelCommonTypes.Import("IKeyValueList");
+export type IKeyValueList = Static<typeof TKeyValueList>;
 
-  /** KeyValue value */
-  value: IAnyValue;
-}
+export const TArrayValue = OtelCommonTypes.Import("IArrayValue");
+export type IArrayValue = Static<typeof TArrayValue>;
 
-/** Properties of an AnyValue. */
-export interface IAnyValue {
-  /** AnyValue stringValue */
-  stringValue?: string | null;
+export const TAnyValue = OtelCommonTypes.Import("IAnyValue");
+export type IAnyValue = Static<typeof TAnyValue>;
 
-  /** AnyValue boolValue */
-  boolValue?: boolean | null;
+export const TInstrumentationScope = OtelCommonTypes.Import("IInstrumentationScope");
+export type IInstrumentationScope = Static<typeof TInstrumentationScope>;
 
-  /** AnyValue intValue */
-  intValue?: number | null;
+export const TLongBits = OtelCommonTypes.Import("LongBits");
+export type LongBits = Static<typeof TLongBits>;
 
-  /** AnyValue doubleValue */
-  doubleValue?: number | null;
-
-  /** AnyValue arrayValue */
-  arrayValue?: IArrayValue;
-
-  /** AnyValue kvlistValue */
-  kvlistValue?: IKeyValueList;
-
-  /** AnyValue bytesValue */
-  bytesValue?: Uint8Array;
-}
-
-/** Properties of an ArrayValue. */
-export interface IArrayValue {
-  /** ArrayValue values */
-  values: IAnyValue[];
-}
-
-/** Properties of a KeyValueList. */
-export interface IKeyValueList {
-  /** KeyValueList values */
-  values: IKeyValue[];
-}
-
-export interface LongBits {
-  low: number;
-  high: number;
-}
-
-export type Fixed64 = LongBits | string | number;
+export const TFixed64 = OtelCommonTypes.Import("Fixed64");
+export type Fixed64 = Static<typeof TFixed64>;
 
 export interface OtlpEncodingOptions {
   /** Convert trace and span IDs to hex strings. */

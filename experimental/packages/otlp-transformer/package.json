@@ -115,10 +115,11 @@
     "nyc": "15.1.0",
     "protobufjs-cli": "1.1.3",
     "ts-loader": "9.5.1",
-    "typescript": "4.4.4",
+    "typescript": "5.7.2",
     "webpack": "5.96.1"
   },
   "dependencies": {
+    "@sinclair/typebox": "0.34.11",
     "@opentelemetry/api-logs": "0.56.0",
     "@opentelemetry/core": "1.29.0",
     "@opentelemetry/resources": "1.29.0",

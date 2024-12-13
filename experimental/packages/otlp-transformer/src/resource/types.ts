@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-import { IKeyValue } from '../common/types';
+import { TKeyValue } from '../common/types';
+import { Type, type Static } from "@sinclair/typebox";
 
-/** Properties of a Resource. */
-export interface IResource {
-  /** Resource attributes */
-  attributes: IKeyValue[];
+export const OtelResourceTypes = Type.Module({
+  IResource: Type.Object({
+    attributes: Type.Array(TKeyValue),
+    droppedAttributesCount: Type.Number(),
+  }),
+});
 
-  /** Resource droppedAttributesCount */
-  droppedAttributesCount: number;
-}
+export const TResource = OtelResourceTypes.Import("IResource");
+export type IResource = Static<typeof TResource>;

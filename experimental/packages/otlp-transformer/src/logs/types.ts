@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-import type {
-  Fixed64,
-  IAnyValue,
-  IInstrumentationScope,
-  IKeyValue,
-} from '../common/types';
-import type { IResource } from '../resource/types';
-
-/** Properties of an ExportLogsServiceRequest. */
-export interface IExportLogsServiceRequest {
-  /** ExportLogsServiceRequest resourceLogs */
-  resourceLogs?: IResourceLogs[];
-}
+import { Type, type Static } from "@sinclair/typebox";
+import { TKeyValue, TFixed64, TAnyValue, TInstrumentationScope } from "../common/types";
+import { TResource } from '../resource/types';
 
 export interface IExportLogsServiceResponse {
   /** ExportLogsServiceResponse partialSuccess */
@@ -41,67 +31,10 @@ export interface IExportLogsPartialSuccess {
   errorMessage?: string;
 }
 
-/** Properties of a ResourceLogs. */
-export interface IResourceLogs {
-  /** ResourceLogs resource */
-  resource?: IResource;
-
-  /** ResourceLogs scopeLogs */
-  scopeLogs: IScopeLogs[];
-
-  /** ResourceLogs schemaUrl */
-  schemaUrl?: string;
-}
-
-/** Properties of an ScopeLogs. */
-export interface IScopeLogs {
-  /** IScopeLogs scope */
-  scope?: IInstrumentationScope;
-
-  /** IScopeLogs logRecords */
-  logRecords?: ILogRecord[];
-
-  /** IScopeLogs schemaUrl */
-  schemaUrl?: string | null;
-}
-
-/** Properties of a LogRecord. */
-export interface ILogRecord {
-  /** LogRecord timeUnixNano */
-  timeUnixNano: Fixed64;
-
-  /** LogRecord observedTimeUnixNano */
-  observedTimeUnixNano: Fixed64;
-
-  /** LogRecord severityNumber */
-  severityNumber?: ESeverityNumber;
-
-  /** LogRecord severityText */
-  severityText?: string;
-
-  /** LogRecord body */
-  body?: IAnyValue;
-
-  /** LogRecord attributes */
-  attributes: IKeyValue[];
-
-  /** LogRecord droppedAttributesCount */
-  droppedAttributesCount: number;
-
-  /** LogRecord flags */
-  flags?: number;
-
-  /** LogRecord traceId */
-  traceId?: string | Uint8Array;
-
-  /** LogRecord spanId */
-  spanId?: string | Uint8Array;
-}
-
 /**
  * Numerical value of the severity, normalized to values described in Log Data Model.
  */
-export const enum ESeverityNumber {
+export enum ESeverityNumber {
   /** Unspecified. Do NOT use as default */
   SEVERITY_NUMBER_UNSPECIFIED = 0,
   SEVERITY_NUMBER_TRACE = 1,
@@ -129,3 +62,43 @@ export const enum ESeverityNumber {
   SEVERITY_NUMBER_FATAL3 = 23,
   SEVERITY_NUMBER_FATAL4 = 24,
 }
+
+export const OtelLogTypes = Type.Module({
+  ILogRecord: Type.Object({
+    timeUnixNano: TFixed64,
+    observedTimeUnixNano: TFixed64,
+    severityNumber: Type.Optional(Type.Enum(ESeverityNumber)),
+    severityText: Type.Optional(Type.String()),
+    body: Type.Optional(TAnyValue),
+    attributes: Type.Array(TKeyValue),
+    droppedAttributesCount: Type.Number(),
+    flags: Type.Optional(Type.Number()),
+    traceId: Type.Optional(Type.Union([Type.String(), Type.Uint8Array()])),
+    spanId: Type.Optional(Type.Union([Type.String(), Type.Uint8Array()])),
+  }),
+  IScopeLogs: Type.Object({
+    scope: Type.Optional(TInstrumentationScope),
+    logRecords: Type.Optional(Type.Array(Type.Ref("ILogRecord"))),
+    schemaUrl: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+  }),
+  IResourceLogs: Type.Object({
+    resource: Type.Optional(TResource),
+    scopeLogs: Type.Array(Type.Ref("IScopeLogs")),
+    schemaUrl: Type.Optional(Type.String()),
+  }),
+  IExportLogsServiceRequest: Type.Object({
+    resourceLogs: Type.Optional(Type.Array(Type.Ref("IResourceLogs"))),
+  }),
+});
+
+export const TLogRecord = OtelLogTypes.Import("ILogRecord");
+export type ILogRecord = Static<typeof TLogRecord>;
+
+export const TScopeLogs = OtelLogTypes.Import("IScopeLogs");
+export type IScopeLogs = Static<typeof TScopeLogs>;
+
+export const TResourceLogs = OtelLogTypes.Import("IResourceLogs");
+export type IResourceLogs = Static<typeof TResourceLogs>;
+
+export const TExportLogsServiceRequest = OtelLogTypes.Import("IExportLogsServiceRequest");
+export type IExportLogsServiceRequest = Static<typeof TExportLogsServiceRequest>;

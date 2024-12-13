@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-import { Fixed64, IInstrumentationScope, IKeyValue } from '../common/types';
-import { IResource } from '../resource/types';
 
-/** Properties of an ExportTraceServiceRequest. */
-export interface IExportTraceServiceRequest {
-  /** ExportTraceServiceRequest resourceSpans */
-  resourceSpans?: IResourceSpans[];
-}
+import { TFixed64, TInstrumentationScope, TKeyValue } from '../common/types';
+import { Type, type Static } from "@sinclair/typebox";
+import { TResource } from '../resource/types';
 
 export interface IExportTraceServiceResponse {
   /** ExportTraceServiceResponse partialSuccess */
@@ -34,78 +30,6 @@ export interface IExportTracePartialSuccess {
 
   /** ExportLogsServiceResponse errorMessage */
   errorMessage?: string;
-}
-
-/** Properties of a ResourceSpans. */
-export interface IResourceSpans {
-  /** ResourceSpans resource */
-  resource?: IResource;
-
-  /** ResourceSpans scopeSpans */
-  scopeSpans: IScopeSpans[];
-
-  /** ResourceSpans schemaUrl */
-  schemaUrl?: string;
-}
-
-/** Properties of an ScopeSpans. */
-export interface IScopeSpans {
-  /** IScopeSpans scope */
-  scope?: IInstrumentationScope;
-
-  /** IScopeSpans spans */
-  spans?: ISpan[];
-
-  /** IScopeSpans schemaUrl */
-  schemaUrl?: string | null;
-}
-
-/** Properties of a Span. */
-export interface ISpan {
-  /** Span traceId */
-  traceId: string | Uint8Array;
-
-  /** Span spanId */
-  spanId: string | Uint8Array;
-
-  /** Span traceState */
-  traceState?: string | null;
-
-  /** Span parentSpanId */
-  parentSpanId?: string | Uint8Array;
-
-  /** Span name */
-  name: string;
-
-  /** Span kind */
-  kind: ESpanKind;
-
-  /** Span startTimeUnixNano */
-  startTimeUnixNano: Fixed64;
-
-  /** Span endTimeUnixNano */
-  endTimeUnixNano: Fixed64;
-
-  /** Span attributes */
-  attributes: IKeyValue[];
-
-  /** Span droppedAttributesCount */
-  droppedAttributesCount: number;
-
-  /** Span events */
-  events: IEvent[];
-
-  /** Span droppedEventsCount */
-  droppedEventsCount: number;
-
-  /** Span links */
-  links: ILink[];
-
-  /** Span droppedLinksCount */
-  droppedLinksCount: number;
-
-  /** Span status */
-  status: IStatus;
 }
 
 /**
@@ -144,17 +68,8 @@ export enum ESpanKind {
   SPAN_KIND_CONSUMER = 5,
 }
 
-/** Properties of a Status. */
-export interface IStatus {
-  /** Status message */
-  message?: string;
-
-  /** Status code */
-  code: EStatusCode;
-}
-
 /** StatusCode enum. */
-export const enum EStatusCode {
+export enum EStatusCode {
   /** The default status. */
   STATUS_CODE_UNSET = 0,
   /** The Span has been evaluated by an Application developers or Operator to have completed successfully. */
@@ -163,35 +78,73 @@ export const enum EStatusCode {
   STATUS_CODE_ERROR = 2,
 }
 
-/** Properties of an Event. */
-export interface IEvent {
-  /** Event timeUnixNano */
-  timeUnixNano: Fixed64;
+export const OtelTraceTypes = Type.Module({
+  IExportTraceServiceRequest: Type.Object({
+    resourceSpans: Type.Optional(Type.Array(Type.Ref("IResourceSpans"))),
+  }),
+  IResourceSpans: Type.Object({
+    resource: Type.Optional(TResource),
+    scopeSpans: Type.Array(Type.Ref("IScopeSpans")),
+    schemaUrl: Type.Optional(Type.String()),
+  }),
+  IScopeSpans: Type.Object({
+    scope: Type.Optional(TInstrumentationScope),
+    spans: Type.Optional(Type.Array(Type.Ref("ISpan"))),
+    schemaUrl: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+  }),
+  ISpan: Type.Object({
+    traceId: Type.Union([Type.String(), Type.Uint8Array()]),
+    spanId: Type.Union([Type.String(), Type.Uint8Array()]),
+    traceState: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+    parentSpanId: Type.Optional(Type.Union([Type.String(), Type.Uint8Array()])),
+    name: Type.String(),
+    kind: Type.Enum(ESpanKind),
+    startTimeUnixNano: TFixed64,
+    endTimeUnixNano: TFixed64,
+    attributes: Type.Array(TKeyValue),
+    droppedAttributesCount: Type.Number(),
+    events: Type.Array(Type.Ref("IEvent")),
+    droppedEventsCount: Type.Number(),
+    links: Type.Array(Type.Ref("ILink")),
+    droppedLinksCount: Type.Number(),
+    status: Type.Ref("IStatus"),
+  }),
+  IStatus: Type.Object({
+    message: Type.Optional(Type.String()),
+    code: Type.Enum(EStatusCode),
+  }),
+  IEvent: Type.Object({
+    timeUnixNano: TFixed64,
+    name: Type.String(),
+    attributes: Type.Array(TKeyValue),
+    droppedAttributesCount: Type.Number(),
+  }),
+  ILink: Type.Object({
+    traceId: Type.Union([Type.String(), Type.Uint8Array()]),
+    spanId: Type.Union([Type.String(), Type.Uint8Array()]),
+    traceState: Type.Optional(Type.String()),
+    attributes: Type.Array(TKeyValue),
+    droppedAttributesCount: Type.Number(),
+  }),
+});
 
-  /** Event name */
-  name: string;
+export const TExportTraceServiceRequest = OtelTraceTypes.Import("IExportTraceServiceRequest");
+export type IExportTraceServiceRequest = Static<typeof TExportTraceServiceRequest>;
 
-  /** Event attributes */
-  attributes: IKeyValue[];
+export const TResourceSpans = OtelTraceTypes.Import("IResourceSpans");
+export type IResourceSpans = Static<typeof TResourceSpans>;
 
-  /** Event droppedAttributesCount */
-  droppedAttributesCount: number;
-}
+export const TScopeSpans = OtelTraceTypes.Import("IScopeSpans");
+export type IScopeSpans = Static<typeof TScopeSpans>;
 
-/** Properties of a Link. */
-export interface ILink {
-  /** Link traceId */
-  traceId: string | Uint8Array;
+export const TSpan = OtelTraceTypes.Import("ISpan");
+export type ISpan = Static<typeof TSpan>;
 
-  /** Link spanId */
-  spanId: string | Uint8Array;
+export const TStatus = OtelTraceTypes.Import("IStatus");
+export type IStatus = Static<typeof TStatus>;
 
-  /** Link traceState */
-  traceState?: string;
+export const TEvent = OtelTraceTypes.Import("IEvent");
+export type IEvent = Static<typeof TEvent>;
 
-  /** Link attributes */
-  attributes: IKeyValue[];
-
-  /** Link droppedAttributesCount */
-  droppedAttributesCount: number;
-}
+export const TLink = OtelTraceTypes.Import("ILink");
+export type ILink = Static<typeof TLink>;
