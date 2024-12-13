@@ -10,6 +10,102 @@
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
   "main": "build/src/index.js",
+  "exports": {
+    ".": {
+      "module": "./build/esm/index.js",
+      "esnext": "./build/esnext/index.js",
+      "types": "./build/src/index.d.ts",
+      "default": "./build/src/index.js"
+    },
+    "./metrics": {
+      "module": "./build/esm/metrics/index.js",
+      "esnext": "./build/esnext/metrics/index.js",
+      "types": "./build/src/metrics/index.d.ts",
+      "default": "./build/src/metrics/index.js"
+    },
+    "./metrics/protobuf": {
+      "module": "./build/esm/metrics/protobuf/index.js",
+      "esnext": "./build/esnext/metrics/protobuf/index.js",
+      "types": "./build/src/metrics/protobuf/index.d.ts",
+      "default": "./build/src/metrics/protobuf/index.js"
+    },
+    "./metrics/json": {
+      "module": "./build/esm/metrics/json/index.js",
+      "esnext": "./build/esnext/metrics/json/index.js",
+      "types": "./build/src/metrics/json/index.d.ts",
+      "default": "./build/src/metrics/json/index.js"
+    },
+    "./trace": {
+      "module": "./build/esm/trace/index.js",
+      "esnext": "./build/esnext/trace/index.js",
+      "types": "./build/src/trace/index.d.ts",
+      "default": "./build/src/trace/index.js"
+    },
+    "./trace/protobuf": {
+      "module": "./build/esm/trace/protobuf/index.js",
+      "esnext": "./build/esnext/trace/protobuf/index.js",
+      "types": "./build/src/trace/protobuf/index.d.ts",
+      "default": "./build/src/trace/protobuf/index.js"
+    },
+    "./trace/json": {
+      "module": "./build/esm/trace/json/index.js",
+      "esnext": "./build/esnext/trace/json/index.js",
+      "types": "./build/src/trace/json/index.d.ts",
+      "default": "./build/src/trace/json/index.js"
+    },
+    "./experimental/logs": {
+      "module": "./build/esm/logs/index.js",
+      "esnext": "./build/esnext/logs/index.js",
+      "types": "./build/src/logs/index.d.ts",
+      "default": "./build/src/logs/index.js"
+    },
+    "./experimental/logs/protobuf": {
+      "module": "./build/esm/logs/protobuf/index.js",
+      "esnext": "./build/esnext/logs/protobuf/index.js",
+      "types": "./build/src/logs/protobuf/index.d.ts",
+      "default": "./build/src/logs/protobuf/index.js"
+    },
+    "./experimental/logs/json": {
+      "module": "./build/esm/logs/json/index.js",
+      "esnext": "./build/esnext/logs/json/index.js",
+      "types": "./build/src/logs/json/index.d.ts",
+      "default": "./build/src/logs/json/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./build/src/index.d.ts"
+      ],
+      "metrics": [
+        "./build/src/metrics/index.d.ts"
+      ],
+      "metrics/protobuf": [
+        "./build/src/metrics/protobuf/index.d.ts"
+      ],
+      "metrics/json": [
+        "./build/src/metrics/json/index.d.ts"
+      ],
+      "trace": [
+        "./build/src/trace/index.d.ts"
+      ],
+      "trace/protobuf": [
+        "./build/src/trace/protobuf/index.d.ts"
+      ],
+      "trace/json": [
+        "./build/src/trace/json/index.d.ts"
+      ],
+      "experimental/logs": [
+        "./build/src/logs/index.d.ts"
+      ],
+      "experimental/logs/protobuf": [
+        "./build/src/logs/protobuf/index.d.ts"
+      ],
+      "experimental/logs/json": [
+        "./build/src/logs/json/index.d.ts"
+      ]
+    }
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
