@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1734088551357,
+  "lastUpdate": 1734090128314,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21546,6 +21546,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.50%",
             "unit": "ops/sec",
             "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bhaskar.banerjee1982@gmail.com",
+            "name": "Bhaskar Banerjee",
+            "username": "bhaskarbanerjee"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6d31a18c34389cc6401cfde30a46c6e2e1785421",
+          "message": "feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables (#5168)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2024-12-13T11:33:47Z",
+          "tree_id": "33e3b3b99b9586b92dcd62c8d0c749bd27fd60a9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/6d31a18c34389cc6401cfde30a46c6e2e1785421"
+        },
+        "date": 1734090127471,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 703625,
+            "range": "±0.23%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 671552,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "90 samples"
           }
         ]
       }
