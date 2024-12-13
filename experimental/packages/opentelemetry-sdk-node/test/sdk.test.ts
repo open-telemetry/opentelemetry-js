@@ -39,6 +39,10 @@ import {
   PeriodicExportingMetricReader,
   View,
 } from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceInstanceIdIsUUID,
@@ -121,6 +125,7 @@ describe('Node SDK', () => {
       // which sets up an exporter and affects the context manager
       env.OTEL_TRACES_EXPORTER = 'none';
       env.OTEL_LOGS_EXPORTER = 'none';
+      env.OTEL_METRIC_EXPORTER = 'none';
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
@@ -149,6 +154,7 @@ describe('Node SDK', () => {
         'logger provider should not have changed'
       );
       delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_METRICS_EXPORTER;
       await sdk.shutdown();
     });
 
@@ -1091,6 +1097,234 @@ describe('Node SDK', () => {
       assert(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPProtoLogExporter
+      );
+      await sdk.shutdown();
+    });
+  });
+
+  describe('configuring metric provider from env', () => {
+    let stubLogger: Sinon.SinonStub;
+
+    beforeEach(() => {
+      stubLogger = Sinon.stub(diag, 'info');
+    });
+
+    afterEach(() => {
+      stubLogger.reset();
+      delete env.OTEL_METRICS_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      delete env.OTEL_EXPORTER_METRICS_PROTOCOL;
+    });
+
+    it('should not register the provider if OTEL_METRICS_EXPORTER is not set', async () => {
+      const sdk = new NodeSDK();
+      sdk.start();
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      await sdk.shutdown();
+    });
+
+    it('should not register the provider if OTEL_METRICS_EXPORTER contains none', async () => {
+      env.OTEL_METRICS_EXPORTER = 'console,none';
+      const sdk = new NodeSDK();
+      sdk.start();
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
+      assert.strictEqual(
+        stubLogger.args[1][0],
+        'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use console with default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'console';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          ConsoleMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with gRPC and default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPGrpcMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/protobuf and default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/protobuf';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/json and default interval and timeout', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/json';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPHttpMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to OTEL_EXPORTER_OTLP_PROTOCOL', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpc';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPGrpcMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to http/protobuf if invalid protocol is set', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'grpcx';
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should fall back to http/protobuf if protocol is not  set', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        60000
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        30000
+      );
+      await sdk.shutdown();
+    });
+
+    it('should use otlp with http/protobuf and and use user defined flushing settings', async () => {
+      env.OTEL_METRICS_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL = 'http/protobuf';
+      env.OTEL_METRIC_EXPORT_INTERVAL = '200';
+      env.OTEL_METRIC_EXPORT_TIMEOUT = '150';
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader._exporter instanceof
+          OTLPProtoMetricExporter
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportInterval,
+        200
+      );
+      assert.strictEqual(
+        sharedState.metricCollectors[0]._metricReader._exportTimeout,
+        150
+      );
+      await sdk.shutdown();
+      delete env.OTEL_METRIC_EXPORT_INTERVAL;
+      delete env.OTEL_METRIC_EXPORT_TIMEOUT;
+    });
+
+    it('should use prometheus if that is set ', async () => {
+      env.OTEL_METRICS_EXPORTER = 'prometheus';
+      delete env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL;
+      const sdk = new NodeSDK();
+      sdk.start();
+      const meterProvider = metrics.getMeterProvider();
+      const sharedState = (meterProvider as any)['_sharedState'];
+      assert(
+        sharedState.metricCollectors[0]._metricReader instanceof
+          PrometheusMetricExporter
       );
       await sdk.shutdown();
     });
