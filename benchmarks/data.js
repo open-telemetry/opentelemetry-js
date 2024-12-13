@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1734018478714,
+  "lastUpdate": 1734088551357,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21508,6 +21508,44 @@ window.BENCHMARK_DATA = {
             "range": "±0.31%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "godfreykfc@gmail.com",
+            "name": "Godfrey Chan",
+            "username": "chancancode"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e03b6e7caadedf3bba74343b2e29135ec0dedb91",
+          "message": "chore: update prettier to 3.4.2 (#5261)",
+          "timestamp": "2024-12-13T11:07:06Z",
+          "tree_id": "c2dd728d5d5c7f2ea2a373a20af70da2f5c1f56d",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e03b6e7caadedf3bba74343b2e29135ec0dedb91"
+        },
+        "date": 1734088550415,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "create spans (10 attributes)",
+            "value": 666125,
+            "range": "±0.26%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 663598,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
