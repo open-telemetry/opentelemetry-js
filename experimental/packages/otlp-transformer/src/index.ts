@@ -17,26 +17,19 @@
 export {
   IExportMetricsPartialSuccess,
   IExportMetricsServiceResponse,
-} from './metrics/types';
+} from './metrics';
 export {
   IExportTracePartialSuccess,
   IExportTraceServiceResponse,
-} from './trace/types';
-export {
-  IExportLogsServiceResponse,
-  IExportLogsPartialSuccess,
-} from './logs/types';
+} from './trace';
+export { IExportLogsServiceResponse, IExportLogsPartialSuccess } from './logs';
 
-export {
-  ProtobufLogsSerializer,
-  ProtobufMetricsSerializer,
-  ProtobufTraceSerializer,
-} from './protobuf/serializers';
+export { ProtobufLogsSerializer } from './logs/protobuf';
+export { ProtobufMetricsSerializer } from './metrics/protobuf';
+export { ProtobufTraceSerializer } from './trace/protobuf';
 
-export {
-  JsonTraceSerializer,
-  JsonLogsSerializer,
-  JsonMetricsSerializer,
-} from './json/serializers';
+export { JsonLogsSerializer } from './logs/json';
+export { JsonMetricsSerializer } from './metrics/json';
+export { JsonTraceSerializer } from './trace/json';
 
-export { ISerializer } from './common/i-serializer';
+export { ISerializer } from './i-serializer';

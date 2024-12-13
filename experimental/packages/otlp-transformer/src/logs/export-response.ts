@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-// IMPORTANT: exports added here are public
-export {
-  IExportTracePartialSuccess,
-  IExportTraceServiceResponse,
-} from './export-response';
+export interface IExportLogsServiceResponse {
+  /** ExportLogsServiceResponse partialSuccess */
+  partialSuccess?: IExportLogsPartialSuccess;
+}
+
+export interface IExportLogsPartialSuccess {
+  /** ExportLogsPartialSuccess rejectedLogRecords */
+  rejectedLogRecords?: number;
+
+  /** ExportLogsPartialSuccess errorMessage */
+  errorMessage?: string;
+}

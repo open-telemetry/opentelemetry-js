@@ -15,7 +15,4 @@
  */
 
 // IMPORTANT: exports added here are public
-export {
-  IExportTracePartialSuccess,
-  IExportTraceServiceResponse,
-} from './export-response';
+export { ProtobufMetricsSerializer } from './metrics';

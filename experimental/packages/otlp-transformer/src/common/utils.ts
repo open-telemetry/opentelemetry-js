@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { OtlpEncodingOptions, Fixed64, LongBits } from './types';
+import type { OtlpEncodingOptions, Fixed64, LongBits } from './internal-types';
 import { HrTime } from '@opentelemetry/api';
 import { hexToBinary, hrTimeToNanoseconds } from '@opentelemetry/core';
 

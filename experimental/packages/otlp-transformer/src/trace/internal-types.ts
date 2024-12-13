@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-import { Fixed64, IInstrumentationScope, IKeyValue } from '../common/types';
-import { IResource } from '../resource/types';
+import {
+  Fixed64,
+  IInstrumentationScope,
+  IKeyValue,
+  IResource,
+} from '../common/internal-types';
 
 /** Properties of an ExportTraceServiceRequest. */
 export interface IExportTraceServiceRequest {
   /** ExportTraceServiceRequest resourceSpans */
   resourceSpans?: IResourceSpans[];
-}
-
-export interface IExportTraceServiceResponse {
-  /** ExportTraceServiceResponse partialSuccess */
-  partialSuccess?: IExportTracePartialSuccess;
-}
-
-export interface IExportTracePartialSuccess {
-  /** ExportLogsServiceResponse rejectedLogRecords */
-  rejectedSpans?: number;
-
-  /** ExportLogsServiceResponse errorMessage */
-  errorMessage?: string;
 }
 
 /** Properties of a ResourceSpans. */
