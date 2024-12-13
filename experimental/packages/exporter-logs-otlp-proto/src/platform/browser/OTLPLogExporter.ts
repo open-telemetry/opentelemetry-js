@@ -18,7 +18,7 @@ import {
   OTLPExporterConfigBase,
   OTLPExporterBase,
 } from '@opentelemetry/otlp-exporter-base';
-import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer/protobuf';
 
 import { ReadableLogRecord, LogRecordExporter } from '@opentelemetry/sdk-logs';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';

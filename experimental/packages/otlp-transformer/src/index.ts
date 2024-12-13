@@ -84,16 +84,4 @@ export { createExportTraceServiceRequest } from './trace';
 export { createExportMetricsServiceRequest } from './metrics';
 export { createExportLogsServiceRequest } from './logs';
 
-export {
-  ProtobufLogsSerializer,
-  ProtobufMetricsSerializer,
-  ProtobufTraceSerializer,
-} from './protobuf/serializers';
-
-export {
-  JsonTraceSerializer,
-  JsonLogsSerializer,
-  JsonMetricsSerializer,
-} from './json/serializers';
-
 export { ISerializer } from './common/i-serializer';

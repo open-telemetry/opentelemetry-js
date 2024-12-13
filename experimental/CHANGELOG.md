@@ -19,6 +19,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(otlp-transformer)!: add new entrypoints for non-core features [#5259](https://github.com/open-telemetry/opentelemetry-js/pull/5259/)
+  * (user-facing): OTLP (binary protobuf) utilities now located at `@opentelemetry/otlp-transformer/proto`
+  * (user-facing): OTLP (json) utilities now located at `@opentelemetry/otlp-transformer/json`
+  * (internal): features to remain experimental post-stabilization now located at `@opentelemetry/otlp-transformer/experimental` (empty for now)
 * feat(otlp-exporter-base)!: collapse base classes into one [#5031](https://github.com/open-telemetry/opentelemetry-js/pull/5031) @pichlermarc
   * `OTLPExporterNodeBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)
   * `OTLPExporterBrowserBase` has been removed in favor of a platform-agnostic implementation (`OTLPExporterBase`)

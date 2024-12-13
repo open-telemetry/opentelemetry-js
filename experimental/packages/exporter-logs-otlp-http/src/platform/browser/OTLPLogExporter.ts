@@ -20,7 +20,7 @@ import type {
 } from '@opentelemetry/sdk-logs';
 import type { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
+import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer/json';
 import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
 /**

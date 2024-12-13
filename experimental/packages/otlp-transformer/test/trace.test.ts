@@ -24,9 +24,9 @@ import {
   createExportTraceServiceRequest,
   ESpanKind,
   EStatusCode,
-  ProtobufTraceSerializer,
-  JsonTraceSerializer,
 } from '../src';
+import { JsonTraceSerializer } from '../src/json';
+import { ProtobufTraceSerializer } from '../src/protobuf';
 import { toBase64 } from './utils';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {

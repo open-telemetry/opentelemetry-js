@@ -21,10 +21,10 @@ import {
   createExportLogsServiceRequest,
   ESeverityNumber,
   IExportLogsServiceRequest,
-  ProtobufLogsSerializer,
-  JsonLogsSerializer,
   OtlpEncodingOptions,
 } from '../src';
+import { JsonLogsSerializer } from '../src/json';
+import { ProtobufLogsSerializer } from '../src/protobuf';
 import { ReadableLogRecord } from '@opentelemetry/sdk-logs';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { toBase64 } from './utils';
