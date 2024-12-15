@@ -23,8 +23,9 @@ import {
   SpanCustomizationHook,
 } from '../../src';
 
-import { MeterProvider } from '@opentelemetry/sdk-metrics';
+import { createMeterProvider } from '@opentelemetry/sdk-metrics';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';
+import { MeterProvider } from '@opentelemetry/api';
 
 interface TestInstrumentationConfig extends InstrumentationConfig {
   isActive?: boolean;
@@ -84,7 +85,7 @@ describe('BaseInstrumentation', () => {
   describe('setMeterProvider', () => {
     let otelTestingMeterProvider: MeterProvider;
     beforeEach(() => {
-      otelTestingMeterProvider = new MeterProvider();
+      otelTestingMeterProvider = createMeterProvider();
     });
     it('should call _updateMetricInstruments', () => {
       let called = true;

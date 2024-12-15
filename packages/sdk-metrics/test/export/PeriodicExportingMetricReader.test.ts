@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
+import { createPeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import {
   AggregationOption,
@@ -129,15 +129,14 @@ describe('PeriodicExportingMetricReader', () => {
   });
 
   describe('constructor', () => {
-    it('should construct PeriodicExportingMetricReader without exceptions', () => {
+    it('should createPeriodicExportingMetricReader without exceptions', () => {
       const exporter = new TestDeltaMetricExporter();
-      assert.doesNotThrow(
-        () =>
-          new PeriodicExportingMetricReader({
-            exporter,
-            exportIntervalMillis: 4000,
-            exportTimeoutMillis: 3000,
-          })
+      assert.doesNotThrow(() =>
+        createPeriodicExportingMetricReader({
+          exporter,
+          exportIntervalMillis: 4000,
+          exportTimeoutMillis: 3000,
+        })
       );
     });
 
@@ -145,7 +144,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestDeltaMetricExporter();
       assert.throws(
         () =>
-          new PeriodicExportingMetricReader({
+          createPeriodicExportingMetricReader({
             exporter: exporter,
             exportIntervalMillis: 0,
             exportTimeoutMillis: 0,
@@ -158,7 +157,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestDeltaMetricExporter();
       assert.throws(
         () =>
-          new PeriodicExportingMetricReader({
+          createPeriodicExportingMetricReader({
             exporter: exporter,
             exportIntervalMillis: 1,
             exportTimeoutMillis: 0,
@@ -171,7 +170,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestDeltaMetricExporter();
       assert.throws(
         () =>
-          new PeriodicExportingMetricReader({
+          createPeriodicExportingMetricReader({
             exporter: exporter,
             exportIntervalMillis: 100,
             exportTimeoutMillis: 200,
@@ -185,7 +184,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporterMock = sinon.mock(exporter);
       exporterMock.expects('export').never();
 
-      new PeriodicExportingMetricReader({
+      createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 1,
         exportTimeoutMillis: 1,
@@ -199,7 +198,7 @@ describe('PeriodicExportingMetricReader', () => {
   describe('setMetricProducer', () => {
     it('should start exporting periodically', async () => {
       const exporter = new TestMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
         exportTimeoutMillis: 20,
@@ -220,7 +219,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should keep running on export errors', async () => {
       const exporter = new TestMetricExporter();
       exporter.throwExport = true;
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
         exportTimeoutMillis: 20,
@@ -241,7 +240,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should keep running on export failure', async () => {
       const exporter = new TestMetricExporter();
       exporter.rejectExport = true;
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
         exportTimeoutMillis: 20,
@@ -263,7 +262,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestMetricExporter();
       // set time longer than timeout.
       exporter.exportTime = 40;
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 30,
         exportTimeoutMillis: 20,
@@ -291,7 +290,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestMetricExporter();
       const exporterMock = sinon.mock(exporter);
       exporterMock.expects('forceFlush').calledOnceWithExactly();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -336,7 +335,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       const exporter = new TestMetricExporter();
 
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -381,7 +380,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       const exporter = new TestMetricExporter();
 
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -403,7 +402,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestMetricExporter();
       exporter.forceFlushTime = 60;
 
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -420,7 +419,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should throw when exporter throws', async () => {
       const exporter = new TestMetricExporter();
       exporter.throwFlush = true;
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -435,7 +434,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporterMock = sinon.mock(exporter);
       // expect once on shutdown.
       exporterMock.expects('forceFlush').once();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -453,7 +452,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should default to Cumulative with no exporter preference', () => {
       // Adding exporter without preference.
       const exporter = new TestMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
       });
@@ -468,7 +467,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should default to exporter preference', () => {
       // Adding exporter with DELTA preference.
       const exporter = new TestDeltaMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
       });
@@ -485,7 +484,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should use default aggregation with no exporter preference', () => {
       // Adding exporter without preference.
       const exporter = new TestMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
       });
@@ -498,7 +497,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should default to exporter preference', () => {
       // Adding exporter with Drop Aggregation preference.
       const exporter = new TestDropMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
       });
@@ -518,7 +517,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestMetricExporter();
       const exporterMock = sinon.mock(exporter);
       exporterMock.expects('forceFlush').calledOnceWithExactly();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -533,7 +532,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestMetricExporter();
       exporter.forceFlushTime = 1000;
 
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -550,7 +549,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestMetricExporter();
       const exporterMock = sinon.mock(exporter);
       exporterMock.expects('shutdown').calledOnceWithExactly();
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,
@@ -568,7 +567,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should throw on non-initialized instance.', async () => {
       const exporter = new TestMetricExporter();
       exporter.throwFlush = true;
-      const reader = new PeriodicExportingMetricReader({
+      const reader = createPeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
         exportTimeoutMillis: 80,

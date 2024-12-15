@@ -16,7 +16,7 @@
 
 import {
   diag,
-  MeterProvider as IMeterProvider,
+  MeterProvider,
   Meter as IMeter,
   MeterOptions,
   createNoopMeter,
@@ -62,7 +62,7 @@ function prepareResource(
 /**
  * This class implements the {@link MeterProvider} interface.
  */
-export class MeterProvider implements IMeterProvider {
+class MeterProviderImpl implements MeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
 
@@ -144,4 +144,13 @@ export class MeterProvider implements IMeterProvider {
       })
     );
   }
+}
+
+export function createMeterProvider(
+  options?: MeterProviderOptions
+): MeterProvider & {
+  shutdown(options?: ShutdownOptions): Promise<void>;
+  forceFlush(options?: ForceFlushOptions): Promise<void>;
+} {
+  return new MeterProviderImpl(options);
 }

@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider } from '../../src';
+import { createMeterProvider } from '../../src';
 import { TimeoutError } from '../../src/utils';
 import { DataPointType } from '../../src/export/MetricData';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
@@ -56,7 +56,7 @@ describe('MetricCollector', () => {
   describe('collect', () => {
     function setupInstruments() {
       const reader = new TestMetricReader();
-      const meterProvider = new MeterProvider({
+      const meterProvider = createMeterProvider({
         resource: defaultResource,
         readers: [reader],
       });

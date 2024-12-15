@@ -18,8 +18,8 @@ import { OTLPMetricExporter } from '../src';
 import { ServerTestContext, startServer } from './utils';
 import * as assert from 'assert';
 import {
-  MeterProvider,
-  PeriodicExportingMetricReader,
+  createMeterProvider,
+  createPeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 
 const testServiceDefinition = {
@@ -78,9 +78,9 @@ describe('OTLPMetricsExporter', function () {
 
   it('successfully exports data', async () => {
     // arrange
-    const meterProvider = new MeterProvider({
+    const meterProvider = createMeterProvider({
       readers: [
-        new PeriodicExportingMetricReader({
+        createPeriodicExportingMetricReader({
           exporter: new OTLPMetricExporter({ url: 'http://localhost:1502' }),
         }),
       ],

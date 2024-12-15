@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { DataPointType, MeterProvider, MetricReader } from '../../src';
+import { DataPointType, createMeterProvider, MetricReader } from '../../src';
 import { TestDeltaMetricReader } from '../export/TestMetricReader';
 import { assertDataPoint, assertMetricData } from '../util';
 
@@ -25,7 +25,7 @@ describe('two-metric-readers-async-instrument', () => {
   it('both metric readers should collect metrics', async () => {
     const reader1 = new TestDeltaMetricReader();
     const reader2 = new TestDeltaMetricReader();
-    const meterProvider = new MeterProvider({
+    const meterProvider = createMeterProvider({
       readers: [reader1, reader2],
     });
 

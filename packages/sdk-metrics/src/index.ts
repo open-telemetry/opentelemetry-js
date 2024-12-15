@@ -49,13 +49,13 @@ export { PushMetricExporter } from './export/MetricExporter';
 export { MetricReader, MetricReaderOptions } from './export/MetricReader';
 
 export {
-  PeriodicExportingMetricReader,
+  createPeriodicExportingMetricReader,
   PeriodicExportingMetricReaderOptions,
 } from './export/PeriodicExportingMetricReader';
 
-export { InMemoryMetricExporter } from './export/InMemoryMetricExporter';
+export { createInMemoryMetricExporter } from './export/InMemoryMetricExporter';
 
-export { ConsoleMetricExporter } from './export/ConsoleMetricExporter';
+export { createConsoleMetricExporter } from './export/ConsoleMetricExporter';
 
 export { MetricCollectOptions, MetricProducer } from './export/MetricProducer';
 
@@ -65,7 +65,7 @@ export { InstrumentType } from './InstrumentDescriptor';
  */
 export type InstrumentDescriptor = MetricDescriptor;
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
+export { createMeterProvider, MeterProviderOptions } from './MeterProvider';
 
 export { AggregationOption, AggregationType } from './view/AggregationOption';
 

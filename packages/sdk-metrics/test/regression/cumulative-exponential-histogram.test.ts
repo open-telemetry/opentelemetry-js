@@ -21,7 +21,7 @@ import {
   AggregationTemporality,
   AggregationType,
   InstrumentType,
-  MeterProvider,
+  createMeterProvider,
   MetricReader,
 } from '../../src';
 import { TestMetricReader } from '../export/TestMetricReader';
@@ -57,7 +57,7 @@ describe('cumulative-exponential-histogram', () => {
           : { type: AggregationType.DEFAULT };
       },
     });
-    const meterProvider = new MeterProvider({
+    const meterProvider = createMeterProvider({
       readers: [reader],
     });
 
