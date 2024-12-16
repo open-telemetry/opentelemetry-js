@@ -37,6 +37,7 @@ import {
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   parseUrl,
+  addSpanContentLengthAttributes,
 } from '@opentelemetry/sdk-trace-web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -152,6 +153,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       if (!this.getConfig().ignoreNetworkEvents) {
         addSpanNetworkEvents(childSpan, corsPreFlightRequest);
       }
+      addSpanContentLengthAttributes(childSpan, corsPreFlightRequest);
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -303,6 +305,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       if (!this.getConfig().ignoreNetworkEvents) {
         addSpanNetworkEvents(span, mainRequest);
       }
+      addSpanContentLengthAttributes(span, mainRequest);
     }
   }
 
