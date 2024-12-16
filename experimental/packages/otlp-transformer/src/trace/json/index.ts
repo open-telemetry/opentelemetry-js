@@ -13,13 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IResource as ISdkResource } from '@opentelemetry/resources';
-import { toAttributes } from '../common/internal';
-import { IResource } from './types';
 
-export function createResource(resource: ISdkResource): IResource {
-  return {
-    attributes: toAttributes(resource.attributes),
-    droppedAttributesCount: 0,
-  };
-}
+// IMPORTANT: exports added here are public
+export { JsonTraceSerializer } from './trace';

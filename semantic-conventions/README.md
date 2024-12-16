@@ -18,7 +18,7 @@ This package has 2 separate entry-points:
 - The main entry-point, `@opentelemetry/semantic-conventions`, includes only stable semantic conventions.
   This entry-point follows semantic versioning 2.0: it will not include breaking changes except with a change in the major version number.
 - The "incubating" entry-point, `@opentelemetry/semantic-conventions/incubating`, contains unstable semantic conventions (sometimes called "experimental") and, for convenience, a re-export of the stable semantic conventions.
-  This entry-point is _NOT_ subject to the restrictions of semantic versioning and _MAY_ contain breaking changes in minor releases.
+  This entry-point is _NOT_ subject to the restrictions of semantic versioning and _MAY_ contain breaking changes in minor releases. See below for suggested usage of this entry-point.
 
 Exported constants follow this naming scheme:
 
@@ -59,29 +59,49 @@ const span = tracer.startSpan(spanName, spanOptions)
 
 <!-- Dev Note: ^^ This '#unstable-semconv' anchor is being used in jsdoc links in the code. -->
 
+Because the "incubating" entry-point may include breaking changes in minor versions, it is recommended that instrumentation libraries **not** import `@opentelemetry/semantic-conventions/incubating` in runtime code, but instead **copy relevant definitions into their own code base**. (This is the same [recommendation](https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#stability-and-versioning) as for other languages.)
+
+For example, create a "src/semconv.ts" (or "lib/semconv.js" if implementing in JavaScript) file that copies from [experimental_attributes.ts](./src/experimental_attributes.ts) or [experimental_metrics.ts](./src/experimental_metrics.ts):
+
+```ts
+// src/semconv.ts
+export const ATTR_DB_NAMESPACE = 'db.namespace';
+export const ATTR_DB_OPERATION_NAME = 'db.operation.name';
+```
+
+```ts
+// src/instrumentation.ts
+import {
+  ATTR_SERVER_PORT,
+  ATTR_SERVER_ADDRESS,
+} from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_DB_NAMESPACE,
+  ATTR_DB_OPERATION_NAME,
+} from './semconv';
+
+span.setAttributes({
+  [ATTR_DB_NAMESPACE]: ...,
+  [ATTR_DB_OPERATION_NAME]: ...,
+  [ATTR_SERVER_PORT]: ...,
+  [ATTR_SERVER_ADDRESS]: ...,
+})
+```
+
+Occasionally, one should review changes to `@opentelemetry/semantic-conventions` to see if any used unstable conventions have changed or been stabilized. However, an update to a newer minor version of the package will never be breaking.
+
+#### Why not pin the version?
+
+A considered alternative for using unstable exports is to **pin** the version. I.e., depend on an exact version, rather than on a version range.
+
 ```bash
 npm install --save-exact @opentelemetry/semantic-conventions
 ```
 
-**Note**: Because the "incubating" entry-point may include breaking changes in minor versions, it is recommended that users of unstable semconv values either:
+Then, import directly from `@opentelemetry/semantic-conventions/incubating`.
+This is **not** recommended.
 
-1. depend on a pinned (exact) version of the package (`npm install --save-exact ...`), or
-2. [copy relevant definitions to their code base](https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#stability-and-versioning).
-
-```ts
-import {
-  ATTR_PROCESS_COMMAND,
-  ATTR_PROCESS_COMMAND_ARGS,
-  ATTR_PROCESS_COMMAND_LINE,
-} from '@opentelemetry/semantic-conventions/incubating';
-
-const span = tracer.startSpan(spanName, spanOptions)
-  .setAttributes({
-    [ATTR_PROCESS_COMMAND]: 'cat',
-    [ATTR_PROCESS_COMMAND_ARGS]: ['file1', 'file2'],
-    [ATTR_CONTAINER_COMMAND_LINE]: 'cat file1 file2',
-  });
-```
+In some languages having multiple versions of a package in a single application is not possible. This _is_ possible in JavaScript. The primary argument against pinning this package is that it can easily lead to many copies being installed in an application's `node_modules/...`, which can cause significant disk usage. In a disk-constrained environment, such as AWS Lambda Layers, that can be a blocker.
 
 ## Deprecations
 
@@ -153,16 +173,26 @@ See [Migrated usage](#migrated-usage) below.
 
 ### Migrated usage
 
+If using any unstable conventions, copy the relevant definitions into your code base (e.g. to "src/semconv.ts", see [above](#unstable-semconv)):
+
+```ts
+// src/semconv.ts
+export const ATTR_DB_SYSTEM = 'db.system' as const;
+export const DB_SYSTEM_VALUE_POSTGRESQL = "postgresql" as const;
+```
+
+then:
+
 ```js
 import {
   ATTR_SERVICE_NAME,
   ATTR_HTTP_ROUTE,
   METRIC_HTTP_CLIENT_REQUEST_DURATION
-} from '@opentelemetry/semantic-conventions';
+} from '@opentelemetry/semantic-conventions'; // stable semconv
 import {
   ATTR_DB_SYSTEM,
   DB_SYSTEM_VALUE_POSTGRESQL
-} from '@opentelemetry/semantic-conventions/incubating';
+} from './semconv'; // unstable semconv
 
 console.log(ATTR_SERVICE_NAME); // 'service.name'
 console.log(ATTR_HTTP_ROUTE);   // 'http.route'
@@ -175,14 +205,6 @@ console.log(ATTR_DB_SYSTEM);    // 'db.system'
 // 'postgresql' enum value for 'db.system' attribute
 console.log(DB_SYSTEM_VALUE_POSTGRESQL);
 ```
-
-### What is "incubating"?
-
-The first three fields in the preceding code sample ('service.name', 'http.route', 'http.client.request.duration') are _stable_ in semantic conventions, the latter two are not. Version 1.26.0 of this package separated stable and unstable into separate module entry points: stable conventions are imported `from '@opentelemetry/semantic-conventions'` and unstable `from '@opentelemetry/semantic-conventions/incubating'`. The name "incubating" is [suggested by the Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/non-normative/code-generation/#semantic-conventions-artifact-structure).
-
-It is recommended that if you are using exports from _incubating_, that you **pin the version** in your package.json dependencies (e.g. via `npm install --save-exact @opentelemetry/semantic-conventions`) _or_ that you copy the relevant definitions into your code base. This is because the removal of exports from the _incubating_ entry point is _not considered a breaking change_ and hence can happen in a minor version.
-
-Note: The _incubating_ entry point also exports all stable fields, so the above example could be changed to import all five constants `from '@opentelemetry/semantic-conventions/incubating'`.
 
 ## Useful links
 

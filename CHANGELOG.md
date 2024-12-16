@@ -13,9 +13,13 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-metrics): PeriodicExportingMetricReader now flushes pending tasks at shutdown [#5242](https://github.com/open-telemetry/opentelemetry-js/pull/5242)
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-trace-base): do not load OTEL_ env vars on module load, but when needed [#5224](https://github.com/open-telemetry/opentelemetry-js/pull/5224)
+
+* fix(instrumentation-xhr, instrumentation-fetch): content length attributes no longer get removed with `ignoreNetworkEvents: true` being set [#5229](https://github.com/open-telemetry/opentelemetry-js/issues/5229)
 
 ### :books: (Refine Doc)
 
@@ -23,9 +27,9 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ## 1.29.0
 
-### :boom: Breaking Change
+### :rocket: (Enhancement)
 
-* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5182](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
+* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5128](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
 
 ## 1.28.0
 
