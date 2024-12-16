@@ -47,7 +47,8 @@ export class SyncInstrument {
   protected _record(
     value: number,
     attributes: Attributes = {},
-    context: Context = contextApi.active()
+    context: Context = contextApi.active(),
+    timestamp: number
   ) {
     if (typeof value !== 'number') {
       diag.warn(
@@ -72,7 +73,7 @@ export class SyncInstrument {
       value,
       attributes,
       context,
-      millisToHrTime(Date.now())
+      millisToHrTime(timestamp)
     );
   }
 }
@@ -87,8 +88,13 @@ export class UpDownCounterInstrument
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, attributes?: Attributes, ctx?: Context): void {
-    this._record(value, attributes, ctx);
+  add(
+    value: number,
+    attributes?: Attributes,
+    ctx?: Context,
+    timestamp = Date.now()
+  ): void {
+    this._record(value, attributes, ctx, timestamp);
   }
 }
 
@@ -99,7 +105,12 @@ export class CounterInstrument extends SyncInstrument implements Counter {
   /**
    * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, attributes?: Attributes, ctx?: Context): void {
+  add(
+    value: number,
+    attributes?: Attributes,
+    ctx?: Context,
+    timestamp = Date.now()
+  ): void {
     if (value < 0) {
       diag.warn(
         `negative value provided to counter ${this._descriptor.name}: ${value}`
@@ -107,7 +118,7 @@ export class CounterInstrument extends SyncInstrument implements Counter {
       return;
     }
 
-    this._record(value, attributes, ctx);
+    this._record(value, attributes, ctx, timestamp);
   }
 }
 
@@ -118,8 +129,13 @@ export class GaugeInstrument extends SyncInstrument implements Gauge {
   /**
    * Records a measurement.
    */
-  record(value: number, attributes?: Attributes, ctx?: Context): void {
-    this._record(value, attributes, ctx);
+  record(
+    value: number,
+    attributes?: Attributes,
+    ctx?: Context,
+    timestamp = Date.now()
+  ): void {
+    this._record(value, attributes, ctx, timestamp);
   }
 }
 
@@ -130,14 +146,19 @@ export class HistogramInstrument extends SyncInstrument implements Histogram {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
-  record(value: number, attributes?: Attributes, ctx?: Context): void {
+  record(
+    value: number,
+    attributes?: Attributes,
+    ctx?: Context,
+    timestamp = Date.now()
+  ): void {
     if (value < 0) {
       diag.warn(
         `negative value provided to histogram ${this._descriptor.name}: ${value}`
       );
       return;
     }
-    this._record(value, attributes, ctx);
+    this._record(value, attributes, ctx, timestamp);
   }
 }
 

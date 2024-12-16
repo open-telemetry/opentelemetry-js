@@ -97,7 +97,12 @@ export interface Counter<
   /**
    * Increment value of counter by the input. Inputs must not be negative.
    */
-  add(value: number, attributes?: AttributesTypes, context?: Context): void;
+  add(
+    value: number,
+    attributes?: AttributesTypes,
+    context?: Context,
+    timestamp?: number
+  ): void;
 }
 
 /**
@@ -109,7 +114,12 @@ export interface UpDownCounter<
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, attributes?: AttributesTypes, context?: Context): void;
+  add(
+    value: number,
+    attributes?: AttributesTypes,
+    context?: Context,
+    timestamp?: number
+  ): void;
 }
 
 /**
@@ -121,7 +131,12 @@ export interface Gauge<
   /**
    * Records a measurement.
    */
-  record(value: number, attributes?: AttributesTypes, context?: Context): void;
+  record(
+    value: number,
+    attributes?: AttributesTypes,
+    context?: Context,
+    timestamp?: number
+  ): void;
 }
 
 /**
@@ -133,7 +148,12 @@ export interface Histogram<
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
-  record(value: number, attributes?: AttributesTypes, context?: Context): void;
+  record(
+    value: number,
+    attributes?: AttributesTypes,
+    context?: Context,
+    timestamp?: number
+  ): void;
 }
 
 /**
