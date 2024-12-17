@@ -72,7 +72,7 @@ jobs:
           node-version: '18'
 
       # npm@11.0.0 drops support for Node.js v18
-      - run: npm install -g npm@"<11.0.0"
+      - run: npm install -g npm@<11.0.0
 
       - name: Bootstrap
         run: npm ci
