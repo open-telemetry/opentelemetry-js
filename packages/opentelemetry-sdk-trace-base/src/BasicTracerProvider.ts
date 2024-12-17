@@ -30,7 +30,8 @@ import {
   merge,
 } from '@opentelemetry/core';
 import { IResource, Resource } from '@opentelemetry/resources';
-import { SpanProcessor, Tracer } from '.';
+import { SpanProcessor } from './SpanProcessor';
+import { Tracer } from './Tracer';
 import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './export/NoopSpanProcessor';
