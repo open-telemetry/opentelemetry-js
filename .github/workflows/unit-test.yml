@@ -69,10 +69,9 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '18'
+          node-version: '20'
 
-      # npm@11.0.0 drops support for Node.js v18
-      - run: npm install -g npm@<11.0.0
+      - run: npm install -g npm@latest
 
       - name: Bootstrap
         run: npm ci
