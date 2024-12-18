@@ -14,12 +14,71 @@
  * limitations under the License.
  */
 
-import { isWrapped } from '@opentelemetry/instrumentation';
+import * as api from '@opentelemetry/api';
+import {
+  isWrapped,
+  registerInstrumentations,
+} from '@opentelemetry/instrumentation';
 
+import { ZoneContextManager } from '@opentelemetry/context-zone';
+import * as tracing from '@opentelemetry/sdk-trace-base';
+import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
-import { FetchInstrumentation } from '../src';
+import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
+import { AttributeNames } from '../src/enums/AttributeNames';
+import {
+  SEMATTRS_HTTP_HOST,
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH,
+  SEMATTRS_HTTP_SCHEME,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_URL,
+  SEMATTRS_HTTP_USER_AGENT,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+} from '@opentelemetry/semantic-conventions';
+
+import * as msw from 'msw';
+import { setupWorker } from 'msw/browser';
+
+class DummySpanExporter implements tracing.SpanExporter {
+  readonly exported: tracing.ReadableSpan[][] = [];
+
+  export(spans: tracing.ReadableSpan[]) {
+    this.exported.push(spans);
+  }
+
+  shutdown() {
+    return Promise.resolve();
+  }
+
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+const worker = setupWorker();
 
 describe('fetch', () => {
+  let workerStarted = false;
+
+  const startWorker = async (
+    ...handlers: msw.RequestHandler[]
+  ): Promise<void> => {
+    worker.use(...handlers);
+    await worker.start({
+      onUnhandledRequest: 'error',
+      quiet: true,
+    });
+    workerStarted = true;
+  };
+
+  afterEach(() => {
+    if (workerStarted) {
+      worker.stop();
+      workerStarted = false;
+    }
+  });
+
   describe('enabling/disabling', () => {
     let fetchInstrumentation: FetchInstrumentation | undefined;
 
@@ -50,6 +109,167 @@ describe('fetch', () => {
 
       // Avoids ERROR in the logs when calling `disable()` again during cleanup
       fetchInstrumentation = undefined;
+    });
+  });
+
+  describe('instrumentation', () => {
+    let exportedSpans: tracing.ReadableSpan[][] = [];
+
+    const trace = async (
+      callback: () => Promise<void>,
+      config: FetchInstrumentationConfig = {}
+    ): Promise<api.Span> => {
+      try {
+        const contextManager = new ZoneContextManager().enable();
+        api.context.setGlobalContextManager(contextManager);
+
+        const fetchInstrumentation: FetchInstrumentation =
+          new FetchInstrumentation(config);
+        const dummySpanExporter = new DummySpanExporter();
+        const webTracerProviderWithZone = new WebTracerProvider({
+          spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
+        });
+        registerInstrumentations({
+          tracerProvider: webTracerProviderWithZone,
+          instrumentations: [fetchInstrumentation],
+        });
+        const webTracerWithZone =
+          webTracerProviderWithZone.getTracer('fetch-test');
+
+        const rootSpan = webTracerWithZone.startSpan('root');
+        await api.context.with(
+          api.trace.setSpan(api.context.active(), rootSpan),
+          callback
+        );
+
+        // FIXME!
+        await new Promise(resolve => {
+          setTimeout(resolve, 500);
+        });
+
+        exportedSpans = dummySpanExporter.exported;
+
+        return rootSpan;
+      } finally {
+        api.context.disable();
+      }
+    };
+
+    afterEach(() => {
+      exportedSpans = [];
+    });
+
+    describe('same origin requests', () => {
+      describe('when request is successful', () => {
+        let rootSpan: api.Span | undefined;
+
+        beforeEach(async () => {
+          await startWorker(
+            msw.http.get('/api/status.json', () => {
+              return msw.HttpResponse.json({ ok: true });
+            })
+          );
+
+          rootSpan = await trace(async () => {
+            await fetch('/api/status.json');
+          });
+
+          assert.strictEqual(exportedSpans.length, 1);
+        });
+
+        afterEach(() => {
+          rootSpan = undefined;
+        });
+
+        it('should create a span with correct root span', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0][0];
+          assert.strictEqual(
+            span.parentSpanId,
+            rootSpan!.spanContext().spanId,
+            'parent span is not root span'
+          );
+        });
+
+        it('span should have correct name', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0][0];
+          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+        });
+
+        it('span should have correct kind', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0][0];
+          assert.strictEqual(
+            span.kind,
+            api.SpanKind.CLIENT,
+            'span has wrong kind'
+          );
+        });
+
+        it('span should have correct attributes', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0][0];
+          const attributes = span.attributes;
+          const keys = Object.keys(attributes);
+          assert.notStrictEqual(
+            attributes[AttributeNames.COMPONENT],
+            '',
+            `attributes ${AttributeNames.COMPONENT} is not defined`
+          );
+
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_METHOD],
+            'GET',
+            `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+          );
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_URL],
+            'http://localhost:9876/api/status.json',
+            `attributes ${SEMATTRS_HTTP_URL} is wrong`
+          );
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_STATUS_CODE],
+            200,
+            `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+          );
+          const statusText = attributes[AttributeNames.HTTP_STATUS_TEXT];
+          assert.ok(
+            statusText === 'OK' || statusText === '',
+            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+          );
+          assert.ok(
+            (attributes[SEMATTRS_HTTP_HOST] as string).indexOf('localhost') ===
+              0,
+            `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+          );
+
+          const httpScheme = attributes[SEMATTRS_HTTP_SCHEME];
+          assert.ok(
+            httpScheme === 'http' || httpScheme === 'https',
+            `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+          );
+          assert.notStrictEqual(
+            attributes[SEMATTRS_HTTP_USER_AGENT],
+            '',
+            `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+          );
+          const requestContentLength = attributes[
+            SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+          ] as number;
+          assert.strictEqual(
+            requestContentLength,
+            undefined,
+            `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+          );
+          const responseContentLength = attributes[
+            SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+          ] as number;
+          assert.strictEqual(
+            responseContentLength,
+            11,
+            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+          );
+
+          assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+        });
+      });
     });
   });
 });
