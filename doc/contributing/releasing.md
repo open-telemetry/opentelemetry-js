@@ -7,7 +7,7 @@ We aim to eventually automate this process as much as possible.
 
 1. Go to the [Release PR Workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/create-or-update-release-pr.yml)
 2. Click "Run workflow"
-3. For `Branch`, select the branch you want to release from, `main` (current major) or `1.x` (if you back-ported something)
+3. For `Branch`, select the branch you want to release from, `main` (current major) or `1.x` (if you backported something)
 4. For `Release Type`, select if you want to create a release PR for a new `minor` or `patch` version.
 5. For `Release Scope`, select if you want to release
    - `experimental` (all packages under `./experimental/packages`)
