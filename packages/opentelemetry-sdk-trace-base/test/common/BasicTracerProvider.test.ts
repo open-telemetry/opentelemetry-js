@@ -36,9 +36,6 @@ import {
   BasicTracerProvider,
   NoopSpanProcessor,
   Span,
-  InMemorySpanExporter,
-  SpanExporter,
-  BatchSpanProcessor,
   AlwaysOnSampler,
   AlwaysOffSampler,
   ConsoleSpanExporter,
@@ -58,8 +55,6 @@ class DummyPropagator implements TextMapPropagator {
     throw new Error('Method not implemented.');
   }
 }
-
-class DummyExporter extends InMemorySpanExporter {}
 
 describe('BasicTracerProvider', () => {
   let envSource: Record<string, any>;
@@ -90,52 +85,16 @@ describe('BasicTracerProvider', () => {
         assert.ok(tracer instanceof BasicTracerProvider);
       });
 
-      it('should use noop span processor by default', () => {
-        const tracer = new BasicTracerProvider();
-        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
-        assert.ok(
-          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
-        );
-        assert.ok(
-          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-            NoopSpanProcessor
-        );
-      });
-      it('should use noop span processor by default and no diag error', () => {
+      it('should use empty span processor by default', () => {
         const errorStub = sinon.spy(diag, 'error');
         const tracer = new BasicTracerProvider();
 
         assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
-        assert.ok(
-          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
-        );
-        assert.ok(
-          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-            NoopSpanProcessor
+        assert.strictEqual(
+          tracer['_activeSpanProcessor']['_spanProcessors'].length,
+          0
         );
         sinon.assert.notCalled(errorStub);
-      });
-    });
-
-    describe('when user sets unavailable exporter', () => {
-      it('should use noop span processor by default and show diag error', () => {
-        envSource.OTEL_TRACES_EXPORTER = 'someExporter';
-        const errorStub = sinon.spy(diag, 'error');
-        const tracer = new BasicTracerProvider();
-
-        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
-        assert.ok(
-          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
-        );
-        assert.ok(
-          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-            NoopSpanProcessor
-        );
-        sinon.assert.calledWith(
-          errorStub,
-          'Exporter "someExporter" requested through environment variable is unavailable.'
-        );
-        delete envSource.OTEL_TRACES_EXPORTER;
       });
     });
 
@@ -448,14 +407,6 @@ describe('BasicTracerProvider', () => {
           ...BasicTracerProvider._registeredPropagators,
           ['custom-propagator', () => new DummyPropagator()],
         ]);
-
-        protected static override readonly _registeredExporters = new Map<
-          string,
-          () => SpanExporter
-        >([
-          ...BasicTracerProvider._registeredExporters,
-          ['custom-exporter', () => new DummyExporter()],
-        ]);
       }
 
       const provider = new CustomTracerProvider({});
@@ -465,19 +416,9 @@ describe('BasicTracerProvider', () => {
       );
       /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
       provider.register();
-
-      assert.ok(provider['_activeSpanProcessor'] instanceof MultiSpanProcessor);
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
-      );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-          BatchSpanProcessor
-      );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0][
-          '_exporter'
-        ] instanceof DummyExporter
+      assert.strictEqual(
+        provider['_activeSpanProcessor']['_spanProcessors'].length,
+        0
       );
 
       sinon.assert.calledOnceWithExactly(
@@ -494,11 +435,6 @@ describe('BasicTracerProvider', () => {
           () => TextMapPropagator
         >([['custom-propagator', () => new DummyPropagator()]]);
 
-        protected static override readonly _registeredExporters = new Map<
-          string,
-          () => SpanExporter
-        >([['custom-exporter', () => new DummyExporter()]]);
-
         protected override _getPropagator(
           name: string
         ): TextMapPropagator | undefined {
@@ -507,32 +443,13 @@ describe('BasicTracerProvider', () => {
             CustomTracerProvider._registeredPropagators.get(name)?.()
           );
         }
-
-        protected override _getSpanExporter(
-          name: string
-        ): SpanExporter | undefined {
-          return (
-            super._getSpanExporter(name) ||
-            CustomTracerProvider._registeredExporters.get(name)?.()
-          );
-        }
       }
 
       const provider = new CustomTracerProvider({});
       provider.register();
-
-      assert.ok(provider['_activeSpanProcessor'] instanceof MultiSpanProcessor);
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
-      );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-          BatchSpanProcessor
-      );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0][
-          '_exporter'
-        ] instanceof DummyExporter
+      assert.strictEqual(
+        provider['_activeSpanProcessor']['_spanProcessors'].length,
+        0
       );
 
       sinon.assert.calledOnceWithExactly(
@@ -597,57 +514,6 @@ describe('BasicTracerProvider', () => {
         sinon.assert.calledOnceWithExactly(
           warnStub,
           'Propagator "missing-propagator" requested through environment variable is unavailable.'
-        );
-      });
-    });
-
-    describe('exporter', () => {
-      class CustomTracerProvider extends BasicTracerProvider {
-        protected override _getSpanExporter(
-          name: string
-        ): SpanExporter | undefined {
-          return name === 'memory'
-            ? new InMemorySpanExporter()
-            : BasicTracerProvider._registeredExporters.get(name)?.();
-        }
-      }
-
-      afterEach(() => {
-        delete envSource.OTEL_TRACES_EXPORTER;
-      });
-
-      it('logs error if there is no exporter registered with a given name', () => {
-        const errorStub = sinon.spy(diag, 'error');
-
-        envSource.OTEL_TRACES_EXPORTER = 'missing-exporter';
-        const provider = new BasicTracerProvider({});
-        provider.register();
-        assert.ok(
-          errorStub.getCall(0).args[0] ===
-            'Exporter "missing-exporter" requested through environment variable is unavailable.'
-        );
-        errorStub.restore();
-      });
-
-      it('registers trace exporter from environment variable', () => {
-        envSource.OTEL_TRACES_EXPORTER = 'memory';
-        const provider = new CustomTracerProvider({});
-        provider.register();
-
-        assert.ok(
-          provider['_activeSpanProcessor'] instanceof MultiSpanProcessor
-        );
-        assert.ok(
-          provider['_activeSpanProcessor']['_spanProcessors'].length === 1
-        );
-        assert.ok(
-          provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-            BatchSpanProcessor
-        );
-        assert.ok(
-          provider['_activeSpanProcessor']['_spanProcessors'][0][
-            '_exporter'
-          ] instanceof InMemorySpanExporter
         );
       });
     });
@@ -834,29 +700,6 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.forceFlush()', () => {
-    it('should call forceFlush with the default processor', done => {
-      sinon.restore();
-      const forceFlushStub = sinon.stub(
-        NoopSpanProcessor.prototype,
-        'forceFlush'
-      );
-      forceFlushStub.resolves();
-
-      const tracerProvider = new BasicTracerProvider();
-
-      tracerProvider
-        .forceFlush()
-        .then(() => {
-          sinon.restore();
-          assert(forceFlushStub.calledOnce);
-          done();
-        })
-        .catch(error => {
-          sinon.restore();
-          done(error);
-        });
-    });
-
     it('should call forceFlush on all registered span processors', done => {
       sinon.restore();
       const forceFlushStub = sinon.stub(

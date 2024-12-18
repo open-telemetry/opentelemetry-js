@@ -33,10 +33,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
-  BatchSpanProcessor,
-  InMemorySpanExporter,
   Span,
-  SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
 import { Resource } from '@opentelemetry/resources';
 import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
@@ -265,10 +262,7 @@ describe('NodeTracerProvider', () => {
       }
     }
 
-    class DummyExporter extends InMemorySpanExporter {}
-
     beforeEach(() => {
-      process.env.OTEL_TRACES_EXPORTER = 'custom-exporter';
       process.env.OTEL_PROPAGATORS = 'custom-propagator';
 
       propagation.disable();
@@ -276,7 +270,6 @@ describe('NodeTracerProvider', () => {
     });
 
     afterEach(() => {
-      delete process.env.OTEL_TRACES_EXPORTER;
       delete process.env.OTEL_PROPAGATORS;
 
       propagation.disable();
@@ -293,33 +286,18 @@ describe('NodeTracerProvider', () => {
           string,
           () => TextMapPropagator
         >([['custom-propagator', () => propagator]]);
-
-        protected static override readonly _registeredExporters = new Map<
-          string,
-          () => SpanExporter
-        >([['custom-exporter', () => new DummyExporter()]]);
       }
 
       const provider = new CustomTracerProvider({});
       provider.register();
-
       assert.ok(
         provider['_activeSpanProcessor'].constructor.name ===
           'MultiSpanProcessor'
       );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
+      assert.strictEqual(
+        provider['_activeSpanProcessor']['_spanProcessors'].length,
+        0
       );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-          BatchSpanProcessor
-      );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0][
-          '_exporter'
-        ] instanceof DummyExporter
-      );
-
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });
 
@@ -333,11 +311,6 @@ describe('NodeTracerProvider', () => {
           () => TextMapPropagator
         >([['custom-propagator', () => propagator]]);
 
-        protected static override readonly _registeredExporters = new Map<
-          string,
-          () => SpanExporter
-        >([['custom-exporter', () => new DummyExporter()]]);
-
         protected override _getPropagator(
           name: string
         ): TextMapPropagator | undefined {
@@ -346,35 +319,17 @@ describe('NodeTracerProvider', () => {
             CustomTracerProvider._registeredPropagators.get(name)?.()
           );
         }
-
-        protected override _getSpanExporter(
-          name: string
-        ): SpanExporter | undefined {
-          return (
-            super._getSpanExporter(name) ||
-            CustomTracerProvider._registeredExporters.get(name)?.()
-          );
-        }
       }
 
       const provider = new CustomTracerProvider({});
       provider.register();
-
       assert.ok(
         provider['_activeSpanProcessor'].constructor.name ===
           'MultiSpanProcessor'
       );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
-      );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
-          BatchSpanProcessor
-      );
-      assert.ok(
-        provider['_activeSpanProcessor']['_spanProcessors'][0][
-          '_exporter'
-        ] instanceof DummyExporter
+      assert.strictEqual(
+        provider['_activeSpanProcessor']['_spanProcessors'].length,
+        0
       );
 
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
