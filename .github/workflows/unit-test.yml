@@ -30,6 +30,11 @@ jobs:
           node-version: ${{ matrix.node_version }}
 
       - run: npm install -g npm@latest
+        if: ${{ matrix.node_version == '20' || matrix.node_version == '22' }}
+
+      # npm@11.0.0 drops support for Node.js v18
+      - run: npm install -g npm@"<11.0.0"
+        if: ${{ matrix.node_version == '18'}}
 
       - name: Bootstrap
         run: npm ci
@@ -58,7 +63,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             package-lock.json
-          node-version: '18'
+          node-version: '20'
 
       - run: npm install -g npm@latest
 

@@ -9,11 +9,17 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
-
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.57.0
+
+### :rocket: (Enhancement)
+
+* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
 
 ### :house: (Internal)
 
