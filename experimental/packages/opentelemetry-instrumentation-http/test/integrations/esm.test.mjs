@@ -45,9 +45,10 @@ import {
 import { assertSpan } from '../../build/test/utils/assertSpan.js';
 import { HttpInstrumentation } from '../../build/src/index.js';
 
-const provider = new NodeTracerProvider();
 const memoryExporter = new InMemorySpanExporter();
-provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+const provider = new NodeTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+});
 const instrumentation = new HttpInstrumentation();
 instrumentation.setTracerProvider(provider);
 

@@ -55,8 +55,9 @@ describe('Packages', () => {
     context.disable();
   });
   describe('get', () => {
-    const provider = new NodeTracerProvider();
-    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    const provider = new NodeTracerProvider({
+      spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+    });
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
       memoryExporter.reset();
@@ -88,15 +89,7 @@ describe('Packages', () => {
       },
     ].forEach(({ name, httpPackage }) => {
       it(`should create a span for GET requests and add propagation headers by using ${name} package`, async () => {
-        if (process.versions.node.startsWith('12') && name === 'got') {
-          // got complains with nock and node version 12+
-          // > RequestError: The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type function
-          // so let's make a real call
-          nock.cleanAll();
-          nock.enableNetConnect();
-        } else {
-          nock.load(path.join(__dirname, '../', '/fixtures/google-http.json'));
-        }
+        nock.load(path.join(__dirname, '../', '/fixtures/google-http.json'));
 
         const urlparsed = url.parse(
           `${protocol}://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`

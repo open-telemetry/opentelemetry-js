@@ -68,11 +68,9 @@ export class BasicTracerProvider implements TracerProvider {
   >();
 
   private readonly _config: TracerConfig;
-  private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
-
-  activeSpanProcessor: SpanProcessor;
-  readonly resource: IResource;
+  private readonly _resource: IResource;
+  private readonly _activeSpanProcessor: MultiSpanProcessor;
 
   constructor(config: TracerConfig = {}) {
     const mergedConfig = merge(
@@ -80,30 +78,30 @@ export class BasicTracerProvider implements TracerProvider {
       loadDefaultConfig(),
       reconfigureLimits(config)
     );
-    this.resource = mergedConfig.resource ?? Resource.empty();
+    this._resource = mergedConfig.resource ?? Resource.empty();
 
     if (mergedConfig.mergeResourceWithDefaults) {
-      this.resource = Resource.default().merge(this.resource);
+      this._resource = Resource.default().merge(this._resource);
     }
 
     this._config = Object.assign({}, mergedConfig, {
-      resource: this.resource,
+      resource: this._resource,
     });
 
+    const spanProcessors: SpanProcessor[] = [];
+
     if (config.spanProcessors?.length) {
-      this._registeredSpanProcessors = [...config.spanProcessors];
-      this.activeSpanProcessor = new MultiSpanProcessor(
-        this._registeredSpanProcessors
-      );
+      spanProcessors.push(...config.spanProcessors);
     } else {
       const defaultExporter = this._buildExporterFromEnv();
-      if (defaultExporter !== undefined) {
-        const batchProcessor = new BatchSpanProcessor(defaultExporter);
-        this.activeSpanProcessor = batchProcessor;
-      } else {
-        this.activeSpanProcessor = new NoopSpanProcessor();
-      }
+      spanProcessors.push(
+        defaultExporter
+          ? new BatchSpanProcessor(defaultExporter)
+          : new NoopSpanProcessor()
+      );
     }
+
+    this._activeSpanProcessor = new MultiSpanProcessor(spanProcessors);
   }
 
   getTracer(
@@ -118,41 +116,14 @@ export class BasicTracerProvider implements TracerProvider {
         new Tracer(
           { name, version, schemaUrl: options?.schemaUrl },
           this._config,
-          this
+          this._resource,
+          this._activeSpanProcessor
         )
       );
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
-  }
-
-  /**
-   * @deprecated please use {@link TracerConfig} spanProcessors property
-   * Adds a new {@link SpanProcessor} to this tracer.
-   * @param spanProcessor the new SpanProcessor to be added.
-   */
-  addSpanProcessor(spanProcessor: SpanProcessor): void {
-    if (this._registeredSpanProcessors.length === 0) {
-      // since we might have enabled by default a batchProcessor, we disable it
-      // before adding the new one
-      this.activeSpanProcessor
-        .shutdown()
-        .catch(err =>
-          diag.error(
-            'Error while trying to shutdown current span processor',
-            err
-          )
-        );
-    }
-    this._registeredSpanProcessors.push(spanProcessor);
-    this.activeSpanProcessor = new MultiSpanProcessor(
-      this._registeredSpanProcessors
-    );
-  }
-
-  getActiveSpanProcessor(): SpanProcessor {
-    return this.activeSpanProcessor;
   }
 
   /**
@@ -179,7 +150,7 @@ export class BasicTracerProvider implements TracerProvider {
 
   forceFlush(): Promise<void> {
     const timeout = this._config.forceFlushTimeoutMillis;
-    const promises = this._registeredSpanProcessors.map(
+    const promises = this._activeSpanProcessor['_spanProcessors'].map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {
           let state: ForceFlushState;
@@ -227,7 +198,7 @@ export class BasicTracerProvider implements TracerProvider {
   }
 
   shutdown(): Promise<void> {
-    return this.activeSpanProcessor.shutdown();
+    return this._activeSpanProcessor.shutdown();
   }
 
   /**

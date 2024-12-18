@@ -288,18 +288,17 @@ describe('fetch', () => {
     }
 
     fetchInstrumentation = new FetchInstrumentation(config);
-    webTracerProviderWithZone = new WebTracerProvider();
+    dummySpanExporter = new DummySpanExporter();
+    webTracerProviderWithZone = new WebTracerProvider({
+      spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
+    });
     registerInstrumentations({
       tracerProvider: webTracerProviderWithZone,
       instrumentations: [fetchInstrumentation],
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
-    dummySpanExporter = new DummySpanExporter();
     exportSpy = sinon.stub(dummySpanExporter, 'export');
     clearResourceTimingsSpy = sinon.stub(performance, 'clearResourceTimings');
-    webTracerProviderWithZone.addSpanProcessor(
-      new tracing.SimpleSpanProcessor(dummySpanExporter)
-    );
 
     // endSpan is called after the whole response body is read
     // this process is scheduled at the same time the fetch promise is resolved

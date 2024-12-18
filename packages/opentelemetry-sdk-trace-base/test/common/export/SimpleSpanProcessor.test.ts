@@ -32,11 +32,12 @@ import {
   BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  Span,
 } from '../../../src';
+import { SpanImpl } from '../../../src/Span';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
-import { Resource, ResourceAttributes } from '@opentelemetry/resources';
+import { Attributes } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import { TestExporterWithDelay } from './TestExporterWithDelay';
 
 describe('SimpleSpanProcessor', () => {
@@ -63,13 +64,17 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
-        provider.getTracer('default'),
-        ROOT_CONTEXT,
-        'span-name',
+      const tracer = provider.getTracer('default');
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       processor.onStart(span, ROOT_CONTEXT);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -87,13 +92,17 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       };
-      const span = new Span(
-        provider.getTracer('default'),
-        ROOT_CONTEXT,
-        'span-name',
+      const tracer = provider.getTracer('default');
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       processor.onStart(span, ROOT_CONTEXT);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -112,13 +121,17 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
-        provider.getTracer('default'),
-        ROOT_CONTEXT,
-        'span-name',
+      const tracer = provider.getTracer('default');
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       processor.onStart(span, ROOT_CONTEXT);
 
       sinon.stub(exporter, 'export').callsFake((_, callback) => {
@@ -164,7 +177,7 @@ describe('SimpleSpanProcessor', () => {
       const providerWithAsyncResource = new BasicTracerProvider({
         resource: new Resource(
           {},
-          new Promise<ResourceAttributes>(resolve => {
+          new Promise<Attributes>(resolve => {
             setTimeout(() => resolve({ async: 'fromasync' }), 1);
           })
         ),
@@ -174,13 +187,18 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
-        providerWithAsyncResource.getTracer('default'),
-        ROOT_CONTEXT,
-        'span-name',
+
+      const tracer = providerWithAsyncResource.getTracer('default');
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       processor.onStart(span, ROOT_CONTEXT);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -205,7 +223,7 @@ describe('SimpleSpanProcessor', () => {
       const providerWithAsyncResource = new BasicTracerProvider({
         resource: new Resource(
           {},
-          new Promise<ResourceAttributes>(resolve => {
+          new Promise<Attributes>(resolve => {
             setTimeout(() => resolve({ async: 'fromasync' }), 1);
           })
         ),
@@ -215,13 +233,17 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
-        providerWithAsyncResource.getTracer('default'),
-        ROOT_CONTEXT,
-        'span-name',
+      const tracer = providerWithAsyncResource.getTracer('default');
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
 
@@ -274,13 +296,17 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(
-        provider.getTracer('default'),
-        ROOT_CONTEXT,
-        'span-name',
+      const tracer = provider.getTracer('default');
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name: 'span-name',
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
 
       processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
@@ -303,7 +329,7 @@ describe('SimpleSpanProcessor', () => {
   //       spanId: '5e0c63257de34c92',
   //       traceFlags: TraceFlags.SAMPLED,
   //     };
-  //     const span = new Span(
+  //     const span = new SpanImpl(
   //       providerWithAsyncResource.getTracer('default'),
   //       ROOT_CONTEXT,
   //       'span-name',

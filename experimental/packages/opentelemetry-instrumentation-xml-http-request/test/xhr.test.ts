@@ -302,20 +302,22 @@ describe('xhr', () => {
           xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation(
             config
           );
-          webTracerProviderWithZone = new WebTracerProvider();
+          dummySpanExporter = new DummySpanExporter();
+          webTracerProviderWithZone = new WebTracerProvider({
+            spanProcessors: [
+              new tracing.SimpleSpanProcessor(dummySpanExporter),
+            ],
+          });
           registerInstrumentations({
             instrumentations: [xmlHttpRequestInstrumentation],
             tracerProvider: webTracerProviderWithZone,
           });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
-          dummySpanExporter = new DummySpanExporter();
+
           exportSpy = sinon.stub(dummySpanExporter, 'export');
           clearResourceTimingsSpy = sinon.stub(
             performance as unknown as Performance,
             'clearResourceTimings'
-          );
-          webTracerProviderWithZone.addSpanProcessor(
-            new tracing.SimpleSpanProcessor(dummySpanExporter)
           );
 
           rootSpan = webTracerWithZone.startSpan('root');
@@ -910,18 +912,19 @@ describe('xhr', () => {
           );
           spyEntries.withArgs('resource').returns(resources);
 
-          webTracerWithZoneProvider = new WebTracerProvider();
+          dummySpanExporter = new DummySpanExporter();
+          webTracerWithZoneProvider = new WebTracerProvider({
+            spanProcessors: [
+              new tracing.SimpleSpanProcessor(dummySpanExporter),
+            ],
+          });
 
           registerInstrumentations({
             instrumentations: [new XMLHttpRequestInstrumentation(config)],
             tracerProvider: webTracerWithZoneProvider,
           });
 
-          dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
-          webTracerWithZoneProvider.addSpanProcessor(
-            new tracing.SimpleSpanProcessor(dummySpanExporter)
-          );
           webTracerWithZone = webTracerWithZoneProvider.getTracer('xhr-test');
 
           rootSpan = webTracerWithZone.startSpan('root');
@@ -1497,20 +1500,21 @@ describe('xhr', () => {
           xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation(
             config
           );
-          webTracerProviderWithZone = new WebTracerProvider();
+          dummySpanExporter = new DummySpanExporter();
+          exportSpy = sinon.stub(dummySpanExporter, 'export');
+          webTracerProviderWithZone = new WebTracerProvider({
+            spanProcessors: [
+              new tracing.SimpleSpanProcessor(dummySpanExporter),
+            ],
+          });
           registerInstrumentations({
             instrumentations: [xmlHttpRequestInstrumentation],
             tracerProvider: webTracerProviderWithZone,
           });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
-          dummySpanExporter = new DummySpanExporter();
-          exportSpy = sinon.stub(dummySpanExporter, 'export');
           clearResourceTimingsSpy = sinon.stub(
             performance as unknown as Performance,
             'clearResourceTimings'
-          );
-          webTracerProviderWithZone.addSpanProcessor(
-            new tracing.SimpleSpanProcessor(dummySpanExporter)
           );
 
           rootSpan = webTracerWithZone.startSpan('root');
@@ -2081,18 +2085,20 @@ describe('xhr', () => {
           );
           spyEntries.withArgs('resource').returns(resources);
 
-          webTracerWithZoneProvider = new WebTracerProvider();
+          dummySpanExporter = new DummySpanExporter();
+          webTracerWithZoneProvider = new WebTracerProvider({
+            spanProcessors: [
+              new tracing.SimpleSpanProcessor(dummySpanExporter),
+            ],
+          });
 
           registerInstrumentations({
             instrumentations: [new XMLHttpRequestInstrumentation(config)],
             tracerProvider: webTracerWithZoneProvider,
           });
 
-          dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
-          webTracerWithZoneProvider.addSpanProcessor(
-            new tracing.SimpleSpanProcessor(dummySpanExporter)
-          );
+
           webTracerWithZone = webTracerWithZoneProvider.getTracer('xhr-test');
 
           rootSpan = webTracerWithZone.startSpan('root');

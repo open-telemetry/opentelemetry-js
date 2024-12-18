@@ -17,7 +17,8 @@
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import {
-  Aggregation,
+  AggregationOption,
+  AggregationType,
   CollectionResult,
   InstrumentType,
   MetricProducer,
@@ -115,8 +116,8 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 }
 
 class TestDropMetricExporter extends TestMetricExporter {
-  selectAggregation(_instrumentType: InstrumentType): Aggregation {
-    return Aggregation.Drop();
+  selectAggregation(_instrumentType: InstrumentType): AggregationOption {
+    return { type: AggregationType.DROP };
   }
 }
 

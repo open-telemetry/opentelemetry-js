@@ -35,6 +35,10 @@
 
 ---
 
+> [!WARNING]
+> This is the working branch for the work in progress 2.0 SDK, see [this tracking issue](https://github.com/open-telemetry/opentelemetry-js/issues/5148) for details.
+> If you are a user looking for the current released state, you are probably looking for the [1.x SDK](https://github.com/open-telemetry/opentelemetry-js/tree/v1.x) on the v1.x branch.
+
 ## About this project
 
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics, and logs from applications.
@@ -135,8 +139,17 @@ Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenT
 > Client instrumentation for the browser is **experimental** and mostly **unspecified**. If you are interested in
 > helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig].
 
-There is currently no list of officially supported browsers. OpenTelemetry is developed using standard web
-technologies and aims to work in currently supported versions of major browsers.
+Rather than define versions of specific browsers / runtimes, OpenTelemetry sets the minimum supported version based on the
+underlying language features used.
+
+The current minumum language feature support is set as [ECMAScript 2020](https://262.ecma-international.org/11.0/) that are available
+in all modern browsers / runtimes.
+
+This means that if you are targeting or your end-users are using a browser / runtime that does not support ES2020, you will need
+to transpile the code and provide any necessary polyfills for the missing features to ensure compatibility with your target
+environments. Any support issues that arise from using a browser or runtime that does not support ES2020 will be closed as "won't fix".
+
+This minimum support level is subject to change as the project evolves and as the underlying language features evolve.
 
 ## Package Version Compatibility
 
