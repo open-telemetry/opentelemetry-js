@@ -17,19 +17,14 @@
 export { Resource } from './Resource';
 export { IResource } from './IResource';
 export { defaultServiceName } from './platform';
-export { DetectorSync, Detector } from './types';
+export { DetectorSync } from './types';
 export { ResourceDetectionConfig } from './config';
 export {
-  browserDetector,
   browserDetectorSync,
-  envDetector,
   envDetectorSync,
-  hostDetector,
   hostDetectorSync,
-  osDetector,
   osDetectorSync,
-  processDetector,
   processDetectorSync,
   serviceInstanceIdDetectorSync,
 } from './detectors';
-export { detectResourcesSync, detectResources } from './detect-resources';
+export { detectResourcesSync } from './detect-resources';

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { processDetector, IResource } from '../../../src';
+import { processDetectorSync } from '../../../src';
 import { assertResource } from '../../util/resource-assertions';
 import { describeNode } from '../../util';
 import * as os from 'os';
 
-describeNode('processDetector() on Node.js', () => {
+describeNode('processDetectorSync() on Node.js', () => {
   afterEach(() => {
     sinon.restore();
   });
@@ -36,8 +36,9 @@ describeNode('processDetector() on Node.js', () => {
       .stub(os, 'userInfo')
       .returns({ username: 'appOwner' } as os.UserInfo<string>);
 
-    const resource: IResource = await processDetector.detect();
-    assertResource(resource, {
+    const resource = await processDetectorSync.detect();
+    const attributes = await resource.attributes;
+    assertResource(attributes, {
       pid: 1234,
       name: 'otProcess',
       command: '/home/ot/test.js',
@@ -61,9 +62,10 @@ describeNode('processDetector() on Node.js', () => {
     sinon.stub(process, 'title').value('');
     sinon.stub(process, 'argv').value([]);
     sinon.stub(process, 'versions').value({ node: '1.4.1' });
-    const resource: IResource = await processDetector.detect();
+    const resource = await processDetectorSync.detect();
+    const attributes = await resource.attributes;
     // at a minium we should be able to rely on pid runtime, runtime name, and description
-    assertResource(resource, {
+    assertResource(attributes, {
       pid: 1234,
       version: '1.4.1',
       runtimeDescription: 'Node.js',
