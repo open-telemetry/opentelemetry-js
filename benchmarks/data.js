@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1734520914147,
+  "lastUpdate": 1734522842980,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -21792,6 +21792,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "mingaudas.vagonis@gmail.com",
+            "name": "Mingaudas Vagonis",
+            "username": "MingaudasVagonis"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e524148b480366bb7ecc129828a64e00058bb84e",
+          "message": "chore: removed circular dependency from BasicTracerProvider (#5279)",
+          "timestamp": "2024-12-18T09:08:09Z",
+          "tree_id": "13b7dd417df5e3514163092916e84cab55c349dc",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/e524148b480366bb7ecc129828a64e00058bb84e"
+        },
+        "date": 1734522842139,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1558875,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18529,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 875435,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 800723,
+            "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
