@@ -19,43 +19,60 @@ To get started you will need to install a compatible OpenTelemetry API.
 npm install @opentelemetry/api
 ```
 
+### Experimental Features and Entrypoint
+
+This package is currently marked as experimental. New minor versions may include breaking changes, regardless of
+the entrypoint used. Once the package is marked as stable, only the `experimental/` entrypoint will break in
+minor versions of the package. If you use experimental features it is therefore recommended to pin the package or use
+to depend on a tilde-version.
+
 ### Serialize Traces/Metrics/Logs
 
 This module exports serializers to serialize traces, metrics and logs from the OpenTelemetry SDK into protocol buffers
 or JSON which can be sent over HTTP or gRPC (protobuf-only) to the OpenTelemetry collector or a compatible receiver.
 
 ```typescript
-import {
-  JsonLogsSerializer,
-  JsonMetricsSerializer,
-  JsonTraceSerializer,
-  ProtobufLogsSerializer,
-  ProtobufMetricsSerializer,
-  ProtobufTraceSerializer,
-  IExportLogsServiceResponse,
-  IExportMetricsServiceResponse,
-  IExportTraceServiceResponse,
-} from '@opentelemetry/otlp-transformer';
+// Logs (protobuf) - experimental
+import { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer/experimental/logs';
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer/experimental/logs/protobuf';
 
-// serialize to JSON export requests
-const serializedJsonLogs: Uint8Array = JsonLogsSerializer.serializeRequest(readableLogRecords);
-const serializedJsonMetrics: Uint8Array = JsonMetricsSerializer.serializeRequest(resourceMetrics);
-const serializedJsonTraces: Uint8Array = JsonTraceSerializer.serializeRequest(readableSpans);
-
-// serialize to Protobuf export requests
 const serializedProtobufLogs: Uint8Array = ProtobufLogsSerializer.serializeRequest(readableLogRecords);
-const serializedProtobufMetrics: Uint8Array = ProtobufMetricsSerializer.serializeRequest(resourceMetrics);
-const serializedProtobufTraces: Uint8Array = ProtobufTraceSerializer.serializeRequest(readableSpans);
-
-// deserialize JSON export responses
-const deserializedJsonLogResponse: IExportLogsServiceResponse = JsonLogsSerializer.deserializeResponse(jsonLogResponse);
-const deserializedJsonMetricsResponse: IExportMetricsServiceResponse = JsonMetricsSerializer.deserializeResponse(jsonMetricsResponse);
-const deserializedJsonTraceResponse: IExportTraceServiceResponse = JsonTraceSerializer.deserializeResponse(jsonTraceResponse);
-
-// deserialize Protobuf export responses
 const deserializedProtobufLogResponse: IExportLogsServiceResponse = ProtobufLogsSerializer.deserializeResponse(protobufLogResponse);
+
+// Logs (json) - experimental
+import { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer/experimental/logs';
+import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer/experimental/logs/json';
+
+const serializedJsonLogs: Uint8Array = JsonLogsSerializer.serializeRequest(readableLogRecords);
+const deserializedJsonLogResponse: IExportLogsServiceResponse = JsonLogsSerializer.deserializeResponse(jsonLogResponse);
+
+// Metrics (protobuf)
+import { IExportMetricsServiceResponse } from '@opentelemetry/otlp-transformer/metrics'
+import { ProtobufMetricsSerializer } from '@opentelemetry/otlp-transformer/metrics/protobuf';
+
+const serializedProtobufMetrics: Uint8Array = ProtobufMetricsSerializer.serializeRequest(resourceMetrics);
 const deserializedProtobufMetricsResponse: IExportMetricsServiceResponse = ProtobufMetricsSerializer.deserializeResponse(protobufMetricsResponse);
+
+// Metrics (json)
+import { IExportMetricsServiceResponse } from '@opentelemetry/otlp-transformer/metrics'
+import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer/metrics/json';
+
+const serializedJsonMetrics: Uint8Array = JsonMetricsSerializer.serializeRequest(resourceMetrics);
+const deserializedJsonMetricsResponse: IExportMetricsServiceResponse = JsonMetricsSerializer.deserializeResponse(jsonMetricsResponse);
+
+// Traces (protobuf)
+import { IExportTraceServiceResponse } from '@opentelemetry/otlp-transformer/trace'
+import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer/trace/protobuf';
+
+const serializedProtobufTraces: Uint8Array = ProtobufTraceSerializer.serializeRequest(readableSpans);
 const deserializedProtobufTraceResponse: IExportTraceServiceResponse = ProtobufTraceSerializer.deserializeResponse(protobufTraceResponse);
+
+// Traces (json)
+import { IExportTraceServiceResponse } from '@opentelemetry/otlp-transformer/trace'
+import { JsonTraceSerializer } from '@opentelemetry/otlp-transformer/trace/json';
+
+const deserializedJsonTraceResponse: IExportTraceServiceResponse = JsonTraceSerializer.deserializeResponse(jsonTraceResponse);
+const serializedJsonTraces: Uint8Array = JsonTraceSerializer.serializeRequest(readableSpans);
 ```
 
 ## Useful links
