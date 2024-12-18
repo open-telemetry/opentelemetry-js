@@ -15,6 +15,16 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+## 0.57.0
+
+### :rocket: (Enhancement)
+
+* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
+
+### :house: (Internal)
+
+* refactor(otlp-transformer): re-structure package to prepare for separate entrypoints [#5264](https://github.com/open-telemetry/opentelemetry-js/pull/5264) @pichlermarc
+
 ## 0.56.0
 
 ### :boom: Breaking Change
@@ -31,6 +41,60 @@ All notable changes to experimental packages in this project will be documented 
 * feat(otlp-transformer)!: accept `ResourceMetrics` in serializers instead of `ResourceMetrics[]`
   * (user-facing): `ProtobufMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
   * (user-facing): `JsonMetricsSerializer` now only accepts `ResourceMetrics` instead of `ResourceMetrics[]` to align with `PushMetricExporter` requirements
+* feat(otlp-transformer)!: remove internal types and functions from public API @pichlermarc
+  * (user-facing): the following types and functions were intended for internal use and have been removed from exports
+    * `OtlpEncodingOptions`
+    * `IKeyValueList`
+    * `IKeyValue`
+    * `IInstrumentationScope`
+    * `IArrayValue`
+    * `LongBits`
+    * `IAnyValue`
+    * `Fixed64`
+    * `SpanContextEncodeFunction`
+    * `toLongBits`
+    * `OptionalSpanContextEncodeFunction`
+    * `getOtlpEncoder`
+    * `Encoder`
+    * `HrTimeEncodeFunction`
+    * `encodeAsLongBits`
+    * `encodeAsString`
+    * `hrTimeToNanos`
+    * `IValueAtQuantile`
+    * `ISummaryDataPoint`
+    * `ISummary`
+    * `ISum`
+    * `IScopeMetrics`
+    * `IResourceMetrics`
+    * `INumberDataPoint`
+    * `IHistogramDataPoint`
+    * `IHistogram`
+    * `IExponentialHistogramDataPoint`
+    * `IExponentialHistogram`
+    * `IMetric`
+    * `IGauge`
+    * `IExemplar`
+    * `EAggregationTemporality`
+    * `IExportMetricsServiceRequest`
+    * `IBuckets`
+    * `IResource`
+    * `IStatus`
+    * `EStatusCode`
+    * `ILink`
+    * `IEvent`
+    * `IScopeSpans`
+    * `ISpan`
+    * `IResourceSpans`
+    * `ESpanKind`
+    * `IExportTraceServiceRequest`
+    * `IScopeLogs`
+    * `IExportLogsServiceRequest`
+    * `IResourceLogs`
+    * `ILogRecord`
+    * `ESeverityNumber`
+    * `createExportTraceServiceRequest`
+    * `createExportMetricsServiceRequest`
+    * `createExportLogsServiceRequest`
 
 ### :rocket: (Enhancement)
 

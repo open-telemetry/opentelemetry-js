@@ -78,9 +78,7 @@ class TestMetricExporter implements PushMetricExporter {
 
   async shutdown(): Promise<void> {
     if (this._shutdown) return;
-    const flushPromise = this.forceFlush();
     this._shutdown = true;
-    await flushPromise;
   }
 
   async forceFlush(): Promise<void> {

@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Fixed64, IInstrumentationScope, IKeyValue } from '../common/types';
-import { IResource } from '../resource/types';
+import {
+  Fixed64,
+  IInstrumentationScope,
+  IKeyValue,
+  IResource,
+} from '../common/internal-types';
 
 /** Properties of an ExportMetricsServiceRequest. */
 export interface IExportMetricsServiceRequest {
   /** ExportMetricsServiceRequest resourceMetrics */
   resourceMetrics: IResourceMetrics[];
-}
-
-export interface IExportMetricsServiceResponse {
-  /** ExportMetricsServiceResponse partialSuccess */
-  partialSuccess?: IExportMetricsPartialSuccess;
-}
-
-export interface IExportMetricsPartialSuccess {
-  /** ExportMetricsPartialSuccess rejectedDataPoints */
-  rejectedDataPoints?: number;
-
-  /** ExportMetricsPartialSuccess errorMessage */
-  errorMessage?: string;
 }
 
 /** Properties of a ResourceMetrics. */
