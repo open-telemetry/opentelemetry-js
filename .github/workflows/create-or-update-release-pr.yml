@@ -30,15 +30,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: opentelemetrybot/opentelemetry-js
-          ref: main
+          ref: v1.x
           token: ${{ secrets.OPENTELEMETRYBOT_GITHUB_TOKEN }}
       - name: Sync with upstream
         run: |
           git remote show origin
           git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
           git fetch upstream
-          git reset --hard upstream/main
-          git push origin main --force
+          git reset --hard upstream/v1.x
+          git push origin v1.x --force
 
       - uses: actions/setup-node@v4
         with:

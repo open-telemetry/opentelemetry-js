@@ -7,8 +7,9 @@ We aim to eventually automate this process as much as possible.
 
 1. Go to the [Release PR Workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/create-or-update-release-pr.yml)
 2. Click "Run workflow"
-3. For `Release Type`, select if you want to create a release PR for a new `minor` or `patch` version.
-4. For `Release Scope`, select if you want to release
+3. For `Branch`, select the branch you want to release from, `main` (current major) or `1.x` (if you backported something)
+4. For `Release Type`, select if you want to create a release PR for a new `minor` or `patch` version.
+5. For `Release Scope`, select if you want to release
    - `experimental` (all packages under `./experimental/packages`)
    - `sdk` (all packages under `./packages/` and `./experimental/packages`)
    - `all` (all packages under `./api/`, `./packages/` and `./experimental/packages`; excludes `./semantic-conventions/`)
@@ -26,11 +27,11 @@ We aim to eventually automate this process as much as possible.
 ## 3. Publish to NPM
 
 > [!IMPORTANT]
-> This step will publish anything that's on `main` IF AND ONLY IF the version has been bumped. If the version for a package
+> This step will publish anything that's on the branch you're releasing from IF AND ONLY IF the version has been bumped. If the version for a package
 > has not been bumped, it will not publish a new version of the package.
 
 1. Go to the [NPM publish workflow](https://github.com/open-telemetry/opentelemetry-js/actions/workflows/publish-to-npm.yml)
-2. Click "Run workflow" (from main)
+2. Click "Run workflow" (from `main` or `v1.x`, based on what branch you chose to create the release PR for)
    1. In rare cases not all packages are published due to a race when publishing, if you suspect this to
       be the case, re-run the workflow: there should be enough time from 1.
 
