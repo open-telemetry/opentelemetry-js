@@ -11,6 +11,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(otlp-exporter-base): use dynamic imports over require for lazy-loading http transport utils [#5220](https://github.com/open-telemetry/opentelemetry-js/pull/5220) @pichlermarc
+  * enables bundling of Node.js HTTP exporters with rollup
+    * Limitation: if a single-file bundle is built the dynamically loaded file needs to be inlined via rollup's `inlineDynamicImports: true` setting. However, doing so may lead to `@opentelemetry/instrumentation-http` not generating telemetry.
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
