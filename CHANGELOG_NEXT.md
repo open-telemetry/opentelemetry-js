@@ -24,6 +24,7 @@
 
 ### :house: (Internal)
 
+* refactor(instrumentation-fetch): refactor `fetch()` tests for clarity, type safety and realism [#5268](https://github.com/open-telemetry/opentelemetry-js/pull/5268)
 * refactor(sdk-metrics): remove `Gauge` and `MetricAdvice` workaround types in favor of the upstream `@opentelemetry/api` types [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
 * chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
 * refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna

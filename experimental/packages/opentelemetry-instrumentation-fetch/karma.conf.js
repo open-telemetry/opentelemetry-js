@@ -17,8 +17,14 @@
 const karmaWebpackConfig = require('../../../karma.webpack');
 const karmaBaseConfig = require('../../../karma.base');
 
-module.exports = (config) => {
-  config.set(Object.assign({}, karmaBaseConfig, {
-    webpack: karmaWebpackConfig
-  }))
+module.exports = config => {
+  config.set(
+    Object.assign({}, karmaBaseConfig, {
+      proxies: {
+        '/mockServiceWorker.js': '/base/test/mockServiceWorker.js',
+      },
+      files: [...karmaBaseConfig.files, 'test/mockServiceWorker.js'],
+      webpack: karmaWebpackConfig,
+    })
+  );
 };
