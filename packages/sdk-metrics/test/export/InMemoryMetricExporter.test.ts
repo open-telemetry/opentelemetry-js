@@ -126,7 +126,7 @@ describe('InMemoryMetricExporter', () => {
     await exporter.shutdown();
 
     const otherMetrics = exporter.getMetrics();
-    assert.ok(otherMetrics.length === 0);
+    assert.strictEqual(otherMetrics.length, 0);
 
     await metricReader.shutdown();
   });
