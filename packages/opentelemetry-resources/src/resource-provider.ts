@@ -13,15 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Resource } from './Resource';
 
-export const isPromiseLike = <R>(val: unknown): val is PromiseLike<R> => {
-  return (
-    val !== null &&
-    typeof val === 'object' &&
-    typeof Object.getOwnPropertyDescriptor(val, 'then')?.value === 'function'
-  );
-};
+/**
+ * A Registry which provides the {@link Resource} to the SDK.
+ *
+ * Note: this does not do much initially, but eventually will be extended for resource mutation over time.
+ * */
+export class ResourceProvider {
+  private _resource: Resource;
 
-export function identity<T>(_: T): T {
-  return _;
+  constructor(resource: Resource) {
+    this._resource = resource;
+  }
+
+  /**
+   * Provides the currently discovered {@link Resource}.
+   *
+   * @return the Resource.
+   */
+  getResource(): Resource {
+    return this._resource;
+  }
 }

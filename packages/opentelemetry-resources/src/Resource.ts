@@ -35,6 +35,7 @@ export class Resource implements IResource {
   private _syncAttributes?: ResourceAttributes;
   private _asyncAttributesPromise?: Promise<ResourceAttributes>;
   private _attributes?: ResourceAttributes;
+  // public entityRefs: EntityRef[] = [];
 
   /**
    * Check if async attributes have resolved. This is useful to avoid awaiting
@@ -76,6 +77,7 @@ export class Resource implements IResource {
     asyncAttributesPromise?: Promise<ResourceAttributes>
   ) {
     this._attributes = attributes;
+
     this.asyncAttributesPending = asyncAttributesPromise != null;
     this._syncAttributes = this._attributes ?? {};
     this._asyncAttributesPromise = asyncAttributesPromise?.then(

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// import { EntityRef } from './entity';
 import { ResourceAttributes } from './types';
 
 /**
@@ -41,6 +42,8 @@ export interface IResource {
    * has finished.
    */
   waitForAsyncAttributes?(): Promise<void>;
+
+  // readonly entityRefs: EntityRef[];
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource

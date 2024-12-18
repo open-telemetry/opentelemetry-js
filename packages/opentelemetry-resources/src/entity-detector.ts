@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Entity } from './entity';
 
-export const isPromiseLike = <R>(val: unknown): val is PromiseLike<R> => {
-  return (
-    val !== null &&
-    typeof val === 'object' &&
-    typeof Object.getOwnPropertyDescriptor(val, 'then')?.value === 'function'
-  );
-};
-
-export function identity<T>(_: T): T {
-  return _;
+/*
+ * The Entity detector in the SDK is responsible for detecting possible entities that could identify
+ * the SDK (called "associated entities"). For Example, if the SDK is running in a kubernetes pod,
+ * it may provide an Entity for that pod.
+ */
+export interface EntityDetector {
+  /**
+   * Discovers {@link Entity} and their current attributes.
+   *
+   * @return a list of discovered entities.
+   */
+  detectEntities(): Entity[];
 }
