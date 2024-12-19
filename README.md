@@ -161,17 +161,18 @@ The below table describes which versions of each set of packages are expected to
 
 | Stable Packages | Experimental Packages |
 |-----------------|-----------------------|
+| 1.30.x          | 0.57.x                |
 | 1.29.x          | 0.56.x                |
 | 1.28.x          | 0.55.x                |
 | 1.27.x          | 0.54.x                |
 | 1.25.x          | 0.52.x                |
-| 1.24.x          | 0.51.x                |
 
 <details>
 <summary>Older version compatibility matrix</summary>
 
 <table>
 <tr><th>Stable Packages</th>                            <th>Experimental Packages</th></tr>
+<tr><td>1.24.x</td>                                                    <td>0.51.x</td></tr>
 <tr><td>1.23.x</td>                                                    <td>0.50.x</td></tr>
 <tr><td>1.22.x</td>                                                    <td>0.49.x</td></tr>
 <tr><td>1.21.x</td>                                                    <td>0.48.x</td></tr>
