@@ -24,10 +24,10 @@ import {
 import {
   DataPointType,
   ExponentialHistogramMetricData,
+  InstrumentType,
   MetricDescriptor,
 } from '../export/MetricData';
 import { diag, HrTime } from '@opentelemetry/api';
-import { InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Buckets } from './exponential-histogram/Buckets';

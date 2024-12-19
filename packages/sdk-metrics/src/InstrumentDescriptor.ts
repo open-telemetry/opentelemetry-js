@@ -22,19 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { View } from './view/View';
 import { equalsCaseInsensitive } from './utils';
-
-/**
- * Supported types of metric instruments.
- */
-export enum InstrumentType {
-  COUNTER = 'COUNTER',
-  GAUGE = 'GAUGE',
-  HISTOGRAM = 'HISTOGRAM',
-  UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
-  OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
-  OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
-  OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
-}
+import { InstrumentType, MetricDescriptor } from './export/MetricData';
 
 /**
  * An internal interface describing the instrument.
@@ -42,12 +30,7 @@ export enum InstrumentType {
  * This is intentionally distinguished from the public MetricDescriptor (a.k.a. InstrumentDescriptor)
  * which may not contains internal fields like metric advice.
  */
-export interface InstrumentDescriptor {
-  readonly name: string;
-  readonly description: string;
-  readonly unit: string;
-  readonly type: InstrumentType;
-  readonly valueType: ValueType;
+export interface InstrumentDescriptor extends MetricDescriptor {
   /**
    * See {@link MetricAdvice}
    *

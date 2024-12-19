@@ -11,6 +11,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
+* feat(sdk-metrics)!: drop deprecated `InstrumentDescriptor` type; use `MetricDescriptor` instead [#5277](https://github.com/open-telemetry/opentelemetry-js/pull/5266)
 * feat(sdk-metrics)!: bump minimum version of `@opentelemetry/api` peer dependency to 1.9.0 [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
 * chore(shim-opentracing): replace deprecated SpanAttributes [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430) @JamieDanielson
 * chore(otel-core): replace deprecated SpanAttributes [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408) @JamieDanielson
@@ -33,6 +34,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :house: (Internal)
 
+* refactor(sdk-metrics): the internal `InstrumentDescriptor` type now extends `MetricDescriptor`; moved public `InstrumentType` type enum into `./src/export/MetricData.ts` [#5277](https://github.com/open-telemetry/opentelemetry-js/pull/5266)
 * refactor(sdk-metrics): remove `Gauge` and `MetricAdvice` workaround types in favor of the upstream `@opentelemetry/api` types [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
 * chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
 * refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
