@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone-peer-dep",
-  "version": "1.29.0",
+  "version": "1.30.0",
   "description": "OpenTelemetry Context Zone with peer dependency for zone.js",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -33,7 +33,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "files": [
     "build/esm/**/*.js",

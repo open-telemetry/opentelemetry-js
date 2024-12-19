@@ -43,7 +43,7 @@ export function assertAggregationSelector(
   expectedSelector: AggregationSelector
 ) {
   for (const instrumentType of instrumentTypes) {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       reader.selectAggregation?.(instrumentType),
       expectedSelector(instrumentType),
       `incorrect aggregation selection for ${InstrumentType[instrumentType]}`

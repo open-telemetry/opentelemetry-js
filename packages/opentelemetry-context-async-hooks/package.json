@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "1.29.0",
+  "version": "1.30.0",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -30,7 +30,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "files": [
     "build/src/**/*.js",

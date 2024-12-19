@@ -23,8 +23,8 @@ import {
   SpanKind,
   TraceFlags,
   HrTime,
-  SpanAttributes,
-  SpanAttributeValue,
+  Attributes,
+  AttributeValue,
 } from '@opentelemetry/api';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
@@ -42,6 +42,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
+import { SpanImpl } from '../../src/Span';
 import { invalidAttributes, validAttributes } from './util';
 
 const performanceTimeOrigin: HrTime = [1, 1];
@@ -76,25 +77,31 @@ describe('Span', () => {
   };
 
   it('should create a Span instance', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
-    assert.ok(span instanceof Span);
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
+    assert.ok(span instanceof SpanImpl);
     span.end();
   });
 
   it('should have valid startTime', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     assert.ok(
       hrTimeToMilliseconds(span.startTime) >
         hrTimeToMilliseconds(performanceTimeOrigin)
@@ -102,13 +109,16 @@ describe('Span', () => {
   });
 
   it('should have valid endTime', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.end();
     assert.ok(
       hrTimeToNanoseconds(span.endTime) >= hrTimeToNanoseconds(span.startTime),
@@ -123,25 +133,31 @@ describe('Span', () => {
   });
 
   it('should have a duration', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.end();
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
   });
 
   it('should ensure duration is never negative even if provided with inconsistent times', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
     span['_performanceOffset'] = 0;
     span.end(hrTimeToMilliseconds(span.startTime) - 1);
@@ -149,13 +165,16 @@ describe('Span', () => {
   });
 
   it('should have valid event.time', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.addEvent('my-event');
     assert.ok(
       hrTimeToMilliseconds(span.events[0].time) >
@@ -165,16 +184,17 @@ describe('Span', () => {
 
   it('should have an entered time for event', () => {
     const startTime = Date.now();
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER,
-      undefined,
-      [],
-      startTime
-    );
+      name,
+      kind: SpanKind.SERVER,
+      startTime,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     const eventTimeMS = 123;
     const spanStartTime = hrTimeToMilliseconds(span.startTime);
     const eventTime = spanStartTime + eventTimeMS;
@@ -188,16 +208,17 @@ describe('Span', () => {
   describe('when 2nd param is "TimeInput" type', () => {
     it('should have an entered time for event - ', () => {
       const startTime = Date.now();
-      const span = new Span(
-        tracer,
-        ROOT_CONTEXT,
-        name,
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.SERVER,
-        undefined,
-        [],
-        startTime
-      );
+        name,
+        kind: SpanKind.SERVER,
+        startTime,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       const eventTimeMS = 123;
       const spanStartTime = hrTimeToMilliseconds(span.startTime);
       const eventTime = spanStartTime + eventTimeMS;
@@ -210,13 +231,16 @@ describe('Span', () => {
   });
 
   it('should get the span context of span', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     const context = span.spanContext();
     assert.strictEqual(context.traceId, spanContext.traceId);
     assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
@@ -228,24 +252,30 @@ describe('Span', () => {
 
   describe('isRecording', () => {
     it('should return true when span is not ended', () => {
-      const span = new Span(
-        tracer,
-        ROOT_CONTEXT,
-        name,
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       assert.ok(span.isRecording());
       span.end();
     });
     it('should return false when span is ended', () => {
-      const span = new Span(
-        tracer,
-        ROOT_CONTEXT,
-        name,
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       span.end();
       assert.ok(span.isRecording() === false);
     });
@@ -254,32 +284,38 @@ describe('Span', () => {
   describe('setAttribute', () => {
     describe('when default options set', () => {
       it('should set an attribute', () => {
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         for (const [k, v] of Object.entries(validAttributes)) {
           span.setAttribute(k, v);
         }
         for (const [k, v] of Object.entries(invalidAttributes)) {
-          span.setAttribute(k, v as unknown as SpanAttributeValue);
+          span.setAttribute(k, v as unknown as AttributeValue);
         }
 
         assert.deepStrictEqual(span.attributes, validAttributes);
       });
 
       it('should be able to overwrite attributes', () => {
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         span.setAttribute('overwrite', 'initial value');
         span.setAttribute('overwrite', 'overwritten value');
@@ -299,13 +335,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
         }
@@ -331,13 +370,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         it('should truncate value which length exceeds this limit', () => {
           span.setAttribute('attr-with-more-length', 'abcdefgh');
@@ -375,18 +417,17 @@ describe('Span', () => {
         });
 
         it('should truncate value when attributes are passed to the constructor', () => {
-          const span = new Span(
-            tracer,
-            ROOT_CONTEXT,
-            name,
+          const span = new SpanImpl({
+            scope: tracer.instrumentationLibrary,
+            resource: tracer['_resource'],
+            context: ROOT_CONTEXT,
             spanContext,
-            SpanKind.CLIENT,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            { 'attr-with-more-length': 'abcdefgh' }
-          );
+            name,
+            kind: SpanKind.CLIENT,
+            spanLimits: tracer.getSpanLimits(),
+            spanProcessor: tracer['_spanProcessor'],
+            attributes: { 'attr-with-more-length': 'abcdefgh' },
+          });
           assert.strictEqual(span.attributes['attr-with-more-length'], 'abcde');
         });
       });
@@ -399,13 +440,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         it('should not truncate any value', () => {
           span.setAttribute('attr-not-truncate', 'abcdefgh');
@@ -436,13 +480,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
         }
@@ -464,13 +511,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         it('should truncate value which length exceeds this limit', () => {
           span.setAttribute('attr-with-more-length', 'abcdefgh');
@@ -516,13 +566,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         it('should not truncate any value', () => {
           span.setAttribute('attr-not-truncate', 'abcdefgh');
@@ -556,13 +609,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
         }
@@ -588,13 +644,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
         }
@@ -624,13 +683,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         it('should truncate value which length exceeds span limit', () => {
           span.setAttribute('attr-with-more-length', 'abcdefgh');
@@ -680,13 +742,16 @@ describe('Span', () => {
           },
         }).getTracer('default');
 
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
 
         it('should not truncate value', () => {
           span.setAttribute('attr-with-more-length', 'abcdefghijklmn');
@@ -726,16 +791,19 @@ describe('Span', () => {
 
   describe('setAttributes', () => {
     it('should be able to set multiple attributes', () => {
-      const span = new Span(
-        tracer,
-        ROOT_CONTEXT,
-        name,
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
 
       span.setAttributes(validAttributes);
-      span.setAttributes(invalidAttributes as unknown as SpanAttributes);
+      span.setAttributes(invalidAttributes as unknown as Attributes);
 
       assert.deepStrictEqual(span.attributes, validAttributes);
     });
@@ -743,30 +811,36 @@ describe('Span', () => {
 
   describe('addEvent', () => {
     it('should add an event', () => {
-      const span = new Span(
-        tracer,
-        ROOT_CONTEXT,
-        name,
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       span.addEvent('sent');
       span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
       span.end();
     });
 
     it('should sanitize attribute values', () => {
-      const span = new Span(
-        tracer,
-        ROOT_CONTEXT,
-        name,
+      const span = new SpanImpl({
+        scope: tracer.instrumentationLibrary,
+        resource: tracer['_resource'],
+        context: ROOT_CONTEXT,
         spanContext,
-        SpanKind.CLIENT
-      );
+        name,
+        kind: SpanKind.CLIENT,
+        spanLimits: tracer.getSpanLimits(),
+        spanProcessor: tracer['_spanProcessor'],
+      });
       span.addEvent('rev', {
         ...validAttributes,
         ...invalidAttributes,
-      } as unknown as SpanAttributes);
+      } as unknown as Attributes);
       span.end();
 
       assert.strictEqual(span.events.length, 1);
@@ -776,13 +850,16 @@ describe('Span', () => {
   });
 
   it('should drop extra events', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
 
     const debugStub = sinon.spy(diag, 'debug');
     const warnStub = sinon.spy(diag, 'warn');
@@ -803,13 +880,16 @@ describe('Span', () => {
   });
 
   it('should store the count of dropped events in droppedEventsCount', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     for (let i = 0; i < 150; i++) {
       span.addEvent('sent' + i);
     }
@@ -825,13 +905,16 @@ describe('Span', () => {
       },
     }).getTracer('default');
 
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     for (let i = 0; i < 10; i++) {
       span.addEvent('sent' + i);
     }
@@ -841,13 +924,16 @@ describe('Span', () => {
   });
 
   it('should set an error status', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.setStatus({
       code: SpanStatusCode.ERROR,
       message: 'This is an error',
@@ -860,13 +946,16 @@ describe('Span', () => {
 
   it('should drop non-string status message', function () {
     const warnStub = sinon.spy(diag, 'warn');
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.setStatus({
       code: SpanStatusCode.ERROR,
       message: new Error('this is not a string') as any,
@@ -883,14 +972,17 @@ describe('Span', () => {
 
   it('should return ReadableSpan', () => {
     const parentId = '5c1c63257de34c67';
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      'my-span',
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.INTERNAL,
-      parentId
-    );
+      name: 'my-span',
+      kind: SpanKind.INTERNAL,
+      parentSpanId: parentId,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
 
     assert.strictEqual(span.name, 'my-span');
     assert.strictEqual(span.kind, SpanKind.INTERNAL);
@@ -910,13 +1002,16 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with attributes', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      'my-span',
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name: 'my-span',
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.setAttribute('attr1', 'value1');
     assert.deepStrictEqual(span.attributes, { attr1: 'value1' });
 
@@ -936,21 +1031,23 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with links', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      'my-span',
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT,
-      undefined,
-      [
+      name: 'my-span',
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+      links: [
         { context: linkContext },
         {
           context: linkContext,
           attributes: { attr1: 'value', attr2: 123, attr3: true },
         },
-      ]
-    );
+      ],
+    });
     assert.strictEqual(span.links.length, 2);
     assert.deepStrictEqual(span.links, [
       {
@@ -966,13 +1063,16 @@ describe('Span', () => {
   });
 
   it('should be possible to add a link after span creation', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      'my-span',
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CONSUMER
-    );
+      name: 'my-span',
+      kind: SpanKind.CONSUMER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
 
     span.addLink({ context: linkContext });
 
@@ -987,13 +1087,16 @@ describe('Span', () => {
   });
 
   it('should be possible to add multiple links after span creation', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      'my-span',
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CONSUMER
-    );
+      name: 'my-span',
+      kind: SpanKind.CONSUMER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
 
     span.addLinks([
       { context: linkContext },
@@ -1018,13 +1121,16 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with events', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      'my-span',
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name: 'my-span',
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.addEvent('sent');
     assert.strictEqual(span.events.length, 1);
     const [event] = span.events;
@@ -1053,13 +1159,16 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with new status', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.CLIENT
-    );
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.setStatus({
       code: SpanStatusCode.ERROR,
       message: 'This is an error',
@@ -1077,13 +1186,16 @@ describe('Span', () => {
   });
 
   it('should only end a span once', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     const endTime = Date.now();
     span.end(endTime);
     span.end(endTime + 10);
@@ -1091,13 +1203,16 @@ describe('Span', () => {
   });
 
   it('should update name', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     span.updateName('foo-span');
     span.end();
 
@@ -1107,13 +1222,16 @@ describe('Span', () => {
   });
 
   it('should have ended', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
+    const span = new SpanImpl({
+      scope: tracer.instrumentationLibrary,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
       spanContext,
-      SpanKind.SERVER
-    );
+      name,
+      kind: SpanKind.SERVER,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
     assert.strictEqual(span.ended, false);
     span.end();
     assert.strictEqual(span.ended, true);
@@ -1131,9 +1249,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       provider.getTracer('default').startSpan('test');
       assert.ok(started);
@@ -1150,9 +1268,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       provider
         .getTracer('default')
@@ -1171,9 +1289,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       provider.getTracer('default').startSpan('test').end();
       assert.ok(ended);
@@ -1189,9 +1307,9 @@ describe('Span', () => {
         shutdown: () => Promise.resolve(),
       };
 
-      const provider = new BasicTracerProvider();
-
-      provider.addSpanProcessor(processor);
+      const provider = new BasicTracerProvider({
+        spanProcessors: [processor],
+      });
 
       const s = provider.getTracer('default').startSpan('test') as Span;
       assert.ok(s.attributes.attr);
@@ -1211,13 +1329,16 @@ describe('Span', () => {
     invalidExceptions.forEach(key => {
       describe(`when exception is (${JSON.stringify(key)})`, () => {
         it('should NOT record an exception', () => {
-          const span = new Span(
-            tracer,
-            ROOT_CONTEXT,
-            name,
+          const span = new SpanImpl({
+            scope: tracer.instrumentationLibrary,
+            resource: tracer['_resource'],
+            context: ROOT_CONTEXT,
             spanContext,
-            SpanKind.CLIENT
-          );
+            name,
+            kind: SpanKind.CLIENT,
+            spanLimits: tracer.getSpanLimits(),
+            spanProcessor: tracer['_spanProcessor'],
+          });
           assert.strictEqual(span.events.length, 0);
           span.recordException(key);
           assert.strictEqual(span.events.length, 0);
@@ -1231,13 +1352,16 @@ describe('Span', () => {
         error = 'boom';
       });
       it('should record an exception', () => {
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
         assert.strictEqual(span.events.length, 0);
         span.recordException(error);
 
@@ -1264,13 +1388,16 @@ describe('Span', () => {
       describe(`when exception type is an object with ${errorObj.description}`, () => {
         const error: Exception = errorObj.obj;
         it('should record an exception', () => {
-          const span = new Span(
-            tracer,
-            ROOT_CONTEXT,
-            name,
+          const span = new SpanImpl({
+            scope: tracer.instrumentationLibrary,
+            resource: tracer['_resource'],
+            context: ROOT_CONTEXT,
             spanContext,
-            SpanKind.CLIENT
-          );
+            name,
+            kind: SpanKind.CLIENT,
+            spanLimits: tracer.getSpanLimits(),
+            spanProcessor: tracer['_spanProcessor'],
+          });
           assert.strictEqual(span.events.length, 0);
           span.recordException(error);
 
@@ -1294,13 +1421,16 @@ describe('Span', () => {
 
     describe('when time is provided', () => {
       it('should record an exception with provided time', () => {
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
         // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
         span['_performanceOffset'] = 0;
         assert.strictEqual(span.events.length, 0);
@@ -1312,13 +1442,16 @@ describe('Span', () => {
 
     describe('when exception code is numeric', () => {
       it('should record an exception with string value', () => {
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+        });
         assert.strictEqual(span.events.length, 0);
         span.recordException({ code: 12 });
         const event = span.events[0];
@@ -1330,18 +1463,17 @@ describe('Span', () => {
 
     describe('when attributes are specified', () => {
       it('should store specified attributes', () => {
-        const span = new Span(
-          tracer,
-          ROOT_CONTEXT,
-          name,
+        const span = new SpanImpl({
+          scope: tracer.instrumentationLibrary,
+          resource: tracer['_resource'],
+          context: ROOT_CONTEXT,
           spanContext,
-          SpanKind.CLIENT,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          { foo: 'bar' }
-        );
+          name,
+          kind: SpanKind.CLIENT,
+          spanLimits: tracer.getSpanLimits(),
+          spanProcessor: tracer['_spanProcessor'],
+          attributes: { foo: 'bar' },
+        });
         assert.deepStrictEqual(span.attributes, { foo: 'bar' });
       });
     });

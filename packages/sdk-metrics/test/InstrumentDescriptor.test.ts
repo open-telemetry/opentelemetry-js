@@ -18,10 +18,10 @@ import * as assert from 'assert';
 import {
   createInstrumentDescriptor,
   InstrumentDescriptor,
-  InstrumentType,
   isValidName,
   isDescriptorCompatibleWith,
 } from '../src/InstrumentDescriptor';
+import { InstrumentType } from '../src';
 import { invalidNames, validNames } from './util';
 import { ValueType } from '@opentelemetry/api';
 

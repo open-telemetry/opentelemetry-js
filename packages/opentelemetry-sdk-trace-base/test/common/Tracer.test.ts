@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  SpanAttributes,
+  Attributes,
   Context,
   context,
   createContextKey,
@@ -65,7 +65,7 @@ describe('Tracer', () => {
       _traceId: string,
       _spanName: string,
       _spanKind: SpanKind,
-      attributes: SpanAttributes,
+      attributes: Attributes,
       links: Link[]
     ) {
       // The attributes object should be valid.
@@ -82,7 +82,7 @@ describe('Tracer', () => {
           testAttribute: 'foobar',
           // invalid attributes should be sanitized.
           ...invalidAttributes,
-        } as unknown as SpanAttributes,
+        } as unknown as Attributes,
         traceState: this.traceState,
       };
     }
@@ -114,7 +114,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     assert.ok(tracer instanceof Tracer);
   });
@@ -123,7 +124,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     assert.strictEqual(
       tracer['_sampler'].toString(),
@@ -135,7 +137,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOffSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span1');
     assert.ok(!span.isRecording());
@@ -146,7 +149,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new AlwaysOnSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span2');
     assert.ok(span.isRecording());
@@ -157,7 +161,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('span3');
     assert.strictEqual((span as Span).attributes.testAttribute, 'foobar');
@@ -169,7 +174,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler(traceState) },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('stateSpan');
     assert.strictEqual(span.spanContext().traceState, traceState);
@@ -179,7 +185,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const lib: InstrumentationLibrary = tracer.instrumentationLibrary;
@@ -195,7 +202,8 @@ describe('Tracer', () => {
       const tracer = new Tracer(
         { name: 'default', version: '0.0.1' },
         { sampler: new TestSampler() },
-        tracerProvider
+        tracerProvider['_resource'],
+        tracerProvider['_activeSpanProcessor']
       );
 
       const span = tracer.startSpan('span3', undefined, context);
@@ -218,7 +226,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan(
       'aSpan',
@@ -239,7 +248,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan(
       'aSpan',
@@ -259,12 +269,18 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider();
-    tp.addSpanProcessor(sp);
+    const tp = new BasicTracerProvider({
+      spanProcessors: [sp],
+    });
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer({ name: 'default' }, { sampler }, tp);
+    const tracer = new Tracer(
+      { name: 'default' },
+      { sampler },
+      tp['_resource'],
+      tp['_activeSpanProcessor']
+    );
     const span = tracer.startSpan('a', {}, context) as Span;
     assert.strictEqual(span.parentSpanId, parent.spanId);
     sinon.assert.calledOnceWithExactly(
@@ -289,12 +305,18 @@ describe('Tracer', () => {
 
     const sp: SpanProcessor = new DummySpanProcessor();
     const onStartSpy = sinon.spy(sp, 'onStart');
-    const tp = new BasicTracerProvider();
-    tp.addSpanProcessor(sp);
+    const tp = new BasicTracerProvider({
+      spanProcessors: [sp],
+    });
 
     const sampler: Sampler = new AlwaysOnSampler();
     const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
-    const tracer = new Tracer({ name: 'default' }, { sampler }, tp);
+    const tracer = new Tracer(
+      { name: 'default' },
+      { sampler },
+      tp['_resource'],
+      tp['_activeSpanProcessor']
+    );
     const span = tracer.startSpan('a', { root: true }, context) as Span;
     assert.strictEqual(span.parentSpanId, undefined);
     sinon.assert.calledOnce(shouldSampleSpy);
@@ -311,7 +333,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('my-span');
     const context = span.spanContext();
@@ -325,7 +348,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('my-span');
     const context = span.spanContext();
@@ -339,7 +363,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
     const span = tracer.startSpan('my-span');
     const context = span.spanContext();
@@ -351,7 +376,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const spy = sinon.spy(tracer, 'startSpan');
@@ -374,7 +400,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const spy = sinon.spy(tracer, 'startSpan');
@@ -401,7 +428,8 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const ctxKey = createContextKey('foo');
@@ -436,13 +464,14 @@ describe('Tracer', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
-      tracerProvider
+      tracerProvider['_resource'],
+      tracerProvider['_activeSpanProcessor']
     );
 
     const attributes = {
       ...validAttributes,
       ...invalidAttributes,
-    } as unknown as SpanAttributes;
+    } as unknown as Attributes;
     const links = [
       {
         context: {

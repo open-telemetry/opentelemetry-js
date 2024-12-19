@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.29.0",
+  "version": "1.30.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -23,7 +23,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "prepublishOnly": "npm run compile",

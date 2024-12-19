@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { AggregationTemporality } from './AggregationTemporality';
-import { ResourceMetrics } from './MetricData';
 import { ExportResult } from '@opentelemetry/core';
-import { InstrumentType } from '../InstrumentDescriptor';
-import { Aggregation } from '../view/Aggregation';
+import { AggregationTemporality } from './AggregationTemporality';
+import { InstrumentType, ResourceMetrics } from './MetricData';
+import { AggregationOption } from '../view/AggregationOption';
 
 /**
  * An interface that allows different metric services to export recorded data
@@ -55,7 +54,7 @@ export interface PushMetricExporter {
    * Select the {@link Aggregation} for the given
    * {@link InstrumentType} for this exporter.
    */
-  selectAggregation?(instrumentType: InstrumentType): Aggregation;
+  selectAggregation?(instrumentType: InstrumentType): AggregationOption;
 
   /**
    * Returns a promise which resolves when the last exportation is completed.
