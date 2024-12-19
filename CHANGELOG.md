@@ -28,6 +28,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat(web): add session handling implementation [5173](https://github.com/open-telemetry/opentelemetry-js/pull/5173)
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
