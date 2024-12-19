@@ -9,7 +9,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
 * feat(oltp-transformer)!: move each serializer to its own entrypoint [#5263](https://github.com/open-telemetry/opentelemetry-js/pull/5263) @pichlermarc
   * This package depends on all signals, as well as `protobuf.js`, so some bundlers like rollup would issue warnings even if the user made a conscious decision to not use a protobuf exporter
   * (user-facing) All types except for `ISerializer` were removed from the main entrypoint, to get previously exported types, use the following entrypoints
