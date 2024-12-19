@@ -36,27 +36,6 @@ export interface MeterProviderOptions {
   resource?: IResource;
   views?: ViewOptions[];
   readers?: MetricReader[];
-  /**
-   * Merge resource with {@link Resource.default()}?
-   * Default: {@code true}
-   */
-  mergeResourceWithDefaults?: boolean;
-}
-
-/**
- * @param mergeWithDefaults
- * @param providedResource
- */
-function prepareResource(
-  mergeWithDefaults: boolean,
-  providedResource: Resource | undefined
-) {
-  const resource = providedResource ?? Resource.empty();
-
-  if (mergeWithDefaults) {
-    return Resource.default().merge(resource);
-  }
-  return resource;
 }
 
 /**
@@ -68,10 +47,7 @@ export class MeterProvider implements IMeterProvider {
 
   constructor(options?: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(
-      prepareResource(
-        options?.mergeResourceWithDefaults ?? true,
-        options?.resource
-      )
+      options?.resource ?? Resource.default()
     );
     if (options?.views != null && options.views.length > 0) {
       for (const viewOption of options.views) {

@@ -932,25 +932,12 @@ describe('BasicTracerProvider', () => {
       assert.deepStrictEqual(tracerProvider['_resource'], Resource.default());
     });
 
-    it('should not merge with defaults when flag is set to false', function () {
-      const expectedResource = new Resource({ foo: 'bar' });
-      const tracerProvider = new BasicTracerProvider({
-        mergeResourceWithDefaults: false,
-        resource: expectedResource,
-      });
-      assert.deepStrictEqual(tracerProvider['_resource'], expectedResource);
-    });
-
-    it('should merge with defaults when flag is set to true', function () {
+    it('should use not use the default if resource passed', function () {
       const providedResource = new Resource({ foo: 'bar' });
       const tracerProvider = new BasicTracerProvider({
-        mergeResourceWithDefaults: true,
         resource: providedResource,
       });
-      assert.deepStrictEqual(
-        tracerProvider['_resource'],
-        Resource.default().merge(providedResource)
-      );
+      assert.deepStrictEqual(tracerProvider['_resource'], providedResource);
     });
   });
 
