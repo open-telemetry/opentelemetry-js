@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { InstrumentType } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
+import { InstrumentType } from './MetricData';
 import { AggregationOption, AggregationType } from '../view/AggregationOption';
 
 /**

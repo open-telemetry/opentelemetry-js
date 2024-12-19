@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { AggregationTemporality } from './AggregationTemporality';
-import { ResourceMetrics } from './MetricData';
 import { ExportResult } from '@opentelemetry/core';
-import { InstrumentType } from '../InstrumentDescriptor';
+import { AggregationTemporality } from './AggregationTemporality';
+import { InstrumentType, ResourceMetrics } from './MetricData';
 import { AggregationOption } from '../view/AggregationOption';
 
 /**
