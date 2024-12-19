@@ -80,12 +80,12 @@
     "@types/node": "18.6.5",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
-    "typescript": "4.4.4"
+    "typescript": "5.0.4"
   },
   "Add these to devDependencies for testing": {
     "@types/mocha": "9.1.1",
     "@types/sinon": "10.0.13",
-    "mocha": "10.0.0",
+    "mocha": "10.7.3",
     "nyc": "15.1.0",
     "sinon": "15.0.0"
   },
