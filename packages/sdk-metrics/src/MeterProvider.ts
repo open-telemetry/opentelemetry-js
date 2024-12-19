@@ -106,7 +106,7 @@ export class MeterProvider implements IMeterProvider {
   }
 
   /**
-   * Flush all buffered data and shut down the MeterProvider and all registered
+   * Shut down the MeterProvider and all registered
    * MetricReaders.
    *
    * Returns a promise which is resolved when all flushes are complete.
