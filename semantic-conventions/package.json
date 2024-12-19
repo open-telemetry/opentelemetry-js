@@ -20,16 +20,6 @@
       "default": "./build/src/index-incubating.js"
     }
   },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/src/index.d.ts"
-      ],
-      "incubating": [
-        "./build/src/index-incubating.d.ts"
-      ]
-    }
-  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",

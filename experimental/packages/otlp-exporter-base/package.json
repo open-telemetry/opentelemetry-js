@@ -26,19 +26,6 @@
       "default": "./build/src/index-browser-http.js"
     }
   },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/src/index.d.ts"
-      ],
-      "node-http": [
-        "./build/src/index-node-http.d.ts"
-      ],
-      "browser-http": [
-        "./build/src/index-browser-http.d.ts"
-      ]
-    }
-  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
