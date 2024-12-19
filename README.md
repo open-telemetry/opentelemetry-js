@@ -121,8 +121,6 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 | Node.JS `v22`       | :heavy_check_mark:                            |
 | Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
-| Node.JS `v16`       | :heavy_check_mark:                            |
-| Node.JS `v14`       | :heavy_check_mark:                            |
 | Older Node Versions | See [Node Support](#node-support)             |
 | Web Browsers        | See [Browser Support](#browser-support) below |
 
@@ -130,8 +128,6 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 Only Node.js Active or Maintenance LTS versions are supported.
 Previous versions of node *may* work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
-Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the
-`perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
 
@@ -161,17 +157,18 @@ The below table describes which versions of each set of packages are expected to
 
 | Stable Packages | Experimental Packages |
 |-----------------|-----------------------|
+| 1.30.x          | 0.57.x                |
 | 1.29.x          | 0.56.x                |
 | 1.28.x          | 0.55.x                |
 | 1.27.x          | 0.54.x                |
 | 1.25.x          | 0.52.x                |
-| 1.24.x          | 0.51.x                |
 
 <details>
 <summary>Older version compatibility matrix</summary>
 
 <table>
 <tr><th>Stable Packages</th>                            <th>Experimental Packages</th></tr>
+<tr><td>1.24.x</td>                                                    <td>0.51.x</td></tr>
 <tr><td>1.23.x</td>                                                    <td>0.50.x</td></tr>
 <tr><td>1.22.x</td>                                                    <td>0.49.x</td></tr>
 <tr><td>1.21.x</td>                                                    <td>0.48.x</td></tr>
