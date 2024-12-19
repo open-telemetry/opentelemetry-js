@@ -263,6 +263,23 @@ describe('PeriodicExportingMetricReader', () => {
     });
   });
 
+  it('should not export without populated scope metrics', async () => {
+    const exporter = new TestMetricExporter();
+    const reader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 30,
+      exportTimeoutMillis: 20,
+    });
+
+    reader.setMetricProducer(
+      new TestMetricProducer()
+    );
+    const result = await exporter.forceFlush();
+
+    assert.deepStrictEqual(result, undefined);
+    await reader.shutdown();
+  });
+
   describe('periodic export', () => {
     it('should keep running on export errors', async () => {
       const exporter = new TestMetricExporter();

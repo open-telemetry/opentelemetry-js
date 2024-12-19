@@ -30,6 +30,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. []() @jacksonweber
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
