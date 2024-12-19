@@ -41,8 +41,8 @@ function prepareResource(
 }
 
 export class LoggerProvider implements logsAPI.LoggerProvider {
-  private _shutdownOnce: BindOnceFuture<void>;
-  private readonly _sharedState: LoggerProviderSharedState;
+  protected _shutdownOnce: BindOnceFuture<void>;
+  protected readonly _sharedState: LoggerProviderSharedState;
 
   constructor(config: LoggerProviderConfig = {}) {
     const mergedConfig = merge({}, loadDefaultConfig(), config);
