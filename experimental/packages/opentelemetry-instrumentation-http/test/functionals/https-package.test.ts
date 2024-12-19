@@ -38,7 +38,7 @@ import * as superagent from 'superagent';
 // Temporarily removed. See https://github.com/open-telemetry/opentelemetry-js/issues/3344
 // import * as got from 'got';
 import * as nock from 'nock';
-import axios, { AxiosResponse } from 'axios';
+import * as axios from 'axios';
 
 const memoryExporter = new InMemorySpanExporter();
 const customAttributeFunction = (span: Span): void => {
@@ -96,7 +96,7 @@ describe('Packages', () => {
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
-          const res = result as AxiosResponse<unknown>;
+          const res = result as axios.AxiosResponse<unknown>;
           resHeaders = res.headers as any;
         }
         const spans = memoryExporter.getFinishedSpans();

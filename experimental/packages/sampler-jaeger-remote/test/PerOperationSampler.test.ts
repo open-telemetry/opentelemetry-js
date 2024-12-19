@@ -18,7 +18,7 @@ import {
   SamplingDecision,
 } from '@opentelemetry/sdk-trace-base';
 import { PerOperationSampler } from '../src/PerOperationSampler';
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 import * as api from '@opentelemetry/api';
 
 describe('PerOPerationSampler', () => {

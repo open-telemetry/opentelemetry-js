@@ -77,7 +77,7 @@ describe('LogLevelFilter DiagLogger', () => {
 
   const levelMap: Array<{
     message: string;
-    level: DiagLogLevel;
+    level: number;
     ignoreFuncs: Array<keyof DiagLogger>;
   }> = [
     { message: 'ALL', level: DiagLogLevel.ALL, ignoreFuncs: [] },

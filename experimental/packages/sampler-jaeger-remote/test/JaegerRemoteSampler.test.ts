@@ -29,7 +29,7 @@ import { SpanKind } from '@opentelemetry/api';
 import { SamplingStrategyResponse, StrategyType } from '../src/types';
 import { PerOperationSampler } from '../src/PerOperationSampler';
 import { randomSamplingProability } from './utils';
-import axios from 'axios';
+import * as axios from 'axios';
 
 describe('JaegerRemoteSampler', () => {
   const endpoint = 'http://localhost:5778';

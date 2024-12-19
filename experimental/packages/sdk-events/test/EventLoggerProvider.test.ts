@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { EventLogger, EventLoggerProvider } from '../src';
 import { LoggerProvider } from '@opentelemetry/sdk-logs';
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 
 describe('EventLoggerProvider', () => {
   describe('getLogger', () => {

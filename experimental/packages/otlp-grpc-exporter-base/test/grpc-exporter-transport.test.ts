@@ -24,7 +24,7 @@ import {
 import * as assert from 'assert';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 import { Metadata, Server, ServerCredentials } from '@grpc/grpc-js';
 import { types } from 'util';
 import {

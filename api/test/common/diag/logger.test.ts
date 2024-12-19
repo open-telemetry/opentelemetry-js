@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 import { diag, DiagLogLevel } from '../../../src';
 import { createNoopDiagLogger } from '../../../src/diag/internal/noopLogger';
 import { DiagLogger } from '../../../src/diag/types';

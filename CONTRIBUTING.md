@@ -203,6 +203,15 @@ cd packages/opentelemetry-module-name
 npm run watch
 ```
 
+#### TypeScript version & update policy
+
+TypeScript version used to compile the pacakges is `v5.0.4`. If you plan to use any of the packages from this
+repository to make your own application or package instrumentation make sure to use same version or higher.
+
+<!-- Ref: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890 -->
+As update policy OpenTelemetry JS will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window)
+which sets a support window of 2 years.
+
 ### Running tests
 
 Similar to compilations, tests can be run from the root to run all tests or from a single module to run only the tests for that module.
