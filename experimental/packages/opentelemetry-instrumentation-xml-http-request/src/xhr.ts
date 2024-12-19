@@ -21,7 +21,12 @@ import {
   InstrumentationConfig,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import {
+  hrTime,
+  isUrlIgnored,
+  otperformance,
+  urlMatches,
+} from '@opentelemetry/core';
 import {
   SEMATTRS_HTTP_HOST,
   SEMATTRS_HTTP_METHOD,
@@ -75,6 +80,11 @@ export interface XMLHttpRequestInstrumentationConfig
   clearTimingResources?: boolean;
   /** URLs which should include trace headers when origin doesn't match */
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
+  /**
+   * URLs that partially match any regex or exactly match strings in allowUrls
+   * will be traced.
+   */
+  allowUrls?: Array<string | RegExp>;
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
    * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
@@ -328,6 +338,27 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   }
 
   /**
+   * Check if {@param url} should be allowed when comparing against {@param allowedUrls}
+   * @param url
+   * @param allowedUrls
+   */
+  private _isUrlAllowed(
+    url: string,
+    allowedUrls: Array<string | RegExp> | undefined
+  ): boolean {
+    if (!allowedUrls) {
+      return true;
+    }
+
+    for (const allowedUrl of allowedUrls) {
+      if (urlMatches(url, allowedUrl)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Creates a new span when method "open" is called
    * @param xhr
    * @param url
@@ -339,6 +370,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     url: string,
     method: string
   ): api.Span | undefined {
+    if (!this._isUrlAllowed(url, this.getConfig().allowUrls)) {
+      this._diag.debug('ignoring span as url does not match an allowed url');
+      return;
+    }
     if (isUrlIgnored(url, this.getConfig().ignoreUrls)) {
       this._diag.debug('ignoring span as url matches ignored url');
       return;
