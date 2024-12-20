@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentType } from './MetricData';
+
 /**
  * Cardinality Limit selector based on metric instrument types.
  */

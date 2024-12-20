@@ -17,9 +17,21 @@
 import { HrTime, Attributes, ValueType } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { IResource } from '@opentelemetry/resources';
-import { InstrumentType } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
 import { Histogram, ExponentialHistogram } from '../aggregator/types';
+
+/**
+ * Supported types of metric instruments.
+ */
+export enum InstrumentType {
+  COUNTER = 'COUNTER',
+  GAUGE = 'GAUGE',
+  HISTOGRAM = 'HISTOGRAM',
+  UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
+  OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
+  OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
+  OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
+}
 
 export interface MetricDescriptor {
   readonly name: string;

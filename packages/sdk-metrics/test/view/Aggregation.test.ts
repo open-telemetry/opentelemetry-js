@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import { InstrumentType } from '../../src';
 import {
   Aggregator,
   DropAggregator,
@@ -22,10 +23,7 @@ import {
   LastValueAggregator,
   SumAggregator,
 } from '../../src/aggregator';
-import {
-  InstrumentDescriptor,
-  InstrumentType,
-} from '../../src/InstrumentDescriptor';
+import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
 import {
   DefaultAggregation,
   ExplicitBucketHistogramAggregation,

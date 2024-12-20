@@ -24,8 +24,9 @@ import {
   ExponentialHistogramAggregator,
 } from '../aggregator';
 import { Accumulation } from '../aggregator/types';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
+import { InstrumentType } from '../export/MetricData';
 
 /**
  * Configures how measurements are combined into metrics for views.

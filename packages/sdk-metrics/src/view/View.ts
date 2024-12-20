@@ -23,12 +23,12 @@ import {
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { Aggregation } from './Aggregation';
-import { InstrumentType } from '../InstrumentDescriptor';
 import {
   AggregationOption,
   AggregationType,
   toAggregation,
 } from './AggregationOption';
+import { InstrumentType } from '../export/MetricData';
 
 export type ViewOptions = {
   /**

@@ -17,9 +17,8 @@
 import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
-import { CollectionResult } from './MetricData';
+import { CollectionResult, InstrumentType } from './MetricData';
 import { FlatMap, callWithTimeout } from '../utils';
-import { InstrumentType } from '../InstrumentDescriptor';
 import {
   CollectionOptions,
   ForceFlushOptions,
