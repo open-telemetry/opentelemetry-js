@@ -271,9 +271,7 @@ describe('PeriodicExportingMetricReader', () => {
       exportTimeoutMillis: 20,
     });
 
-    reader.setMetricProducer(
-      new TestMetricProducer()
-    );
+    reader.setMetricProducer(new TestMetricProducer());
     const result = await exporter.forceFlush();
 
     assert.deepStrictEqual(result, undefined);
