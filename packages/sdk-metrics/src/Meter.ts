@@ -17,6 +17,7 @@
 import {
   Meter as IMeter,
   MetricOptions,
+  Gauge,
   Histogram,
   Counter,
   UpDownCounter,
@@ -40,7 +41,6 @@ import {
   UpDownCounterInstrument,
 } from './Instruments';
 import { MeterSharedState } from './state/MeterSharedState';
-import { Gauge } from './types';
 
 /**
  * This class implements the {@link IMeter} interface.
