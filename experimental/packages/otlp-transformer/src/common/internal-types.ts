@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+/** Properties of a Resource. */
+export interface IResource {
+  /** Resource attributes */
+  attributes: IKeyValue[];
+
+  /** Resource droppedAttributesCount */
+  droppedAttributesCount: number;
+}
+
 /** Properties of an InstrumentationScope. */
 export interface IInstrumentationScope {
   /** InstrumentationScope name */

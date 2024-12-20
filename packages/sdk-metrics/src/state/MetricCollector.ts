@@ -16,10 +16,13 @@
 
 import { millisToHrTime } from '@opentelemetry/core';
 import { AggregationTemporalitySelector } from '../export/AggregationSelector';
-import { CollectionResult, ScopeMetrics } from '../export/MetricData';
+import {
+  CollectionResult,
+  InstrumentType,
+  ScopeMetrics,
+} from '../export/MetricData';
 import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
-import { InstrumentType } from '../InstrumentDescriptor';
 import { ForceFlushOptions, ShutdownOptions } from '../types';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
 

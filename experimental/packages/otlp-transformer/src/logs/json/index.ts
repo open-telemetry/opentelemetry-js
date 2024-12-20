@@ -14,13 +14,5 @@
  * limitations under the License.
  */
 
-import { IKeyValue } from '../common/types';
-
-/** Properties of a Resource. */
-export interface IResource {
-  /** Resource attributes */
-  attributes: IKeyValue[];
-
-  /** Resource droppedAttributesCount */
-  droppedAttributesCount: number;
-}
+// IMPORTANT: exports added here are public
+export { JsonLogsSerializer } from './logs';

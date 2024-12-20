@@ -16,13 +16,13 @@
 
 import { InstrumentationScope } from '@opentelemetry/core';
 import { IResource } from '@opentelemetry/resources';
-import { InstrumentType } from '..';
 import { instrumentationScopeId } from '../utils';
 import { ViewRegistry } from '../view/ViewRegistry';
 import { MeterSharedState } from './MeterSharedState';
 import { MetricCollector, MetricCollectorHandle } from './MetricCollector';
 import { toAggregation } from '../view/AggregationOption';
 import { Aggregation } from '../view/Aggregation';
+import { InstrumentType } from '../export/MetricData';
 
 /**
  * An internal record for shared meter provider states.
