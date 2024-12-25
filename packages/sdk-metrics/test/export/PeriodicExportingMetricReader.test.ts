@@ -148,8 +148,9 @@ describe('PeriodicExportingMetricReader', () => {
           dataPointType: DataPointType.GAUGE,
           dataPoints: [
             {
-              startTime: process.hrtime(),
-              endTime: process.hrtime(),
+              // Sample hr time datapoints.
+              startTime: [12345, 678901234],
+              endTime: [12345, 678901234],
               attributes: {},
               value: 1,
             },
