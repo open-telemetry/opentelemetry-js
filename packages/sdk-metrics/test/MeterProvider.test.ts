@@ -126,9 +126,9 @@ describe('MeterProvider', () => {
       assert.strictEqual(meter1, meter2);
     });
 
-    it('get a noop meter on shutdown', () => {
+    it('get a noop meter on shutdown', async () => {
       const meterProvider = new MeterProvider();
-      meterProvider.shutdown();
+      await meterProvider.shutdown();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
       // returned tracer should be no-op, not instance of Meter (from SDK)
       assert.ok(!(meter instanceof Meter));

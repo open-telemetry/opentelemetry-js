@@ -19,26 +19,13 @@ import type {
   IAnyValue,
   IInstrumentationScope,
   IKeyValue,
-} from '../common/types';
-import type { IResource } from '../resource/types';
+  IResource,
+} from '../common/internal-types';
 
 /** Properties of an ExportLogsServiceRequest. */
 export interface IExportLogsServiceRequest {
   /** ExportLogsServiceRequest resourceLogs */
   resourceLogs?: IResourceLogs[];
-}
-
-export interface IExportLogsServiceResponse {
-  /** ExportLogsServiceResponse partialSuccess */
-  partialSuccess?: IExportLogsPartialSuccess;
-}
-
-export interface IExportLogsPartialSuccess {
-  /** ExportLogsPartialSuccess rejectedLogRecords */
-  rejectedLogRecords?: number;
-
-  /** ExportLogsPartialSuccess errorMessage */
-  errorMessage?: string;
 }
 
 /** Properties of a ResourceLogs. */

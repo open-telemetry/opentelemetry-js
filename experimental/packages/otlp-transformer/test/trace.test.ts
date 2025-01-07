@@ -19,15 +19,12 @@ import { TraceState, hexToBinary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import {
-  OtlpEncodingOptions,
-  createExportTraceServiceRequest,
-  ESpanKind,
-  EStatusCode,
-  ProtobufTraceSerializer,
-  JsonTraceSerializer,
-} from '../src';
 import { toBase64 } from './utils';
+import { OtlpEncodingOptions } from '../src/common/internal-types';
+import { ESpanKind, EStatusCode } from '../src/trace/internal-types';
+import { createExportTraceServiceRequest } from '../src/trace/internal';
+import { ProtobufTraceSerializer } from '../src/trace/protobuf';
+import { JsonTraceSerializer } from '../src/trace/json';
 
 function createExpectedSpanJson(options: OtlpEncodingOptions) {
   const useHex = options.useHex ?? false;
