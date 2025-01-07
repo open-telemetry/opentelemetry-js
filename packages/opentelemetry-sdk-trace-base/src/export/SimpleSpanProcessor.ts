@@ -38,16 +38,16 @@ import { Resource } from '@opentelemetry/resources';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   private _shutdownOnce: BindOnceFuture<void>;
-  private _unresolvedExports: Set<Promise<void>>;
+  private _pendingExports: Set<Promise<void>>;
 
   constructor(private readonly _exporter: SpanExporter) {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
-    this._unresolvedExports = new Set<Promise<void>>();
+    this._pendingExports = new Set<Promise<void>>();
   }
 
   async forceFlush(): Promise<void> {
-    // await unresolved resources before resolving
-    await Promise.all(Array.from(this._unresolvedExports));
+    // await pending exports
+    await Promise.all(Array.from(this._pendingExports));
     if (this._exporter.forceFlush) {
       await this._exporter.forceFlush();
     }
@@ -64,10 +64,15 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
+    let exportPromise: Promise<void> | undefined = undefined;
+
     const doExport = () =>
       internal
         ._export(this._exporter, [span])
         .then((result: ExportResult) => {
+          if (exportPromise) {
+            this._pendingExports.delete(exportPromise);
+          }
           if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(
               result.error ??
@@ -81,26 +86,17 @@ export class SimpleSpanProcessor implements SpanProcessor {
           globalErrorHandler(error);
         });
 
-    // Avoid scheduling a promise to make the behavior more predictable and easier to test
     if (span.resource.asyncAttributesPending) {
-      const exportPromise = (span.resource as Resource)
+      exportPromise = (span.resource as Resource)
         .waitForAsyncAttributes?.()
-        .then(
-          () => {
-            if (exportPromise != null) {
-              this._unresolvedExports.delete(exportPromise);
-            }
-            return doExport();
-          },
-          err => globalErrorHandler(err)
-        );
-
-      // store the unresolved exports
-      if (exportPromise != null) {
-        this._unresolvedExports.add(exportPromise);
-      }
+        .then(doExport, err => globalErrorHandler(err));
     } else {
-      void doExport();
+      exportPromise = doExport();
+    }
+
+    // store the unresolved exports
+    if (exportPromise) {
+      this._pendingExports.add(exportPromise);
     }
   }
 
