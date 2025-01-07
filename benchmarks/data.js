@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1736256135020,
+  "lastUpdate": 1736256284434,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -22154,6 +22154,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 769226,
             "range": "±0.46%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fa5edc639c33890eb03cd071a14d126076fbdfc3",
+          "message": "chore(deps): remove webpack-merge where it is not needed (#5289)",
+          "timestamp": "2025-01-07T13:17:33Z",
+          "tree_id": "9dbe89b7b5cb9b3e8b698ab7d8d4b854e4452a94",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/fa5edc639c33890eb03cd071a14d126076fbdfc3"
+        },
+        "date": 1736256283488,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1533661,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17239,
+            "range": "±0.28%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 839556,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 819740,
+            "range": "±0.19%",
             "unit": "ops/sec",
             "extra": "99 samples"
           }
