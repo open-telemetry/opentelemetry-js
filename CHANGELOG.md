@@ -11,6 +11,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
+* fix(sdk-metrics): InMemoryMetricExporter clear metrics after shutdown to align with other exporters [#5131](https://github.com/open-telemetry/opentelemetry-js/issues/5131) @paper2
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)

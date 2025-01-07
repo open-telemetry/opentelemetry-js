@@ -76,6 +76,7 @@ export class InMemoryMetricExporter implements PushMetricExporter {
 
   shutdown(): Promise<void> {
     this._shutdown = true;
+    this._metrics = [];
     return Promise.resolve();
   }
 }
