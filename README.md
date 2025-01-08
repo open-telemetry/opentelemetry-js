@@ -152,8 +152,7 @@ This minimum support level is subject to change as the project evolves and as th
 OpenTelemetry JavaScript is built with TypeScript `v5.0.4`. If you have a TypeScript project (app, library, instrumentation, etc.)
 that depends on it we recomed using same or higher version to compile the project.
 
-As update policy OpenTelemetry JavaScript will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window)
-which sets a support window of 2 years.
+OpenTelemetry JavaScript will follows DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
 
 ## Package Version Compatibility
 
