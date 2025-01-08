@@ -930,25 +930,33 @@ describe('fetch', () => {
       };
 
       await prepare(url, applyCustomAttributes);
-      assert.ok(request.method === 'GET');
-      assert.ok(response.status === 200);
-    });
+      assert.strictEqual(request.method, 'GET');
+      assert.ok(lastResponse !== undefined);
+      assert.strictEqual(response, lastResponse);
+      assert.strictEqual(response.status, 200);
 
-    it('get response body from callback arguments response', async () => {
-      let response: any;
-      const applyCustomAttributes: FetchCustomAttributeFunction = async (
-        span,
-        req,
-        res
-      ) => {
-        if (res instanceof Response) {
-          response = res;
-        }
-      };
+      /*
+         Note: this confirms that nothing *in the instrumentation code*
+         consumed the response body; it doesn't guarantee that the response
+         object passed to the `applyCustomAttributes` hook will always have
+         a consumable body – in fact, this is typically *not* the case:
 
-      await prepare(url, applyCustomAttributes);
-      const rsp = await response.json();
-      assert.strictEqual(rsp.isServerResponse, true);
+         ```js
+         // user code:
+         let response = await fetch("foo");
+         let json = await response.json(); // <- user code consumes the body on `response`
+         // ...
+
+         {
+           // ...this is called sometime later...
+           applyCustomAttributes(span, request, response) {
+             // too late!
+             response.bodyUsed // => true
+           }
+         }
+         ```
+      */
+      assert.strictEqual(response.bodyUsed, false);
     });
   });
 
