@@ -31,7 +31,6 @@ import {
   DataPoint,
   DataPointType,
   ScopeMetrics,
-  MetricDescriptor,
 } from '../src/export/MetricData';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
@@ -103,7 +102,7 @@ export function assertScopeMetrics(
 export function assertMetricData(
   actual: unknown,
   dataPointType?: DataPointType,
-  metricDescriptor: Partial<MetricDescriptor> | null = defaultInstrumentDescriptor,
+  metricDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
   aggregationTemporality?: AggregationTemporality
 ): asserts actual is MetricData {
   const it = actual as MetricData;

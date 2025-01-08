@@ -800,6 +800,7 @@ describe('ExponentialHistogramAggregation', () => {
           type: instrumentType,
           unit: '1',
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
         AggregationTemporality.CUMULATIVE,
         [[{}, acc]],
