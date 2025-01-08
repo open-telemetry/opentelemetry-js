@@ -57,7 +57,6 @@ import {
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import * as semver from 'semver';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
 import { env } from 'process';
@@ -88,10 +87,6 @@ import {
   SEMRESATTRS_PROCESS_PID,
 } from '@opentelemetry/semantic-conventions';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-
-const DefaultContextManager = semver.gte(process.version, '14.8.0')
-  ? AsyncLocalStorageContextManager
-  : AsyncHooksContextManager;
 
 describe('Node SDK', () => {
   let ctxManager: any;
@@ -257,7 +252,7 @@ describe('Node SDK', () => {
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
-          DefaultContextManager.name
+          AsyncLocalStorageContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
