@@ -24,11 +24,11 @@ import {
   DataPointType,
   HistogramMetricData,
   InstrumentType,
-  MetricDescriptor,
 } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
 import { binarySearchUB, Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 /**
  * Internal value type for HistogramAggregation.
@@ -217,7 +217,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   }
 
   toMetricData(
-    descriptor: MetricDescriptor,
+    descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
     endTime: HrTime
