@@ -62,7 +62,6 @@ export const baggageUtils = {
   parsePairKeyValue,
 };
 export {
-  RandomIdGenerator,
   SDK_INFO,
   _globalThis,
   getEnv,
@@ -81,7 +80,6 @@ export {
   W3CTraceContextPropagator,
   parseTraceParent,
 } from './trace/W3CTraceContextPropagator';
-export { IdGenerator } from './trace/IdGenerator';
 export {
   RPCMetadata,
   RPCType,
