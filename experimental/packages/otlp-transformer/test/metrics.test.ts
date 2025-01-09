@@ -18,7 +18,6 @@ import { Resource } from '@opentelemetry/resources';
 import {
   AggregationTemporality,
   DataPointType,
-  InstrumentType,
   MetricData,
   ResourceMetrics,
 } from '@opentelemetry/sdk-metrics';
@@ -110,7 +109,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.COUNTER,
         name: 'counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -136,7 +134,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.UP_DOWN_COUNTER,
         name: 'up-down-counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -162,7 +159,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.OBSERVABLE_COUNTER,
         name: 'observable-counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -188,7 +184,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
         name: 'observable-up-down-counter',
         unit: '1',
         valueType: ValueType.INT,
@@ -211,7 +206,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.OBSERVABLE_GAUGE,
         name: 'gauge',
         unit: '1',
         valueType: ValueType.DOUBLE,
@@ -241,7 +235,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.HISTOGRAM,
         name: 'hist',
         unit: '1',
         valueType: ValueType.INT,
@@ -282,7 +275,6 @@ describe('Metrics', () => {
     return {
       descriptor: {
         description: 'this is a description',
-        type: InstrumentType.HISTOGRAM,
         name: 'xhist',
         unit: '1',
         valueType: ValueType.INT,
