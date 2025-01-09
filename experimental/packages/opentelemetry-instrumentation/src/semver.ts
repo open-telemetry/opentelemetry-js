@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+// This is a custom semantic versioning implementation compatible with the
+// `satisfies` functionality of the actual `semver` package.
+// The motivation for the custom semver implementation is that
+// `semver` package has some initialization delay (lots of RegExp init and compile)
+// and this leads to coldstart overhead for the OTEL Lambda Node.js layer.
+// Hence, we have implemented lightweight version of it internally with required functionalities.
+
 import { diag } from '@opentelemetry/api';
 
 const VERSION_REGEXP =

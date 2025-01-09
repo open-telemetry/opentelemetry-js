@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+// These tests are added as mirror (to be sure that we are compatible)
+// of the actual `semver` package `satisfies` tests here:
+// https://github.com/npm/node-semver/blob/main/test/functions/satisfies.js
+
 import * as assert from 'assert';
 
 import { satisfies, SatisfiesOptions } from '../../src/semver';
@@ -42,6 +46,21 @@ describe('SemVer', () => {
           );
         }
       );
+    });
+    it('invalid ranges never satisfied (but do not throw)', () => {
+      const cases = [
+        ['blerg', '1.2.3'],
+        ['git+https://user:password0123@github.com/foo', '123.0.0', true],
+        ['^1.2.3', '2.0.0-pre'],
+        ['0.x', undefined],
+        ['*', undefined],
+      ];
+      cases.forEach(([range, ver]) => {
+        assert.ok(
+          !satisfies(ver as any, range as any),
+          `${range} not satisfied because invalid`
+        );
+      });
     });
   });
 });
