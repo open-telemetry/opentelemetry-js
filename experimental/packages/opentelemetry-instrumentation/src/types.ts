@@ -84,8 +84,8 @@ export interface InstrumentationModuleFile {
   /** Supported versions for the file.
    *
    * A module version is supported if one of the supportedVersions in the array satisfies the module version.
-   * The syntax of the version is checked with the `satisfies` function of
-   * "The [semantic versioner](https://semver.org) for npm".
+   * The syntax of the version is checked with a function compatible
+   * with [node-semver's `satisfies()` function](https://github.com/npm/node-semver#ranges-1).
    * If the version is not supported, we won't apply instrumentation patch.
    * If omitted, all versions of the module will be patched.
    *
