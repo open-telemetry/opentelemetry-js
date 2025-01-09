@@ -29,7 +29,7 @@ import {
   TraceState,
 } from '@opentelemetry/api';
 import {
-  InstrumentationLibrary,
+  InstrumentationScope,
   sanitizeAttributes,
   suppressTracing,
 } from '@opentelemetry/core';
@@ -181,7 +181,7 @@ describe('Tracer', () => {
     assert.strictEqual(span.spanContext().traceState, traceState);
   });
 
-  it('should have an instrumentationLibrary', () => {
+  it('should have an instrumentationScope', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
@@ -189,7 +189,7 @@ describe('Tracer', () => {
       tracerProvider['_activeSpanProcessor']
     );
 
-    const lib: InstrumentationLibrary = tracer.instrumentationLibrary;
+    const lib: InstrumentationScope = tracer.instrumentationScope;
 
     assert.strictEqual(lib.name, 'default');
     assert.strictEqual(lib.version, '0.0.1');

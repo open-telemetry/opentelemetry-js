@@ -66,7 +66,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const tracer = provider.getTracer('default');
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -94,7 +94,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const tracer = provider.getTracer('default');
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -123,7 +123,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const tracer = provider.getTracer('default');
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -190,7 +190,7 @@ describe('SimpleSpanProcessor', () => {
 
       const tracer = providerWithAsyncResource.getTracer('default');
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -235,7 +235,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const tracer = providerWithAsyncResource.getTracer('default');
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
@@ -298,7 +298,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const tracer = provider.getTracer('default');
       const span = new SpanImpl({
-        scope: tracer.instrumentationLibrary,
+        scope: tracer.instrumentationScope,
         resource: tracer['_resource'],
         context: ROOT_CONTEXT,
         spanContext,
