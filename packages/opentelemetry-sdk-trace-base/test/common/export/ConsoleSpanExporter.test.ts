@@ -102,8 +102,7 @@ describe('ConsoleSpanExporter', () => {
           firstSpan.instrumentationScope.name === instrumentationScopeName
         );
         assert.ok(
-          firstSpan.instrumentationScope.version ===
-            instrumentationScopeVersion
+          firstSpan.instrumentationScope.version === instrumentationScopeVersion
         );
 
         assert.ok(spyExport.calledOnce);

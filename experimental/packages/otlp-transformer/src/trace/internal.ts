@@ -160,9 +160,7 @@ function spanRecordsToResourceSpans(
         );
 
         scopeResourceSpans.push({
-          scope: createInstrumentationScope(
-            scopeSpans[0].instrumentationScope
-          ),
+          scope: createInstrumentationScope(scopeSpans[0].instrumentationScope),
           spans: spans,
           schemaUrl: scopeSpans[0].instrumentationScope.schemaUrl,
         });
