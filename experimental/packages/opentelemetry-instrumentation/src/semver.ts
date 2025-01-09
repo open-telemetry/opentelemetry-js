@@ -37,39 +37,6 @@ const operatorResMap: { [op: string]: number[] } = {
   '!=': [-1, 1],
 };
 
-const LETTERDASHNUMBER = '[a-zA-Z0-9-]';
-const NUMERICIDENTIFIER = '0|[1-9]\\d*';
-const NONNUMERICIDENTIFIER = `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`;
-const GTLT = '((?:<|>)?=?)';
-
-const PRERELEASEIDENTIFIER = `(?:${NUMERICIDENTIFIER}|${NONNUMERICIDENTIFIER})`;
-const PRERELEASE = `(?:-(${PRERELEASEIDENTIFIER}(?:\\.${PRERELEASEIDENTIFIER})*))`;
-
-const BUILDIDENTIFIER = `${LETTERDASHNUMBER}+`;
-const BUILD = `(?:\\+(${BUILDIDENTIFIER}(?:\\.${BUILDIDENTIFIER})*))`;
-
-const XRANGEIDENTIFIER = `${NUMERICIDENTIFIER}|x|X|\\*`;
-const XRANGEPLAIN =
-  `[v=\\s]*(${XRANGEIDENTIFIER})` +
-  `(?:\\.(${XRANGEIDENTIFIER})` +
-  `(?:\\.(${XRANGEIDENTIFIER})` +
-  `(?:${PRERELEASE})?${BUILD}?` +
-  `)?)?`;
-const XRANGE = `^${GTLT}\\s*${XRANGEPLAIN}$`;
-const XRANGE_REGEXP = new RegExp(XRANGE);
-
-const HYPHENRANGE =
-  `^\\s*(${XRANGEPLAIN})` + `\\s+-\\s+` + `(${XRANGEPLAIN})` + `\\s*$`;
-const HYPHENRANGE_REGEXP = new RegExp(HYPHENRANGE);
-
-const LONETILDE = '(?:~>?)';
-const TILDE = `^${LONETILDE}${XRANGEPLAIN}$`;
-const TILDE_REGEXP = new RegExp(TILDE);
-
-const LONECARET = '(?:\\^)';
-const CARET = `^${LONECARET}${XRANGEPLAIN}$`;
-const CARET_REGEXP = new RegExp(CARET);
-
 /** Interface for the options to configure semantic versioning satisfy check. */
 export interface SatisfiesOptions {
   /**
@@ -219,7 +186,7 @@ function _satisfies(
   }
 
   // Compare version segment first
-  let comparisonResult: number = _compareSegments(
+  let comparisonResult: number = _compareVersionSegments(
     parsedVersion.versionSegments || [],
     parsedRange.versionSegments || []
   );
@@ -243,7 +210,7 @@ function _satisfies(
     ) {
       comparisonResult = -1;
     } else {
-      comparisonResult = _compareSegments(
+      comparisonResult = _compareVersionSegments(
         versionPrereleaseSegments,
         rangePrereleaseSegments
       );
@@ -274,6 +241,187 @@ function _normalizeRange(range: string, options?: SatisfiesOptions): string {
   range = range.trim();
   return range;
 }
+
+function isX(id?: string): boolean {
+  return !id || id.toLowerCase() === 'x' || id === '*';
+}
+
+function _parseVersion(versionString: string): ParsedVersion | undefined {
+  const match: RegExpMatchArray | null = versionString.match(VERSION_REGEXP);
+  if (!match) {
+    diag.error(`Invalid version: ${versionString}`);
+    return undefined;
+  }
+
+  const version: string = match!.groups!.version;
+  const prerelease: string = match!.groups!.prerelease;
+  const build: string = match!.groups!.build;
+
+  const versionSegments: string[] = version.split('.');
+  const prereleaseSegments: string[] | undefined = prerelease?.split('.');
+
+  return {
+    op: undefined,
+
+    version,
+    versionSegments,
+    versionSegmentCount: versionSegments.length,
+
+    prerelease,
+    prereleaseSegments,
+    prereleaseSegmentCount: prereleaseSegments ? prereleaseSegments.length : 0,
+
+    build,
+  };
+}
+
+function _parseRange(rangeString: string): ParsedVersion {
+  if (!rangeString) {
+    return {};
+  }
+
+  const match: RegExpMatchArray | null = rangeString.match(RANGE_REGEXP);
+  if (!match) {
+    diag.error(`Invalid range: ${rangeString}`);
+    return {
+      invalid: true,
+    };
+  }
+
+  let op: string = match!.groups!.op;
+  const version: string = match!.groups!.version;
+  const prerelease: string = match!.groups!.prerelease;
+  const build: string = match!.groups!.build;
+
+  const versionSegments: string[] = version.split('.');
+  const prereleaseSegments: string[] | undefined = prerelease?.split('.');
+
+  if (op === '==') {
+    op = '=';
+  }
+
+  return {
+    op: op || '=',
+
+    version,
+    versionSegments,
+    versionSegmentCount: versionSegments.length,
+
+    prerelease,
+    prereleaseSegments,
+    prereleaseSegmentCount: prereleaseSegments ? prereleaseSegments.length : 0,
+
+    build,
+  };
+}
+
+function _isWildcard(s: string | undefined): boolean {
+  return s === '*' || s === 'x' || s === 'X';
+}
+
+function _parseVersionString(v: string): string | number {
+  const n: number = parseInt(v, 10);
+  return isNaN(n) ? v : n;
+}
+
+function _normalizeVersionType(
+  a: string | number,
+  b: string | number
+): [string, string] | [number, number] {
+  if (typeof a === typeof b) {
+    if (typeof a === 'number') {
+      return [a as number, b as number];
+    } else if (typeof a === 'string') {
+      return [a as string, b as string];
+    } else {
+      throw new Error('Version segments can only be strings or numbers');
+    }
+  } else {
+    return [String(a), String(b)];
+  }
+}
+
+function _compareVersionStrings(v1: string, v2: string): number {
+  if (_isWildcard(v1) || _isWildcard(v2)) {
+    return 0;
+  }
+  const [parsedV1, parsedV2] = _normalizeVersionType(
+    _parseVersionString(v1),
+    _parseVersionString(v2)
+  );
+  if (parsedV1 > parsedV2) {
+    return 1;
+  } else if (parsedV1 < parsedV2) {
+    return -1;
+  }
+  return 0;
+}
+
+function _compareVersionSegments(v1: string[], v2: string[]): number {
+  for (let i = 0; i < Math.max(v1.length, v2.length); i++) {
+    const res: number = _compareVersionStrings(v1[i] || '0', v2[i] || '0');
+    if (res !== 0) {
+      return res;
+    }
+  }
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+ * The ISC License
+ *
+ * Copyright (c) Isaac Z. Schlueter and Contributors
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+// The rest of this file are used pursuant to the ISC license,
+// and are Copyright (c) Isaac Z. Schlueter and Contributors.
+
+const LETTERDASHNUMBER = '[a-zA-Z0-9-]';
+const NUMERICIDENTIFIER = '0|[1-9]\\d*';
+const NONNUMERICIDENTIFIER = `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`;
+const GTLT = '((?:<|>)?=?)';
+
+const PRERELEASEIDENTIFIER = `(?:${NUMERICIDENTIFIER}|${NONNUMERICIDENTIFIER})`;
+const PRERELEASE = `(?:-(${PRERELEASEIDENTIFIER}(?:\\.${PRERELEASEIDENTIFIER})*))`;
+
+const BUILDIDENTIFIER = `${LETTERDASHNUMBER}+`;
+const BUILD = `(?:\\+(${BUILDIDENTIFIER}(?:\\.${BUILDIDENTIFIER})*))`;
+
+const XRANGEIDENTIFIER = `${NUMERICIDENTIFIER}|x|X|\\*`;
+const XRANGEPLAIN =
+  `[v=\\s]*(${XRANGEIDENTIFIER})` +
+  `(?:\\.(${XRANGEIDENTIFIER})` +
+  `(?:\\.(${XRANGEIDENTIFIER})` +
+  `(?:${PRERELEASE})?${BUILD}?` +
+  `)?)?`;
+const XRANGE = `^${GTLT}\\s*${XRANGEPLAIN}$`;
+const XRANGE_REGEXP = new RegExp(XRANGE);
+
+const HYPHENRANGE =
+  `^\\s*(${XRANGEPLAIN})` + `\\s+-\\s+` + `(${XRANGEPLAIN})` + `\\s*$`;
+const HYPHENRANGE_REGEXP = new RegExp(HYPHENRANGE);
+
+const LONETILDE = '(?:~>?)';
+const TILDE = `^${LONETILDE}${XRANGEPLAIN}$`;
+const TILDE_REGEXP = new RegExp(TILDE);
+
+const LONECARET = '(?:\\^)';
+const CARET = `^${LONECARET}${XRANGEPLAIN}$`;
+const CARET_REGEXP = new RegExp(CARET);
 
 // Borrowed from https://github.com/npm/node-semver/blob/868d4bbe3d318c52544f38d5f9977a1103e924c2/classes/range.js#L285
 //
@@ -467,126 +615,4 @@ function replaceHyphen(comp: string, options?: SatisfiesOptions): string {
       return `${from} ${to}`.trim();
     }
   );
-}
-
-function isX(id?: string): boolean {
-  return !id || id.toLowerCase() === 'x' || id === '*';
-}
-
-function _parseVersion(versionString: string): ParsedVersion | undefined {
-  const match: RegExpMatchArray | null = versionString.match(VERSION_REGEXP);
-  if (!match) {
-    diag.error(`Invalid version: ${versionString}`);
-    return undefined;
-  }
-
-  const version: string = match!.groups!.version;
-  const prerelease: string = match!.groups!.prerelease;
-  const build: string = match!.groups!.build;
-
-  const versionSegments: string[] = version.split('.');
-  const prereleaseSegments: string[] | undefined = prerelease?.split('.');
-
-  return {
-    op: undefined,
-
-    version,
-    versionSegments,
-    versionSegmentCount: versionSegments.length,
-
-    prerelease,
-    prereleaseSegments,
-    prereleaseSegmentCount: prereleaseSegments ? prereleaseSegments.length : 0,
-
-    build,
-  };
-}
-
-function _parseRange(rangeString: string): ParsedVersion {
-  if (!rangeString) {
-    return {};
-  }
-
-  const match: RegExpMatchArray | null = rangeString.match(RANGE_REGEXP);
-  if (!match) {
-    diag.error(`Invalid range: ${rangeString}`);
-    return {
-      invalid: true,
-    };
-  }
-
-  let op: string = match!.groups!.op;
-  const version: string = match!.groups!.version;
-  const prerelease: string = match!.groups!.prerelease;
-  const build: string = match!.groups!.build;
-
-  const versionSegments: string[] = version.split('.');
-  const prereleaseSegments: string[] | undefined = prerelease?.split('.');
-
-  if (op === '==') {
-    op = '=';
-  }
-
-  return {
-    op: op || '=',
-
-    version,
-    versionSegments,
-    versionSegmentCount: versionSegments.length,
-
-    prerelease,
-    prereleaseSegments,
-    prereleaseSegmentCount: prereleaseSegments ? prereleaseSegments.length : 0,
-
-    build,
-  };
-}
-
-function _isWildcard(s: string | undefined): boolean {
-  return s === '*' || s === 'x' || s === 'X';
-}
-
-function _tryParse(v: string): string | number {
-  const n: number = parseInt(v, 10);
-  return isNaN(n) ? v : n;
-}
-
-function _forceType(
-  a: string | number,
-  b: string | number
-): [string, string] | [number, number] {
-  if (typeof a === typeof b) {
-    if (typeof a === 'number') {
-      return [a as number, b as number];
-    } else if (typeof a === 'string') {
-      return [a as string, b as string];
-    } else {
-      throw new Error('Version segments can only be strings or numbers');
-    }
-  } else {
-    return [String(a), String(b)];
-  }
-}
-
-function _compareStrings(a: string, b: string): number {
-  if (_isWildcard(a) || _isWildcard(b)) {
-    return 0;
-  }
-  const [ap, bp] = _forceType(_tryParse(a), _tryParse(b));
-  if (ap > bp) {
-    return 1;
-  } else if (ap < bp) {
-    return -1;
-  }
-  return 0;
-}
-
-function _compareSegments(a: string[], b: string[]): number {
-  for (let i = 0; i < Math.max(a.length, b.length); i++) {
-    const r: number = _compareStrings(a[i] || '0', b[i] || '0');
-    if (r !== 0) {
-      return r;
-    }
-  }
-  return 0;
 }
