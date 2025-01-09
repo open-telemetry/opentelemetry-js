@@ -10,7 +10,7 @@
       "path": "../../api"
     },
     {
-      "path": "../../packages/opentelemetry-context-async-hooks"
+      "path": "../../packages/context-async-local"
     },
     {
       "path": "../../packages/opentelemetry-core"

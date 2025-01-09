@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/context-async-hooks",
+  "name": "@opentelemetry/context-async-local",
   "version": "1.30.0",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
   "main": "build/src/index.js",
@@ -56,6 +56,6 @@
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.10.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-local",
   "sideEffects": false
 }

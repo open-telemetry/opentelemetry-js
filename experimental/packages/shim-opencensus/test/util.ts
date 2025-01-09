@@ -22,7 +22,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { ShimTracer } from '../src/ShimTracer';
-import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import { Tracer, TracerProvider, context } from '@opentelemetry/api';
 
 export async function withTestTracer(

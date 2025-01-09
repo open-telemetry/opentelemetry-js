@@ -34,7 +34,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import { HttpInstrumentation } from '../../src';
 
 const instrumentation = new HttpInstrumentation();
@@ -106,7 +106,7 @@ describe('HttpsInstrumentation Integration tests', () => {
 
   beforeEach(() => {
     memoryExporter.reset();
-    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    context.setGlobalContextManager(new AsyncLocalStorageContextManager().enable());
   });
 
   afterEach(() => {

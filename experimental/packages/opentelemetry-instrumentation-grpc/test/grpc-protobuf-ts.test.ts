@@ -38,7 +38,7 @@ import {
   trace,
 } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import { startServer } from './helper';
 import {
   assertExportedSpans,
@@ -166,7 +166,7 @@ describe('#grpc-protobuf', () => {
 
   beforeEach(() => {
     memoryExporter.reset();
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 

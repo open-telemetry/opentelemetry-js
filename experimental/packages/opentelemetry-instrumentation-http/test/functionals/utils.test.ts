@@ -42,7 +42,7 @@ import {
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import { extractHostnameAndPort } from '../../src/utils';
 
 describe('Utility', () => {
@@ -221,7 +221,7 @@ describe('Utility', () => {
 
   describe('getIncomingRequestAttributesOnResponse()', () => {
     it('should correctly parse the middleware stack if present', done => {
-      context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+      context.setGlobalContextManager(new AsyncLocalStorageContextManager().enable());
       const request = {
         socket: {},
       } as IncomingMessage;

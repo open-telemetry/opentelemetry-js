@@ -88,7 +88,7 @@ Detect resources automatically from the environment using the default resource d
 
 ### contextManager
 
-Use a custom context manager. Default: [AsyncLocalStorageContextManager](../../../packages/opentelemetry-context-async-hooks/README.md)
+Use a custom context manager. Default: [AsyncLocalStorageContextManager](../../../packages/context-async-local/README.md)
 
 ### textMapPropagator
 

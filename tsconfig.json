@@ -32,7 +32,7 @@
       "experimental/packages/sdk-logs",
       "experimental/packages/shim-opencensus",
       "experimental/packages/web-common",
-      "packages/opentelemetry-context-async-hooks",
+      "packages/context-async-local",
       "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-core",
@@ -144,7 +144,7 @@
       "path": "experimental/packages/web-common"
     },
     {
-      "path": "packages/opentelemetry-context-async-hooks"
+      "path": "packages/context-async-local"
     },
     {
       "path": "packages/opentelemetry-context-zone"

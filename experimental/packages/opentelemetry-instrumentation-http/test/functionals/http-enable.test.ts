@@ -71,7 +71,7 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import { ContextManager } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import {AsyncLocalStorageContextManager} from '@opentelemetry/context-async-local';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -169,7 +169,7 @@ describe('HttpInstrumentation', () => {
   });
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager().enable();
+    contextManager = new AsyncLocalStorageContextManager().enable();
     context.setGlobalContextManager(contextManager);
   });
 

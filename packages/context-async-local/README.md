@@ -1,24 +1,11 @@
-# OpenTelemetry async_hooks-based Context Managers
+# OpenTelemetry Async Local Storage-based Context Manager
 
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This package provides two [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.ContextManager.html) implementations built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
+This package provides a [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.ContextManager.html) implementation built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
 
 The definition of the `ContextManager` interface and the problem it solves can be found [here][def-context-manager].
-
-## API
-
-Two `ContextManager` implementations are exported:
-
-- `AsyncLocalStorageContextManager`, based on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage)
-- `AsyncHooksContextManager`, based on [`AsyncHook`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynchook)
-
-The former should be preferred over the latter as its implementation is substantially simpler than the latter's, and according to [Node.js docs](https://github.com/nodejs/node/blame/v17.1.0/doc/api/async_context.md#L42-L45),
-
-> While you can create your own implementation [of `AsyncLocalStorage`] on top of [`AsyncHook`], `AsyncLocalStorage` should be preferred as it is a performant and memory safe implementation that involves significant optimizations that are non-obvious to implement.
-
-`AsyncLocalStorage` is available in node `^12.17.0 || >= 13.10.0`, however `AsyncLocalStorageContextManager` is not enabled by default for node `<14.8.0` because of some important bugfixes which were introduced in `v14.8.0` (e.g., [nodejs/node#34573](https://github.com/nodejs/node/pull/34573)).
 
 ## Limitations
 

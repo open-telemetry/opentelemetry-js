@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { ContextManager, Context } from '@opentelemetry/api';
+import { ContextManager, Context, ROOT_CONTEXT } from '@opentelemetry/api';
+import { AsyncLocalStorage } from 'async_hooks';
 import { EventEmitter } from 'events';
 
 type Func<T> = (...args: unknown[]) => T;
@@ -36,21 +37,35 @@ const ADD_LISTENER_METHODS = [
   'prependOnceListener' as const,
 ];
 
-export abstract class AbstractAsyncHooksContextManager
-  implements ContextManager
-{
-  abstract active(): Context;
+export class AsyncLocalStorageContextManager implements ContextManager {
+  private _asyncLocalStorage: AsyncLocalStorage<Context>;
 
-  abstract with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
+  constructor() {
+    this._asyncLocalStorage = new AsyncLocalStorage();
+  }
+
+  active(): Context {
+    return this._asyncLocalStorage.getStore() ?? ROOT_CONTEXT;
+  }
+
+  with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
     context: Context,
     fn: F,
     thisArg?: ThisParameterType<F>,
     ...args: A
-  ): ReturnType<F>;
+  ): ReturnType<F> {
+    const cb = thisArg == null ? fn : fn.bind(thisArg);
+    return this._asyncLocalStorage.run(context, cb as never, ...args);
+  }
 
-  abstract enable(): this;
+  enable(): this {
+    return this;
+  }
 
-  abstract disable(): this;
+  disable(): this {
+    this._asyncLocalStorage.disable();
+    return this;
+  }
 
   /**
    * Binds a the certain context or the active one to the target function and then returns the target

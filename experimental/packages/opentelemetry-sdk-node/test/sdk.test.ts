@@ -24,10 +24,7 @@ import {
   metrics,
   DiagConsoleLogger,
 } from '@opentelemetry/api';
-import {
-  AsyncHooksContextManager,
-  AsyncLocalStorageContextManager,
-} from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import { CompositePropagator } from '@opentelemetry/core';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import {
@@ -401,7 +398,7 @@ describe('Node SDK', () => {
 
     it('should register a context manager if only a context manager is provided', async () => {
       // arrange
-      const expectedContextManager = new AsyncHooksContextManager();
+      const expectedContextManager = new AsyncLocalStorageContextManager();
       const sdk = new NodeSDK({
         contextManager: expectedContextManager,
       });

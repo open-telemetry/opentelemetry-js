@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import { ContextManager } from '@opentelemetry/api';
 import {
   InMemorySpanExporter,
@@ -426,7 +426,7 @@ export const runTests = (
     });
 
     beforeEach(() => {
-      contextManager = new AsyncHooksContextManager().enable();
+      contextManager = new AsyncLocalStorageContextManager().enable();
       context.setGlobalContextManager(contextManager);
     });
 

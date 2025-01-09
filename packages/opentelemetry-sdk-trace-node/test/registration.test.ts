@@ -23,7 +23,7 @@ import {
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import { CompositePropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '../src';
 

@@ -29,7 +29,7 @@ import {
   trace,
   TraceFlags,
 } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-local';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -53,7 +53,7 @@ describe('NodeTracerProvider', () => {
   let contextManager: ContextManager;
 
   beforeEach(() => {
-    contextManager = new AsyncHooksContextManager();
+    contextManager = new AsyncLocalStorageContextManager();
     context.setGlobalContextManager(contextManager.enable());
   });
 
@@ -156,7 +156,7 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('.withSpan()', () => {
-    it('should run context with AsyncHooksContextManager context manager', done => {
+    it('should run context with AsyncLocalStorageContextManager context manager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       context.with(trace.setSpan(context.active(), span), () => {
@@ -166,7 +166,7 @@ describe('NodeTracerProvider', () => {
       assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
     });
 
-    it('should run context with AsyncHooksContextManager context manager with multiple spans', done => {
+    it('should run context with AsyncLocalStorageContextManager context manager with multiple spans', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       context.with(trace.setSpan(context.active(), span), () => {
@@ -203,7 +203,7 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('.bind()', () => {
-    it('should bind context with AsyncHooksContextManager context manager', done => {
+    it('should bind context with AsyncLocalStorageContextManager context manager', done => {
       const provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       const fn = () => {
