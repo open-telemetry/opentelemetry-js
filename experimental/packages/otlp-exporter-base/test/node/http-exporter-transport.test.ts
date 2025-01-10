@@ -17,7 +17,7 @@
 import { createHttpExporterTransport } from '../../src/transport/http-exporter-transport';
 import * as http from 'http';
 import * as assert from 'assert';
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 import {
   ExportResponseRetryable,
   ExportResponseFailure,

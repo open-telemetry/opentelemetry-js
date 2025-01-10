@@ -42,7 +42,6 @@ export {
 } from './common/time';
 export {
   ErrorHandler,
-  InstrumentationLibrary,
   InstrumentationScope,
   ShimWrapped,
   TimeOriginLegacy,

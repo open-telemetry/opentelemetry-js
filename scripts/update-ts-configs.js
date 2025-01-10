@@ -47,7 +47,6 @@ const ignoredLernaProjects = [
   'experimental/examples/*',
   'experimental/backwards-compatibility/*',
   'integration-tests/*',
-  'selenium-tests',
   'examples/otlp-exporter-node',
   'examples/opentelemetry-web',
   'examples/http',

@@ -389,9 +389,9 @@ describe('PrometheusExporter', () => {
 
       assert.deepStrictEqual(lines, [
         ...serializedDefaultResourceLines,
-        '# HELP metric_observable_counter a test description',
-        '# TYPE metric_observable_counter counter',
-        'metric_observable_counter{key1="attributeValue1"} 20',
+        '# HELP metric_observable_counter_total a test description',
+        '# TYPE metric_observable_counter_total counter',
+        'metric_observable_counter_total{key1="attributeValue1"} 20',
         '',
       ]);
     });

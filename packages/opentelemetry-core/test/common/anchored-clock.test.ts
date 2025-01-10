@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import assert = require('assert');
+import * as assert from 'assert';
 import { AnchoredClock, otperformance } from '../../src';
 
 describe('AnchoredClock', () => {

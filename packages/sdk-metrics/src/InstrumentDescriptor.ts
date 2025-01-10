@@ -32,6 +32,12 @@ import { InstrumentType, MetricDescriptor } from './export/MetricData';
  */
 export interface InstrumentDescriptor extends MetricDescriptor {
   /**
+   * For internal use; exporter should avoid depending on the type of the
+   * instrument as their resulting aggregator can be re-mapped with views.
+   */
+  readonly type: InstrumentType;
+
+  /**
    * See {@link MetricAdvice}
    *
    * @experimental

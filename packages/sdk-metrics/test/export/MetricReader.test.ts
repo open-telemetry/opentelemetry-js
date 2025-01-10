@@ -24,7 +24,6 @@ import {
   AggregationTemporality,
   AggregationType,
   DataPointType,
-  InstrumentType,
   ScopeMetrics,
 } from '../../src';
 import {
@@ -59,7 +58,6 @@ const testScopeMetrics: ScopeMetrics[] = [
         descriptor: {
           name: 'additionalCounter',
           unit: '',
-          type: InstrumentType.COUNTER,
           description: '',
           valueType: ValueType.INT,
         },
