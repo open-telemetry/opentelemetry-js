@@ -159,7 +159,6 @@ describe('PeriodicExportingMetricReader', () => {
             name: '',
             description: '',
             unit: '',
-            type: InstrumentType.COUNTER,
             valueType: ValueType.INT,
           },
           aggregationTemporality: AggregationTemporality.CUMULATIVE,
