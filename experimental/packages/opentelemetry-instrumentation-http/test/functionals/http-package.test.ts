@@ -34,8 +34,6 @@ instrumentation.disable();
 
 import * as http from 'http';
 import * as superagent from 'superagent';
-// Temporarily removed. See https://github.com/open-telemetry/opentelemetry-js/issues/3344
-// import * as got from 'got';
 import * as nock from 'nock';
 import * as axios from 'axios';
 
