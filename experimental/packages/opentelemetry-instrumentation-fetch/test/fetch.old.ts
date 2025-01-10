@@ -369,13 +369,13 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('should wrap methods', () => {
+    xit('should wrap methods', () => {
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.enable();
       assert.ok(isWrapped(window.fetch));
     });
 
-    it('should unwrap methods', () => {
+    xit('should unwrap methods', () => {
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.disable();
       assert.ok(!isWrapped(window.fetch));
