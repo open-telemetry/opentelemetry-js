@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1736505448709,
+  "lastUpdate": 1736528519242,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -22676,6 +22676,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.34%",
             "unit": "ops/sec",
             "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ec9429711e01aa243ba118e29c5fc0db6615c93b",
+          "message": "chore(deps): update dependency typedoc-plugin-missing-exports to v3.1.0 (#5244)",
+          "timestamp": "2025-01-10T16:09:44Z",
+          "tree_id": "bfcf4b2f60c8f9b768d39231f4c3f52d3d60f9ee",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/ec9429711e01aa243ba118e29c5fc0db6615c93b"
+        },
+        "date": 1736528518419,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1557025,
+            "range": "±0.60%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16932,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 842165,
+            "range": "±0.39%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 780339,
+            "range": "±0.36%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
           }
         ]
       }
