@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1736451579579,
+  "lastUpdate": 1736505448709,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -22624,6 +22624,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.57%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.pichler@dynatrace.com",
+            "name": "Marc Pichler",
+            "username": "pichlermarc"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4a6021af7a8fd8a912d221cab3d96b40a0b0433c",
+          "message": "feat(core)!: remove deprecated InstrumentationLibrary (#5308)",
+          "timestamp": "2025-01-10T10:20:09Z",
+          "tree_id": "fdbe14caf94b2ef37a4b265915351196276012c5",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/4a6021af7a8fd8a912d221cab3d96b40a0b0433c"
+        },
+        "date": 1736505447825,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1498260,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16864,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 842208,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 776072,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
           }
         ]
       }
