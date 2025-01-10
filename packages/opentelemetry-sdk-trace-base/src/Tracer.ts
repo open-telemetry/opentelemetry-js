@@ -16,7 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  InstrumentationLibrary,
+  InstrumentationScope,
   sanitizeAttributes,
   isTracingSuppressed,
 } from '@opentelemetry/core';
@@ -37,7 +37,7 @@ export class Tracer implements api.Tracer {
   private readonly _generalLimits: GeneralLimits;
   private readonly _spanLimits: SpanLimits;
   private readonly _idGenerator: IdGenerator;
-  readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly instrumentationScope: InstrumentationScope;
 
   private readonly _resource: IResource;
   private readonly _spanProcessor: SpanProcessor;
@@ -46,7 +46,7 @@ export class Tracer implements api.Tracer {
    * Constructs a new Tracer instance.
    */
   constructor(
-    instrumentationLibrary: InstrumentationLibrary,
+    instrumentationScope: InstrumentationScope,
     config: TracerConfig,
     resource: IResource,
     spanProcessor: SpanProcessor
@@ -58,7 +58,7 @@ export class Tracer implements api.Tracer {
     this._idGenerator = config.idGenerator || new RandomIdGenerator();
     this._resource = resource;
     this._spanProcessor = spanProcessor;
-    this.instrumentationLibrary = instrumentationLibrary;
+    this.instrumentationScope = instrumentationScope;
   }
 
   /**
@@ -143,7 +143,7 @@ export class Tracer implements api.Tracer {
 
     const span = new SpanImpl({
       resource: this._resource,
-      scope: this.instrumentationLibrary,
+      scope: this.instrumentationScope,
       context,
       spanContext,
       name,
