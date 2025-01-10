@@ -99,11 +99,10 @@ describe('ConsoleSpanExporter', () => {
         assert.ok(consoleSpan.id === firstSpan.spanContext().spanId);
         assert.ok(keys === expectedKeys, 'expectedKeys');
         assert.ok(
-          firstSpan.instrumentationLibrary.name === instrumentationScopeName
+          firstSpan.instrumentationScope.name === instrumentationScopeName
         );
         assert.ok(
-          firstSpan.instrumentationLibrary.version ===
-            instrumentationScopeVersion
+          firstSpan.instrumentationScope.version === instrumentationScopeVersion
         );
 
         assert.ok(spyExport.calledOnce);
