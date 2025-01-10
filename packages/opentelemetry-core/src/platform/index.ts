@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 export {
-  RandomIdGenerator,
   SDK_INFO,
   _globalThis,
   getEnv,
