@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1736536651401,
+  "lastUpdate": 1736540050824,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -22986,6 +22986,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 752287,
             "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "513ef0d7fb0f83919b5e2172ea84da86d678d7ef",
+          "message": "chore(deps): update dependency markdownlint-cli2 to v0.17.1 (#5321)",
+          "timestamp": "2025-01-10T17:28:53Z",
+          "tree_id": "9a1e6725fb4ce0625d9d2342b334a05a29b899eb",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/513ef0d7fb0f83919b5e2172ea84da86d678d7ef"
+        },
+        "date": 1736540049960,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1467320,
+            "range": "±0.48%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 18324,
+            "range": "±0.22%",
+            "unit": "ops/sec",
+            "extra": "95 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 796015,
+            "range": "±0.68%",
+            "unit": "ops/sec",
+            "extra": "96 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 749076,
+            "range": "±0.66%",
             "unit": "ops/sec",
             "extra": "97 samples"
           }
