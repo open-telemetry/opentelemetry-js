@@ -19,7 +19,7 @@ import { SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH } from '@opentelemetry/semantic-c
 import { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { XMLHttpRequestInstrumentation } from '../src';
-import assert = require('assert');
+import * as assert from 'assert';
 
 class TestSpanProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];

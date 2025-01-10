@@ -34,6 +34,9 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
     * also renames the property in implementations of `ReadableSpan`
 * feat(exporter-jaeger): use `ReadableSpan.instrumentationScope` over `ReadableSpan.instrumentationLibrary` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
 * feat(exporter-zipkin): use `ReadableSpan.instrumentationScope` over `ReadableSpan.instrumentationLibrary` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
+* chore!: update typescript to version `5.0.4` [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145) @david-luna
+  * (user-facing) dropped support for `typescript@<5.0.4`
+  * (user-facing) all packages published from this repository will from now on drop support for old versions of `typescript` in minor releases. We will only drop support for versions that are older than 2 years.
 
 ### :rocket: (Enhancement)
 
@@ -48,6 +51,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
 * refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
 * refactor(sdk-trace-base): rename `BasicTracerProvider.activeSpanProcessor` private property. [#5211](https://github.com/open-telemetry/opentelemetry-js/pull/5211) @david-luna
+* chore(selenium-tests): remove internal selenium-tests/ package, it wasn't being used @trentm
 
 ## 1.30.0
 
