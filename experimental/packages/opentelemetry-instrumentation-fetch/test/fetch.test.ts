@@ -233,6 +233,7 @@ describe('fetch', () => {
             const decoder = new TextDecoder();
             requestBody = '';
             const read = async () => {
+              // @ts-expect-error -- iterator symbol was removed from types
               for await (const c of body) {
                 requestBody += decoder.decode(c);
               }
