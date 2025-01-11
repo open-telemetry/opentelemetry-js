@@ -15,9 +15,9 @@
  */
 
 import { hexToBinary } from '@opentelemetry/core';
-import { getOtlpEncoder } from '../src';
 import { toAnyValue } from '../src/common/internal';
 import * as assert from 'assert';
+import { getOtlpEncoder } from '../src/common/utils';
 
 const traceId = 'abcdef01234567890000000000000000';
 const spanId = '12341234abcdabcd';

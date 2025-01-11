@@ -28,7 +28,7 @@ import * as realFs from 'fs';
  * Webpack doesn't run in node 8 because it requires BigInt. Since we are testing
  * build tooling here, we can safely skip tooling we know can't run anyway.
  */
-describe('tree-shaking', () => {
+describe('tree-shaking', function () {
   const allowedAPIs = ['ContextAPI', 'DiagAPI'];
   const testAPIs = [
     {
@@ -50,7 +50,7 @@ describe('tree-shaking', () => {
   const outputPath = path.join(__dirname, 'output');
   const outputFilename = path.join(outputPath, 'bundle.js');
 
-  afterEach(() => {
+  afterEach(function () {
     try {
       mfs.unlinkSync(outputFilename);
     } catch {
@@ -88,9 +88,10 @@ describe('tree-shaking', () => {
       const fs = new Union();
       fs.use(mfs as any).use(realFs);
 
-      //direct webpack to use unionfs for file input
-      compiler.inputFileSystem = fs;
-      //direct webpack to output to memoryfs rather than to disk
+      // direct webpack to use unionfs for file input
+      // needs workaround from https://github.com/webpack/webpack/issues/18242#issuecomment-2018116985 since webpack 5.91.0
+      compiler.inputFileSystem = fs as any as typeof compiler.inputFileSystem;
+      // direct webpack to output to memoryfs rather than to disk
       compiler.outputFileSystem = {
         ...mfs,
         join: path.join,
@@ -121,6 +122,6 @@ describe('tree-shaking', () => {
       allowedAPIs.forEach(it => matches.delete(it));
 
       assert.deepStrictEqual(Array.from(matches), [testAPI.name]);
-    });
+    }).timeout(5000);
   }
 });

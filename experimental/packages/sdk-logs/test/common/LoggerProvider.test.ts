@@ -63,14 +63,13 @@ describe('LoggerProvider', () => {
         assert.deepStrictEqual(resource, Resource.default());
       });
 
-      it('should fallback to default resource attrs', () => {
+      it('should not have default resource if passed', function () {
         const passedInResource = new Resource({ foo: 'bar' });
-        const provider = new LoggerProvider({ resource: passedInResource });
+        const provider = new LoggerProvider({
+          resource: passedInResource,
+        });
         const { resource } = provider['_sharedState'];
-        assert.deepStrictEqual(
-          resource,
-          Resource.default().merge(passedInResource)
-        );
+        assert.deepStrictEqual(resource, passedInResource);
       });
 
       it('should have default forceFlushTimeoutMillis if not pass', () => {

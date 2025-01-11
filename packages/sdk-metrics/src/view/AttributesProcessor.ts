@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { Context, MetricAttributes } from '@opentelemetry/api';
+import { Context, Attributes } from '@opentelemetry/api';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which
  * attribute(s) are to be reported as metrics dimension(s) and adding
  * additional dimension(s) from the {@link Context}.
  */
-export abstract class AttributesProcessor {
+export interface IAttributesProcessor {
   /**
    * Process the metric instrument attributes.
    *
@@ -29,33 +29,31 @@ export abstract class AttributesProcessor {
    * @param context The active context when the instrument is synchronous.
    * `undefined` otherwise.
    */
-  abstract process(
-    incoming: MetricAttributes,
-    context?: Context
-  ): MetricAttributes;
-
-  static Noop() {
-    return NOOP;
-  }
+  process: (incoming: Attributes, context?: Context) => Attributes;
 }
 
-export class NoopAttributesProcessor extends AttributesProcessor {
-  process(incoming: MetricAttributes, _context?: Context) {
+class NoopAttributesProcessor implements IAttributesProcessor {
+  process(incoming: Attributes, _context?: Context) {
     return incoming;
   }
 }
 
-/**
- * {@link AttributesProcessor} that filters by allowed attribute names and drops any names that are not in the
- * allow list.
- */
-export class FilteringAttributesProcessor extends AttributesProcessor {
-  constructor(private _allowedAttributeNames: string[]) {
-    super();
+class MultiAttributesProcessor implements IAttributesProcessor {
+  constructor(private readonly _processors: IAttributesProcessor[]) {}
+  process(incoming: Attributes, context?: Context): Attributes {
+    let filteredAttributes = incoming;
+    for (const processor of this._processors) {
+      filteredAttributes = processor.process(filteredAttributes, context);
+    }
+    return filteredAttributes;
   }
+}
 
-  process(incoming: MetricAttributes, _context: Context): MetricAttributes {
-    const filteredAttributes: MetricAttributes = {};
+class AllowListProcessor implements IAttributesProcessor {
+  constructor(private _allowedAttributeNames: string[]) {}
+
+  process(incoming: Attributes, _context?: Context): Attributes {
+    const filteredAttributes: Attributes = {};
     Object.keys(incoming)
       .filter(attributeName =>
         this._allowedAttributeNames.includes(attributeName)
@@ -66,6 +64,64 @@ export class FilteringAttributesProcessor extends AttributesProcessor {
       );
     return filteredAttributes;
   }
+}
+
+class DenyListProcessor implements IAttributesProcessor {
+  constructor(private _deniedAttributeNames: string[]) {}
+
+  process(incoming: Attributes, _context?: Context): Attributes {
+    const filteredAttributes: Attributes = {};
+    Object.keys(incoming)
+      .filter(
+        attributeName => !this._deniedAttributeNames.includes(attributeName)
+      )
+      .forEach(
+        attributeName =>
+          (filteredAttributes[attributeName] = incoming[attributeName])
+      );
+    return filteredAttributes;
+  }
+}
+
+/**
+ * @internal
+ *
+ * Create an {@link IAttributesProcessor} that acts as a simple pass-through for attributes.
+ */
+export function createNoopAttributesProcessor(): IAttributesProcessor {
+  return NOOP;
+}
+
+/**
+ * @internal
+ *
+ * Create an {@link IAttributesProcessor} that applies all processors from the provided list in order.
+ *
+ * @param processors Processors to apply in order.
+ */
+export function createMultiAttributesProcessor(
+  processors: IAttributesProcessor[]
+): IAttributesProcessor {
+  return new MultiAttributesProcessor(processors);
+}
+
+/**
+ * Create an {@link IAttributesProcessor} that filters by allowed attribute names and drops any names that are not in the
+ * allow list.
+ */
+export function createAllowListAttributesProcessor(
+  attributeAllowList: string[]
+): IAttributesProcessor {
+  return new AllowListProcessor(attributeAllowList);
+}
+
+/**
+ * Create an {@link IAttributesProcessor} that drops attributes based on the names provided in the deny list
+ */
+export function createDenyListAttributesProcessor(
+  attributeDenyList: string[]
+): IAttributesProcessor {
+  return new DenyListProcessor(attributeDenyList);
 }
 
 const NOOP = new NoopAttributesProcessor();

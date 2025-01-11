@@ -19,7 +19,7 @@ import { SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH } from '@opentelemetry/semantic-c
 import { ReadableSpan, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { XMLHttpRequestInstrumentation } from '../src';
-import assert = require('assert');
+import * as assert from 'assert';
 
 class TestSpanProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];
@@ -41,13 +41,14 @@ describe('unmocked xhr', () => {
   let testSpans: TestSpanProcessor;
   let provider: WebTracerProvider;
   beforeEach(() => {
-    provider = new WebTracerProvider();
+    testSpans = new TestSpanProcessor();
+    provider = new WebTracerProvider({
+      spanProcessors: [testSpans],
+    });
     registerInstrumentations({
       instrumentations: [new XMLHttpRequestInstrumentation()],
       tracerProvider: provider,
     });
-    testSpans = new TestSpanProcessor();
-    provider.addSpanProcessor(testSpans);
   });
   afterEach(() => {
     // nop

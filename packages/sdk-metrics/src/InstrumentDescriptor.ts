@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-import { MetricOptions, ValueType, diag } from '@opentelemetry/api';
+import {
+  MetricAdvice,
+  MetricOptions,
+  ValueType,
+  diag,
+} from '@opentelemetry/api';
 import { View } from './view/View';
 import { equalsCaseInsensitive } from './utils';
-
-/**
- * Supported types of metric instruments.
- */
-export enum InstrumentType {
-  COUNTER = 'COUNTER',
-  GAUGE = 'GAUGE',
-  HISTOGRAM = 'HISTOGRAM',
-  UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
-  OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
-  OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
-  OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
-}
+import { InstrumentType, MetricDescriptor } from './export/MetricData';
 
 /**
  * An internal interface describing the instrument.
@@ -37,25 +30,19 @@ export enum InstrumentType {
  * This is intentionally distinguished from the public MetricDescriptor (a.k.a. InstrumentDescriptor)
  * which may not contains internal fields like metric advice.
  */
-export interface InstrumentDescriptor {
-  readonly name: string;
-  readonly description: string;
-  readonly unit: string;
-  readonly type: InstrumentType;
-  readonly valueType: ValueType;
+export interface InstrumentDescriptor extends MetricDescriptor {
   /**
-   * @experimental
-   *
-   * This is intentionally not using the API's type as it's only available from @opentelemetry/api 1.7.0 and up.
-   * In SDK 2.0 we'll be able to bump the minimum API version and remove this workaround.
+   * For internal use; exporter should avoid depending on the type of the
+   * instrument as their resulting aggregator can be re-mapped with views.
    */
-  readonly advice: {
-    /**
-     * Hint the explicit bucket boundaries for SDK if the metric has been
-     * aggregated with a HistogramAggregator.
-     */
-    explicitBucketBoundaries?: number[];
-  };
+  readonly type: InstrumentType;
+
+  /**
+   * See {@link MetricAdvice}
+   *
+   * @experimental
+   */
+  readonly advice: MetricAdvice;
 }
 
 export function createInstrumentDescriptor(

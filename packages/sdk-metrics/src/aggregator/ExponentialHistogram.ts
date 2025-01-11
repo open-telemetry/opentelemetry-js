@@ -24,12 +24,12 @@ import {
 import {
   DataPointType,
   ExponentialHistogramMetricData,
-  MetricDescriptor,
+  InstrumentType,
 } from '../export/MetricData';
 import { diag, HrTime } from '@opentelemetry/api';
-import { InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Buckets } from './exponential-histogram/Buckets';
 import { getMapping } from './exponential-histogram/mapping/getMapping';
 import { Mapping } from './exponential-histogram/mapping/types';
@@ -566,7 +566,7 @@ export class ExponentialHistogramAggregator
   }
 
   toMetricData(
-    descriptor: MetricDescriptor,
+    descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<ExponentialHistogramAccumulation>[],
     endTime: HrTime

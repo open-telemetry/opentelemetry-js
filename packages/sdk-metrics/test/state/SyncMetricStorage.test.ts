@@ -22,7 +22,7 @@ import { AggregationTemporality } from '../../src/export/AggregationTemporality'
 import { DataPointType } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { SyncMetricStorage } from '../../src/state/SyncMetricStorage';
-import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
+import { createNoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import {
   assertMetricData,
   assertDataPoint,
@@ -33,10 +33,12 @@ import {
 
 const deltaCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
+  selectCardinalityLimit: () => 2000,
 };
 
 const cumulativeCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
+  selectCardinalityLimit: () => 2000,
 };
 
 describe('SyncMetricStorage', () => {
@@ -45,7 +47,7 @@ describe('SyncMetricStorage', () => {
       const metricStorage = new SyncMetricStorage(
         defaultInstrumentDescriptor,
         new SumAggregator(true),
-        new NoopAttributesProcessor(),
+        createNoopAttributesProcessor(),
         []
       );
 
@@ -63,7 +65,7 @@ describe('SyncMetricStorage', () => {
         const metricStorage = new SyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [deltaCollector]
         );
 
@@ -101,7 +103,7 @@ describe('SyncMetricStorage', () => {
         const metricStorage = new SyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [cumulativeCollector]
         );
         metricStorage.record(1, {}, api.context.active(), [0, 0]);

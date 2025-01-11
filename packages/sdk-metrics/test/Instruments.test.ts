@@ -24,9 +24,9 @@ import {
   Histogram,
   InstrumentType,
   MeterProvider,
-  MetricDescriptor,
   MetricReader,
 } from '../src';
+import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
   TestDeltaMetricReader,
   TestMetricReader,
@@ -63,6 +63,7 @@ describe('Instruments', () => {
           unit: 'kB',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       });
     });
@@ -89,6 +90,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.COUNTER,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.SUM,
         isMonotonic: true,
@@ -191,6 +193,7 @@ describe('Instruments', () => {
           unit: 'kB',
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       });
     });
@@ -219,6 +222,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.SUM,
         isMonotonic: false,
@@ -286,6 +290,7 @@ describe('Instruments', () => {
           unit: 'kB',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       });
     });
@@ -314,6 +319,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -325,7 +331,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 10,
@@ -341,7 +347,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 100,
@@ -374,6 +380,9 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {
+            explicitBucketBoundaries: [1, 9, 100],
+          },
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -395,7 +404,7 @@ describe('Instruments', () => {
             value: {
               buckets: {
                 boundaries: [1, 9, 100],
-                counts: [1, 0, 0, 1],
+                counts: [1, 0, 1, 0],
               },
               count: 2,
               sum: 100,
@@ -443,6 +452,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -473,6 +483,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -484,7 +495,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 0, 1, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 4,
               sum: 220,
@@ -534,7 +545,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 10.1,
@@ -550,7 +561,7 @@ describe('Instruments', () => {
                   0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000,
                   7500, 10000,
                 ],
-                counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
               sum: 100.1,
@@ -827,7 +838,7 @@ function setup() {
 interface ValidateMetricData {
   resource?: Resource;
   instrumentationScope?: InstrumentationScope;
-  descriptor?: MetricDescriptor;
+  descriptor?: InstrumentDescriptor;
   dataPointType?: DataPointType;
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
   isMonotonic?: boolean;

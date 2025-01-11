@@ -33,9 +33,10 @@ const collectorOptions = {
   url: 'http://<collector-hostname>:<port>',
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -59,9 +60,10 @@ const collectorOptions = {
   credentials: grpc.credentials.createSsl(),
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -100,9 +102,10 @@ const collectorOptions = {
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
-const provider = new BasicTracerProvider();
 const exporter = new OTLPTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const provider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(exporter)]
+});
 
 provider.register();
 ['SIGINT', 'SIGTERM'].forEach(signal => {

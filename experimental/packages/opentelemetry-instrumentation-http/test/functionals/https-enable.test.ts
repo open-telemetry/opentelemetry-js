@@ -65,10 +65,11 @@ const hostname = 'localhost';
 const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const provider = new BasicTracerProvider();
+const provider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
+});
 instrumentation.setTracerProvider(provider);
 const tracer = provider.getTracer('test-https');
-provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 function doNock(
   hostname: string,
@@ -111,19 +112,9 @@ describe('HttpsInstrumentation', () => {
 
       before(() => {
         instrumentation.setConfig({
-          ignoreIncomingPaths: [
-            (url: string) => {
-              throw new Error('bad ignoreIncomingPaths function');
-            },
-          ],
           ignoreIncomingRequestHook: _request => {
             throw new Error('bad ignoreIncomingRequestHook function');
           },
-          ignoreOutgoingUrls: [
-            (url: string) => {
-              throw new Error('bad ignoreOutgoingUrls function');
-            },
-          ],
           ignoreOutgoingRequestHook: _request => {
             throw new Error('bad ignoreOutgoingRequestHook function');
           },
@@ -184,6 +175,7 @@ describe('HttpsInstrumentation', () => {
         );
       });
     });
+
     describe('with good instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
@@ -191,21 +183,11 @@ describe('HttpsInstrumentation', () => {
 
       before(() => {
         instrumentation.setConfig({
-          ignoreIncomingPaths: [
-            '/ignored/string',
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith('/ignored/function'),
-          ],
           ignoreIncomingRequestHook: request => {
             return (
               request.headers['user-agent']?.match('ignored-string') != null
             );
           },
-          ignoreOutgoingUrls: [
-            `${protocol}://${hostname}:${serverPort}/ignored/string`,
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith('/ignored/function'),
-          ],
           ignoreOutgoingRequestHook: request => {
             if (request.headers?.['user-agent'] != null) {
               return (
@@ -440,19 +422,7 @@ describe('HttpsInstrumentation', () => {
         });
       });
 
-      for (const ignored of ['string', 'function', 'regexp']) {
-        it(`should not trace ignored requests with paths (client and server side) with type ${ignored}`, async () => {
-          const testPath = `/ignored/${ignored}`;
-
-          await httpsRequest.get(
-            `${protocol}://${hostname}:${serverPort}${testPath}`
-          );
-          const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 0);
-        });
-      }
-
-      it('should not trace ignored requests with headers (client and server side)', async () => {
+      it('should trace requests when ignore hook returns false', async () => {
         const testValue = 'ignored-string';
 
         await Promise.all([
@@ -466,7 +436,7 @@ describe('HttpsInstrumentation', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      for (const arg of ['string', {}, new Date()]) {
+      for (const arg of [{}, new Date()]) {
         it(`should be traceable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
@@ -702,6 +672,86 @@ describe('HttpsInstrumentation', () => {
           });
         });
         req.end();
+      });
+
+      it('should keep username and password in the request', async () => {
+        await httpsRequest.get(
+          `${protocol}://username:password@${hostname}:${serverPort}/login`
+        );
+      });
+
+      it('should keep query in the request', async () => {
+        await httpsRequest.get(
+          `${protocol}://${hostname}:${serverPort}/withQuery?foo=bar`
+        );
+      });
+
+      it('using an invalid url does throw from client but still creates a span', async () => {
+        try {
+          await httpsRequest.get(
+            `${protocol}://instrumentation.test:string-as-port/`
+          );
+        } catch (e) {
+          assert.match(e.message, /Invalid URL/);
+        }
+
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+      });
+    });
+
+    describe('partially disable instrumentation', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('allows to disable outgoing request instrumentation', () => {
+        instrumentation.setConfig({
+          disableOutgoingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = https.createServer(
+          {
+            key: fs.readFileSync('test/fixtures/server-key.pem'),
+            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+          },
+          (request, response) => {
+            response.end('Test Server Response');
+          }
+        );
+
+        server.listen(serverPort);
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), true);
+        assert.strictEqual(isWrapped(http.get), false);
+        assert.strictEqual(isWrapped(http.request), false);
+      });
+
+      it('allows to disable incoming request instrumentation', () => {
+        instrumentation.setConfig({
+          disableIncomingRequestInstrumentation: true,
+        });
+        instrumentation.enable();
+        server = https.createServer(
+          {
+            key: fs.readFileSync('test/fixtures/server-key.pem'),
+            cert: fs.readFileSync('test/fixtures/server-cert.pem'),
+          },
+          (request, response) => {
+            response.end('Test Server Response');
+          }
+        );
+
+        server.listen(serverPort);
+
+        assert.strictEqual(isWrapped(http.Server.prototype.emit), false);
+        assert.strictEqual(isWrapped(http.get), true);
+        assert.strictEqual(isWrapped(http.request), true);
       });
     });
   });

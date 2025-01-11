@@ -26,9 +26,11 @@ const provider = new BasicTracerProvider({
   resource: new Resource({
     [SEMRESATTRS_SERVICE_NAME]: 'basic-service',
   }),
+  spanProcessors: [
+    new SimpleSpanProcessor(exporter),
+    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+  ]
 });
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
 const tracer = trace.getTracer('example-otlp-exporter-node');

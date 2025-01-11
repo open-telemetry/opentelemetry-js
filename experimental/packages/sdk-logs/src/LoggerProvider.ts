@@ -34,9 +34,7 @@ export class LoggerProvider implements logsAPI.LoggerProvider {
 
   constructor(config: LoggerProviderConfig = {}) {
     const mergedConfig = merge({}, loadDefaultConfig(), config);
-    const resource = Resource.default().merge(
-      mergedConfig.resource ?? Resource.empty()
-    );
+    const resource = config.resource ?? Resource.default();
     this._sharedState = new LoggerProviderSharedState(
       resource,
       mergedConfig.forceFlushTimeoutMillis,

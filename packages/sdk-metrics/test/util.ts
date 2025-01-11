@@ -17,23 +17,20 @@
 import {
   Context,
   BatchObservableCallback,
-  MetricAttributes,
+  Attributes,
   ObservableCallback,
   ValueType,
 } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
-  InstrumentDescriptor,
   InstrumentType,
-} from '../src/InstrumentDescriptor';
-import {
   MetricData,
   DataPoint,
   DataPointType,
   ScopeMetrics,
-  MetricDescriptor,
 } from '../src/export/MetricData';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
@@ -42,8 +39,7 @@ import { AggregationTemporality } from '../src/export/AggregationTemporality';
 
 export type Measurement = {
   value: number;
-  // TODO: use common attributes
-  attributes: MetricAttributes;
+  attributes: Attributes;
   context?: Context;
 };
 
@@ -80,7 +76,7 @@ export const validNames = [
 ];
 
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
-export const commonAttributes: MetricAttributes[] = [
+export const commonAttributes: Attributes[] = [
   {},
   { 1: '1' },
   { a: '2' },
@@ -106,7 +102,7 @@ export function assertScopeMetrics(
 export function assertMetricData(
   actual: unknown,
   dataPointType?: DataPointType,
-  metricDescriptor: Partial<MetricDescriptor> | null = defaultInstrumentDescriptor,
+  metricDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
   aggregationTemporality?: AggregationTemporality
 ): asserts actual is MetricData {
   const it = actual as MetricData;
@@ -126,7 +122,7 @@ export function assertMetricData(
 
 export function assertDataPoint(
   actual: unknown,
-  attributes: MetricAttributes,
+  attributes: Attributes,
   point: Histogram | number,
   startTime?: HrTime,
   endTime?: HrTime

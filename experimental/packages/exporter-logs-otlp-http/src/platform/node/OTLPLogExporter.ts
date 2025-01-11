@@ -19,49 +19,30 @@ import type {
   LogRecordExporter,
 } from '@opentelemetry/sdk-logs';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import type { IExportLogsServiceResponse } from '@opentelemetry/otlp-transformer';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
-import {
-  OTLPExporterNodeBase,
-  parseHeaders,
-} from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer';
-
-import { getDefaultUrl } from '../config';
 import { VERSION } from '../../version';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
+import {
+  convertLegacyHttpOptions,
+  createOtlpHttpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
 /**
  * Collector Logs Exporter for Node
  */
 export class OTLPLogExporter
-  extends OTLPExporterNodeBase<ReadableLogRecord, IExportLogsServiceResponse>
+  extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    // load  OTEL_EXPORTER_OTLP_LOGS_TIMEOUT env
     super(
-      {
-        timeoutMillis: getEnv().OTEL_EXPORTER_OTLP_LOGS_TIMEOUT,
-        ...config,
-      },
-      JsonLogsSerializer,
-      'application/json'
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config, 'LOGS', 'v1/logs', {
+          'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
+          'Content-Type': 'application/json',
+        }),
+        JsonLogsSerializer
+      )
     );
-    this.headers = {
-      ...this.headers,
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_LOGS_HEADERS
-      ),
-      ...parseHeaders(config?.headers),
-    };
-  }
-
-  getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
-    return getDefaultUrl(config);
   }
 }

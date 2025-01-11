@@ -35,11 +35,18 @@
 
 ---
 
+> [!WARNING]
+> This is the working branch for the work in progress 2.0 SDK, see [this tracking issue](https://github.com/open-telemetry/opentelemetry-js/issues/5148) for details.
+> If you are a user looking for the current released state, you are probably looking for the [1.x SDK](https://github.com/open-telemetry/opentelemetry-js/tree/v1.x) on the v1.x branch.
+
 ## About this project
 
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics, and logs from applications.
 
 ## Quick Start
+
+**Much of OpenTelemetry JS documentation is written assuming the compiled application is run as CommonJS.**
+For more details on ECMAScript Modules vs CommonJS, refer to [esm-support](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/esm-support.md).
 
 The following describes how to set up tracing for a basic web application.
 For more detailed documentation, see the website at <https://opentelemetry.io/docs/instrumentation/js/>.
@@ -110,12 +117,10 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 ## Supported Runtimes
 
 | Platform Version    | Supported                                     |
-|---------------------|-----------------------------------------------|
+| ------------------- | --------------------------------------------- |
 | Node.JS `v22`       | :heavy_check_mark:                            |
 | Node.JS `v20`       | :heavy_check_mark:                            |
 | Node.JS `v18`       | :heavy_check_mark:                            |
-| Node.JS `v16`       | :heavy_check_mark:                            |
-| Node.JS `v14`       | :heavy_check_mark:                            |
 | Older Node Versions | See [Node Support](#node-support)             |
 | Web Browsers        | See [Browser Support](#browser-support) below |
 
@@ -123,8 +128,6 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 Only Node.js Active or Maintenance LTS versions are supported.
 Previous versions of node *may* work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
-Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the
-`perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
 
@@ -132,8 +135,24 @@ Note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenT
 > Client instrumentation for the browser is **experimental** and mostly **unspecified**. If you are interested in
 > helping out, get in touch with the [Client Instrumentation SIG][client-instrumentation-sig].
 
-There is currently no list of officially supported browsers. OpenTelemetry is developed using standard web
-technologies and aims to work in currently supported versions of major browsers.
+Rather than define versions of specific browsers / runtimes, OpenTelemetry sets the minimum supported version based on the
+underlying language features used.
+
+The current minumum language feature support is set as [ECMAScript 2020](https://262.ecma-international.org/11.0/) that are available
+in all modern browsers / runtimes.
+
+This means that if you are targeting or your end-users are using a browser / runtime that does not support ES2020, you will need
+to transpile the code and provide any necessary polyfills for the missing features to ensure compatibility with your target
+environments. Any support issues that arise from using a browser or runtime that does not support ES2020 will be closed as "won't fix".
+
+This minimum support level is subject to change as the project evolves and as the underlying language features evolve.
+
+## TypeScript Support
+
+OpenTelemetry JavaScript is built with TypeScript `v5.0.4`. If you have a TypeScript project (app, library, instrumentation, etc.)
+that depends on it we recomed using same or higher version to compile the project.
+
+OpenTelemetry JavaScript will follows DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window) which sets a support window of 2 years. Support for TypeScript versions older than 2 years will be dropped in minor releases of OpenTelemetry JavaScript.
 
 ## Package Version Compatibility
 
@@ -143,19 +162,27 @@ There may also be API packages for experimental signals in the experimental dire
 All stable packages are released with the same version, and all experimental packages are released with the same version.
 The below table describes which versions of each set of packages are expected to work together.
 
-| Stable Packages                                                 | Experimental Packages |
-|-----------------------------------------------------------------|-----------------------|
-| 1.21.x                                                          | 0.48.x                |
-| 1.20.x                                                          | 0.47.x                |
-| 1.19.x                                                          | 0.46.x                |
-| 1.18.x                                                          | 0.45.x                |
-| 1.17.x                                                          | 0.44.x                |
+| Stable Packages | Experimental Packages |
+|-----------------|-----------------------|
+| 1.30.x          | 0.57.x                |
+| 1.29.x          | 0.56.x                |
+| 1.28.x          | 0.55.x                |
+| 1.27.x          | 0.54.x                |
+| 1.25.x          | 0.52.x                |
 
 <details>
 <summary>Older version compatibility matrix</summary>
 
 <table>
 <tr><th>Stable Packages</th>                            <th>Experimental Packages</th></tr>
+<tr><td>1.24.x</td>                                                    <td>0.51.x</td></tr>
+<tr><td>1.23.x</td>                                                    <td>0.50.x</td></tr>
+<tr><td>1.22.x</td>                                                    <td>0.49.x</td></tr>
+<tr><td>1.21.x</td>                                                    <td>0.48.x</td></tr>
+<tr><td>1.20.x</td>                                                    <td>0.47.x</td></tr>
+<tr><td>1.19.x</td>                                                    <td>0.46.x</td></tr>
+<tr><td>1.18.x</td>                                                    <td>0.45.x</td></tr>
+<tr><td>1.17.x</td>                                                    <td>0.43.x, 0.44.x</td></tr>
 <tr><td>1.16.x</td>                                                    <td>0.42.x</td></tr>
 <tr><td>1.15.x</td>                                                    <td>0.41.x</td></tr>
 <tr><td>1.14.x</td>                                                    <td>0.40.x</td></tr>
@@ -208,22 +235,23 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 - [Amir Blum](https://github.com/blumamir), Odigos
 - [Chengzhong Wu](https://github.com/legendecas), Bloomberg
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Marc Pichler](https://github.com/pichlermarc), Dynatrace
+- [Trent Mick](https://github.com/trentm), Elastic
 
 *Find more about the maintainer role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
 
 #### Approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers))
 
+- [David Luna](https://github.com/david-luna), Elastic
 - [Hector Hernandez](https://github.com/hectorhdzg), Microsoft
-- [Jamie Danielson](https://github.com/JamieDanielson), Honeycomb
 - [Martin Kuba](https://github.com/martinkuba), Lightstep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Purvi Kanal](https://github.com/pkanal), Honeycomb
 - [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
-- [Trent Mick](https://github.com/trentm), Elastic
-- [David Luna](https://github.com/david-luna), Elastic
+- [Marylia Gutierrez](https://github.com/maryliag), Grafana Labs
 
 *Find more about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 

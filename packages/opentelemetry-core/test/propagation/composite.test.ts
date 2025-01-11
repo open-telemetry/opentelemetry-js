@@ -25,11 +25,7 @@ import {
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
-import {
-  CompositePropagator,
-  W3CTraceContextPropagator,
-  RandomIdGenerator,
-} from '../../src';
+import { CompositePropagator, W3CTraceContextPropagator } from '../../src';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
@@ -52,14 +48,8 @@ class DummyPropagator implements TextMapPropagator {
 }
 
 describe('Composite Propagator', () => {
-  let traceId: string;
-  let spanId: string;
-
-  beforeEach(() => {
-    const idGenerator = new RandomIdGenerator();
-    traceId = idGenerator.generateTraceId();
-    spanId = idGenerator.generateSpanId();
-  });
+  const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
+  const spanId = '6e0c63257de34c92';
 
   describe('inject', () => {
     let carrier: { [key: string]: unknown };

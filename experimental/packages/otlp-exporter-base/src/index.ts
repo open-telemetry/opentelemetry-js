@@ -13,17 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './platform';
+
 export { OTLPExporterBase } from './OTLPExporterBase';
+export { OTLPExporterError } from './types';
+
 export {
-  OTLPExporterError,
-  OTLPExporterConfigBase,
-  ExportServiceError,
-} from './types';
+  ExportResponse,
+  ExportResponseFailure,
+  ExportResponseSuccess,
+  ExportResponseRetryable,
+} from './export-response';
+
+export { IExporterTransport } from './exporter-transport';
+
 export {
-  parseHeaders,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
-  configureExporterTimeout,
-  invalidTimeout,
-} from './util';
+  OtlpSharedConfiguration,
+  mergeOtlpSharedConfigurationWithDefaults,
+  getSharedConfigurationDefaults,
+} from './configuration/shared-configuration';
+
+export {
+  OTLPExporterNodeConfigBase,
+  CompressionAlgorithm,
+} from './configuration/legacy-node-configuration';
+export { OTLPExporterConfigBase } from './configuration/legacy-base-configuration';
+export { IOtlpExportDelegate } from './otlp-export-delegate';
+export { createOtlpNetworkExportDelegate } from './otlp-network-export-delegate';

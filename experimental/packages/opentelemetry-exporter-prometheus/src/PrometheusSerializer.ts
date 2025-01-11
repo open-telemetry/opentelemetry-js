@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-import {
-  diag,
-  MetricAttributes,
-  MetricAttributeValue,
-} from '@opentelemetry/api';
+import { diag, Attributes, AttributeValue } from '@opentelemetry/api';
 import {
   ResourceMetrics,
-  InstrumentType,
   DataPointType,
   ScopeMetrics,
   MetricData,
@@ -48,7 +43,7 @@ function escapeString(str: string) {
  *
  * `undefined` is converted to an empty string.
  */
-function escapeAttributeValue(str: MetricAttributeValue = '') {
+function escapeAttributeValue(str: AttributeValue = '') {
   if (typeof str !== 'string') {
     str = JSON.stringify(str);
   }
@@ -94,10 +89,14 @@ function sanitizePrometheusMetricName(name: string): string {
  */
 function enforcePrometheusNamingConvention(
   name: string,
-  type: InstrumentType
+  data: MetricData
 ): string {
   // Prometheus requires that metrics of the Counter kind have "_total" suffix
-  if (!name.endsWith('_total') && type === InstrumentType.COUNTER) {
+  if (
+    !name.endsWith('_total') &&
+    data.dataPointType === DataPointType.SUM &&
+    data.isMonotonic
+  ) {
     name = name + '_total';
   }
 
@@ -136,10 +135,10 @@ function toPrometheusType(metricData: MetricData): PrometheusDataTypeLiteral {
 
 function stringify(
   metricName: string,
-  attributes: MetricAttributes,
+  attributes: Attributes,
   value: number,
   timestamp?: number,
-  additionalAttributes?: MetricAttributes
+  additionalAttributes?: Attributes
 ) {
   let hasAttribute = false;
   let attributesStr = '';
@@ -214,7 +213,7 @@ export class PrometheusSerializer {
     }
     const dataPointType = metricData.dataPointType;
 
-    name = enforcePrometheusNamingConvention(name, metricData.descriptor.type);
+    name = enforcePrometheusNamingConvention(name, metricData);
 
     const help = `# HELP ${name} ${escapeString(
       metricData.descriptor.description || 'description missing'
@@ -229,25 +228,13 @@ export class PrometheusSerializer {
       case DataPointType.SUM:
       case DataPointType.GAUGE: {
         results = metricData.dataPoints
-          .map(it =>
-            this._serializeSingularDataPoint(
-              name,
-              metricData.descriptor.type,
-              it
-            )
-          )
+          .map(it => this._serializeSingularDataPoint(name, metricData, it))
           .join('');
         break;
       }
       case DataPointType.HISTOGRAM: {
         results = metricData.dataPoints
-          .map(it =>
-            this._serializeHistogramDataPoint(
-              name,
-              metricData.descriptor.type,
-              it
-            )
-          )
+          .map(it => this._serializeHistogramDataPoint(name, metricData, it))
           .join('');
         break;
       }
@@ -263,12 +250,12 @@ export class PrometheusSerializer {
 
   private _serializeSingularDataPoint(
     name: string,
-    type: InstrumentType,
+    data: MetricData,
     dataPoint: DataPoint<number>
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, type);
+    name = enforcePrometheusNamingConvention(name, data);
     const { value, attributes } = dataPoint;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     results += stringify(
@@ -283,12 +270,12 @@ export class PrometheusSerializer {
 
   private _serializeHistogramDataPoint(
     name: string,
-    type: InstrumentType,
+    data: MetricData,
     dataPoint: DataPoint<Histogram>
   ): string {
     let results = '';
 
-    name = enforcePrometheusNamingConvention(name, type);
+    name = enforcePrometheusNamingConvention(name, data);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);

@@ -15,59 +15,29 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { baggageUtils, getEnv } from '@opentelemetry/core';
 import {
+  convertLegacyOtlpGrpcOptions,
+  createOtlpGrpcExportDelegate,
   OTLPGRPCExporterConfigNode,
-  OTLPGRPCExporterNodeBase,
-  validateAndNormalizeUrl,
-  DEFAULT_COLLECTOR_URL,
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import {
-  IExportTraceServiceResponse,
-  ProtobufTraceSerializer,
-} from '@opentelemetry/otlp-transformer';
-import { VERSION } from './version';
-
-const USER_AGENT = {
-  'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
-};
+import { ProtobufTraceSerializer } from '@opentelemetry/otlp-transformer';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPGRPCExporterNodeBase<ReadableSpan, IExportTraceServiceResponse>
+  extends OTLPExporterBase<ReadableSpan[]>
   implements SpanExporter
 {
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
-    const signalSpecificMetadata = {
-      ...USER_AGENT,
-      ...baggageUtils.parseKeyPairsIntoRecord(
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS
-      ),
-    };
     super(
-      config,
-      signalSpecificMetadata,
-      'TraceExportService',
-      '/opentelemetry.proto.collector.trace.v1.TraceService/Export',
-      ProtobufTraceSerializer
-    );
-  }
-
-  getDefaultUrl(config: OTLPGRPCExporterConfigNode) {
-    return validateAndNormalizeUrl(this.getUrlFromConfig(config));
-  }
-
-  getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return (
-      getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
-      getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
-      DEFAULT_COLLECTOR_URL
+      createOtlpGrpcExportDelegate(
+        convertLegacyOtlpGrpcOptions(config, 'TRACES'),
+        ProtobufTraceSerializer,
+        'TraceExportService',
+        '/opentelemetry.proto.collector.trace.v1.TraceService/Export'
+      )
     );
   }
 }

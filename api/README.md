@@ -45,8 +45,9 @@ const { trace }  = require("@opentelemetry/api");
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor }  = require("@opentelemetry/sdk-trace-base");
 
 // Create and register an SDK
-const provider = new BasicTracerProvider();
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+const provider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(new ConsoleSpanExporter())]
+});
 trace.setGlobalTracerProvider(provider);
 
 // Acquire a tracer from the global tracer provider which will be used to trace the application

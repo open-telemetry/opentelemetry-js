@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
-export * from './platform';
-export * from './OTLPMetricExporterOptions';
-export * from './OTLPMetricExporterBase';
+export { OTLPMetricExporter } from './platform';
+export {
+  OTLPMetricExporterOptions,
+  AggregationTemporalityPreference,
+} from './OTLPMetricExporterOptions';
+export {
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
+  LowMemoryTemporalitySelector,
+  OTLPMetricExporterBase,
+} from './OTLPMetricExporterBase';

@@ -16,10 +16,13 @@
 
 import { millisToHrTime } from '@opentelemetry/core';
 import { AggregationTemporalitySelector } from '../export/AggregationSelector';
-import { CollectionResult, ScopeMetrics } from '../export/MetricData';
+import {
+  CollectionResult,
+  InstrumentType,
+  ScopeMetrics,
+} from '../export/MetricData';
 import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
-import { InstrumentType } from '../InstrumentDescriptor';
 import { ForceFlushOptions, ShutdownOptions } from '../types';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
 
@@ -90,6 +93,14 @@ export class MetricCollector implements MetricProducer {
   selectAggregation(instrumentType: InstrumentType) {
     return this._metricReader.selectAggregation(instrumentType);
   }
+
+  /**
+   * Select the cardinality limit for the given {@link InstrumentType} for this
+   * collector.
+   */
+  selectCardinalityLimit(instrumentType: InstrumentType): number {
+    return this._metricReader.selectCardinalityLimit?.(instrumentType) ?? 2000;
+  }
 }
 
 /**
@@ -98,4 +109,5 @@ export class MetricCollector implements MetricProducer {
  */
 export interface MetricCollectorHandle {
   selectAggregationTemporality: AggregationTemporalitySelector;
+  selectCardinalityLimit(instrumentType: InstrumentType): number;
 }

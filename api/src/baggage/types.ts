@@ -32,6 +32,9 @@ import { baggageEntryMetadataSymbol } from './internal/symbol';
  * limitations under the License.
  */
 
+/**
+ * @since 1.0.0
+ */
 export interface BaggageEntry {
   /** `String` value of the `BaggageEntry`. */
   value: string;
@@ -45,6 +48,8 @@ export interface BaggageEntry {
 /**
  * Serializable Metadata defined by the W3C baggage specification.
  * It currently has no special meaning defined by the OpenTelemetry or W3C.
+ *
+ * @since 1.0.0
  */
 export type BaggageEntryMetadata = { toString(): string } & {
   __TYPE__: typeof baggageEntryMetadataSymbol;
@@ -54,6 +59,8 @@ export type BaggageEntryMetadata = { toString(): string } & {
  * Baggage represents collection of key-value pairs with optional metadata.
  * Each key of Baggage is associated with exactly one value.
  * Baggage may be used to annotate and enrich telemetry data.
+ *
+ * @since 1.0.0
  */
 export interface Baggage {
   /**

@@ -30,9 +30,9 @@ export const _globalThis: typeof globalThis =
   typeof globalThis === 'object'
     ? globalThis
     : typeof self === 'object'
-    ? self
-    : typeof window === 'object'
-    ? window
-    : typeof global === 'object'
-    ? global
-    : ({} as typeof globalThis);
+      ? self
+      : typeof window === 'object'
+        ? window
+        : typeof global === 'object'
+          ? global
+          : ({} as typeof globalThis);
