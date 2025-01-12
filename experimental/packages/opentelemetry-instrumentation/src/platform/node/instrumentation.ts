@@ -291,8 +291,10 @@ export abstract class InstrumentationBase<
 
     this._warnOnPreloadedModules();
 
-    const imdsFromHookPath: Map<string, InstrumentationModuleDefinition[]> =
-      new Map();
+    const imdsFromHookPath = new Map<
+      string,
+      InstrumentationModuleDefinition[]
+    >();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
         if (!baseDir && path.isAbsolute(name)) {
