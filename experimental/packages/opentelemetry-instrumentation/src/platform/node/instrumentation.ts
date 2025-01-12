@@ -16,7 +16,7 @@
 
 import * as types from '../../types';
 import * as path from 'path';
-import * as diagch from 'diagnostics_channel'; // XXX added v14.17. Do we need to conditionally import?
+import * as diagch from 'diagnostics_channel';
 import { types as utilTypes } from 'util';
 import { satisfies } from 'semver';
 import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
