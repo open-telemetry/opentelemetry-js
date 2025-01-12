@@ -15,6 +15,7 @@ All notable changes to experimental packages in this project will be documented 
   * Previously, the fetch instrumentation code unconditionally clones every `fetch()` response in order to preserve the ability for the `applyCustomAttributes` hook to consume the response body. This is fundamentally unsound, as it forces the browser to buffer and retain the response body until it is fully received and read, which crates unnecessary memory pressure on large or long-running response streams. In extreme cases, this is effectively a memory leak and can cause the browser tab to crash. If your use case for `applyCustomAttributes` requires access to the response body, please chime in on [#5293](https://github.com/open-telemetry/opentelemetry-js/issues/5293).
 
 ### :rocket: (Enhancement)
+
 * feat(instrumentation): Add support for patching modules via diagnostic channels, to support auto instrumentation with bundlers [#5334](https://github.com/open-telemetry/opentelemetry-js/pull/5334)
 
 ### :bug: (Bug Fix)
