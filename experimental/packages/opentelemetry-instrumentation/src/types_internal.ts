@@ -45,7 +45,8 @@ export type DiagChSubscribe = (
  * The shape of a `otel:bundle:load` diagnostics_channel message.
  */
 export type OTelBundleLoadMessage = {
-  name: string;
+  name?: string;
+  file?: string;
   version: string;
   exports: any;
 };

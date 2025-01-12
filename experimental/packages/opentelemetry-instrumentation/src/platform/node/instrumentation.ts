@@ -291,7 +291,7 @@ export abstract class InstrumentationBase<
 
     this._warnOnPreloadedModules();
 
-    const imdFromHookPath: Map<string, InstrumentationModuleDefinition> =
+    const imdsFromHookPath: Map<string, InstrumentationModuleDefinition[]> =
       new Map();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
@@ -321,9 +321,13 @@ export abstract class InstrumentationBase<
       );
       this._hooks.push(esmHook);
 
-      imdFromHookPath.set(module.name, module);
+      const imdsByModuleName = imdsFromHookPath.get(module.name) ?? [];
+      imdsFromHookPath.set(module.name, imdsByModuleName);
+      imdsByModuleName.push(module);
       for (const file of module.files) {
-        imdFromHookPath.set(file.name, module);
+        const imdsByFileName = imdsFromHookPath.get(file.name) ?? [];
+        imdsFromHookPath.set(file.name, imdsByFileName);
+        imdsByFileName.push(module);
       }
     }
 
@@ -334,30 +338,39 @@ export abstract class InstrumentationBase<
       // a loaded module to this instrumentation via the well-known
       // `otel:bundle:load` diagnostics channel message. The message includes
       // the module exports, that can be patched in-place.
-      subscribe('otel:bundle:load', message_ => {
-        const message = message_ as OTelBundleLoadMessage; // XXX TS advice
+      subscribe('otel:bundle:load', rawMessage => {
+        console.log('received message', rawMessage);
+        const message = rawMessage as OTelBundleLoadMessage;
         if (
-          typeof message.name !== 'string' ||
+          (typeof message.name !== 'string' &&
+            typeof message.file !== 'string') ||
           typeof message.version !== 'string'
         ) {
           this._diag.debug(
-            'skipping invalid "otel:bundle:load" diagch message'
+            'skipping invalid "otel:bundle:load" diagch message',
+            rawMessage
           );
           return;
         }
-        const imd = imdFromHookPath.get(message.name);
-        if (!imd) {
-          // This loaded module is not relevant for this instrumentation.
-          return;
+        const names = [message.name, message.file].filter(Boolean) as string[];
+        for (const name of names) {
+          const imds = imdsFromHookPath.get(name);
+          if (!imds) {
+            // This loaded module is not relevant for this instrumentation.
+            return;
+          }
+          for (const imd of imds) {
+            console.log('patching modules', message.name, message.version);
+            const patchedExports = this._onRequire<typeof exports>(
+              imd,
+              message.exports,
+              name,
+              undefined,
+              message.version // Package version was determined at bundle-time.
+            );
+            message.exports = patchedExports;
+          }
         }
-        const patchedExports = this._onRequire<typeof exports>(
-          imd,
-          message.exports,
-          message.name,
-          undefined,
-          message.version // Package version was determined at bundle-time.
-        );
-        message.exports = patchedExports;
       });
     }
   }
