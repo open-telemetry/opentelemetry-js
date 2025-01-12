@@ -339,7 +339,6 @@ export abstract class InstrumentationBase<
       // `otel:bundle:load` diagnostics channel message. The message includes
       // the module exports, that can be patched in-place.
       subscribe('otel:bundle:load', rawMessage => {
-        console.log('received message', rawMessage);
         const message = rawMessage as OTelBundleLoadMessage;
         if (
           (typeof message.name !== 'string' &&
@@ -360,7 +359,6 @@ export abstract class InstrumentationBase<
             return;
           }
           for (const imd of imds) {
-            console.log('patching modules', message.name, message.version);
             const patchedExports = this._onRequire<typeof exports>(
               imd,
               message.exports,
