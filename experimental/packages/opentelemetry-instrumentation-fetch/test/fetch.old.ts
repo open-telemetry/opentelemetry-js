@@ -961,7 +961,7 @@ describe('fetch', () => {
     });
   });
 
-  describe('when url is ignored', () => {
+  xdescribe('when url is ignored', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
       await prepareData(url, () => getData(url), {
@@ -974,11 +974,11 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('should NOT create any span', () => {
+    xit('should NOT create any span', () => {
       assert.strictEqual(exportSpy.args.length, 0, "span shouldn't b exported");
     });
 
-    it('should accept Request objects as argument (#2411)', async () => {
+    xit('should accept Request objects as argument (#2411)', async () => {
       const response = await window.fetch(new Request(url));
       assert.ok(response instanceof Response);
 

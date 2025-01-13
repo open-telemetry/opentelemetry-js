@@ -152,7 +152,8 @@ describe('fetch', () => {
 
     const trace = async (
       callback: () => Promise<void>,
-      config: FetchInstrumentationConfig = {}
+      config: FetchInstrumentationConfig = {},
+      expectExport = true
     ): Promise<api.Span> => {
       try {
         const contextManager = new ZoneContextManager().enable();
@@ -182,12 +183,16 @@ describe('fetch', () => {
           setTimeout(resolve, 500);
         });
 
-        // This isn't intended to be an invariant, but in the current setup we
-        // don't expect multiple exports, it's easier to assert and unwrap the
-        // array of arrays here, than have every single test deal with that
-        // downstream.
-        assert.strictEqual(dummySpanExporter.exported.length, 1);
-        exportedSpans = dummySpanExporter.exported[0];
+        if (expectExport) {
+          // This isn't intended to be an invariant, but in the current setup we
+          // don't expect multiple exports, it's easier to assert and unwrap the
+          // array of arrays here, than have every single test deal with that
+          // downstream.
+          assert.strictEqual(dummySpanExporter.exported.length, 1);
+          exportedSpans = dummySpanExporter.exported[0];
+        } else {
+          assert.strictEqual(dummySpanExporter.exported.length, 0);
+        }
 
         return rootSpan;
       } finally {
@@ -1270,6 +1275,90 @@ describe('fetch', () => {
           const span: tracing.ReadableSpan = exportedSpans[0];
           assert.strictEqual(span.attributes['custom.body-used'], true);
         });
+      });
+    });
+
+    describe('`ignoreUrls` config', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('/api/ignored.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          }),
+          msw.http.get('/api/not-ignored.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          }),
+        ],
+        callback,
+        expectExport = true,
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback: () => Promise<Response>;
+        expectExport?: boolean;
+      }): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(
+          async () => {
+            response = await callback();
+          },
+          { ignoreUrls: [/\/ignored\.json/] },
+          expectExport
+        );
+
+        assert.ok(response instanceof Response);
+
+        return { rootSpan, response };
+      };
+
+      let spyDebug: sinon.SinonSpy | undefined;
+
+      beforeEach(async () => {
+        const logger = new api.DiagConsoleLogger();
+        spyDebug = sinon.stub(logger, 'debug');
+        api.diag.setLogger(logger, api.DiagLogLevel.ALL);
+      });
+
+      afterEach(() => {
+        api.diag.disable();
+        spyDebug = undefined;
+      });
+
+      const assertNoDebugMessages = () => {
+        assert.ok(spyDebug);
+        sinon.assert.neverCalledWith(
+          spyDebug,
+          '@opentelemetry/instrumentation-fetch',
+          'ignoring span as url matches ignored url'
+        );
+      };
+
+      const assertDebugMessage = () => {
+        assert.ok(spyDebug);
+        sinon.assert.calledWith(
+          spyDebug,
+          '@opentelemetry/instrumentation-fetch',
+          'ignoring span as url matches ignored url'
+        );
+      };
+
+      it('should create spans for normal request', async () => {
+        await tracedFetch({
+          callback: () => fetch('/api/not-ignored.json'),
+        });
+
+        assert.strictEqual(exportedSpans.length, 1);
+        assertNoDebugMessages();
+      });
+
+      it('should not create any spans for ignored request', async () => {
+        await tracedFetch({
+          callback: () => fetch('/api/ignored.json'),
+          expectExport: false,
+        });
+
+        assertDebugMessage();
       });
     });
   });
