@@ -9,6 +9,7 @@
     "incremental": true,
     "inlineSources": true,
     "module": "commonjs",
+    "moduleResolution": "node16",
     "newLine": "LF",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,

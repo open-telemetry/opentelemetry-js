@@ -24,7 +24,7 @@ import {
   createDenyListAttributesProcessor,
 } from '../../src/view/AttributesProcessor';
 
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 
 describe('NoopAttributesProcessor', () => {
   const processor = createNoopAttributesProcessor();

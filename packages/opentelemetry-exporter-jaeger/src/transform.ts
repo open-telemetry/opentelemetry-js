@@ -75,14 +75,14 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     })
   );
 
-  if (span.instrumentationLibrary) {
+  if (span.instrumentationScope) {
     tags.push({
       key: 'otel.library.name',
-      value: toTagValue(span.instrumentationLibrary.name),
+      value: toTagValue(span.instrumentationScope.name),
     });
     tags.push({
       key: 'otel.library.version',
-      value: toTagValue(span.instrumentationLibrary.version),
+      value: toTagValue(span.instrumentationScope.version),
     });
   }
 
