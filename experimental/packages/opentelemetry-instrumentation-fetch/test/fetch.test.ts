@@ -218,6 +218,27 @@ describe('fetch', () => {
       return request.headers;
     };
 
+    const assertNoPropagationHeaders = async (
+      response: Response
+    ): Promise<Record<string, string>> => {
+      const { request } = await response.json();
+
+      assert.ok(
+        !(X_B3_TRACE_ID in request.headers),
+        `trace header '${X_B3_TRACE_ID}' should not be set`
+      );
+      assert.ok(
+        !(X_B3_SPAN_ID in request.headers),
+        `trace header '${X_B3_SPAN_ID}' should not be set`
+      );
+      assert.ok(
+        !(X_B3_SAMPLED in request.headers),
+        `trace header '${X_B3_SAMPLED}' should not be set`
+      );
+
+      return request.headers;
+    };
+
     describe('same origin requests', () => {
       const tracedFetch = async ({
         handlers = [
@@ -453,6 +474,79 @@ describe('fetch', () => {
             });
 
             const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+        });
+
+        describe('without global propagator', () => {
+          it('should not set trace propagation headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () => fetch('/api/echo-headers.json'),
+            });
+
+            await assertNoPropagationHeaders(response);
+          });
+
+          it('should not set trace propagation headers with a request object', async () => {
+            const { response } = await tracedFetch({
+              callback: () => fetch(new Request('/api/echo-headers.json')),
+            });
+
+            await assertNoPropagationHeaders(response);
+          });
+
+          it('should keep custom headers with a request object and a headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch(
+                  new Request('/api/echo-headers.json', {
+                    headers: new Headers({ foo: 'bar' }),
+                  })
+                ),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and typed (Headers) headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: new Headers({ foo: 'bar' }),
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and untyped headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: { foo: 'bar' },
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and typed (Map) headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  // @ts-expect-error relies on implicit coercion
+                  headers: new Map().set('foo', 'bar'),
+                }),
+            });
+
+            const headers = await assertNoPropagationHeaders(response);
 
             assert.strictEqual(headers['foo'], 'bar');
           });
