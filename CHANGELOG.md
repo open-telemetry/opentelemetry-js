@@ -38,6 +38,11 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * chore!: update typescript to version `5.0.4` [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145) @david-luna
   * (user-facing) dropped support for `typescript@<5.0.4`
   * (user-facing) all packages published from this repository will from now on drop support for old versions of `typescript` in minor releases. We will only drop support for versions that are older than 2 years.
+* feat(core)!: remove deprecated samplers [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316) @pichlermarc
+  * (user-facing): deprecated `AlwaysOnSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `AlwaysOffSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `TraceIdRatioSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `TraceIdRatioSampler` has moved to  `@opentelemetry/sdk-trace-base`
 
 ### :rocket: (Enhancement)
 
