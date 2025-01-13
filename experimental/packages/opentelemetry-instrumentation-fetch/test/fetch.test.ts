@@ -35,7 +35,11 @@ import {
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
+import {
+  FetchCustomAttributeFunction,
+  FetchInstrumentation,
+  FetchInstrumentationConfig,
+} from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import {
   SEMATTRS_HTTP_HOST,
@@ -1107,6 +1111,165 @@ describe('fetch', () => {
           PTN.RESPONSE_START,
           PTN.RESPONSE_END,
         ]);
+      });
+    });
+
+    describe('`applyCustomAttributesOnSpan` hook', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('/api/project-headers.json', ({ request }) => {
+            const headers = new Headers();
+
+            for (const [key, value] of request.headers) {
+              headers.set(`x-request-${key}`, value);
+            }
+
+            return msw.HttpResponse.json({ ok: true }, { headers });
+          }),
+          msw.http.get('/api/fail.json', () => {
+            return msw.HttpResponse.json({ fail: true }, { status: 500 });
+          }),
+        ],
+        callback = () => fetch('/api/project-headers.json'),
+        config,
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config: FetchInstrumentationConfig &
+          Required<
+            Pick<FetchInstrumentationConfig, 'applyCustomAttributesOnSpan'>
+          >;
+      }): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        // The current implementation doesn't call this hook until the body has
+        // been fully read, this ensures that timing is met before returning to
+        // the test so we don't have to deal with it in every test. Plus it
+        // checks that the hook is definitely called which is important here.
+        const appliedCustomAttributes = new Promise<void>(resolve => {
+          const originalHook = config.applyCustomAttributesOnSpan;
+
+          const applyCustomAttributesOnSpan = (
+            ...args: Parameters<FetchCustomAttributeFunction>
+          ) => {
+            resolve();
+            originalHook(...args);
+          };
+
+          config = { ...config, applyCustomAttributesOnSpan };
+        });
+
+        const rootSpan = await trace(async () => {
+          response = await callback();
+        }, config);
+
+        await appliedCustomAttributes;
+
+        assert.ok(response instanceof Response);
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, response };
+      };
+
+      it('can apply arbitrary attributes to the span indiscriminantly', async () => {
+        await tracedFetch({
+          config: {
+            applyCustomAttributesOnSpan: span => {
+              span.setAttribute('custom.foo', 'bar');
+            },
+          },
+        });
+
+        const span: tracing.ReadableSpan = exportedSpans[0];
+        assert.strictEqual(span.attributes['custom.foo'], 'bar');
+      });
+
+      describe('successful request', () => {
+        it('has access to the request and response objects', async () => {
+          await tracedFetch({
+            callback: () =>
+              fetch(
+                new Request('/api/project-headers.json', {
+                  headers: new Headers({
+                    foo: 'bar',
+                  }),
+                })
+              ),
+            config: {
+              applyCustomAttributesOnSpan: (span, request, response) => {
+                assert.ok(request.headers instanceof Headers);
+                assert.ok(response instanceof Response);
+                assert.ok(response.headers instanceof Headers);
+
+                assert.strictEqual(
+                  request.headers.get('foo'),
+                  response.headers.get('x-request-foo')
+                );
+
+                span.setAttribute(
+                  'custom.foo',
+                  response.headers.get('x-request-foo')!
+                );
+
+                /*
+                  Note: this confirms that nothing *in the instrumentation code*
+                  consumed the response body; it doesn't guarantee that the response
+                  object passed to the `applyCustomAttributes` hook will always have
+                  a consumable body – in fact, this is typically *not* the case:
+
+                  ```js
+                  // user code:
+                  let response = await fetch("foo");
+                  let json = await response.json(); // <- user code consumes the body on `response`
+                  // ...
+
+                  {
+                    // ...this is called sometime later...
+                    applyCustomAttributes(span, request, response) {
+                      // too late!
+                      response.bodyUsed // => true
+                    }
+                  }
+                  ```
+
+                  See https://github.com/open-telemetry/opentelemetry-js/pull/5281
+                */
+                assert.strictEqual(response.bodyUsed, false);
+              },
+            },
+          });
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(span.attributes['custom.foo'], 'bar');
+        });
+
+        // https://github.com/open-telemetry/opentelemetry-js/pull/5281
+        it('will not be able to access the response body if already consumed by the application', async () => {
+          await tracedFetch({
+            callback: async () => {
+              const response = await fetch(
+                new Request('/api/project-headers.json')
+              );
+
+              // body consumed here by the application
+              await response.json();
+
+              return response;
+            },
+            config: {
+              applyCustomAttributesOnSpan: (span, _request, response) => {
+                assert.ok(response instanceof Response);
+
+                span.setAttribute('custom.body-used', response.bodyUsed);
+              },
+            },
+          });
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(span.attributes['custom.body-used'], true);
+        });
       });
     });
   });
