@@ -594,5 +594,277 @@ describe('fetch', () => {
         });
       });
     });
+
+    // ServiceWorker request interception occurs before CORS preflight requests
+    // are made. If a request is handled by the SW, it won't cause a preflight
+    // (at least not on the page – if the SW makes its own "real" request while
+    // responding to the fetch event, that request may very well require CORS &
+    // preflight, but that would be happening within the SW, not the page.)
+    //
+    // However, as far as the instrumentation behavior, there aren't much that
+    // we need to specifically unit test in relation to CORS and preflights,
+    // since preflight requests are completely transparent, the instrumentation
+    // code could not detect that it happened, let alone report on its timing:
+    // https://github.com/open-telemetry/opentelemetry-js/issues/5122
+    //
+    // So the purpose of this test module is mostly just to test the configs
+    // related to CORS requests.
+    describe('cross origin requests', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('http://example.com/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          }),
+          msw.http.get(
+            'http://example.com/api/echo-headers.json',
+            ({ request }) => {
+              return msw.HttpResponse.json({
+                request: {
+                  headers: Object.fromEntries(request.headers),
+                },
+              });
+            }
+          ),
+        ],
+        callback = () =>
+          fetch('http://example.com/api/status.json', {
+            mode: 'cors',
+            headers: { 'x-custom': 'custom value' },
+          }),
+        config = {},
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config?: FetchInstrumentationConfig;
+      } = {}): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(async () => {
+          response = await callback();
+        }, config);
+
+        assert.ok(response instanceof Response);
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, response };
+      };
+
+      // Smoke test to ensure nothing breaks when the request is CORS
+      describe('simple request', () => {
+        let rootSpan: api.Span | undefined;
+        let response: Response | undefined;
+
+        beforeEach(async () => {
+          const result = await tracedFetch();
+          rootSpan = result.rootSpan;
+          response = result.response;
+        });
+
+        afterEach(() => {
+          rootSpan = undefined;
+          response = undefined;
+        });
+
+        it('should create a span with correct root span', () => {
+          assert.strictEqual(
+            exportedSpans.length,
+            1,
+            'creates a single span for the fetch() request'
+          );
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+
+          assert.strictEqual(
+            span.parentSpanId,
+            rootSpan!.spanContext().spanId,
+            'parent span is not root span'
+          );
+        });
+
+        it('span should have correct name', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+        });
+
+        it('span should have correct kind', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.kind,
+            api.SpanKind.CLIENT,
+            'span has wrong kind'
+          );
+        });
+
+        it('span should have correct attributes', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const attributes = span.attributes;
+          const keys = Object.keys(attributes);
+          assert.notStrictEqual(
+            attributes[AttributeNames.COMPONENT],
+            '',
+            `attributes ${AttributeNames.COMPONENT} is not defined`
+          );
+
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_METHOD],
+            'GET',
+            `attributes ${SEMATTRS_HTTP_METHOD} is wrong`
+          );
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_URL],
+            'http://example.com/api/status.json',
+            `attributes ${SEMATTRS_HTTP_URL} is wrong`
+          );
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_STATUS_CODE],
+            200,
+            `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+          );
+          assert.strictEqual(
+            attributes[AttributeNames.HTTP_STATUS_TEXT],
+            'OK',
+            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+          );
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_HOST],
+            'example.com',
+            `attributes ${SEMATTRS_HTTP_HOST} is wrong`
+          );
+
+          assert.ok(
+            attributes[SEMATTRS_HTTP_SCHEME] === 'http',
+            `attributes ${SEMATTRS_HTTP_SCHEME} is wrong`
+          );
+          assert.notStrictEqual(
+            attributes[SEMATTRS_HTTP_USER_AGENT],
+            '',
+            `attributes ${SEMATTRS_HTTP_USER_AGENT} is not defined`
+          );
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+            undefined,
+            `attributes ${SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED} is defined`
+          );
+          assert.strictEqual(
+            attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH],
+            parseInt(response!.headers.get('content-length')!),
+            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is incorrect`
+          );
+
+          assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+        });
+
+        it('span should have correct events', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const events = span.events;
+          assert.strictEqual(events.length, 8, 'number of events is wrong');
+          testForCorrectEvents(events, [
+            PTN.FETCH_START,
+            PTN.DOMAIN_LOOKUP_START,
+            PTN.DOMAIN_LOOKUP_END,
+            PTN.CONNECT_START,
+            PTN.CONNECT_END,
+            PTN.REQUEST_START,
+            PTN.RESPONSE_START,
+            PTN.RESPONSE_END,
+          ]);
+        });
+      });
+
+      describe('trace propagation headers', () => {
+        let spyDebug: sinon.SinonSpy | undefined;
+
+        before(() => {
+          api.propagation.setGlobalPropagator(
+            new B3Propagator({
+              injectEncoding: B3InjectEncoding.MULTI_HEADER,
+            })
+          );
+        });
+
+        beforeEach(async () => {
+          const logger = new api.DiagConsoleLogger();
+          spyDebug = sinon.stub(logger, 'debug');
+          api.diag.setLogger(logger, api.DiagLogLevel.ALL);
+        });
+
+        afterEach(() => {
+          api.diag.disable();
+          spyDebug = undefined;
+        });
+
+        after(() => {
+          api.propagation.disable();
+        });
+
+        const assertNoDebugMessages = () => {
+          assert.ok(spyDebug);
+          sinon.assert.neverCalledWith(
+            spyDebug,
+            '@opentelemetry/instrumentation-fetch',
+            'headers inject skipped due to CORS policy'
+          );
+        };
+
+        const assertDebugMessage = () => {
+          assert.ok(spyDebug);
+          sinon.assert.calledWith(
+            spyDebug,
+            '@opentelemetry/instrumentation-fetch',
+            'headers inject skipped due to CORS policy'
+          );
+        };
+
+        it('should not set propagation headers with no `propagateTraceHeaderCorsUrls`', async () => {
+          const { response } = await tracedFetch({
+            callback: () =>
+              fetch('http://example.com/api/echo-headers.json', {
+                mode: 'cors',
+                headers: { 'x-custom': 'custom value' },
+              }),
+          });
+
+          await assertNoPropagationHeaders(response);
+
+          assertDebugMessage();
+        });
+
+        it('should not set propagation headers when not matching `propagateTraceHeaderCorsUrls`', async () => {
+          const { response } = await tracedFetch({
+            callback: () =>
+              fetch('http://example.com/api/echo-headers.json', {
+                mode: 'cors',
+                headers: { 'x-custom': 'custom value' },
+              }),
+            config: {
+              propagateTraceHeaderCorsUrls: ['nope'],
+            },
+          });
+
+          await assertNoPropagationHeaders(response);
+
+          assertDebugMessage();
+        });
+
+        it('should set propagation headers when matching `propagateTraceHeaderCorsUrls`', async () => {
+          const { response } = await tracedFetch({
+            callback: () =>
+              fetch('http://example.com/api/echo-headers.json', {
+                mode: 'cors',
+                headers: { 'x-custom': 'custom value' },
+              }),
+            config: {
+              propagateTraceHeaderCorsUrls: [/example\.com/],
+            },
+          });
+
+          await assertPropagationHeaders(response);
+
+          assertNoDebugMessages();
+        });
+      });
+    });
   });
 });

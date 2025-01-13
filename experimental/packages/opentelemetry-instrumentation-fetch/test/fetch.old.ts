@@ -481,7 +481,7 @@ describe('fetch', () => {
       ]);
     });
 
-    it('should create a span for preflight request', () => {
+    xit('should create a span for preflight request', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
@@ -491,7 +491,7 @@ describe('fetch', () => {
       );
     });
 
-    it('preflight request span should have correct name', () => {
+    xit('preflight request span should have correct name', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.name,
@@ -500,7 +500,7 @@ describe('fetch', () => {
       );
     });
 
-    it('preflight request span should have correct kind', () => {
+    xit('preflight request span should have correct kind', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.kind,
@@ -509,7 +509,7 @@ describe('fetch', () => {
       );
     });
 
-    it('preflight request span should have correct events', () => {
+    xit('preflight request span should have correct events', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 8, 'number of events is wrong');
@@ -599,7 +599,7 @@ describe('fetch', () => {
       );
     });
 
-    describe('when propagateTraceHeaderCorsUrls does NOT MATCH', () => {
+    xdescribe('when propagateTraceHeaderCorsUrls does NOT MATCH', () => {
       let spyDebug: sinon.SinonSpy;
       beforeEach(async () => {
         const diagLogger = new api.DiagConsoleLogger();
@@ -613,7 +613,7 @@ describe('fetch', () => {
         sinon.restore();
       });
 
-      it('should NOT set trace headers', async () => {
+      xit('should NOT set trace headers', async () => {
         assert.ok(lastResponse instanceof Response);
 
         const { request } = await lastResponse.json();
@@ -634,7 +634,7 @@ describe('fetch', () => {
           `trace header '${X_B3_SAMPLED}' should not be set`
         );
       });
-      it('should debug info that injecting headers was skipped', () => {
+      xit('should debug info that injecting headers was skipped', () => {
         assert.strictEqual(
           spyDebug.lastCall.args[1],
           'headers inject skipped due to CORS policy'
