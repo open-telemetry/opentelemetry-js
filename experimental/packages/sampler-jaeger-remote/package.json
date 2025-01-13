@@ -59,7 +59,7 @@
     "mocha": "10.8.2",
     "nyc": "17.1.0",
     "sinon": "15.1.2",
-    "ts-loader": "8.4.0",
+    "ts-loader": "9.5.2",
     "typescript": "5.0.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sampler-jaeger-remote",

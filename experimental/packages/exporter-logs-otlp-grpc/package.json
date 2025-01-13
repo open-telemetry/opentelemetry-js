@@ -61,7 +61,7 @@
     "mocha": "10.8.2",
     "nyc": "17.1.0",
     "sinon": "15.1.2",
-    "ts-loader": "9.5.1",
+    "ts-loader": "9.5.2",
     "typescript": "5.0.4"
   },
   "peerDependencies": {
