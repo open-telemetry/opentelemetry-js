@@ -157,6 +157,7 @@ describe('PeriodicExportingMetricReader', () => {
           descriptor: {
             name: '',
             description: '',
+            type: InstrumentType.GAUGE,
             unit: '',
             valueType: ValueType.INT,
           },
