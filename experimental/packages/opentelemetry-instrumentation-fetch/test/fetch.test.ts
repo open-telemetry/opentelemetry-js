@@ -961,6 +961,40 @@ describe('fetch', () => {
     });
   });
 
+  describe('when url is allowed', () => {
+    beforeEach(async () => {
+      const propagateTraceHeaderCorsUrls = url;
+      await prepareData(url, () => getData(url), {
+        propagateTraceHeaderCorsUrls,
+        allowUrls: [propagateTraceHeaderCorsUrls],
+      });
+    });
+    afterEach(() => {
+      clearData();
+    });
+    it('should create a span', () => {
+      assert.ok(exportSpy.args.length > 0, 'span should be exported');
+    });
+  });
+
+  describe('when url is NOT allowed', () => {
+    const otherUrl = 'http://localhost:8099/get';
+
+    beforeEach(async () => {
+      const propagateTraceHeaderCorsUrls = url;
+      await prepareData(url, () => getData(url), {
+        propagateTraceHeaderCorsUrls,
+        allowUrls: [otherUrl],
+      });
+    });
+    afterEach(() => {
+      clearData();
+    });
+    it('should NOT create any span', () => {
+      assert.ok(exportSpy.args.length === 0, "span shouldn't be exported");
+    });
+  });
+
   describe('when url is ignored', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
@@ -975,7 +1009,11 @@ describe('fetch', () => {
     });
 
     it('should NOT create any span', () => {
-      assert.strictEqual(exportSpy.args.length, 0, "span shouldn't b exported");
+      assert.strictEqual(
+        exportSpy.args.length,
+        0,
+        "span shouldn't be exported"
+      );
     });
 
     it('should accept Request objects as argument (#2411)', async () => {
