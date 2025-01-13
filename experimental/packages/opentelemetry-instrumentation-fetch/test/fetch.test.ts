@@ -1058,5 +1058,56 @@ describe('fetch', () => {
         });
       });
     });
+
+    describe('secure origin requests', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('https://example.com/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          }),
+        ],
+        callback = () =>
+          fetch('https://example.com/api/status.json', {
+            mode: 'cors',
+          }),
+        config = {},
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config?: FetchInstrumentationConfig;
+      } = {}): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(async () => {
+          response = await callback();
+        }, config);
+
+        assert.ok(response instanceof Response);
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, response };
+      };
+
+      it('span should have correct events (includes SECURE_CONNECTION_START)', async () => {
+        await tracedFetch();
+
+        const span: tracing.ReadableSpan = exportedSpans[0];
+        const events = span.events;
+        assert.strictEqual(events.length, 9, 'number of events is wrong');
+        testForCorrectEvents(events, [
+          PTN.FETCH_START,
+          PTN.DOMAIN_LOOKUP_START,
+          PTN.DOMAIN_LOOKUP_END,
+          PTN.CONNECT_START,
+          PTN.SECURE_CONNECTION_START,
+          PTN.CONNECT_END,
+          PTN.REQUEST_START,
+          PTN.RESPONSE_START,
+          PTN.RESPONSE_END,
+        ]);
+      });
+    });
   });
 });

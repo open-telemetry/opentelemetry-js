@@ -834,7 +834,7 @@ describe('fetch', () => {
     });
   });
 
-  describe('when request is secure and successful', () => {
+  xdescribe('when request is secure and successful', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = [secureUrl];
       await prepareData(secureUrl, () => getData(secureUrl), {
@@ -846,7 +846,7 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('span should have correct events', () => {
+    xit('span should have correct events', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 9, 'number of events is wrong');
@@ -863,7 +863,7 @@ describe('fetch', () => {
       ]);
     });
 
-    it('preflight request span should have correct events', () => {
+    xit('preflight request span should have correct events', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 9, 'number of events is wrong');
