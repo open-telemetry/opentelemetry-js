@@ -46,7 +46,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/buf": "1.49.0",
     "@grpc/grpc-js": "^1.7.1",
     "@grpc/proto-loader": "^0.7.10",
     "@opentelemetry/api": "1.9.0",
@@ -63,7 +63,7 @@
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "mocha": "10.8.2",
-    "nyc": "15.1.0",
+    "nyc": "17.1.0",
     "sinon": "15.1.2",
     "typescript": "5.0.4"
   },

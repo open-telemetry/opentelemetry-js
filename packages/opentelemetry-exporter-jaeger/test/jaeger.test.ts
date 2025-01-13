@@ -49,7 +49,7 @@ describe('JaegerExporter', () => {
     resource: new Resource({
       [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry',
     }),
-    instrumentationLibrary: {
+    instrumentationScope: {
       name: 'default',
       version: '0.0.1',
     },
