@@ -643,8 +643,8 @@ describe('fetch', () => {
     });
   });
 
-  describe('post data', () => {
-    describe('url and config object when request body measurement is disabled', () => {
+  xdescribe('post data', () => {
+    xdescribe('url and config object when request body measurement is disabled', () => {
       beforeEach(async () => {
         await prepareData(
           url,
@@ -666,7 +666,7 @@ describe('fetch', () => {
         clearData();
       });
 
-      it('should post data', async () => {
+      xit('should post data', async () => {
         assert.strictEqual(requestBody, '{"hello":"world"}');
 
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
@@ -679,7 +679,7 @@ describe('fetch', () => {
       });
     });
 
-    describe('url and config object', () => {
+    xdescribe('url and config object', () => {
       beforeEach(async () => {
         await prepareData(
           url,
@@ -703,7 +703,7 @@ describe('fetch', () => {
         clearData();
       });
 
-      it('should post data', async () => {
+      xit('should post data', async () => {
         assert.strictEqual(requestBody, '{"hello":"world"}');
 
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
@@ -716,7 +716,7 @@ describe('fetch', () => {
       });
     });
 
-    describe('url and config object with stream', () => {
+    xdescribe('url and config object with stream', () => {
       beforeEach(async () => {
         await prepareData(
           url,
@@ -740,7 +740,7 @@ describe('fetch', () => {
         clearData();
       });
 
-      it('should post data', async () => {
+      xit('should post data', async () => {
         assert.strictEqual(requestBody, '{"hello":"world"}');
 
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
@@ -753,7 +753,7 @@ describe('fetch', () => {
       });
     });
 
-    describe('single request object', () => {
+    xdescribe('single request object', () => {
       beforeEach(async () => {
         await prepareData(
           url,
@@ -779,7 +779,7 @@ describe('fetch', () => {
         clearData();
       });
 
-      it('should post data', async () => {
+      xit('should post data', async () => {
         assert.strictEqual(requestBody, '{"hello":"world"}');
 
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
@@ -792,7 +792,7 @@ describe('fetch', () => {
       });
     });
 
-    describe('single request object with urlparams', () => {
+    xdescribe('single request object with urlparams', () => {
       beforeEach(async () => {
         await prepareData(
           url,
@@ -820,7 +820,7 @@ describe('fetch', () => {
         clearData();
       });
 
-      it('should post data', async () => {
+      xit('should post data', async () => {
         assert.strictEqual(requestBody, 'hello=world');
 
         const span: tracing.ReadableSpan = exportSpy.args[1][0][0];

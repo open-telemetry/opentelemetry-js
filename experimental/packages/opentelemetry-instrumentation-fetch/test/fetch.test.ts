@@ -866,5 +866,197 @@ describe('fetch', () => {
         });
       });
     });
+
+    describe('POST requests', () => {
+      const DEFAULT_BODY = Object.freeze({ hello: 'world' });
+
+      async function tracedFetch({
+        handlers = [
+          msw.http.post('/api/echo-body.json', async ({ request }) => {
+            if (request.headers.get('Content-Type') === 'application/json') {
+              return msw.HttpResponse.json({
+                request: {
+                  headers: Object.fromEntries(request.headers),
+                  body: await request.json(),
+                },
+              });
+            } else {
+              return msw.HttpResponse.json({
+                request: {
+                  headers: Object.fromEntries(request.headers),
+                  body: await request.text(),
+                },
+              });
+            }
+          }),
+        ],
+        body = DEFAULT_BODY,
+        callback = () =>
+          fetch('/api/echo-body.json', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+          }),
+        config = {},
+      }: {
+        handlers?: msw.RequestHandler[];
+        body?: unknown;
+        callback?: () => Promise<Response>;
+        config?: FetchInstrumentationConfig;
+      } = {}): Promise<{ rootSpan: api.Span; response: Response }> {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(async () => {
+          response = await callback();
+        }, config);
+
+        assert.ok(response instanceof Response);
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, response };
+      }
+
+      const assertJSONBody = async (
+        response: Response,
+        body: unknown = DEFAULT_BODY
+      ) => {
+        const { request } = await response.json();
+        assert.strictEqual(request.headers['content-type'], 'application/json');
+        assert.deepStrictEqual(request.body, body);
+      };
+
+      describe('measureRequestSize', () => {
+        const assertNoRequestContentLength = () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+
+          assert.strictEqual(
+            span.attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+            undefined
+          );
+        };
+
+        const assertHasRequestContentLength = (
+          body = JSON.stringify(DEFAULT_BODY)
+        ) => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+
+          assert.strictEqual(
+            span.attributes[SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+            body.length
+          );
+        };
+
+        describe('when `measureRequestSize` is not set', () => {
+          it('should not measure request body size', async () => {
+            const { response } = await tracedFetch();
+            assertJSONBody(response);
+            assertNoRequestContentLength();
+          });
+        });
+
+        describe('when `measureRequestSize` is `false`', () => {
+          it('should not measure request body size', async () => {
+            const { response } = await tracedFetch({
+              config: { measureRequestSize: false },
+            });
+            assertJSONBody(response);
+            assertNoRequestContentLength();
+          });
+        });
+
+        describe('with `measureRequestSize: `true`', () => {
+          describe('with url and init object', () => {
+            it('should measure request body size', async () => {
+              const { response } = await tracedFetch({
+                config: { measureRequestSize: true },
+              });
+              assertJSONBody(response);
+              assertHasRequestContentLength();
+            });
+          });
+
+          describe('with url and init object with a body stream', () => {
+            it('should measure request body size', async () => {
+              const body = JSON.stringify(DEFAULT_BODY);
+              const encoder = new TextEncoder();
+              const stream = new ReadableStream({
+                start: controller => {
+                  controller.enqueue(encoder.encode(body));
+                  controller.close();
+                },
+                cancel: controller => {
+                  controller.close();
+                },
+              });
+              const { response } = await tracedFetch({
+                callback: () =>
+                  fetch('/api/echo-body.json', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: stream,
+                    // @ts-expect-error this is required IRL but missing on the current TS definition
+                    // https://developer.chrome.com/docs/capabilities/web-apis/fetch-streaming-requests#half_duplex
+                    duplex: 'half',
+                  }),
+                config: { measureRequestSize: true },
+              });
+              assertJSONBody(response);
+              assertHasRequestContentLength();
+            });
+          });
+
+          describe('with a Request object', () => {
+            it('should measure request body size', async () => {
+              const { response } = await tracedFetch({
+                callback: () =>
+                  fetch(
+                    new Request('/api/echo-body.json', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(DEFAULT_BODY),
+                    })
+                  ),
+                config: { measureRequestSize: true },
+              });
+              assertJSONBody(response);
+              assertHasRequestContentLength();
+            });
+          });
+
+          describe('with a Request object and a URLSearchParams body', () => {
+            it('should measure request body size', async () => {
+              const { response } = await tracedFetch({
+                callback: () =>
+                  fetch(
+                    new Request('/api/echo-body.json', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                      },
+                      body: new URLSearchParams(DEFAULT_BODY),
+                    })
+                  ),
+                config: { measureRequestSize: true },
+              });
+              const { request } = await response.json();
+              assert.strictEqual(
+                request.headers['content-type'],
+                'application/x-www-form-urlencoded'
+              );
+              assert.strictEqual(request.body, 'hello=world');
+              assertHasRequestContentLength('hello=world');
+            });
+          });
+        });
+      });
+    });
   });
 });
