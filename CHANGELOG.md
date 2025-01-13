@@ -19,6 +19,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :house: (Internal)
 
+* ci: make changelog workflow check v1.x [#5338](https://github.com/open-telemetry/opentelemetry-js/pull/5338) @pichlermarc
+
 ## 1.30.0
 
 ### :rocket: (Enhancement)
