@@ -9,6 +9,7 @@ on:
     types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
+      - v1.x
 jobs:
   changelog:
     runs-on: ubuntu-latest
