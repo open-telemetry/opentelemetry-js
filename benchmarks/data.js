@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1736778670620,
+  "lastUpdate": 1736778860866,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -23352,6 +23352,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.53%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "47067795+JacksonWeber@users.noreply.github.com",
+            "name": "Jackson Weber",
+            "username": "JacksonWeber"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "13e951a00173d37cfcde8548089b55c3baf7d27c",
+          "message": "fix(sdk-metrics) Don't Export from PeriodicExportingMetricReader with No Metrics (#5288)\n\nCo-authored-by: Hector Hernandez <39923391+hectorhdzg@users.noreply.github.com>\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-01-13T14:25:05Z",
+          "tree_id": "61d2a26e0c19159dacaaa426be2758a713cb6336",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/13e951a00173d37cfcde8548089b55c3baf7d27c"
+        },
+        "date": 1736778859929,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1551452,
+            "range": "±0.52%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16948,
+            "range": "±0.30%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 801060,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 774641,
+            "range": "±0.40%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
