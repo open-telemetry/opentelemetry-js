@@ -34,6 +34,7 @@ import {
   WebTracerProvider,
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import {
@@ -105,6 +106,8 @@ describe('fetch', () => {
       worker.stop();
       workerStarted = false;
     }
+
+    sinon.restore();
   });
 
   describe('enabling/disabling', () => {
@@ -254,9 +257,11 @@ describe('fetch', () => {
           }),
         ],
         callback = () => fetch('/api/status.json'),
+        config = {},
       }: {
         handlers?: msw.RequestHandler[];
         callback?: () => Promise<Response>;
+        config?: FetchInstrumentationConfig;
       } = {}): Promise<{ rootSpan: api.Span; response: Response }> => {
         let response: Response | undefined;
 
@@ -264,7 +269,7 @@ describe('fetch', () => {
 
         const rootSpan = await trace(async () => {
           response = await callback();
-        });
+        }, config);
 
         assert.ok(response instanceof Response);
         assert.strictEqual(exportedSpans.length, 1);
@@ -549,6 +554,42 @@ describe('fetch', () => {
             const headers = await assertNoPropagationHeaders(response);
 
             assert.strictEqual(headers['foo'], 'bar');
+          });
+        });
+      });
+
+      describe('clearTimingResources', () => {
+        let clearResourceTimingsStub: sinon.SinonStub | undefined;
+
+        beforeEach(async () => {
+          clearResourceTimingsStub = sinon.stub(
+            performance,
+            'clearResourceTimings'
+          );
+        });
+
+        afterEach(() => {
+          clearResourceTimingsStub = undefined;
+        });
+
+        describe('when `clearResourceTimings` is not set', () => {
+          it('should not clear resource timing entries', async () => {
+            await tracedFetch();
+            assert.strictEqual(clearResourceTimingsStub!.notCalled, true);
+          });
+        });
+
+        describe('when `clearResourceTimings` is `false`', () => {
+          it('should not clear resource timing entries', async () => {
+            await tracedFetch({ config: { clearTimingResources: false } });
+            assert.strictEqual(clearResourceTimingsStub!.notCalled, true);
+          });
+        });
+
+        describe('when `clearResourceTimings` is `true`', () => {
+          it('should clear resource timing entries', async () => {
+            await tracedFetch({ config: { clearTimingResources: true } });
+            assert.strictEqual(clearResourceTimingsStub!.calledOnce, true);
           });
         });
       });
