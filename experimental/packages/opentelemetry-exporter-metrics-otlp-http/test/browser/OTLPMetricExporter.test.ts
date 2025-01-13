@@ -16,9 +16,9 @@
 
 import { AggregationTemporalityPreference } from '../../src';
 import {
-  AggregationOption,
+  Aggregation,
   AggregationTemporality,
-  AggregationType,
+  ExplicitBucketHistogramAggregation,
   InstrumentType,
   MeterProvider,
   PeriodicExportingMetricReader,
@@ -223,12 +223,9 @@ describe('OTLPMetricExporter', function () {
 
   describe('aggregation', () => {
     it('aggregationSelector calls the selector supplied to the constructor', () => {
-      const aggregation: AggregationOption = {
-        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
-        options: {
-          boundaries: [0, 100, 100000],
-        },
-      };
+      const aggregation: Aggregation = new ExplicitBucketHistogramAggregation([
+        0, 100, 100000,
+      ]);
       const exporter = new OTLPMetricExporter({
         aggregationPreference: _instrumentType => aggregation,
       });
@@ -240,15 +237,11 @@ describe('OTLPMetricExporter', function () {
 
     it('aggregationSelector returns the default aggregation preference when nothing is supplied', () => {
       const exporter = new OTLPMetricExporter({
-        aggregationPreference: _instrumentType => ({
-          type: AggregationType.DEFAULT,
-        }),
+        aggregationPreference: _instrumentType => Aggregation.Default(),
       });
       assert.deepStrictEqual(
         exporter.selectAggregation(InstrumentType.COUNTER),
-        {
-          type: AggregationType.DEFAULT,
-        }
+        Aggregation.Default()
       );
     });
   });
