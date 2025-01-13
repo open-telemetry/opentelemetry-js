@@ -525,7 +525,7 @@ describe('fetch', () => {
       ]);
     });
 
-    it('should set trace headers', async () => {
+    xit('should set trace headers', async () => {
       const span: api.Span = exportSpy.args[1][0][0];
       assert.ok(lastResponse instanceof Response);
 
@@ -548,13 +548,13 @@ describe('fetch', () => {
       );
     });
 
-    it('should set trace headers with a request object', () => {
+    xit('should set trace headers with a request object', () => {
       const r = new Request('url');
       window.fetch(r).catch(() => {});
       assert.ok(typeof r.headers.get(X_B3_TRACE_ID) === 'string');
     });
 
-    it('should keep custom headers with a request object and a headers object', () => {
+    xit('should keep custom headers with a request object and a headers object', () => {
       const r = new Request('url', {
         headers: new Headers({ foo: 'bar' }),
       });
@@ -562,7 +562,7 @@ describe('fetch', () => {
       assert.ok(r.headers.get('foo') === 'bar');
     });
 
-    it('should keep custom headers with url, untyped request object and typed (Headers) headers object', () => {
+    xit('should keep custom headers with url, untyped request object and typed (Headers) headers object', () => {
       const url = 'url';
       const init = {
         headers: new Headers({ foo: 'bar' }),
@@ -571,7 +571,7 @@ describe('fetch', () => {
       assert.ok(init.headers.get('foo') === 'bar');
     });
 
-    it('should keep custom headers with url, untyped request object and untyped headers object', () => {
+    xit('should keep custom headers with url, untyped request object and untyped headers object', () => {
       const url = 'url';
       const init = {
         headers: { foo: 'bar' },
@@ -580,7 +580,7 @@ describe('fetch', () => {
       assert.ok(init.headers['foo'] === 'bar');
     });
 
-    it('should keep custom headers with url, untyped request object and typed (Map) headers object', () => {
+    xit('should keep custom headers with url, untyped request object and typed (Map) headers object', () => {
       const url = 'url';
       const init = {
         headers: new Map().set('foo', 'bar'),

@@ -20,6 +20,13 @@ import {
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 
+import {
+  B3Propagator,
+  B3InjectEncoding,
+  X_B3_TRACE_ID,
+  X_B3_SPAN_ID,
+  X_B3_SAMPLED,
+} from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/sdk-trace-base';
 import {
@@ -185,11 +192,44 @@ describe('fetch', () => {
       exportedSpans = [];
     });
 
+    const assertPropagationHeaders = async (
+      response: Response
+    ): Promise<Record<string, string>> => {
+      const { request } = await response.json();
+
+      const span: tracing.ReadableSpan = exportedSpans[0];
+
+      assert.strictEqual(
+        request.headers[X_B3_TRACE_ID],
+        span.spanContext().traceId,
+        `trace header '${X_B3_TRACE_ID}' not set`
+      );
+      assert.strictEqual(
+        request.headers[X_B3_SPAN_ID],
+        span.spanContext().spanId,
+        `trace header '${X_B3_SPAN_ID}' not set`
+      );
+      assert.strictEqual(
+        request.headers[X_B3_SAMPLED],
+        String(span.spanContext().traceFlags),
+        `trace header '${X_B3_SAMPLED}' not set`
+      );
+
+      return request.headers;
+    };
+
     describe('same origin requests', () => {
       const tracedFetch = async ({
         handlers = [
           msw.http.get('/api/status.json', () => {
             return msw.HttpResponse.json({ ok: true });
+          }),
+          msw.http.get('/api/echo-headers.json', ({ request }) => {
+            return msw.HttpResponse.json({
+              request: {
+                headers: Object.fromEntries(request.headers),
+              },
+            });
           }),
         ],
         callback = () => fetch('/api/status.json'),
@@ -329,6 +369,93 @@ describe('fetch', () => {
             PTN.RESPONSE_START,
             PTN.RESPONSE_END,
           ]);
+        });
+      });
+
+      describe('trace propagation headers', () => {
+        describe('with global propagator', () => {
+          before(() => {
+            api.propagation.setGlobalPropagator(
+              new B3Propagator({
+                injectEncoding: B3InjectEncoding.MULTI_HEADER,
+              })
+            );
+          });
+
+          after(() => {
+            api.propagation.disable();
+          });
+
+          it('should set trace propagation headers', async () => {
+            const { response } = await tracedFetch({
+              callback: () => fetch('/api/echo-headers.json'),
+            });
+
+            await assertPropagationHeaders(response);
+          });
+
+          it('should set trace propagation headers with a request object', async () => {
+            const { response } = await tracedFetch({
+              callback: () => fetch(new Request('/api/echo-headers.json')),
+            });
+
+            await assertPropagationHeaders(response);
+          });
+
+          it('should keep custom headers with a request object and a headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch(
+                  new Request('/api/echo-headers.json', {
+                    headers: new Headers({ foo: 'bar' }),
+                  })
+                ),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and typed (Headers) headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: new Headers({ foo: 'bar' }),
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and untyped headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  headers: { foo: 'bar' },
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
+
+          it('should keep custom headers with url, untyped request object and typed (Map) headers object', async () => {
+            const { response } = await tracedFetch({
+              callback: () =>
+                fetch('/api/echo-headers.json', {
+                  // @ts-expect-error relies on implicit coercion
+                  headers: new Map().set('foo', 'bar'),
+                }),
+            });
+
+            const headers = await assertPropagationHeaders(response);
+
+            assert.strictEqual(headers['foo'], 'bar');
+          });
         });
       });
     });
