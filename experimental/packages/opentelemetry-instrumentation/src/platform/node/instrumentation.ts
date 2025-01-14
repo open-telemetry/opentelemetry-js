@@ -16,6 +16,7 @@
 
 import * as types from '../../types';
 import * as path from 'path';
+import * as diagch from 'diagnostics_channel';
 import { types as utilTypes } from 'util';
 import { satisfies } from 'semver';
 import { wrap, unwrap, massWrap, massUnwrap } from 'shimmer';
@@ -30,6 +31,7 @@ import {
   InstrumentationConfig,
   InstrumentationModuleDefinition,
 } from '../../types';
+import { DiagChSubscribe, OTelBundleLoadMessage } from '../../types_internal';
 import { diag } from '@opentelemetry/api';
 import type { OnRequireFn } from 'require-in-the-middle';
 import { Hook as HookRequire } from 'require-in-the-middle';
@@ -178,9 +180,10 @@ export abstract class InstrumentationBase<
     module: InstrumentationModuleDefinition,
     exports: T,
     name: string,
-    baseDir?: string | void
+    baseDir?: string | void,
+    version?: string
   ): T {
-    if (!baseDir) {
+    if (!version && !baseDir) {
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
         if (this._enabled) {
@@ -196,7 +199,9 @@ export abstract class InstrumentationBase<
       return exports;
     }
 
-    const version = this._extractPackageVersion(baseDir);
+    if (!version && baseDir) {
+      version = this._extractPackageVersion(baseDir);
+    }
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
@@ -285,6 +290,11 @@ export abstract class InstrumentationBase<
     }
 
     this._warnOnPreloadedModules();
+
+    const imdsFromHookPath = new Map<
+      string,
+      InstrumentationModuleDefinition[]
+    >();
     for (const module of this._modules) {
       const hookFn: HookFn = (exports, name, baseDir) => {
         if (!baseDir && path.isAbsolute(name)) {
@@ -312,6 +322,56 @@ export abstract class InstrumentationBase<
         <HookFn>hookFn
       );
       this._hooks.push(esmHook);
+
+      const imdsByModuleName = imdsFromHookPath.get(module.name) ?? [];
+      imdsFromHookPath.set(module.name, imdsByModuleName);
+      imdsByModuleName.push(module);
+      for (const file of module.files) {
+        const imdsByFileName = imdsFromHookPath.get(file.name) ?? [];
+        imdsFromHookPath.set(file.name, imdsByFileName);
+        imdsByFileName.push(module);
+      }
+    }
+
+    // `diagch.subscribe` was added in Node.js v18.7.0, v16.17.0.
+    const subscribe: DiagChSubscribe = (diagch as any).subscribe;
+    if (typeof subscribe === 'function') {
+      // A bundler plugin, e.g. `@opentelemetry/esbuild-plugin`, can pass
+      // a loaded module to this instrumentation via the well-known
+      // `otel:bundle:load` diagnostics channel message. The message includes
+      // the module exports, that can be patched in-place.
+      subscribe('otel:bundle:load', rawMessage => {
+        const message = rawMessage as OTelBundleLoadMessage;
+        if (
+          (typeof message.name !== 'string' &&
+            typeof message.file !== 'string') ||
+          typeof message.version !== 'string'
+        ) {
+          this._diag.debug(
+            'skipping invalid "otel:bundle:load" diagch message',
+            rawMessage
+          );
+          return;
+        }
+        const names = [message.name, message.file].filter(Boolean) as string[];
+        for (const name of names) {
+          const imds = imdsFromHookPath.get(name);
+          if (!imds) {
+            // This loaded module is not relevant for this instrumentation.
+            return;
+          }
+          for (const imd of imds) {
+            const patchedExports = this._onRequire<typeof exports>(
+              imd,
+              message.exports,
+              name,
+              undefined,
+              message.version // Package version was determined at bundle-time.
+            );
+            message.exports = patchedExports;
+          }
+        }
+      });
     }
   }
 

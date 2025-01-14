@@ -16,6 +16,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation): Add support for patching modules via diagnostic channels, to support auto instrumentation with bundlers [#5334](https://github.com/open-telemetry/opentelemetry-js/pull/5334)
+
 ### :bug: (Bug Fix)
 
 * fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
