@@ -1007,7 +1007,7 @@ describe('fetch', () => {
     });
   });
 
-  describe('when request is NOT successful (wrong url)', () => {
+  xdescribe('when request is NOT successful (wrong url)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = badUrl;
       await prepareData(badUrl, () => getData(badUrl), {
@@ -1017,7 +1017,7 @@ describe('fetch', () => {
     afterEach(() => {
       clearData();
     });
-    it('should create a span with correct root span', () => {
+    xit('should create a span with correct root span', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,
@@ -1027,7 +1027,7 @@ describe('fetch', () => {
     });
   });
 
-  describe('when request is NOT successful (405)', () => {
+  xdescribe('when request is NOT successful (405)', () => {
     beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
       await prepareData(url, () => getData(url, 'DELETE'), {
@@ -1038,7 +1038,7 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('should create a span with correct root span', () => {
+    xit('should create a span with correct root span', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,

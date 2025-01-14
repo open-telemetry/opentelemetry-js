@@ -1361,5 +1361,104 @@ describe('fetch', () => {
         assertDebugMessage();
       });
     });
+
+    describe('unsuccessful request', () => {
+      describe('wrong URL (404)', () => {
+        const tracedFetch = async ({
+          handlers = [
+            msw.http.get('/not-found.json', () => {
+              return msw.HttpResponse.json({ ok: false }, { status: 404 });
+            }),
+          ],
+          callback = () => fetch('/not-found.json'),
+          config = {},
+        }: {
+          handlers?: msw.RequestHandler[];
+          callback?: () => Promise<Response>;
+          config?: FetchInstrumentationConfig;
+        } = {}): Promise<{ rootSpan: api.Span; response: Response }> => {
+          let response: Response | undefined;
+
+          await startWorker(...handlers);
+
+          const rootSpan = await trace(async () => {
+            response = await callback();
+          }, config);
+
+          assert.ok(response instanceof Response);
+          assert.strictEqual(exportedSpans.length, 1);
+
+          return { rootSpan, response };
+        };
+
+        it('should create a span with correct root span', async () => {
+          const { rootSpan } = await tracedFetch();
+
+          assert.strictEqual(
+            exportedSpans.length,
+            1,
+            'creates a single span for the fetch() request'
+          );
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+
+          assert.strictEqual(
+            span.parentSpanId,
+            rootSpan!.spanContext().spanId,
+            'parent span is not root span'
+          );
+        });
+      });
+
+      describe('wrong HTTP method (405)', () => {
+        const tracedFetch = async ({
+          handlers = [
+            msw.http.get('/post-only.json', () => {
+              return msw.HttpResponse.json({ ok: false }, { status: 405 });
+            }),
+            msw.http.post('/post-only.json', () => {
+              return msw.HttpResponse.json({ ok: true });
+            }),
+          ],
+          callback = () => fetch('/post-only.json'),
+          config = {},
+        }: {
+          handlers?: msw.RequestHandler[];
+          callback?: () => Promise<Response>;
+          config?: FetchInstrumentationConfig;
+        } = {}): Promise<{ rootSpan: api.Span; response: Response }> => {
+          let response: Response | undefined;
+
+          await startWorker(...handlers);
+
+          const rootSpan = await trace(async () => {
+            response = await callback();
+          }, config);
+
+          assert.ok(response instanceof Response);
+          assert.strictEqual(exportedSpans.length, 1);
+
+          return { rootSpan, response };
+        };
+
+        it('should create a span with correct root span', async () => {
+          const { rootSpan } = await tracedFetch();
+
+          assert.strictEqual(
+            exportedSpans.length,
+            1,
+            'creates a single span for the fetch() request'
+          );
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+
+          assert.strictEqual(
+            span.parentSpanId,
+            rootSpan!.spanContext().spanId,
+            'parent span is not root span'
+          );
+        });
+      });
+    });
   });
 });
