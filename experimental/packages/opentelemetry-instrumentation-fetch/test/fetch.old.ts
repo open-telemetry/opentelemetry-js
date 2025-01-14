@@ -1048,7 +1048,7 @@ describe('fetch', () => {
     });
   });
 
-  describe('when PerformanceObserver is used by default', () => {
+  xdescribe('when PerformanceObserver is used by default', () => {
     beforeEach(async () => {
       // All above tests test it already but just in case
       // lets explicitly turn getEntriesByType off so we can be sure
@@ -1058,7 +1058,7 @@ describe('fetch', () => {
     afterEach(() => {
       clearData();
     });
-    it('should create both spans with network events', () => {
+    xit('should create both spans with network events', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
 
@@ -1083,14 +1083,14 @@ describe('fetch', () => {
     });
   });
 
-  describe('when fetching with relative url', () => {
+  xdescribe('when fetching with relative url', () => {
     beforeEach(async () => {
       await prepareData('/get', () => getData('/get'), {}, false, true);
     });
     afterEach(() => {
       clearData();
     });
-    it('should create spans with network info', () => {
+    xit('should create spans with network info', () => {
       // no prefetch span because mock observer uses location.origin as url when relative
       // and prefetch span finding compares url origins
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
@@ -1115,7 +1115,7 @@ describe('fetch', () => {
       ]);
     });
 
-    it('should have an absolute http.url attribute', () => {
+    xit('should have an absolute http.url attribute', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const attributes = span.attributes;
 

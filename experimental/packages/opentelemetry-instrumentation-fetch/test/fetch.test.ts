@@ -1460,5 +1460,112 @@ describe('fetch', () => {
         });
       });
     });
+
+    describe('PerformanceObserver', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          }),
+        ],
+        callback = () => fetch('/api/status.json'),
+        config = {},
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config?: FetchInstrumentationConfig;
+      } = {}): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(async () => {
+          response = await callback();
+        }, config);
+
+        assert.ok(response instanceof Response);
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, response };
+      };
+
+      // This is essentially the same as the basic tests from above, but
+      // asserting that the data indeed came from PerformanceObserver, as
+      // opposed to performance.getEntriesByType.
+      describe('when `PerformanceObserver` is available', () => {
+        if (!PerformanceObserver?.supportedEntryTypes?.includes('resource')) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            'Testing in an environment without `PerformanceObserver`!'
+          );
+
+          return;
+        }
+
+        let getEntriesByTypeStub: sinon.SinonStub | undefined;
+        let rootSpan: api.Span | undefined;
+
+        beforeEach(async () => {
+          getEntriesByTypeStub = sinon
+            .stub(performance, 'getEntriesByType')
+            .throws();
+
+          const result = await tracedFetch();
+          rootSpan = result.rootSpan;
+        });
+
+        afterEach(() => {
+          assert.strictEqual(
+            getEntriesByTypeStub?.notCalled,
+            true,
+            'should not call performance.getEntriesByType'
+          );
+
+          getEntriesByTypeStub = undefined;
+          rootSpan = undefined;
+        });
+
+        it('should create a span with correct root span', () => {
+          assert.strictEqual(
+            exportedSpans.length,
+            1,
+            'creates a single span for the fetch() request'
+          );
+
+          const span: tracing.ReadableSpan = exportedSpans[0];
+
+          assert.strictEqual(
+            span.parentSpanId,
+            rootSpan!.spanContext().spanId,
+            'parent span is not root span'
+          );
+        });
+
+        it('span should have correct events', async () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const events = span.events;
+          assert.strictEqual(events.length, 8, 'number of events is wrong');
+          testForCorrectEvents(events, [
+            PTN.FETCH_START,
+            PTN.DOMAIN_LOOKUP_START,
+            PTN.DOMAIN_LOOKUP_END,
+            PTN.CONNECT_START,
+            PTN.CONNECT_END,
+            PTN.REQUEST_START,
+            PTN.RESPONSE_START,
+            PTN.RESPONSE_END,
+          ]);
+        });
+
+        it('span should have correct (absolute) http.url attribute', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[SEMATTRS_HTTP_URL],
+            `${ORIGIN}/api/status.json`,
+            `attributes ${SEMATTRS_HTTP_URL} is wrong`
+          );
+        });
+      });
+    });
   });
 });
