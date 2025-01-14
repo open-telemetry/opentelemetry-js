@@ -1650,6 +1650,69 @@ describe('fetch', () => {
             );
           });
         });
+
+        // This is the worst case scenario, all resource-timing dependent data
+        // will be missing
+        describe('when `getEntriesByType` is NOT available', () => {
+          let rootSpan: api.Span | undefined;
+
+          beforeEach(async () => {
+            sinon.stub(performance, 'getEntriesByType').value(undefined);
+
+            const result = await tracedFetch();
+            rootSpan = result.rootSpan;
+          });
+
+          afterEach(() => {
+            rootSpan = undefined;
+          });
+
+          it('should create a span with correct root span', () => {
+            assert.strictEqual(
+              exportedSpans.length,
+              1,
+              'creates a single span for the fetch() request'
+            );
+
+            const span: tracing.ReadableSpan = exportedSpans[0];
+
+            assert.strictEqual(
+              span.parentSpanId,
+              rootSpan!.spanContext().spanId,
+              'parent span is not root span'
+            );
+          });
+
+          it('span should have no events', async () => {
+            const span: tracing.ReadableSpan = exportedSpans[0];
+            assert.strictEqual(
+              span.events.length,
+              0,
+              'should not have any events'
+            );
+          });
+
+          it('span should have correct basic attributes', () => {
+            const span: tracing.ReadableSpan = exportedSpans[0];
+
+            assert.strictEqual(span.name, 'HTTP GET', `wrong span name`);
+
+            assert.strictEqual(
+              span.attributes[SEMATTRS_HTTP_STATUS_CODE],
+              200,
+              `attributes ${SEMATTRS_HTTP_STATUS_CODE} is wrong`
+            );
+          });
+
+          it('span should have correct (absolute) http.url attribute', () => {
+            const span: tracing.ReadableSpan = exportedSpans[0];
+            assert.strictEqual(
+              span.attributes[SEMATTRS_HTTP_URL],
+              `${ORIGIN}/api/status.json`,
+              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+            );
+          });
+        });
       });
     });
   });
