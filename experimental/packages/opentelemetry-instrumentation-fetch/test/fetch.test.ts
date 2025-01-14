@@ -1715,5 +1715,145 @@ describe('fetch', () => {
         });
       });
     });
+
+    describe('`ignoreNetworkEvents` config', () => {
+      const tracedFetch = async ({
+        handlers = [
+          msw.http.get('/api/status.json', () => {
+            return msw.HttpResponse.json({ ok: true });
+          }),
+        ],
+        callback = () => fetch('/api/status.json'),
+        config = {},
+      }: {
+        handlers?: msw.RequestHandler[];
+        callback?: () => Promise<Response>;
+        config?: FetchInstrumentationConfig;
+      } = {}): Promise<{ rootSpan: api.Span; response: Response }> => {
+        let response: Response | undefined;
+
+        await startWorker(...handlers);
+
+        const rootSpan = await trace(async () => {
+          response = await callback();
+        }, config);
+
+        assert.ok(response instanceof Response);
+        assert.strictEqual(exportedSpans.length, 1);
+
+        return { rootSpan, response };
+      };
+
+      describe('when `ignoreNetworkEvents` is not set', function () {
+        let response: Response | undefined;
+
+        beforeEach(async () => {
+          const result = await tracedFetch();
+          response = result.response;
+        });
+
+        afterEach(() => {
+          response = undefined;
+        });
+
+        it('span should have correct events', async () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const events = span.events;
+          assert.strictEqual(events.length, 8, 'number of events is wrong');
+          testForCorrectEvents(events, [
+            PTN.FETCH_START,
+            PTN.DOMAIN_LOOKUP_START,
+            PTN.DOMAIN_LOOKUP_END,
+            PTN.CONNECT_START,
+            PTN.CONNECT_END,
+            PTN.REQUEST_START,
+            PTN.RESPONSE_START,
+            PTN.RESPONSE_END,
+          ]);
+        });
+
+        it('span should have http.response_content_length attribute', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH],
+            parseInt(response!.headers.get('content-length')!),
+            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+          );
+        });
+      });
+
+      describe('when `ignoreNetworkEvents` is `false`', function () {
+        let response: Response | undefined;
+
+        beforeEach(async () => {
+          const result = await tracedFetch({
+            config: { ignoreNetworkEvents: false },
+          });
+          response = result.response;
+        });
+
+        afterEach(() => {
+          response = undefined;
+        });
+
+        it('span should have correct events', async () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          const events = span.events;
+          assert.strictEqual(events.length, 8, 'number of events is wrong');
+          testForCorrectEvents(events, [
+            PTN.FETCH_START,
+            PTN.DOMAIN_LOOKUP_START,
+            PTN.DOMAIN_LOOKUP_END,
+            PTN.CONNECT_START,
+            PTN.CONNECT_END,
+            PTN.REQUEST_START,
+            PTN.RESPONSE_START,
+            PTN.RESPONSE_END,
+          ]);
+        });
+
+        it('span should have http.response_content_length attribute', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH],
+            parseInt(response!.headers.get('content-length')!),
+            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+          );
+        });
+      });
+
+      describe('when `ignoreNetworkEvents` is `true`', function () {
+        let response: Response | undefined;
+
+        beforeEach(async () => {
+          const result = await tracedFetch({
+            config: { ignoreNetworkEvents: true },
+          });
+          response = result.response;
+        });
+
+        afterEach(() => {
+          response = undefined;
+        });
+
+        it('span should have no events', async () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.events.length,
+            0,
+            'should not have any events'
+          );
+        });
+
+        it('span should have http.response_content_length attribute', () => {
+          const span: tracing.ReadableSpan = exportedSpans[0];
+          assert.strictEqual(
+            span.attributes[SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH],
+            parseInt(response!.headers.get('content-length')!),
+            `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+          );
+        });
+      });
+    });
   });
 });

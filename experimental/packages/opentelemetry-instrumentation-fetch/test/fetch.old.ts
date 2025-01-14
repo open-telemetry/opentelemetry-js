@@ -1194,7 +1194,7 @@ describe('fetch', () => {
     });
   });
 
-  describe('when network events are ignored', () => {
+  xdescribe('when network events are ignored', () => {
     beforeEach(async () => {
       await prepareData(url, () => getData(url), {
         ignoreNetworkEvents: true,
@@ -1203,13 +1203,13 @@ describe('fetch', () => {
     afterEach(() => {
       clearData();
     });
-    it('should NOT add network events', () => {
+    xit('should NOT add network events', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 0, 'number of events is wrong');
     });
 
-    it('should still add the CONTENT_LENGTH attribute', () => {
+    xit('should still add the CONTENT_LENGTH attribute', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const attributes = span.attributes;
       const responseContentLength = attributes[
