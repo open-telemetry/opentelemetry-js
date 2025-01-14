@@ -1127,7 +1127,7 @@ describe('fetch', () => {
     });
   });
 
-  describe('when PerformanceObserver is undefined', () => {
+  xdescribe('when PerformanceObserver is undefined', () => {
     beforeEach(async () => {
       await prepareData(url, () => getData(url), {}, true, false);
     });
@@ -1136,7 +1136,7 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('should fallback to getEntries', () => {
+    xit('should fallback to getEntries', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
 

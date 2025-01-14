@@ -1566,6 +1566,91 @@ describe('fetch', () => {
           );
         });
       });
+
+      describe('when `PerformanceObserver` is NOT available', () => {
+        beforeEach(async () => {
+          sinon.stub(window, 'PerformanceObserver').value(undefined);
+        });
+
+        // The assertions are essentially the same as the tests from above, but
+        // here we are asserting that when the data is still correct even when
+        // it comes from the fallback performance.getEntriesByType.
+        describe('when `getEntriesByType` is available', () => {
+          if (typeof performance.getEntriesByType !== 'function') {
+            // eslint-disable-next-line no-console
+            console.warn(
+              'Testing in an environment without `performance.getEntriesByType`!'
+            );
+
+            return;
+          }
+
+          let getEntriesByTypeSpy: sinon.SinonSpy | undefined;
+          let rootSpan: api.Span | undefined;
+
+          beforeEach(async () => {
+            // Free up the buffer to ensure our events can be collected
+            performance.clearResourceTimings();
+
+            getEntriesByTypeSpy = sinon.spy(performance, 'getEntriesByType');
+
+            const result = await tracedFetch();
+            rootSpan = result.rootSpan;
+          });
+
+          afterEach(() => {
+            assert.strictEqual(
+              getEntriesByTypeSpy?.called,
+              true,
+              'should call performance.getEntriesByType'
+            );
+
+            getEntriesByTypeSpy = undefined;
+            rootSpan = undefined;
+          });
+
+          it('should create a span with correct root span', () => {
+            assert.strictEqual(
+              exportedSpans.length,
+              1,
+              'creates a single span for the fetch() request'
+            );
+
+            const span: tracing.ReadableSpan = exportedSpans[0];
+
+            assert.strictEqual(
+              span.parentSpanId,
+              rootSpan!.spanContext().spanId,
+              'parent span is not root span'
+            );
+          });
+
+          it('span should have correct events', async () => {
+            const span: tracing.ReadableSpan = exportedSpans[0];
+            const events = span.events;
+            assert.strictEqual(events.length, 8, 'number of events is wrong');
+            testForCorrectEvents(events, [
+              PTN.FETCH_START,
+              PTN.DOMAIN_LOOKUP_START,
+              PTN.DOMAIN_LOOKUP_END,
+              PTN.CONNECT_START,
+              PTN.CONNECT_END,
+              PTN.REQUEST_START,
+              PTN.RESPONSE_START,
+              PTN.RESPONSE_END,
+            ]);
+          });
+
+          it('span should have correct (absolute) http.url attribute', () => {
+            const span: tracing.ReadableSpan = exportedSpans[0];
+            assert.strictEqual(
+              span.attributes[SEMATTRS_HTTP_URL],
+              `${ORIGIN}/api/status.json`,
+              `attributes ${SEMATTRS_HTTP_URL} is wrong`
+            );
+          });
+        });
+      });
     });
   });
 });
