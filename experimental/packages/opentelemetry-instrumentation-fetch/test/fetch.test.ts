@@ -55,6 +55,9 @@ import {
 import * as msw from 'msw';
 import { setupWorker } from 'msw/browser';
 
+// This should match the unexported constant with the same name in fetch.ts
+const OBSERVER_WAIT_TIME_MS = 300;
+
 class DummySpanExporter implements tracing.SpanExporter {
   readonly exported: tracing.ReadableSpan[][] = [];
 
@@ -91,6 +94,34 @@ const ORIGIN = location.origin;
 // "localhost:9876"
 const ORIGIN_HOST = new URL(ORIGIN).host;
 
+interface Resolvers<T> {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+  reject: (reason: any) => void;
+}
+
+// Use Promise.withResolvers when we can
+function withResolvers<T>(): Resolvers<T> {
+  let resolve: (value: T) => void;
+  let reject: (reason: any) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return {
+    promise,
+    resolve: resolve!,
+    reject: reject!,
+  };
+}
+
+function waitFor(timeout: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout);
+  });
+}
+
 describe('fetch', () => {
   let workerStarted = false;
 
@@ -105,13 +136,74 @@ describe('fetch', () => {
     workerStarted = true;
   };
 
-  afterEach(() => {
-    if (workerStarted) {
-      worker.stop();
-      workerStarted = false;
-    }
+  let pendingObservers = 0;
+  let waitForPerformanceObservers = async () => {};
 
-    sinon.restore();
+  beforeEach(() => {
+    if (PerformanceObserver) {
+      assert.strictEqual(
+        pendingObservers,
+        0,
+        'Did a previous test leak a PerformanceObserver?'
+      );
+
+      let resolvers: Resolvers<void> | undefined;
+
+      const _observe = PerformanceObserver.prototype.observe;
+      const _disconnect = PerformanceObserver.prototype.disconnect;
+
+      sinon.stub(PerformanceObserver.prototype, 'observe').callsFake(function (
+        this: PerformanceObserver,
+        ...args
+      ) {
+        _observe.call(this, ...args);
+        pendingObservers++;
+
+        if (!resolvers) {
+          resolvers = withResolvers();
+        }
+      });
+
+      sinon
+        .stub(PerformanceObserver.prototype, 'disconnect')
+        .callsFake(function (this: PerformanceObserver, ...args) {
+          _disconnect.call(this, ...args);
+          pendingObservers--;
+
+          if (pendingObservers === 0) {
+            resolvers?.resolve();
+            resolvers = undefined;
+          }
+        });
+
+      waitForPerformanceObservers = async (): Promise<void> => {
+        while (resolvers) {
+          await resolvers.promise;
+        }
+      };
+    }
+  });
+
+  afterEach(() => {
+    try {
+      if (workerStarted) {
+        worker.stop();
+        workerStarted = false;
+      }
+
+      const _pendingObservers = pendingObservers;
+
+      pendingObservers = 0;
+      waitForPerformanceObservers = async () => {};
+
+      assert.strictEqual(
+        _pendingObservers,
+        0,
+        `Test leaked ${_pendingObservers} \`PerformanceObserver\`(s)!`
+      );
+    } finally {
+      sinon.restore();
+    }
   });
 
   describe('enabling/disabling', () => {
@@ -178,10 +270,7 @@ describe('fetch', () => {
           callback
         );
 
-        // FIXME!
-        await new Promise(resolve => {
-          setTimeout(resolve, 500);
-        });
+        await waitForPerformanceObservers();
 
         if (expectExport) {
           // This isn't intended to be an invariant, but in the current setup we
@@ -1570,6 +1659,21 @@ describe('fetch', () => {
       describe('when `PerformanceObserver` is NOT available', () => {
         beforeEach(async () => {
           sinon.stub(window, 'PerformanceObserver').value(undefined);
+
+          // This seemingly random timeout is testing real behavior!
+          //
+          // Currently, the implementation works by waiting a hardcoded
+          // OBSERVER_WAIT_TIME_MS before trying to get the resource
+          // timing entries, and hoping that they are there by then.
+          //
+          // We will match that here plus an additional 50ms. If the
+          // tests still fail despite this timeout, then we may have
+          // found a bug that could occur in the real world, and it's
+          // probably time to revisit the naïve implementation.
+          //
+          // This should be updated as the implementation changes.
+          waitForPerformanceObservers = () =>
+            waitFor(OBSERVER_WAIT_TIME_MS + 50);
         });
 
         // The assertions are essentially the same as the tests from above, but
