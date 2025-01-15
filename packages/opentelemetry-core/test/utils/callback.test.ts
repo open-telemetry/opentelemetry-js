@@ -34,7 +34,7 @@ describe('callback', () => {
       assert.deepStrictEqual(stub.firstCall.args, [1]);
       assert.deepStrictEqual(stub.firstCall.thisValue, that);
 
-      assert(future.isCalled);
+      assert.ok(future.isCalled);
     });
 
     it('should handle thrown errors', async () => {

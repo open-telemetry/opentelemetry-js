@@ -49,7 +49,7 @@ describe('EventLogger', () => {
         timestamp: now,
       });
 
-      assert(
+      assert.ok(
         spy.calledWith(
           sinon.match({
             attributes: {
@@ -77,7 +77,7 @@ describe('EventLogger', () => {
         name: 'event name',
       });
 
-      assert(
+      assert.ok(
         spy.calledWith(
           sinon.match({
             severityNumber: SeverityNumber.INFO,
@@ -86,7 +86,7 @@ describe('EventLogger', () => {
         'severityNumber should be set to INFO'
       );
 
-      assert(
+      assert.ok(
         spy.calledWith(
           sinon.match((value: any) => {
             return value.timestamp !== undefined;
