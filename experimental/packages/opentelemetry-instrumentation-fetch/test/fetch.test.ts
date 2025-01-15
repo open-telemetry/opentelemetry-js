@@ -176,7 +176,7 @@ function testForCorrectEvents(
 
 describe('fetch', () => {
   let contextManager: ZoneContextManager;
-  let lastResponse: any | undefined;
+  let lastResponse: Response | undefined;
   let requestBody: any | undefined;
   let webTracerWithZone: api.Tracer;
   let webTracerProviderWithZone: WebTracerProvider;
@@ -210,12 +210,21 @@ describe('fetch', () => {
     sinon.stub(core.otperformance, 'now').callsFake(() => fakeNow);
 
     function fakeFetch(input: RequestInfo | Request, init: RequestInit = {}) {
+      // Once upon a time, there was a bug (#2411), causing a `Request` object
+      // to be incorrectly passed to `fetch()` as the second argument
+      assert.ok(!(init instanceof Request));
+
       return new Promise((resolve, reject) => {
-        const response: any = {
-          args: {},
-          url: fileUrl,
-        };
-        response.headers = Object.assign({}, init.headers);
+        const responseInit: ResponseInit = {};
+
+        // This is the default response body expected by the few tests that care
+        let responseBody = JSON.stringify({
+          isServerResponse: true,
+          request: {
+            url: fileUrl,
+            headers: { ...init.headers },
+          },
+        });
 
         // get the request body
         if (typeof input === 'string') {
@@ -224,6 +233,7 @@ describe('fetch', () => {
             const decoder = new TextDecoder();
             requestBody = '';
             const read = async () => {
+              // @ts-expect-error -- iterator symbol was removed from types
               for await (const c of body) {
                 requestBody += decoder.decode(c);
               }
@@ -235,28 +245,22 @@ describe('fetch', () => {
         } else {
           input.text().then(r => (requestBody = r));
         }
-
-        if (init instanceof Request) {
-          // Passing request as 2nd argument causes missing body bug (#2411)
-          response.status = 400;
-          response.statusText = 'Bad Request (Request object as 2nd argument)';
-          reject(new window.Response(JSON.stringify(response), response));
-        } else if (init.method === 'DELETE') {
-          response.status = 405;
-          response.statusText = 'OK';
-          resolve(new window.Response('foo', response));
+        if (init.method === 'DELETE') {
+          responseInit.status = 405;
+          responseInit.statusText = 'OK';
+          responseBody = 'foo';
         } else if (
           (input instanceof Request && input.url === url) ||
           input === url
         ) {
-          response.status = 200;
-          response.statusText = 'OK';
-          resolve(new window.Response(JSON.stringify(response), response));
+          responseInit.status = 200;
+          responseInit.statusText = 'OK';
         } else {
-          response.status = 404;
-          response.statusText = 'Bad request';
-          reject(new window.Response(JSON.stringify(response), response));
+          responseInit.status = 404;
+          responseInit.statusText = 'Not found';
         }
+
+        resolve(new window.Response(responseBody, responseInit));
       });
     }
 
@@ -288,18 +292,17 @@ describe('fetch', () => {
     }
 
     fetchInstrumentation = new FetchInstrumentation(config);
-    webTracerProviderWithZone = new WebTracerProvider();
+    dummySpanExporter = new DummySpanExporter();
+    webTracerProviderWithZone = new WebTracerProvider({
+      spanProcessors: [new tracing.SimpleSpanProcessor(dummySpanExporter)],
+    });
     registerInstrumentations({
       tracerProvider: webTracerProviderWithZone,
       instrumentations: [fetchInstrumentation],
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
-    dummySpanExporter = new DummySpanExporter();
     exportSpy = sinon.stub(dummySpanExporter, 'export');
     clearResourceTimingsSpy = sinon.stub(performance, 'clearResourceTimings');
-    webTracerProviderWithZone.addSpanProcessor(
-      new tracing.SimpleSpanProcessor(dummySpanExporter)
-    );
 
     // endSpan is called after the whole response body is read
     // this process is scheduled at the same time the fetch promise is resolved
@@ -322,26 +325,16 @@ describe('fetch', () => {
       api.trace.setSpan(api.context.active(), rootSpan),
       async () => {
         fakeNow = 0;
-        try {
-          const responsePromise = apiCall();
-          fakeNow = 300;
-          const response = await responsePromise;
+        lastResponse = undefined;
 
-          // if the url is not ignored, body.read should be called by now
-          // awaiting for the span to end
-          if (readSpy.callCount > 0) await spanEnded;
+        const responsePromise = apiCall();
+        fakeNow = 300;
+        lastResponse = await responsePromise;
 
-          // this is a bit tricky as the only way to get all request headers from
-          // fetch is to use json()
-          lastResponse = await response.json();
-          const headers: { [key: string]: string } = {};
-          Object.keys(lastResponse.headers).forEach(key => {
-            headers[key.toLowerCase()] = lastResponse.headers[key];
-          });
-          lastResponse.headers = headers;
-        } catch (e) {
-          lastResponse = undefined;
-        }
+        // if the url is not ignored, body.read should be called by now
+        // awaiting for the span to end
+        if (readSpy.callCount > 0) await spanEnded;
+
         await sinon.clock.runAllAsync();
       }
     );
@@ -532,20 +525,24 @@ describe('fetch', () => {
       ]);
     });
 
-    it('should set trace headers', () => {
+    it('should set trace headers', async () => {
       const span: api.Span = exportSpy.args[1][0][0];
+      assert.ok(lastResponse instanceof Response);
+
+      const { request } = await lastResponse.json();
+
       assert.strictEqual(
-        lastResponse.headers[X_B3_TRACE_ID],
+        request.headers[X_B3_TRACE_ID],
         span.spanContext().traceId,
         `trace header '${X_B3_TRACE_ID}' not set`
       );
       assert.strictEqual(
-        lastResponse.headers[X_B3_SPAN_ID],
+        request.headers[X_B3_SPAN_ID],
         span.spanContext().spanId,
         `trace header '${X_B3_SPAN_ID}' not set`
       );
       assert.strictEqual(
-        lastResponse.headers[X_B3_SAMPLED],
+        request.headers[X_B3_SAMPLED],
         String(span.spanContext().traceFlags),
         `trace header '${X_B3_SAMPLED}' not set`
       );
@@ -594,18 +591,6 @@ describe('fetch', () => {
       assert.ok(init.headers.get('foo') === 'bar');
     });
 
-    it('should pass request object as first parameter to the original function (#2411)', () => {
-      const r = new Request(url);
-      return window.fetch(r).then(
-        () => {
-          assert.ok(true);
-        },
-        (response: Response) => {
-          assert.fail(response.statusText);
-        }
-      );
-    });
-
     it('should NOT clear the resources', () => {
       assert.strictEqual(
         clearResourceTimingsSpy.args.length,
@@ -628,19 +613,23 @@ describe('fetch', () => {
         sinon.restore();
       });
 
-      it('should NOT set trace headers', () => {
+      it('should NOT set trace headers', async () => {
+        assert.ok(lastResponse instanceof Response);
+
+        const { request } = await lastResponse.json();
+
         assert.strictEqual(
-          lastResponse.headers[X_B3_TRACE_ID],
+          request.headers[X_B3_TRACE_ID],
           undefined,
           `trace header '${X_B3_TRACE_ID}' should not be set`
         );
         assert.strictEqual(
-          lastResponse.headers[X_B3_SPAN_ID],
+          request.headers[X_B3_SPAN_ID],
           undefined,
           `trace header '${X_B3_SPAN_ID}' should not be set`
         );
         assert.strictEqual(
-          lastResponse.headers[X_B3_SAMPLED],
+          request.headers[X_B3_SAMPLED],
           undefined,
           `trace header '${X_B3_SAMPLED}' should not be set`
         );
@@ -942,25 +931,33 @@ describe('fetch', () => {
       };
 
       await prepare(url, applyCustomAttributes);
-      assert.ok(request.method === 'GET');
-      assert.ok(response.status === 200);
-    });
+      assert.strictEqual(request.method, 'GET');
+      assert.ok(lastResponse !== undefined);
+      assert.strictEqual(response, lastResponse);
+      assert.strictEqual(response.status, 200);
 
-    it('get response body from callback arguments response', async () => {
-      let response: any;
-      const applyCustomAttributes: FetchCustomAttributeFunction = async (
-        span,
-        req,
-        res
-      ) => {
-        if (res instanceof Response) {
-          response = res;
-        }
-      };
+      /*
+         Note: this confirms that nothing *in the instrumentation code*
+         consumed the response body; it doesn't guarantee that the response
+         object passed to the `applyCustomAttributes` hook will always have
+         a consumable body – in fact, this is typically *not* the case:
 
-      await prepare(url, applyCustomAttributes);
-      const rsp = await response.json();
-      assert.deepStrictEqual(rsp.args, {});
+         ```js
+         // user code:
+         let response = await fetch("foo");
+         let json = await response.json(); // <- user code consumes the body on `response`
+         // ...
+
+         {
+           // ...this is called sometime later...
+           applyCustomAttributes(span, request, response) {
+             // too late!
+             response.bodyUsed // => true
+           }
+         }
+         ```
+      */
+      assert.strictEqual(response.bodyUsed, false);
     });
   });
 
@@ -972,22 +969,21 @@ describe('fetch', () => {
         ignoreUrls: [propagateTraceHeaderCorsUrls],
       });
     });
+
     afterEach(() => {
       clearData();
     });
+
     it('should NOT create any span', () => {
       assert.strictEqual(exportSpy.args.length, 0, "span shouldn't b exported");
     });
-    it('should pass request object as the first parameter to the original function (#2411)', () => {
-      const r = new Request(url);
-      return window.fetch(r).then(
-        () => {
-          assert.ok(true);
-        },
-        (response: Response) => {
-          assert.fail(response.statusText);
-        }
-      );
+
+    it('should accept Request objects as argument (#2411)', async () => {
+      const response = await window.fetch(new Request(url));
+      assert.ok(response instanceof Response);
+
+      const { isServerResponse } = await response.json();
+      assert.strictEqual(isServerResponse, true);
     });
   });
 
@@ -1211,6 +1207,19 @@ describe('fetch', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const events = span.events;
       assert.strictEqual(events.length, 0, 'number of events is wrong');
+    });
+
+    it('should still add the CONTENT_LENGTH attribute', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const attributes = span.attributes;
+      const responseContentLength = attributes[
+        SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH
+      ] as number;
+      assert.strictEqual(
+        responseContentLength,
+        30,
+        `attributes ${SEMATTRS_HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+      );
     });
   });
 });

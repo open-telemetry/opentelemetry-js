@@ -19,7 +19,6 @@ import {
   MeterProvider,
   InstrumentType,
   DataPointType,
-  ExplicitBucketHistogramAggregation,
   HistogramMetricData,
   DataPoint,
 } from '../src';
@@ -31,8 +30,9 @@ import {
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
-import { View } from '../src/view/View';
 import { Meter } from '../src/Meter';
+import { createAllowListAttributesProcessor } from '../src/view/AttributesProcessor';
+import { AggregationType } from '../src/view/AggregationOption';
 import { Resource } from '@opentelemetry/resources';
 
 describe('MeterProvider', () => {
@@ -68,14 +68,13 @@ describe('MeterProvider', () => {
       assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
     });
 
-    it('should not merge with defaults when flag is set to false', async function () {
+    it('should use the resource passed in constructor', async function () {
       const reader = new TestMetricReader();
       const expectedResource = new Resource({ foo: 'bar' });
 
       const meterProvider = new MeterProvider({
         readers: [reader],
         resource: expectedResource,
-        mergeResourceWithDefaults: false,
       });
 
       // Create meter and instrument, otherwise nothing will export
@@ -88,14 +87,10 @@ describe('MeterProvider', () => {
       assert.deepStrictEqual(resourceMetrics.resource, expectedResource);
     });
 
-    it('should merge with defaults when flag is set to true', async function () {
+    it('should use default resource if not passed in constructor', async function () {
       const reader = new TestMetricReader();
-      const providedResource = new Resource({ foo: 'bar' });
-
       const meterProvider = new MeterProvider({
         readers: [reader],
-        resource: providedResource,
-        mergeResourceWithDefaults: true,
       });
 
       // Create meter and instrument, otherwise nothing will export
@@ -105,10 +100,7 @@ describe('MeterProvider', () => {
 
       // Perform collection.
       const { resourceMetrics } = await reader.collect();
-      assert.deepStrictEqual(
-        resourceMetrics.resource,
-        Resource.default().merge(providedResource)
-      );
+      assert.deepStrictEqual(resourceMetrics.resource, Resource.default());
     });
   });
 
@@ -126,9 +118,9 @@ describe('MeterProvider', () => {
       assert.strictEqual(meter1, meter2);
     });
 
-    it('get a noop meter on shutdown', () => {
+    it('get a noop meter on shutdown', async () => {
       const meterProvider = new MeterProvider();
-      meterProvider.shutdown();
+      await meterProvider.shutdown();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
       // returned tracer should be no-op, not instance of Meter (from SDK)
       assert.ok(!(meter instanceof Meter));
@@ -200,11 +192,11 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
         views: [
-          new View({
+          {
             name: 'renamed-instrument',
             description: 'my renamed instrument',
             instrumentName: 'non-renamed-instrument',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -262,17 +254,19 @@ describe('MeterProvider', () => {
       );
     });
 
-    it('with attributeKeys should drop non-listed attributes', async () => {
+    it('with allowListProcessor should drop non-listed attributes', async () => {
       const reader = new TestMetricReader();
 
       // Add view to drop all attributes except 'attrib1'
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({
-            attributeKeys: ['attrib1'],
+          {
+            attributesProcessors: [
+              createAllowListAttributesProcessor(['attrib1']),
+            ],
             instrumentName: 'non-renamed-instrument',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -335,10 +329,10 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -407,11 +401,11 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         views: [
           // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
-          new View({
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
             meterName: 'meter1',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -480,16 +474,16 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         // Add Views to rename both instruments (of different types) to the same name.
         views: [
-          new View({
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-counter',
             meterName: 'meter1',
-          }),
-          new View({
+          },
+          {
             name: 'renamed-instrument',
             instrumentName: 'test-histogram',
             meterName: 'meter1',
-          }),
+          },
         ],
         readers: [reader],
       });
@@ -548,14 +542,21 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({
+          {
             instrumentUnit: 'ms',
-            aggregation: new ExplicitBucketHistogramAggregation(msBoundaries),
-          }),
-          new View({
+            // aggregation: new ExplicitBucketHistogramAggregation(msBoundaries),
+            aggregation: {
+              type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+              options: { boundaries: msBoundaries },
+            },
+          },
+          {
             instrumentUnit: 's',
-            aggregation: new ExplicitBucketHistogramAggregation(sBoundaries),
-          }),
+            aggregation: {
+              type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+              options: { boundaries: sBoundaries },
+            },
+          },
         ],
         readers: [reader],
       });
@@ -610,10 +611,10 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         readers: [reader],
         views: [
-          new View({
+          {
             instrumentName: 'test-counter',
             aggregationCardinalityLimit: 2, // Set cardinality limit to 2
-          }),
+          },
         ],
       });
 
@@ -655,10 +656,10 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         readers: [reader],
         views: [
-          new View({
+          {
             instrumentName: 'test-observable-counter',
             aggregationCardinalityLimit: 2, // Set cardinality limit to 2
-          }),
+          },
         ],
       });
 

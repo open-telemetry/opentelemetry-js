@@ -108,7 +108,6 @@ describe('NodeTracerProvider', () => {
         sampler: new AlwaysOnSampler(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
-      assert.ok(span instanceof Span);
       assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
@@ -127,7 +126,6 @@ describe('NodeTracerProvider', () => {
           traceFlags: TraceFlags.NONE,
         })
       );
-      assert.ok(sampledParent instanceof Span);
       assert.strictEqual(
         sampledParent.spanContext().traceFlags,
         TraceFlags.SAMPLED
@@ -141,7 +139,6 @@ describe('NodeTracerProvider', () => {
           {},
           trace.setSpan(ROOT_CONTEXT, sampledParent)
         );
-      assert.ok(span instanceof Span);
       assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
@@ -305,11 +302,23 @@ describe('NodeTracerProvider', () => {
 
       const provider = new CustomTracerProvider({});
       provider.register();
-      const processor = provider.getActiveSpanProcessor();
-      assert(processor instanceof BatchSpanProcessor);
-      // @ts-expect-error access configured to verify its the correct one
-      const exporter = processor._exporter;
-      assert(exporter instanceof DummyExporter);
+
+      assert.ok(
+        provider['_activeSpanProcessor'].constructor.name ===
+          'MultiSpanProcessor'
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+          BatchSpanProcessor
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
+          '_exporter'
+        ] instanceof DummyExporter
+      );
 
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });
@@ -350,11 +359,23 @@ describe('NodeTracerProvider', () => {
 
       const provider = new CustomTracerProvider({});
       provider.register();
-      const processor = provider.getActiveSpanProcessor();
-      assert(processor instanceof BatchSpanProcessor);
-      // @ts-expect-error access configured to verify its the correct one
-      const exporter = processor._exporter;
-      assert(exporter instanceof DummyExporter);
+
+      assert.ok(
+        provider['_activeSpanProcessor'].constructor.name ===
+          'MultiSpanProcessor'
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+          BatchSpanProcessor
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
+          '_exporter'
+        ] instanceof DummyExporter
+      );
 
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });

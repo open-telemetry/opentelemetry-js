@@ -26,7 +26,7 @@ import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
 import { ForceFlushOptions, ShutdownOptions } from './types';
-import { View } from './view/View';
+import { View, ViewOptions } from './view/View';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -34,29 +34,8 @@ import { View } from './view/View';
 export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: IResource;
-  views?: View[];
+  views?: ViewOptions[];
   readers?: MetricReader[];
-  /**
-   * Merge resource with {@link Resource.default()}?
-   * Default: {@code true}
-   */
-  mergeResourceWithDefaults?: boolean;
-}
-
-/**
- * @param mergeWithDefaults
- * @param providedResource
- */
-function prepareResource(
-  mergeWithDefaults: boolean,
-  providedResource: Resource | undefined
-) {
-  const resource = providedResource ?? Resource.empty();
-
-  if (mergeWithDefaults) {
-    return Resource.default().merge(resource);
-  }
-  return resource;
 }
 
 /**
@@ -68,20 +47,19 @@ export class MeterProvider implements IMeterProvider {
 
   constructor(options?: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(
-      prepareResource(
-        options?.mergeResourceWithDefaults ?? true,
-        options?.resource
-      )
+      options?.resource ?? Resource.default()
     );
     if (options?.views != null && options.views.length > 0) {
-      for (const view of options.views) {
-        this._sharedState.viewRegistry.addView(view);
+      for (const viewOption of options.views) {
+        this._sharedState.viewRegistry.addView(new View(viewOption));
       }
     }
 
     if (options?.readers != null && options.readers.length > 0) {
       for (const metricReader of options.readers) {
-        this.addMetricReader(metricReader);
+        const collector = new MetricCollector(this._sharedState, metricReader);
+        metricReader.setMetricProducer(collector);
+        this._sharedState.metricCollectors.push(collector);
       }
     }
   }
@@ -104,25 +82,7 @@ export class MeterProvider implements IMeterProvider {
   }
 
   /**
-   * Register a {@link MetricReader} to the meter provider. After the
-   * registration, the MetricReader can start metrics collection.
-   *
-   * <p> NOTE: {@link MetricReader} instances MUST be added before creating any instruments.
-   * A {@link MetricReader} instance registered later may receive no or incomplete metric data.
-   *
-   * @param metricReader the metric reader to be registered.
-   *
-   * @deprecated This method will be removed in SDK 2.0. Please use
-   * {@link MeterProviderOptions.readers} via the {@link MeterProvider} constructor instead
-   */
-  addMetricReader(metricReader: MetricReader) {
-    const collector = new MetricCollector(this._sharedState, metricReader);
-    metricReader.setMetricProducer(collector);
-    this._sharedState.metricCollectors.push(collector);
-  }
-
-  /**
-   * Flush all buffered data and shut down the MeterProvider and all registered
+   * Shut down the MeterProvider and all registered
    * MetricReaders.
    *
    * Returns a promise which is resolved when all flushes are complete.

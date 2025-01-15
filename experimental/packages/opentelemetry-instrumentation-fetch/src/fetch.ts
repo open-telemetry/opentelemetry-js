@@ -112,9 +112,11 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
       },
       api.trace.setSpan(api.context.active(), span)
     );
-    if (!this.getConfig().ignoreNetworkEvents) {
-      web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-    }
+    web.addSpanNetworkEvents(
+      childSpan,
+      corsPreFlightRequest,
+      this.getConfig().ignoreNetworkEvents
+    );
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
     );
@@ -262,9 +264,11 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      if (!this.getConfig().ignoreNetworkEvents) {
-        web.addSpanNetworkEvents(span, mainRequest);
-      }
+      web.addSpanNetworkEvents(
+        span,
+        mainRequest,
+        this.getConfig().ignoreNetworkEvents
+      );
     }
   }
 
@@ -368,7 +372,6 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
         ): void {
           try {
             const resClone = response.clone();
-            const resClone4Hook = response.clone();
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
@@ -376,7 +379,7 @@ export class FetchInstrumentation extends InstrumentationBase<FetchInstrumentati
                 reader.read().then(
                   ({ done }) => {
                     if (done) {
-                      endSpanOnSuccess(span, resClone4Hook);
+                      endSpanOnSuccess(span, response);
                     } else {
                       read();
                     }

@@ -21,10 +21,9 @@ import { assertRejects } from '../test-utils';
 import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
 import {
-  Aggregation,
   AggregationTemporality,
+  AggregationType,
   DataPointType,
-  InstrumentType,
   ScopeMetrics,
 } from '../../src';
 import {
@@ -59,7 +58,6 @@ const testScopeMetrics: ScopeMetrics[] = [
         descriptor: {
           name: 'additionalCounter',
           unit: '',
-          type: InstrumentType.COUNTER,
           description: '',
           valueType: ValueType.INT,
         },
@@ -228,9 +226,17 @@ describe('MetricReader', () => {
 
     it('should override default when provided with a selector', () => {
       const reader = new TestMetricReader({
-        aggregationSelector: _instrumentType => Aggregation.Sum(),
+        aggregationSelector: _instrumentType => {
+          return {
+            type: AggregationType.SUM,
+          };
+        },
       });
-      assertAggregationSelector(reader, _instrumentType => Aggregation.Sum());
+      assertAggregationSelector(reader, _instrumentType => {
+        return {
+          type: AggregationType.SUM,
+        };
+      });
       reader.shutdown();
     });
   });

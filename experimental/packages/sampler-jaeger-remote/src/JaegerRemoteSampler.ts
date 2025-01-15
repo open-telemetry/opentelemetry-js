@@ -21,7 +21,7 @@ import {
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/sdk-trace-base';
-import axios from 'axios';
+import * as axios from 'axios';
 import { PerOperationSampler } from './PerOperationSampler';
 import { SamplingStrategyResponse, StrategyType } from './types';
 

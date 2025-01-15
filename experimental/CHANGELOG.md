@@ -7,6 +7,13 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(exporter-prometheus)!: stop the using `type` field to enforce naming conventions [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
+  * Any non-monotonic sums will now be treated as counters and will therefore include the `_total` suffix.
+* feat(shim-opencenus)!: stop mapping removed Instrument `type` to OpenTelemetry metrics [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
+  * The internal OpenTelemetry data model dropped the concept of instrument type on exported metrics, therefore mapping it is not necessary anymore.
+* feat(instrumentation-fetch)!: passthrough original response to `applyCustomAttributes` hook [#5281](https://github.com/open-telemetry/opentelemetry-js/pull/5281) @chancancode
+  * Previously, the fetch instrumentation code unconditionally clones every `fetch()` response in order to preserve the ability for the `applyCustomAttributes` hook to consume the response body. This is fundamentally unsound, as it forces the browser to buffer and retain the response body until it is fully received and read, which crates unnecessary memory pressure on large or long-running response streams. In extreme cases, this is effectively a memory leak and can cause the browser tab to crash. If your use case for `applyCustomAttributes` requires access to the response body, please chime in on [#5293](https://github.com/open-telemetry/opentelemetry-js/issues/5293).
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
@@ -14,10 +21,21 @@ All notable changes to experimental packages in this project will be documented 
 * fix(otlp-exporter-base): use dynamic imports over require for lazy-loading http transport utils [#5220](https://github.com/open-telemetry/opentelemetry-js/pull/5220) @pichlermarc
   * enables bundling of Node.js HTTP exporters with rollup
     * Limitation: if a single-file bundle is built the dynamically loaded file needs to be inlined via rollup's `inlineDynamicImports: true` setting. However, doing so may lead to `@opentelemetry/instrumentation-http` not generating telemetry.
+* fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.57.0
+
+### :rocket: (Enhancement)
+
+* feat(opentelemetry-sdk-node): automatically configure metrics exporter based on environment variables [#5168](https://github.com/open-telemetry/opentelemetry-js/pull/5168) @bhaskarbanerjee
+
+### :house: (Internal)
+
+* refactor(otlp-transformer): re-structure package to prepare for separate entrypoints [#5264](https://github.com/open-telemetry/opentelemetry-js/pull/5264) @pichlermarc
 
 ## 0.56.0
 

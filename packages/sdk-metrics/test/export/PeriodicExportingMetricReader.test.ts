@@ -17,13 +17,18 @@
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import {
-  Aggregation,
+  AggregationOption,
+  AggregationType,
   CollectionResult,
   InstrumentType,
   MetricProducer,
   PushMetricExporter,
 } from '../../src';
-import { ResourceMetrics } from '../../src/export/MetricData';
+import {
+  DataPointType,
+  ResourceMetrics,
+  ScopeMetrics,
+} from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TimeoutError } from '../../src/utils';
@@ -33,7 +38,7 @@ import {
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';
-import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
+import { TestMetricProducer } from './TestMetricProducer';
 import {
   assertAggregationSelector,
   assertAggregationTemporalitySelector,
@@ -42,6 +47,7 @@ import {
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from '../../src/export/AggregationSelector';
+import { ValueType } from '@opentelemetry/api';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
@@ -77,9 +83,7 @@ class TestMetricExporter implements PushMetricExporter {
 
   async shutdown(): Promise<void> {
     if (this._shutdown) return;
-    const flushPromise = this.forceFlush();
     this._shutdown = true;
-    await flushPromise;
   }
 
   async forceFlush(): Promise<void> {
@@ -117,8 +121,8 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 }
 
 class TestDropMetricExporter extends TestMetricExporter {
-  selectAggregation(_instrumentType: InstrumentType): Aggregation {
-    return Aggregation.Drop();
+  selectAggregation(_instrumentType: InstrumentType): AggregationOption {
+    return { type: AggregationType.DROP };
   }
 }
 
@@ -126,6 +130,51 @@ describe('PeriodicExportingMetricReader', () => {
   afterEach(() => {
     sinon.restore();
   });
+
+  const waitForAsyncAttributesStub = sinon.stub().returns(
+    new Promise<void>(resolve =>
+      setTimeout(() => {
+        resolve();
+      }, 10)
+    )
+  );
+  const scopeMetrics: ScopeMetrics[] = [
+    {
+      scope: {
+        name: 'test',
+      },
+      metrics: [
+        {
+          dataPointType: DataPointType.GAUGE,
+          dataPoints: [
+            {
+              // Sample hr time datapoints.
+              startTime: [12345, 678901234],
+              endTime: [12345, 678901234],
+              attributes: {},
+              value: 1,
+            },
+          ],
+          descriptor: {
+            name: '',
+            description: '',
+            unit: '',
+            valueType: ValueType.INT,
+          },
+          aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        },
+      ],
+    },
+  ];
+  const resourceMetrics: ResourceMetrics = {
+    resource: {
+      attributes: {},
+      merge: sinon.stub(),
+      asyncAttributesPending: true, // ensure we try to await async attributes
+      waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
+    },
+    scopeMetrics: scopeMetrics,
+  };
 
   describe('constructor', () => {
     it('should construct PeriodicExportingMetricReader without exceptions', () => {
@@ -204,15 +253,29 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
       const result = await exporter.waitForNumberOfExports(2);
 
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
       await reader.shutdown();
     });
+  });
+
+  it('should not export without populated scope metrics', async () => {
+    const exporter = new TestMetricExporter();
+    const reader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 30,
+      exportTimeoutMillis: 20,
+    });
+
+    reader.setMetricProducer(new TestMetricProducer());
+    const result = await exporter.forceFlush();
+
+    assert.deepStrictEqual(result, undefined);
+    await reader.shutdown();
   });
 
   describe('periodic export', () => {
@@ -225,13 +288,12 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
 
       exporter.throwExport = false;
       await reader.shutdown();
@@ -246,13 +308,12 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
 
       exporter.rejectExport = false;
       await reader.shutdown();
@@ -268,13 +329,12 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 20,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [
-        emptyResourceMetrics,
-        emptyResourceMetrics,
-      ]);
+      assert.deepStrictEqual(result, [resourceMetrics, resourceMetrics]);
 
       exporter.throwExport = false;
       await reader.shutdown();
@@ -296,7 +356,9 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.setMetricProducer(new TestMetricProducer());
+      reader.setMetricProducer(
+        new TestMetricProducer({ resourceMetrics: resourceMetrics, errors: [] })
+      );
       await reader.forceFlush();
       exporterMock.verify();
 
@@ -322,7 +384,7 @@ describe('PeriodicExportingMetricReader', () => {
           asyncAttributesPending: true, // ensure we try to await async attributes
           waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
         },
-        scopeMetrics: [],
+        scopeMetrics: scopeMetrics,
       };
 
       const mockCollectionResult: CollectionResult = {

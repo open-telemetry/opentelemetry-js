@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { Attributes, diag } from '@opentelemetry/api';
 import {
   SEMRESATTRS_PROCESS_COMMAND,
   SEMRESATTRS_PROCESS_COMMAND_ARGS,
@@ -27,7 +27,7 @@ import {
   SEMRESATTRS_PROCESS_RUNTIME_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import { Resource } from '../../../Resource';
-import { DetectorSync, ResourceAttributes } from '../../../types';
+import { DetectorSync } from '../../../types';
 import { ResourceDetectionConfig } from '../../../config';
 import { IResource } from '../../../IResource';
 import * as os from 'os';
@@ -38,7 +38,7 @@ import * as os from 'os';
  */
 class ProcessDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): IResource {
-    const attributes: ResourceAttributes = {
+    const attributes: Attributes = {
       [SEMRESATTRS_PROCESS_PID]: process.pid,
       [SEMRESATTRS_PROCESS_EXECUTABLE_NAME]: process.title,
       [SEMRESATTRS_PROCESS_EXECUTABLE_PATH]: process.execPath,

@@ -21,7 +21,7 @@ import { AggregationTemporality } from '../../src/export/AggregationTemporality'
 import { DataPointType } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
-import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
+import { createNoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
 import {
   assertMetricData,
@@ -51,7 +51,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [deltaCollector]
         );
 
@@ -151,7 +151,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [deltaCollector]
         );
 
@@ -235,7 +235,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(false),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [deltaCollector]
         );
 
@@ -321,7 +321,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [cumulativeCollector]
         );
 
@@ -453,7 +453,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(true),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [cumulativeCollector]
         );
 
@@ -547,7 +547,7 @@ describe('AsyncMetricStorage', () => {
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(false),
-          new NoopAttributesProcessor(),
+          createNoopAttributesProcessor(),
           [cumulativeCollector]
         );
 

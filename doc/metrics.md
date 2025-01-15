@@ -483,7 +483,7 @@ that are used are Prometheus and OTLP.
 
 The latter is the [OpenTelemetry protocol format](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md)
 which is supported by the OpenTelemetry Collector. The former is based on the [OpenMetrics
-format](https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md) can be consumed by Prometheus and Thanos or other OpenMetrics compatible
+format](https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md) can be consumed by Prometheus and Thanos or other OpenMetrics compatible
 backends.
 
 _Note_: Both OpenTelemetry JavaScript and OpenTelemetry Collector support
