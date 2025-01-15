@@ -1367,7 +1367,9 @@ describe('setup exporter from env', () => {
 
     assert.ok(listOfProcessors.length === 1);
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     await sdk.shutdown();
   });
 
@@ -1443,7 +1445,9 @@ describe('setup exporter from env', () => {
 
     assert.ok(listOfProcessors.length === 1);
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
@@ -1459,7 +1463,9 @@ describe('setup exporter from env', () => {
 
     assert.ok(listOfProcessors.length === 1);
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
@@ -1493,7 +1499,9 @@ describe('setup exporter from env', () => {
 
     assert.ok(listOfProcessors.length === 1);
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     env.OTEL_TRACES_EXPORTER = '';
     await sdk.shutdown();
   });
@@ -1513,7 +1521,9 @@ describe('setup exporter from env', () => {
 
     assert.ok(listOfProcessors.length === 1);
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
 
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
@@ -1567,7 +1577,9 @@ describe('setup exporter from env', () => {
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
     assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
     assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
 
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
@@ -1601,7 +1613,9 @@ describe('setup exporter from env', () => {
 
     assert.ok(listOfProcessors.length === 2);
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
     assert.ok(listOfProcessors[1]['_exporter'] instanceof JaegerExporter);
 
@@ -1622,7 +1636,9 @@ describe('setup exporter from env', () => {
     assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
     assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
     assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     assert.ok(listOfProcessors[2] instanceof BatchSpanProcessor);
     assert.ok(listOfProcessors[2]['_exporter'] instanceof JaegerExporter);
 
@@ -1642,7 +1658,9 @@ describe('setup exporter from env', () => {
     assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
     assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert.ok(listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });

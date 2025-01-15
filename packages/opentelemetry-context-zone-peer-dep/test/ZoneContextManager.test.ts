@@ -47,7 +47,10 @@ describe('ZoneContextManager', () => {
           'should return this'
         );
         contextManager.with(ctx, () => {
-          assert.ok(contextManager.active() === ctx, 'should have root context');
+          assert.ok(
+            contextManager.active() === ctx,
+            'should have root context'
+          );
         });
       });
     });
