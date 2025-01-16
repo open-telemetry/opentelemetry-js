@@ -28,7 +28,7 @@ to depend on a tilde-version.
 
 ### Serialize Traces/Metrics/Logs
 
-This module exports serializers to serialize traces, metrics and logs from the OpenTelemetry SDK into protocol buffers
+This package exports serializers to serialize traces, metrics and logs from the OpenTelemetry SDK into protocol buffers
 or JSON which can be sent over HTTP or gRPC (protobuf-only) to the OpenTelemetry collector or a compatible receiver.
 
 ```typescript
