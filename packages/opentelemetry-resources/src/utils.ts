@@ -18,7 +18,7 @@ export const isPromiseLike = <R>(val: unknown): val is PromiseLike<R> => {
   return (
     val !== null &&
     typeof val === 'object' &&
-    typeof Object.getOwnPropertyDescriptor(val, 'then')?.value === 'function'
+    typeof (val as PromiseLike<R>).then === 'function'
   );
 };
 

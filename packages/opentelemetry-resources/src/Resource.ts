@@ -61,6 +61,7 @@ export class Resource implements IResource {
   ) {
     const attributes = resource.attributes ?? {};
     this._rawAttributes = Object.entries(attributes).map(([k, v]) => {
+      console.log(v);
       if (isPromiseLike(v)) {
         // side-effect
         this._asyncAttributesPending = true;
@@ -75,6 +76,8 @@ export class Resource implements IResource {
             return [k, undefined];
           }),
         ];
+      } else {
+        console.log('not a promise')
       }
 
       return [k, v];

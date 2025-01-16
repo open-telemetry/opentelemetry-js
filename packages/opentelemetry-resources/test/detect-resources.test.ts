@@ -19,11 +19,16 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { detectResources, Resource, ResourceDetector } from '../src';
 import { describeNode } from './util';
+import { isPromiseLike } from '../src/utils';
 
 describe('detectResources', () => {
   afterEach(() => {
     sinon.restore();
   });
+
+  it('reliably detects promises', () => {
+    assert.ok(isPromiseLike(Promise.resolve()));
+  })
 
   it('handles resource detectors which return Promise<Resource>', async () => {
     const detector: ResourceDetector = {
