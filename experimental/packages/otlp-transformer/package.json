@@ -72,40 +72,6 @@
       "default": "./build/src/logs/json/index.js"
     }
   },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./build/src/index.d.ts"
-      ],
-      "metrics": [
-        "./build/src/metrics/index.d.ts"
-      ],
-      "metrics/protobuf": [
-        "./build/src/metrics/protobuf/index.d.ts"
-      ],
-      "metrics/json": [
-        "./build/src/metrics/json/index.d.ts"
-      ],
-      "trace": [
-        "./build/src/trace/index.d.ts"
-      ],
-      "trace/protobuf": [
-        "./build/src/trace/protobuf/index.d.ts"
-      ],
-      "trace/json": [
-        "./build/src/trace/json/index.d.ts"
-      ],
-      "experimental/logs": [
-        "./build/src/logs/index.d.ts"
-      ],
-      "experimental/logs/protobuf": [
-        "./build/src/logs/protobuf/index.d.ts"
-      ],
-      "experimental/logs/json": [
-        "./build/src/logs/json/index.d.ts"
-      ]
-    }
-  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
