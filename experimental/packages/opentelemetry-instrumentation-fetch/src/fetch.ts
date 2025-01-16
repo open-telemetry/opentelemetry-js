@@ -58,26 +58,31 @@ export interface FetchCustomAttributeFunction {
  * FetchPlugin Config
  */
 export interface FetchInstrumentationConfig extends InstrumentationConfig {
-  // the number of timing resources is limited, after the limit
-  // (chrome 250, safari 150) the information is not collected anymore
-  // the only way to prevent that is to regularly clean the resources
-  // whenever it is possible, this is needed only when PerformanceObserver
-  // is not available
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
+
+  /**  the number of timing resources is limited, after the limit
+  (chrome 250, safari 150) the information is not collected anymore
+  the only way to prevent that is to regularly clean the resources
+  whenever it is possible, this is needed only when PerformanceObserver
+  is not available */
   clearTimingResources?: boolean;
-  // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
+
+  /**  Ignore adding network events as span events */
+  ignoreNetworkEvents?: boolean;
+
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
    * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
-  /** Function for adding custom attributes on the span */
-  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
-  // Ignore adding network events as span events
-  ignoreNetworkEvents?: boolean;
+
   /** Measure outgoing request size */
   measureRequestSize?: boolean;
+
+  /**  urls which should include trace headers when origin doesn't match */
+  propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
 }
 
 /**
