@@ -17,24 +17,26 @@
 import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Resource, Detector, detectResourcesSync, DetectorSync } from '../src';
+import { detectResources, Resource, ResourceDetector } from '../src';
 import { describeNode } from './util';
 
-describe('detectResourcesSync', () => {
+describe('detectResources', () => {
   afterEach(() => {
     sinon.restore();
   });
 
   it('handles resource detectors which return Promise<Resource>', async () => {
-    const detector: Detector = {
-      async detect() {
-        return new Resource(
-          { sync: 'fromsync' },
-          Promise.resolve().then(() => ({ async: 'fromasync' }))
-        );
+    const detector: ResourceDetector = {
+      detect() {
+        return new Resource({
+          attributes: {
+            sync: 'fromsync',
+            async: Promise.resolve().then(() => 'fromasync'),
+          },
+        });
       },
     };
-    const resource = detectResourcesSync({
+    const resource = detectResources({
       detectors: [detector],
     });
 
@@ -46,15 +48,17 @@ describe('detectResourcesSync', () => {
   });
 
   it('handles resource detectors which return Resource with a promise inside', async () => {
-    const detector: DetectorSync = {
+    const detector: ResourceDetector = {
       detect() {
-        return new Resource(
-          { sync: 'fromsync' },
-          Promise.resolve({ async: 'fromasync' })
-        );
+        return new Resource({
+          attributes: {
+            sync: 'fromsync',
+            async: Promise.resolve('fromasync'),
+          },
+        });
       },
     };
-    const resource = detectResourcesSync({
+    const resource = detectResources({
       detectors: [detector],
     });
 
@@ -72,24 +76,28 @@ describe('detectResourcesSync', () => {
       const debugStub = sinon.spy(diag, 'debug');
 
       // use a class so it has a name
-      class DetectorRejects implements DetectorSync {
+      class DetectorRejects implements ResourceDetector {
         detect() {
-          return new Resource(
-            { sync: 'fromsync' },
-            Promise.reject(new Error('reject'))
-          );
+          return new Resource({
+            attributes: {
+              sync: 'fromsync',
+              async: Promise.reject(new Error('reject')),
+            },
+          });
         }
       }
-      class DetectorOk implements DetectorSync {
+      class DetectorOk implements ResourceDetector {
         detect() {
-          return new Resource(
-            { sync: 'fromsync' },
-            Promise.resolve({ async: 'fromasync' })
-          );
+          return new Resource({
+            attributes: {
+              sync: 'fromsync',
+              async: Promise.resolve('fromasync'),
+            },
+          });
         }
       }
 
-      const resource = detectResourcesSync({
+      const resource = detectResources({
         detectors: [new DetectorRejects(), new DetectorOk()],
       });
 
