@@ -31,7 +31,8 @@ export class OTLPMetricExporter extends OTLPMetricExporterBase {
         JsonMetricsSerializer,
         'v1/metrics',
         { 'Content-Type': 'application/json' }
-      )
+      ),
+      config
     );
   }
 }
