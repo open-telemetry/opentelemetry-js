@@ -86,10 +86,6 @@ export {
   getRPCMetadata,
   setRPCMetadata,
 } from './trace/rpc-metadata';
-export { AlwaysOffSampler } from './trace/sampler/AlwaysOffSampler';
-export { AlwaysOnSampler } from './trace/sampler/AlwaysOnSampler';
-export { ParentBasedSampler } from './trace/sampler/ParentBasedSampler';
-export { TraceIdRatioBasedSampler } from './trace/sampler/TraceIdRatioBasedSampler';
 export {
   isTracingSuppressed,
   suppressTracing,
