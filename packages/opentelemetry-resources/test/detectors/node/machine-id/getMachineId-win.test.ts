@@ -53,7 +53,7 @@ describe('getMachineId on Windows', () => {
 
     const machineId = await getMachineId();
 
-    assert.equal(machineId, '');
+    assert.equal(machineId, undefined);
     assert.equal(stub.callCount, 1);
   });
 });

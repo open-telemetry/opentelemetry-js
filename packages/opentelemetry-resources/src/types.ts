@@ -42,7 +42,7 @@ export type DetectedResource = {
  * An object representing detected resource attributes.
  * Value may be {@link AttributeValue}s, a promise to an {@link AttributeValue}, or undefined.
  */
-type DetectedResourceAttributeValue = MaybePromise<AttributeValue> | undefined;
+type DetectedResourceAttributeValue = MaybePromise<AttributeValue | undefined>;
 
 /**
  * An object representing detected resource attributes.

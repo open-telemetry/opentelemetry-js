@@ -80,7 +80,7 @@ describe('getMachineId on Darwin', () => {
 
     const machineId = await getMachineId();
 
-    assert.equal(machineId, '');
+    assert.equal(machineId, undefined);
     assert.equal(stub.callCount, 1);
   });
 });

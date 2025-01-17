@@ -24,14 +24,15 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { IResource } from './IResource';
 import { defaultServiceName } from './platform';
-import { DetectedResource, DetectedResourceAttributes } from './types';
-import { identity, isPromiseLike } from './utils';
+import {
+  DetectedResource,
+  DetectedResourceAttributes,
+  MaybePromise,
+} from './types';
+import { isPromiseLike } from './utils';
 
 export class Resource implements IResource {
-  private _rawAttributes: [
-    string,
-    AttributeValue | Promise<AttributeValue> | undefined,
-  ][];
+  private _rawAttributes: [string, MaybePromise<AttributeValue | undefined>][];
   private _asyncAttributesPending = false;
 
   private _memoizedAttributes?: Attributes;
@@ -61,23 +62,9 @@ export class Resource implements IResource {
   ) {
     const attributes = resource.attributes ?? {};
     this._rawAttributes = Object.entries(attributes).map(([k, v]) => {
-      console.log(v);
       if (isPromiseLike(v)) {
         // side-effect
         this._asyncAttributesPending = true;
-
-        return [
-          k,
-          v.then(identity, err => {
-            diag.debug(
-              "a resource's async attributes promise rejected: %s",
-              err
-            );
-            return [k, undefined];
-          }),
-        ];
-      } else {
-        console.log('not a promise')
       }
 
       return [k, v];
@@ -93,11 +80,15 @@ export class Resource implements IResource {
       return;
     }
 
-    this._rawAttributes = await Promise.all(
-      this._rawAttributes.map<Promise<[string, AttributeValue | undefined]>>(
-        async ([k, v]) => [k, await v]
-      )
-    );
+    for (let i = 0; i < this._rawAttributes.length; i++) {
+      const [k,v] = this._rawAttributes[i];
+      try {
+        this._rawAttributes[i] = [k, await v];
+      } catch (err) {
+        diag.debug("a resource's async attributes promise rejected: %s", err);
+        this._rawAttributes[i] = [k, undefined];
+      }
+    }
 
     this._asyncAttributesPending = false;
   }
@@ -109,7 +100,6 @@ export class Resource implements IResource {
       );
     }
 
-    // TODO
     if (this._memoizedAttributes) {
       return this._memoizedAttributes;
     }
@@ -120,7 +110,9 @@ export class Resource implements IResource {
         diag.debug(`Unsettled resource attribute ${k} skipped`);
         continue;
       }
-      attrs[k] ??= v;
+      if (v != null) {
+        attrs[k] ??= v;
+      }
     }
 
     // only memoize output if all attributes are settled
@@ -137,7 +129,9 @@ export class Resource implements IResource {
     // incoming attributes have a lower priority
     const attributes: DetectedResourceAttributes = {};
     for (const [k, v] of [...this._rawAttributes, ...resource._rawAttributes]) {
-      attributes[k] ??= v;
+      if (v != null) {
+        attributes[k] ??= v;
+      }
     }
 
     return new Resource({ attributes });

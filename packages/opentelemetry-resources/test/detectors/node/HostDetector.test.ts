@@ -72,7 +72,7 @@ describeNode('hostDetector() on Node.js', () => {
 
     sinon.stub(os, 'arch').returns('x64');
     sinon.stub(os, 'hostname').returns('opentelemetry-test');
-    sinon.stub(mid, 'getMachineId').returns(Promise.resolve(''));
+    sinon.stub(mid, 'getMachineId').returns(Promise.resolve(undefined));
 
     const resource = new Resource(hostDetector.detect());
     await resource.waitForAsyncAttributes?.();

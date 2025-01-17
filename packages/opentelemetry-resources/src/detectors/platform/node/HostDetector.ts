@@ -26,7 +26,7 @@ import { getMachineId } from './machine-id/getMachineId';
 import { normalizeArch } from './utils';
 
 /**
- * HostDetectorSync detects the resources related to the host current process is
+ * HostDetector detects the resources related to the host current process is
  * running on. Currently only non-cloud-based attributes are included.
  */
 class HostDetector implements ResourceDetector {
