@@ -15,6 +15,10 @@
  */
 
 /*
+ * These tests are adapted from semver's tests for `semver.satisfies()`.
+ * https://github.com/npm/node-semver/blob/868d4bbe3d318c52544f38d5f9977a1103e924c2/test/functions/satisfies.js
+ * License:
+ *
  * The ISC License
  *
  * Copyright (c) Isaac Z. Schlueter and Contributors
