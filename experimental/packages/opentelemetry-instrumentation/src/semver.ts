@@ -389,9 +389,6 @@ function _compareVersionSegments(v1: string[], v2: string[]): number {
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-// The rest of this file are used pursuant to the ISC license,
-// and are Copyright (c) Isaac Z. Schlueter and Contributors.
-
 const LETTERDASHNUMBER = '[a-zA-Z0-9-]';
 const NUMERICIDENTIFIER = '0|[1-9]\\d*';
 const NONNUMERICIDENTIFIER = `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`;
