@@ -370,7 +370,8 @@ function _compareVersionSegments(v1: string[], v2: string[]): number {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
+// The rest of this file is adapted from portions of https://github.com/npm/node-semver/tree/868d4bb
+// License:
 /*
  * The ISC License
  *
