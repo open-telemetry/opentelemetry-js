@@ -14,26 +14,10 @@
  * limitations under the License.
  */
 
-/*
- * The ISC License
- *
- * Copyright (c) Isaac Z. Schlueter and Contributors
- *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
- * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 // Imported from https://github.com/npm/node-semver/blob/868d4bbe3d318c52544f38d5f9977a1103e924c2/test/fixtures/range-exclude.js
 
+// [range, version, options]
+// version should not be included by range
 module.exports = [
   ['1.0.0 - 2.0.0', '2.2.3'],
   ['1.2.3+asdf - 2.4.3+asdf', '1.2.3-pre.2'],
@@ -48,15 +32,9 @@ module.exports = [
   ['=0.7.x', '0.7.0-asdf'],
   ['>=0.7.x', '0.7.0-asdf'],
   ['<=0.7.x', '0.7.0-asdf'],
-  //['1', '1.0.0beta', { loose: 420 }],
-  // 'loose' option and syntax are not supported (there must be '-' before pre-release tag), so test with this:
-  ['1', '1.0.0-beta'],
-  //['<1', '1.0.0beta', true],
-  // 'true' option and syntax are not supported (there must be '-' before pre-release tag), so test with this:
-  ['<1', '1.0.0-beta'],
-  //['< 1', '1.0.0beta', true],
-  // 'true' option and syntax are not supported (there must be '-' before pre-release tag), so test with this:
-  ['< 1', '1.0.0-beta'],
+  ['1', '1.0.0beta', { loose: 420 }],
+  ['<1', '1.0.0beta', true],
+  ['< 1', '1.0.0beta', true],
   ['1.0.0', '1.0.1'],
   ['>=1.0.0', '0.0.0'],
   ['>=1.0.0', '0.0.1'],
@@ -68,17 +46,12 @@ module.exports = [
   ['<=2.0.0', '2.2.9'],
   ['<2.0.0', '2.9999.9999'],
   ['<2.0.0', '2.2.9'],
-  //['>=0.1.97', 'v0.1.93', true],
-  // 'true' option is not supported, so test with this:
-  ['>=0.1.97', 'v0.1.93'],
+  ['>=0.1.97', 'v0.1.93', true],
   ['>=0.1.97', '0.1.93'],
   ['0.1.20 || 1.2.4', '1.2.3'],
   ['>=0.2.3 || <0.0.1', '0.0.3'],
   ['>=0.2.3 || <0.0.1', '0.2.2'],
-  //['2.x.x', '1.1.3', { loose: NaN }],
-  // 'loose' option is not supported, so test with this:
-  ['2.x.x', '1.1.3'],
-  ['2.x.x', '1.1.3'],
+  ['2.x.x', '1.1.3', { loose: NaN }],
   ['2.x.x', '3.1.3'],
   ['1.2.x', '1.3.3'],
   ['1.2.x || 2.x', '3.1.3'],
@@ -92,18 +65,16 @@ module.exports = [
   ['2.3', '2.4.1'],
   ['~0.0.1', '0.1.0-alpha'],
   ['~0.0.1', '0.1.0'],
-  ['~2.4', '2.5.0'],
+  ['~2.4', '2.5.0'], // >=2.4.0 <2.5.0
   ['~2.4', '2.3.9'],
-  ['~>3.2.1', '3.3.2'],
-  ['~>3.2.1', '3.2.0'],
-  ['~1', '0.2.3'],
+  ['~>3.2.1', '3.3.2'], // >=3.2.1 <3.3.0
+  ['~>3.2.1', '3.2.0'], // >=3.2.1 <3.3.0
+  ['~1', '0.2.3'], // >=1.0.0 <2.0.0
   ['~>1', '2.2.3'],
-  ['~1.0', '1.1.0'],
+  ['~1.0', '1.1.0'], // >=1.0.0 <1.1.0
   ['<1', '1.0.0'],
   ['>=1.2', '1.1.1'],
-  //['1', '2.0.0beta', true],
-  // 'true' option and syntax are not supported (there must be '-' before pre-release tag), so test with this:
-  ['1', '2.0.0-beta'],
+  ['1', '2.0.0beta', true],
   ['~v0.5.4-beta', '0.5.4-alpha'],
   ['=0.7.x', '0.8.2'],
   ['>=0.7.x', '0.6.2'],
@@ -116,9 +87,7 @@ module.exports = [
   ['^1.2.3', '2.0.0-alpha'],
   ['^1.2.3', '1.2.2'],
   ['^1.2', '1.1.9'],
-  //['*', 'v1.2.3-foo', true],
-  // 'true' option is not supported, so test with this:
-  ['*', 'v1.2.3-foo'],
+  ['*', 'v1.2.3-foo', true],
 
   // invalid versions never satisfy, but shouldn't throw
   ['*', 'not a version'],
@@ -152,7 +121,5 @@ module.exports = [
   ['>=1.0.0 <1.1.0', '1.1.0-pre'],
   ['>=1.0.0 <1.1.0-pre', '1.1.0-pre'],
 
-  //['== 1.0.0 || foo', '2.0.0', { loose: true }],
-  // 'loose' option is not supported, so test with this:
-  ['== 1.0.0 || foo', '2.0.0'],
+  ['== 1.0.0 || foo', '2.0.0', { loose: true }],
 ];

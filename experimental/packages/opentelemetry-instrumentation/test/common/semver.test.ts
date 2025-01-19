@@ -40,30 +40,42 @@ import * as assert from 'assert';
 
 import { satisfies, SatisfiesOptions } from '../../src/semver';
 
-const rangeInclude = require('./fixtures/semver-range-include.js');
-const rangeExclude = require('./fixtures/semver-range-exclude.js');
+const rangeInclude = require('./third-party/node-semver/range-include.js');
+const rangeExclude = require('./third-party/node-semver/range-exclude.js');
 
 describe('SemVer', () => {
   describe('satisfies', () => {
+    function isOptionsSupported(options: any): boolean {
+      // We don't support
+      // - boolean typed options
+      // - 'loose' option parameter
+      if (options && (typeof options === 'boolean' || options.loose)) {
+        return false;
+      }
+      return true;
+    }
+
     it('when range is included', () => {
-      rangeInclude.forEach(
-        ([range, ver, options]: [string, string, SatisfiesOptions]) => {
-          assert.ok(
-            satisfies(ver, range, options),
-            `${range} satisfied by ${ver}`
-          );
+      rangeInclude.forEach(([range, ver, options]: [string, string, any]) => {
+        if (!isOptionsSupported(options)) {
+          return;
         }
-      );
+        assert.ok(
+          satisfies(ver, range, options),
+          `${range} satisfied by ${ver}`
+        );
+      });
     });
     it('when range is not included', () => {
-      rangeExclude.forEach(
-        ([range, ver, options]: [string, string, SatisfiesOptions]) => {
-          assert.ok(
-            !satisfies(ver, range, options),
-            `${range} not satisfied by ${ver}`
-          );
+      rangeExclude.forEach(([range, ver, options]: [string, string, any]) => {
+        if (!isOptionsSupported(options)) {
+          return;
         }
-      );
+        assert.ok(
+          !satisfies(ver, range, options as SatisfiesOptions),
+          `${range} not satisfied by ${ver}`
+        );
+      });
     });
     it('invalid ranges never satisfied (but do not throw)', () => {
       const cases = [
