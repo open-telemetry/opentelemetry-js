@@ -46,6 +46,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :rocket: (Enhancement)
 
+* feat(opentelemetry-instrumentation-http, opentelemetry-instrumentation-grpc): generate esm build files too [5351](https://github.com/open-telemetry/opentelemetry-js/pull/5351) @serkan-ozal
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
