@@ -32,10 +32,6 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-// These tests are added as mirror (to be sure that we are compatible)
-// of the actual `semver` package `satisfies` tests here:
-// https://github.com/npm/node-semver/blob/868d4bbe3d318c52544f38d5f9977a1103e924c2/test/functions/satisfies.js
-
 import * as assert from 'assert';
 
 import { satisfies, SatisfiesOptions } from '../../src/semver';
