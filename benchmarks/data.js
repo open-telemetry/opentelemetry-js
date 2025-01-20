@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1736784500458,
+  "lastUpdate": 1737389417301,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -23558,6 +23558,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 781947,
             "range": "±0.21%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bot@renovateapp.com",
+            "name": "Mend Renovate",
+            "username": "renovate-bot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": false,
+          "id": "bb22068a27cf9990d0f63438c0e6b055cdd82eb0",
+          "message": "chore(deps): update dependency eslint-config-prettier to v10 (#5353)",
+          "timestamp": "2025-01-20T16:02:06Z",
+          "tree_id": "1c7205ef29840f46a94d1ce15fea0dcad2e7f151",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/bb22068a27cf9990d0f63438c0e6b055cdd82eb0"
+        },
+        "date": 1737389413329,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1441586,
+            "range": "±0.45%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16813,
+            "range": "±0.27%",
+            "unit": "ops/sec",
+            "extra": "93 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 828844,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 779598,
+            "range": "±0.32%",
             "unit": "ops/sec",
             "extra": "98 samples"
           }
