@@ -312,6 +312,7 @@ describe('HistogramAggregator', () => {
           type: instrumentType,
           unit: '1',
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
         AggregationTemporality.CUMULATIVE,
         [[{}, accumulation]],

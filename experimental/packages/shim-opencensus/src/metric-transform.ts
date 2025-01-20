@@ -22,14 +22,12 @@ import {
   DataPointType,
   GaugeMetricData,
   HistogramMetricData,
-  InstrumentType,
   MetricData,
   SumMetricData,
 } from '@opentelemetry/sdk-metrics';
 
 type BaseMetric = Omit<MetricData, 'dataPoints' | 'dataPointType'>;
 interface MappedType {
-  type: InstrumentType;
   valueType: ValueType;
   dataPointType:
     | DataPointType.GAUGE
@@ -51,7 +49,6 @@ export function mapOcMetric(metric: oc.Metric): MetricData | null {
       description,
       name,
       unit,
-      type: mappedType.type,
       valueType: mappedType.valueType,
     },
   };
@@ -72,33 +69,28 @@ function mapOcMetricDescriptorType(
   switch (type) {
     case oc.MetricDescriptorType.GAUGE_INT64:
       return {
-        type: InstrumentType.OBSERVABLE_GAUGE,
         valueType: ValueType.INT,
         dataPointType: DataPointType.GAUGE,
       };
     case oc.MetricDescriptorType.GAUGE_DOUBLE:
       return {
-        type: InstrumentType.OBSERVABLE_GAUGE,
         valueType: ValueType.DOUBLE,
         dataPointType: DataPointType.GAUGE,
       };
 
     case oc.MetricDescriptorType.CUMULATIVE_INT64:
       return {
-        type: InstrumentType.COUNTER,
         valueType: ValueType.INT,
         dataPointType: DataPointType.SUM,
       };
     case oc.MetricDescriptorType.CUMULATIVE_DOUBLE:
       return {
-        type: InstrumentType.COUNTER,
         valueType: ValueType.DOUBLE,
         dataPointType: DataPointType.SUM,
       };
 
     case oc.MetricDescriptorType.CUMULATIVE_DISTRIBUTION:
       return {
-        type: InstrumentType.HISTOGRAM,
         valueType: ValueType.DOUBLE,
         dataPointType: DataPointType.HISTOGRAM,
       };

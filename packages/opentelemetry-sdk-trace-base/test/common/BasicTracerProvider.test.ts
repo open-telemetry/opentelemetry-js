@@ -44,6 +44,8 @@ import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '../../src';
+import { SpanImpl } from '../../src/Span';
+import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 
 class DummyPropagator implements TextMapPropagator {
   inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
@@ -90,25 +92,45 @@ describe('BasicTracerProvider', () => {
 
       it('should use noop span processor by default', () => {
         const tracer = new BasicTracerProvider();
-        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
+        assert.ok(
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
+        );
+        assert.ok(
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+            NoopSpanProcessor
+        );
       });
       it('should use noop span processor by default and no diag error', () => {
         const errorStub = sinon.spy(diag, 'error');
         const tracer = new BasicTracerProvider();
-        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
 
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
+        assert.ok(
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
+        );
+        assert.ok(
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+            NoopSpanProcessor
+        );
         sinon.assert.notCalled(errorStub);
       });
     });
 
     describe('when user sets unavailable exporter', () => {
       it('should use noop span processor by default and show diag error', () => {
-        const errorStub = sinon.spy(diag, 'error');
         envSource.OTEL_TRACES_EXPORTER = 'someExporter';
-
+        const errorStub = sinon.spy(diag, 'error');
         const tracer = new BasicTracerProvider();
-        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
 
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
+        assert.ok(
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
+        );
+        assert.ok(
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+            NoopSpanProcessor
+        );
         sinon.assert.calledWith(
           errorStub,
           'Exporter "someExporter" requested through environment variable is unavailable.'
@@ -121,16 +143,22 @@ describe('BasicTracerProvider', () => {
       it('should use the span processors defined in the config', () => {
         const traceExporter = new ConsoleSpanExporter();
         const spanProcessor = new SimpleSpanProcessor(traceExporter);
-
         const tracer = new BasicTracerProvider({
           spanProcessors: [spanProcessor],
         });
+
+        assert.ok(tracer['_activeSpanProcessor'] instanceof MultiSpanProcessor);
         assert.ok(
-          tracer['_registeredSpanProcessors'][0] instanceof SimpleSpanProcessor
+          tracer['_activeSpanProcessor']['_spanProcessors'].length === 1
         );
         assert.ok(
-          tracer['_registeredSpanProcessors'][0]['_exporter'] instanceof
-            ConsoleSpanExporter
+          tracer['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+            SimpleSpanProcessor
+        );
+        assert.ok(
+          tracer['_activeSpanProcessor']['_spanProcessors'][0][
+            '_exporter'
+          ] instanceof ConsoleSpanExporter
         );
       });
     });
@@ -436,13 +464,21 @@ describe('BasicTracerProvider', () => {
           W3CTraceContextPropagator
       );
       /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
-
       provider.register();
-      const processor = provider.getActiveSpanProcessor();
-      assert(processor instanceof BatchSpanProcessor);
-      // @ts-expect-error access configured to verify its the correct one
-      const exporter = processor._exporter;
-      assert(exporter instanceof DummyExporter);
+
+      assert.ok(provider['_activeSpanProcessor'] instanceof MultiSpanProcessor);
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+          BatchSpanProcessor
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
+          '_exporter'
+        ] instanceof DummyExporter
+      );
 
       sinon.assert.calledOnceWithExactly(
         setGlobalPropagatorStub,
@@ -484,11 +520,20 @@ describe('BasicTracerProvider', () => {
 
       const provider = new CustomTracerProvider({});
       provider.register();
-      const processor = provider.getActiveSpanProcessor();
-      assert(processor instanceof BatchSpanProcessor);
-      // @ts-expect-error access configured to verify its the correct one
-      const exporter = processor._exporter;
-      assert(exporter instanceof DummyExporter);
+
+      assert.ok(provider['_activeSpanProcessor'] instanceof MultiSpanProcessor);
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'].length === 1
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+          BatchSpanProcessor
+      );
+      assert.ok(
+        provider['_activeSpanProcessor']['_spanProcessors'][0][
+          '_exporter'
+        ] instanceof DummyExporter
+      );
 
       sinon.assert.calledOnceWithExactly(
         setGlobalPropagatorStub,
@@ -588,11 +633,22 @@ describe('BasicTracerProvider', () => {
         envSource.OTEL_TRACES_EXPORTER = 'memory';
         const provider = new CustomTracerProvider({});
         provider.register();
-        const processor = provider.getActiveSpanProcessor();
-        assert(processor instanceof BatchSpanProcessor);
-        // @ts-expect-error access configured to verify its the correct one
-        const exporter = processor._exporter;
-        assert(exporter instanceof InMemorySpanExporter);
+
+        assert.ok(
+          provider['_activeSpanProcessor'] instanceof MultiSpanProcessor
+        );
+        assert.ok(
+          provider['_activeSpanProcessor']['_spanProcessors'].length === 1
+        );
+        assert.ok(
+          provider['_activeSpanProcessor']['_spanProcessors'][0] instanceof
+            BatchSpanProcessor
+        );
+        assert.ok(
+          provider['_activeSpanProcessor']['_spanProcessors'][0][
+            '_exporter'
+          ] instanceof InMemorySpanExporter
+        );
       });
     });
   });
@@ -602,22 +658,22 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span);
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
     });
 
     it('should propagate resources', () => {
       const tracerProvider = new BasicTracerProvider();
       const tracer = tracerProvider.getTracer('default');
       const span = tracer.startSpan('my-span') as Span;
-      assert.strictEqual(tracer.resource, tracerProvider.resource);
-      assert.strictEqual(span.resource, tracerProvider.resource);
+      assert.strictEqual(tracer['_resource'], tracerProvider['_resource']);
+      assert.strictEqual(span.resource, tracerProvider['_resource']);
     });
 
     it('should start a span with name and options', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       const context = span.spanContext();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
@@ -658,7 +714,7 @@ describe('BasicTracerProvider', () => {
           traceState: state,
         })
       );
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       const context = span.spanContext();
       assert.strictEqual(context.traceId, 'd4cda95b652f4a1592b449d5929fda1b');
       assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
@@ -711,7 +767,7 @@ describe('BasicTracerProvider', () => {
           'invalid-parent' as unknown as SpanContext
         )
       );
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       assert.deepStrictEqual((span as Span).parentSpanId, undefined);
     });
 
@@ -726,7 +782,7 @@ describe('BasicTracerProvider', () => {
           traceFlags: TraceFlags.SAMPLED,
         })
       );
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       const context = span.spanContext();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
@@ -753,7 +809,7 @@ describe('BasicTracerProvider', () => {
         sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
-      assert.ok(span instanceof Span);
+      assert.ok(span instanceof SpanImpl);
       assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
@@ -778,7 +834,7 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.forceFlush()', () => {
-    it('should call forceFlush on all registered span processors', done => {
+    it('should call forceFlush with the default processor', done => {
       sinon.restore();
       const forceFlushStub = sinon.stub(
         NoopSpanProcessor.prototype,
@@ -787,11 +843,33 @@ describe('BasicTracerProvider', () => {
       forceFlushStub.resolves();
 
       const tracerProvider = new BasicTracerProvider();
+
+      tracerProvider
+        .forceFlush()
+        .then(() => {
+          sinon.restore();
+          assert(forceFlushStub.calledOnce);
+          done();
+        })
+        .catch(error => {
+          sinon.restore();
+          done(error);
+        });
+    });
+
+    it('should call forceFlush on all registered span processors', done => {
+      sinon.restore();
+      const forceFlushStub = sinon.stub(
+        NoopSpanProcessor.prototype,
+        'forceFlush'
+      );
+      forceFlushStub.resolves();
+
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-
-      tracerProvider.addSpanProcessor(spanProcessorOne);
-      tracerProvider.addSpanProcessor(spanProcessorTwo);
+      const tracerProvider = new BasicTracerProvider({
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
+      });
 
       tracerProvider
         .forceFlush()
@@ -815,11 +893,11 @@ describe('BasicTracerProvider', () => {
       );
       forceFlushStub.returns(Promise.reject('Error'));
 
-      const tracerProvider = new BasicTracerProvider();
       const spanProcessorOne = new NoopSpanProcessor();
       const spanProcessorTwo = new NoopSpanProcessor();
-      tracerProvider.addSpanProcessor(spanProcessorOne);
-      tracerProvider.addSpanProcessor(spanProcessorTwo);
+      const tracerProvider = new BasicTracerProvider({
+        spanProcessors: [spanProcessorOne, spanProcessorTwo],
+      });
 
       tracerProvider
         .forceFlush()
@@ -851,28 +929,15 @@ describe('BasicTracerProvider', () => {
   describe('.resource', () => {
     it('should use the default resource when no resource is provided', function () {
       const tracerProvider = new BasicTracerProvider();
-      assert.deepStrictEqual(tracerProvider.resource, Resource.default());
+      assert.deepStrictEqual(tracerProvider['_resource'], Resource.default());
     });
 
-    it('should not merge with defaults when flag is set to false', function () {
-      const expectedResource = new Resource({ foo: 'bar' });
-      const tracerProvider = new BasicTracerProvider({
-        mergeResourceWithDefaults: false,
-        resource: expectedResource,
-      });
-      assert.deepStrictEqual(tracerProvider.resource, expectedResource);
-    });
-
-    it('should merge with defaults when flag is set to true', function () {
+    it('should use not use the default if resource passed', function () {
       const providedResource = new Resource({ foo: 'bar' });
       const tracerProvider = new BasicTracerProvider({
-        mergeResourceWithDefaults: true,
         resource: providedResource,
       });
-      assert.deepStrictEqual(
-        tracerProvider.resource,
-        Resource.default().merge(providedResource)
-      );
+      assert.deepStrictEqual(tracerProvider['_resource'], providedResource);
     });
   });
 
@@ -880,7 +945,7 @@ describe('BasicTracerProvider', () => {
     it('should trigger shutdown when manually invoked', () => {
       const tracerProvider = new BasicTracerProvider();
       const shutdownStub = sinon.stub(
-        tracerProvider.getActiveSpanProcessor(),
+        tracerProvider['_activeSpanProcessor'],
         'shutdown'
       );
       tracerProvider.shutdown();

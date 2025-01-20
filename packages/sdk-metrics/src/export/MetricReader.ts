@@ -17,21 +17,21 @@
 import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
-import { CollectionResult } from './MetricData';
+import { CollectionResult, InstrumentType } from './MetricData';
 import { FlatMap, callWithTimeout } from '../utils';
-import { InstrumentType } from '../InstrumentDescriptor';
 import {
   CollectionOptions,
   ForceFlushOptions,
   ShutdownOptions,
 } from '../types';
-import { Aggregation } from '../view/Aggregation';
 import {
   AggregationSelector,
   AggregationTemporalitySelector,
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
+import { AggregationOption } from '../view/AggregationOption';
+import { CardinalitySelector } from './CardinalitySelector';
 
 export interface MetricReaderOptions {
   /**
@@ -45,6 +45,11 @@ export interface MetricReaderOptions {
    * not configured, cumulative is used for all instruments.
    */
   aggregationTemporalitySelector?: AggregationTemporalitySelector;
+  /**
+   * Cardinality selector based on metric instrument types. If not configured,
+   * a default value is used.
+   */
+  cardinalitySelector?: CardinalitySelector;
   /**
    * **Note, this option is experimental**. Additional MetricProducers to use as a source of
    * aggregated metric data in addition to the SDK's metric data. The resource returned by
@@ -68,6 +73,7 @@ export abstract class MetricReader {
   private _sdkMetricProducer?: MetricProducer;
   private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
   private readonly _aggregationSelector: AggregationSelector;
+  private readonly _cardinalitySelector?: CardinalitySelector;
 
   constructor(options?: MetricReaderOptions) {
     this._aggregationSelector =
@@ -76,6 +82,7 @@ export abstract class MetricReader {
       options?.aggregationTemporalitySelector ??
       DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
     this._metricProducers = options?.metricProducers ?? [];
+    this._cardinalitySelector = options?.cardinalitySelector;
   }
 
   /**
@@ -99,10 +106,10 @@ export abstract class MetricReader {
   }
 
   /**
-   * Select the {@link Aggregation} for the given {@link InstrumentType} for this
+   * Select the {@link AggregationOption} for the given {@link InstrumentType} for this
    * reader.
    */
-  selectAggregation(instrumentType: InstrumentType): Aggregation {
+  selectAggregation(instrumentType: InstrumentType): AggregationOption {
     return this._aggregationSelector(instrumentType);
   }
 
@@ -114,6 +121,16 @@ export abstract class MetricReader {
     instrumentType: InstrumentType
   ): AggregationTemporality {
     return this._aggregationTemporalitySelector(instrumentType);
+  }
+
+  /**
+   * Select the cardinality limit for the given {@link InstrumentType} for this
+   * reader.
+   */
+  selectCardinalityLimit(instrumentType: InstrumentType): number {
+    return this._cardinalitySelector
+      ? this._cardinalitySelector(instrumentType)
+      : 2000; // default value if no selector is provided
   }
 
   /**

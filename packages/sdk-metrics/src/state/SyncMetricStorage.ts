@@ -18,7 +18,7 @@ import { Context, HrTime, Attributes } from '@opentelemetry/api';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { AttributesProcessor } from '../view/AttributesProcessor';
+import { IAttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
 import { MetricData } from '../export/MetricData';
 import { DeltaMetricProcessor } from './DeltaMetricProcessor';
@@ -41,11 +41,15 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>>
   constructor(
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    private _attributesProcessor: AttributesProcessor,
-    collectorHandles: MetricCollectorHandle[]
+    private _attributesProcessor: IAttributesProcessor,
+    collectorHandles: MetricCollectorHandle[],
+    private _aggregationCardinalityLimit?: number
   ) {
     super(instrumentDescriptor);
-    this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
+    this._deltaMetricStorage = new DeltaMetricProcessor(
+      aggregator,
+      this._aggregationCardinalityLimit
+    );
     this._temporalMetricStorage = new TemporalMetricProcessor(
       aggregator,
       collectorHandles

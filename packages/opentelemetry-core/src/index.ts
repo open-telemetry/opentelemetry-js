@@ -42,7 +42,6 @@ export {
 } from './common/time';
 export {
   ErrorHandler,
-  InstrumentationLibrary,
   InstrumentationScope,
   ShimWrapped,
   TimeOriginLegacy,
@@ -62,7 +61,6 @@ export const baggageUtils = {
   parsePairKeyValue,
 };
 export {
-  RandomIdGenerator,
   SDK_INFO,
   _globalThis,
   getEnv,
@@ -81,7 +79,6 @@ export {
   W3CTraceContextPropagator,
   parseTraceParent,
 } from './trace/W3CTraceContextPropagator';
-export { IdGenerator } from './trace/IdGenerator';
 export {
   RPCMetadata,
   RPCType,
@@ -89,10 +86,6 @@ export {
   getRPCMetadata,
   setRPCMetadata,
 } from './trace/rpc-metadata';
-export { AlwaysOffSampler } from './trace/sampler/AlwaysOffSampler';
-export { AlwaysOnSampler } from './trace/sampler/AlwaysOnSampler';
-export { ParentBasedSampler } from './trace/sampler/ParentBasedSampler';
-export { TraceIdRatioBasedSampler } from './trace/sampler/TraceIdRatioBasedSampler';
 export {
   isTracingSuppressed,
   suppressTracing,

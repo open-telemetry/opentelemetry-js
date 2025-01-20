@@ -16,28 +16,28 @@
 
 import {
   OTLPExporterConfigBase,
-  OTLPExporterBrowserBase,
+  OTLPExporterBase,
 } from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportLogsServiceResponse,
-  ProtobufLogsSerializer,
-} from '@opentelemetry/otlp-transformer';
+import { ProtobufLogsSerializer } from '@opentelemetry/otlp-transformer';
 
 import { ReadableLogRecord, LogRecordExporter } from '@opentelemetry/sdk-logs';
+import { createLegacyOtlpBrowserExportDelegate } from '@opentelemetry/otlp-exporter-base/browser-http';
 
 /**
  * Collector Trace Exporter for Web
  */
 export class OTLPLogExporter
-  extends OTLPExporterBrowserBase<ReadableLogRecord, IExportLogsServiceResponse>
+  extends OTLPExporterBase<ReadableLogRecord[]>
   implements LogRecordExporter
 {
   constructor(config: OTLPExporterConfigBase = {}) {
     super(
-      config,
-      ProtobufLogsSerializer,
-      { 'Content-Type': 'application/x-protobuf' },
-      'v1/logs'
+      createLegacyOtlpBrowserExportDelegate(
+        config,
+        ProtobufLogsSerializer,
+        'v1/logs',
+        { 'Content-Type': 'application/x-protobuf' }
+      )
     );
   }
 }

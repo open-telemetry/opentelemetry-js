@@ -29,6 +29,7 @@ import {
   SEMATTRS_HTTP_STATUS_CODE,
   SEMATTRS_HTTP_URL,
   SEMATTRS_HTTP_USER_AGENT,
+  SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
@@ -44,6 +45,7 @@ import {
   SendFunction,
   XhrMem,
 } from './types';
+import { getXHRBodyLength } from './utils';
 import { VERSION } from './version';
 import { AttributeNames } from './enums/AttributeNames';
 
@@ -83,6 +85,8 @@ export interface XMLHttpRequestInstrumentationConfig
   applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
   /** Ignore adding network events as span events */
   ignoreNetworkEvents?: boolean;
+  /** Measure outgoing request size */
+  measureRequestSize?: boolean;
 }
 
 /**
@@ -145,9 +149,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      if (!this.getConfig().ignoreNetworkEvents) {
-        addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-      }
+      addSpanNetworkEvents(
+        childSpan,
+        corsPreFlightRequest,
+        this.getConfig().ignoreNetworkEvents
+      );
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -296,9 +302,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      if (!this.getConfig().ignoreNetworkEvents) {
-        addSpanNetworkEvents(span, mainRequest);
-      }
+      addSpanNetworkEvents(
+        span,
+        mainRequest,
+        this.getConfig().ignoreNetworkEvents
+      );
     }
   }
 
@@ -486,6 +494,17 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
+          if (plugin.getConfig().measureRequestSize && args?.[0]) {
+            const body = args[0];
+            const bodyLength = getXHRBodyLength(body);
+            if (bodyLength !== undefined) {
+              currentSpan.setAttribute(
+                SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+                bodyLength
+              );
+            }
+          }
+
           api.context.with(
             api.trace.setSpan(api.context.active(), currentSpan),
             () => {

@@ -79,7 +79,7 @@ Reporting bugs is an important contribution. Please make sure to include:
 ### Before you start
 
 Please read project contribution
-[guide](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md)
+[guide](https://github.com/open-telemetry/community/blob/main/guides/contributor)
 for general practices for OpenTelemetry project.
 
 #### Conventional commit
@@ -145,7 +145,7 @@ git merge upstream/main
 
 Remember to always work in a branch of your local copy, as you might otherwise have to contend with conflicts in main.
 
-Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#github-workflow) section of general project contributing guide.
+Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/main/guides/contributor/processes.md#github-workflow) section of general project contributing guide.
 
 ## Development
 
@@ -202,6 +202,15 @@ npm run watch
 cd packages/opentelemetry-module-name
 npm run watch
 ```
+
+#### TypeScript version & update policy
+
+TypeScript version used to compile the pacakges is `v5.0.4`. If you plan to use any of the packages from this
+repository to make your own application or package instrumentation make sure to use same version or higher.
+
+<!-- Ref: https://github.com/open-telemetry/opentelemetry-js/pull/5145#issuecomment-2518263890 -->
+As update policy OpenTelemetry JS will follow DefinitelyType's [support policy for TypeScript](https://github.com/DefinitelyTyped/DefinitelyTyped#support-window)
+which sets a support window of 2 years.
 
 ### Running tests
 

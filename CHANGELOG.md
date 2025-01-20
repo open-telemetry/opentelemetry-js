@@ -11,6 +11,75 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 
 ### :boom: Breaking Change
 
+* feat(sdk-metrics)!: drop deprecated `type` field on `MetricDescriptor` [#5291](https://github.com/open-telemetry/opentelemetry-js/pull/5291) @chancancode
+* feat(sdk-metrics)!: drop deprecated `InstrumentDescriptor` type; use `MetricDescriptor` instead [#5277](https://github.com/open-telemetry/opentelemetry-js/pull/5266) @chancancode
+* feat(sdk-metrics)!: bump minimum version of `@opentelemetry/api` peer dependency to 1.9.0 [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
+* chore(shim-opentracing): replace deprecated SpanAttributes [#4430](https://github.com/open-telemetry/opentelemetry-js/pull/4430) @JamieDanielson
+* chore(otel-core): replace deprecated SpanAttributes [#4408](https://github.com/open-telemetry/opentelemetry-js/pull/4408) @JamieDanielson
+* feat(sdk-metrics)!: remove MeterProvider.addMetricReader() in favor of constructor option [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419) @pichlermarc
+* chore(otel-resources): replace deprecated SpanAttributes [#4428](https://github.com/open-telemetry/opentelemetry-js/pull/4428) @JamieDanielson
+* feat(sdk-metrics)!: remove MeterProvider.addMetricReader() in favor of constructor option [#4419](https://github.com/open-telemetry/opentelemetry-js/pull/4419) @pichlermarc
+* feat(sdk-metrics)!: replace attributeKeys with custom processors option [#4532](https://github.com/open-telemetry/opentelemetry-js/pull/4532) @pichlermarc
+* refactor(sdk-trace-base)!: replace `SpanAttributes` with `Attributes` [#5009](https://github.com/open-telemetry/opentelemetry-js/pull/5009) @david-luna
+* refactor(resources)!: replace `ResourceAttributes` with `Attributes` [#5016](https://github.com/open-telemetry/opentelemetry-js/pull/5016) @david-luna
+* feat(sdk-metrics)!: drop `View` and `Aggregation` in favor of `ViewOptions` and `AggregationOption` [#4931](https://github.com/open-telemetry/opentelemetry-js/pull/4931) @pichlermarc
+* refactor(sdk-trace-base)!: remove `new Span` constructor in favor of `Tracer.startSpan` API [#5048](https://github.com/open-telemetry/opentelemetry-js/pull/5048) @david-luna
+* refactor(sdk-trace-base)!: remove `BasicTracerProvider.addSpanProcessor` API in favor of constructor options. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
+* refactor(sdk-trace-base)!: make `resource` property private in `BasicTracerProvider` and remove `getActiveSpanProcessor` API. [#5192](https://github.com/open-telemetry/opentelemetry-js/pull/5192) @david-luna
+* feat(core)!: remove deprecated `IdGenerator` and `RandomIdGenerator` [#5309](https://github.com/open-telemetry/opentelemetry-js/pull/5309) @pichlermarc
+* feat(core)!: remove deprecated type `InstrumentationLibrary` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
+  * (user-facing): please use equivalent type `InstrumentationScope` instead
+* feat(sdk-trace-base)!: replace usages fo `InstrumentationLibrary` with `InstrumentationScope` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
+  * (user-facing) rename `Tracer.instrumentationLibrary` -> `Tracer.instrumentationScope`
+  * (user-facing) rename `ReadableSpan.instrumentationLibrary` -> `ReadableSpan.instrumentationScope`
+    * also renames the property in implementations of `ReadableSpan`
+* feat(exporter-jaeger): use `ReadableSpan.instrumentationScope` over `ReadableSpan.instrumentationLibrary` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
+* feat(exporter-zipkin): use `ReadableSpan.instrumentationScope` over `ReadableSpan.instrumentationLibrary` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
+* chore!: update typescript to version `5.0.4` [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145) @david-luna
+  * (user-facing) dropped support for `typescript@<5.0.4`
+  * (user-facing) all packages published from this repository will from now on drop support for old versions of `typescript` in minor releases. We will only drop support for versions that are older than 2 years.
+* feat(core)!: remove deprecated samplers [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316) @pichlermarc
+  * (user-facing): deprecated `AlwaysOnSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `AlwaysOffSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `TraceIdRatioSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `TraceIdRatioSampler` has moved to  `@opentelemetry/sdk-trace-base`
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+* refactor(sdk-metrics): the internal `InstrumentDescriptor` type now extends `MetricDescriptor`; moved public `InstrumentType` type enum into `./src/export/MetricData.ts` [#5277](https://github.com/open-telemetry/opentelemetry-js/pull/5266)
+* refactor(sdk-metrics): remove `Gauge` and `MetricAdvice` workaround types in favor of the upstream `@opentelemetry/api` types [#5254](https://github.com/open-telemetry/opentelemetry-js/pull/5254) @chancancode
+* chore: remove checks for unsupported node versions [#4341](https://github.com/open-telemetry/opentelemetry-js/pull/4341) @dyladan
+* refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
+* refactor(sdk-trace-base): rename `BasicTracerProvider.activeSpanProcessor` private property. [#5211](https://github.com/open-telemetry/opentelemetry-js/pull/5211) @david-luna
+* chore(selenium-tests): remove internal selenium-tests/ package, it wasn't being used @trentm
+
+## 1.30.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): PeriodicExportingMetricReader now flushes pending tasks at shutdown [#5242](https://github.com/open-telemetry/opentelemetry-js/pull/5242)
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): do not load OTEL_ env vars on module load, but when needed [#5233](https://github.com/open-telemetry/opentelemetry-js/pull/5233)
+* fix(instrumentation-xhr, instrumentation-fetch): content length attributes no longer get removed with `ignoreNetworkEvents: true` being set [#5229](https://github.com/open-telemetry/opentelemetry-js/issues/5229)
+
+## 1.29.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-metrics): Add support for aggregation cardinality limit with a default limit of 2000. This limit can be customized via views [#5128](https://github.com/open-telemetry/opentelemetry-js/pull/5128)
+
+## 1.28.0
+
 ### :rocket: (Enhancement)
 
 * feat(sdk-metrics, sdk-trace): add `mergeResourceWithDefaults` flag, which allows opting-out of resources getting merged with the default resource [#4617](https://github.com/open-telemetry/opentelemetry-js/pull/4617)
@@ -22,12 +91,9 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): await exports in `PeriodicExportingMetricReader` when async resource attributes have not yet settled [#5119](https://github.com/open-telemetry/opentelemetry-js/pull/5119/) @pichlermarc
+* fix(sdk-trace): performance.now() may return the same value for consecutive calls [#5150](https://github.com/open-telemetry/opentelemetry-js/pull/5150) @dyladan
 * fix(sdk-trace-base): pass BatchSpanProcessor#forceFlush() errors on visibilitychange/pagehide to globalErrorHandler [#5143](https://github.com/open-telemetry/opentelemetry-js/pull/5143) @pichlermarc
   * fixes a bug where switching browser tabs with a failing exporter would cause an unhandled error
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 1.27.0
 
@@ -44,6 +110,8 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * The [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/6672dbc97ddeb34f36c020a0f0a30323c8bc4d95/specification/context/api-propagators.md?plain=1#L354-L356) prohibits hosting these packages in the core repository
   * `@opentelemetry/propagator-aws-xray` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
   * `@opentelemetry/propagator-aws-xray-lambda` is now located in [open-telemetry/opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
+
+* docs: [Browser] Define the supported browser runtimes [Issue #4168](https://github.com/open-telemetry/opentelemetry-js/issues/4168) PR:[#5059](https://github.com/open-telemetry/opentelemetry-js/pull/5059) @MSNev
 
 ### :house: (Internal)
 

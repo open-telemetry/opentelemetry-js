@@ -48,7 +48,17 @@ import {
 import { OTLPLogExporter as OTLPHttpLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPLogExporter as OTLPGrpcLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { OTLPLogExporter as OTLPProtoLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
-import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
+import { OTLPMetricExporter as OTLPGrpcMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
+import { OTLPMetricExporter as OTLPProtoMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
+import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
+import {
+  MeterProvider,
+  MetricReader,
+  ViewOptions,
+  ConsoleMetricExporter,
+  PeriodicExportingMetricReader,
+} from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
   SpanProcessor,
@@ -57,7 +67,7 @@ import {
   NodeTracerConfig,
   NodeTracerProvider,
 } from '@opentelemetry/sdk-trace-node';
-import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 import {
@@ -74,9 +84,9 @@ export type MeterProviderConfig = {
    */
   reader?: MetricReader;
   /**
-   * List of {@link View}s that should be passed to the MeterProvider
+   * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
-  views?: View[];
+  views?: ViewOptions[];
 };
 
 export type LoggerProviderConfig = {
@@ -86,6 +96,107 @@ export type LoggerProviderConfig = {
   logRecordProcessors: LogRecordProcessor[];
 };
 
+/**
+ * @Returns param value, if set else returns the default value
+ */
+function getValueInMillis(envName: string, defaultValue: number): number {
+  return parseInt(process.env[envName] || '') || defaultValue;
+}
+
+/**
+ *
+ * @returns MetricReader[] if appropriate environment variables are configured
+ */
+function configureMetricProviderFromEnv(): MetricReader[] {
+  const metricReaders: MetricReader[] = [];
+  const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
+  if (!metricsExporterList) {
+    return metricReaders;
+  }
+  const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
+
+  if (enabledExporters.length === 0) {
+    diag.info('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+  }
+
+  if (enabledExporters.includes('none')) {
+    diag.info(
+      `OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.`
+    );
+    return metricReaders;
+  }
+  enabledExporters.forEach(exporter => {
+    if (exporter === 'otlp') {
+      const protocol =
+        process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?.trim() ||
+        process.env.OTEL_EXPORTER_OTLP_PROTOCOL?.trim();
+
+      const exportIntervalMillis = getValueInMillis(
+        'OTEL_METRIC_EXPORT_INTERVAL',
+        60000
+      );
+      const exportTimeoutMillis = getValueInMillis(
+        'OTEL_METRIC_EXPORT_TIMEOUT',
+        30000
+      );
+
+      switch (protocol) {
+        case 'grpc':
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPGrpcMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+          break;
+        case 'http/json':
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPHttpMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+          break;
+        case 'http/protobuf':
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPProtoMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+          break;
+        default:
+          diag.warn(
+            `Unsupported OTLP metrics protocol: "${protocol}". Using http/protobuf.`
+          );
+          metricReaders.push(
+            new PeriodicExportingMetricReader({
+              exporter: new OTLPProtoMetricExporter(),
+              exportIntervalMillis: exportIntervalMillis,
+              exportTimeoutMillis: exportTimeoutMillis,
+            })
+          );
+      }
+    } else if (exporter === 'console') {
+      metricReaders.push(
+        new PeriodicExportingMetricReader({
+          exporter: new ConsoleMetricExporter(),
+        })
+      );
+    } else if (exporter === 'prometheus') {
+      metricReaders.push(new PrometheusMetricExporter());
+    } else {
+      diag.warn(
+        `Unsupported OTEL_METRICS_EXPORTER value: "${exporter}". Supported values are: otlp, console, prometheus, none.`
+      );
+    }
+  });
+
+  return metricReaders;
+}
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -99,7 +210,6 @@ export class NodeSDK {
 
   private _resource: IResource;
   private _resourceDetectors: Array<Detector | DetectorSync>;
-  private _mergeResourceWithDefaults: boolean;
 
   private _autoDetectResources: boolean;
 
@@ -134,9 +244,7 @@ export class NodeSDK {
 
     this._configuration = configuration;
 
-    this._resource = configuration.resource ?? new Resource({});
-    this._mergeResourceWithDefaults =
-      configuration.mergeResourceWithDefaults ?? true;
+    this._resource = configuration.resource ?? Resource.default();
     this._autoDetectResources = configuration.autoDetectResources ?? true;
     if (!this._autoDetectResources) {
       this._resourceDetectors = [];
@@ -247,7 +355,7 @@ export class NodeSDK {
         ? this._resource
         : this._resource.merge(
             new Resource({
-              [SEMRESATTRS_SERVICE_NAME]: this._serviceName,
+              [ATTR_SERVICE_NAME]: this._serviceName,
             })
           );
 
@@ -259,7 +367,6 @@ export class NodeSDK {
     this._tracerProvider = new NodeTracerProvider({
       ...this._configuration,
       resource: this._resource,
-      mergeResourceWithDefaults: this._mergeResourceWithDefaults,
       spanProcessors,
     });
 
@@ -277,7 +384,6 @@ export class NodeSDK {
     if (this._loggerProviderConfig) {
       const loggerProvider = new LoggerProvider({
         resource: this._resource,
-        mergeResourceWithDefaults: this._mergeResourceWithDefaults,
       });
 
       for (const logRecordProcessor of this._loggerProviderConfig
@@ -290,20 +396,25 @@ export class NodeSDK {
       logs.setGlobalLoggerProvider(loggerProvider);
     }
 
-    if (this._meterProviderConfig) {
+    const metricReadersFromEnv: MetricReader[] =
+      configureMetricProviderFromEnv();
+    if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
       const readers: MetricReader[] = [];
-      if (this._meterProviderConfig.reader) {
+      if (this._meterProviderConfig?.reader) {
         readers.push(this._meterProviderConfig.reader);
       }
+
+      if (readers.length === 0) {
+        metricReadersFromEnv.forEach((r: MetricReader) => readers.push(r));
+      }
+
       const meterProvider = new MeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
         readers: readers,
-        mergeResourceWithDefaults: this._mergeResourceWithDefaults,
       });
 
       this._meterProvider = meterProvider;
-
       metrics.setGlobalMeterProvider(meterProvider);
 
       // TODO: This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/3609

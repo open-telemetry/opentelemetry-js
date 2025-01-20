@@ -14,46 +14,34 @@
  * limitations under the License.
  */
 
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
-import {
-  OTLPExporterNodeBase,
-  OTLPExporterNodeConfigBase,
-} from '@opentelemetry/otlp-exporter-base';
-import {
-  IExportMetricsServiceResponse,
-  JsonMetricsSerializer,
-} from '@opentelemetry/otlp-transformer';
+import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { JsonMetricsSerializer } from '@opentelemetry/otlp-transformer';
 import { VERSION } from '../../version';
+import {
+  convertLegacyHttpOptions,
+  createOtlpHttpExportDelegate,
+} from '@opentelemetry/otlp-exporter-base/node-http';
 
 const USER_AGENT = {
   'User-Agent': `OTel-OTLP-Exporter-JavaScript/${VERSION}`,
 };
 
-class OTLPExporterNodeProxy extends OTLPExporterNodeBase<
-  ResourceMetrics,
-  IExportMetricsServiceResponse
-> {
+/**
+ * OTLP Metric Exporter for Node.js
+ */
+export class OTLPMetricExporter extends OTLPMetricExporterBase {
   constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(
-      config,
-      JsonMetricsSerializer,
-      {
-        ...USER_AGENT,
-        'Content-Type': 'application/json',
-      },
-      'METRICS',
-      'v1/metrics'
+      createOtlpHttpExportDelegate(
+        convertLegacyHttpOptions(config ?? {}, 'METRICS', 'v1/metrics', {
+          ...USER_AGENT,
+          'Content-Type': 'application/json',
+        }),
+        JsonMetricsSerializer
+      ),
+      config
     );
-  }
-}
-
-/**
- * Collector Metric Exporter for Node
- */
-export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPExporterNodeProxy> {
-  constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
-    super(new OTLPExporterNodeProxy(config), config);
   }
 }
