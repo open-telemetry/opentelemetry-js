@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1737389529278,
+  "lastUpdate": 1737390721760,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -23664,6 +23664,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.48%",
             "unit": "ops/sec",
             "extra": "100 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjpearson@users.noreply.github.com",
+            "name": "Connor Pearson",
+            "username": "cjpearson"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6c04a414430750e1ba183d337f979c5ec3d09184",
+          "message": "feat(instrumentation): re-export initialize from import-in-the-middle (#5123)\n\nSigned-off-by: Connor Pearson <connor.pearson@mailbox.org>\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-01-20T16:22:40Z",
+          "tree_id": "aa234ccb4e89c9198c11227e5d0883e6a903d4dd",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/6c04a414430750e1ba183d337f979c5ec3d09184"
+        },
+        "date": 1737390720581,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1540414,
+            "range": "±0.53%",
+            "unit": "ops/sec",
+            "extra": "98 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 17103,
+            "range": "±0.29%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 831494,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 762922,
+            "range": "±0.59%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
           }
         ]
       }
