@@ -26,6 +26,12 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * refactor(sdk-trace-base)!: remove `new Span` constructor in favor of `Tracer.startSpan` API [#5048](https://github.com/open-telemetry/opentelemetry-js/pull/5048) @david-luna
 * refactor(sdk-trace-base)!: remove `BasicTracerProvider.addSpanProcessor` API in favor of constructor options. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
 * refactor(sdk-trace-base)!: make `resource` property private in `BasicTracerProvider` and remove `getActiveSpanProcessor` API. [#5192](https://github.com/open-telemetry/opentelemetry-js/pull/5192) @david-luna
+* feat(sdk-trace)!: remove ability to have BasicTracerProvider instantiate exporters [#5239](https://github.com/open-telemetry/opentelemetry-js/pull/5239) @pichlermarc
+  * When extending `BasicTracerProvider`, the class offered multiple methods to facilitate the creation of exporters and auto-pairing with `SpanProcessor`s.
+    * This functionality has been removed - users may now pass `SpanProcessor`s to the base class constructor when extending
+    * (user-facing): `_registeredExporters` has been removed
+    * (user-facing): `_getSpanExporter` has been removed
+    * (user-facing): `_buildExporterFromEnv` has been removed
 * feat(core)!: remove deprecated `IdGenerator` and `RandomIdGenerator` [#5309](https://github.com/open-telemetry/opentelemetry-js/pull/5309) @pichlermarc
 * feat(core)!: remove deprecated type `InstrumentationLibrary` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
   * (user-facing): please use equivalent type `InstrumentationScope` instead
