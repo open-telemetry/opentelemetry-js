@@ -64,8 +64,6 @@
   "dependencies": {
     "@opentelemetry/context-async-hooks": "1.30.0",
     "@opentelemetry/core": "1.30.0",
-    "@opentelemetry/propagator-b3": "1.30.0",
-    "@opentelemetry/propagator-jaeger": "1.30.0",
     "@opentelemetry/sdk-trace-base": "1.30.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node",
