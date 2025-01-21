@@ -60,17 +60,16 @@ describe('getPropagatorFromEnv', function () {
   });
 
   it('should return the selected propagators when multiple are in the list', () => {
-    process.env.OTEL_PROPAGATORS = 'b3,jaeger';
+    process.env.OTEL_PROPAGATORS = 'tracecontext,baggage,b3,b3multi,jaeger';
     assert.deepStrictEqual(getPropgagatorFromEnv()?.fields(), [
+      'traceparent',
+      'tracestate',
       'b3',
-      'uber-trace-id',
-    ]);
-  });
-
-  it('should return the selected propagators when multiple are in the list', () => {
-    process.env.OTEL_PROPAGATORS = 'b3,jaeger';
-    assert.deepStrictEqual(getPropgagatorFromEnv()?.fields(), [
-      'b3',
+      'x-b3-traceid',
+      'x-b3-spanid',
+      'x-b3-flags',
+      'x-b3-sampled',
+      'x-b3-parentspanid',
       'uber-trace-id',
     ]);
   });
