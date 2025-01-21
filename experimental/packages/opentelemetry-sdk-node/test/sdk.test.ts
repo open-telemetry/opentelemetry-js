@@ -63,11 +63,11 @@ import { NodeSDK } from '../src';
 import { env } from 'process';
 import {
   envDetector,
-  envDetectorSync,
   processDetector,
   hostDetector,
   Resource,
-  serviceInstanceIdDetectorSync,
+  serviceInstanceIdDetector,
+  DetectedResource,
 } from '@opentelemetry/resources';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { logs, ProxyLoggerProvider } from '@opentelemetry/api-logs';
@@ -530,8 +530,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,
@@ -695,7 +697,7 @@ describe('Node SDK', () => {
           await sdk1.shutdown();
 
           const sdk2 = new NodeSDK({
-            resourceDetectors: [envDetectorSync],
+            resourceDetectors: [envDetector],
           });
           sdk2.start();
           await sdk2.shutdown();
@@ -860,7 +862,7 @@ describe('Node SDK', () => {
           processDetector,
           envDetector,
           hostDetector,
-          serviceInstanceIdDetectorSync,
+          serviceInstanceIdDetector,
         ],
       });
 
@@ -930,8 +932,10 @@ describe('Node SDK', () => {
           resourceDetectors: [
             processDetector,
             {
-              async detect(): Promise<Resource> {
-                return new Resource({ customAttr: 'someValue' });
+              detect(): DetectedResource {
+                return {
+                  attributes: { customAttr: 'someValue' },
+                };
               },
             },
             envDetector,
@@ -942,7 +946,7 @@ describe('Node SDK', () => {
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(resource, Resource.empty());
+        assert.deepStrictEqual(resource, Resource.EMPTY);
         await sdk.shutdown();
       });
     });

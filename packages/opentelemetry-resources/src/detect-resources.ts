@@ -34,7 +34,7 @@ export const detectResources = (
       return resource;
     } catch (e) {
       diag.debug(`${d.constructor.name} failed: ${e.message}`);
-      return new Resource({});
+      return new Resource({ attributes: {}});
     }
   });
 
@@ -43,7 +43,7 @@ export const detectResources = (
 
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
-    new Resource({})
+    new Resource({ attributes: {}})
   );
 };
 

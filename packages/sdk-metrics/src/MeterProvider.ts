@@ -49,9 +49,9 @@ export interface MeterProviderOptions {
  */
 function prepareResource(
   mergeWithDefaults: boolean,
-  providedResource: Resource | undefined
+  providedResource: IResource | undefined
 ) {
-  const resource = providedResource ?? Resource.empty();
+  const resource = providedResource ?? Resource.EMPTY;
 
   if (mergeWithDefaults) {
     return Resource.default().merge(resource);

@@ -64,7 +64,7 @@ describe('LoggerProvider', () => {
       });
 
       it('should fallback to default resource attrs', () => {
-        const passedInResource = new Resource({ foo: 'bar' });
+        const passedInResource = new Resource({ attributes: { foo: 'bar' }});
         const provider = new LoggerProvider({ resource: passedInResource });
         const { resource } = provider['_sharedState'];
         assert.deepStrictEqual(
@@ -74,7 +74,7 @@ describe('LoggerProvider', () => {
       });
 
       it('should not merge with default resource attrs when flag is set to false', function () {
-        const passedInResource = new Resource({ foo: 'bar' });
+        const passedInResource = new Resource({ attributes: { foo: 'bar' }});
         const provider = new LoggerProvider({
           resource: passedInResource,
           mergeResourceWithDefaults: false,
@@ -84,7 +84,7 @@ describe('LoggerProvider', () => {
       });
 
       it('should merge with default resource attrs when flag is set to true', function () {
-        const passedInResource = new Resource({ foo: 'bar' });
+        const passedInResource = new Resource({ attributes: { foo: 'bar' }});
         const provider = new LoggerProvider({
           resource: passedInResource,
           mergeResourceWithDefaults: true,

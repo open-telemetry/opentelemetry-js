@@ -37,7 +37,7 @@ export class Resource implements IResource {
 
   private _memoizedAttributes?: Attributes;
 
-  public static EMPTY = new Resource({});
+  public static EMPTY = new Resource({ attributes: {}});
   /**
    * Returns a Resource that identifies the SDK in use.
    */

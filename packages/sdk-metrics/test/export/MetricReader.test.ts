@@ -143,7 +143,9 @@ describe('MetricReader', () => {
       const additionalProducer = new TestMetricProducer({
         resourceMetrics: {
           resource: new Resource({
-            shouldBeDiscarded: 'should-be-discarded',
+            attributes: {
+              shouldBeDiscarded: 'should-be-discarded',
+            }
           }),
           scopeMetrics: testScopeMetrics,
         },

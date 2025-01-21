@@ -933,7 +933,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should not merge with defaults when flag is set to false', function () {
-      const expectedResource = new Resource({ foo: 'bar' });
+      const expectedResource = new Resource({ attributes: { foo: 'bar' } });
       const tracerProvider = new BasicTracerProvider({
         mergeResourceWithDefaults: false,
         resource: expectedResource,
@@ -942,7 +942,7 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should merge with defaults when flag is set to true', function () {
-      const providedResource = new Resource({ foo: 'bar' });
+      const providedResource = new Resource({ attributes: { foo: 'bar' } });
       const tracerProvider = new BasicTracerProvider({
         mergeResourceWithDefaults: true,
         resource: providedResource,

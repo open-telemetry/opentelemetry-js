@@ -16,7 +16,7 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
-import { Resource } from '@opentelemetry/resources';
+import { IResource, Resource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig } from './types';
@@ -30,9 +30,9 @@ export const DEFAULT_LOGGER_NAME = 'unknown';
 
 function prepareResource(
   mergeWithDefaults: boolean,
-  providedResource: Resource | undefined
+  providedResource: IResource | undefined
 ) {
-  const resource = providedResource ?? Resource.empty();
+  const resource = providedResource ?? Resource.EMPTY;
 
   if (mergeWithDefaults) {
     return Resource.default().merge(resource);

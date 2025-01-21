@@ -29,4 +29,4 @@ export {
 export { IResource } from './IResource';
 export { defaultServiceName } from './platform';
 export { Resource } from './Resource';
-export { ResourceDetector } from './types';
+export { ResourceDetector, DetectedResource, DetectedResourceAttributes } from './types';

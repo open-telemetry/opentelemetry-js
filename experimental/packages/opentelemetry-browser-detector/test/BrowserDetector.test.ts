@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { IResource } from '@opentelemetry/resources';
 import { browserDetector } from '../src/BrowserDetector';
-import { describeBrowser, assertResource, assertEmptyResource } from './util';
+import { assertEmptyResource, assertResource, describeBrowser } from './util';
 
 describeBrowser('browserDetector()', () => {
   afterEach(() => {
