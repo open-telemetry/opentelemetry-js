@@ -26,6 +26,7 @@ import {
   TextMapGetter,
   propagation,
   diag,
+  ContextManager,
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import { TraceState } from '@opentelemetry/core';
@@ -59,6 +60,7 @@ class DummyPropagator implements TextMapPropagator {
 describe('BasicTracerProvider', () => {
   let envSource: Record<string, any>;
   let setGlobalPropagatorStub: sinon.SinonSpy<[TextMapPropagator], boolean>;
+  let setGlobalContextManagerStub: sinon.SinonSpy<[ContextManager], boolean>;
 
   if (global.process?.versions?.node === undefined) {
     envSource = globalThis as unknown as Record<string, any>;
@@ -70,6 +72,7 @@ describe('BasicTracerProvider', () => {
     // to avoid actually registering the TraceProvider and leaking env to other tests
     sinon.stub(trace, 'setGlobalTracerProvider');
     setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+    setGlobalContextManagerStub = sinon.spy(context, 'setGlobalContextManager');
 
     context.disable();
   });
@@ -413,6 +416,34 @@ describe('BasicTracerProvider', () => {
           'tracestate',
           'baggage',
         ]);
+      });
+    });
+    describe('contextManager', () => {
+      it('should not be set if not provided', () => {
+        const provider = new BasicTracerProvider();
+        provider.register();
+
+        sinon.assert.notCalled(setGlobalContextManagerStub);
+      });
+
+      it('should be set if provided', () => {
+        const provider = new BasicTracerProvider();
+        const mockContextManager: ContextManager = {
+          active: sinon.stub(),
+          bind: sinon.stub(),
+          disable: sinon.stub(),
+          enable: sinon.stub(),
+          with: sinon.stub(),
+        };
+
+        provider.register({
+          contextManager: mockContextManager,
+        });
+
+        sinon.assert.calledOnceWithExactly(
+          setGlobalContextManagerStub,
+          mockContextManager
+        );
       });
     });
   });
