@@ -63,7 +63,9 @@
     "@opentelemetry/sdk-metrics": "1.30.0",
     "@opentelemetry/sdk-trace-base": "1.30.0",
     "@opentelemetry/sdk-trace-node": "1.30.0",
-    "@opentelemetry/semantic-conventions": "1.28.0"
+    "@opentelemetry/semantic-conventions": "1.28.0",
+    "@opentelemetry/propagator-jaeger": "1.30.0",
+    "@opentelemetry/propagator-b3": "1.30.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.3.0 <1.10.0"
