@@ -1,6 +1,7 @@
 
 params:
-  excluded_attributes: ["messaging.client_id"]
+  # Exclude `network.interface.name` for now because https://github.com/open-telemetry/semantic-conventions/issues/1777
+  excluded_attributes: ["messaging.client_id", "network.interface.name"]
 
 # https://github.com/open-telemetry/weaver/blob/main/crates/weaver_forge/README.md#comment-filter
 comment_formats:
