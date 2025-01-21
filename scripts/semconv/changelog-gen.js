@@ -282,7 +282,7 @@ function semconvChangelogGen() {
     if (stableSummary.length) {
       changelogEntry.push('');
     }
-    changelogEntry.push(`##### Unstable changes ${specVer}`);
+    changelogEntry.push(`#### Unstable changes ${specVer}`);
     changelogEntry.push(`
 <details>
 <summary>Full unstable changes</summary>
