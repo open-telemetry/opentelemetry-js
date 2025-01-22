@@ -16,7 +16,7 @@
 import { ExportResultCode } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as metrics from '@opentelemetry/api';
-import assert = require('assert');
+import * as assert from 'assert';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter';
 import { ResourceMetrics } from '../../src/export/MetricData';

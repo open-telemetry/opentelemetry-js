@@ -57,7 +57,6 @@ import {
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import * as semver from 'semver';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
 import { env } from 'process';
@@ -88,10 +87,6 @@ import {
   SEMRESATTRS_PROCESS_PID,
 } from '@opentelemetry/semantic-conventions';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-
-const DefaultContextManager = semver.gte(process.version, '14.8.0')
-  ? AsyncLocalStorageContextManager
-  : AsyncHooksContextManager;
 
 describe('Node SDK', () => {
   let ctxManager: any;
@@ -257,7 +252,7 @@ describe('Node SDK', () => {
 
       assert.ok(
         context['_getContextManager']().constructor.name ===
-          DefaultContextManager.name
+          AsyncLocalStorageContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
@@ -946,7 +941,7 @@ describe('Node SDK', () => {
         const resource = sdk['_resource'];
         await resource.waitForAsyncAttributes?.();
 
-        assert.deepStrictEqual(resource, Resource.EMPTY);
+        assert.deepStrictEqual(resource, Resource.default());
         await sdk.shutdown();
       });
     });
@@ -1474,7 +1469,7 @@ describe('setup exporter from env', () => {
     await sdk.shutdown();
   });
 
-  it('should use noop span processor when user sets env exporter to none', async () => {
+  it('should use empty span processor when user sets env exporter to none', async () => {
     env.OTEL_TRACES_EXPORTER = 'none';
     const sdk = new NodeSDK();
     sdk.start();
@@ -1487,8 +1482,7 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof NoopSpanProcessor);
+    assert.strictEqual(listOfProcessors.length, 0);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });

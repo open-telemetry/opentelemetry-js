@@ -24,9 +24,9 @@ import {
   Histogram,
   InstrumentType,
   MeterProvider,
-  MetricDescriptor,
   MetricReader,
 } from '../src';
+import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
   TestDeltaMetricReader,
   TestMetricReader,
@@ -63,6 +63,7 @@ describe('Instruments', () => {
           unit: 'kB',
           type: InstrumentType.COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       });
     });
@@ -89,6 +90,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.COUNTER,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.SUM,
         isMonotonic: true,
@@ -191,6 +193,7 @@ describe('Instruments', () => {
           unit: 'kB',
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       });
     });
@@ -219,6 +222,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.SUM,
         isMonotonic: false,
@@ -286,6 +290,7 @@ describe('Instruments', () => {
           unit: 'kB',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.DOUBLE,
+          advice: {},
         },
       });
     });
@@ -314,6 +319,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -374,6 +380,9 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {
+            explicitBucketBoundaries: [1, 9, 100],
+          },
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -443,6 +452,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -473,6 +483,7 @@ describe('Instruments', () => {
           unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
+          advice: {},
         },
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -827,7 +838,7 @@ function setup() {
 interface ValidateMetricData {
   resource?: Resource;
   instrumentationScope?: InstrumentationScope;
-  descriptor?: MetricDescriptor;
+  descriptor?: InstrumentDescriptor;
   dataPointType?: DataPointType;
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
   isMonotonic?: boolean;

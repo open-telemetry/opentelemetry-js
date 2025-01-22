@@ -74,16 +74,14 @@
     "@opentelemetry/exporter-jaeger": "1.30.0",
     "@types/mocha": "10.0.10",
     "@types/node": "18.6.5",
-    "@types/semver": "7.5.8",
     "@types/sinon": "17.0.3",
     "cross-var": "1.1.0",
     "lerna": "6.6.2",
     "mocha": "10.8.2",
-    "nyc": "15.1.0",
-    "semver": "7.6.3",
+    "nyc": "17.1.0",
     "sinon": "15.1.2",
-    "ts-loader": "9.5.1",
-    "typescript": "4.4.4"
+    "ts-loader": "9.5.2",
+    "typescript": "5.0.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-node",
   "sideEffects": false

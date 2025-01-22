@@ -114,22 +114,22 @@ export function createExportTraceServiceRequest(
 function createResourceMap(readableSpans: ReadableSpan[]) {
   const resourceMap: Map<IResource, Map<string, ReadableSpan[]>> = new Map();
   for (const record of readableSpans) {
-    let ilmMap = resourceMap.get(record.resource);
+    let ilsMap = resourceMap.get(record.resource);
 
-    if (!ilmMap) {
-      ilmMap = new Map();
-      resourceMap.set(record.resource, ilmMap);
+    if (!ilsMap) {
+      ilsMap = new Map();
+      resourceMap.set(record.resource, ilsMap);
     }
 
     // TODO this is duplicated in basic tracer. Consolidate on a common helper in core
-    const instrumentationLibraryKey = `${record.instrumentationLibrary.name}@${
-      record.instrumentationLibrary.version || ''
-    }:${record.instrumentationLibrary.schemaUrl || ''}`;
-    let records = ilmMap.get(instrumentationLibraryKey);
+    const instrumentationScopeKey = `${record.instrumentationScope.name}@${
+      record.instrumentationScope.version || ''
+    }:${record.instrumentationScope.schemaUrl || ''}`;
+    let records = ilsMap.get(instrumentationScopeKey);
 
     if (!records) {
       records = [];
-      ilmMap.set(instrumentationLibraryKey, records);
+      ilsMap.set(instrumentationScopeKey, records);
     }
 
     records.push(record);
@@ -160,11 +160,9 @@ function spanRecordsToResourceSpans(
         );
 
         scopeResourceSpans.push({
-          scope: createInstrumentationScope(
-            scopeSpans[0].instrumentationLibrary
-          ),
+          scope: createInstrumentationScope(scopeSpans[0].instrumentationScope),
           spans: spans,
-          schemaUrl: scopeSpans[0].instrumentationLibrary.schemaUrl,
+          schemaUrl: scopeSpans[0].instrumentationScope.schemaUrl,
         });
       }
       ilmEntry = ilmIterator.next();

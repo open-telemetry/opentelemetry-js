@@ -33,12 +33,9 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import * as request from 'request-promise-native';
 import * as superagent from 'superagent';
-// Temporarily removed. See https://github.com/open-telemetry/opentelemetry-js/issues/3344
-// import * as got from 'got';
 import * as nock from 'nock';
-import axios, { AxiosResponse } from 'axios';
+import * as axios from 'axios';
 
 const memoryExporter = new InMemorySpanExporter();
 const protocol = 'http';
@@ -82,11 +79,6 @@ describe('Packages', () => {
     [
       { name: 'axios', httpPackage: axios }, //keep first
       { name: 'superagent', httpPackage: superagent },
-      // { name: 'got', httpPackage: { get: (url: string) => got(url) } },
-      {
-        name: 'request',
-        httpPackage: { get: (url: string) => request(url) },
-      },
     ].forEach(({ name, httpPackage }) => {
       it(`should create a span for GET requests and add propagation headers by using ${name} package`, async () => {
         nock.load(path.join(__dirname, '../', '/fixtures/google-http.json'));
@@ -96,7 +88,7 @@ describe('Packages', () => {
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
-          const res = result as AxiosResponse<unknown>;
+          const res = result as axios.AxiosResponse<unknown>;
           resHeaders = res.headers as any;
         }
         const spans = memoryExporter.getFinishedSpans();
@@ -123,7 +115,6 @@ describe('Packages', () => {
               result.request._headers[DummyPropagation.SPAN_CONTEXT_KEY]
             );
             break;
-          case 'got':
           case 'superagent':
             break;
           default:

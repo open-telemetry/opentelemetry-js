@@ -16,7 +16,7 @@
 import { diag } from '@opentelemetry/api';
 import type * as logsAPI from '@opentelemetry/api-logs';
 import { NOOP_LOGGER } from '@opentelemetry/api-logs';
-import { IResource, Resource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { BindOnceFuture, merge } from '@opentelemetry/core';
 
 import type { LoggerProviderConfig } from './types';
@@ -28,28 +28,13 @@ import { LoggerProviderSharedState } from './internal/LoggerProviderSharedState'
 
 export const DEFAULT_LOGGER_NAME = 'unknown';
 
-function prepareResource(
-  mergeWithDefaults: boolean,
-  providedResource: IResource | undefined
-) {
-  const resource = providedResource ?? Resource.EMPTY;
-
-  if (mergeWithDefaults) {
-    return Resource.default().merge(resource);
-  }
-  return resource;
-}
-
 export class LoggerProvider implements logsAPI.LoggerProvider {
   private _shutdownOnce: BindOnceFuture<void>;
   private readonly _sharedState: LoggerProviderSharedState;
 
   constructor(config: LoggerProviderConfig = {}) {
     const mergedConfig = merge({}, loadDefaultConfig(), config);
-    const resource = prepareResource(
-      mergedConfig.mergeResourceWithDefaults,
-      config.resource
-    );
+    const resource = config.resource ?? Resource.default();
     this._sharedState = new LoggerProviderSharedState(
       resource,
       mergedConfig.forceFlushTimeoutMillis,

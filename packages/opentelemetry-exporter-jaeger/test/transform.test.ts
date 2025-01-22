@@ -80,7 +80,7 @@ describe('transform', () => {
             cost: 112.12,
           },
         }),
-        instrumentationLibrary: {
+        instrumentationScope: {
           name: 'default',
           version: '0.0.1',
         },
@@ -180,7 +180,7 @@ describe('transform', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.EMPTY,
-        instrumentationLibrary: {
+        instrumentationScope: {
           name: 'default',
           version: '0.0.1',
         },
@@ -250,7 +250,7 @@ describe('transform', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.EMPTY,
-        instrumentationLibrary: {
+        instrumentationScope: {
           name: 'default',
           version: '0.0.1',
         },
@@ -298,7 +298,7 @@ describe('transform', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.EMPTY,
-        instrumentationLibrary: {
+        instrumentationScope: {
           name: 'default',
           version: '0.0.1',
         },
@@ -365,7 +365,7 @@ describe('transform', () => {
             cost: 112.12,
           },
         }),
-        instrumentationLibrary: {
+        instrumentationScope: {
           name: 'default',
           version: '0.0.1',
         },

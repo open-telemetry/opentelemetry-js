@@ -40,7 +40,6 @@ export interface NodeSDKConfiguration {
   instrumentations: (Instrumentation | Instrumentation[])[];
   resource: IResource;
   resourceDetectors: Array<ResourceDetector>;
-  mergeResourceWithDefaults?: boolean;
   sampler: Sampler;
   serviceName?: string;
   /** @deprecated use spanProcessors instead*/

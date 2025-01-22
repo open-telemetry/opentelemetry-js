@@ -20,7 +20,7 @@
     "express": "4.21.2"
   },
   "devDependencies": {
-    "typescript": "4.4.4"
+    "typescript": "5.0.4"
   },
   "engines": {
     "node": ">=18"
