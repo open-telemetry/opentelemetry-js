@@ -53,6 +53,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * Resource constructor now takes a single argument which contains an optional `attributes` object
   * Detected resource attribute values may be a promise or a synchronous value
   * Resources are now merged by the order in which their detectors are configured instead of async attributes being last
+  * Resource detectors now return `DetectedResource` plain objects instead of `new Resource()`
 
 ### :rocket: (Enhancement)
 
