@@ -20,7 +20,7 @@ import { ResourceDetectionConfig } from '../../../config';
 import { DetectedResource, ResourceDetector } from '../../../types';
 
 /**
- * ServiceInstanceIdDetectorSync detects the resources related to the service instance ID.
+ * ServiceInstanceIdDetector detects the resources related to the service instance ID.
  */
 class ServiceInstanceIdDetector implements ResourceDetector {
   detect(_config?: ResourceDetectionConfig): DetectedResource {

@@ -21,7 +21,7 @@ import { ResourceDetectionConfig } from '../config';
 import { ResourceDetector } from '../types';
 
 /**
- * EnvDetectorSync can be used to detect the presence of and create a Resource
+ * EnvDetector can be used to detect the presence of and create a Resource
  * from the OTEL_RESOURCE_ATTRIBUTES environment variable.
  */
 class EnvDetector implements ResourceDetector {

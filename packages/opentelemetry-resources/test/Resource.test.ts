@@ -332,28 +332,4 @@ describe('Resource', () => {
       );
     });
   });
-
-  // describe('compatibility', () => {
-  //   it('should merge resource with old implementation', () => {
-  //     const resource = Resource.EMPTY;
-  //     const oldResource = new Resource190({ fromold: 'fromold' });
-
-  //     const mergedResource = resource.merge(oldResource);
-
-  //     assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
-  //   });
-
-  //   it('should merge resource containing async attributes with old implementation', async () => {
-  //     const resource = new Resource({
-  //       attributes: { fromNew: Promise.resolve('fromnew') },
-  //     });
-  //     const oldResource = new Resource190({ fromold: 'fromold' });
-
-  //     const mergedResource = resource.merge(oldResource);
-  //     assert.strictEqual(mergedResource.attributes['fromold'], 'fromold');
-
-  //     await mergedResource.waitForAsyncAttributes?.();
-  //     assert.strictEqual(mergedResource.attributes['fromnew'], 'fromnew');
-  //   });
-  // });
 });

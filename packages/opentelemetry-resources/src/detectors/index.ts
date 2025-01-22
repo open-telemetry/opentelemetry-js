@@ -16,7 +16,6 @@
 
 export {
   browserDetector,
-  browserDetector as browserDetectorSync,
 } from './BrowserDetector';
 export { envDetector } from './EnvDetector';
 export {

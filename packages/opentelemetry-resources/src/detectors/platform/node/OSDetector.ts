@@ -25,7 +25,7 @@ import { ResourceDetector } from '../../../types';
 import { normalizeType } from './utils';
 
 /**
- * OSDetectorSync detects the resources related to the operating system (OS) on
+ * OSDetector detects the resources related to the operating system (OS) on
  * which the process represented by this resource is running.
  */
 class OSDetector implements ResourceDetector {

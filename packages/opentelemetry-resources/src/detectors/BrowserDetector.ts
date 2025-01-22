@@ -24,7 +24,7 @@ import { ResourceDetectionConfig } from '../config';
 import { ResourceDetector } from '../types';
 
 /**
- * BrowserDetectorSync will be used to detect the resources related to browser.
+ * BrowserDetector will be used to detect the resources related to browser.
  */
 class BrowserDetector implements ResourceDetector {
   detect(config?: ResourceDetectionConfig) {
