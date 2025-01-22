@@ -1,7 +1,6 @@
 
 params:
-  # Exclude `network.interface.name` for now because https://github.com/open-telemetry/semantic-conventions/issues/1777
-  excluded_attributes: ["messaging.client_id", "network.interface.name"]
+  excluded_attributes: ["messaging.client_id"]
 
 # https://github.com/open-telemetry/weaver/blob/main/crates/weaver_forge/README.md#comment-filter
 comment_formats:
@@ -17,12 +16,14 @@ comment_formats:
     escape_backslashes: true
 default_comment_format: jsdoc
 
+# `exclude_stability` includes `"", null` to skip attributes that
+# accidentally do not have a stability set (e.g. https://github.com/open-telemetry/semantic-conventions/issues/1777).
 templates:
   - pattern: attributes.ts.j2
     # Remove file name prefix when per-pattern params are available https://github.com/open-telemetry/weaver/issues/288
     filter: >
       semconv_attributes({
-        "exclude_stability": ["experimental"]
+        "exclude_stability": ["experimental", "", null]
       }) | {
         stability: "stable",
         attributes: .
@@ -31,7 +32,7 @@ templates:
   - pattern: attributes.ts.j2
     filter: >
       semconv_attributes({
-        "exclude_stability": ["stable"]
+        "exclude_stability": ["stable", "", null]
       }) | {
         stability: "experimental",
         attributes: .
@@ -40,7 +41,7 @@ templates:
   - pattern: metrics.ts.j2
     filter: >
       semconv_metrics({
-        "exclude_stability": ["experimental"]
+        "exclude_stability": ["experimental", "", null]
       }) | {
         stability: "stable",
         metrics: .
@@ -49,7 +50,7 @@ templates:
   - pattern: metrics.ts.j2
     filter: >
       semconv_metrics({
-        "exclude_stability": ["stable"]
+        "exclude_stability": ["stable", "", null]
       }) | {
         stability: "experimental",
         metrics: .
