@@ -20,7 +20,6 @@ export {
   browserDetector,
   envDetector,
   hostDetector,
-  noopDetector,
   osDetector,
   processDetector,
   serviceInstanceIdDetector,
