@@ -64,7 +64,7 @@ describe('Resource', () => {
     assert.deepStrictEqual(actualResource.attributes, expectedResource.attributes);
   });
 
-  it.skip('should return merged resource when collision in attributes', () => {
+  it('should return merged resource when collision in attributes', () => {
     const expectedResource = new Resource({
       attributes: {
         'k8s.io/container/name': 'c2',
@@ -75,7 +75,6 @@ describe('Resource', () => {
     });
     const actualResource = resource1.merge(resource3);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 4);
-    // TODO first wins vs last wins semantic
     assert.deepStrictEqual(actualResource.attributes, expectedResource.attributes);
   });
 
@@ -181,7 +180,7 @@ describe('Resource', () => {
       });
     });
 
-    it.skip('should merge async attributes when both resources have promises', async () => {
+    it('should merge async attributes when both resources have promises', async () => {
       const resource1 = new Resource({
         attributes: {
           promise1: Promise.resolve('promise1val'),
@@ -218,12 +217,11 @@ describe('Resource', () => {
         promise1: 'promise1val',
         promise2: 'promise2val',
         promise4: 'promise4val',
-        // TODO first wins vs last wins semantic
         shared: 'promise4val',
       });
     });
 
-    it.skip('should merge async attributes correctly when resource1 fulfils after resource2', async () => {
+    it('should merge async attributes correctly when resource1 fulfils after resource2', async () => {
       const resource1 = new Resource({
         attributes: {
           promise1: Promise.resolve('promise1val'),
@@ -245,12 +243,11 @@ describe('Resource', () => {
       assert.deepStrictEqual(merged.attributes, {
         promise1: 'promise1val',
         promise2: 'promise2val',
-        // TODO first wins vs last wins semantic
         shared: 'promise2val',
       });
     });
 
-    it.skip('should merge async attributes correctly when resource2 fulfils after resource1', async () => {
+    it('should merge async attributes correctly when resource2 fulfils after resource1', async () => {
       const resource1 = new Resource({
         attributes: {
           promise1: Promise.resolve('promise1val'),
@@ -272,7 +269,6 @@ describe('Resource', () => {
       assert.deepStrictEqual(merged.attributes, {
         promise1: 'promise1val',
         promise2: 'promise2val',
-        // TODO first wins vs last wins semantic
         shared: 'promise2val',
       });
     });
