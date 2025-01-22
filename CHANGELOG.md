@@ -49,6 +49,10 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
   * (user-facing): deprecated `AlwaysOffSampler` has moved to `@opentelemetry/sdk-trace-base`
   * (user-facing): deprecated `TraceIdRatioSampler` has moved to `@opentelemetry/sdk-trace-base`
   * (user-facing): deprecated `TraceIdRatioSampler` has moved to  `@opentelemetry/sdk-trace-base`
+* feat(resource): Merge sync and async resource interfaces into a single interface [#5350](https://github.com/open-telemetry/opentelemetry-js/pull/5350) @dyladan
+  * Resource constructor now takes a single argument which contains an optional `attributes` object
+  * Detected resource attribute values may be a promise or a synchronous value
+  * Resources are now merged by the order in which their detectors are configured instead of async attributes being last
 
 ### :rocket: (Enhancement)
 
