@@ -13,16 +13,31 @@ All notable changes to the semantic-conventions package will be documented in th
   * Semantic Conventions v1.29.0:
     [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#v1290) |
     [latest docs](https://opentelemetry.io/docs/specs/semconv/)
-  * `@opentelemetry/semantic-conventions` (stable) export changes: *none*
-  * `@opentelemetry/semantic-conventions/incubating` (unstable) export changes: 95 added, 8 newly deprecated
+  * `@opentelemetry/semantic-conventions` (stable) changes: *none*
+  * `@opentelemetry/semantic-conventions/incubating` (unstable) changes: *8 newly deprecated exports, 95 added exports*
 
-#### Unstable changes v1.29.0
+#### Unstable changes in v1.29.0
 
 <details>
-<summary>Full unstable changes</summary>
+<summary>8 newly deprecated exports</summary>
 
 ```js
-// Added (95)
+ATTR_DB_COSMOSDB_OPERATION_TYPE            // No replacement at this time.
+ATTR_DB_QUERY_PARAMETER                    // Replaced by `db.operation.parameter`.
+ATTR_PROCESS_EXECUTABLE_BUILD_ID_PROFILING // Replaced by `process.executable.build_id.htlhash`
+ATTR_VCS_REPOSITORY_CHANGE_ID              // Deprecated, use `vcs.change.id` instead.
+ATTR_VCS_REPOSITORY_CHANGE_TITLE           // Deprecated, use `vcs.change.title` instead.
+ATTR_VCS_REPOSITORY_REF_NAME               // Deprecated, use `vcs.ref.head.name` instead.
+ATTR_VCS_REPOSITORY_REF_REVISION           // Deprecated, use `vcs.ref.head.revision` instead.
+ATTR_VCS_REPOSITORY_REF_TYPE               // Deprecated, use `vcs.ref.head.type` instead.
+```
+
+</details>
+
+<details>
+<summary>95 added exports</summary>
+
+```js
 METRIC_CONTAINER_UPTIME                               // container.uptime
 
 METRIC_DB_CLIENT_COSMOSDB_ACTIVE_INSTANCE_COUNT       // db.client.cosmosdb.active_instance.count
@@ -129,16 +144,6 @@ ATTR_VCS_REF_TYPE                                     // vcs.ref.type
 ATTR_VCS_REVISION_DELTA_DIRECTION                     // vcs.revision_delta.direction
   VCS_REVISION_DELTA_DIRECTION_VALUE_AHEAD              // "ahead"
   VCS_REVISION_DELTA_DIRECTION_VALUE_BEHIND             // "behind"
-
-// Deprecated (8)
-ATTR_DB_COSMOSDB_OPERATION_TYPE            // No replacement at this time.
-ATTR_DB_QUERY_PARAMETER                    // Replaced by `db.operation.parameter`.
-ATTR_PROCESS_EXECUTABLE_BUILD_ID_PROFILING // Replaced by `process.executable.build_id.htlhash`
-ATTR_VCS_REPOSITORY_CHANGE_ID              // Deprecated, use `vcs.change.id` instead.
-ATTR_VCS_REPOSITORY_CHANGE_TITLE           // Deprecated, use `vcs.change.title` instead.
-ATTR_VCS_REPOSITORY_REF_NAME               // Deprecated, use `vcs.ref.head.name` instead.
-ATTR_VCS_REPOSITORY_REF_REVISION           // Deprecated, use `vcs.ref.head.revision` instead.
-ATTR_VCS_REPOSITORY_REF_TYPE               // Deprecated, use `vcs.ref.head.type` instead.
 ```
 
 </details>

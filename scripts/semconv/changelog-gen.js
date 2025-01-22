@@ -105,7 +105,7 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
       // 'ns' is the "namespace". The value here is wrong for "FEATURE_FLAG",
       // "GEN_AI", etc. But good enough for the usage below.
       const ns = /^(ATTR_|METRIC_|)?([^_]+)_/.exec(k)[2];
-      changes.push({type: 'new', k, v: curr[k], ns});
+      changes.push({type: 'added', k, v: curr[k], ns});
     } else if (valChanged(curr[k], prev[k])) {
       changes.push({type: 'changed', k, v: curr[k], prevV: prev[k]});
     } else {
@@ -121,14 +121,83 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
     }
   }
 
-  // Create a summary of changes, grouped by change type.
-  const summary = [];
-  const execSummary = [];
+  // Create a set of summaries, one for each change type.
+  let haveChanges = changes.length > 0;
+  const summaryFromChangeType = {
+    removed: [],
+    changed: [],
+    deprecated: [],
+    added: [],
+  }
+  const execSummaryFromChangeType = {
+    removed: null,
+    changed: null,
+    deprecated: null,
+    added: null,
+  };
 
-  const added = changes.filter(ch => ch.type === 'new');
+  const removed = changes.filter(ch => ch.type === 'removed');
+  let summary = summaryFromChangeType.removed;
+  if (removed.length) {
+    execSummaryFromChangeType.removed = `${removed.length} removed exports`;
+    if (summary.length) { summary.push(''); }
+    let last;
+    const longest = removed.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
+    removed.forEach(ch => {
+      if (last && ch.ns !== last.ns) { summary.push(''); }
+      const cindent = ' '.repeat(longest - ch.k.length + 1);
+
+      const prevVRepr = ch.prevV.includes('_VALUE_') ? JSON.stringify(ch.prevV) : ch.prevV;
+      summary.push(`${ch.k}${cindent}// ${prevVRepr}`);
+
+      last = ch;
+    });
+  }
+
+  const changed = changes.filter(ch => ch.type === 'changed');
+  summary = summaryFromChangeType.changed;
+  if (changed.length) {
+    execSummaryFromChangeType.changed = `${changed.length} exported values changed`;
+    if (summary.length) { summary.push(''); }
+    let last;
+    const longest = changed.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
+    changed.forEach(ch => {
+      if (last && ch.ns !== last.ns) { summary.push(''); }
+      const cindent = ' '.repeat(longest - ch.k.length + 1);
+
+      const prevVRepr = ch.prevV.includes('_VALUE_') ? JSON.stringify(ch.prevV) : ch.prevV;
+      const vRepr = ch.k.includes('_VALUE_') ? JSON.stringify(ch.v) : ch.v;
+      summary.push(`${ch.k}${cindent}// ${prevVRepr} -> ${vRepr}`);
+
+      last = ch;
+    });
+  }
+
+  const deprecated = changes.filter(ch => ch.type === 'deprecated');
+  summary = summaryFromChangeType.deprecated;
+  if (deprecated.length) {
+    execSummaryFromChangeType.deprecated = `${deprecated.length} newly deprecated exports`;
+    if (summary.length) { summary.push(''); }
+    let last;
+    const longest = deprecated.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
+    deprecated.forEach(ch => {
+      if (last && ch.ns !== last.ns) { summary.push(''); }
+      const cindent = ' '.repeat(longest - ch.k.length + 1);
+
+      if (typeof ch.deprecatedResult === 'string') {
+        summary.push(`${ch.k}${cindent}// ${ch.deprecatedResult}`);
+      } else {
+        summary.push(ch.k)
+      }
+
+      last = ch;
+    });
+  }
+
+  const added = changes.filter(ch => ch.type === 'added');
+  summary = summaryFromChangeType.added;
   if (added.length) {
-    execSummary.push(`${added.length} added`);
-    summary.push(`// Added (${added.length})`);
+    execSummaryFromChangeType.added = `${added.length} added exports`;
     let last, lastAttr;
     const longest = added.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
     added.forEach(ch => {
@@ -149,68 +218,11 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
     });
   }
 
-  const changed = changes.filter(ch => ch.type === 'changed');
-  if (changed.length) {
-    execSummary.push(`${changed.length} changed value`);
-    if (summary.length) { summary.push(''); }
-    summary.push(`// Changed (${changed.length})`);
-    let last;
-    const longest = changed.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
-    changed.forEach(ch => {
-      if (last && ch.ns !== last.ns) { summary.push(''); }
-      const cindent = ' '.repeat(longest - ch.k.length + 1);
-
-      const prevVRepr = ch.prevV.includes('_VALUE_') ? JSON.stringify(ch.prevV) : ch.prevV;
-      const vRepr = ch.k.includes('_VALUE_') ? JSON.stringify(ch.v) : ch.v;
-      summary.push(`${ch.k}${cindent}// ${prevVRepr} -> ${vRepr}`);
-
-      last = ch;
-    });
-  }
-
-  const deprecated = changes.filter(ch => ch.type === 'deprecated');
-  if (deprecated.length) {
-    execSummary.push(`${deprecated.length} newly deprecated`);
-    if (summary.length) { summary.push(''); }
-    summary.push(`// Deprecated (${deprecated.length})`);
-    let last;
-    const longest = deprecated.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
-    deprecated.forEach(ch => {
-      if (last && ch.ns !== last.ns) { summary.push(''); }
-      const cindent = ' '.repeat(longest - ch.k.length + 1);
-
-      if (typeof ch.deprecatedResult === 'string') {
-        summary.push(`${ch.k}${cindent}// ${ch.deprecatedResult}`);
-      } else {
-        summary.push(ch.k)
-      }
-
-      last = ch;
-    });
-  }
-
-  const removed = changes.filter(ch => ch.type === 'removed');
-  if (removed.length) {
-    execSummary.push(`${removed.length} removed`);
-    if (summary.length) { summary.push(''); }
-    summary.push(`// Removed (${removed.length})`);
-    let last;
-    const longest = removed.reduce((acc, ch) => Math.max(acc, ch.k.length), 0);
-    removed.forEach(ch => {
-      if (last && ch.ns !== last.ns) { summary.push(''); }
-      const cindent = ' '.repeat(longest - ch.k.length + 1);
-
-      const prevVRepr = ch.prevV.includes('_VALUE_') ? JSON.stringify(ch.prevV) : ch.prevV;
-      summary.push(`${ch.k}${cindent}// ${prevVRepr}`);
-
-      last = ch;
-    });
-  }
-  if (execSummary.length === 0) {
-    execSummary.push('*none*');
-  }
-
-  return [execSummary, summary];
+  return {
+    haveChanges,
+    execSummaryFromChangeType,
+    summaryFromChangeType
+  };
 }
 
 
@@ -238,7 +250,7 @@ function semconvChangelogGen() {
   execSync(`curl -sf -o - ${pkgInfo.dist.tarball} | tar xzf -`, { cwd: TMP_DIR });
 
   console.log(`Comparing exports to "${scDir}"`)
-  const [stableExecSummary, stableSummary] = summarizeChanges({
+  const stableChInfo = summarizeChanges({
     // require('.../build/src/stable_*.js') from previous and current.
     prev: Object.assign(...globSync(path.join(TMP_DIR, 'package/build/src/stable_*.js')).map(require)),
     curr: Object.assign(...globSync(path.join(scDir, 'build/src/stable_*.js')).map(require)),
@@ -250,7 +262,7 @@ function semconvChangelogGen() {
       .map(f => fs.readFileSync(f, 'utf8'))
       .join('\n\n'),
   });
-  const [unstableExecSummary, unstableSummary] = summarizeChanges({
+  const unstableChInfo = summarizeChanges({
     prev: Object.assign(...globSync(path.join(TMP_DIR, 'package/build/src/experimental_*.js')).map(require)),
     curr: Object.assign(...globSync(path.join(scDir, 'build/src/experimental_*.js')).map(require)),
     prevSrc: globSync(path.join(TMP_DIR, 'package/build/esnext/experimental_*.js'))
@@ -261,38 +273,61 @@ function semconvChangelogGen() {
       .join('\n\n'),
   });
 
+  // Render the "change info" into a Markdown summary for the changelog.
+  const changeTypes = ['removed', 'changed', 'deprecated', 'added'];
+  let execSummaryFromChInfo = (chInfo) => {
+    const parts = changeTypes
+      .map(chType => chInfo.execSummaryFromChangeType[chType])
+      .filter(s => typeof(s) === 'string');
+    if (parts.length) {
+      return parts.join(', ');
+    } else {
+      return 'none';
+    }
+  }
   const changelogEntry = [`
 * feat: update semantic conventions to ${specVer} [#NNNN]
   * Semantic Conventions ${specVer}:
     [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#${slugify(specVer)}) |
     [latest docs](https://opentelemetry.io/docs/specs/semconv/)
-  * \`@opentelemetry/semantic-conventions\` (stable) export changes: ${stableExecSummary.join(', ')}
-  * \`@opentelemetry/semantic-conventions/incubating\` (unstable) export changes: ${unstableExecSummary.join(', ')}
+  * \`@opentelemetry/semantic-conventions\` (stable) changes: *${execSummaryFromChInfo(stableChInfo)}*
+  * \`@opentelemetry/semantic-conventions/incubating\` (unstable) changes: *${execSummaryFromChInfo(unstableChInfo)}*
 `];
 
-  if (stableSummary.length) {
-    changelogEntry.push('');
-    changelogEntry.push(`##### Stable changes ${specVer}\n`);
-    changelogEntry.push('```js');
-    changelogEntry.push(stableSummary.join('\n'));
-    changelogEntry.push('```');
-  }
-
-  if (unstableSummary.length) {
-    if (stableSummary.length) {
-      changelogEntry.push('');
-    }
-    changelogEntry.push(`#### Unstable changes ${specVer}`);
-    changelogEntry.push(`
-<details>
-<summary>Full unstable changes</summary>
+  if (stableChInfo.haveChanges) {
+    changelogEntry.push(`#### Stable changes in ${specVer}\n`);
+    for (let changeType of changeTypes) {
+      const summary = stableChInfo.summaryFromChangeType[changeType];
+      if (summary.length) {
+        changelogEntry.push(`<details open>
+<summary>${stableChInfo.execSummaryFromChangeType[changeType]}</summary>
 
 \`\`\`js
-${unstableSummary.join('\n')}
+${summary.join('\n')}
 \`\`\`
 
 </details>
 `);
+      }
+    }
+  }
+
+  if (unstableChInfo.haveChanges) {
+    changelogEntry.push(`#### Unstable changes in ${specVer}\n`);
+    for (let changeType of changeTypes) {
+      const summary = unstableChInfo.summaryFromChangeType[changeType];
+      if (summary.length) {
+        changelogEntry.push(`<details>
+<summary>${unstableChInfo.execSummaryFromChangeType[changeType]}</summary>
+
+\`\`\`js
+${summary.join('\n')}
+\`\`\`
+
+</details>
+`);
+      }
+    }
   }
 
   return changelogEntry.join('\n');
