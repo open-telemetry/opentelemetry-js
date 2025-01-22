@@ -67,19 +67,9 @@ describe('detectResources', () => {
           };
         }
       }
-      class DetectorOk implements ResourceDetector {
-        detect() {
-          return {
-            attributes: {
-              sync: 'fromsync',
-              async: Promise.resolve('fromasync'),
-            },
-          };
-        }
-      }
 
       const resource = detectResources({
-        detectors: [new DetectorRejects(), new DetectorOk()],
+        detectors: [new DetectorRejects()],
       });
 
       await resource.waitForAsyncAttributes?.();

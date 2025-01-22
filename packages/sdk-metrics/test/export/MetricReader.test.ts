@@ -168,8 +168,8 @@ describe('MetricReader', () => {
       assert.strictEqual(collectionResult.errors.length, 0);
       // Should keep the SDK's Resource only
       assert.deepStrictEqual(
-        collectionResult.resourceMetrics.resource,
-        defaultResource
+        collectionResult.resourceMetrics.resource.attributes,
+        defaultResource.attributes
       );
       assert.strictEqual(
         collectionResult.resourceMetrics.scopeMetrics.length,

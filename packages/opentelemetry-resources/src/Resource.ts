@@ -26,7 +26,6 @@ import { IResource } from './IResource';
 import { defaultServiceName } from './platform';
 import {
   DetectedResource,
-  DetectedResourceAttributes,
   MaybePromise,
 } from './types';
 import { isPromiseLike } from './utils';
@@ -50,6 +49,13 @@ export class Resource implements IResource {
         [ATTR_TELEMETRY_SDK_VERSION]: SDK_INFO[ATTR_TELEMETRY_SDK_VERSION],
       },
     });
+  }
+
+  static FromAttributeList(attributes: [string, MaybePromise<AttributeValue | undefined>][]): Resource {
+    const res = new Resource({});
+    res._rawAttributes = attributes;
+    res._asyncAttributesPending = attributes.filter(([_,val]) => isPromiseLike(val)).length > 0
+    return res;
   }
 
   constructor(
@@ -106,6 +112,7 @@ export class Resource implements IResource {
 
     const attrs: Attributes = {};
     for (const [k, v] of this._rawAttributes) {
+      console.log(k,v)
       if (isPromiseLike(v)) {
         diag.debug(`Unsettled resource attribute ${k} skipped`);
         continue;
@@ -126,14 +133,16 @@ export class Resource implements IResource {
   public merge(resource: Resource | null) {
     if (resource == null) return this;
 
-    // incoming attributes have a lower priority
-    const attributes: DetectedResourceAttributes = {};
-    for (const [k, v] of [...this._rawAttributes, ...resource._rawAttributes]) {
-      if (v != null) {
-        attributes[k] ??= v;
-      }
-    }
+    // incoming attributes have a higher priority
+    // const attributes: DetectedResourceAttributes = {};
+    // for (const [k, v] of [...resource._rawAttributes, ...this._rawAttributes]) {
+    //   if (v != null) {
+    //     attributes[k] ??= v;
+    //   }
+    // }
 
-    return new Resource({ attributes });
+    // return new Resource({ attributes });
+
+    return Resource.FromAttributeList([...resource._rawAttributes, ...this._rawAttributes]);
   }
 }
