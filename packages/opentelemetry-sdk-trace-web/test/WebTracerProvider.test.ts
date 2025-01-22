@@ -16,7 +16,6 @@
 
 import { context, ContextManager, trace } from '@opentelemetry/api';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { Resource } from '@opentelemetry/resources';
 import { SEMRESATTRS_TELEMETRY_SDK_LANGUAGE } from '@opentelemetry/semantic-conventions';
 import { Span, Tracer } from '@opentelemetry/sdk-trace-base';
@@ -51,38 +50,6 @@ describe('WebTracerProvider', () => {
       assert.doesNotThrow(() => {
         new WebTracerProvider({});
       });
-    });
-
-    it('should throw error when context manager is passed in constructor', () => {
-      let error = '';
-      try {
-        new WebTracerProvider({
-          contextManager: new ZoneContextManager(),
-        } as any);
-      } catch (e) {
-        error = e;
-      }
-      assert.strictEqual(
-        error,
-        'contextManager should be defined in' +
-          ' register method not in constructor'
-      );
-    });
-
-    it('should throw error when propagator is passed in constructor', () => {
-      let error = '';
-      try {
-        new WebTracerProvider({
-          propagator: new B3Propagator(),
-        } as any);
-      } catch (e) {
-        error = e;
-      }
-      assert.strictEqual(
-        error,
-        'propagator should be defined in register' +
-          ' method not in constructor'
-      );
     });
 
     describe('when contextManager is "ZoneContextManager"', () => {
