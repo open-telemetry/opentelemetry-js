@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-export {
-  browserDetector,
-} from './BrowserDetector';
+export { browserDetector } from './BrowserDetector';
 export { envDetector } from './EnvDetector';
 export {
   hostDetector,
@@ -24,4 +22,4 @@ export {
   processDetector,
   serviceInstanceIdDetector,
 } from './platform';
-export { noopDetector } from "./NoopDetector";
+export { noopDetector } from './NoopDetector';

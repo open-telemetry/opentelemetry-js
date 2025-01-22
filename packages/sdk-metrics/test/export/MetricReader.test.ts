@@ -143,7 +143,7 @@ describe('MetricReader', () => {
           resource: new Resource({
             attributes: {
               shouldBeDiscarded: 'should-be-discarded',
-            }
+            },
           }),
           scopeMetrics: testScopeMetrics,
         },

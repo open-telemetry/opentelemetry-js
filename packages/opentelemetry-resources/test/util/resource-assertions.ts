@@ -411,7 +411,10 @@ export const assertEmptyResource = (resource: DetectedResource) => {
  * Assert that the `resource` has at least one known attribute with the given
  * `prefix`. By "known", we mean it is an attribute defined in semconv.
  */
-const assertHasOneLabel = (prefix: string, resource: DetectedResource): void => {
+const assertHasOneLabel = (
+  prefix: string,
+  resource: DetectedResource
+): void => {
   const semconvModPrefix = `SEMRESATTRS_${prefix.toUpperCase()}_`;
   const knownAttrs: Set<string> = new Set(
     Object.entries(semconv)

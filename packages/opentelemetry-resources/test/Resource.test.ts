@@ -61,7 +61,10 @@ describe('Resource', () => {
     });
     const actualResource = resource1.merge(resource2);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 5);
-    assert.deepStrictEqual(actualResource.attributes, expectedResource.attributes);
+    assert.deepStrictEqual(
+      actualResource.attributes,
+      expectedResource.attributes
+    );
   });
 
   it('should return merged resource when collision in attributes', () => {
@@ -75,7 +78,10 @@ describe('Resource', () => {
     });
     const actualResource = resource1.merge(resource3);
     assert.strictEqual(Object.keys(actualResource.attributes).length, 4);
-    assert.deepStrictEqual(actualResource.attributes, expectedResource.attributes);
+    assert.deepStrictEqual(
+      actualResource.attributes,
+      expectedResource.attributes
+    );
   });
 
   it('should return merged resource when first resource is empty', () => {
@@ -152,7 +158,9 @@ describe('Resource', () => {
       const resourceReject = new Resource({
         attributes: {
           async: new Promise((_, reject) => {
-            setTimeout(() => { reject(new Error('reject')) }, 1);
+            setTimeout(() => {
+              reject(new Error('reject'));
+            }, 1);
           }),
         },
       });
@@ -169,7 +177,9 @@ describe('Resource', () => {
         attributes: {
           sync: 'fromsync',
           // async attribute resolves after 1ms
-          async: new Promise(resolve => setTimeout(() => resolve('fromasync'), 1)),
+          async: new Promise(resolve =>
+            setTimeout(() => resolve('fromasync'), 1)
+          ),
         },
       });
 

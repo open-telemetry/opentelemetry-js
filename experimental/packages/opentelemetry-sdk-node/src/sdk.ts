@@ -344,9 +344,7 @@ export class NodeSDK {
         detectors: this._resourceDetectors,
       };
 
-      this._resource = this._resource.merge(
-        detectResources(internalConfig)
-      );
+      this._resource = this._resource.merge(detectResources(internalConfig));
     }
 
     this._resource =

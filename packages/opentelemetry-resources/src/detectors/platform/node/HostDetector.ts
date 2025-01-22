@@ -21,7 +21,11 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { arch, hostname } from 'os';
 import { ResourceDetectionConfig } from '../../../config';
-import { DetectedResource, DetectedResourceAttributes, ResourceDetector } from '../../../types';
+import {
+  DetectedResource,
+  DetectedResourceAttributes,
+  ResourceDetector,
+} from '../../../types';
 import { getMachineId } from './machine-id/getMachineId';
 import { normalizeArch } from './utils';
 
