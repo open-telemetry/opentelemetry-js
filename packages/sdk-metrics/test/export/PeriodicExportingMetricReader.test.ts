@@ -172,6 +172,7 @@ describe('PeriodicExportingMetricReader', () => {
       merge: sinon.stub(),
       asyncAttributesPending: true, // ensure we try to await async attributes
       waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
+      getRawAttributes: () => [],
     },
     scopeMetrics: scopeMetrics,
   };
@@ -383,6 +384,7 @@ describe('PeriodicExportingMetricReader', () => {
           merge: sinon.stub(),
           asyncAttributesPending: true, // ensure we try to await async attributes
           waitForAsyncAttributes: waitForAsyncAttributesStub, // resolve when awaited
+          getRawAttributes: () => [],
         },
         scopeMetrics: scopeMetrics,
       };
@@ -428,6 +430,7 @@ describe('PeriodicExportingMetricReader', () => {
           merge: sinon.stub(),
           asyncAttributesPending: true, // ensure we try to await async attributes
           waitForAsyncAttributes: waitForAsyncAttributesStub, // reject when awaited
+          getRawAttributes: () => [],
         },
         scopeMetrics: [],
       };
