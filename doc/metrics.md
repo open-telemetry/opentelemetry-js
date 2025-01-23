@@ -545,7 +545,7 @@ const exporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({
   readers: [
     new PeriodicExportingMetricReader({
-      exporter: metricExporter,
+      exporter,
       exportIntervalMillis: 1000,
     }),
   ],
