@@ -54,7 +54,7 @@ import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exp
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import {
   MeterProvider,
-  MetricReader,
+  IMetricReader,
   ViewOptions,
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
@@ -82,7 +82,7 @@ export type MeterProviderConfig = {
   /**
    * Reference to the MetricReader instance by the NodeSDK
    */
-  reader?: MetricReader;
+  reader?: IMetricReader;
   /**
    * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
@@ -107,8 +107,8 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  *
  * @returns MetricReader[] if appropriate environment variables are configured
  */
-function configureMetricProviderFromEnv(): MetricReader[] {
-  const metricReaders: MetricReader[] = [];
+function configureMetricProviderFromEnv(): IMetricReader[] {
+  const metricReaders: IMetricReader[] = [];
   const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
   if (!metricsExporterList) {
     return metricReaders;
@@ -395,16 +395,16 @@ export class NodeSDK {
       logs.setGlobalLoggerProvider(loggerProvider);
     }
 
-    const metricReadersFromEnv: MetricReader[] =
+    const metricReadersFromEnv: IMetricReader[] =
       configureMetricProviderFromEnv();
     if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
-      const readers: MetricReader[] = [];
+      const readers: IMetricReader[] = [];
       if (this._meterProviderConfig?.reader) {
         readers.push(this._meterProviderConfig.reader);
       }
 
       if (readers.length === 0) {
-        metricReadersFromEnv.forEach((r: MetricReader) => readers.push(r));
+        metricReadersFromEnv.forEach((r: IMetricReader) => readers.push(r));
       }
 
       const meterProvider = new MeterProvider({
