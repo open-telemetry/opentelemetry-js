@@ -33,17 +33,15 @@ import { getMachineId } from './machine-id/getMachineId';
  */
 class HostDetectorSync implements DetectorSync {
   detect(_config?: ResourceDetectionConfig): Resource {
-    const attributes: Attributes = {
-      [SEMRESATTRS_HOST_NAME]: hostname(),
-      [SEMRESATTRS_HOST_ARCH]: normalizeArch(arch()),
-    };
-
-    return new Resource(attributes, this._getAsyncAttributes());
+    return new Resource(this._getAttributes())
   }
 
-  private _getAsyncAttributes(): Promise<Attributes> {
+  private _getAttributes(): Promise<Attributes> {
     return getMachineId().then(machineId => {
-      const attributes: Attributes = {};
+      const attributes: Attributes = {
+        [SEMRESATTRS_HOST_NAME]: hostname(),
+        [SEMRESATTRS_HOST_ARCH]: normalizeArch(arch()),
+      };
       if (machineId) {
         attributes[SEMRESATTRS_HOST_ID] = machineId;
       }

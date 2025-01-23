@@ -18,13 +18,6 @@ import { ResourceDetectionConfig } from './config';
 import { IResource } from './IResource';
 
 /**
- * @deprecated please use {@link DetectorSync}
- */
-export interface Detector {
-  detect(config?: ResourceDetectionConfig): Promise<IResource>;
-}
-
-/**
  * Interface for a synchronous Resource Detector. In order to detect attributes asynchronously, a detector
  * can pass a Promise as the second parameter to the Resource constructor.
  */

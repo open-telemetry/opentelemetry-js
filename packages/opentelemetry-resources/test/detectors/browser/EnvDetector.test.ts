@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { RAW_ENVIRONMENT } from '@opentelemetry/core';
-import { envDetector, IResource } from '../../../src';
+import { envDetectorSync } from '../../../src';
 import {
   assertEmptyResource,
   assertWebEngineResource,
@@ -38,13 +38,14 @@ describeBrowser('envDetector() on web browser', () => {
     });
 
     it('should return resource information from environment variable', async () => {
-      const resource: IResource = await envDetector.detect();
-      assertWebEngineResource(resource, {
+      const resource = await envDetectorSync.detect();
+      const attribs = await resource.attributes;
+      assertWebEngineResource(attribs, {
         name: 'chromium',
         version: '99',
         description: 'Chromium',
       });
-      assert.strictEqual(resource.attributes['custom.key'], 'custom value');
+      assert.strictEqual(attribs['custom.key'], 'custom value');
     });
   });
 
@@ -65,8 +66,9 @@ describeBrowser('envDetector() on web browser', () => {
         });
 
         it('should return empty resource', async () => {
-          const resource: IResource = await envDetector.detect();
-          assertEmptyResource(resource);
+          const resource = await envDetectorSync.detect();
+          const attribs = await resource.attributes;
+          assertEmptyResource(attribs);
         });
       });
     }
@@ -74,15 +76,15 @@ describeBrowser('envDetector() on web browser', () => {
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: IResource = await envDetector.detect();
-      assertEmptyResource(resource);
+      const resource = await envDetectorSync.detect();
+      assertEmptyResource(await resource.attributes);
     });
   });
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: IResource = await envDetector.detect();
-      assertEmptyResource(resource);
+      const resource = await envDetectorSync.detect();
+      assertEmptyResource(await resource.attributes);
     });
   });
 });
