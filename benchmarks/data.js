@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1737675441332,
+  "lastUpdate": 1737675539741,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -23922,6 +23922,58 @@ window.BENCHMARK_DATA = {
             "name": "BatchSpanProcessor process span",
             "value": 760977,
             "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "neil.fordyce@skyscanner.net",
+            "name": "Neil Fordyce",
+            "username": "neilfordyce"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0ae25f191ea4ad2509ced1488b7a13c68b7f5bca",
+          "message": "feat(sdk-trace-base): add stack trace to operation on ended Span warning (#5363)\n\nCo-authored-by: Victor <Zeusvictor88@gmail.com>",
+          "timestamp": "2025-01-23T20:15:04Z",
+          "tree_id": "4ed089125f9de36749806b99c9cc290b235428da",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/0ae25f191ea4ad2509ced1488b7a13c68b7f5bca"
+        },
+        "date": 1737675538892,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1463760,
+            "range": "±0.50%",
+            "unit": "ops/sec",
+            "extra": "97 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16761,
+            "range": "±0.32%",
+            "unit": "ops/sec",
+            "extra": "94 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 823497,
+            "range": "±0.43%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 783183,
+            "range": "±0.45%",
             "unit": "ops/sec",
             "extra": "92 samples"
           }
