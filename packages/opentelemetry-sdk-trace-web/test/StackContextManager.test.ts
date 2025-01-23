@@ -34,11 +34,11 @@ describe('StackContextManager', () => {
   describe('.enable()', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
-        assert(
+        assert.ok(
           contextManager.enable() === contextManager,
           'should return this'
         );
-        assert(
+        assert.ok(
           contextManager.active() === ROOT_CONTEXT,
           'should have root context'
         );
@@ -49,11 +49,11 @@ describe('StackContextManager', () => {
   describe('.disable()', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
-        assert(
+        assert.ok(
           contextManager.disable() === contextManager,
           'should return this'
         );
-        assert(
+        assert.ok(
           contextManager.active() === ROOT_CONTEXT,
           'should have no context'
         );

@@ -43,12 +43,12 @@ describe('MeterProvider', () => {
   describe('constructor', () => {
     it('should construct without exceptions', () => {
       const meterProvider = new MeterProvider();
-      assert(meterProvider instanceof MeterProvider);
+      assert.ok(meterProvider instanceof MeterProvider);
     });
 
     it('construct with resource', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
-      assert(meterProvider instanceof MeterProvider);
+      assert.ok(meterProvider instanceof MeterProvider);
     });
 
     it('should use default resource when no resource is passed', async function () {
@@ -108,7 +108,7 @@ describe('MeterProvider', () => {
     it('should get a meter', () => {
       const meterProvider = new MeterProvider();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
-      assert(meter instanceof Meter);
+      assert.ok(meter instanceof Meter);
     });
 
     it('should get an identical meter on duplicated calls', () => {

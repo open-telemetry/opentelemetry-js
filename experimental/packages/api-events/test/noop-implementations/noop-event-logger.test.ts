@@ -21,7 +21,7 @@ import { NoopEventLoggerProvider } from '../../src/NoopEventLoggerProvider';
 describe('NoopEventLogger', () => {
   it('constructor should not crash', () => {
     const logger = new NoopEventLoggerProvider().getEventLogger('test-noop');
-    assert(logger instanceof NoopEventLogger);
+    assert.ok(logger instanceof NoopEventLogger);
   });
 
   it('calling emit should not crash', () => {

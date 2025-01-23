@@ -66,6 +66,7 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * refactor(sdk-trace-base): remove `BasicTracerProvider._registeredSpanProcessors` private property. [#5134](https://github.com/open-telemetry/opentelemetry-js/pull/5134) @david-luna
 * refactor(sdk-trace-base): rename `BasicTracerProvider.activeSpanProcessor` private property. [#5211](https://github.com/open-telemetry/opentelemetry-js/pull/5211) @david-luna
 * chore(selenium-tests): remove internal selenium-tests/ package, it wasn't being used @trentm
+* chore: update typescript `module` compiler option to `node16`. [#5347](https://github.com/open-telemetry/opentelemetry-js/pull/5347) @david-luna
 
 ## 1.30.0
 

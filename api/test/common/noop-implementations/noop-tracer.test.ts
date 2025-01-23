@@ -59,9 +59,9 @@ describe('NoopTracer', () => {
       {},
       trace.setSpanContext(context.active(), parent)
     );
-    assert(span.spanContext().traceId === parent.traceId);
-    assert(span.spanContext().spanId === parent.spanId);
-    assert(span.spanContext().traceFlags === parent.traceFlags);
+    assert.ok(span.spanContext().traceId === parent.traceId);
+    assert.ok(span.spanContext().spanId === parent.spanId);
+    assert.ok(span.spanContext().traceFlags === parent.traceFlags);
   });
 
   it('should propagate valid spanContext on the span (from current context)', () => {
@@ -76,9 +76,9 @@ describe('NoopTracer', () => {
     const activeStub = sinon.stub(context, 'active');
     activeStub.returns(ctx);
     const span = tracer.startSpan('test-1');
-    assert(span.spanContext().traceId === parent.traceId);
-    assert(span.spanContext().spanId === parent.spanId);
-    assert(span.spanContext().traceFlags === parent.traceFlags);
+    assert.ok(span.spanContext().traceId === parent.traceId);
+    assert.ok(span.spanContext().spanId === parent.spanId);
+    assert.ok(span.spanContext().traceFlags === parent.traceFlags);
   });
 
   it('should accept 2 to 4 args and start an active span', () => {

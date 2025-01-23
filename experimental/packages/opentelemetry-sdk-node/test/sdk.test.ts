@@ -265,7 +265,7 @@ describe('Node SDK', () => {
 
       const spanProcessor = nodeTracerProvider['_activeSpanProcessor'] as any;
 
-      assert(
+      assert.ok(
         spanProcessor.constructor.name === 'MultiSpanProcessor',
         'is MultiSpanProcessor'
       );
@@ -274,13 +274,13 @@ describe('Node SDK', () => {
         '_spanProcessors'
       ] as SpanProcessor[];
 
-      assert(
+      assert.ok(
         listOfProcessors.length === 3,
         'it has the right amount of processors'
       );
-      assert(listOfProcessors[0] instanceof NoopSpanProcessor);
-      assert(listOfProcessors[1] instanceof SimpleSpanProcessor);
-      assert(listOfProcessors[2] instanceof BatchSpanProcessor);
+      assert.ok(listOfProcessors[0] instanceof NoopSpanProcessor);
+      assert.ok(listOfProcessors[1] instanceof SimpleSpanProcessor);
+      assert.ok(listOfProcessors[2] instanceof BatchSpanProcessor);
       await sdk.shutdown();
     });
 
@@ -380,20 +380,20 @@ describe('Node SDK', () => {
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
-      assert(sharedState.registeredLogRecordProcessors.length === 2);
-      assert(
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           InMemoryLogRecordExporter
       );
-      assert(
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0] instanceof
           SimpleLogRecordProcessor
       );
-      assert(
+      assert.ok(
         sharedState.registeredLogRecordProcessors[1]._exporter instanceof
           InMemoryLogRecordExporter
       );
-      assert(
+      assert.ok(
         sharedState.registeredLogRecordProcessors[1] instanceof
           BatchLogRecordProcessor
       );
@@ -1004,7 +1004,7 @@ describe('Node SDK', () => {
       sdk.start();
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPProtoLogExporter
       );
@@ -1019,21 +1019,21 @@ describe('Node SDK', () => {
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
-      assert(sharedState.registeredLogRecordProcessors.length === 2);
-      assert(
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 2);
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           ConsoleLogRecordExporter
       );
-      assert(
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0] instanceof
           SimpleLogRecordProcessor
       );
       // defaults to http/protobuf
-      assert(
+      assert.ok(
         sharedState.registeredLogRecordProcessors[1]._exporter instanceof
           OTLPProtoLogExporter
       );
-      assert(
+      assert.ok(
         sharedState.registeredLogRecordProcessors[1] instanceof
           BatchLogRecordProcessor
       );
@@ -1049,8 +1049,8 @@ describe('Node SDK', () => {
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
-      assert(sharedState.registeredLogRecordProcessors.length === 1);
-      assert(
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPGrpcLogExporter
       );
@@ -1066,8 +1066,8 @@ describe('Node SDK', () => {
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
-      assert(sharedState.registeredLogRecordProcessors.length === 1);
-      assert(
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPHttpLogExporter
       );
@@ -1083,8 +1083,8 @@ describe('Node SDK', () => {
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
-      assert(sharedState.registeredLogRecordProcessors.length === 1);
-      assert(
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPGrpcLogExporter
       );
@@ -1100,8 +1100,8 @@ describe('Node SDK', () => {
 
       const loggerProvider = logs.getLoggerProvider();
       const sharedState = (loggerProvider as any)['_sharedState'];
-      assert(sharedState.registeredLogRecordProcessors.length === 1);
-      assert(
+      assert.ok(sharedState.registeredLogRecordProcessors.length === 1);
+      assert.ok(
         sharedState.registeredLogRecordProcessors[0]._exporter instanceof
           OTLPProtoLogExporter
       );
@@ -1148,7 +1148,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           ConsoleMetricExporter
       );
@@ -1170,7 +1170,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPGrpcMetricExporter
       );
@@ -1192,7 +1192,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
       );
@@ -1214,7 +1214,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPHttpMetricExporter
       );
@@ -1236,7 +1236,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPGrpcMetricExporter
       );
@@ -1258,7 +1258,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
       );
@@ -1280,7 +1280,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
       );
@@ -1305,7 +1305,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader._exporter instanceof
           OTLPProtoMetricExporter
       );
@@ -1329,7 +1329,7 @@ describe('Node SDK', () => {
       sdk.start();
       const meterProvider = metrics.getMeterProvider();
       const sharedState = (meterProvider as any)['_sharedState'];
-      assert(
+      assert.ok(
         sharedState.metricCollectors[0]._metricReader instanceof
           PrometheusMetricExporter
       );
@@ -1344,11 +1344,11 @@ describe('setup exporter from env', () => {
   const getSdkSpanProcessors = (sdk: NodeSDK) => {
     const tracerProvider = sdk['_tracerProvider'];
 
-    assert(tracerProvider instanceof NodeTracerProvider);
+    assert.ok(tracerProvider instanceof NodeTracerProvider);
 
     const activeSpanProcessor = tracerProvider['_activeSpanProcessor'];
 
-    assert(activeSpanProcessor.constructor.name === 'MultiSpanProcessor');
+    assert.ok(activeSpanProcessor.constructor.name === 'MultiSpanProcessor');
 
     return (activeSpanProcessor as any)['_spanProcessors'] as SpanProcessor[];
   };
@@ -1365,9 +1365,11 @@ describe('setup exporter from env', () => {
     sdk.start();
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     await sdk.shutdown();
   });
 
@@ -1379,9 +1381,9 @@ describe('setup exporter from env', () => {
     sdk.start();
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     await sdk.shutdown();
   });
 
@@ -1394,9 +1396,9 @@ describe('setup exporter from env', () => {
     sdk.start();
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     await sdk.shutdown();
   });
 
@@ -1409,9 +1411,9 @@ describe('setup exporter from env', () => {
     sdk.start();
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof OTLPTraceExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof OTLPTraceExporter);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
@@ -1428,8 +1430,8 @@ describe('setup exporter from env', () => {
       sdk['_tracerProvider']!['_config']?.sampler instanceof AlwaysOffSampler
     );
     assert.strictEqual(listOfProcessors.length, 1);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
@@ -1441,9 +1443,11 @@ describe('setup exporter from env', () => {
     sdk.start();
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
@@ -1457,9 +1461,11 @@ describe('setup exporter from env', () => {
     sdk.start();
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
@@ -1477,8 +1483,8 @@ describe('setup exporter from env', () => {
     );
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
-
     assert.strictEqual(listOfProcessors.length, 0);
+
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
@@ -1490,9 +1496,11 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     env.OTEL_TRACES_EXPORTER = '';
     await sdk.shutdown();
   });
@@ -1510,9 +1518,11 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
 
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
@@ -1545,9 +1555,9 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
 
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
@@ -1562,11 +1572,13 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 2);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
-    assert(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter);
+    assert.ok(listOfProcessors.length === 2);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
 
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
@@ -1581,9 +1593,9 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof JaegerExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof JaegerExporter);
 
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
@@ -1598,11 +1610,13 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 2);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter);
-    assert(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[1]['_exporter'] instanceof JaegerExporter);
+    assert.ok(listOfProcessors.length === 2);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[0]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[1]['_exporter'] instanceof JaegerExporter);
 
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
@@ -1617,13 +1631,15 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 3);
-    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
-    assert(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter);
-    assert(listOfProcessors[2] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[2]['_exporter'] instanceof JaegerExporter);
+    assert.ok(listOfProcessors.length === 3);
+    assert.ok(listOfProcessors[0] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ZipkinExporter);
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPGrpcTraceExporter
+    );
+    assert.ok(listOfProcessors[2] instanceof BatchSpanProcessor);
+    assert.ok(listOfProcessors[2]['_exporter'] instanceof JaegerExporter);
 
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
@@ -1637,11 +1653,13 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 2);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
-    assert(listOfProcessors[1] instanceof BatchSpanProcessor);
-    assert(listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter);
+    assert.ok(listOfProcessors.length === 2);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    assert.ok(listOfProcessors[1] instanceof BatchSpanProcessor);
+    assert.ok(
+      listOfProcessors[1]['_exporter'] instanceof OTLPProtoTraceExporter
+    );
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
@@ -1653,9 +1671,9 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
@@ -1668,9 +1686,9 @@ describe('setup exporter from env', () => {
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
 
-    assert(listOfProcessors.length === 1);
-    assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
-    assert(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
+    assert.ok(listOfProcessors.length === 1);
+    assert.ok(listOfProcessors[0] instanceof SimpleSpanProcessor);
+    assert.ok(listOfProcessors[0]['_exporter'] instanceof ConsoleSpanExporter);
     delete env.OTEL_TRACES_EXPORTER;
     delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     await sdk.shutdown();
