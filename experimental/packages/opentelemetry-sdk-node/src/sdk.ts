@@ -116,7 +116,7 @@ function configureMetricProviderFromEnv(): IMetricReader[] {
   const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
 
   if (enabledExporters.length === 0) {
-    diag.info('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
   }
 
   if (enabledExporters.includes('none')) {
@@ -449,7 +449,7 @@ export class NodeSDK {
     const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
 
     if (enabledExporters.length === 0) {
-      diag.info('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
+      diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
       enabledExporters.push('otlp');
     }
 
