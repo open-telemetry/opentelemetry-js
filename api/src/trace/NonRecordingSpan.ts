@@ -49,7 +49,13 @@ export class NonRecordingSpan implements Span {
   }
 
   // By default does nothing
-  addEvent(_name: string, _attributes?: SpanAttributes): this {
+  addEvent(name: string, startTime?: TimeInput): this;
+  addEvent(
+    name: string,
+    attributes: SpanAttributes | undefined,
+    startTime?: TimeInput
+  ): this;
+  addEvent(): this {
     return this;
   }
 
