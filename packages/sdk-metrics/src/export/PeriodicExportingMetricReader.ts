@@ -135,6 +135,10 @@ export class PeriodicExportingMetricReader extends MetricReader {
       }
     }
 
+    if (resourceMetrics.scopeMetrics.length === 0) {
+      return;
+    }
+
     const result = await internal._export(this._exporter, resourceMetrics);
     if (result.code !== ExportResultCode.SUCCESS) {
       throw new Error(

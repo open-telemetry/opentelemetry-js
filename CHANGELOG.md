@@ -29,6 +29,12 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * feat(sdk-metrics)!: extract `IMetricReader` interface and use it over abstract class [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
   * (user-facing): `MeterProviderOptions` now provides the more general `IMetricReader` type over `MetricReader`
   * If you accept `MetricReader` in your public interface, consider accepting the more general `IMetricReader` instead to avoid unintentional breaking changes
+* feat(sdk-trace)!: remove ability to have BasicTracerProvider instantiate exporters [#5239](https://github.com/open-telemetry/opentelemetry-js/pull/5239) @pichlermarc
+  * When extending `BasicTracerProvider`, the class offered multiple methods to facilitate the creation of exporters and auto-pairing with `SpanProcessor`s.
+    * This functionality has been removed - users may now pass `SpanProcessor`s to the base class constructor when extending
+    * (user-facing): `_registeredExporters` has been removed
+    * (user-facing): `_getSpanExporter` has been removed
+    * (user-facing): `_buildExporterFromEnv` has been removed
 * feat(core)!: remove deprecated `IdGenerator` and `RandomIdGenerator` [#5309](https://github.com/open-telemetry/opentelemetry-js/pull/5309) @pichlermarc
 * feat(core)!: remove deprecated type `InstrumentationLibrary` [#5308](https://github.com/open-telemetry/opentelemetry-js/pull/5308) @pichlermarc
   * (user-facing): please use equivalent type `InstrumentationScope` instead
@@ -41,10 +47,17 @@ For semantic convention package changes, see the [semconv CHANGELOG](packages/se
 * chore!: update typescript to version `5.0.4` [#5145](https://github.com/open-telemetry/opentelemetry-js/pull/5145) @david-luna
   * (user-facing) dropped support for `typescript@<5.0.4`
   * (user-facing) all packages published from this repository will from now on drop support for old versions of `typescript` in minor releases. We will only drop support for versions that are older than 2 years.
+* feat(core)!: remove deprecated samplers [#5316](https://github.com/open-telemetry/opentelemetry-js/pull/5316) @pichlermarc
+  * (user-facing): deprecated `AlwaysOnSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `AlwaysOffSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `TraceIdRatioSampler` has moved to `@opentelemetry/sdk-trace-base`
+  * (user-facing): deprecated `TraceIdRatioSampler` has moved to  `@opentelemetry/sdk-trace-base`
 
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
+
+* fix(sdk-metrics): do not export from `PeriodicExportingMetricReader` when there are no metrics to export. [#5288](https://github.com/open-telemetry/opentelemetry-js/pull/5288) @jacksonweber
 
 ### :books: (Refine Doc)
 
