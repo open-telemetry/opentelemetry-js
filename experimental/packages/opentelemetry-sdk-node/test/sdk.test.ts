@@ -1136,7 +1136,7 @@ describe('Node SDK', () => {
       sdk.start();
       assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
       assert.strictEqual(
-        stubLogger.args[1][0],
+        stubLogger.args[0][0],
         'OTEL_METRICS_EXPORTER contains "none". Metric provider will not be initialized.'
       );
       await sdk.shutdown();
