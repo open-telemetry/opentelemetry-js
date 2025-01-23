@@ -159,7 +159,11 @@ export interface Span {
    */
   recordException(
     exception: Exception,
-    attributes?: SpanAttributes,
+    time?: TimeInput
+  ): void;
+  recordException(
+    exception: Exception,
+    attributes: SpanAttributes | undefined,
     time?: TimeInput
   ): void;
 }

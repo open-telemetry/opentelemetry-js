@@ -81,8 +81,13 @@ export class NonRecordingSpan implements Span {
 
   // By default does nothing
   recordException(
-    _exception: Exception,
-    _attributesOrStartTime?: SpanAttributes | TimeInput,
-    _time?: TimeInput
-  ): void {}
+    exception: Exception,
+    time?: TimeInput
+  ): void;
+  recordException(
+    exception: Exception,
+    attributes: SpanAttributes | undefined,
+    time?: TimeInput
+  ): void;
+  recordException(): void {}
 }
