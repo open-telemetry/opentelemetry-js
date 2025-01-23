@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1737668594040,
+  "lastUpdate": 1737675441332,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-js",
   "entries": {
     "Benchmark": [
@@ -23872,6 +23872,58 @@ window.BENCHMARK_DATA = {
             "range": "±0.72%",
             "unit": "ops/sec",
             "extra": "97 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "cjihrig@gmail.com",
+            "name": "Colin Ihrig",
+            "username": "cjihrig"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b4ae9ca61de4a496ed9c7ea3ef7ec67e2143a6ab",
+          "message": "feat(sdk-node): lower diagnostic level (#5360)\n\nCo-authored-by: Marc Pichler <marc.pichler@dynatrace.com>",
+          "timestamp": "2025-01-23T20:04:43Z",
+          "tree_id": "69a08dc2cc47c0f7bf26fe74bf6d78abae2ccae9",
+          "url": "https://github.com/open-telemetry/opentelemetry-js/commit/b4ae9ca61de4a496ed9c7ea3ef7ec67e2143a6ab"
+        },
+        "date": 1737675440404,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "transform 1 span",
+            "value": 1499749,
+            "range": "±0.47%",
+            "unit": "ops/sec",
+            "extra": "100 samples"
+          },
+          {
+            "name": "transform 100 spans",
+            "value": 16523,
+            "range": "±0.34%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
+          },
+          {
+            "name": "create spans (10 attributes)",
+            "value": 788450,
+            "range": "±0.24%",
+            "unit": "ops/sec",
+            "extra": "99 samples"
+          },
+          {
+            "name": "BatchSpanProcessor process span",
+            "value": 760977,
+            "range": "±0.63%",
+            "unit": "ops/sec",
+            "extra": "92 samples"
           }
         ]
       }
