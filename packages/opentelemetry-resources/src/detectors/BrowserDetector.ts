@@ -31,8 +31,7 @@ class BrowserDetector implements ResourceDetector {
     const isBrowser =
       typeof navigator !== 'undefined' &&
       global.process?.versions?.node === undefined && // Node.js v21 adds `navigator`
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore don't have Bun types
+      // @ts-expect-error don't have Bun types
       global.Bun?.version === undefined; // Bun (bun.sh) defines `navigator`
     if (!isBrowser) {
       return { attributes: {} };

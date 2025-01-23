@@ -32,5 +32,5 @@ export {
   DetectedResource,
   DetectedResourceAttributes,
   RawResourceAttribute,
-  MaybePromise
+  MaybePromise,
 } from './types';

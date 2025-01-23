@@ -51,7 +51,8 @@ export class Resource implements IResource {
   static FromAttributeList(
     attributes: [string, MaybePromise<AttributeValue | undefined>][]
   ): Resource {
-    const res = Resource.EMPTY;
+    // cast required to access private fields
+    const res = Resource.EMPTY as Resource;
     res._rawAttributes = attributes;
     res._asyncAttributesPending =
       attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
@@ -130,7 +131,7 @@ export class Resource implements IResource {
   }
 
   public getRawAttributes() {
-      return this._rawAttributes;
+    return this._rawAttributes;
   }
 
   public merge(resource: IResource | null): IResource {

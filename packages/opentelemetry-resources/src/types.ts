@@ -55,4 +55,7 @@ export type DetectedResourceAttributes = Record<
 
 export type MaybePromise<T> = T | Promise<T>;
 
-export type RawResourceAttribute = [string, MaybePromise<AttributeValue | undefined>]
+export type RawResourceAttribute = [
+  string,
+  MaybePromise<AttributeValue | undefined>,
+];
