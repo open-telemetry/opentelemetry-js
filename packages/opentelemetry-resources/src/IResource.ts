@@ -28,7 +28,7 @@ export interface IResource {
    *
    * @returns true if the resource "attributes" property is not yet settled to its final value
    */
-  asyncAttributesPending?: boolean;
+  readonly asyncAttributesPending?: boolean;
 
   /**
    * @returns the Resource's attributes.
