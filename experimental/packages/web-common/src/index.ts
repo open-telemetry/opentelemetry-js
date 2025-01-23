@@ -19,3 +19,11 @@ export {
   createSessionSpanProcessor,
   createSessionLogRecordProcessor,
 } from './utils';
+export { Session } from './types/Session';
+export { SessionIdGenerator } from './types/SessionIdGenerator';
+export { SessionPublisher } from './types/SessionPublisher';
+export { SessionObserver } from './types/SessionObserver';
+export { SessionStore } from './types/SessionStore';
+export { SessionManager } from './SessionManager';
+export { LocalStorageSessionStore } from './LocalStorageSessionStore';
+export { DefaultIdGenerator } from './DefaultIdGenerator';
