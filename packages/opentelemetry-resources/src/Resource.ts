@@ -51,7 +51,7 @@ export class Resource implements IResource {
   static FromAttributeList(
     attributes: [string, MaybePromise<AttributeValue | undefined>][]
   ): Resource {
-    const res = new Resource({});
+    const res = Resource.EMPTY;
     res._rawAttributes = attributes;
     res._asyncAttributesPending =
       attributes.filter(([_, val]) => isPromiseLike(val)).length > 0;
