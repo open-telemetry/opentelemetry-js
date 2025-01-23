@@ -1471,7 +1471,7 @@ describe('setup exporter from env', () => {
     await sdk.shutdown();
   });
 
-  it('should use noop span processor when user sets env exporter to none', async () => {
+  it('should use empty span processor when user sets env exporter to none', async () => {
     env.OTEL_TRACES_EXPORTER = 'none';
     const sdk = new NodeSDK();
     sdk.start();
@@ -1483,9 +1483,8 @@ describe('setup exporter from env', () => {
     );
 
     const listOfProcessors = getSdkSpanProcessors(sdk);
+    assert.strictEqual(listOfProcessors.length, 0);
 
-    assert.ok(listOfProcessors.length === 1);
-    assert.ok(listOfProcessors[0] instanceof NoopSpanProcessor);
     delete env.OTEL_TRACES_EXPORTER;
     await sdk.shutdown();
   });
