@@ -280,31 +280,30 @@ describe('Span', () => {
       assert.ok(span.isRecording() === false);
     });
   });
-  it('should log a warning and a debug message when span is ended', () => {
-    const span = new Span(
-        tracer,
-        ROOT_CONTEXT,
-        name,
-        spanContext,
-        SpanKind.CLIENT
-    );
-    span.end(); // End the span to set it to ended state
+
+  it('should log a warning attempting to add event to ended span', () => {
+    const span = new SpanImpl({
+      scope: tracer.instrumentationScope,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
+      spanContext,
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
+    span.end();
 
     const warnStub = sinon.spy(diag, 'warn');
-    const debugStub = sinon.spy(diag, 'debug');
 
-    // Call the method that checks if the span is ended
-    span['_isSpanEnded']();
+    span.addEvent('oops, too late');
 
-    // Assert that the warning log was called with the expected message and an Error object
     sinon.assert.calledOnce(warnStub);
-    sinon.assert.calledWith(warnStub, sinon.match(/Cannot execute the operation on ended Span/), sinon.match.instanceOf(Error));
-
-   // Assert that the debug log was called and contains a stack trace
-      sinon.assert.calledOnce(debugStub);
-      const debugMessage = debugStub.getCall(0).args[0];
-      assert.ok(debugMessage.startsWith('Stack trace for ended span operation:'));
-    });
+    sinon.assert.calledWith(
+      warnStub,
+      sinon.match(/Cannot execute the operation on ended Span/),
+      sinon.match.instanceOf(Error)
+    );
   });
 
   describe('setAttribute', () => {
