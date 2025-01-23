@@ -108,5 +108,5 @@ export async function assertRejects(
       }, expected);
     }
   }
-  assert(rejected, 'Promise not rejected');
+  assert.ok(rejected, 'Promise not rejected');
 }
