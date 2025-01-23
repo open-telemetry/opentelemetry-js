@@ -27,7 +27,7 @@ import { ResourceDetectionConfig } from './config';
 export const detectResources = (
   config: ResourceDetectionConfig = {}
 ): IResource => {
-  const resources: Resource[] = (config.detectors || []).map(d => {
+  const resources: IResource[] = (config.detectors || []).map(d => {
     try {
       const resource = new Resource(d.detect(config));
       diag.debug(`${d.constructor.name} found resource.`, resource);

@@ -31,4 +31,6 @@ export {
   ResourceDetector,
   DetectedResource,
   DetectedResourceAttributes,
+  RawResourceAttribute,
+  MaybePromise
 } from './types';

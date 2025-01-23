@@ -24,16 +24,16 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { IResource } from './IResource';
 import { defaultServiceName } from './platform';
-import { DetectedResource, MaybePromise } from './types';
+import { DetectedResource, MaybePromise, RawResourceAttribute } from './types';
 import { isPromiseLike } from './utils';
 
 export class Resource implements IResource {
-  private _rawAttributes: [string, MaybePromise<AttributeValue | undefined>][];
+  private _rawAttributes: RawResourceAttribute[];
   private _asyncAttributesPending = false;
 
   private _memoizedAttributes?: Attributes;
 
-  public static EMPTY = new Resource({ attributes: {} });
+  public static EMPTY: IResource = new Resource({ attributes: {} });
   /**
    * Returns a Resource that identifies the SDK in use.
    */
@@ -129,12 +129,16 @@ export class Resource implements IResource {
     return attrs;
   }
 
-  public merge(resource: Resource | null) {
+  public getRawAttributes() {
+      return this._rawAttributes;
+  }
+
+  public merge(resource: IResource | null): IResource {
     if (resource == null) return this;
 
     return Resource.FromAttributeList([
-      ...resource._rawAttributes,
-      ...this._rawAttributes,
+      ...resource.getRawAttributes(),
+      ...this.getRawAttributes(),
     ]);
   }
 }
