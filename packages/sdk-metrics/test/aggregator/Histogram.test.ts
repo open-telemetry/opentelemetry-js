@@ -33,7 +33,7 @@ describe('HistogramAggregator', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
       const accumulation = aggregator.createAccumulation([0, 0]);
-      assert(accumulation instanceof HistogramAccumulation);
+      assert.ok(accumulation instanceof HistogramAccumulation);
     });
   });
 

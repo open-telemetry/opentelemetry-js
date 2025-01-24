@@ -19,7 +19,7 @@ import * as sinon from 'sinon';
 import {
   MeterProvider,
   DataPointType,
-  MetricReader,
+  IMetricReader,
   InstrumentType,
   AggregationType,
   ViewOptions,
@@ -44,7 +44,7 @@ describe('MeterSharedState', () => {
   });
 
   describe('registerMetricStorage', () => {
-    function setupMeter(views?: ViewOptions[], readers?: MetricReader[]) {
+    function setupMeter(views?: ViewOptions[], readers?: IMetricReader[]) {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views,
