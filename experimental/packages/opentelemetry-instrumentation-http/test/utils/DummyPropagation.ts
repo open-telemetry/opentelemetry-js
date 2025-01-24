@@ -15,33 +15,63 @@
  */
 import {
   Context,
+  TextMapGetter,
   TextMapPropagator,
+  TextMapSetter,
   trace,
   TraceFlags,
 } from '@opentelemetry/api';
-import type * as http from 'http';
 
 export class DummyPropagation implements TextMapPropagator {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';
-  extract(context: Context, carrier: http.OutgoingHttpHeaders) {
-    const extractedSpanContext = {
-      traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
-      spanId: carrier[DummyPropagation.SPAN_CONTEXT_KEY] as string,
-      traceFlags: TraceFlags.SAMPLED,
-      isRemote: true,
-    };
-    if (extractedSpanContext.traceId && extractedSpanContext.spanId) {
+
+  extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ) {
+    const traceId = getter.get(carrier, DummyPropagation.TRACE_CONTEXT_KEY);
+    const spanId = getter.get(carrier, DummyPropagation.SPAN_CONTEXT_KEY);
+
+    if (traceId && spanId) {
+      if (typeof traceId !== 'string') {
+        throw new Error('expecting traceId to be a string');
+      }
+
+      if (typeof spanId !== 'string') {
+        throw new Error('expecting spanId to be a string');
+      }
+
+      const extractedSpanContext = {
+        traceId,
+        spanId,
+        traceFlags: TraceFlags.SAMPLED,
+        isRemote: true,
+      };
+
       return trace.setSpanContext(context, extractedSpanContext);
     }
+
     return context;
   }
-  inject(context: Context, headers: { [custom: string]: string }): void {
+
+  inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     if (!spanContext) return;
-    headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
-    headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;
+
+    setter.set(
+      carrier,
+      DummyPropagation.TRACE_CONTEXT_KEY,
+      spanContext.traceId
+    );
+    setter.set(carrier, DummyPropagation.SPAN_CONTEXT_KEY, spanContext.spanId);
   }
+
   fields(): string[] {
     return [
       DummyPropagation.TRACE_CONTEXT_KEY,

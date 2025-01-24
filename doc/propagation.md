@@ -34,7 +34,11 @@ const MyHeader = 'my-header';
 
 export class MyPropagator implements TextMapPropagator {
   // Inject the header to the outgoing request.
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     // Skip if the current span context is not valid or suppressed.
     if (
@@ -51,7 +55,11 @@ export class MyPropagator implements TextMapPropagator {
   }
 
   // Extract the header from the incoming request.
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ): Context {
     const headers = getter.get(carrier, MyHeader);
     const header = Array.isArray(headers) ? headers[0] : headers;
     if (typeof header !== 'string') return context;
