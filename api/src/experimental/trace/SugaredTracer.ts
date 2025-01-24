@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 import { SugaredSpanOptions } from './SugaredOptions';
-import { context, Context, Span, SpanStatusCode, Tracer } from '../../';
+import {
+  context as contextApi,
+  Context,
+  Span,
+  SpanStatusCode,
+  Tracer,
+} from '../../';
 
 const defaultOnException = (e: Error, span: Span) => {
   span.recordException(e);
@@ -174,7 +180,7 @@ function massageParams<F extends (span: Span) => ReturnType<F>>(
     fn = arg3 as F;
   }
   opts = opts ?? {};
-  ctx = ctx ?? context.active();
+  ctx = ctx ?? contextApi.active();
 
   return { opts, ctx, fn };
 }
