@@ -29,6 +29,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* chore(instrumentation-grpc): remove unused findIndex() function [#5372](https://github.com/open-telemetry/opentelemetry-js/pull/5372) @cjihrig
+
 ## 0.57.0
 
 ### :rocket: (Enhancement)
