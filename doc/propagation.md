@@ -32,9 +32,13 @@ import { isTracingSuppressed } from '@opentelemetry/core';
 // Example header, the content format can be `<trace-id>:<span-id>`
 const MyHeader = 'my-header';
 
-export class MyPropagator implements TextMapPropagator {
+export class MyPropagator implements TextMapPropagator<unknown> {
   // Inject the header to the outgoing request.
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     // Skip if the current span context is not valid or suppressed.
     if (
@@ -51,7 +55,11 @@ export class MyPropagator implements TextMapPropagator {
   }
 
   // Extract the header from the incoming request.
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
     const headers = getter.get(carrier, MyHeader);
     const header = Array.isArray(headers) ? headers[0] : headers;
     if (typeof header !== 'string') return context;

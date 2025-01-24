@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
+* docs(api): Clarify `TextMapPropagator` interface implementation requirements around the `Carrier` type [#5370](https://github.com/open-telemetry/opentelemetry-js/pull/5370) @chancancode
+
 ### :house: (Internal)
 
 * refactor(api): remove "export *" in favor of explicit named exports [#4880](https://github.com/open-telemetry/opentelemetry-js/pull/4880) @robbkidd

@@ -33,7 +33,7 @@ export interface CompositePropagatorConfig {
 }
 
 /** Combines multiple propagators into a single propagator. */
-export class CompositePropagator implements TextMapPropagator {
+export class CompositePropagator implements TextMapPropagator<unknown> {
   private readonly _propagators: TextMapPropagator[];
   private readonly _fields: string[];
 
@@ -64,7 +64,11 @@ export class CompositePropagator implements TextMapPropagator {
    * @param context Context to inject
    * @param carrier Carrier into which context will be injected
    */
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
     for (const propagator of this._propagators) {
       try {
         propagator.inject(context, carrier, setter);
@@ -85,7 +89,11 @@ export class CompositePropagator implements TextMapPropagator {
    * @param context Context to add values to
    * @param carrier Carrier from which to extract context
    */
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
     return this._propagators.reduce((ctx, propagator) => {
       try {
         return propagator.extract(ctx, carrier, getter);

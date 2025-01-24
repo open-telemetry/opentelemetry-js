@@ -32,24 +32,53 @@ import {
 } from '../../src/trace/W3CTraceContextPropagator';
 import { TraceState } from '../../src/trace/TraceState';
 
-class DummyPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
-    carrier['dummy'] = trace.getSpanContext(context);
-  }
-  extract(context: Context, carrier: any, getter: TextMapGetter<any>): Context {
-    if (carrier['dummy']) {
-      return trace.setSpanContext(context, carrier['dummy']);
+class DummyPropagator implements TextMapPropagator<unknown> {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
+    const spanContext = trace.getSpanContext(context);
+
+    if (spanContext) {
+      const { traceId, spanId, traceFlags } = spanContext;
+      setter.set(carrier, 'dummy-trace-id', traceId);
+      setter.set(carrier, 'dummy-span-id', spanId);
+      setter.set(carrier, 'dummy-trace-flags', String(traceFlags));
     }
+  }
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
+    const traceId = getter.get(carrier, 'dummy-trace-id');
+    const spanId = getter.get(carrier, 'dummy-span-id');
+    const traceFlags = getter.get(carrier, 'dummy-trace-flags');
+
+    if (
+      typeof traceId === 'string' &&
+      typeof spanId === 'string' &&
+      typeof traceFlags === 'string'
+    ) {
+      return trace.setSpanContext(context, {
+        traceId,
+        spanId,
+        traceFlags: parseInt(traceFlags),
+      });
+    }
+
     return context;
   }
   fields(): string[] {
-    return ['dummy'];
+    return ['dummy-trace-id', 'dummy-span-id', 'dummy-trace-flags'];
   }
 }
 
 describe('Composite Propagator', () => {
   const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
   const spanId = '6e0c63257de34c92';
+  const traceFlags = 1;
 
   describe('inject', () => {
     let carrier: { [key: string]: unknown };
@@ -61,7 +90,7 @@ describe('Composite Propagator', () => {
       spanContext = {
         spanId,
         traceId,
-        traceFlags: 1,
+        traceFlags,
         traceState: new TraceState('foo=bar'),
       };
       ctxWithSpanContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
@@ -73,7 +102,9 @@ describe('Composite Propagator', () => {
       });
       composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
 
-      assert.strictEqual(carrier['dummy'], spanContext);
+      assert.strictEqual(carrier['dummy-trace-id'], traceId);
+      assert.strictEqual(carrier['dummy-span-id'], spanId);
+      assert.strictEqual(carrier['dummy-trace-flags'], String(traceFlags));
       assert.strictEqual(
         carrier[TRACE_PARENT_HEADER],
         `00-${traceId}-${spanId}-01`
@@ -102,7 +133,9 @@ describe('Composite Propagator', () => {
 
     beforeEach(() => {
       carrier = {
-        ['dummy']: { traceId, spanId },
+        ['dummy-trace-id']: traceId,
+        ['dummy-span-id']: spanId,
+        ['dummy-trace-flags']: String(traceFlags),
         [TRACE_PARENT_HEADER]: `00-${traceId}-${spanId}-01`,
         [TRACE_STATE_HEADER]: 'foo=bar',
       };
@@ -213,7 +246,7 @@ describe('Composite Propagator', () => {
   });
 });
 
-class ThrowingPropagator implements TextMapPropagator {
+class ThrowingPropagator implements TextMapPropagator<unknown> {
   inject(context: Context, carrier: unknown) {
     throw new Error('this propagator throws');
   }

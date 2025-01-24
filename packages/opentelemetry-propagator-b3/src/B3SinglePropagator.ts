@@ -50,8 +50,12 @@ function convertToTraceFlags(samplingState: string | undefined): TraceFlags {
  * Propagator for the B3 single-header HTTP format.
  * Based on: https://github.com/openzipkin/b3-propagation
  */
-export class B3SinglePropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+export class B3SinglePropagator implements TextMapPropagator<unknown> {
+  inject(
+    context: Context,
+    carrier: unknown,
+    setter: TextMapSetter<unknown>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
@@ -66,7 +70,11 @@ export class B3SinglePropagator implements TextMapPropagator {
     setter.set(carrier, B3_CONTEXT_HEADER, value);
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract(
+    context: Context,
+    carrier: unknown,
+    getter: TextMapGetter<unknown>
+  ): Context {
     const header = getter.get(carrier, B3_CONTEXT_HEADER);
     const b3Context = Array.isArray(header) ? header[0] : header;
     if (typeof b3Context !== 'string') return context;
