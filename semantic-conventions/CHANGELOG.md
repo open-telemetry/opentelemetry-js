@@ -22,14 +22,14 @@ All notable changes to the semantic-conventions package will be documented in th
 <summary>8 newly deprecated exports</summary>
 
 ```js
-ATTR_DB_COSMOSDB_OPERATION_TYPE            // No replacement at this time.
-ATTR_DB_QUERY_PARAMETER                    // Replaced by `db.operation.parameter`.
-ATTR_PROCESS_EXECUTABLE_BUILD_ID_PROFILING // Replaced by `process.executable.build_id.htlhash`
-ATTR_VCS_REPOSITORY_CHANGE_ID              // Deprecated, use `vcs.change.id` instead.
-ATTR_VCS_REPOSITORY_CHANGE_TITLE           // Deprecated, use `vcs.change.title` instead.
-ATTR_VCS_REPOSITORY_REF_NAME               // Deprecated, use `vcs.ref.head.name` instead.
-ATTR_VCS_REPOSITORY_REF_REVISION           // Deprecated, use `vcs.ref.head.revision` instead.
-ATTR_VCS_REPOSITORY_REF_TYPE               // Deprecated, use `vcs.ref.head.type` instead.
+ATTR_DB_COSMOSDB_OPERATION_TYPE            // db.cosmosdb.operation_type: No replacement at this time.
+ATTR_DB_QUERY_PARAMETER                    // (key) => `db.query.parameter.${key}`: Replaced by `db.operation.parameter`.
+ATTR_PROCESS_EXECUTABLE_BUILD_ID_PROFILING // process.executable.build_id.profiling: Replaced by `process.executable.build_id.htlhash`
+ATTR_VCS_REPOSITORY_CHANGE_ID              // vcs.repository.change.id: Deprecated, use `vcs.change.id` instead.
+ATTR_VCS_REPOSITORY_CHANGE_TITLE           // vcs.repository.change.title: Deprecated, use `vcs.change.title` instead.
+ATTR_VCS_REPOSITORY_REF_NAME               // vcs.repository.ref.name: Deprecated, use `vcs.ref.head.name` instead.
+ATTR_VCS_REPOSITORY_REF_REVISION           // vcs.repository.ref.revision: Deprecated, use `vcs.ref.head.revision` instead.
+ATTR_VCS_REPOSITORY_REF_TYPE               // vcs.repository.ref.type: Deprecated, use `vcs.ref.head.type` instead.
 ```
 
 </details>

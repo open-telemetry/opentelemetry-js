@@ -6,7 +6,15 @@
  * Usage:
  *    vi scripts/semconv/generate.sh  # Typically update SPEC_VERSION to latest.
  *    ./scripts/semconv/generate.sh   # Re-generate the semconv package exports.
- *    ./scripts/semconv/changelog-gen.sh
+ *    ./scripts/semconv/changelog-gen.sh [aVer [bVer]]
+ *
+ * where:
+ * - `aVer` is the base version of `@opentelemetry/semantic-conventions` to
+ *   which to compare, e.g. "1.28.0". This defaults to the latest version
+ *   published to npm.
+ * - `bVer` is the version being compared against `aVer`. This defaults to
+ *   "local", which uses the local build in ../../semantic-conventions in this
+ *   repo.
  *
  * The last command (this script) will output a text block that can be used
  * in "semantic-conventions/CHANGELOG.md" (and also perhaps in the PR
@@ -111,7 +119,7 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
     } else {
       const deprecatedResult = isNewlyDeprecated(k);
       if (deprecatedResult) {
-        changes.push({type: 'deprecated', k, deprecatedResult});
+        changes.push({type: 'deprecated', k, v: curr[k], deprecatedResult});
       }
     }
   }
@@ -165,7 +173,7 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
       if (last && ch.ns !== last.ns) { summary.push(''); }
       const cindent = ' '.repeat(longest - ch.k.length + 1);
 
-      const prevVRepr = ch.prevV.includes('_VALUE_') ? JSON.stringify(ch.prevV) : ch.prevV;
+      const prevVRepr = ch.k.includes('_VALUE_') ? JSON.stringify(ch.prevV) : ch.prevV;
       const vRepr = ch.k.includes('_VALUE_') ? JSON.stringify(ch.v) : ch.v;
       summary.push(`${ch.k}${cindent}// ${prevVRepr} -> ${vRepr}`);
 
@@ -185,7 +193,7 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
       const cindent = ' '.repeat(longest - ch.k.length + 1);
 
       if (typeof ch.deprecatedResult === 'string') {
-        summary.push(`${ch.k}${cindent}// ${ch.deprecatedResult}`);
+        summary.push(`${ch.k}${cindent}// ${ch.v}: ${ch.deprecatedResult}`);
       } else {
         summary.push(ch.k)
       }
@@ -226,49 +234,73 @@ function summarizeChanges({prev, curr, prevSrc, currSrc}) {
 }
 
 
-function semconvChangelogGen() {
-  // Determine target spec ver.
-  const generateShPath = path.join(__dirname, 'generate.sh');
-  const specVerRe = /^SPEC_VERSION=(.*)$/m;
-  const specVerMatch = specVerRe.exec(fs.readFileSync(generateShPath));
-  if (!specVerMatch) {
-    throw new Error(`could not determine current semconv SPEC_VERSION: ${specVerRe} did not match in ${generateShPath}`);
-  }
-  const specVer = specVerMatch[1].trim();
-  console.log('Target Semantic Conventions ver is:', specVer);
+function semconvChangelogGen(aVer=undefined, bVer=undefined) {
 
   console.log(`Creating tmp working dir "${TMP_DIR}"`);
   rimraf.sync(TMP_DIR);
   fs.mkdirSync(TMP_DIR);
 
-  const scDir = path.join(TOP, 'semantic-conventions');
-  const pj = JSON.parse(fs.readFileSync(path.join(scDir, 'package.json')));
+  const localDir = path.join(TOP, 'semantic-conventions');
+  const pj = JSON.parse(fs.readFileSync(path.join(localDir, 'package.json')));
   const pkgInfo = JSON.parse(execSync(`npm info -j ${pj.name}`))
-  console.log(`Previous published version for comparison is: ${pkgInfo.version}`);
 
-  console.log(`Downloading and extracting @opentelemetry/semantic-conventions@${pkgInfo.version}`)
-  execSync(`curl -sf -o - ${pkgInfo.dist.tarball} | tar xzf -`, { cwd: TMP_DIR });
+  let aDir;
+  if (!aVer) {
+    aVer = pkgInfo.version; // By default compare to latest published version.
+  }
+  aDir = path.join(TMP_DIR, aVer, 'package');
+  if (!fs.existsSync(aDir)) {
+    console.log(`Downloading and extracting @opentelemetry/semantic-conventions@${aVer}`)
+    const tarballUrl = `https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-${aVer}.tgz`;
+    fs.mkdirSync(path.dirname(aDir));
+    execSync(`curl -sf -o - ${tarballUrl} | tar xzf -`,
+      { cwd: path.dirname(aDir) });
+  }
 
-  console.log(`Comparing exports to "${scDir}"`)
+  let bDir, bSemconvVer;
+  if (!bVer) {
+    bVer = 'local' // By default comparison target is the local build.
+    bDir = localDir;
+
+    // Determine target spec ver.
+    const generateShPath = path.join(__dirname, 'generate.sh');
+    const specVerRe = /^SPEC_VERSION=(.*)$/m;
+    const specVerMatch = specVerRe.exec(fs.readFileSync(generateShPath));
+    if (!specVerMatch) {
+      throw new Error(`could not determine current semconv SPEC_VERSION: ${specVerRe} did not match in ${generateShPath}`);
+    }
+    bSemconvVer = specVerMatch[1].trim();
+    console.log('Target Semantic Conventions ver is:', bSemconvVer);
+  } else {
+    bSemconvVer = 'v' + bVer;
+    bDir = path.join(TMP_DIR, bVer, 'package');
+    console.log(`Downloading and extracting @opentelemetry/semantic-conventions@${bVer}`)
+    const tarballUrl = `https://registry.npmjs.org/@opentelemetry/semantic-conventions/-/semantic-conventions-${bVer}.tgz`;
+    fs.mkdirSync(path.dirname(bDir));
+    execSync(`curl -sf -o - ${tarballUrl} | tar xzf -`,
+      { cwd: path.dirname(bDir) });
+  }
+
+  console.log(`Comparing exports between versions ${aVer} and ${bVer}`)
   const stableChInfo = summarizeChanges({
     // require('.../build/src/stable_*.js') from previous and current.
-    prev: Object.assign(...globSync(path.join(TMP_DIR, 'package/build/src/stable_*.js')).map(require)),
-    curr: Object.assign(...globSync(path.join(scDir, 'build/src/stable_*.js')).map(require)),
+    prev: Object.assign(...globSync(path.join(aDir, 'build/src/stable_*.js')).map(require)),
+    curr: Object.assign(...globSync(path.join(bDir, 'build/src/stable_*.js')).map(require)),
     // Load '.../build/esnext/stable_*.js' sources to use for parsing jsdoc comments.
-    prevSrc: globSync(path.join(TMP_DIR, 'package/build/esnext/stable_*.js'))
+    prevSrc: globSync(path.join(aDir, 'build/esnext/stable_*.js'))
       .map(f => fs.readFileSync(f, 'utf8'))
       .join('\n\n'),
-    currSrc: globSync(path.join(scDir, 'build/esnext/stable_*.js'))
+    currSrc: globSync(path.join(bDir, 'build/esnext/stable_*.js'))
       .map(f => fs.readFileSync(f, 'utf8'))
       .join('\n\n'),
   });
   const unstableChInfo = summarizeChanges({
-    prev: Object.assign(...globSync(path.join(TMP_DIR, 'package/build/src/experimental_*.js')).map(require)),
-    curr: Object.assign(...globSync(path.join(scDir, 'build/src/experimental_*.js')).map(require)),
-    prevSrc: globSync(path.join(TMP_DIR, 'package/build/esnext/experimental_*.js'))
+    prev: Object.assign(...globSync(path.join(aDir, 'build/src/experimental_*.js')).map(require)),
+    curr: Object.assign(...globSync(path.join(bDir, 'build/src/experimental_*.js')).map(require)),
+    prevSrc: globSync(path.join(aDir, 'build/esnext/experimental_*.js'))
       .map(f => fs.readFileSync(f, 'utf8'))
       .join('\n\n'),
-    currSrc: globSync(path.join(scDir, 'build/esnext/experimental_*.js'))
+    currSrc: globSync(path.join(bDir, 'build/esnext/experimental_*.js'))
       .map(f => fs.readFileSync(f, 'utf8'))
       .join('\n\n'),
   });
@@ -286,16 +318,16 @@ function semconvChangelogGen() {
     }
   }
   const changelogEntry = [`
-* feat: update semantic conventions to ${specVer} [#NNNN]
-  * Semantic Conventions ${specVer}:
-    [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#${slugify(specVer)}) |
+* feat: update semantic conventions to ${bSemconvVer} [#NNNN]
+  * Semantic Conventions ${bSemconvVer}:
+    [changelog](https://github.com/open-telemetry/semantic-conventions/blob/main/CHANGELOG.md#${slugify(bSemconvVer)}) |
     [latest docs](https://opentelemetry.io/docs/specs/semconv/)
   * \`@opentelemetry/semantic-conventions\` (stable) changes: *${execSummaryFromChInfo(stableChInfo)}*
   * \`@opentelemetry/semantic-conventions/incubating\` (unstable) changes: *${execSummaryFromChInfo(unstableChInfo)}*
 `];
 
   if (stableChInfo.haveChanges) {
-    changelogEntry.push(`#### Stable changes in ${specVer}\n`);
+    changelogEntry.push(`#### Stable changes in ${bSemconvVer}\n`);
     for (let changeType of changeTypes) {
       const summary = stableChInfo.summaryFromChangeType[changeType];
       if (summary.length) {
@@ -313,7 +345,7 @@ ${summary.join('\n')}
   }
 
   if (unstableChInfo.haveChanges) {
-    changelogEntry.push(`#### Unstable changes in ${specVer}\n`);
+    changelogEntry.push(`#### Unstable changes in ${bSemconvVer}\n`);
     for (let changeType of changeTypes) {
       const summary = unstableChInfo.summaryFromChangeType[changeType];
       if (summary.length) {
@@ -334,7 +366,8 @@ ${summary.join('\n')}
 }
 
 function main() {
-  const s = semconvChangelogGen();
+  const [aVer, bVer] = process.argv.slice(2);
+  const s = semconvChangelogGen(aVer, bVer);
   console.log('The following could be added to the top "Enhancement" section of "semantic-conventions/CHANGELOG.md":');
   console.log('\n- - -');
   console.log(s)
