@@ -21,6 +21,7 @@ default_comment_format: jsdoc
 templates:
   - pattern: attributes.ts.j2
     # Remove file name prefix when per-pattern params are available https://github.com/open-telemetry/weaver/issues/288
+    # Switch from 'exclude_stability:["experimental",...]' to 'include_stability:["stable":...]' when available: https://github.com/open-telemetry/weaver/issues/569
     filter: >
       semconv_attributes({
         "exclude_stability": ["experimental", "", null]
