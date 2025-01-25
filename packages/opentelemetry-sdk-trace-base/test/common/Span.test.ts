@@ -281,6 +281,31 @@ describe('Span', () => {
     });
   });
 
+  it('should log a warning attempting to add event to ended span', () => {
+    const span = new SpanImpl({
+      scope: tracer.instrumentationScope,
+      resource: tracer['_resource'],
+      context: ROOT_CONTEXT,
+      spanContext,
+      name,
+      kind: SpanKind.CLIENT,
+      spanLimits: tracer.getSpanLimits(),
+      spanProcessor: tracer['_spanProcessor'],
+    });
+    span.end();
+
+    const warnStub = sinon.spy(diag, 'warn');
+
+    span.addEvent('oops, too late');
+
+    sinon.assert.calledOnce(warnStub);
+    sinon.assert.calledWith(
+      warnStub,
+      sinon.match(/Cannot execute the operation on ended Span/),
+      sinon.match.instanceOf(Error)
+    );
+  });
+
   describe('setAttribute', () => {
     describe('when default options set', () => {
       it('should set an attribute', () => {

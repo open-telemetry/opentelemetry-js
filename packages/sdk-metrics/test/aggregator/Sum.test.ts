@@ -26,7 +26,7 @@ describe('SumAggregator', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new SumAggregator(true);
       const accumulation = aggregator.createAccumulation([0, 0]);
-      assert(accumulation instanceof SumAccumulation);
+      assert.ok(accumulation instanceof SumAccumulation);
     });
   });
 

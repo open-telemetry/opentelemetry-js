@@ -18,7 +18,7 @@ import {
   AggregationSelector,
   AggregationTemporalitySelector,
   InstrumentType,
-  MetricReader,
+  IMetricReader,
   PushMetricExporter,
 } from '../../src';
 import * as assert from 'assert';
@@ -39,7 +39,7 @@ const instrumentTypes = [
  * @param expectedSelector
  */
 export function assertAggregationSelector(
-  reader: MetricReader | PushMetricExporter,
+  reader: IMetricReader | PushMetricExporter,
   expectedSelector: AggregationSelector
 ) {
   for (const instrumentType of instrumentTypes) {
@@ -57,7 +57,7 @@ export function assertAggregationSelector(
  * @param expectedSelector
  */
 export function assertAggregationTemporalitySelector(
-  reader: MetricReader | PushMetricExporter,
+  reader: IMetricReader | PushMetricExporter,
   expectedSelector: AggregationTemporalitySelector
 ) {
   for (const instrumentType of instrumentTypes) {

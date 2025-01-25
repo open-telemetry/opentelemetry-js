@@ -33,20 +33,20 @@ describe('ShimTracer', () => {
 
   it('should initially be inactive', () => {
     const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
-    assert(!shimTracer.active);
+    assert.ok(!shimTracer.active);
   });
   describe('start', () => {
     it('should set the tracer as active', () => {
       const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
       shimTracer.start({});
-      assert(shimTracer.active);
+      assert.ok(shimTracer.active);
     });
   });
   describe('stop', () => {
     it('should set the tracer as inactive', () => {
       const shimTracer = new ShimTracer(sinon.createStubInstance(Tracer));
       shimTracer.start({});
-      assert(shimTracer.active);
+      assert.ok(shimTracer.active);
     });
   });
 
