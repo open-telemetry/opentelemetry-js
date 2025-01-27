@@ -63,8 +63,9 @@ class BrowserDetector implements Detector {
 // Add Browser related attributes to resources
 function getBrowserAttributes(): Attributes {
   const browserAttribs: Attributes = {};
-  const userAgentData: UserAgentData | undefined = (navigator as any)
-    .userAgentData;
+  const userAgentData = (
+    navigator as Navigator & { userAgentData?: UserAgentData }
+  ).userAgentData;
   if (userAgentData) {
     browserAttribs[BROWSER_ATTRIBUTES.PLATFORM] = userAgentData.platform;
     browserAttribs[BROWSER_ATTRIBUTES.BRANDS] = userAgentData.brands.map(
