@@ -19,13 +19,17 @@ import { EventEmitter } from 'events';
 
 type Func<T> = (...args: unknown[]) => T;
 
+// `any` here is intentional for variance, `unknown` won't work
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFunc = (this: any, ...args: any[]) => any;
+
 /**
  * Store a map for each event of all original listeners and their "patched"
  * version. So when a listener is removed by the user, the corresponding
  * patched function will be also removed.
  */
 interface PatchMap {
-  [name: string]: WeakMap<Func<void>, Func<void>>;
+  [name: string | symbol]: WeakMap<Func<void>, Func<void>>;
 }
 
 const ADD_LISTENER_METHODS = [
@@ -35,6 +39,12 @@ const ADD_LISTENER_METHODS = [
   'prependListener' as const,
   'prependOnceListener' as const,
 ];
+
+// 'addListener' | 'on' | 'once' | 'prependListener' | 'prependOnceListener'
+type AddListenerKeys = (typeof ADD_LISTENER_METHODS)[number];
+type AddListener = EventEmitter[AddListenerKeys];
+type RemoveListener = EventEmitter['removeListener'];
+type removeAllListeners = EventEmitter['removeAllListeners'];
 
 export abstract class AbstractAsyncHooksContextManager
   implements ContextManager
@@ -60,18 +70,21 @@ export abstract class AbstractAsyncHooksContextManager
    */
   bind<T>(context: Context, target: T): T {
     if (target instanceof EventEmitter) {
-      return this._bindEventEmitter(context, target);
+      return this._bindEventEmitter(context, target) as T;
     }
 
     if (typeof target === 'function') {
-      return this._bindFunction(context, target);
+      return this._bindFunction(context, target as T & AnyFunc);
     }
     return target;
   }
 
-  private _bindFunction<T extends Function>(context: Context, target: T): T {
+  private _bindFunction<T extends AnyFunc>(context: Context, target: T): T {
     const manager = this;
-    const contextWrapper = function (this: never, ...args: unknown[]) {
+    const contextWrapper = function (
+      this: ThisParameterType<T>,
+      ...args: Parameters<T>
+    ): ReturnType<T> {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -80,12 +93,7 @@ export abstract class AbstractAsyncHooksContextManager
       writable: false,
       value: target.length,
     });
-    /**
-     * It isn't possible to tell Typescript that contextWrapper is the same as T
-     * so we forced to cast as any here.
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return contextWrapper as any;
+    return contextWrapper as T;
   }
 
   /**
@@ -95,18 +103,17 @@ export abstract class AbstractAsyncHooksContextManager
    * @param context the context we want to bind
    * @param ee EventEmitter an instance of EventEmitter to patch
    */
-  private _bindEventEmitter<T extends EventEmitter>(
-    context: Context,
-    ee: T
-  ): T {
+  private _bindEventEmitter(context: Context, ee: EventEmitter): EventEmitter {
     const map = this._getPatchMap(ee);
     if (map !== undefined) return ee;
     this._createPatchMap(ee);
 
     // patch methods that add a listener to propagate context
     ADD_LISTENER_METHODS.forEach(methodName => {
-      if (ee[methodName] === undefined) return;
-      ee[methodName] = this._patchAddListener(ee, ee[methodName], context);
+      const original = ee[methodName];
+      if (original) {
+        ee[methodName] = this._patchAddListener(ee, original, context);
+      }
     });
     // patch methods that remove a listener
     if (typeof ee.removeListener === 'function') {
@@ -131,15 +138,22 @@ export abstract class AbstractAsyncHooksContextManager
    * @param ee EventEmitter instance
    * @param original reference to the patched method
    */
-  private _patchRemoveListener(ee: EventEmitter, original: Function) {
+  private _patchRemoveListener(
+    ee: EventEmitter,
+    original: RemoveListener
+  ): RemoveListener {
     const contextManager = this;
-    return function (this: never, event: string, listener: Func<void>) {
+    return function (
+      this: ThisParameterType<RemoveListener>,
+      ...args: Parameters<RemoveListener>
+    ): ReturnType<RemoveListener> {
+      const [event, listener] = args;
       const events = contextManager._getPatchMap(ee)?.[event];
-      if (events === undefined) {
-        return original.call(this, event, listener);
+      if (events) {
+        const patchedListener = events.get(listener);
+        args[1] = patchedListener || listener;
       }
-      const patchedListener = events.get(listener);
-      return original.call(this, event, patchedListener || listener);
+      return original.apply(this, args);
     };
   }
 
@@ -149,18 +163,25 @@ export abstract class AbstractAsyncHooksContextManager
    * @param ee EventEmitter instance
    * @param original reference to the patched method
    */
-  private _patchRemoveAllListeners(ee: EventEmitter, original: Function) {
+  private _patchRemoveAllListeners(
+    ee: EventEmitter,
+    original: removeAllListeners
+  ): removeAllListeners {
     const contextManager = this;
-    return function (this: never, event: string) {
-      const map = contextManager._getPatchMap(ee);
-      if (map !== undefined) {
-        if (arguments.length === 0) {
+    return function (
+      this: ThisParameterType<removeAllListeners>,
+      ...args: Parameters<removeAllListeners>
+    ): ReturnType<removeAllListeners> {
+      const [event] = args;
+      const events = contextManager._getPatchMap(ee);
+      if (events) {
+        if (args.length === 0) {
           contextManager._createPatchMap(ee);
-        } else if (map[event] !== undefined) {
-          delete map[event];
+        } else if (event && events[event]) {
+          delete events[event];
         }
       }
-      return original.apply(this, arguments);
+      return original.apply(this, args);
     };
   }
 
@@ -173,11 +194,14 @@ export abstract class AbstractAsyncHooksContextManager
    */
   private _patchAddListener(
     ee: EventEmitter,
-    original: Function,
+    original: AddListener,
     context: Context
-  ) {
+  ): AddListener {
     const contextManager = this;
-    return function (this: never, event: string, listener: Func<void>) {
+    return function (
+      this: ThisParameterType<AddListener>,
+      ...args: Parameters<AddListener>
+    ): ReturnType<AddListener> {
       /**
        * This check is required to prevent double-wrapping the listener.
        * The implementation for ee.once wraps the listener and calls ee.on.
@@ -187,27 +211,29 @@ export abstract class AbstractAsyncHooksContextManager
        * that detection.
        */
       if (contextManager._wrapped) {
-        return original.call(this, event, listener);
+        return original.apply(this, args);
       }
-      let map = contextManager._getPatchMap(ee);
-      if (map === undefined) {
-        map = contextManager._createPatchMap(ee);
+      const [event, listener] = args;
+      let events = contextManager._getPatchMap(ee);
+      if (events === undefined) {
+        events = contextManager._createPatchMap(ee);
       }
-      let listeners = map[event];
+      let listeners = events[event];
       if (listeners === undefined) {
         listeners = new WeakMap();
-        map[event] = listeners;
+        events[event] = listeners;
       }
       const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
+      args[1] = patchedListener;
 
       /**
        * See comment at the start of this function for the explanation of this property.
        */
       contextManager._wrapped = true;
       try {
-        return original.call(this, event, patchedListener);
+        return original.apply(this, args);
       } finally {
         contextManager._wrapped = false;
       }
