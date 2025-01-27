@@ -143,7 +143,7 @@ export function getSpanProcessorsFromEnv(): SpanProcessor[] {
   }
 
   if (traceExportersList.length === 0) {
-    diag.warn('OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.');
+    diag.debug('OTEL_TRACES_EXPORTER is empty. Using default otlp exporter.');
     traceExportersList = ['otlp'];
   } else if (
     traceExportersList.length > 1 &&

@@ -53,7 +53,7 @@ import { OTLPMetricExporter as OTLPHttpMetricExporter } from '@opentelemetry/exp
 import { PrometheusExporter as PrometheusMetricExporter } from '@opentelemetry/exporter-prometheus';
 import {
   MeterProvider,
-  MetricReader,
+  IMetricReader,
   ViewOptions,
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
@@ -81,7 +81,7 @@ export type MeterProviderConfig = {
   /**
    * Reference to the MetricReader instance by the NodeSDK
    */
-  reader?: MetricReader;
+  reader?: IMetricReader;
   /**
    * List of {@link ViewOptions}s that should be passed to the MeterProvider
    */
@@ -106,8 +106,8 @@ function getValueInMillis(envName: string, defaultValue: number): number {
  *
  * @returns MetricReader[] if appropriate environment variables are configured
  */
-function configureMetricProviderFromEnv(): MetricReader[] {
-  const metricReaders: MetricReader[] = [];
+function configureMetricProviderFromEnv(): IMetricReader[] {
+  const metricReaders: IMetricReader[] = [];
   const metricsExporterList = process.env.OTEL_METRICS_EXPORTER?.trim();
   if (!metricsExporterList) {
     return metricReaders;
@@ -115,7 +115,7 @@ function configureMetricProviderFromEnv(): MetricReader[] {
   const enabledExporters = filterBlanksAndNulls(metricsExporterList.split(','));
 
   if (enabledExporters.length === 0) {
-    diag.info('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
+    diag.debug('OTEL_METRICS_EXPORTER is empty. Using default otlp exporter.');
   }
 
   if (enabledExporters.includes('none')) {
@@ -394,16 +394,16 @@ export class NodeSDK {
       logs.setGlobalLoggerProvider(loggerProvider);
     }
 
-    const metricReadersFromEnv: MetricReader[] =
+    const metricReadersFromEnv: IMetricReader[] =
       configureMetricProviderFromEnv();
     if (this._meterProviderConfig || metricReadersFromEnv.length > 0) {
-      const readers: MetricReader[] = [];
+      const readers: IMetricReader[] = [];
       if (this._meterProviderConfig?.reader) {
         readers.push(this._meterProviderConfig.reader);
       }
 
       if (readers.length === 0) {
-        metricReadersFromEnv.forEach((r: MetricReader) => readers.push(r));
+        metricReadersFromEnv.forEach((r: IMetricReader) => readers.push(r));
       }
 
       const meterProvider = new MeterProvider({
@@ -448,7 +448,7 @@ export class NodeSDK {
     const enabledExporters = filterBlanksAndNulls(logExportersList.split(','));
 
     if (enabledExporters.length === 0) {
-      diag.info('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
+      diag.debug('OTEL_LOGS_EXPORTER is empty. Using default otlp exporter.');
       enabledExporters.push('otlp');
     }
 

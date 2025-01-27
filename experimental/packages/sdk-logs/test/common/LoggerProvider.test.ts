@@ -274,7 +274,7 @@ describe('LoggerProvider', () => {
         .forceFlush()
         .then(() => {
           sinon.restore();
-          assert(forceFlushStub.calledTwice);
+          assert.ok(forceFlushStub.calledTwice);
           done();
         })
         .catch(error => {

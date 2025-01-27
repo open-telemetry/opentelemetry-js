@@ -96,7 +96,7 @@ export function assertScopeMetrics(
 ): asserts actual is ScopeMetrics {
   const it = actual as ScopeMetrics;
   assertPartialDeepStrictEqual(it.scope, instrumentationScope);
-  assert(Array.isArray(it.metrics));
+  assert.ok(Array.isArray(it.metrics));
 }
 
 export function assertMetricData(
@@ -112,12 +112,12 @@ export function assertMetricData(
   if (isNotNullish(dataPointType)) {
     assert.strictEqual(it.dataPointType, dataPointType);
   } else {
-    assert(isNotNullish(DataPointType[it.dataPointType]));
+    assert.ok(isNotNullish(DataPointType[it.dataPointType]));
   }
   if (aggregationTemporality != null) {
     assert.strictEqual(aggregationTemporality, it.aggregationTemporality);
   }
-  assert(Array.isArray(it.dataPoints));
+  assert.ok(Array.isArray(it.dataPoints));
 }
 
 export function assertDataPoint(
@@ -137,13 +137,13 @@ export function assertDataPoint(
       'startTime should be equal'
     );
   } else {
-    assert(Array.isArray(it.startTime));
+    assert.ok(Array.isArray(it.startTime));
     assert.strictEqual(it.startTime.length, 2, 'startTime should be equal');
   }
   if (endTime) {
     assert.deepStrictEqual(it.endTime, endTime, 'endTime should be equal');
   } else {
-    assert(Array.isArray(it.endTime));
+    assert.ok(Array.isArray(it.endTime));
     assert.strictEqual(it.endTime.length, 2, 'endTime should be equal');
   }
 }
@@ -154,7 +154,7 @@ export function assertMeasurementEqual(
 ): asserts actual is Measurement {
   // NOTE: Node.js v8 assert.strictEquals treat two NaN as different values.
   if (Number.isNaN(expected.value)) {
-    assert(Number.isNaN((actual as Measurement).value));
+    assert.ok(Number.isNaN((actual as Measurement).value));
   } else {
     assert.strictEqual((actual as Measurement).value, expected.value);
   }

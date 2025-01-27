@@ -74,7 +74,7 @@ describe('PrometheusSerializer', () => {
   describe('constructor', () => {
     it('should construct a serializer', () => {
       const serializer = new PrometheusSerializer();
-      assert(serializer instanceof PrometheusSerializer);
+      assert.ok(serializer instanceof PrometheusSerializer);
     });
   });
 

@@ -24,7 +24,6 @@ import {
   Histogram,
   InstrumentType,
   MeterProvider,
-  MetricReader,
 } from '../src';
 import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import {
@@ -40,6 +39,7 @@ import {
   defaultResource,
 } from './util';
 import { ObservableResult, ValueType } from '@opentelemetry/api';
+import { IMetricReader } from '../src/export/MetricReader';
 
 describe('Instruments', () => {
   describe('Counter', () => {
@@ -845,7 +845,7 @@ interface ValidateMetricData {
 }
 
 async function validateExport(
-  reader: MetricReader,
+  reader: IMetricReader,
   expected: ValidateMetricData
 ) {
   const { resourceMetrics, errors } = await reader.collect();
