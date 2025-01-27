@@ -22,18 +22,21 @@ import {
   SEMRESATTRS_HOST_ID,
   SEMRESATTRS_HOST_TYPE,
 } from '@opentelemetry/semantic-conventions';
-import { Detector, Resource } from '../../src';
+import { ResourceDetector } from '../../src';
+import { DetectedResource } from '../../src/types';
 
-class SampleDetector implements Detector {
-  async detect(): Promise<Resource> {
-    return new Resource({
-      [SEMRESATTRS_CLOUD_PROVIDER]: 'provider',
-      [SEMRESATTRS_CLOUD_ACCOUNT_ID]: 'accountId',
-      [SEMRESATTRS_CLOUD_REGION]: 'region',
-      [SEMRESATTRS_CLOUD_AVAILABILITY_ZONE]: 'zone',
-      [SEMRESATTRS_HOST_ID]: 'instanceId',
-      [SEMRESATTRS_HOST_TYPE]: 'instanceType',
-    });
+class SampleDetector implements ResourceDetector {
+  detect(): DetectedResource {
+    return {
+      attributes: {
+        [SEMRESATTRS_CLOUD_PROVIDER]: 'provider',
+        [SEMRESATTRS_CLOUD_ACCOUNT_ID]: 'accountId',
+        [SEMRESATTRS_CLOUD_REGION]: 'region',
+        [SEMRESATTRS_CLOUD_AVAILABILITY_ZONE]: 'zone',
+        [SEMRESATTRS_HOST_ID]: 'instanceId',
+        [SEMRESATTRS_HOST_TYPE]: 'instanceType',
+      },
+    };
   }
 }
 

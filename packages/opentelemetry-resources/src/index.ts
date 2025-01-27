@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-export { Resource } from './Resource';
-export { IResource } from './IResource';
-export { defaultServiceName } from './platform';
-export { DetectorSync, Detector } from './types';
 export { ResourceDetectionConfig } from './config';
+export { detectResources } from './detect-resources';
 export {
   browserDetector,
-  browserDetectorSync,
   envDetector,
-  envDetectorSync,
   hostDetector,
-  hostDetectorSync,
   osDetector,
-  osDetectorSync,
   processDetector,
-  processDetectorSync,
-  serviceInstanceIdDetectorSync,
+  serviceInstanceIdDetector,
 } from './detectors';
-export { detectResourcesSync, detectResources } from './detect-resources';
+export { IResource } from './IResource';
+export { defaultServiceName } from './platform';
+export { Resource } from './Resource';
+export {
+  ResourceDetector,
+  DetectedResource,
+  DetectedResourceAttributes,
+  RawResourceAttribute,
+  MaybePromise,
+} from './types';

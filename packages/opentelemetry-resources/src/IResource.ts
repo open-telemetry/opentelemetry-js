@@ -15,6 +15,7 @@
  */
 
 import { Attributes } from '@opentelemetry/api';
+import { RawResourceAttribute } from './types';
 
 /**
  * An interface that represents a resource. A Resource describes the entity for which signals (metrics or trace) are
@@ -28,7 +29,7 @@ export interface IResource {
    *
    * @returns true if the resource "attributes" property is not yet settled to its final value
    */
-  asyncAttributesPending?: boolean;
+  readonly asyncAttributesPending?: boolean;
 
   /**
    * @returns the Resource's attributes.
@@ -51,4 +52,6 @@ export interface IResource {
    * @returns the newly merged Resource.
    */
   merge(other: IResource | null): IResource;
+
+  getRawAttributes(): RawResourceAttribute[];
 }

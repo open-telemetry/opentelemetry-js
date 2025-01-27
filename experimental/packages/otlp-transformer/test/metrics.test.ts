@@ -303,7 +303,9 @@ describe('Metrics', () => {
 
   function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
     const resource = new Resource({
-      'resource-attribute': 'resource attribute value',
+      attributes: {
+        'resource-attribute': 'resource attribute value',
+      },
     });
     return {
       resource: resource,

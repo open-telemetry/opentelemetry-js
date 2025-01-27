@@ -40,9 +40,11 @@ export const mockedReadableSpan: ReadableSpan = {
   events: [],
   duration: [0, 8885000],
   resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
+    attributes: {
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    },
   }),
   instrumentationScope: { name: 'default', version: '0.0.1' },
   droppedAttributesCount: 0,

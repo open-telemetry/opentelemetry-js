@@ -232,7 +232,9 @@ describe('Trace', () => {
 
   beforeEach(() => {
     resource = new Resource({
-      'resource-attribute': 'resource attribute value',
+      attributes: {
+        'resource-attribute': 'resource attribute value',
+      },
     });
     span = {
       spanContext: () => ({

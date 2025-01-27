@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { envDetector, IResource } from '../../../src';
-import {
-  assertK8sResource,
-  assertEmptyResource,
-} from '../../util/resource-assertions';
+import { envDetector, Resource } from '../../../src';
 import { describeNode } from '../../util';
+import {
+  assertEmptyResource,
+  assertK8sResource,
+} from '../../util/resource-assertions';
 
 describeNode('envDetector() on Node.js', () => {
   describe('with valid env', () => {
@@ -33,7 +33,7 @@ describeNode('envDetector() on Node.js', () => {
     });
 
     it('should return resource information from environment variable', async () => {
-      const resource: IResource = await envDetector.detect();
+      const resource = new Resource(envDetector.detect());
       assertK8sResource(resource, {
         podName: 'pod-xyz-123',
         clusterName: 'c1',
@@ -57,7 +57,7 @@ describeNode('envDetector() on Node.js', () => {
         });
 
         it('should return empty resource', async () => {
-          const resource: IResource = await envDetector.detect();
+          const resource = new Resource(envDetector.detect());
           assertEmptyResource(resource);
         });
       });
@@ -66,7 +66,7 @@ describeNode('envDetector() on Node.js', () => {
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: IResource = await envDetector.detect();
+      const resource = new Resource(envDetector.detect());
       assertEmptyResource(resource);
     });
   });

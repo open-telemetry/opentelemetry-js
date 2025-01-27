@@ -857,7 +857,8 @@ async function validateExport(
 
   const { scope, metrics } = scopeMetrics[0];
 
-  assert.deepStrictEqual(resource, defaultResource);
+  assert.ok(!resource.asyncAttributesPending);
+  assert.deepStrictEqual(resource.attributes, defaultResource.attributes);
   assert.deepStrictEqual(scope, defaultInstrumentationScope);
 
   const metric = metrics[0];

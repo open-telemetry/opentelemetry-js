@@ -166,10 +166,14 @@ describe('Logs', () => {
 
   beforeEach(() => {
     resource_1 = new Resource({
-      'resource-attribute': 'some attribute value',
+      attributes: {
+        'resource-attribute': 'some attribute value',
+      },
     });
     resource_2 = new Resource({
-      'resource-attribute': 'another attribute value',
+      attributes: {
+        'resource-attribute': 'another attribute value',
+      },
     });
     scope_1 = {
       name: 'scope_name_1',

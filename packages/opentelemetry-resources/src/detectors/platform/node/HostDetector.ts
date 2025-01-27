@@ -14,18 +14,34 @@
  * limitations under the License.
  */
 
-import { Detector } from '../../../types';
+import {
+  SEMRESATTRS_HOST_ARCH,
+  SEMRESATTRS_HOST_ID,
+  SEMRESATTRS_HOST_NAME,
+} from '@opentelemetry/semantic-conventions';
+import { arch, hostname } from 'os';
 import { ResourceDetectionConfig } from '../../../config';
-import { IResource } from '../../../IResource';
-import { hostDetectorSync } from './HostDetectorSync';
+import {
+  DetectedResource,
+  DetectedResourceAttributes,
+  ResourceDetector,
+} from '../../../types';
+import { getMachineId } from './machine-id/getMachineId';
+import { normalizeArch } from './utils';
 
 /**
  * HostDetector detects the resources related to the host current process is
  * running on. Currently only non-cloud-based attributes are included.
  */
-class HostDetector implements Detector {
-  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(hostDetectorSync.detect(_config));
+class HostDetector implements ResourceDetector {
+  detect(_config?: ResourceDetectionConfig): DetectedResource {
+    const attributes: DetectedResourceAttributes = {
+      [SEMRESATTRS_HOST_NAME]: hostname(),
+      [SEMRESATTRS_HOST_ARCH]: normalizeArch(arch()),
+      [SEMRESATTRS_HOST_ID]: getMachineId(),
+    };
+
+    return { attributes };
   }
 }
 

@@ -45,7 +45,7 @@ export type Measurement = {
 
 export const defaultResource = Resource.default().merge(
   new Resource({
-    resourceKey: 'my-resource',
+    attributes: { resourceKey: 'my-resource' },
   })
 );
 

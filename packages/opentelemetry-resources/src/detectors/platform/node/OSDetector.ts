@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-import { Detector } from '../../../types';
+import { Attributes } from '@opentelemetry/api';
+import {
+  SEMRESATTRS_OS_TYPE,
+  SEMRESATTRS_OS_VERSION,
+} from '@opentelemetry/semantic-conventions';
+import { platform, release } from 'os';
 import { ResourceDetectionConfig } from '../../../config';
-import { IResource } from '../../../IResource';
-import { osDetectorSync } from './OSDetectorSync';
+import { DetectedResource, ResourceDetector } from '../../../types';
+import { normalizeType } from './utils';
 
 /**
  * OSDetector detects the resources related to the operating system (OS) on
  * which the process represented by this resource is running.
  */
-class OSDetector implements Detector {
-  detect(_config?: ResourceDetectionConfig): Promise<IResource> {
-    return Promise.resolve(osDetectorSync.detect(_config));
+class OSDetector implements ResourceDetector {
+  detect(_config?: ResourceDetectionConfig): DetectedResource {
+    const attributes: Attributes = {
+      [SEMRESATTRS_OS_TYPE]: normalizeType(platform()),
+      [SEMRESATTRS_OS_VERSION]: release(),
+    };
+    return { attributes };
   }
 }
 

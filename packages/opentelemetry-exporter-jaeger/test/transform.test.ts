@@ -74,9 +74,11 @@ describe('transform', () => {
         ],
         duration: [32, 800000000],
         resource: new Resource({
-          service: 'ui',
-          version: 1,
-          cost: 112.12,
+          attributes: {
+            service: 'ui',
+            version: 1,
+            cost: 112.12,
+          },
         }),
         instrumentationScope: {
           name: 'default',
@@ -177,7 +179,7 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.empty(),
+        resource: Resource.EMPTY,
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -247,7 +249,7 @@ describe('transform', () => {
         ],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.empty(),
+        resource: Resource.EMPTY,
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -295,7 +297,7 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.empty(),
+        resource: Resource.EMPTY,
         instrumentationScope: {
           name: 'default',
           version: '0.0.1',
@@ -357,9 +359,11 @@ describe('transform', () => {
         ],
         duration: [32, 800000000],
         resource: new Resource({
-          service: 'ui',
-          version: 1,
-          cost: 112.12,
+          attributes: {
+            service: 'ui',
+            version: 1,
+            cost: 112.12,
+          },
         }),
         instrumentationScope: {
           name: 'default',

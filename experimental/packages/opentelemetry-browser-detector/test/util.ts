@@ -16,7 +16,7 @@
 import { Suite } from 'mocha';
 import * as assert from 'assert';
 import { BROWSER_ATTRIBUTES } from '../src/types';
-import { IResource } from '@opentelemetry/resources';
+import { DetectedResource } from '@opentelemetry/resources';
 
 export function describeBrowser(title: string, fn: (this: Suite) => void) {
   title = `Browser: ${title}`;
@@ -27,7 +27,7 @@ export function describeBrowser(title: string, fn: (this: Suite) => void) {
 }
 
 export const assertResource = (
-  resource: IResource,
+  resource: DetectedResource,
   validations: {
     platform?: string;
     brands?: string[];
@@ -38,32 +38,32 @@ export const assertResource = (
 ) => {
   if (validations.platform) {
     assert.strictEqual(
-      resource.attributes[BROWSER_ATTRIBUTES.PLATFORM],
+      resource.attributes?.[BROWSER_ATTRIBUTES.PLATFORM],
       validations.platform
     );
   }
   if (validations.brands) {
-    assert.ok(Array.isArray(resource.attributes[BROWSER_ATTRIBUTES.BRANDS]));
+    assert.ok(Array.isArray(resource.attributes?.[BROWSER_ATTRIBUTES.BRANDS]));
     assert.deepStrictEqual(
-      resource.attributes[BROWSER_ATTRIBUTES.BRANDS] as string[],
+      resource.attributes?.[BROWSER_ATTRIBUTES.BRANDS] as string[],
       validations.brands
     );
   }
   if (validations.mobile) {
     assert.strictEqual(
-      resource.attributes[BROWSER_ATTRIBUTES.MOBILE],
+      resource.attributes?.[BROWSER_ATTRIBUTES.MOBILE],
       validations.mobile
     );
   }
   if (validations.language) {
     assert.strictEqual(
-      resource.attributes[BROWSER_ATTRIBUTES.LANGUAGE],
+      resource.attributes?.[BROWSER_ATTRIBUTES.LANGUAGE],
       validations.language
     );
   }
   if (validations.user_agent) {
     assert.strictEqual(
-      resource.attributes[BROWSER_ATTRIBUTES.USER_AGENT],
+      resource.attributes?.[BROWSER_ATTRIBUTES.USER_AGENT],
       validations.user_agent
     );
   }
@@ -74,6 +74,6 @@ export const assertResource = (
  *
  * @param resource the Resource to validate
  */
-export const assertEmptyResource = (resource: IResource) => {
-  assert.strictEqual(Object.keys(resource.attributes).length, 0);
+export const assertEmptyResource = (resource: DetectedResource) => {
+  assert.strictEqual(Object.keys(resource.attributes ?? {}).length, 0);
 };

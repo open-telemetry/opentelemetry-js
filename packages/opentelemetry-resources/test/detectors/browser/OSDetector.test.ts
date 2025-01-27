@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { osDetector, IResource } from '../../../src';
-import { assertEmptyResource } from '../../util/resource-assertions';
+import { osDetector } from '../../../src';
 import { describeBrowser } from '../../util';
+import { assertEmptyResource } from '../../util/resource-assertions';
 
 describeBrowser('osDetector() on web browser', () => {
   afterEach(() => {
@@ -24,7 +24,7 @@ describeBrowser('osDetector() on web browser', () => {
   });
 
   it('should return empty resource', async () => {
-    const resource: IResource = await osDetector.detect();
+    const resource = osDetector.detect();
     assertEmptyResource(resource);
   });
 });

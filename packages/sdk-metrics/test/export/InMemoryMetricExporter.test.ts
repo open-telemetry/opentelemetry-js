@@ -70,7 +70,9 @@ describe('InMemoryMetricExporter', () => {
   it('should return failed result code', done => {
     exporter.shutdown().then(() => {
       const resource = new Resource({
-        'resource-attribute': 'resource attribute value',
+        attributes: {
+          'resource-attribute': 'resource attribute value',
+        },
       });
       const resourceMetrics: ResourceMetrics = {
         resource: resource,
