@@ -39,7 +39,11 @@ import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils';
  * https://w3c.github.io/baggage/
  */
 export class W3CBaggagePropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void {
     const baggage = propagation.getBaggage(context);
     if (!baggage || isTracingSuppressed(context)) return;
     const keyPairs = getKeyPairs(baggage)
@@ -53,7 +57,11 @@ export class W3CBaggagePropagator implements TextMapPropagator {
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ): Context {
     const headerValue = getter.get(carrier, BAGGAGE_HEADER);
     const baggageString = Array.isArray(headerValue)
       ? headerValue.join(BAGGAGE_ITEMS_SEPARATOR)

@@ -63,7 +63,11 @@ export class JaegerPropagator implements TextMapPropagator {
     }
   }
 
-  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+  inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void {
     const spanContext = trace.getSpanContext(context);
     const baggage = propagation.getBaggage(context);
     if (spanContext && isTracingSuppressed(context) === false) {
@@ -89,7 +93,11 @@ export class JaegerPropagator implements TextMapPropagator {
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+  extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ): Context {
     const uberTraceIdHeader = getter.get(carrier, this._jaegerTraceHeader);
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]

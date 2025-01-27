@@ -18,8 +18,6 @@ import * as assert from 'assert';
 import api, {
   context,
   Context,
-  defaultTextMapGetter,
-  defaultTextMapSetter,
   diag,
   metrics,
   propagation,
@@ -137,31 +135,23 @@ describe('API', () => {
     describe('should use the global propagation', () => {
       const testKey = Symbol('kTestKey');
 
-      interface Carrier {
-        context?: Context;
-        setter?: TextMapSetter;
-      }
+      type Carrier = Record<string, string | undefined>;
 
-      class TestTextMapPropagation implements TextMapPropagator<Carrier> {
-        inject(
+      class TestTextMapPropagation implements TextMapPropagator {
+        inject<C>(
           context: Context,
-          carrier: Carrier,
-          setter: TextMapSetter
+          carrier: C,
+          setter: TextMapSetter<C>
         ): void {
-          carrier.context = context;
-          carrier.setter = setter;
+          setter.set(carrier, 'TestField', String(context.getValue(testKey)));
         }
 
-        extract(
+        extract<C>(
           context: Context,
-          carrier: Carrier,
-          getter: TextMapGetter
+          carrier: C,
+          getter: TextMapGetter<C>
         ): Context {
-          return context.setValue(testKey, {
-            context,
-            carrier,
-            getter,
-          });
+          return context.setValue(testKey, getter.get(carrier, 'TestField'));
         }
 
         fields(): string[] {
@@ -172,41 +162,40 @@ describe('API', () => {
       it('inject', () => {
         api.propagation.setGlobalPropagator(new TestTextMapPropagation());
 
-        const context = ROOT_CONTEXT.setValue(testKey, 15);
+        const context = ROOT_CONTEXT.setValue(testKey, 'test-value');
         const carrier: Carrier = {};
         api.propagation.inject(context, carrier);
-        assert.strictEqual(carrier.context, context);
-        assert.strictEqual(carrier.setter, defaultTextMapSetter);
+        assert.strictEqual(carrier['TestField'], 'test-value');
 
-        const setter: TextMapSetter = {
-          set: () => {},
+        const setter: TextMapSetter<Carrier> = {
+          set: (carrier, key, value) => {
+            carrier[key.toLowerCase()] = value.toUpperCase();
+          },
         };
         api.propagation.inject(context, carrier, setter);
-        assert.strictEqual(carrier.context, context);
-        assert.strictEqual(carrier.setter, setter);
+        assert.strictEqual(carrier['testfield'], 'TEST-VALUE');
       });
 
       it('extract', () => {
         api.propagation.setGlobalPropagator(new TestTextMapPropagation());
 
-        const carrier: Carrier = {};
-        let context = api.propagation.extract(ROOT_CONTEXT, carrier);
-        let data: any = context.getValue(testKey);
-        assert.ok(data != null);
-        assert.strictEqual(data.context, ROOT_CONTEXT);
-        assert.strictEqual(data.carrier, carrier);
-        assert.strictEqual(data.getter, defaultTextMapGetter);
+        let context = api.propagation.extract(ROOT_CONTEXT, {
+          TestField: 'test-value',
+        });
+        let data = context.getValue(testKey);
+        assert.strictEqual(data, 'test-value');
 
-        const getter: TextMapGetter = {
-          keys: () => [],
-          get: () => undefined,
+        const getter: TextMapGetter<Carrier> = {
+          keys: carrier => Object.keys(carrier),
+          get: (carrier, key) => carrier[key.toLowerCase()],
         };
-        context = api.propagation.extract(ROOT_CONTEXT, carrier, getter);
+        context = api.propagation.extract(
+          ROOT_CONTEXT,
+          { testfield: 'TEST-VALUE' },
+          getter
+        );
         data = context.getValue(testKey);
-        assert.ok(data != null);
-        assert.strictEqual(data.context, ROOT_CONTEXT);
-        assert.strictEqual(data.carrier, carrier);
-        assert.strictEqual(data.getter, getter);
+        assert.strictEqual(data, 'TEST-VALUE');
       });
 
       it('fields', () => {

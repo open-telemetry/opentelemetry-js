@@ -76,10 +76,23 @@ export class PropagationAPI {
    * @param carrier carrier to inject context into
    * @param setter Function used to set values on the carrier
    */
+  public inject<Carrier extends object | null | undefined>(
+    context: Context,
+    carrier: Carrier,
+    setter?: TextMapSetter<Carrier>
+  ): void;
   public inject<Carrier>(
     context: Context,
     carrier: Carrier,
-    setter: TextMapSetter<Carrier> = defaultTextMapSetter
+    setter: TextMapSetter<Carrier>
+  ): void;
+  public inject<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    // Note: this is only safe as long as the TypeScript overloads are enforced.
+    // If an incompatible `Carrier` is paired with `defaultTextMapSetter`, it
+    // will error at runtime when the operation is performed.
+    setter: TextMapSetter<Carrier> = defaultTextMapSetter as TextMapSetter<Carrier>
   ): void {
     return this._getGlobalPropagator().inject(context, carrier, setter);
   }
@@ -91,10 +104,23 @@ export class PropagationAPI {
    * @param carrier Carrier to extract context from
    * @param getter Function used to extract keys from a carrier
    */
+  public extract<Carrier extends object | null | undefined>(
+    context: Context,
+    carrier: Carrier,
+    getter?: TextMapGetter<Carrier>
+  ): Context;
   public extract<Carrier>(
     context: Context,
     carrier: Carrier,
-    getter: TextMapGetter<Carrier> = defaultTextMapGetter
+    getter: TextMapGetter<Carrier>
+  ): Context;
+  public extract<Carrier>(
+    context: Context,
+    carrier: Carrier,
+    // Note: this is only safe as long as the TypeScript overloads are enforced.
+    // If an incompatible `Carrier` is paired with `defaultTextMapSetter`, it
+    // will error at runtime when the operation is performed.
+    getter: TextMapGetter<Carrier> = defaultTextMapGetter as TextMapGetter<Carrier>
   ): Context {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }

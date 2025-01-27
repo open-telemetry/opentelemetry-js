@@ -23,9 +23,7 @@ import {
   ContextManager,
   propagation,
   ROOT_CONTEXT,
-  TextMapGetter,
   TextMapPropagator,
-  TextMapSetter,
   trace,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -247,14 +245,10 @@ describe('NodeTracerProvider', () => {
 
   describe('Custom TracerProvider through inheritance', () => {
     class DummyPropagator implements TextMapPropagator {
-      inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
+      inject(): void {
         throw new Error('Method not implemented.');
       }
-      extract(
-        context: Context,
-        carrier: any,
-        getter: TextMapGetter<any>
-      ): Context {
+      extract(): Context {
         throw new Error('Method not implemented.');
       }
       fields(): string[] {
