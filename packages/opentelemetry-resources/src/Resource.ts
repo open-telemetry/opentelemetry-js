@@ -77,7 +77,7 @@ export class Resource implements IResource {
     });
   }
 
-  public get asyncAttributesPending() {
+  public get asyncAttributesPending(): boolean {
     return this._asyncAttributesPending;
   }
 
@@ -129,7 +129,7 @@ export class Resource implements IResource {
     return attrs;
   }
 
-  public getRawAttributes() {
+  public getRawAttributes(): RawResourceAttribute[] {
     return this._rawAttributes;
   }
 

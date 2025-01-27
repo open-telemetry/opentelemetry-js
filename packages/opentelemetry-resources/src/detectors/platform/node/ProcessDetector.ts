@@ -28,14 +28,14 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as os from 'os';
 import { ResourceDetectionConfig } from '../../../config';
-import { ResourceDetector } from '../../../types';
+import { DetectedResource, ResourceDetector } from '../../../types';
 
 /**
  * ProcessDetector will be used to detect the resources related current process running
  * and being instrumented from the NodeJS Process module.
  */
 class ProcessDetector implements ResourceDetector {
-  detect(_config?: ResourceDetectionConfig) {
+  detect(_config?: ResourceDetectionConfig): DetectedResource {
     const attributes: Attributes = {
       [SEMRESATTRS_PROCESS_PID]: process.pid,
       [SEMRESATTRS_PROCESS_EXECUTABLE_NAME]: process.title,

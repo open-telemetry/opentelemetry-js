@@ -21,13 +21,13 @@ import {
   SEMRESATTRS_PROCESS_RUNTIME_VERSION,
 } from '@opentelemetry/semantic-conventions';
 import { ResourceDetectionConfig } from '../config';
-import { ResourceDetector } from '../types';
+import { DetectedResource, ResourceDetector } from '../types';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.
  */
 class BrowserDetector implements ResourceDetector {
-  detect(config?: ResourceDetectionConfig) {
+  detect(config?: ResourceDetectionConfig): DetectedResource {
     const isBrowser =
       typeof navigator !== 'undefined' &&
       global.process?.versions?.node === undefined && // Node.js v21 adds `navigator`

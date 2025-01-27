@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { ResourceDetector } from '../types';
+import { DetectedResource, ResourceDetector } from '../types';
 
 export class NoopDetector implements ResourceDetector {
-  detect() {
+  detect(): DetectedResource {
     return {
       attributes: {},
     };

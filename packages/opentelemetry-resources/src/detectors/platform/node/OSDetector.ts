@@ -21,7 +21,7 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { platform, release } from 'os';
 import { ResourceDetectionConfig } from '../../../config';
-import { ResourceDetector } from '../../../types';
+import { DetectedResource, ResourceDetector } from '../../../types';
 import { normalizeType } from './utils';
 
 /**
@@ -29,7 +29,7 @@ import { normalizeType } from './utils';
  * which the process represented by this resource is running.
  */
 class OSDetector implements ResourceDetector {
-  detect(_config?: ResourceDetectionConfig) {
+  detect(_config?: ResourceDetectionConfig): DetectedResource {
     const attributes: Attributes = {
       [SEMRESATTRS_OS_TYPE]: normalizeType(platform()),
       [SEMRESATTRS_OS_VERSION]: release(),
