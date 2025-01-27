@@ -15,6 +15,18 @@ All notable changes to experimental packages in this project will be documented 
   * Previously, the fetch instrumentation code unconditionally clones every `fetch()` response in order to preserve the ability for the `applyCustomAttributes` hook to consume the response body. This is fundamentally unsound, as it forces the browser to buffer and retain the response body until it is fully received and read, which crates unnecessary memory pressure on large or long-running response streams. In extreme cases, this is effectively a memory leak and can cause the browser tab to crash. If your use case for `applyCustomAttributes` requires access to the response body, please chime in on [#5293](https://github.com/open-telemetry/opentelemetry-js/issues/5293).
 * feat(sdk-node)!: use `IMetricReader` over `MetricReader` [#5311](https://github.com/open-telemetry/opentelemetry-js/pull/5311)
   * (user-facing): `NodeSDKConfiguration` now provides the more general `IMetricReader` type over `MetricReader`
+* feat(oltp-transformer)!: move each serializer to its own entrypoint [#5263](https://github.com/open-telemetry/opentelemetry-js/pull/5263) @pichlermarc
+  * This package depends on all signals, as well as `protobuf.js`, so some bundlers like rollup would issue warnings even if the user made a conscious decision to not use a protobuf exporter
+  * (user-facing) All types except for `ISerializer` were removed from the main entrypoint, to get previously exported types, use the following entrypoints
+    * `@opentelemetry/otlp-transformer/metrics`: metrics export service return types
+    * `@opentelemetry/otlp-transformer/metrics/json`: metrics json serializer
+    * `@opentelemetry/otlp-transformer/metrics/protobuf`: metrics protobuf serializer
+    * `@opentelemetry/otlp-transformer/trace`: trace export service return types
+    * `@opentelemetry/otlp-transformer/trace/trace`: trace json serializer
+    * `@opentelemetry/otlp-transformer/trace/protobuf`: trace protobuf serializer
+    * `@opentelemetry/otlp-transformer/logs`: logs export service return types
+    * `@opentelemetry/otlp-transformer/logs/trace`: logs export service return types
+    * `@opentelemetry/otlp-transformer/logs/protobuf`: logs export service return types
 
 ### :rocket: (Enhancement)
 
