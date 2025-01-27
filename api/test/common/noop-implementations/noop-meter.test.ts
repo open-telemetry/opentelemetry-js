@@ -37,7 +37,7 @@ const options = {
 describe('NoopMeter', () => {
   it('constructor should not crash', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
-    assert(meter instanceof NoopMeter);
+    assert.ok(meter instanceof NoopMeter);
   });
 
   it('counter should not crash', () => {

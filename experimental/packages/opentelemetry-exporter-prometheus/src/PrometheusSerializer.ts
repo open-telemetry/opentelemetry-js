@@ -104,15 +104,12 @@ function enforcePrometheusNamingConvention(
 }
 
 function valueString(value: number) {
-  if (Number.isNaN(value)) {
-    return 'NaN';
-  } else if (!Number.isFinite(value)) {
-    if (value < 0) {
-      return '-Inf';
-    } else {
-      return '+Inf';
-    }
+  if (value === Infinity) {
+    return '+Inf';
+  } else if (value === -Infinity) {
+    return '-Inf';
   } else {
+    // Handle finite numbers and NaN.
     return `${value}`;
   }
 }
