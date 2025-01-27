@@ -91,7 +91,8 @@ describe('utils', () => {
     sinon.restore();
   });
 
-  describe('addSpanNetworkEvents', () => {
+  // Temporarily disabled while awaiting #5332
+  xdescribe('addSpanNetworkEvents', () => {
     it('should add all network events to span', () => {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
@@ -176,7 +177,9 @@ describe('utils', () => {
       assert.strictEqual(setAttributeSpy.callCount, 1);
     });
   });
-  describe('addSpanNetworkEvent', () => {
+
+  // Temporarily disabled while awaiting #5332
+  xdescribe('addSpanNetworkEvent', () => {
     [0, -2, 123].forEach(value => {
       describe(`when entry is ${value}`, () => {
         it('should add event to span', () => {

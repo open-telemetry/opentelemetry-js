@@ -75,6 +75,7 @@
     "karma-webpack": "5.0.1",
     "lerna": "6.6.2",
     "mocha": "10.8.2",
+    "msw": "^2.7.0",
     "nyc": "17.1.0",
     "sinon": "15.1.2",
     "ts-loader": "9.5.2",
@@ -92,5 +93,10 @@
     "@opentelemetry/semantic-conventions": "1.28.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch",
-  "sideEffects": false
+  "sideEffects": false,
+  "msw": {
+    "workerDirectory": [
+      "test"
+    ]
+  }
 }
