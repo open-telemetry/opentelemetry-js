@@ -23,6 +23,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation-grpc): monitor error events with events.errorMonitor [#5369](https://github.com/open-telemetry/opentelemetry-js/pull/5369) @cjihrig
 * fix(exporter-metrics-otlp-http): browser OTLPMetricExporter was not passing config to OTLPMetricExporterBase super class [#5331](https://github.com/open-telemetry/opentelemetry-js/pull/5331) @trentm
 
 ### :books: (Refine Doc)
