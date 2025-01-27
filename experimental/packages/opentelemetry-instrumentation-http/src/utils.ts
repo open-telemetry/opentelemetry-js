@@ -393,15 +393,25 @@ export const getRequestInfo = (
 
 /**
  * Makes sure options is of type string or object
+ * If a string, make sure the URL has no authentication credentials (username/password)
  * @param options for the request
  */
+
 export const isValidOptionsType = (options: unknown): boolean => {
   if (!options) {
     return false;
   }
 
   const type = typeof options;
-  return type === 'string' || (type === 'object' && !Array.isArray(options));
+
+  if (type === 'string') {
+    const parsedUrl = url.parse(options as string);
+    if (!parsedUrl.auth) {
+      return true;
+    }
+  }
+
+  return type === 'object' && !Array.isArray(options);
 };
 
 export const extractHostnameAndPort = (
