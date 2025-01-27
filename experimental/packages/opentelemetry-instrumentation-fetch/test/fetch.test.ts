@@ -51,6 +51,7 @@ import {
   SEMATTRS_HTTP_USER_AGENT,
   SEMATTRS_HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
 } from '@opentelemetry/semantic-conventions';
+import { FetchRequestCustomAttributeFunction } from '../src/fetch';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -182,6 +183,7 @@ describe('fetch', () => {
   let webTracerProviderWithZone: WebTracerProvider;
   let dummySpanExporter: DummySpanExporter;
   let exportSpy: any;
+  let requestInit: RequestInit;
   let clearResourceTimingsSpy: any;
   let rootSpan: api.Span;
   let fakeNow = 0;
@@ -213,6 +215,8 @@ describe('fetch', () => {
       // Once upon a time, there was a bug (#2411), causing a `Request` object
       // to be incorrectly passed to `fetch()` as the second argument
       assert.ok(!(init instanceof Request));
+
+      requestInit = init;
 
       return new Promise((resolve, reject) => {
         const responseInit: ResponseInit = {};
@@ -958,6 +962,46 @@ describe('fetch', () => {
          ```
       */
       assert.strictEqual(response.bodyUsed, false);
+    });
+  });
+
+  describe('requestHook option', () => {
+    const prepare = async (
+      url: string,
+      requestHook: FetchRequestCustomAttributeFunction
+    ) => {
+      const propagateTraceHeaderCorsUrls = [url];
+
+      await prepareData(url, () => getData(url), {
+        propagateTraceHeaderCorsUrls,
+        requestHook,
+      });
+    };
+
+    afterEach(() => {
+      clearData();
+    });
+
+    it('applies attributes before sending the request', async () => {
+      await prepare(url, span => {
+        span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+      });
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const attributes = span.attributes;
+
+      assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+    });
+
+    it('applies headers before sending the request', async () => {
+      await prepare(url, (span, request) => {
+        (request.headers as Record<string, string>)['traceparent'] =
+          'custom value';
+      });
+
+      assert.ok(
+        (requestInit.headers as Record<string, string>)['traceparent'] ===
+          'custom value'
+      );
     });
   });
 
