@@ -49,7 +49,7 @@ for (const contextManagerClass of [
       it('should work', () => {
         assert.doesNotThrow(() => {
           contextManager = new contextManagerClass();
-          assert(
+          assert.ok(
             contextManager.enable() === contextManager,
             'should return this'
           );
@@ -60,7 +60,7 @@ for (const contextManagerClass of [
     describe('.disable()', () => {
       it('should work', () => {
         assert.doesNotThrow(() => {
-          assert(
+          assert.ok(
             contextManager.disable() === contextManager,
             'should return this'
           );

@@ -1369,10 +1369,10 @@ describe('HttpInstrumentation', () => {
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
-        assert(
+        assert.ok(
           result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !== undefined
         );
-        assert(
+        assert.ok(
           result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !== undefined
         );
         const spans = memoryExporter.getFinishedSpans();
@@ -1393,10 +1393,10 @@ describe('HttpInstrumentation', () => {
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
-        assert(
+        assert.ok(
           result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !== undefined
         );
-        assert(
+        assert.ok(
           result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !== undefined
         );
         const spans = memoryExporter.getFinishedSpans();
@@ -1424,11 +1424,11 @@ describe('HttpInstrumentation', () => {
             .get(`${protocol}://${hostname}:${serverPort}${testPath}`)
             .then(result => {
               span.end();
-              assert(
+              assert.ok(
                 result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !==
                   undefined
               );
-              assert(
+              assert.ok(
                 result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !==
                   undefined
               );
@@ -1463,9 +1463,9 @@ describe('HttpInstrumentation', () => {
       it('should set rpc metadata for incoming http request', async () => {
         server = http.createServer((request, response) => {
           const rpcMetadata = getRPCMetadata(context.active());
-          assert(typeof rpcMetadata !== 'undefined');
-          assert(rpcMetadata.type === RPCType.HTTP);
-          assert(rpcMetadata.span.setAttribute('key', 'value'));
+          assert.ok(typeof rpcMetadata !== 'undefined');
+          assert.ok(rpcMetadata.type === RPCType.HTTP);
+          assert.ok(rpcMetadata.span.setAttribute('key', 'value'));
           response.end('Test Server Response');
         });
         await new Promise<void>(resolve => server.listen(serverPort, resolve));

@@ -36,12 +36,14 @@ const collectorOptions = {
 };
 
 const metricExporter = new OTLPMetricExporter(collectorOptions);
-const meterProvider = new MeterProvider({});
-
-meterProvider.addMetricReader(new PeriodicExportingMetricReader({
-  exporter: metricExporter,
-  exportIntervalMillis: 1000,
-}));
+const meterProvider = new MeterProvider({
+  readers: [
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    }),
+  ],
+});
 
 ['SIGINT', 'SIGTERM'].forEach(signal => {
   process.on(signal, () => meterProvider.shutdown().catch(console.error));
